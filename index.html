@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>아르칸 연대기</title>
+<link rel="preload" as="image" href="assets/ui/loading-screen.png" fetchpriority="high">
 <style>
 @font-face { font-family: Galmuri11; src: url(assets/fonts/Galmuri11.woff) format("woff"); font-display: block; }
 :root { --ivory:#faf4e4; --ivory2:#ece2cc; --teal:#287f80; --teal-d:#18565c; --gold:#d6ac54; --gold-d:#a06a10; --ink:#3a2f25; --muted:#8a7a66; --red:#c04a3c; --good:#2f9a52; }
@@ -165,8 +166,17 @@ small { font-size:.8em; }
 .gender { display:flex; gap:8px; } .gender .btn { flex:1; }
 .create .pbtns { width:100%; }
 
-#loading { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:12px; background:#1c2a26; color:var(--ivory); font-size:20px; z-index:10; }
-#loading .t { font-size:40px; color:var(--gold); }
+/* The supplied artwork stays fully visible at every aspect ratio. */
+#loading { position:fixed; inset:0; display:grid; place-items:center; overflow:hidden; background:#142434; color:#fff4da; z-index:10; font-family:"Malgun Gothic",sans-serif; }
+#loading::before { content:""; position:absolute; inset:0; background:linear-gradient(#14243488,#14243488),url(assets/ui/loading-screen.png) center/cover; }
+.loading-art { position:relative; width:min(100vw,121.6359vh); aspect-ratio:1383 / 1137; }
+.loading-art > img { display:block; width:100%; height:100%; }
+.loading-meter { position:absolute; left:28.1%; top:53%; width:48.8%; height:3.9%; display:flex; align-items:center; gap:2%; padding:.35% 1.2%; border:2px solid #eac479; border-radius:999px; background:linear-gradient(#27384b,#0c1826); box-shadow:0 0 0 1px #67451d,inset 0 0 0 1px #8e6b36,0 0 12px #f4c86755; }
+.loading-track { flex:1; height:72%; overflow:hidden; border-radius:999px; background:#07131e; box-shadow:inset 0 1px 4px #000; }
+#loadfill { display:block; width:0; height:100%; border-radius:inherit; background:linear-gradient(#b9efff,#34c7fa 45%,#1684d0); box-shadow:0 0 12px #80e6ff,inset 0 1px 2px #fff; transition:width .2s ease; }
+#loadpercent { flex:none; width:3.4em; text-align:center; font-family:Georgia,serif; font-size:clamp(9px,min(2.2vw,2.68vh),30px); color:#fff0c8; text-shadow:0 1px 3px #000; }
+#loadmsg { position:absolute; bottom:max(16px,env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); max-width:90%; padding:8px 18px; border:1px solid #cfa85c88; border-radius:8px; background:#142434e8; text-align:center; font-size:clamp(12px,1.5vw,18px); overflow-wrap:anywhere; }
+@media (prefers-reduced-motion:reduce) { #loadfill { transition:none; } }
 
 .winopen .toasts { top:auto; bottom:18px; } .winopen .feed { top:auto; bottom:18px; flex-direction:column-reverse; }
 .ver { background:rgba(20,40,44,.7); padding:4px 8px; border-radius:4px; }
@@ -269,7 +279,15 @@ small { font-size:.8em; }
 <body>
 <div id="view"></div>
 <div id="ui"></div>
-<div id="loading"><div class="t">아르칸 연대기</div><div id="loadmsg">불러오는 중...</div></div>
+<div id="loading" aria-label="아르칸 연대기 로딩 화면" aria-busy="true">
+  <div class="loading-art">
+    <img src="assets/ui/loading-screen.png" width="1383" height="1137" alt="아르칸 연대기 — 성 마을을 바라보는 모험가와 고양이" fetchpriority="high">
+    <div class="loading-meter" id="loadprogress" role="progressbar" aria-label="게임 준비 진행률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div class="loading-track"><i id="loadfill"></i></div><span id="loadpercent" aria-hidden="true">0%</span>
+    </div>
+  </div>
+  <div id="loadmsg" role="status" aria-live="polite">자원 불러오는 중...</div>
+</div>
 <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }</script>
 <script type="module" src="js/game.js"></script>
 </body>
