@@ -177,8 +177,23 @@ const DEFAULT_SETTINGS = { music: 0.6, sfx: 0.8, shake: 0.7, damageNumbers: true
 class Game {
   async boot() {
     const st = document.getElementById("loadmsg");
+    // Stage-weighted preparation progress, not downloaded byte percentage.
+    const progress = (value, message) => {
+      const meter = document.getElementById("loadprogress");
+      if (meter) meter.setAttribute("aria-valuenow", String(value));
+      const fill = document.getElementById("loadfill");
+      if (fill) fill.style.width = value + "%";
+      const percent = document.getElementById("loadpercent");
+      if (percent) percent.textContent = value + "%";
+      if (st && message) st.textContent = message;
+    };
+    progress(0, "게임 데이터 불러오는 중...");
     const names = ["config", "levels", "jobs", "skills", "skills2", "items", "monsters", "quests", "npcs", "zones"];
-    const files = {}; await Promise.all(names.map(async n => files[n] = await fetchJson("assets/data/" + n + ".json")));
+    let dataDone = 0;
+    const files = {}; await Promise.all(names.map(async n => {
+      files[n] = await fetchJson("assets/data/" + n + ".json");
+      progress(Math.round(++dataDone / names.length * 15));
+    }));
     this.data = new GameData(files);
     const errs = this.data.validate(); for (const e of errs) console.error("[Arcan data]", e);
     this.store = new SaveStore();
@@ -190,19 +205,27 @@ class Game {
     import('./skillfx.js').then(m => { this.skillFx = new m.SkillFx(this.render.scene); this.skillFx.onShake = (a, d) => this.render.addShake(a, d); m.SkillFx.reduceFlash = !!this.reduceFlash; }).catch(e => console.warn('skillfx', e));
     this.ui = new UI(document.getElementById("ui"));
     this.loadSheet = loadSheet; this.timeScale = 1; this.simSteps = Math.max(1, Math.min(8, parseInt(new URLSearchParams(location.search).get("sim")) || 1)); this.timers = []; this.session = 0; this.autoSaveT = 0;
-    if (st) st.textContent = "자원 불러오는 중...";
+    progress(15, "캐릭터와 자원 불러오는 중...");
     const sheetNames = new Set();
     for (const m of Object.values(this.data.monsters)) sheetNames.add(m.sheet);
     for (const n of Object.values(this.data.npcs)) sheetNames.add(n.sheet);
-    await Promise.all([this.fx.load(), this.ui.load(), loadPlayerModel("m"), loadPlayerModel("f"), loadActions(), document.fonts && document.fonts.load("16px Galmuri11").catch(() => { }), ...[...sheetNames].map(n => loadSheet(n))]);
+    const resources = [this.fx.load(), this.ui.load(), loadPlayerModel("m"), loadPlayerModel("f"), loadActions(), document.fonts && document.fonts.load("16px Galmuri11").catch(() => { }), ...[...sheetNames].map(n => loadSheet(n))];
+    let resourceDone = 0;
+    await Promise.all(resources.map(async task => {
+      await task;
+      progress(15 + Math.round(++resourceDone / resources.length * 60));
+    }));
+    progress(75, "텍스처 준비하는 중...");
     await preloadTextures([...sheetNames].map(n => "assets/sprites/" + n + ".png").concat(["assets/fx/effects.png", "assets/ui/icons.png", "assets/ui/shadow.png"]));
     const unlock = () => this.audio.unlock();
     addEventListener("pointerdown", unlock); addEventListener("keydown", unlock);
     document.addEventListener("visibilitychange", () => { if (document.hidden) this.autoSave(); });
     addEventListener("pagehide", () => this.autoSave());
     this.applySettings();
+    progress(85, "성 마을 준비하는 중...");
     await this.showTitle();
-    if (st) st.parentElement.remove();
+    progress(100, "준비 완료");
+    document.getElementById("loading")?.remove();
     this.last = performance.now();
     requestAnimationFrame(t => this.frame(t));
   }

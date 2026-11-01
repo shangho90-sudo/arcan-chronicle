@@ -249,7 +249,7 @@ export class UI {
     if (name !== "dialog" && window.ResizeObserver) { const ro = new ResizeObserver(() => { if (this.current === wnd) this.fit(); else ro.disconnect(); }); ro.observe(wnd); }
     return body;
   }
-  fit() { if (!this.current || this.currentName === "dialog") return; const w = this.current; w.style.transform = ""; const s = Math.min(1, (innerWidth - 20) / w.offsetWidth, (innerHeight - 20) / w.offsetHeight); w.style.transform = `translate(-50%,-50%) scale(${s})`; }
+  fit() { if (!this.current || this.currentName === "dialog" || this.currentName === "title") return; const w = this.current; w.style.transform = ""; const s = Math.min(1, (innerWidth - 20) / w.offsetWidth, (innerHeight - 20) / w.offsetHeight); w.style.transform = `translate(-50%,-50%) scale(${s})`; }
   close(notify = true) {
     const was = !!this.current;
     if (this.current) this.current.remove(); if (this.dim) this.dim.remove();
@@ -406,11 +406,19 @@ export class UI {
   showTitle(info, cont, ng) {
     const b = this.open("title", null, 1000, 0, false, false);
     this.current.classList.add("titlewin");
-    $("div", "logo panel-dark", b, `<img class="tp l" src="assets/ui/portrait_boy.png" alt=""><img class="tp r" src="assets/ui/portrait_girl.png" alt=""><div class="logotxt">아르칸 연대기</div><div class="sub">생활 직업으로 살아가는 마을의 작은 모험 · 웹 플레이 버전</div>`);
-    const c = this.button(b, info ? "이어하기" : "이어하기 (저장 없음)", "gold big", cont); c.disabled = !info;
-    if (info) $("div", "saveinfo", b, esc(info));
-    this.button(b, "새 게임", "teal big", ng);
-    $("div", "ver", b, "주인공 원화 제공 · 배경/몬스터 도트와 3D는 임시 자산 · 폰트: 갈무리(OFL) · 소리는 첫 클릭 후 재생");
+    this.current.setAttribute("aria-label", "아르칸 연대기 시작 메뉴");
+    const stage = $("div", "title-art", b);
+    $("img", "title-illustration", stage).src = "assets/ui/title-screen.png";
+    stage.firstChild.alt = "아르칸 연대기 — 꽃과 분수가 있는 마을";
+    const c = this.button(stage, "", "title-action title-continue", cont);
+    c.setAttribute("aria-label", info ? "이어하기" : "이어하기 (저장 없음)");
+    c.disabled = !info;
+    const save = $("div", "title-save", stage);
+    save.textContent = info || "저장된 모험이 없습니다. 새 게임으로 시작하세요.";
+    save.title = save.textContent;
+    const n = this.button(stage, "", "title-action title-new", ng);
+    n.setAttribute("aria-label", "새 게임");
+    (info ? c : n).focus({ preventScroll: true });
   }
   showCreate(start, back) {
     const b = this.open("create", "캐릭터 선택", 1240, 0, false);
