@@ -11,27 +11,27 @@ export const CREATURES = {
   mon_slime:  { file: 'rabbit', size: 0.75 },
   mon_fox:    { file: 'fox', size: 1.15 },
   mon_shroom: { file: 'squirrel', size: 0.85 },
-  mon_wolf:   { file: 'wolf', size: 1.45 },
-  mon_boar:   { file: 'boar', size: 1.45 },
-  mon_golem:  { file: 'bear', size: 2.1 },
-  boss_mushroom: { file: 'boss_mushroom', size: 4.2, height: true, rigless: true },
+  mon_wolf:   { file: 'cute_wolf', size: 1.05, height: true, rigless: true, yaw: -90 },
+  mon_boar:   { file: 'cute_boar', size: 1.0, height: true, rigless: true, yaw: -90 },
+  mon_golem:  { file: 'cute_bear', size: 1.45, height: true, rigless: true, yaw: -90 },
+  boss_mushroom: { file: 'cute_boss_mushroom', size: 3.6, height: true, rigless: true, yaw: -90 },
   // Lv10-50 zones (tint / recolor: see the constructor)
   mon_mist_fox:      { file: 'fox', size: 1.25, tint: [0.72, 0.78, 0.95], recolor: 0.75 },
-  mon_fog_toad:      { file: 'toad', size: 1.05 },
-  mon_bog_boar:      { file: 'boar', size: 1.6, tint: [0.45, 0.6, 0.38], recolor: 0.7 },
-  mon_mist_wolf:     { file: 'wolf', size: 1.6, tint: [0.62, 0.56, 0.85], recolor: 0.7 },
-  mon_mist_bear:     { file: 'bear', size: 3.0, tint: [0.45, 0.46, 0.72], recolor: 0.75 },
-  mon_frost_wolf:    { file: 'wolf', size: 1.65, tint: [0.9, 0.96, 1.0], recolor: 0.85 },
+  mon_fog_toad:      { file: 'cute_toad', size: 0.95, height: true, rigless: true, yaw: -90 },
+  mon_bog_boar:      { file: 'cute_boar', size: 1.1, height: true, rigless: true, yaw: -90, tint: [0.62, 0.78, 0.5], recolor: 0.45 },
+  mon_mist_wolf:     { file: 'cute_wolf', size: 1.15, height: true, rigless: true, yaw: -90, tint: [0.7, 0.66, 0.95], recolor: 0.35 },
+  mon_mist_bear:     { file: 'cute_bear', size: 2.1, height: true, rigless: true, yaw: -90, tint: [0.66, 0.66, 0.92], recolor: 0.5 },
+  mon_frost_wolf:    { file: 'cute_wolf', size: 1.15, height: true, rigless: true, yaw: -90, tint: [0.88, 0.95, 1.0], recolor: 0.6 },
   mon_ice_fox:       { file: 'fox', size: 1.2, tint: [0.74, 0.9, 1.0], recolor: 0.85 },
-  mon_frost_ram:     { file: 'ram', size: 1.55 },
-  mon_snow_bear:     { file: 'bear', size: 2.35, tint: [0.95, 0.97, 1.0], recolor: 0.9 },
-  mon_ram_king:      { file: 'ram', size: 2.7, tint: [0.6, 0.8, 1.0], recolor: 0.5 },
+  mon_frost_ram:     { file: 'cute_ram', size: 1.1, height: true, rigless: true, yaw: -90 },
+  mon_snow_bear:     { file: 'cute_bear', size: 1.7, height: true, rigless: true, yaw: -90, tint: [0.95, 0.97, 1.0], recolor: 0.7 },
+  mon_ram_king:      { file: 'cute_ram', size: 1.9, height: true, rigless: true, yaw: -90, tint: [0.7, 0.85, 1.0], recolor: 0.35 },
   mon_ember_drake:   { file: 'drake', size: 1.55, height: true, rigless: true, yaw: -90 },
   mon_cinder_lizard: { file: 'drake', size: 1.15, height: true, rigless: true, yaw: -90, tint: [1.0, 0.55, 0.12], recolor: 0.4 },
-  mon_lava_boar:     { file: 'boar', size: 1.65, tint: [0.75, 0.2, 0.14], recolor: 0.75 },
-  mon_ruin_golem:    { file: 'golem', size: 2.3, height: true, rigless: true, yaw: -90 },
+  mon_lava_boar:     { file: 'cute_boar', size: 1.15, height: true, rigless: true, yaw: -90, tint: [0.95, 0.45, 0.3], recolor: 0.5 },
+  mon_ruin_golem:    { file: 'cute_golem', size: 1.9, height: true, rigless: true, yaw: -90 },
   mon_drake_lord:    { file: 'drake', size: 2.7, height: true, rigless: true, yaw: -90, tint: [0.42, 0.22, 0.58], recolor: 0.45 },
-  boss_ancient_dragon: { file: 'dragon', size: 5.0, height: true, rigless: true, yaw: -90 },
+  boss_ancient_dragon: { file: 'cute_dragon', size: 4.0, height: true, rigless: true, yaw: -90 },
 };
 const cache = new Map();
 function load(file) {
@@ -119,7 +119,11 @@ export class CreatureBody {
     P.position.set(0, 0, 0); P.rotation.set(0, 0, 0); I.position.y = 0; const sc = I.scale.x; let sy = 1, sxz = 1;
     switch (this.action) {
       case 'idle': sy = 1 + Math.sin(this.phase * 2.4) * 0.025; sxz = 1 - Math.sin(this.phase * 2.4) * 0.012; break;
-      case 'walk': if (this.cfg.rigless) { P.position.y = Math.abs(Math.sin(this.t * 7)) * 0.12 * s * 0.1; P.rotation.z = Math.sin(this.t * 7) * 0.06; } break;
+      case 'walk': if (this.cfg.rigless) {                                // bouncy waddle: hop, squash on landing, side-to-side rock
+        const ph = this.t * 7.5 * Math.max(0.6, this.speed), hop = Math.abs(Math.sin(ph));
+        P.position.y = hop * Math.min(0.18, 0.07 * s); P.rotation.z = Math.sin(ph) * 0.09; P.rotation.x = 0.06;
+        sy = 1 + (hop - 0.35) * 0.08; sxz = 1 - (hop - 0.35) * 0.04;
+      } break;
       case 'attack': case 'skill': case 'cast': case 'throw': {
         const wind = 0.45, k = u < wind ? -Math.sin(u / wind * Math.PI / 2) * 0.35 : Math.sin((u - wind) / (1 - wind) * Math.PI) * 1.0;
         P.position.z = k * s * 0.18;                                        // lunge forward (model faces local +z)
