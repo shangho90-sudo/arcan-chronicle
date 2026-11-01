@@ -4,7 +4,7 @@
    "id": "town",
    "name": "아르칸 마을",
    "kind": "town",
-   "bgm": "bgm_town",
+   "bgm": "bgm_arcan_town",
    "bounds": [
     -30.0,
     -29.0,
@@ -2938,7 +2938,7 @@
    "id": "forest",
    "name": "속삭이는 숲",
    "kind": "field",
-   "bgm": "bgm_field",
+   "bgm": "bgm_arcan_forest",
    "bounds": [
     -40.0,
     -40.0,
@@ -5699,7 +5699,7 @@
    "id": "mist_valley",
    "name": "안개 골짜기",
    "kind": "field",
-   "bgm": "bgm_field",
+   "bgm": "bgm_arcan_mist_valley",
    "bounds": [
     -40.0,
     -40.0,
@@ -10229,7 +10229,7 @@
    "id": "frost_highland",
    "name": "서리 고원",
    "kind": "field",
-   "bgm": "bgm_field",
+   "bgm": "bgm_arcan_frost_highland",
    "bounds": [
     -40.0,
     -40.0,
@@ -14559,7 +14559,7 @@
    "id": "dragon_ruins",
    "name": "잊힌 용의 유적",
    "kind": "field",
-   "bgm": "bgm_field",
+   "bgm": "bgm_arcan_dragon_ruins",
    "bounds": [
     -40.0,
     -40.0,

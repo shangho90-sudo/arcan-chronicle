@@ -244,7 +244,7 @@ class Game {
     if (this.player) { if (this.zone) this.zone.removeActor(this.player); this.player.body.dispose(); this.player = null; }
     await this.buildZone("town");
     this.render.setFocus({ x: 0, y: 0, z: -2 }, true);
-    this.audio.playMusic("bgm_town");
+    this.audio.playMusic("bgm_arcan_menu");
     const p = this.store.load(); let info = null;
     if (p) { const j = this.data.job(p.job), z = this.data.zones[p.zone]; info = `${p.name} · Lv${p.level} ${j ? j.name : p.job} · ${z ? z.name : p.zone} · 저장 ${p.saveTime}`; }
     this.ui.showTitle(info, () => this.continueGame(), () => this.newGameFlow());

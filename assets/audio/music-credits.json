@@ -1,0 +1,44 @@
+[
+  {
+    "zone": "menu",
+    "title": "돌아오는 햇살",
+    "id": "cc534733-c09c-43cd-a5bc-e3b22cc6103a",
+    "file": "bgm_arcan_menu.mp3",
+    "duration": 176.248125
+  },
+  {
+    "zone": "town",
+    "title": "돌아오는 빛",
+    "id": "275cb884-fbdb-49b8-a862-314e3f21880f",
+    "file": "bgm_arcan_town.mp3",
+    "duration": 180.218708
+  },
+  {
+    "zone": "forest",
+    "title": "잎새 사이의 약속",
+    "id": "9d8c7289-ea7e-46fb-a5b4-18f99324a767",
+    "file": "bgm_arcan_forest.mp3",
+    "duration": 180.270958
+  },
+  {
+    "zone": "mist_valley",
+    "title": "안개 너머의 약속",
+    "id": "ea4cbaf8-6857-4a9b-99fc-9a6be6b5d137",
+    "file": "bgm_arcan_mist_valley.mp3",
+    "duration": 174.994208
+  },
+  {
+    "zone": "frost_highland",
+    "title": "눈꽃의 약속",
+    "id": "1e035777-76a3-4caf-99a7-d103dc749061",
+    "file": "bgm_arcan_frost_highland.mp3",
+    "duration": 179.043208
+  },
+  {
+    "zone": "dragon_ruins",
+    "title": "잊히지 않는 서약",
+    "id": "7f57ea1b-8596-43fa-bff6-3dcd61f8fed7",
+    "file": "bgm_arcan_dragon_ruins.mp3",
+    "duration": 175.438292
+  }
+]
