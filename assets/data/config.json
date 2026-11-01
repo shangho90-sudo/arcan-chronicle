@@ -1,0 +1,21 @@
+{
+ "cameraPitch": 38,
+ "cameraYaw": 45,
+ "cameraDistance": 30,
+ "referenceOrthoSize": 5.625,
+ "minVisibleWidth": 17,
+ "followSharpness": 12,
+ "lookAhead": 0.6,
+ "playerRadius": 0.32,
+ "dodgeDistance": 3.2,
+ "dodgeDuration": 0.28,
+ "dodgeCooldown": 1.2,
+ "dodgeCost": 0,
+ "interactRange": 2.2,
+ "potionCooldown": 1.0,
+ "reviveInPlaceGoldPerLevel": 20,
+ "hitStop": 0.05,
+ "spritePpu": 32,
+ "spriteDepthOffset": 0.6,
+ "footStride": 1.1
+}

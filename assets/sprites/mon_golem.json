@@ -1,0 +1,56 @@
+{
+ "name": "mon_golem",
+ "frameW": 112,
+ "frameH": 112,
+ "pivotX": 56,
+ "pivotY": 24,
+ "ppu": 32,
+ "pitch": 38.0,
+ "cols": 18,
+ "rows": 7,
+ "texW": 2016,
+ "texH": 784,
+ "dirMode": "5mirror",
+ "actions": [
+  {
+   "name": "idle",
+   "frames": 4,
+   "fps": 4,
+   "loop": true,
+   "hitFrame": -1,
+   "start": 0
+  },
+  {
+   "name": "walk",
+   "frames": 6,
+   "fps": 7,
+   "loop": true,
+   "hitFrame": -1,
+   "start": 20
+  },
+  {
+   "name": "attack",
+   "frames": 6,
+   "fps": 8,
+   "loop": false,
+   "hitFrame": 4,
+   "start": 50
+  },
+  {
+   "name": "hit",
+   "frames": 2,
+   "fps": 8,
+   "loop": false,
+   "hitFrame": -1,
+   "start": 80
+  },
+  {
+   "name": "death",
+   "frames": 6,
+   "fps": 8,
+   "loop": false,
+   "hitFrame": -1,
+   "start": 90
+  }
+ ]
+}

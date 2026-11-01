@@ -1,0 +1,1029 @@
+[
+{
+"name": "idle",
+"frames": 4,
+"fps": 5,
+"loop": true,
+"hitFrame": -1,
+"poses": [
+{
+"bob": -0.0,
+"lean": 0.0,
+"twist": 0.0,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 75.0,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+8,
+14
+],
+"armL": [
+8,
+14
+],
+"held": null
+},
+{
+"bob": -0.006,
+"lean": 0.0,
+"twist": 0.0,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 75.0,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+10,
+14
+],
+"armL": [
+8,
+14
+],
+"held": null
+},
+{
+"bob": -0.012,
+"lean": 0.0,
+"twist": 0.0,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 75.0,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+8,
+14
+],
+"armL": [
+8,
+14
+],
+"held": null
+},
+{
+"bob": -0.006,
+"lean": 0.0,
+"twist": 0.0,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 75.0,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+10,
+14
+],
+"armL": [
+8,
+14
+],
+"held": null
+}
+]
+},
+{
+"name": "walk",
+"frames": 6,
+"fps": 10,
+"loop": true,
+"hitFrame": -1,
+"poses": [
+{
+"bob": 0.015,
+"lean": 4,
+"twist": 0.0,
+"legL": 0.0,
+"legR": -0.0,
+"wOff": 75.0,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+10.0,
+12
+],
+"armL": [
+10.0,
+12
+],
+"held": null
+},
+{
+"bob": 3.469446951953614e-18,
+"lean": 4,
+"twist": 0.0,
+"legL": 29.444863728670914,
+"legR": -29.444863728670914,
+"wOff": 75.0,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+32.5166604983954,
+12
+],
+"armL": [
+-12.516660498395403,
+12
+],
+"held": null
+},
+{
+"bob": -6.938893903907228e-18,
+"lean": 4,
+"twist": 0.0,
+"legL": 29.444863728670917,
+"legR": -29.444863728670917,
+"wOff": 75.0,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+32.51666049839541,
+12
+],
+"armL": [
+-12.516660498395407,
+12
+],
+"held": null
+},
+{
+"bob": 0.015,
+"lean": 4,
+"twist": 0.0,
+"legL": 4.1637991171010006e-15,
+"legR": -4.1637991171010006e-15,
+"wOff": 75.0,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+10.000000000000004,
+12
+],
+"armL": [
+9.999999999999996,
+12
+],
+"held": null
+},
+{
+"bob": 1.3877787807814457e-17,
+"lean": 4,
+"twist": 0.0,
+"legL": -29.444863728670903,
+"legR": 29.444863728670903,
+"wOff": 75.0,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+-12.516660498395396,
+12
+],
+"armL": [
+32.516660498395396,
+12
+],
+"held": null
+},
+{
+"bob": 3.469446951953614e-18,
+"lean": 4,
+"twist": 0.0,
+"legL": -29.444863728670914,
+"legR": 29.444863728670914,
+"wOff": 75.0,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+-12.516660498395403,
+12
+],
+"armL": [
+32.5166604983954,
+12
+],
+"held": null
+}
+]
+},
+{
+"name": "attack",
+"frames": 5,
+"fps": 14,
+"loop": false,
+"hitFrame": 2,
+"poses": [
+{
+"bob": 0.0,
+"lean": -4,
+"twist": -18,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 70,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+150,
+30
+],
+"armL": [
+25,
+18
+],
+"held": null
+},
+{
+"bob": 0.0,
+"lean": -6,
+"twist": -26,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 85,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+172,
+28
+],
+"armL": [
+25,
+18
+],
+"held": null
+},
+{
+"bob": 0.0,
+"lean": 12,
+"twist": 16,
+"legL": 18,
+"legR": -12,
+"wOff": 40,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+70,
+8
+],
+"armL": [
+25,
+18
+],
+"held": null
+},
+{
+"bob": 0.0,
+"lean": 10,
+"twist": 22,
+"legL": 14,
+"legR": -10,
+"wOff": 40,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+40,
+4
+],
+"armL": [
+25,
+18
+],
+"held": null
+},
+{
+"bob": 0.0,
+"lean": 4,
+"twist": 6,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 70,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+20,
+10
+],
+"armL": [
+25,
+18
+],
+"held": null
+}
+]
+},
+{
+"name": "skill",
+"frames": 6,
+"fps": 12,
+"loop": false,
+"hitFrame": 3,
+"poses": [
+{
+"bob": 0.0,
+"lean": -6,
+"twist": 0.0,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 80,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+150,
+10
+],
+"armL": [
+140,
+10
+],
+"held": null
+},
+{
+"bob": 0.02,
+"lean": -10,
+"twist": 0.0,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 95,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+185,
+6
+],
+"armL": [
+175,
+6
+],
+"held": null
+},
+{
+"bob": 0.03,
+"lean": -12,
+"twist": 0.0,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 100,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+195,
+4
+],
+"armL": [
+185,
+4
+],
+"held": null
+},
+{
+"bob": -0.03,
+"lean": 18,
+"twist": 0.0,
+"legL": 24,
+"legR": -16,
+"wOff": 30,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+80,
+4
+],
+"armL": [
+70,
+4
+],
+"held": null
+},
+{
+"bob": -0.03,
+"lean": 16,
+"twist": 0.0,
+"legL": 20,
+"legR": -14,
+"wOff": 30,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+60,
+4
+],
+"armL": [
+55,
+4
+],
+"held": null
+},
+{
+"bob": 0.0,
+"lean": 5,
+"twist": 0.0,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 70,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+25,
+10
+],
+"armL": [
+20,
+10
+],
+"held": null
+}
+]
+},
+{
+"name": "cast",
+"frames": 6,
+"fps": 10,
+"loop": false,
+"hitFrame": 3,
+"poses": [
+{
+"bob": 0.0,
+"lean": 0.0,
+"twist": 0.0,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 60,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+60,
+20
+],
+"armL": [
+60,
+20
+],
+"held": null
+},
+{
+"bob": 0.01,
+"lean": 0.0,
+"twist": 0.0,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 60,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+110,
+30
+],
+"armL": [
+110,
+30
+],
+"held": null
+},
+{
+"bob": 0.03,
+"lean": -6,
+"twist": 0.0,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 60,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+160,
+35
+],
+"armL": [
+160,
+35
+],
+"held": null
+},
+{
+"bob": 0.035,
+"lean": -8,
+"twist": 0.0,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 60,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": true,
+"armR": [
+170,
+40
+],
+"armL": [
+170,
+40
+],
+"held": null
+},
+{
+"bob": 0.02,
+"lean": -4,
+"twist": 0.0,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 60,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+150,
+35
+],
+"armL": [
+150,
+35
+],
+"held": null
+},
+{
+"bob": 0.0,
+"lean": 0.0,
+"twist": 0.0,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 60,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+40,
+15
+],
+"armL": [
+40,
+15
+],
+"held": null
+}
+]
+},
+{
+"name": "throw",
+"frames": 5,
+"fps": 12,
+"loop": false,
+"hitFrame": 2,
+"poses": [
+{
+"bob": 0.0,
+"lean": -4,
+"twist": -20,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 60,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+140,
+25
+],
+"armL": [
+30,
+20
+],
+"held": "bottle"
+},
+{
+"bob": 0.0,
+"lean": -8,
+"twist": -28,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 60,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+190,
+20
+],
+"armL": [
+30,
+20
+],
+"held": "bottle"
+},
+{
+"bob": 0.0,
+"lean": 10,
+"twist": 14,
+"legL": 16,
+"legR": -12,
+"wOff": 60,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+95,
+10
+],
+"armL": [
+30,
+20
+],
+"held": null
+},
+{
+"bob": 0.0,
+"lean": 8,
+"twist": 18,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 60,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+55,
+8
+],
+"armL": [
+30,
+20
+],
+"held": null
+},
+{
+"bob": 0.0,
+"lean": 2,
+"twist": 4,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 60,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+20,
+10
+],
+"armL": [
+30,
+20
+],
+"held": null
+}
+]
+},
+{
+"name": "hit",
+"frames": 2,
+"fps": 10,
+"loop": false,
+"hitFrame": -1,
+"poses": [
+{
+"bob": 0.0,
+"lean": -14,
+"twist": 0.0,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 75.0,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": true,
+"armR": [
+30,
+30
+],
+"armL": [
+30,
+30
+],
+"held": null
+},
+{
+"bob": 0.0,
+"lean": -7,
+"twist": 0.0,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 75.0,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": true,
+"armR": [
+20,
+20
+],
+"armL": [
+20,
+20
+],
+"held": null
+}
+]
+},
+{
+"name": "death",
+"frames": 6,
+"fps": 8,
+"loop": false,
+"hitFrame": -1,
+"poses": [
+{
+"bob": 0.0,
+"lean": 0.0,
+"twist": 0.0,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 75.0,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 10,
+"sink": 0.0,
+"squint": true,
+"armR": [
+60,
+40
+],
+"armL": [
+60,
+40
+],
+"held": null
+},
+{
+"bob": 0.0,
+"lean": 0.0,
+"twist": 0.0,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 75.0,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 22,
+"sink": 0.0,
+"squint": true,
+"armR": [
+75,
+40
+],
+"armL": [
+75,
+40
+],
+"held": null
+},
+{
+"bob": 0.0,
+"lean": 0.0,
+"twist": 0.0,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 75.0,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 38,
+"sink": 0.03,
+"squint": true,
+"armR": [
+90,
+40
+],
+"armL": [
+90,
+40
+],
+"held": null
+},
+{
+"bob": 0.0,
+"lean": 0.0,
+"twist": 0.0,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 75.0,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 55,
+"sink": 0.06,
+"squint": true,
+"armR": [
+105,
+40
+],
+"armL": [
+105,
+40
+],
+"held": null
+},
+{
+"bob": 0.0,
+"lean": 0.0,
+"twist": 0.0,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 75.0,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 66,
+"sink": 0.08,
+"squint": true,
+"armR": [
+120,
+40
+],
+"armL": [
+120,
+40
+],
+"held": null
+},
+{
+"bob": 0.0,
+"lean": 0.0,
+"twist": 0.0,
+"legL": 0.0,
+"legR": 0.0,
+"wOff": 75.0,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 70,
+"sink": 0.08,
+"squint": true,
+"armR": [
+135,
+40
+],
+"armL": [
+135,
+40
+],
+"held": null
+}
+]
+},
+{
+"name": "dash",
+"frames": 3,
+"fps": 14,
+"loop": false,
+"hitFrame": -1,
+"poses": [
+{
+"bob": -0.02,
+"lean": 22,
+"twist": 0.0,
+"legL": 40,
+"legR": -30,
+"wOff": 75.0,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+-30,
+20
+],
+"armL": [
+-30,
+20
+],
+"held": null
+},
+{
+"bob": 0.0,
+"lean": 26,
+"twist": 0.0,
+"legL": -20,
+"legR": 30,
+"wOff": 75.0,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+-40,
+25
+],
+"armL": [
+-40,
+25
+],
+"held": null
+},
+{
+"bob": 0.0,
+"lean": 12,
+"twist": 0.0,
+"legL": 10,
+"legR": -10,
+"wOff": 75.0,
+"wSide": 0.0,
+"offOff": 60.0,
+"fall": 0.0,
+"sink": 0.0,
+"squint": false,
+"armR": [
+0,
+15
+],
+"armL": [
+0,
+15
+],
+"held": null
+}
+]
+}
+]

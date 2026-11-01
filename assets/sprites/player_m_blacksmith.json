@@ -1,0 +1,88 @@
+{
+ "name": "player_m_blacksmith",
+ "frameW": 104,
+ "frameH": 104,
+ "pivotX": 52,
+ "pivotY": 26,
+ "ppu": 42,
+ "pitch": 38.0,
+ "cols": 19,
+ "rows": 19,
+ "texW": 1976,
+ "texH": 1976,
+ "dirMode": "8",
+ "actions": [
+  {
+   "name": "idle",
+   "frames": 4,
+   "fps": 5,
+   "loop": true,
+   "hitFrame": -1,
+   "start": 0
+  },
+  {
+   "name": "walk",
+   "frames": 6,
+   "fps": 10,
+   "loop": true,
+   "hitFrame": -1,
+   "start": 32
+  },
+  {
+   "name": "attack",
+   "frames": 5,
+   "fps": 14,
+   "loop": false,
+   "hitFrame": 2,
+   "start": 80
+  },
+  {
+   "name": "skill",
+   "frames": 6,
+   "fps": 12,
+   "loop": false,
+   "hitFrame": 3,
+   "start": 120
+  },
+  {
+   "name": "cast",
+   "frames": 6,
+   "fps": 10,
+   "loop": false,
+   "hitFrame": 3,
+   "start": 168
+  },
+  {
+   "name": "throw",
+   "frames": 5,
+   "fps": 12,
+   "loop": false,
+   "hitFrame": 2,
+   "start": 216
+  },
+  {
+   "name": "hit",
+   "frames": 2,
+   "fps": 10,
+   "loop": false,
+   "hitFrame": -1,
+   "start": 256
+  },
+  {
+   "name": "death",
+   "frames": 6,
+   "fps": 8,
+   "loop": false,
+   "hitFrame": -1,
+   "start": 272
+  },
+  {
+   "name": "dash",
+   "frames": 3,
+   "fps": 14,
+   "loop": false,
+   "hitFrame": -1,
+   "start": 320
+  }
+ ]
+}

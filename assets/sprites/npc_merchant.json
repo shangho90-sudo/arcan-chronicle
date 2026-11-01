@@ -1,0 +1,32 @@
+{
+ "name": "npc_merchant",
+ "frameW": 80,
+ "frameH": 80,
+ "pivotX": 40,
+ "pivotY": 26,
+ "ppu": 32,
+ "pitch": 38.0,
+ "cols": 25,
+ "rows": 4,
+ "texW": 2000,
+ "texH": 320,
+ "dirMode": "8",
+ "actions": [
+  {
+   "name": "idle",
+   "frames": 4,
+   "fps": 5,
+   "loop": true,
+   "hitFrame": -1,
+   "start": 0
+  },
+  {
+   "name": "walk",
+   "frames": 6,
+   "fps": 10,
+   "loop": true,
+   "hitFrame": -1,
+   "start": 32
+  }
+ ]
+}

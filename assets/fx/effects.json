@@ -1,0 +1,135 @@
+{
+ "cell": 64,
+ "cols": 16,
+ "rows": 7,
+ "texW": 1024,
+ "texH": 448,
+ "effects": [
+  {
+   "name": "slash",
+   "start": 0,
+   "frames": 6,
+   "fps": 24,
+   "worldSize": 2.0
+  },
+  {
+   "name": "hit",
+   "start": 6,
+   "frames": 6,
+   "fps": 24,
+   "worldSize": 2.0
+  },
+  {
+   "name": "potion_splash",
+   "start": 12,
+   "frames": 6,
+   "fps": 16,
+   "worldSize": 2.0
+  },
+  {
+   "name": "paint_burst",
+   "start": 18,
+   "frames": 6,
+   "fps": 16,
+   "worldSize": 2.0
+  },
+  {
+   "name": "heal",
+   "start": 24,
+   "frames": 6,
+   "fps": 12,
+   "worldSize": 2.0
+  },
+  {
+   "name": "ring",
+   "start": 30,
+   "frames": 6,
+   "fps": 14,
+   "worldSize": 2.0
+  },
+  {
+   "name": "smoke",
+   "start": 36,
+   "frames": 6,
+   "fps": 12,
+   "worldSize": 2.0
+  },
+  {
+   "name": "fire",
+   "start": 42,
+   "frames": 6,
+   "fps": 14,
+   "worldSize": 2.0
+  },
+  {
+   "name": "poison",
+   "start": 48,
+   "frames": 6,
+   "fps": 10,
+   "worldSize": 2.0
+  },
+  {
+   "name": "levelup",
+   "start": 54,
+   "frames": 6,
+   "fps": 10,
+   "worldSize": 2.0
+  },
+  {
+   "name": "wind",
+   "start": 60,
+   "frames": 6,
+   "fps": 16,
+   "worldSize": 2.0
+  },
+  {
+   "name": "shield",
+   "start": 66,
+   "frames": 6,
+   "fps": 10,
+   "worldSize": 2.0
+  },
+  {
+   "name": "food",
+   "start": 72,
+   "frames": 6,
+   "fps": 10,
+   "worldSize": 2.0
+  },
+  {
+   "name": "proj_spore",
+   "start": 78,
+   "frames": 4,
+   "fps": 10,
+   "worldSize": 1.0
+  },
+  {
+   "name": "proj_bottle",
+   "start": 82,
+   "frames": 4,
+   "fps": 14,
+   "worldSize": 1.0
+  },
+  {
+   "name": "proj_paint",
+   "start": 86,
+   "frames": 4,
+   "fps": 10,
+   "worldSize": 1.0
+  },
+  {
+   "name": "proj_note",
+   "start": 90,
+   "frames": 4,
+   "fps": 10,
+   "worldSize": 1.0
+  },
+  {
+   "name": "proj_rock",
+   "start": 94,
+   "frames": 4,
+   "fps": 10,
+   "worldSize": 1.0
+  }
+ ]
+}

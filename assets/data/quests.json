@@ -1,0 +1,548 @@
+{
+ "quests": [
+  {
+   "id": "q1_start",
+   "name": "새로운 시작",
+   "giver": "elder",
+   "turnIn": "elder",
+   "summary": "대장장이 철산에게 마을의 생활 직업 이야기를 듣자.",
+   "prereq": [],
+   "minLevel": 1,
+   "objectives": [
+    {
+     "type": "talk",
+     "target": "master_blacksmith",
+     "count": 1,
+     "text": "대장장이 철산과 대화하기"
+    }
+   ],
+   "reward": {
+    "exp": 40,
+    "gold": 50,
+    "items": [
+     {
+      "id": "c_potion_s",
+      "count": 5
+     }
+    ]
+   },
+   "consumeCollected": true,
+   "offerText": "어서 오게, 아르칸 마을에 온 걸 환영하네. 이 마을 사람들은 모두 생활 직업으로 살아가지. 직업은 견습생으로 경험을 쌓아 레벨 10이 되면 정할 수 있다네. 먼저 대장간의 철산에게 이야기를 들어 보게.",
+   "progressText": "대장간은 광장 북서쪽에 있네.",
+   "completeText": "허허, 철산이 반가워하던가? 레벨 10이 되면 마음에 드는 마스터를 찾아가 전직하게. 이 물약은 선물일세."
+  },
+  {
+   "id": "q2_merchant",
+   "name": "마을 상인 모아",
+   "giver": "elder",
+   "turnIn": "merchant",
+   "summary": "광장 남서쪽 노점의 상인 모아에게 인사하자.",
+   "prereq": [
+    "q1_start"
+   ],
+   "minLevel": 1,
+   "objectives": [
+    {
+     "type": "talk",
+     "target": "merchant",
+     "count": 1,
+     "text": "상인 모아와 대화하기"
+    }
+   ],
+   "reward": {
+    "exp": 20,
+    "gold": 80,
+    "items": [
+     {
+      "id": "c_sp_potion",
+      "count": 2
+     }
+    ]
+   },
+   "consumeCollected": true,
+   "offerText": "모험에는 물약이 필수지. 노점의 모아에게 인사해 두게. 필요 없는 재료도 사 준다네.",
+   "progressText": "노점은 광장 남서쪽에 있네.",
+   "completeText": "촌장님이 보내셨군요! 앞으로 잘 부탁해요. 이건 첫 거래 기념이에요."
+  },
+  {
+   "id": "q_job1",
+   "prereq": [
+    "q1_start"
+   ],
+   "minLevel": 10,
+   "consumeCollected": true,
+   "reward": {
+    "exp": 300,
+    "gold": 200,
+    "items": [
+     {
+      "id": "c_potion_m",
+      "count": 5
+     }
+    ]
+   },
+   "name": "첫 전직",
+   "giver": "elder",
+   "turnIn": "elder",
+   "summary": "레벨 10이 되면 직업 마스터를 찾아가 1차 전직을 하자.",
+   "objectives": [
+    {
+     "type": "job",
+     "target": "any",
+     "count": 1,
+     "text": "1차 전직하기"
+    }
+   ],
+   "offerText": "견습생 수련을 마쳤군! 이제 약국·식당·대장간·의상실·화방 중 마음에 드는 마스터를 찾아가 전직하게. 전직하면 스킬 포인트를 받아 스킬창(K)에서 배울 수 있다네.",
+   "progressText": "마스터들은 광장을 둘러싼 가게 앞에 있네.",
+   "completeText": "훌륭하네! 스킬창(K)에서 스킬을 배우고 슬롯에 장착해 보게."
+  },
+  {
+   "id": "q3_slime",
+   "name": "숲 토끼 소동",
+   "giver": "guard",
+   "turnIn": "guard",
+   "summary": "속삭이는 숲 입구의 숲 토끼 6마리를 쫓아내자.",
+   "prereq": [
+    "q1_start"
+   ],
+   "minLevel": 1,
+   "objectives": [
+    {
+     "type": "kill",
+     "target": "mon_slime",
+     "count": 6,
+     "text": "숲 토끼 처치"
+    }
+   ],
+   "reward": {
+    "exp": 60,
+    "gold": 60,
+    "items": [
+     {
+      "id": "a_armor_1",
+      "count": 1
+     }
+    ]
+   },
+   "consumeCollected": true,
+   "offerText": "성문 너머 속삭이는 숲에 숲 토끼가 너무 늘어 밭을 망치고 있소. 여섯 마리만 쫓아내 주겠소?",
+   "progressText": "성문 밖 워프를 타면 숲이오. 조심하시오.",
+   "completeText": "수고했소! 이 옷이라도 입어 두시오. 숲은 생각보다 거칠다오."
+  },
+  {
+   "id": "q4_spore",
+   "name": "도토리 채집",
+   "giver": "master_pharmacist",
+   "turnIn": "master_pharmacist",
+   "summary": "도토리 다람쥐에게서 단단한 도토리 5개를 모아 약사 소연에게 가져가자.",
+   "prereq": [
+    "q3_slime"
+   ],
+   "minLevel": 3,
+   "objectives": [
+    {
+     "type": "collect",
+     "target": "m_spore",
+     "count": 5,
+     "text": "단단한 도토리 모으기"
+    }
+   ],
+   "reward": {
+    "exp": 80,
+    "gold": 100,
+    "items": [
+     {
+      "id": "c_potion_m",
+      "count": 3
+     }
+    ]
+   },
+   "consumeCollected": true,
+   "offerText": "새 해독약을 만들려면 단단한 도토리가 필요해요. 숲 안쪽의 도토리 다람쥐가 떨어뜨린답니다. 다섯 개만 부탁해요!",
+   "progressText": "다람쥐는 멀리서 도토리를 던지니까 가까이 붙어서 싸워요.",
+   "completeText": "완벽해요! 이걸로 좋은 약을 만들 수 있겠어요. 감사의 표시로 회복 물약을 드릴게요."
+  },
+  {
+   "id": "q5_gear",
+   "name": "새 장비 마련",
+   "giver": "master_blacksmith",
+   "turnIn": "master_blacksmith",
+   "summary": "2단계 이상의 무기를 장착하고 대장장이 철산에게 보여주자.",
+   "prereq": [
+    "q_job1"
+   ],
+   "minLevel": 10,
+   "objectives": [
+    {
+     "type": "equip",
+     "target": "weapon:2",
+     "count": 1,
+     "text": "2단계 이상 무기 장착하기"
+    }
+   ],
+   "reward": {
+    "exp": 60,
+    "gold": 50,
+    "items": []
+   },
+   "consumeCollected": true,
+   "offerText": "그 장비로 곰을 상대할 생각인가? 대장간이나 단오의 무기점에서 2단계 무기를 사거나 숲에서 구해서 장착하고 오게.",
+   "progressText": "무기는 내 가게에서 팔고 있네. 직업에 맞는 걸 고르게.",
+   "completeText": "좋아, 손에 잘 맞는군. 이제야 모험가 같네!"
+  },
+  {
+   "id": "q6_golem",
+   "name": "꽃잎 곰 토벌",
+   "giver": "guard",
+   "turnIn": "guard",
+   "summary": "숲 동쪽 유적의 꽃잎 곰 3마리를 쓰러뜨리자.",
+   "prereq": [
+    "q4_spore"
+   ],
+   "minLevel": 6,
+   "objectives": [
+    {
+     "type": "kill",
+     "target": "mon_golem",
+     "count": 3,
+     "text": "꽃잎 곰 처치"
+    }
+   ],
+   "reward": {
+    "exp": 150,
+    "gold": 200,
+    "items": [
+     {
+      "id": "ac_amulet_2",
+      "count": 1
+     }
+    ]
+   },
+   "consumeCollected": true,
+   "offerText": "숲 동쪽 유적에 꽃잎 곰이 내려왔소. 앞발을 내려치기 전에 땅에 표시가 나타나니 그때 피하시오.",
+   "progressText": "붉은 표시가 차오르면 바로 벗어나야 하오.",
+   "completeText": "대단하오! 곰 굴에서 찾은 부적이오. 체력을 북돋아 줄 거요."
+  },
+  {
+   "id": "q7_boss",
+   "name": "거대 독버섯",
+   "giver": "elder",
+   "turnIn": "elder",
+   "summary": "숲 북쪽 고지대의 독버섯 군락지에서 거대 독버섯을 쓰러뜨리자.",
+   "prereq": [
+    "q6_golem"
+   ],
+   "minLevel": 8,
+   "objectives": [
+    {
+     "type": "kill",
+     "target": "boss_mushroom",
+     "count": 1,
+     "text": "거대 독버섯 처치"
+    }
+   ],
+   "reward": {
+    "exp": 400,
+    "gold": 500,
+    "items": [
+     {
+      "id": "c_potion_m",
+      "count": 5
+     }
+    ]
+   },
+   "consumeCollected": true,
+   "offerText": "숲이 병드는 원인은 북쪽 고지대의 거대 독버섯이네. 독 웅덩이와 땅의 경고 표시를 잘 보고 싸우게. 해독제도 챙기고!",
+   "progressText": "고지대로 오르는 비탈길은 숲 북쪽에 있네.",
+   "completeText": "해냈군! 이제 숲도 다시 숨을 쉬겠지. 아르칸 마을의 영웅일세!"
+  },
+  {
+   "id": "qt_western_pharmacist",
+   "prereq": [
+    "q_job1"
+   ],
+   "minLevel": 30,
+   "consumeCollected": true,
+   "reward": {
+    "exp": 500,
+    "gold": 500,
+    "items": []
+   },
+   "name": "양약사 전직 시험",
+   "giver": "master_pharmacist",
+   "turnIn": "master_pharmacist",
+   "summary": "양약사의 자격을 증명하자.",
+   "jobReq": "western_pharmacist",
+   "objectives": [
+    {
+     "type": "kill",
+     "target": "mon_mist_bear",
+     "count": 1,
+     "text": "안개골 우두머리 곰 처치"
+    },
+    {
+     "type": "kill",
+     "target": "mon_frost_ram",
+     "count": 10,
+     "text": "서리뿔 산양 10마리 처치"
+    },
+    {
+     "type": "level",
+     "target": "30",
+     "count": 30,
+     "text": "레벨 30 달성"
+    }
+   ],
+   "offerText": "양약사의 길을 걷고 싶다고? 실력을 보여 주게. 시험을 통과하면 양약사로 전직할 수 있다네.",
+   "progressText": "안개 골짜기의 우두머리 곰과 서리 고원의 서리뿔 산양을 상대해 보게.",
+   "completeText": "합격일세! 이제 나에게 양약사 전직을 신청할 수 있네."
+  },
+  {
+   "id": "qt_herbalist",
+   "prereq": [
+    "q_job1"
+   ],
+   "minLevel": 30,
+   "consumeCollected": true,
+   "reward": {
+    "exp": 500,
+    "gold": 500,
+    "items": []
+   },
+   "name": "한약사 전직 시험",
+   "giver": "master_pharmacist",
+   "turnIn": "master_pharmacist",
+   "summary": "한약사의 자격을 증명하자.",
+   "jobReq": "herbalist",
+   "objectives": [
+    {
+     "type": "kill",
+     "target": "mon_mist_bear",
+     "count": 1,
+     "text": "안개골 우두머리 곰 처치"
+    },
+    {
+     "type": "kill",
+     "target": "mon_frost_ram",
+     "count": 10,
+     "text": "서리뿔 산양 10마리 처치"
+    },
+    {
+     "type": "level",
+     "target": "30",
+     "count": 30,
+     "text": "레벨 30 달성"
+    }
+   ],
+   "offerText": "한약사의 길을 걷고 싶다고? 실력을 보여 주게. 시험을 통과하면 한약사로 전직할 수 있다네.",
+   "progressText": "안개 골짜기의 우두머리 곰과 서리 고원의 서리뿔 산양을 상대해 보게.",
+   "completeText": "합격일세! 이제 나에게 한약사 전직을 신청할 수 있네."
+  },
+  {
+   "id": "qt_chef",
+   "prereq": [
+    "q_job1"
+   ],
+   "minLevel": 30,
+   "consumeCollected": true,
+   "reward": {
+    "exp": 500,
+    "gold": 500,
+    "items": []
+   },
+   "name": "쉐프 전직 시험",
+   "giver": "master_cook",
+   "turnIn": "master_cook",
+   "summary": "쉐프의 자격을 증명하자.",
+   "jobReq": "chef",
+   "objectives": [
+    {
+     "type": "kill",
+     "target": "mon_mist_bear",
+     "count": 1,
+     "text": "안개골 우두머리 곰 처치"
+    },
+    {
+     "type": "kill",
+     "target": "mon_frost_ram",
+     "count": 10,
+     "text": "서리뿔 산양 10마리 처치"
+    },
+    {
+     "type": "level",
+     "target": "30",
+     "count": 30,
+     "text": "레벨 30 달성"
+    }
+   ],
+   "offerText": "쉐프의 길을 걷고 싶다고? 실력을 보여 주게. 시험을 통과하면 쉐프로 전직할 수 있다네.",
+   "progressText": "안개 골짜기의 우두머리 곰과 서리 고원의 서리뿔 산양을 상대해 보게.",
+   "completeText": "합격일세! 이제 나에게 쉐프 전직을 신청할 수 있네."
+  },
+  {
+   "id": "qt_engineer",
+   "prereq": [
+    "q_job1"
+   ],
+   "minLevel": 30,
+   "consumeCollected": true,
+   "reward": {
+    "exp": 500,
+    "gold": 500,
+    "items": []
+   },
+   "name": "엔지니어 전직 시험",
+   "giver": "master_blacksmith",
+   "turnIn": "master_blacksmith",
+   "summary": "엔지니어의 자격을 증명하자.",
+   "jobReq": "engineer",
+   "objectives": [
+    {
+     "type": "kill",
+     "target": "mon_mist_bear",
+     "count": 1,
+     "text": "안개골 우두머리 곰 처치"
+    },
+    {
+     "type": "kill",
+     "target": "mon_frost_ram",
+     "count": 10,
+     "text": "서리뿔 산양 10마리 처치"
+    },
+    {
+     "type": "level",
+     "target": "30",
+     "count": 30,
+     "text": "레벨 30 달성"
+    }
+   ],
+   "offerText": "엔지니어의 길을 걷고 싶다고? 실력을 보여 주게. 시험을 통과하면 엔지니어로 전직할 수 있다네.",
+   "progressText": "안개 골짜기의 우두머리 곰과 서리 고원의 서리뿔 산양을 상대해 보게.",
+   "completeText": "합격일세! 이제 나에게 엔지니어 전직을 신청할 수 있네."
+  },
+  {
+   "id": "qt_designer",
+   "prereq": [
+    "q_job1"
+   ],
+   "minLevel": 30,
+   "consumeCollected": true,
+   "reward": {
+    "exp": 500,
+    "gold": 500,
+    "items": []
+   },
+   "name": "디자이너 전직 시험",
+   "giver": "master_hairdresser",
+   "turnIn": "master_hairdresser",
+   "summary": "디자이너의 자격을 증명하자.",
+   "jobReq": "designer",
+   "objectives": [
+    {
+     "type": "kill",
+     "target": "mon_mist_bear",
+     "count": 1,
+     "text": "안개골 우두머리 곰 처치"
+    },
+    {
+     "type": "kill",
+     "target": "mon_frost_ram",
+     "count": 10,
+     "text": "서리뿔 산양 10마리 처치"
+    },
+    {
+     "type": "level",
+     "target": "30",
+     "count": 30,
+     "text": "레벨 30 달성"
+    }
+   ],
+   "offerText": "디자이너의 길을 걷고 싶다고? 실력을 보여 주게. 시험을 통과하면 디자이너로 전직할 수 있다네.",
+   "progressText": "안개 골짜기의 우두머리 곰과 서리 고원의 서리뿔 산양을 상대해 보게.",
+   "completeText": "합격일세! 이제 나에게 디자이너 전직을 신청할 수 있네."
+  },
+  {
+   "id": "qt_painter",
+   "prereq": [
+    "q_job1"
+   ],
+   "minLevel": 30,
+   "consumeCollected": true,
+   "reward": {
+    "exp": 500,
+    "gold": 500,
+    "items": []
+   },
+   "name": "화가 전직 시험",
+   "giver": "master_artist",
+   "turnIn": "master_artist",
+   "summary": "화가의 자격을 증명하자.",
+   "jobReq": "painter",
+   "objectives": [
+    {
+     "type": "kill",
+     "target": "mon_mist_bear",
+     "count": 1,
+     "text": "안개골 우두머리 곰 처치"
+    },
+    {
+     "type": "kill",
+     "target": "mon_frost_ram",
+     "count": 10,
+     "text": "서리뿔 산양 10마리 처치"
+    },
+    {
+     "type": "level",
+     "target": "30",
+     "count": 30,
+     "text": "레벨 30 달성"
+    }
+   ],
+   "offerText": "화가의 길을 걷고 싶다고? 실력을 보여 주게. 시험을 통과하면 화가로 전직할 수 있다네.",
+   "progressText": "안개 골짜기의 우두머리 곰과 서리 고원의 서리뿔 산양을 상대해 보게.",
+   "completeText": "합격일세! 이제 나에게 화가 전직을 신청할 수 있네."
+  },
+  {
+   "id": "qt_musician",
+   "prereq": [
+    "q_job1"
+   ],
+   "minLevel": 30,
+   "consumeCollected": true,
+   "reward": {
+    "exp": 500,
+    "gold": 500,
+    "items": []
+   },
+   "name": "음악가 전직 시험",
+   "giver": "master_artist",
+   "turnIn": "master_artist",
+   "summary": "음악가의 자격을 증명하자.",
+   "jobReq": "musician",
+   "objectives": [
+    {
+     "type": "kill",
+     "target": "mon_mist_bear",
+     "count": 1,
+     "text": "안개골 우두머리 곰 처치"
+    },
+    {
+     "type": "kill",
+     "target": "mon_frost_ram",
+     "count": 10,
+     "text": "서리뿔 산양 10마리 처치"
+    },
+    {
+     "type": "level",
+     "target": "30",
+     "count": 30,
+     "text": "레벨 30 달성"
+    }
+   ],
+   "offerText": "음악가의 길을 걷고 싶다고? 실력을 보여 주게. 시험을 통과하면 음악가로 전직할 수 있다네.",
+   "progressText": "안개 골짜기의 우두머리 곰과 서리 고원의 서리뿔 산양을 상대해 보게.",
+   "completeText": "합격일세! 이제 나에게 음악가 전직을 신청할 수 있네."
+  }
+ ]
+}

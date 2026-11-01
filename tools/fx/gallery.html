@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>SkillFx gallery</title>
+<style>body{margin:0;background:#222;color:#eee;font:12px sans-serif}</style>
+<script type="importmap">{ "imports": { "three": "/fxtest/three.module.js" } }</script>
+</head><body>
+<script type="module">
+import * as THREE from 'three';
+import { SkillFx, FX_KINDS } from '/ArcanWeb/js/skillfx.js';
+
+const PPM = +(new URLSearchParams(location.search).get('ppm') || 96);
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.setPixelRatio(1);
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x5c855c);
+const sun = new THREE.DirectionalLight(0xffffff, 2.6); const hemi = new THREE.HemisphereLight(0xaab4c0, 0x707880, 2.2);
+scene.add(sun, sun.target, hemi);
+// ground: cream stone tiles
+const gc = document.createElement('canvas'); gc.width = gc.height = 256; const g = gc.getContext('2d');
+g.fillStyle = '#c9bea6'; g.fillRect(0, 0, 256, 256); g.strokeStyle = '#a99c84'; g.lineWidth = 3;
+for (let i = 0; i <= 4; i++) { g.beginPath(); g.moveTo(0, i * 64); g.lineTo(256, i * 64); g.stroke(); for (let j = 0; j < 4; j++) { const x = j * 64 + (i % 2) * 32; g.beginPath(); g.moveTo(x, i * 64); g.lineTo(x, i * 64 + 64); g.stroke(); } }
+const gt = new THREE.CanvasTexture(gc); gt.wrapS = gt.wrapT = THREE.RepeatWrapping; gt.repeat.set(20, 20); gt.colorSpace = THREE.SRGBColorSpace;
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(80, 80).rotateX(-Math.PI / 2), new THREE.MeshLambertMaterial({ map: gt }));
+scene.add(ground);
+// player dummy (1.6 m)
+const dummy = new THREE.Group();
+const dm = new THREE.MeshLambertMaterial({ color: 0x4a6a9a });
+const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.28, 0.8, 4, 8), dm); body.position.y = 0.68; dummy.add(body);
+const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 8), new THREE.MeshLambertMaterial({ color: 0xf0d0b0 })); head.position.y = 1.42; dummy.add(head);
+scene.add(dummy);
+const cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.3, 120);
+const DEG = Math.PI / 180;
+function aim(fx, fz, W, H) {
+  const p = 38 * DEG, y = 45 * DEG, f = { x: Math.sin(y) * Math.cos(p), y: -Math.sin(p), z: Math.cos(y) * Math.cos(p) };
+  const pos = { x: fx - f.x * 30, y: 0.6 - f.y * 30, z: fz - f.z * 30 };
+  cam.position.set(pos.x, pos.y, -pos.z); cam.lookAt(fx, 0.6, -fz);
+  const hw = W / 2 / PPM, hh = H / 2 / PPM; cam.left = -hw; cam.right = hw; cam.top = hh; cam.bottom = -hh; cam.updateProjectionMatrix();
+  sun.target.position.set(fx, 0, -fz); sun.position.set(fx - 0.55 * 40, 34, -(fz - 0.45 * 40));
+}
+window.FX_KINDS = FX_KINDS; window.SkillFx = SkillFx; window.THREE = THREE; window.renderer = renderer;
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+// spawn one kind, step to time t, render into the sheet
+function stage(cat, kind, fx, t, opt) {
+  const dt = 1 / 60; let h = null, step = 0;
+  const steps = Math.round(t / dt);
+  const P0 = { x: 0, y: 0, z: 0 };
+  dummy.visible = !!opt.dummy;
+  let model = null;
+  switch (cat) {
+    case 'burst': fx.burst(kind, P0, opt.o || {}); break;
+    case 'slash': fx.slash(kind, { x: -0.9, y: 0, z: 0.9 }, { x: 0.8, z: -1 }, opt.o || {}); dummy.visible = true; break;
+    case 'beam': fx.beam(kind, { x: -2.0, y: 1.0, z: 0.3 }, { x: 2.0, y: 0.6, z: -0.6 }, opt.o || {}); break;
+    case 'projectile': h = fx.projectile(kind, opt.o || {}); break;
+    case 'area': h = fx.area(kind, P0, opt.r || 1.8, opt.o || {}); break;
+    case 'aura': h = fx.aura(kind, () => ({ x: 0, y: 0, z: 0 }), opt.o || {}); if (opt.stacks !== undefined) h.setStacks(opt.stacks); dummy.visible = true; dummy.position.set(0, 0, 0); break;
+    case 'summon': model = fx.summonModel(kind, opt.o || {}); model.position.set(0, 0, 0); model.rotation.y = -Math.PI / 4; scene.add(model); break;
+    case 'tele': h = fx.telegraph(P0, 1.8, 1, Object.assign({ shape: kind.startsWith('line') ? 'line' : 'circle', dir: { x: 1, z: -1 }, length: 3.5, width: 1.2 }, opt.o || {})); break;
+  }
+  dummy.position.set(cat === 'slash' ? -0.9 : 0, 0, cat === 'slash' ? -0.9 : 0);
+  for (let i = 0; i < steps; i++) {
+    const tt = (i + 1) * dt;
+    if (h && cat === 'projectile') { const x = -2.4 + tt / t * 2.4 * (opt.travel ?? 1); h.set({ x: x * 0.7, y: 1.0, z: -x * 0.7 + 0.0 }, { x: 0.7, y: 0, z: -0.7 }); }
+    fx.update(dt);
+    if (model && model.userData.anim) model.userData.anim(model, tt);
+  }
+  return { h, model };
+}
+const info = { tris: {}, errors: [] };
+window.info = info;
+window.sheet = async function (cat, kinds, opt = {}) {
+  const CW = opt.cw || 420, CH = opt.ch || 380, cols = opt.cols || 6, rows = Math.ceil(kinds.length / cols);
+  renderer.setSize(CW, CH);
+  const out = document.createElement('canvas'); out.width = CW * cols; out.height = CH * rows; const o2 = out.getContext('2d');
+  o2.fillStyle = '#000'; o2.fillRect(0, 0, out.width, out.height);
+  for (let i = 0; i < kinds.length; i++) {
+    const [kind, grade] = kinds[i].split('@'), fx = new SkillFx(scene);
+    const optK = grade ? Object.assign({}, opt, { o: Object.assign({}, opt.o || {}, { grade: +grade }) }) : opt;
+    let st;
+    try { st = stage(cat, kind, fx, opt.t ?? 0.3, optK); } catch (err) { info.errors.push(cat + ':' + kind + ' ' + err.stack); }
+    aim(opt.fx ?? 0, opt.fz ?? 0, CW, CH);
+    const dv = dummy.visible; ground.visible = false; dummy.visible = false;
+    renderer.render(scene, cam); info.tris[cat + ':' + kinds[i]] = renderer.info.render.triangles;
+    ground.visible = true; dummy.visible = dv;
+    renderer.render(scene, cam);
+    o2.drawImage(renderer.domElement, (i % cols) * CW, Math.floor(i / cols) * CH);
+    o2.fillStyle = 'rgba(0,0,0,0.55)'; o2.fillRect((i % cols) * CW, Math.floor(i / cols) * CH, CW, 20);
+    o2.fillStyle = '#fff'; o2.font = '15px sans-serif'; o2.fillText(`${kinds[i]}  (${info.tris[cat + ':' + kinds[i]]} tris)`, (i % cols) * CW + 6, Math.floor(i / cols) * CH + 15);
+    if (st && st.model) scene.remove(st.model);
+    fx.dispose();
+  }
+  return out.toDataURL('image/png');
+};
+window.ready = true;
+</script></body></html>

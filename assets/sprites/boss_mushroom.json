@@ -1,0 +1,64 @@
+{
+ "name": "boss_mushroom",
+ "frameW": 168,
+ "frameH": 168,
+ "pivotX": 84,
+ "pivotY": 46,
+ "ppu": 32,
+ "pitch": 38.0,
+ "cols": 12,
+ "rows": 12,
+ "texW": 2016,
+ "texH": 2016,
+ "dirMode": "5mirror",
+ "actions": [
+  {
+   "name": "idle",
+   "frames": 4,
+   "fps": 4,
+   "loop": true,
+   "hitFrame": -1,
+   "start": 0
+  },
+  {
+   "name": "walk",
+   "frames": 4,
+   "fps": 6,
+   "loop": true,
+   "hitFrame": -1,
+   "start": 20
+  },
+  {
+   "name": "attack",
+   "frames": 6,
+   "fps": 8,
+   "loop": false,
+   "hitFrame": 4,
+   "start": 40
+  },
+  {
+   "name": "cast",
+   "frames": 6,
+   "fps": 8,
+   "loop": false,
+   "hitFrame": 3,
+   "start": 70
+  },
+  {
+   "name": "hit",
+   "frames": 2,
+   "fps": 10,
+   "loop": false,
+   "hitFrame": -1,
+   "start": 100
+  },
+  {
+   "name": "death",
+   "frames": 6,
+   "fps": 6,
+   "loop": false,
+   "hitFrame": -1,
+   "start": 110
+  }
+ ]
+}

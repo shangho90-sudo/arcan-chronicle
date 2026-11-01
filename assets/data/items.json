@@ -1,0 +1,1421 @@
+{
+ "items": [
+  {
+   "id": "w_stick_1",
+   "name": "연습용 단검",
+   "desc": "모험을 막 시작한 사람에게 주어지는 가벼운 단검. 누구나 쓸 수 있다.",
+   "type": "weapon",
+   "job": "",
+   "tier": 1,
+   "levelReq": 1,
+   "price": 10,
+   "sellPrice": 3,
+   "maxStack": 1,
+   "icon": "w_stick_1",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 3,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "w_pestle_1",
+   "name": "견습 유봉",
+   "desc": "약재를 빻던 튼튼한 유봉.",
+   "type": "weapon",
+   "job": "pharmacist",
+   "tier": 1,
+   "levelReq": 1,
+   "price": 80,
+   "sellPrice": 24,
+   "maxStack": 1,
+   "icon": "w_pestle_1",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 6,
+     "mul": 0.0
+    },
+    {
+     "stat": "matk",
+     "add": 2,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "w_pestle_2",
+   "name": "은빛 유봉",
+   "desc": "은으로 감싼 유봉. 회복 효율 +10%.",
+   "type": "weapon",
+   "job": "pharmacist",
+   "tier": 2,
+   "levelReq": 5,
+   "price": 420,
+   "sellPrice": 120,
+   "maxStack": 1,
+   "icon": "w_pestle_2",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 14,
+     "mul": 0.0
+    },
+    {
+     "stat": "healPower",
+     "add": 0.1,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "w_pestle_3",
+   "name": "명의의 유봉",
+   "desc": "독버섯의 독을 정화해 만든 명품. 회복 효율 +20%.",
+   "type": "weapon",
+   "job": "pharmacist",
+   "tier": 3,
+   "levelReq": 8,
+   "price": 0,
+   "sellPrice": 300,
+   "maxStack": 1,
+   "icon": "w_pestle_3",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 26,
+     "mul": 0.0
+    },
+    {
+     "stat": "healPower",
+     "add": 0.2,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "w_knife_1",
+   "name": "무딘 식칼",
+   "desc": "잘 갈면 그럭저럭 쓸 만하다.",
+   "type": "weapon",
+   "job": "cook",
+   "tier": 1,
+   "levelReq": 1,
+   "price": 80,
+   "sellPrice": 24,
+   "maxStack": 1,
+   "icon": "w_knife_1",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 6,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "w_knife_2",
+   "name": "숙련 식칼",
+   "desc": "균형이 좋은 식칼. 치명타 +3%.",
+   "type": "weapon",
+   "job": "cook",
+   "tier": 2,
+   "levelReq": 5,
+   "price": 420,
+   "sellPrice": 120,
+   "maxStack": 1,
+   "icon": "w_knife_2",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 14,
+     "mul": 0.0
+    },
+    {
+     "stat": "crit",
+     "add": 0.03,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "w_knife_3",
+   "name": "명장의 식칼",
+   "desc": "명장이 벼린 식칼. 치명타 +6%.",
+   "type": "weapon",
+   "job": "cook",
+   "tier": 3,
+   "levelReq": 8,
+   "price": 0,
+   "sellPrice": 300,
+   "maxStack": 1,
+   "icon": "w_knife_3",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 26,
+     "mul": 0.0
+    },
+    {
+     "stat": "crit",
+     "add": 0.06,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "w_hammer_1",
+   "name": "견습 망치",
+   "desc": "손에 익은 대장간 망치.",
+   "type": "weapon",
+   "job": "blacksmith",
+   "tier": 1,
+   "levelReq": 1,
+   "price": 80,
+   "sellPrice": 24,
+   "maxStack": 1,
+   "icon": "w_hammer_1",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 7,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "w_hammer_2",
+   "name": "강철 망치",
+   "desc": "단단한 강철 망치. 방어력 +3.",
+   "type": "weapon",
+   "job": "blacksmith",
+   "tier": 2,
+   "levelReq": 5,
+   "price": 420,
+   "sellPrice": 120,
+   "maxStack": 1,
+   "icon": "w_hammer_2",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 16,
+     "mul": 0.0
+    },
+    {
+     "stat": "def",
+     "add": 3,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "w_hammer_3",
+   "name": "장인의 망치",
+   "desc": "장인의 혼이 담긴 망치. 방어력 +6.",
+   "type": "weapon",
+   "job": "blacksmith",
+   "tier": 3,
+   "levelReq": 8,
+   "price": 0,
+   "sellPrice": 300,
+   "maxStack": 1,
+   "icon": "w_hammer_3",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 29,
+     "mul": 0.0
+    },
+    {
+     "stat": "def",
+     "add": 6,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "w_scissors_1",
+   "name": "견습 가위",
+   "desc": "연습용 가위.",
+   "type": "weapon",
+   "job": "hairdresser",
+   "tier": 1,
+   "levelReq": 1,
+   "price": 80,
+   "sellPrice": 24,
+   "maxStack": 1,
+   "icon": "w_scissors_1",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 5,
+     "mul": 0.0
+    },
+    {
+     "stat": "crit",
+     "add": 0.03,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "w_scissors_2",
+   "name": "은 가위",
+   "desc": "날렵한 은 가위. 치명타 +6%.",
+   "type": "weapon",
+   "job": "hairdresser",
+   "tier": 2,
+   "levelReq": 5,
+   "price": 420,
+   "sellPrice": 120,
+   "maxStack": 1,
+   "icon": "w_scissors_2",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 12,
+     "mul": 0.0
+    },
+    {
+     "stat": "crit",
+     "add": 0.06,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "w_scissors_3",
+   "name": "장인의 가위",
+   "desc": "바람도 자르는 가위. 치명타 +10%.",
+   "type": "weapon",
+   "job": "hairdresser",
+   "tier": 3,
+   "levelReq": 8,
+   "price": 0,
+   "sellPrice": 300,
+   "maxStack": 1,
+   "icon": "w_scissors_3",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 23,
+     "mul": 0.0
+    },
+    {
+     "stat": "crit",
+     "add": 0.1,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "w_brush_1",
+   "name": "견습 붓",
+   "desc": "물감이 잘 묻는 붓.",
+   "type": "weapon",
+   "job": "artist",
+   "tier": 1,
+   "levelReq": 1,
+   "price": 80,
+   "sellPrice": 24,
+   "maxStack": 1,
+   "icon": "w_brush_1",
+   "stats": [
+    {
+     "stat": "matk",
+     "add": 7,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "w_brush_2",
+   "name": "비단 붓",
+   "desc": "비단결처럼 부드러운 붓.",
+   "type": "weapon",
+   "job": "artist",
+   "tier": 2,
+   "levelReq": 5,
+   "price": 420,
+   "sellPrice": 120,
+   "maxStack": 1,
+   "icon": "w_brush_2",
+   "stats": [
+    {
+     "stat": "matk",
+     "add": 16,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "w_brush_3",
+   "name": "거장의 붓",
+   "desc": "거장이 쓰던 붓. 영감이 샘솟는다.",
+   "type": "weapon",
+   "job": "artist",
+   "tier": 3,
+   "levelReq": 8,
+   "price": 0,
+   "sellPrice": 300,
+   "maxStack": 1,
+   "icon": "w_brush_3",
+   "stats": [
+    {
+     "stat": "matk",
+     "add": 30,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "a_armor_1",
+   "name": "무명 옷",
+   "desc": "질긴 무명으로 지은 옷.",
+   "type": "armor",
+   "job": "",
+   "tier": 1,
+   "levelReq": 1,
+   "price": 60,
+   "sellPrice": 18,
+   "maxStack": 1,
+   "icon": "a_armor_1",
+   "stats": [
+    {
+     "stat": "def",
+     "add": 4,
+     "mul": 0.0
+    },
+    {
+     "stat": "maxHp",
+     "add": 20,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "a_armor_2",
+   "name": "가죽 조끼",
+   "desc": "두꺼운 가죽 조끼.",
+   "type": "armor",
+   "job": "",
+   "tier": 2,
+   "levelReq": 5,
+   "price": 380,
+   "sellPrice": 110,
+   "maxStack": 1,
+   "icon": "a_armor_2",
+   "stats": [
+    {
+     "stat": "def",
+     "add": 10,
+     "mul": 0.0
+    },
+    {
+     "stat": "maxHp",
+     "add": 50,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "a_armor_3",
+   "name": "독버섯 망토",
+   "desc": "거대 독버섯의 갓으로 만든 망토.",
+   "type": "armor",
+   "job": "",
+   "tier": 3,
+   "levelReq": 8,
+   "price": 0,
+   "sellPrice": 280,
+   "maxStack": 1,
+   "icon": "a_armor_3",
+   "stats": [
+    {
+     "stat": "def",
+     "add": 18,
+     "mul": 0.0
+    },
+    {
+     "stat": "maxHp",
+     "add": 100,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "ac_ring_1",
+   "name": "구리 반지",
+   "desc": "평범한 구리 반지.",
+   "type": "accessory",
+   "job": "",
+   "tier": 1,
+   "levelReq": 1,
+   "price": 120,
+   "sellPrice": 36,
+   "maxStack": 1,
+   "icon": "ac_ring_1",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 3,
+     "mul": 0.0
+    },
+    {
+     "stat": "matk",
+     "add": 3,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "ac_amulet_2",
+   "name": "이끼 부적",
+   "desc": "이끼 골렘의 기운이 깃든 부적.",
+   "type": "accessory",
+   "job": "",
+   "tier": 2,
+   "levelReq": 6,
+   "price": 0,
+   "sellPrice": 150,
+   "maxStack": 1,
+   "icon": "ac_amulet_2",
+   "stats": [
+    {
+     "stat": "maxHp",
+     "add": 60,
+     "mul": 0.0
+    },
+    {
+     "stat": "spRegen",
+     "add": 0.8,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "ac_ring_3",
+   "name": "포자 결정 반지",
+   "desc": "독버섯의 포자가 결정이 된 반지.",
+   "type": "accessory",
+   "job": "",
+   "tier": 3,
+   "levelReq": 8,
+   "price": 0,
+   "sellPrice": 320,
+   "maxStack": 1,
+   "icon": "ac_ring_3",
+   "stats": [
+    {
+     "stat": "crit",
+     "add": 0.08,
+     "mul": 0.0
+    },
+    {
+     "stat": "atk",
+     "add": 8,
+     "mul": 0.0
+    },
+    {
+     "stat": "matk",
+     "add": 8,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "c_potion_s",
+   "name": "작은 회복 물약",
+   "desc": "체력을 60 회복한다.",
+   "type": "consumable",
+   "job": "",
+   "tier": 1,
+   "levelReq": 1,
+   "price": 25,
+   "sellPrice": 8,
+   "maxStack": 50,
+   "icon": "c_potion_s",
+   "stats": [],
+   "use": {
+    "heal": 60,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "c_potion_m",
+   "name": "회복 물약",
+   "desc": "체력을 160 회복한다.",
+   "type": "consumable",
+   "job": "",
+   "tier": 2,
+   "levelReq": 1,
+   "price": 70,
+   "sellPrice": 22,
+   "maxStack": 50,
+   "icon": "c_potion_m",
+   "stats": [],
+   "use": {
+    "heal": 160,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "c_sp_potion",
+   "name": "기력 물약",
+   "desc": "기력을 50 회복한다.",
+   "type": "consumable",
+   "job": "",
+   "tier": 1,
+   "levelReq": 1,
+   "price": 40,
+   "sellPrice": 12,
+   "maxStack": 50,
+   "icon": "c_sp_potion",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 50,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "c_antidote",
+   "name": "해독제",
+   "desc": "중독을 즉시 치료한다.",
+   "type": "consumable",
+   "job": "",
+   "tier": 1,
+   "levelReq": 1,
+   "price": 20,
+   "sellPrice": 6,
+   "maxStack": 50,
+   "icon": "c_antidote",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "poison",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "m_jelly",
+   "name": "보송한 토끼털",
+   "desc": "숲 토끼의 부드러운 털. 상점에 팔 수 있다.",
+   "type": "material",
+   "job": "",
+   "tier": 1,
+   "levelReq": 1,
+   "price": 0,
+   "sellPrice": 4,
+   "maxStack": 99,
+   "icon": "m_jelly",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "m_spore",
+   "name": "단단한 도토리",
+   "desc": "도토리 다람쥐가 모아 둔 도토리. 약재로 쓰인다.",
+   "type": "material",
+   "job": "",
+   "tier": 1,
+   "levelReq": 1,
+   "price": 0,
+   "sellPrice": 6,
+   "maxStack": 99,
+   "icon": "m_spore",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "m_herb",
+   "name": "약초",
+   "desc": "숲에서 자라는 약초.",
+   "type": "material",
+   "job": "",
+   "tier": 1,
+   "levelReq": 1,
+   "price": 0,
+   "sellPrice": 5,
+   "maxStack": 99,
+   "icon": "m_herb",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "m_moss_stone",
+   "name": "곰 발톱",
+   "desc": "꽃잎 곰의 단단한 발톱. 대장장이가 좋아한다.",
+   "type": "material",
+   "job": "",
+   "tier": 2,
+   "levelReq": 1,
+   "price": 0,
+   "sellPrice": 14,
+   "maxStack": 99,
+   "icon": "m_moss_stone",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "m_boss_cap",
+   "name": "독버섯 갓",
+   "desc": "거대 독버섯의 갓 조각. 귀한 재료.",
+   "type": "material",
+   "job": "",
+   "tier": 3,
+   "levelReq": 1,
+   "price": 0,
+   "sellPrice": 120,
+   "maxStack": 99,
+   "icon": "m_boss_cap",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "m_fox_fur",
+   "name": "여우 꼬리털",
+   "desc": "날쌘 여우의 풍성한 꼬리털.",
+   "type": "material",
+   "job": "",
+   "tier": 1,
+   "levelReq": 1,
+   "price": 0,
+   "sellPrice": 6,
+   "maxStack": 99,
+   "icon": "m_fox_fur",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "m_wolf_fang",
+   "name": "늑대 송곳니",
+   "desc": "달빛 늑대의 날카로운 송곳니.",
+   "type": "material",
+   "job": "",
+   "tier": 2,
+   "levelReq": 1,
+   "price": 0,
+   "sellPrice": 10,
+   "maxStack": 99,
+   "icon": "m_wolf_fang",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "m_boar_tusk",
+   "name": "멧돼지 엄니",
+   "desc": "이끼 멧돼지의 굽은 엄니.",
+   "type": "material",
+   "job": "",
+   "tier": 2,
+   "levelReq": 1,
+   "price": 0,
+   "sellPrice": 12,
+   "maxStack": 99,
+   "icon": "m_boar_tusk",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "m_mist_tail",
+   "name": "안개빛 여우 꼬리",
+   "desc": "안개 여우의 은빛 꼬리털. 안개처럼 가볍다.",
+   "type": "material",
+   "job": "",
+   "tier": 2,
+   "levelReq": 1,
+   "price": 0,
+   "sellPrice": 18,
+   "maxStack": 99,
+   "icon": "m_mist_tail",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "m_toad_gland",
+   "name": "안개 두꺼비 독샘",
+   "desc": "안개 두꺼비의 끈적한 독샘. 약사들이 해독제 재료로 쓴다.",
+   "type": "material",
+   "job": "",
+   "tier": 2,
+   "levelReq": 1,
+   "price": 0,
+   "sellPrice": 22,
+   "maxStack": 99,
+   "icon": "m_toad_gland",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "m_bog_tusk",
+   "name": "늪 멧돼지 엄니",
+   "desc": "이끼와 진흙이 엉겨 붙은 묵직한 엄니.",
+   "type": "material",
+   "job": "",
+   "tier": 2,
+   "levelReq": 1,
+   "price": 0,
+   "sellPrice": 26,
+   "maxStack": 99,
+   "icon": "m_bog_tusk",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "m_mist_fang",
+   "name": "안개 늑대 송곳니",
+   "desc": "희미하게 빛나는 안개 늑대의 송곳니.",
+   "type": "material",
+   "job": "",
+   "tier": 2,
+   "levelReq": 1,
+   "price": 0,
+   "sellPrice": 30,
+   "maxStack": 99,
+   "icon": "m_mist_fang",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "m_mist_bear_claw",
+   "name": "우두머리 곰의 발톱",
+   "desc": "안개골 우두머리 곰의 거대한 발톱. 대장장이가 탐내는 재료.",
+   "type": "material",
+   "job": "",
+   "tier": 3,
+   "levelReq": 1,
+   "price": 0,
+   "sellPrice": 160,
+   "maxStack": 99,
+   "icon": "m_mist_bear_claw",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "m_frost_fang",
+   "name": "서리 송곳니",
+   "desc": "서리 늑대의 얼음처럼 차가운 송곳니.",
+   "type": "material",
+   "job": "",
+   "tier": 2,
+   "levelReq": 1,
+   "price": 0,
+   "sellPrice": 34,
+   "maxStack": 99,
+   "icon": "m_frost_fang",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "m_ice_tail",
+   "name": "얼음꽃 꼬리털",
+   "desc": "눈꽃이 맺힌 얼음꽃 여우의 꼬리털.",
+   "type": "material",
+   "job": "",
+   "tier": 2,
+   "levelReq": 1,
+   "price": 0,
+   "sellPrice": 40,
+   "maxStack": 99,
+   "icon": "m_ice_tail",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "m_frost_horn",
+   "name": "서리뿔 조각",
+   "desc": "서리뿔 산양의 뿔에서 떨어진 얼음 결정 조각.",
+   "type": "material",
+   "job": "",
+   "tier": 2,
+   "levelReq": 1,
+   "price": 0,
+   "sellPrice": 46,
+   "maxStack": 99,
+   "icon": "m_frost_horn",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "m_snow_pelt",
+   "name": "설원 곰 가죽",
+   "desc": "눈보라도 막아 주는 두툼한 설원 곰 가죽.",
+   "type": "material",
+   "job": "",
+   "tier": 3,
+   "levelReq": 1,
+   "price": 0,
+   "sellPrice": 55,
+   "maxStack": 99,
+   "icon": "m_snow_pelt",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "m_glacier_horn",
+   "name": "빙하뿔",
+   "desc": "산양왕의 빙하처럼 푸른 뿔. 녹지 않는다.",
+   "type": "material",
+   "job": "",
+   "tier": 3,
+   "levelReq": 1,
+   "price": 0,
+   "sellPrice": 260,
+   "maxStack": 99,
+   "icon": "m_glacier_horn",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "m_drake_scale",
+   "name": "비룡 비늘",
+   "desc": "불씨 비룡의 붉은 비늘. 아직 따뜻하다.",
+   "type": "material",
+   "job": "",
+   "tier": 3,
+   "levelReq": 1,
+   "price": 0,
+   "sellPrice": 60,
+   "maxStack": 99,
+   "icon": "m_drake_scale",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "m_cinder_gland",
+   "name": "잿불 주머니",
+   "desc": "잿불 도마뱀이 불씨를 머금어 두는 주머니.",
+   "type": "material",
+   "job": "",
+   "tier": 3,
+   "levelReq": 1,
+   "price": 0,
+   "sellPrice": 66,
+   "maxStack": 99,
+   "icon": "m_cinder_gland",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "m_lava_tusk",
+   "name": "용암 엄니",
+   "desc": "용암에 그을린 검붉은 엄니.",
+   "type": "material",
+   "job": "",
+   "tier": 3,
+   "levelReq": 1,
+   "price": 0,
+   "sellPrice": 72,
+   "maxStack": 99,
+   "icon": "m_lava_tusk",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "m_rune_shard",
+   "name": "룬 석판 조각",
+   "desc": "유적 수호석에 새겨진 고대 룬의 파편. 희미한 빛이 남아 있다.",
+   "type": "material",
+   "job": "",
+   "tier": 3,
+   "levelReq": 1,
+   "price": 0,
+   "sellPrice": 80,
+   "maxStack": 99,
+   "icon": "m_rune_shard",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "m_dragon_blood",
+   "name": "용혈 결정",
+   "desc": "용혈 비룡의 피가 굳어 생긴 붉은 결정.",
+   "type": "material",
+   "job": "",
+   "tier": 3,
+   "levelReq": 1,
+   "price": 0,
+   "sellPrice": 380,
+   "maxStack": 99,
+   "icon": "m_dragon_blood",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  },
+  {
+   "id": "m_dragon_heart",
+   "name": "고룡의 심장",
+   "desc": "잊힌 고룡 벨카르의 심장. 아직도 고동치는 듯하다. 전설의 재료.",
+   "type": "material",
+   "job": "",
+   "tier": 3,
+   "levelReq": 1,
+   "price": 0,
+   "sellPrice": 1500,
+   "maxStack": 99,
+   "icon": "m_dragon_heart",
+   "stats": [],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   }
+  }
+ ]
+}

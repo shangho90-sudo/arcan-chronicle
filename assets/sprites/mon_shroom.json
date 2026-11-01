@@ -1,0 +1,56 @@
+{
+ "name": "mon_shroom",
+ "frameW": 64,
+ "frameH": 64,
+ "pivotX": 32,
+ "pivotY": 22,
+ "ppu": 32,
+ "pitch": 38.0,
+ "cols": 32,
+ "rows": 4,
+ "texW": 2048,
+ "texH": 256,
+ "dirMode": "5mirror",
+ "actions": [
+  {
+   "name": "idle",
+   "frames": 4,
+   "fps": 5,
+   "loop": true,
+   "hitFrame": -1,
+   "start": 0
+  },
+  {
+   "name": "walk",
+   "frames": 4,
+   "fps": 8,
+   "loop": true,
+   "hitFrame": -1,
+   "start": 20
+  },
+  {
+   "name": "attack",
+   "frames": 5,
+   "fps": 10,
+   "loop": false,
+   "hitFrame": 3,
+   "start": 40
+  },
+  {
+   "name": "hit",
+   "frames": 2,
+   "fps": 10,
+   "loop": false,
+   "hitFrame": -1,
+   "start": 65
+  },
+  {
+   "name": "death",
+   "frames": 6,
+   "fps": 10,
+   "loop": false,
+   "hitFrame": -1,
+   "start": 75
+  }
+ ]
+}

@@ -1,0 +1,23 @@
+const { chromium } = require('playwright');
+const W = +process.env.W || 1280, H = +process.env.H || 720, DPR = +process.env.DPR || 1, TAG = process.env.TAG || 'fhd';
+(async () => {
+  const b = await chromium.launch({ args: ['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader'] });
+  const ctx = await b.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: DPR });
+  await ctx.route(/cdn\.jsdelivr\.net\/npm\/three@0\.160\.0\/examples\/jsm\/(.*)/, r => { const m = r.request().url().match(/examples\/jsm\/(.*)$/); r.fulfill({ path: '/tmp/three160/examples/jsm/' + m[1], contentType: 'text/javascript', headers: { 'access-control-allow-origin': '*' } }); });
+  await ctx.route('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js', r => r.fulfill({ path: '/opt/dl/three.module.js', contentType: 'text/javascript', headers: { 'access-control-allow-origin': '*' } }));
+  const pg = await ctx.newPage(); const errs = [];
+  pg.on('pageerror', e => errs.push('PAGEERR ' + e.message)); pg.on('console', m => { if (m.type() === 'error' || m.type() === 'warning') errs.push(m.type() + ' ' + m.text()); });
+  const ev = (f, a) => pg.evaluate(f, a), wait = ms => pg.waitForTimeout(ms);
+  await pg.goto('http://localhost:8765/index.html?sim=3');
+  await pg.waitForFunction(() => !document.getElementById('loading'), null, { timeout: 300000 });
+  await wait(1500); if (!process.env.CLIP) await pg.screenshot({ path: `/tmp/t_${TAG}_title.png` });
+  await pg.waitForFunction(() => [...document.querySelectorAll('button')].some(b => b.textContent.includes('새 게임')), null, { timeout: 300000 }); await pg.evaluate(() => [...document.querySelectorAll('button')].find(b => b.textContent.includes('새 게임')).click()); await wait(400);
+  if (await pg.locator('button', { hasText: '확인' }).count()) await pg.locator('button', { hasText: '확인' }).click();
+  await pg.waitForFunction(() => [...document.querySelectorAll('button')].some(b => b.textContent.includes('모험 시작')), null, { timeout: 300000 }); await pg.evaluate(() => [...document.querySelectorAll('button')].find(b => b.textContent.includes('모험 시작')).click());
+  await pg.waitForFunction(() => G.inWorld && G.player && !G.loading, null, { timeout: 300000 }); await wait(1500);
+  await ev(() => { const b = G.player.sheet.bag; for (const id of ['w_hammer_3','w_pestle_2','w_knife_1','w_scissors_2','w_brush_3','a_armor_2','a_armor_3','ac_ring_1','ac_amulet_2','ac_ring_3','c_potion_m','c_sp_potion','c_antidote','m_jelly','m_spore','m_herb','m_moss_stone','m_boss_cap']) b.add(id, 1); });
+  await pg.keyboard.press('KeyI'); await wait(1200);
+  await pg.screenshot({ path: '/tmp/inv.png', timeout: 300000 });
+  console.log(errs.join('\n'));
+  await b.close();
+})();

@@ -1,0 +1,182 @@
+{
+ "npcs": [
+  {
+   "id": "elder",
+   "name": "하람",
+   "title": "촌장",
+   "sheet": "npc_elder",
+   "role": "elder",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "아르칸 마을은 생활 직업으로 살아가는 곳이라네.",
+    "분수는 마을의 자랑이지. 물소리가 들리나?"
+   ]
+  },
+  {
+   "id": "merchant",
+   "name": "모아",
+   "title": "잡화 상인",
+   "sheet": "npc_merchant",
+   "role": "merchant",
+   "shop": "shop_general",
+   "job": "",
+   "lines": [
+    "물약, 해독제, 장신구 있어요!",
+    "숲에서 주운 재료는 저한테 파세요."
+   ]
+  },
+  {
+   "id": "guard",
+   "name": "도윤",
+   "title": "경비병",
+   "sheet": "npc_guard",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "이 길로 가면 속삭이는 숲이오.",
+    "몸 조심하시오."
+   ]
+  },
+  {
+   "id": "master_pharmacist",
+   "name": "소연",
+   "title": "약사 마스터",
+   "sheet": "npc_master_pharmacist",
+   "role": "jobmaster",
+   "shop": "shop_pharmacy",
+   "job": "pharmacist",
+   "lines": [
+    "약은 쓰지만 몸에는 좋답니다.",
+    "유봉은 약재도 빻고 몬스터도 빻죠!"
+   ]
+  },
+  {
+   "id": "master_cook",
+   "name": "금강",
+   "title": "요리사 마스터",
+   "sheet": "npc_master_cook",
+   "role": "jobmaster",
+   "shop": "",
+   "job": "cook",
+   "lines": [
+    "배가 든든해야 싸움도 이기지!",
+    "칼질은 리듬이야. 탁탁탁!"
+   ]
+  },
+  {
+   "id": "master_blacksmith",
+   "name": "철산",
+   "title": "대장장이 마스터",
+   "sheet": "npc_master_blacksmith",
+   "role": "jobmaster",
+   "shop": "shop_smithy",
+   "job": "blacksmith",
+   "lines": [
+    "쇠는 달궈졌을 때 두드려야지.",
+    "좋은 장비는 목숨을 구한다네."
+   ]
+  },
+  {
+   "id": "master_hairdresser",
+   "name": "리라",
+   "title": "미용사 마스터",
+   "sheet": "npc_master_hairdresser",
+   "role": "jobmaster",
+   "shop": "",
+   "job": "hairdresser",
+   "lines": [
+    "스타일은 속도에서 나와요!",
+    "가위질 한 번에 분위기가 바뀌죠."
+   ]
+  },
+  {
+   "id": "master_artist",
+   "name": "노을",
+   "title": "예술가 마스터",
+   "sheet": "npc_master_artist",
+   "role": "jobmaster",
+   "shop": "",
+   "job": "artist",
+   "lines": [
+    "세상은 거대한 캔버스라네.",
+    "영감은 보호막이 되기도 하지."
+   ]
+  },
+  {
+   "id": "armorer",
+   "name": "단오",
+   "title": "무기상",
+   "sheet": "npc_armorer",
+   "role": "merchant",
+   "shop": "shop_arms",
+   "job": "",
+   "lines": [
+    "검이든 방패든, 손에 맞아야 진짜 장비지.",
+    "직업에 맞는 무기를 골라 봐."
+   ]
+  }
+ ],
+ "shops": [
+  {
+   "id": "shop_general",
+   "name": "모아의 잡화·물약점",
+   "items": [
+    "c_potion_s",
+    "c_potion_m",
+    "c_sp_potion",
+    "c_antidote",
+    "a_armor_1",
+    "ac_ring_1",
+    "w_stick_1"
+   ]
+  },
+  {
+   "id": "shop_smithy",
+   "name": "철산의 대장간",
+   "items": [
+    "w_pestle_1",
+    "w_knife_1",
+    "w_hammer_1",
+    "w_scissors_1",
+    "w_brush_1",
+    "w_pestle_2",
+    "w_knife_2",
+    "w_hammer_2",
+    "w_scissors_2",
+    "w_brush_2",
+    "a_armor_1",
+    "a_armor_2"
+   ]
+  },
+  {
+   "id": "shop_arms",
+   "name": "단오의 무기·방어구점",
+   "items": [
+    "w_pestle_1",
+    "w_knife_1",
+    "w_hammer_1",
+    "w_scissors_1",
+    "w_brush_1",
+    "w_pestle_2",
+    "w_knife_2",
+    "w_hammer_2",
+    "w_scissors_2",
+    "w_brush_2",
+    "a_armor_1",
+    "a_armor_2"
+   ]
+  },
+  {
+   "id": "shop_pharmacy",
+   "name": "소연의 약국",
+   "items": [
+    "c_potion_s",
+    "c_potion_m",
+    "c_sp_potion",
+    "c_antidote"
+   ]
+  }
+ ]
+}

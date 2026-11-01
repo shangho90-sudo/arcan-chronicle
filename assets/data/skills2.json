@@ -1,0 +1,11009 @@
+{
+"version": 1,
+"skills": [
+{
+"id": "ph1_a1",
+"job": "pharmacist",
+"tier": 1,
+"cat": 0,
+"catName": "유봉 전투",
+"idx": 1,
+"name": "유봉 내려찍기",
+"type": "attack",
+"desc": "정면의 적 하나를 유봉으로 강하게 내려친다.",
+"maxLv": 5,
+"unlock": 10,
+"prereq": [],
+"weapon": "pestle",
+"target": "enemy",
+"range": 2.0,
+"mp": 8,
+"cd": 4,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "attack",
+"ops": [
+{
+"op": "hit",
+"shape": "single",
+"coef": 2.2,
+"fx": {
+"slash": "smash",
+"burst": "hit_blunt"
+},
+"st": [
+{
+"id": "stagger",
+"dur": 0.4,
+"val": 0,
+"ch": 1.0
+}
+]
+}
+],
+"mods": [],
+"flags": {},
+"fx": {
+"color": 4763776
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ph1_a2",
+"job": "pharmacist",
+"tier": 1,
+"cat": 0,
+"catName": "유봉 전투",
+"idx": 2,
+"name": "유봉 두 번 치기",
+"type": "attack",
+"desc": "두 번 타격하며 두 번째 타격이 더 강하다.",
+"maxLv": 5,
+"unlock": 12,
+"prereq": [],
+"weapon": "pestle",
+"target": "enemy",
+"range": 2.0,
+"mp": 10,
+"cd": 5,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "attack",
+"ops": [
+{
+"op": "hit",
+"shape": "single",
+"coef": 1.1,
+"fx": {
+"slash": "arc",
+"burst": "hit_blunt"
+}
+},
+{
+"op": "hit",
+"shape": "single",
+"coef": 1.9,
+"at": 0.28,
+"fx": {
+"slash": "arc",
+"burst": "hit_blunt"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {
+"color": 4763776
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ph1_a3",
+"job": "pharmacist",
+"tier": 1,
+"cat": 0,
+"catName": "유봉 전투",
+"idx": 3,
+"name": "유봉 휘두르기",
+"type": "attack",
+"desc": "좁은 부채꼴 범위의 적을 휩쓴다.",
+"maxLv": 5,
+"unlock": 15,
+"prereq": [],
+"weapon": "pestle",
+"target": "dir",
+"range": 2.6,
+"mp": 12,
+"cd": 6,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "attack",
+"ops": [
+{
+"op": "hit",
+"shape": "cone",
+"coef": 1.7,
+"r": 2.6,
+"ang": 70,
+"fx": {
+"slash": "arc"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {
+"color": 4763776
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ph1_a4",
+"job": "pharmacist",
+"tier": 1,
+"cat": 0,
+"catName": "유봉 전투",
+"idx": 4,
+"name": "밀어내기",
+"type": "attack",
+"desc": "적을 밀쳐낸다. 밀치기에 면역인 적에게는 추가 피해.",
+"maxLv": 5,
+"unlock": 18,
+"prereq": [],
+"weapon": "pestle",
+"target": "enemy",
+"range": 2.0,
+"mp": 10,
+"cd": 7,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "attack",
+"ops": [
+{
+"op": "hit",
+"shape": "cone",
+"coef": 1.4,
+"r": 2.2,
+"ang": 80,
+"knock": 3.0,
+"vsImmune": 1.6,
+"fx": {
+"slash": "thrust",
+"burst": "hit_blunt"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {
+"color": 4763776
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ph1_a5",
+"job": "pharmacist",
+"tier": 1,
+"cat": 0,
+"catName": "유봉 전투",
+"idx": 5,
+"name": "유봉 숙련",
+"type": "passive",
+"desc": "유봉 기본 공격 피해와 공격 속도가 증가한다.",
+"maxLv": 5,
+"unlock": 20,
+"prereq": [],
+"weapon": "pestle",
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [
+{
+"stat": "atkSpeed",
+"mul": 0.04,
+"mulLv": 0.02
+}
+],
+"flags": {
+"basicDmg": [
+0.06,
+0.04
+]
+},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ph1_b1",
+"job": "pharmacist",
+"tier": 1,
+"cat": 1,
+"catName": "기초 약병술",
+"idx": 1,
+"name": "화염 약병",
+"type": "attack",
+"desc": "약병을 던져 작은 폭발과 화상을 일으킨다.",
+"maxLv": 5,
+"unlock": 10,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 7,
+"mp": 12,
+"cd": 5,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "throw",
+"ops": [
+{
+"op": "proj",
+"kind": "lob",
+"coef": 1.6,
+"r": 1.6,
+"elem": "fire",
+"fx": "flask_fire",
+"burst": "explosion_fire",
+"st": [
+{
+"id": "burn",
+"dur": 4,
+"val": 0.12,
+"ch": 1.0
+}
+],
+"tag": "flask"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {
+"color": 16742960
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ph1_b2",
+"job": "pharmacist",
+"tier": 1,
+"cat": 1,
+"catName": "기초 약병술",
+"idx": 2,
+"name": "냉각 약병",
+"type": "attack",
+"desc": "냉기 피해와 둔화를 준다.",
+"maxLv": 5,
+"unlock": 12,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 7,
+"mp": 12,
+"cd": 6,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "throw",
+"ops": [
+{
+"op": "proj",
+"kind": "lob",
+"coef": 1.4,
+"r": 1.8,
+"elem": "ice",
+"fx": "flask_ice",
+"burst": "explosion_ice",
+"st": [
+{
+"id": "slow",
+"dur": 3,
+"val": 0.35,
+"ch": 1.0
+}
+],
+"tag": "flask"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {
+"color": 8048895
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ph1_b3",
+"job": "pharmacist",
+"tier": 1,
+"cat": 1,
+"catName": "기초 약병술",
+"idx": 3,
+"name": "전격 약병",
+"type": "attack",
+"desc": "전기 피해 후 가까운 적 하나에게 전이된다.",
+"maxLv": 5,
+"unlock": 15,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 7,
+"mp": 14,
+"cd": 6,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "throw",
+"ops": [
+{
+"op": "proj",
+"kind": "lob",
+"coef": 1.5,
+"r": 1.2,
+"elem": "shock",
+"fx": "flask_shock",
+"burst": "explosion_shock",
+"chain": {
+"n": 1,
+"range": 4,
+"coef": 0.8
+},
+"tag": "flask"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {
+"color": 16769104
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ph1_b4",
+"job": "pharmacist",
+"tier": 1,
+"cat": 1,
+"catName": "기초 약병술",
+"idx": 4,
+"name": "부식 약병",
+"type": "attack",
+"desc": "지속 피해와 방어력 감소를 남긴다.",
+"maxLv": 5,
+"unlock": 18,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 7,
+"mp": 14,
+"cd": 8,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "throw",
+"ops": [
+{
+"op": "proj",
+"kind": "lob",
+"coef": 0.8,
+"r": 1.8,
+"elem": "acid",
+"fx": "flask_acid",
+"burst": "explosion_acid",
+"st": [
+{
+"id": "poison",
+"dur": 5,
+"val": 0.15,
+"ch": 1.0
+},
+{
+"id": "defdown",
+"dur": 5,
+"val": 0.2,
+"ch": 1.0
+}
+],
+"tag": "flask"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {
+"color": 9097280
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ph1_b5",
+"job": "pharmacist",
+"tier": 1,
+"cat": 1,
+"catName": "기초 약병술",
+"idx": 5,
+"name": "정확한 투척",
+"type": "passive",
+"desc": "약병 사거리가 늘고 폭발 중심의 적이 추가 피해를 받는다.",
+"maxLv": 5,
+"unlock": 20,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {
+"throwRange": [
+1.0,
+0.5
+],
+"centerBonus": [
+0.15,
+0.05
+]
+},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ph1_c1",
+"job": "pharmacist",
+"tier": 1,
+"cat": 2,
+"catName": "조제와 응급처치",
+"idx": 1,
+"name": "회복제 제작",
+"type": "craft",
+"desc": "약초와 빈 병으로 HP 회복제를 만든다.",
+"maxLv": 5,
+"unlock": 10,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true,
+"recipes": [
+"r_potion_s",
+"r_potion_m"
+]
+},
+{
+"id": "ph1_c2",
+"job": "pharmacist",
+"tier": 1,
+"cat": 2,
+"catName": "조제와 응급처치",
+"idx": 2,
+"name": "활력제 제작",
+"type": "craft",
+"desc": "약초와 빈 병으로 기력(MP) 회복제를 만든다.",
+"maxLv": 5,
+"unlock": 12,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true,
+"recipes": [
+"r_sp"
+]
+},
+{
+"id": "ph1_c3",
+"job": "pharmacist",
+"tier": 1,
+"cat": 2,
+"catName": "조제와 응급처치",
+"idx": 3,
+"name": "응급 복용",
+"type": "support",
+"desc": "HP 회복제 하나를 소비해 즉시 회복한다. 물약 공용 쿨타임 적용.",
+"maxLv": 5,
+"unlock": 15,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 2,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "consume",
+"tag": "hp_potion",
+"potionCd": true,
+"ops": [
+{
+"op": "heal",
+"pct": 0.08,
+"flat": 20,
+"boost": 0.3
+}
+]
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ph1_c4",
+"job": "pharmacist",
+"tier": 1,
+"cat": 2,
+"catName": "조제와 응급처치",
+"idx": 4,
+"name": "정화 약제",
+"type": "support",
+"desc": "자신의 독 또는 화상 하나를 제거한다.",
+"maxLv": 5,
+"unlock": 18,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 10,
+"cd": 12,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "cleanse",
+"n": 1,
+"ids": [
+"poison",
+"burn"
+]
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ph1_c5",
+"job": "pharmacist",
+"tier": 1,
+"cat": 2,
+"catName": "조제와 응급처치",
+"idx": 5,
+"name": "알뜰 조제",
+"type": "passive",
+"desc": "회복제·활력제 제작 시 확률적으로 하나 더 만든다. 추가 생산은 다시 발동하지 않는다.",
+"maxLv": 5,
+"unlock": 20,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {
+"craftExtra:potion": [
+0.1,
+0.05
+]
+},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "wp_a1",
+"job": "western_pharmacist",
+"tier": 2,
+"cat": 0,
+"catName": "고급 약 마법",
+"idx": 1,
+"name": "작열 캡슐",
+"type": "attack",
+"desc": "대상에 캡슐을 붙인 뒤 지연 폭발시킨다. 화상과 반응 표식 부여.",
+"maxLv": 5,
+"unlock": 30,
+"prereq": [],
+"weapon": null,
+"target": "enemy",
+"range": 7,
+"mp": 22,
+"cd": 7,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "throw",
+"ops": [
+{
+"op": "proj",
+"kind": "normal",
+"coef": 0.6,
+"fx": "capsule",
+"speed": 14,
+"attach": true
+},
+{
+"op": "delay",
+"after": 1.2,
+"r": 2.0,
+"coef": 2.8,
+"elem": "fire",
+"burst": "explosion_fire",
+"onTarget": true,
+"st": [
+{
+"id": "burn",
+"dur": 4,
+"val": 0.15,
+"ch": 1.0
+}
+],
+"mark": {
+"type": "reaction",
+"n": 1
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {
+"color": 16738874
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "wp_a2",
+"job": "western_pharmacist",
+"tier": 2,
+"cat": 0,
+"catName": "고급 약 마법",
+"idx": 2,
+"name": "극저온 앰플",
+"type": "attack",
+"desc": "얼음 결정 범위 공격. 이미 둔화된 일반 적은 짧게 빙결된다.",
+"maxLv": 5,
+"unlock": 33,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 7,
+"mp": 24,
+"cd": 8,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "throw",
+"ops": [
+{
+"op": "proj",
+"kind": "lob",
+"coef": 2.4,
+"r": 2.4,
+"elem": "ice",
+"fx": "ampoule",
+"burst": "ice_crystal",
+"st": [
+{
+"id": "slow",
+"dur": 3,
+"val": 0.4,
+"ch": 1.0
+}
+],
+"vsStatus": {
+"id": "slow",
+"st": {
+"id": "freeze",
+"dur": 1.2,
+"val": 0,
+"ch": 1.0
+}
+},
+"mark": {
+"type": "reaction",
+"n": 1
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {
+"color": 9101567
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "wp_a3",
+"job": "western_pharmacist",
+"tier": 2,
+"cat": 0,
+"catName": "고급 약 마법",
+"idx": 3,
+"name": "전도성 약액",
+"type": "attack",
+"desc": "직선으로 관통하는 전기 약액을 발사하고 표식을 남긴다.",
+"maxLv": 5,
+"unlock": 36,
+"prereq": [],
+"weapon": null,
+"target": "dir",
+"range": 9,
+"mp": 24,
+"cd": 7,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "hit",
+"shape": "line",
+"coef": 2.6,
+"len": 9,
+"w": 1.2,
+"elem": "shock",
+"fx": {
+"beam": "lightning"
+},
+"mark": {
+"type": "reaction",
+"n": 1
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {
+"color": 16769120
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "wp_a4",
+"job": "western_pharmacist",
+"tier": 2,
+"cat": 0,
+"catName": "고급 약 마법",
+"idx": 4,
+"name": "삼중 처방",
+"type": "attack",
+"desc": "화염·냉기·전격 약탄을 차례로 쏜다. 같은 적이 세 속성에 모두 맞으면 추가 폭발.",
+"maxLv": 5,
+"unlock": 40,
+"prereq": [],
+"weapon": null,
+"target": "enemy",
+"range": 8,
+"mp": 30,
+"cd": 10,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "throw",
+"ops": [
+{
+"op": "proj",
+"kind": "normal",
+"coef": 1.0,
+"elem": "fire",
+"fx": "flask_fire",
+"speed": 13,
+"burst": "explosion_fire",
+"tri": "fire"
+},
+{
+"op": "proj",
+"kind": "normal",
+"coef": 1.0,
+"at": 0.18,
+"elem": "ice",
+"fx": "flask_ice",
+"speed": 13,
+"burst": "explosion_ice",
+"tri": "ice"
+},
+{
+"op": "proj",
+"kind": "normal",
+"coef": 1.0,
+"at": 0.36,
+"elem": "shock",
+"fx": "flask_shock",
+"speed": 13,
+"burst": "explosion_shock",
+"tri": "shock"
+},
+{
+"op": "custom",
+"fn": "triple_check",
+"coef": 2.5,
+"r": 2.2
+}
+],
+"mods": [],
+"flags": {},
+"fx": {
+"color": 16777215
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "wp_a5",
+"job": "western_pharmacist",
+"tier": 2,
+"cat": 0,
+"catName": "고급 약 마법",
+"idx": 5,
+"name": "제약 마도포",
+"type": "ultimate",
+"desc": "관통 광선을 쏘고 끝 지점에서 대형 폭발을 일으킨다.",
+"maxLv": 3,
+"unlock": 45,
+"prereq": [],
+"weapon": null,
+"target": "dir",
+"range": 12,
+"mp": 70,
+"cd": 60,
+"cast": 0.9,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "telegraph",
+"shape": "line",
+"len": 12,
+"w": 2.0,
+"dur": 0.9
+},
+{
+"op": "hit",
+"shape": "line",
+"coef": 6.0,
+"len": 12,
+"w": 2.0,
+"elem": "light",
+"fx": {
+"beam": "laser"
+}
+},
+{
+"op": "delay",
+"after": 0.25,
+"r": 3.6,
+"coef": 7.0,
+"atEnd": true,
+"burst": "explosion_big",
+"elem": "fire"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {
+"color": 10148095
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "wp_b1",
+"job": "western_pharmacist",
+"tier": 2,
+"cat": 1,
+"catName": "표식과 연쇄 반응",
+"idx": 1,
+"name": "반응 촉진",
+"type": "support",
+"desc": "일정 시간 표식 부여량이 늘고, 1차 약병도 표식을 남긴다.",
+"maxLv": 5,
+"unlock": 30,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 20,
+"cd": 20,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "buff",
+"id": "catalyst",
+"dur": 10,
+"val": 1,
+"target": "self"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "wp_b2",
+"job": "western_pharmacist",
+"tier": 2,
+"cat": 1,
+"catName": "표식과 연쇄 반응",
+"idx": 2,
+"name": "표적 처방",
+"type": "support",
+"desc": "지정한 적의 표식 축적량과 표식 폭발 피해를 강화한다.",
+"maxLv": 5,
+"unlock": 33,
+"prereq": [],
+"weapon": null,
+"target": "enemy",
+"range": 9,
+"mp": 16,
+"cd": 14,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "hit",
+"shape": "single",
+"coef": 0.0,
+"st": [
+{
+"id": "prescribed",
+"dur": 10,
+"val": 0.5,
+"ch": 1.0
+}
+],
+"fx": {
+"burst": "mark_pop"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "wp_b3",
+"job": "western_pharmacist",
+"tier": 2,
+"cat": 1,
+"catName": "표식과 연쇄 반응",
+"idx": 3,
+"name": "연쇄 약병 폭발",
+"type": "attack",
+"desc": "대상의 표식을 터뜨려 주변 표식 보유 적에게 폭발을 전파한다. 적마다 한 번만 발동.",
+"maxLv": 5,
+"unlock": 36,
+"prereq": [],
+"weapon": null,
+"target": "enemy",
+"range": 8,
+"mp": 26,
+"cd": 9,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "custom",
+"fn": "mark_chain",
+"coef": 1.6,
+"perStack": 0.6,
+"range": 5
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "wp_b4",
+"job": "western_pharmacist",
+"tier": 2,
+"cat": 1,
+"catName": "표식과 연쇄 반응",
+"idx": 4,
+"name": "잔류 반응",
+"type": "passive",
+"desc": "표식 폭발 자리에 지속 피해 영역이 남는다. 잔류 피해는 표식을 만들지 않는다.",
+"maxLv": 5,
+"unlock": 40,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {
+"residue": [
+0.25,
+0.08
+]
+},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "wp_b5",
+"job": "western_pharmacist",
+"tier": 2,
+"cat": 1,
+"catName": "표식과 연쇄 반응",
+"idx": 5,
+"name": "임계 반응",
+"type": "ultimate",
+"desc": "범위 안의 모든 표식을 소비해 대폭발을 일으킨다. 소비량이 많을수록 강해진다.",
+"maxLv": 3,
+"unlock": 45,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 0,
+"mp": 60,
+"cd": 50,
+"cast": 0.6,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "telegraph",
+"shape": "circle",
+"r": 6,
+"dur": 0.6
+},
+{
+"op": "custom",
+"fn": "critical_mass",
+"r": 6,
+"coef": 3.0,
+"perStack": 0.8,
+"cap": 15
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "wp_c1",
+"job": "western_pharmacist",
+"tier": 2,
+"cat": 2,
+"catName": "전문 조제와 생존",
+"idx": 1,
+"name": "고급 회복제 제작",
+"type": "craft",
+"desc": "농축 HP 회복제를 만든다.",
+"maxLv": 5,
+"unlock": 30,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true,
+"recipes": [
+"r_potion_l"
+]
+},
+{
+"id": "wp_c2",
+"job": "western_pharmacist",
+"tier": 2,
+"cat": 2,
+"catName": "전문 조제와 생존",
+"idx": 2,
+"name": "지속 방출 제제",
+"type": "craft",
+"desc": "지속 HP 또는 MP 회복 제제를 만든다.",
+"maxLv": 5,
+"unlock": 33,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true,
+"recipes": [
+"r_regen_hp",
+"r_regen_sp"
+]
+},
+{
+"id": "wp_c3",
+"job": "western_pharmacist",
+"tier": 2,
+"cat": 2,
+"catName": "전문 조제와 생존",
+"idx": 3,
+"name": "광역 분무 치료",
+"type": "support",
+"desc": "자신과 생명체 소환물을 회복하는 치유 안개를 뿌린다.",
+"maxLv": 5,
+"unlock": 36,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 28,
+"cd": 18,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "area",
+"kind": "heal",
+"r": 3.5,
+"dur": 6,
+"tick": 1.0,
+"heal": 0.03,
+"fx": "healing_mist",
+"follow": false,
+"living": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "wp_c4",
+"job": "western_pharmacist",
+"tier": 2,
+"cat": 2,
+"catName": "전문 조제와 생존",
+"idx": 4,
+"name": "응급 보호막",
+"type": "support",
+"desc": "피해를 흡수하는 보호막. 체력이 낮을수록 강해진다.",
+"maxLv": 5,
+"unlock": 40,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 22,
+"cd": 16,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "shield",
+"base": 40,
+"coef": 1.2,
+"dur": 8,
+"lowHp": 1.0
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "wp_c5",
+"job": "western_pharmacist",
+"tier": 2,
+"cat": 2,
+"catName": "전문 조제와 생존",
+"idx": 5,
+"name": "생명 보존 처방",
+"type": "passive",
+"desc": "치명적인 피해를 받으면 소량의 HP를 남기고 보호막을 만든다. (내부 쿨타임 120초)",
+"maxLv": 5,
+"unlock": 45,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {
+"cheatDeath": [
+0.15,
+0.05
+]
+},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hb_a1",
+"job": "herbalist",
+"tier": 2,
+"cat": 0,
+"catName": "약초와 보양",
+"idx": 1,
+"name": "보양탕 달이기",
+"type": "craft",
+"desc": "최대 HP와 자연 회복을 높이는 탕약을 만든다.",
+"maxLv": 5,
+"unlock": 30,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true,
+"recipes": [
+"r_tonic"
+]
+},
+{
+"id": "hb_a2",
+"job": "herbalist",
+"tier": 2,
+"cat": 0,
+"catName": "약초와 보양",
+"idx": 2,
+"name": "기력 순환",
+"type": "support",
+"desc": "자신과 주변 소환물의 이동 속도를 높이고 자신의 MP 회복을 강화한다.",
+"maxLv": 5,
+"unlock": 33,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 18,
+"cd": 20,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "buff",
+"id": "haste",
+"dur": 8,
+"val": 0.2,
+"target": "all"
+},
+{
+"op": "buff",
+"id": "mpregen",
+"dur": 8,
+"val": 4,
+"target": "self"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hb_a3",
+"job": "herbalist",
+"tier": 2,
+"cat": 0,
+"catName": "약초와 보양",
+"idx": 3,
+"name": "금강 약초",
+"type": "support",
+"desc": "방어력과 경직 저항을 강화한다.",
+"maxLv": 5,
+"unlock": 36,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 18,
+"cd": 22,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "buff",
+"id": "defup",
+"dur": 10,
+"val": 0.3,
+"target": "self"
+},
+{
+"op": "buff",
+"id": "ccres",
+"dur": 10,
+"val": 0.5,
+"target": "self"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hb_a4",
+"job": "herbalist",
+"tier": 2,
+"cat": 0,
+"catName": "약초와 보양",
+"idx": 4,
+"name": "정화의 약초밭",
+"type": "support",
+"desc": "주기적으로 회복하고 상태이상을 정화하는 영역을 만든다.",
+"maxLv": 5,
+"unlock": 40,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 6,
+"mp": 30,
+"cd": 24,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "area",
+"kind": "heal",
+"r": 3.0,
+"dur": 8,
+"tick": 1.5,
+"heal": 0.025,
+"cleanse": true,
+"fx": "herb_field",
+"herb": true,
+"living": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hb_a5",
+"job": "herbalist",
+"tier": 2,
+"cat": 0,
+"catName": "약초와 보양",
+"idx": 5,
+"name": "백초대환",
+"type": "ultimate",
+"desc": "즉시 크게 회복한 뒤 공격·방어·회복 효과를 강화한다.",
+"maxLv": 3,
+"unlock": 45,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 60,
+"cd": 60,
+"cast": 0.5,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "heal",
+"pct": 0.35,
+"flat": 0
+},
+{
+"op": "buff",
+"id": "atkup",
+"dur": 12,
+"val": 0.25,
+"target": "self"
+},
+{
+"op": "buff",
+"id": "defup",
+"dur": 12,
+"val": 0.3,
+"target": "self"
+},
+{
+"op": "buff",
+"id": "healup",
+"dur": 12,
+"val": 0.3,
+"target": "self"
+},
+{
+"op": "fx",
+"burst": "heal",
+"r": 3
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hb_b1",
+"job": "herbalist",
+"tier": 2,
+"cat": 1,
+"catName": "식물과 영물 소환",
+"idx": 1,
+"name": "가시덩굴 소환",
+"type": "summon",
+"desc": "적을 속박하고 반복 공격하는 가시덩굴을 소환한다.",
+"maxLv": 5,
+"unlock": 30,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 7,
+"mp": 24,
+"cd": 10,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "summon",
+"kind": "vine",
+"ai": "static_melee",
+"life": 10,
+"hp": 0.6,
+"coef": 0.6,
+"rate": 1.0,
+"range": 2.2,
+"onHit": [
+{
+"id": "root",
+"dur": 1.2,
+"val": 0,
+"ch": 1.0
+}
+],
+"limit": 2,
+"living": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hb_b2",
+"job": "herbalist",
+"tier": 2,
+"cat": 1,
+"catName": "식물과 영물 소환",
+"idx": 2,
+"name": "독초 화원",
+"type": "summon",
+"desc": "독성 포자를 뿌리는 지속 피해 영역을 만든다.",
+"maxLv": 5,
+"unlock": 33,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 7,
+"mp": 26,
+"cd": 14,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "area",
+"kind": "dmg",
+"r": 2.8,
+"dur": 8,
+"tick": 1.0,
+"coef": 0.45,
+"elem": "poison",
+"st": [
+{
+"id": "poison",
+"dur": 3,
+"val": 0.1,
+"ch": 1.0
+}
+],
+"fx": "poison_garden",
+"herb": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hb_b3",
+"job": "herbalist",
+"tier": 2,
+"cat": 1,
+"catName": "식물과 영물 소환",
+"idx": 3,
+"name": "약초 정령",
+"type": "summon",
+"desc": "잎 투사체로 공격하고 주기적으로 주인을 회복하는 정령.",
+"maxLv": 5,
+"unlock": 36,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 28,
+"cd": 20,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "summon",
+"kind": "herb_spirit",
+"ai": "follow_ranged",
+"life": 30,
+"hp": 0.5,
+"coef": 0.7,
+"rate": 1.4,
+"range": 7,
+"proj": "leaf",
+"healOwner": 0.03,
+"healEvery": 4,
+"limit": 1,
+"living": true,
+"fly": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hb_b4",
+"job": "herbalist",
+"tier": 2,
+"cat": 1,
+"catName": "식물과 영물 소환",
+"idx": 4,
+"name": "고목 수호령",
+"type": "summon",
+"desc": "적의 주의를 끌고 뿌리로 범위 공격하는 고목 수호령.",
+"maxLv": 5,
+"unlock": 40,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 6,
+"mp": 34,
+"cd": 28,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "summon",
+"kind": "tree_guardian",
+"ai": "taunt_aoe",
+"life": 20,
+"hp": 2.5,
+"coef": 1.0,
+"rate": 2.2,
+"range": 2.6,
+"taunt": true,
+"limit": 1,
+"living": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hb_b5",
+"job": "herbalist",
+"tier": 2,
+"cat": 1,
+"catName": "식물과 영물 소환",
+"idx": 5,
+"name": "신령의 숲",
+"type": "ultimate",
+"desc": "넓은 둔화 영역을 펼치고 식물 소환물을 강화한다.",
+"maxLv": 3,
+"unlock": 45,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 70,
+"cd": 70,
+"cast": 0.8,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "telegraph",
+"shape": "circle",
+"r": 7,
+"dur": 0.8
+},
+{
+"op": "area",
+"kind": "slow",
+"r": 7,
+"dur": 12,
+"tick": 1.0,
+"coef": 0.3,
+"st": [
+{
+"id": "slow",
+"dur": 1.5,
+"val": 0.45,
+"ch": 1.0
+}
+],
+"fx": "forest_sanctum",
+"empowerSummons": 0.5
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hb_c1",
+"job": "herbalist",
+"tier": 2,
+"cat": 2,
+"catName": "음양오행 공격",
+"idx": 1,
+"name": "목행·청룡덩굴",
+"type": "attack",
+"desc": "직선으로 관통하는 덩굴. 속박된 적에게 추가 피해.",
+"maxLv": 5,
+"unlock": 30,
+"prereq": [],
+"weapon": null,
+"target": "dir",
+"range": 9,
+"mp": 20,
+"cd": 6,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "hit",
+"shape": "line",
+"coef": 2.4,
+"len": 9,
+"w": 1.2,
+"elem": "wood",
+"vsStatus": {
+"id": "root",
+"mul": 1.6
+},
+"fx": {
+"beam": "vine_line"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {
+"color": 4898912
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hb_c2",
+"job": "herbalist",
+"tier": 2,
+"cat": 2,
+"catName": "음양오행 공격",
+"idx": 2,
+"name": "화행·주작염",
+"type": "attack",
+"desc": "불새 투사체가 날아가 범위 폭발과 화상을 일으킨다.",
+"maxLv": 5,
+"unlock": 33,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 9,
+"mp": 24,
+"cd": 8,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "proj",
+"kind": "normal",
+"coef": 2.6,
+"r": 2.2,
+"speed": 11,
+"elem": "fire",
+"fx": "firebird",
+"burst": "explosion_fire",
+"st": [
+{
+"id": "burn",
+"dur": 4,
+"val": 0.15,
+"ch": 1.0
+}
+],
+"toGround": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {
+"color": 16734762
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hb_c3",
+"job": "herbalist",
+"tier": 2,
+"cat": 2,
+"catName": "음양오행 공격",
+"idx": 3,
+"name": "토행·황토진",
+"type": "attack",
+"desc": "지면 범위 공격. 영역 안의 자신은 받는 피해가 줄어든다.",
+"maxLv": 5,
+"unlock": 36,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 6,
+"mp": 24,
+"cd": 10,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "hit",
+"shape": "circle",
+"coef": 2.2,
+"r": 2.6,
+"atAim": true,
+"elem": "earth",
+"fx": {
+"burst": "dust"
+}
+},
+{
+"op": "area",
+"kind": "ward",
+"r": 2.6,
+"dur": 6,
+"tick": 0.5,
+"selfBuff": [
+"dmgreduce",
+0.25
+],
+"fx": "earth_seal"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {
+"color": 14196800
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hb_c4",
+"job": "herbalist",
+"tier": 2,
+"cat": 2,
+"catName": "음양오행 공격",
+"idx": 4,
+"name": "금행·백호침",
+"type": "attack",
+"desc": "부채꼴로 금빛 침을 날린다. 중심의 적이 여러 번 맞으면 방어력이 감소한다.",
+"maxLv": 5,
+"unlock": 40,
+"prereq": [],
+"weapon": null,
+"target": "dir",
+"range": 6,
+"mp": 22,
+"cd": 7,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "hit",
+"shape": "cone",
+"coef": 0.6,
+"r": 6,
+"ang": 50,
+"hits": 4,
+"gap": 0.06,
+"elem": "metal",
+"centerStack": {
+"n": 3,
+"st": {
+"id": "defdown",
+"dur": 5,
+"val": 0.2,
+"ch": 1.0
+}
+},
+"fx": {
+"slash": "fan_needles"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {
+"color": 16767072
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hb_c5",
+"job": "herbalist",
+"tier": 2,
+"cat": 2,
+"catName": "음양오행 공격",
+"idx": 5,
+"name": "수행·현무파",
+"type": "attack",
+"desc": "물결로 밀치고 둔화시킨다. 통과한 약초 영역의 지속시간을 조금 늘린다(최대 +4초).",
+"maxLv": 5,
+"unlock": 45,
+"prereq": [],
+"weapon": null,
+"target": "dir",
+"range": 8,
+"mp": 24,
+"cd": 9,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "hit",
+"shape": "line",
+"coef": 1.8,
+"len": 8,
+"w": 2.4,
+"elem": "water",
+"knock": 2.5,
+"st": [
+{
+"id": "slow",
+"dur": 3,
+"val": 0.35,
+"ch": 1.0
+}
+],
+"extendHerb": 2.0,
+"extendCap": 4.0,
+"fx": {
+"beam": "water_wave"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {
+"color": 4890879
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ck1_a1",
+"job": "cook",
+"tier": 1,
+"cat": 0,
+"catName": "식칼과 프라이팬",
+"idx": 1,
+"name": "식칼 썰기",
+"type": "attack",
+"desc": "빠르게 두 번 벤다.",
+"maxLv": 5,
+"unlock": 10,
+"prereq": [],
+"weapon": "knife",
+"target": "enemy",
+"range": 1.8,
+"mp": 6,
+"cd": 3,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "attack",
+"ops": [
+{
+"op": "hit",
+"shape": "single",
+"coef": 1.0,
+"hits": 2,
+"gap": 0.14,
+"fx": {
+"slash": "arc",
+"burst": "hit_slash"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ck1_a2",
+"job": "cook",
+"tier": 1,
+"cat": 0,
+"catName": "식칼과 프라이팬",
+"idx": 2,
+"name": "팬 강타",
+"type": "attack",
+"desc": "프라이팬으로 강하게 내려쳐 짧게 경직시킨다.",
+"maxLv": 5,
+"unlock": 12,
+"prereq": [],
+"weapon": "knife",
+"target": "enemy",
+"range": 1.8,
+"mp": 10,
+"cd": 6,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "attack",
+"ops": [
+{
+"op": "hit",
+"shape": "single",
+"coef": 2.3,
+"st": [
+{
+"id": "stagger",
+"dur": 0.6,
+"val": 0,
+"ch": 1.0
+}
+],
+"fx": {
+"slash": "smash",
+"burst": "hit_blunt"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ck1_a3",
+"job": "cook",
+"tier": 1,
+"cat": 0,
+"catName": "식칼과 프라이팬",
+"idx": 3,
+"name": "뒤집기",
+"type": "attack",
+"desc": "일반 적을 잠시 띄운다. 띄우기 면역 적에게는 추가 피해.",
+"maxLv": 5,
+"unlock": 15,
+"prereq": [],
+"weapon": "knife",
+"target": "enemy",
+"range": 1.8,
+"mp": 12,
+"cd": 8,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "attack",
+"ops": [
+{
+"op": "hit",
+"shape": "single",
+"coef": 1.5,
+"launch": 0.8,
+"vsImmune": 1.6,
+"fx": {
+"slash": "arc",
+"burst": "dust"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ck1_a4",
+"job": "cook",
+"tier": 1,
+"cat": 0,
+"catName": "식칼과 프라이팬",
+"idx": 4,
+"name": "도마 방어",
+"type": "support",
+"desc": "정면에서 받는 피해를 줄인다.",
+"maxLv": 5,
+"unlock": 18,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 10,
+"cd": 14,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "buff",
+"id": "frontguard",
+"dur": 5,
+"val": 0.5,
+"target": "self"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ck1_a5",
+"job": "cook",
+"tier": 1,
+"cat": 0,
+"catName": "식칼과 프라이팬",
+"idx": 5,
+"name": "손질 숙련",
+"type": "passive",
+"desc": "식칼 공격 속도와 식재료 획득량이 증가한다.",
+"maxLv": 5,
+"unlock": 20,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [
+{
+"stat": "atkSpeed",
+"mul": 0.05,
+"mulLv": 0.02
+}
+],
+"flags": {
+"ingredientDrop": [
+0.1,
+0.05
+]
+},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ck1_b1",
+"job": "cook",
+"tier": 1,
+"cat": 1,
+"catName": "간단한 요리 공격",
+"idx": 1,
+"name": "미트볼 던지기",
+"type": "attack",
+"desc": "미트볼이 부딪히면 작은 범위 피해를 준다.",
+"maxLv": 5,
+"unlock": 10,
+"prereq": [],
+"weapon": null,
+"target": "enemy",
+"range": 7,
+"mp": 10,
+"cd": 4,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "throw",
+"ops": [
+{
+"op": "proj",
+"kind": "normal",
+"coef": 1.7,
+"r": 1.2,
+"speed": 12,
+"fx": "meatball",
+"burst": "hit_blunt"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ck1_b2",
+"job": "cook",
+"tier": 1,
+"cat": 1,
+"catName": "간단한 요리 공격",
+"idx": 2,
+"name": "뜨거운 국물",
+"type": "attack",
+"desc": "전방에 뜨거운 국물을 뿌려 피해와 화상을 준다.",
+"maxLv": 5,
+"unlock": 12,
+"prereq": [],
+"weapon": null,
+"target": "dir",
+"range": 3.2,
+"mp": 12,
+"cd": 6,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "throw",
+"ops": [
+{
+"op": "hit",
+"shape": "cone",
+"coef": 1.5,
+"r": 3.2,
+"ang": 60,
+"elem": "fire",
+"st": [
+{
+"id": "burn",
+"dur": 3,
+"val": 0.12,
+"ch": 1.0
+}
+],
+"fx": {
+"slash": "fire_cone"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ck1_b3",
+"job": "cook",
+"tier": 1,
+"cat": 1,
+"catName": "간단한 요리 공격",
+"idx": 3,
+"name": "후추 뿌리기",
+"type": "attack",
+"desc": "범위 피해와 함께 적의 공격력을 낮춘다.",
+"maxLv": 5,
+"unlock": 15,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 5,
+"mp": 12,
+"cd": 8,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "throw",
+"ops": [
+{
+"op": "hit",
+"shape": "circle",
+"coef": 1.2,
+"r": 2.2,
+"atAim": true,
+"st": [
+{
+"id": "atkdown",
+"dur": 5,
+"val": 0.2,
+"ch": 1.0
+}
+],
+"fx": {
+"burst": "pepper_puff"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ck1_b4",
+"job": "cook",
+"tier": 1,
+"cat": 1,
+"catName": "간단한 요리 공격",
+"idx": 4,
+"name": "밀가루 구름",
+"type": "support",
+"desc": "적을 둔화시키는 밀가루 구름을 만든다.",
+"maxLv": 5,
+"unlock": 18,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 6,
+"mp": 14,
+"cd": 12,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "throw",
+"ops": [
+{
+"op": "area",
+"kind": "slow",
+"r": 2.6,
+"dur": 6,
+"tick": 0.5,
+"st": [
+{
+"id": "slow",
+"dur": 1.0,
+"val": 0.4,
+"ch": 1.0
+}
+],
+"fx": "flour"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ck1_b5",
+"job": "cook",
+"tier": 1,
+"cat": 1,
+"catName": "간단한 요리 공격",
+"idx": 5,
+"name": "꼬치 찌르기",
+"type": "attack",
+"desc": "가까운 직선상의 적을 관통해 찌른다.",
+"maxLv": 5,
+"unlock": 20,
+"prereq": [],
+"weapon": null,
+"target": "dir",
+"range": 3.5,
+"mp": 10,
+"cd": 5,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "attack",
+"ops": [
+{
+"op": "hit",
+"shape": "line",
+"coef": 1.9,
+"len": 3.5,
+"w": 1.0,
+"fx": {
+"slash": "thrust",
+"burst": "hit_pierce"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ck1_c1",
+"job": "cook",
+"tier": 1,
+"cat": 2,
+"catName": "식사와 기초 조리",
+"idx": 1,
+"name": "간단한 도시락",
+"type": "craft",
+"desc": "비전투용 HP 회복 음식을 만든다.",
+"maxLv": 5,
+"unlock": 10,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true,
+"recipes": [
+"r_lunch"
+]
+},
+{
+"id": "ck1_c2",
+"job": "cook",
+"tier": 1,
+"cat": 2,
+"catName": "식사와 기초 조리",
+"idx": 2,
+"name": "따뜻한 수프",
+"type": "craft",
+"desc": "지속 HP 회복 음식을 만든다.",
+"maxLv": 5,
+"unlock": 12,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true,
+"recipes": [
+"r_soup"
+]
+},
+{
+"id": "ck1_c3",
+"job": "cook",
+"tier": 1,
+"cat": 2,
+"catName": "식사와 기초 조리",
+"idx": 3,
+"name": "든든한 한 끼",
+"type": "support",
+"desc": "준비된 음식을 먹어 최대 HP를 일시적으로 높인다.",
+"maxLv": 5,
+"unlock": 15,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 30,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "consume",
+"tag": "food",
+"ops": [
+{
+"op": "buff",
+"id": "maxhp",
+"dur": 30,
+"val": 0.15,
+"target": "self"
+}
+]
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ck1_c4",
+"job": "cook",
+"tier": 1,
+"cat": 2,
+"catName": "식사와 기초 조리",
+"idx": 4,
+"name": "간식 시간",
+"type": "support",
+"desc": "간식을 먹어 조금 회복하고 잠깐 빨라진다.",
+"maxLv": 5,
+"unlock": 18,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 15,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "consume",
+"tag": "food",
+"ops": [
+{
+"op": "heal",
+"pct": 0.08,
+"flat": 0
+},
+{
+"op": "buff",
+"id": "haste",
+"dur": 4,
+"val": 0.25,
+"target": "self"
+}
+]
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ck1_c5",
+"job": "cook",
+"tier": 1,
+"cat": 2,
+"catName": "식사와 기초 조리",
+"idx": 5,
+"name": "알뜰한 손질",
+"type": "passive",
+"desc": "요리 제작에 쓴 일반 식재료 일부를 확률적으로 돌려받는다.",
+"maxLv": 5,
+"unlock": 20,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {
+"craftReturn:food": [
+0.1,
+0.05
+]
+},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "cf_a1",
+"job": "chef",
+"tier": 2,
+"cat": 0,
+"catName": "화염 조리",
+"idx": 1,
+"name": "화염 볶음",
+"type": "attack",
+"desc": "전방에 불꽃과 식재료를 흩뿌려 범위 공격.",
+"maxLv": 5,
+"unlock": 30,
+"prereq": [],
+"weapon": null,
+"target": "dir",
+"range": 3.6,
+"mp": 22,
+"cd": 6,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "attack",
+"ops": [
+{
+"op": "hit",
+"shape": "cone",
+"coef": 2.6,
+"r": 3.6,
+"ang": 80,
+"elem": "fire",
+"temp": 1,
+"st": [
+{
+"id": "burn",
+"dur": 3,
+"val": 0.12,
+"ch": 1.0
+}
+],
+"fx": {
+"slash": "fire_cone"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "cf_a2",
+"job": "chef",
+"tier": 2,
+"cat": 0,
+"catName": "화염 조리",
+"idx": 2,
+"name": "플람베",
+"type": "attack",
+"desc": "범위에 불길을 일으킨다. 냉각된 적에게는 증기 폭발이 추가된다.",
+"maxLv": 5,
+"unlock": 33,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 6,
+"mp": 26,
+"cd": 9,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "hit",
+"shape": "circle",
+"coef": 2.8,
+"r": 2.6,
+"atAim": true,
+"elem": "fire",
+"temp": 1,
+"st": [
+{
+"id": "burn",
+"dur": 4,
+"val": 0.15,
+"ch": 1.0
+}
+],
+"react": {
+"need": "chilled",
+"coef": 2.0,
+"r": 2.0,
+"burst": "explosion_steam"
+},
+"fx": {
+"burst": "explosion_fire"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "cf_a3",
+"job": "chef",
+"tier": 2,
+"cat": 0,
+"catName": "화염 조리",
+"idx": 3,
+"name": "압력솥 폭발",
+"type": "summon",
+"desc": "압력솥을 설치해 지연 폭발로 밀치고 화상 영역을 남긴다.",
+"maxLv": 5,
+"unlock": 36,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 6,
+"mp": 26,
+"cd": 14,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "summon",
+"kind": "pressure_cooker",
+"ai": "bomb",
+"life": 2.0,
+"hp": 0.4,
+"fuse": 2.0,
+"boom": {
+"r": 2.8,
+"coef": 4.0,
+"elem": "fire",
+"knock": 3,
+"burst": "explosion_fire",
+"area": {
+"kind": "dmg",
+"r": 2.4,
+"dur": 4,
+"tick": 1,
+"coef": 0.3,
+"fx": "fire",
+"st": [
+{
+"id": "burn",
+"dur": 2,
+"val": 0.1,
+"ch": 1.0
+}
+]
+}
+},
+"limit": 2,
+"machine": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "cf_a4",
+"job": "chef",
+"tier": 2,
+"cat": 0,
+"catName": "화염 조리",
+"idx": 4,
+"name": "불꽃 꼬치 행진",
+"type": "attack",
+"desc": "지면에서 불타는 꼬치가 순서대로 솟아오른다.",
+"maxLv": 5,
+"unlock": 40,
+"prereq": [],
+"weapon": null,
+"target": "dir",
+"range": 9,
+"mp": 28,
+"cd": 10,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "custom",
+"fn": "march",
+"n": 6,
+"step": 1.4,
+"r": 1.2,
+"coef": 1.1,
+"gap": 0.12,
+"elem": "fire",
+"fx": "skewer_row",
+"temp": 1
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "cf_a5",
+"job": "chef",
+"tier": 2,
+"cat": 0,
+"catName": "화염 조리",
+"idx": 5,
+"name": "지옥의 오픈 키친",
+"type": "ultimate",
+"desc": "팬·꼬치·솥 연속 공격 뒤 대폭발.",
+"maxLv": 3,
+"unlock": 45,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 75,
+"cd": 70,
+"cast": 0.6,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "telegraph",
+"shape": "circle",
+"r": 5,
+"dur": 0.6
+},
+{
+"op": "hit",
+"shape": "circle",
+"coef": 1.6,
+"r": 4,
+"hits": 3,
+"gap": 0.3,
+"elem": "fire",
+"fx": {
+"slash": "spin"
+}
+},
+{
+"op": "custom",
+"fn": "march",
+"n": 8,
+"step": 0.0,
+"ring": 4,
+"r": 1.2,
+"coef": 1.0,
+"gap": 0.08,
+"elem": "fire",
+"fx": "skewer_row",
+"at": 1.0
+},
+{
+"op": "delay",
+"after": 2.0,
+"r": 5.0,
+"coef": 8.0,
+"burst": "explosion_big",
+"elem": "fire",
+"self": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "cf_b1",
+"job": "chef",
+"tier": 2,
+"cat": 1,
+"catName": "냉채와 디저트",
+"idx": 1,
+"name": "소르베 탄환",
+"type": "attack",
+"desc": "냉기 탄환을 연속으로 쏘며 둔화를 쌓는다.",
+"maxLv": 5,
+"unlock": 30,
+"prereq": [],
+"weapon": null,
+"target": "enemy",
+"range": 8,
+"mp": 20,
+"cd": 5,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "throw",
+"ops": [
+{
+"op": "proj",
+"kind": "normal",
+"coef": 0.8,
+"count": 4,
+"gap": 0.12,
+"speed": 16,
+"elem": "ice",
+"fx": "sorbet",
+"burst": "explosion_ice",
+"temp": -1,
+"st": [
+{
+"id": "slow",
+"dur": 2,
+"val": 0.12,
+"ch": 1.0
+}
+],
+"stackSlow": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "cf_b2",
+"job": "chef",
+"tier": 2,
+"cat": 1,
+"catName": "냉채와 디저트",
+"idx": 2,
+"name": "급속 냉동",
+"type": "attack",
+"desc": "범위를 얼린다. 화상 상태의 적은 추가 피해 후 화상이 사라진다.",
+"maxLv": 5,
+"unlock": 33,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 6,
+"mp": 26,
+"cd": 9,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "hit",
+"shape": "circle",
+"coef": 2.4,
+"r": 2.6,
+"atAim": true,
+"elem": "ice",
+"temp": -1,
+"st": [
+{
+"id": "slow",
+"dur": 3,
+"val": 0.4,
+"ch": 1.0
+}
+],
+"react": {
+"need": "burn",
+"coef": 2.2,
+"consume": "burn",
+"burst": "explosion_steam"
+},
+"fx": {
+"burst": "ice_crystal"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "cf_b3",
+"job": "chef",
+"tier": 2,
+"cat": 1,
+"catName": "냉채와 디저트",
+"idx": 3,
+"name": "얼음 접시",
+"type": "attack",
+"desc": "관통하며 왕복하는 얼음 접시를 던진다.",
+"maxLv": 5,
+"unlock": 36,
+"prereq": [],
+"weapon": null,
+"target": "dir",
+"range": 8,
+"mp": 22,
+"cd": 7,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "throw",
+"ops": [
+{
+"op": "proj",
+"kind": "boomerang",
+"coef": 1.8,
+"speed": 12,
+"range": 8,
+"pierce": true,
+"elem": "ice",
+"fx": "ice_plate",
+"temp": -1
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "cf_b4",
+"job": "chef",
+"tier": 2,
+"cat": 1,
+"catName": "냉채와 디저트",
+"idx": 4,
+"name": "설탕 유리벽",
+"type": "summon",
+"desc": "이동과 투사체를 막는 설탕 유리벽. 부서지면 파편 피해.",
+"maxLv": 5,
+"unlock": 40,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 5,
+"mp": 24,
+"cd": 18,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "summon",
+"kind": "sugar_wall",
+"ai": "wall",
+"life": 8,
+"hp": 1.5,
+"width": 3.0,
+"onBreak": {
+"r": 2.4,
+"coef": 1.6,
+"burst": "shield_break"
+},
+"limit": 2,
+"machine": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "cf_b5",
+"job": "chef",
+"tier": 2,
+"cat": 1,
+"catName": "냉채와 디저트",
+"idx": 5,
+"name": "겨울의 디저트 궁전",
+"type": "ultimate",
+"desc": "대형 빙과 장식으로 냉각한 뒤 파편 폭발.",
+"maxLv": 3,
+"unlock": 45,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 75,
+"cd": 70,
+"cast": 0.8,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "telegraph",
+"shape": "circle",
+"r": 6,
+"dur": 0.8
+},
+{
+"op": "area",
+"kind": "slow",
+"r": 6,
+"dur": 3,
+"tick": 0.5,
+"coef": 0.4,
+"elem": "ice",
+"st": [
+{
+"id": "slow",
+"dur": 1,
+"val": 0.5,
+"ch": 1.0
+}
+],
+"fx": "frost",
+"temp": -1
+},
+{
+"op": "delay",
+"after": 2.6,
+"r": 6,
+"coef": 7.0,
+"burst": "ice_crystal",
+"elem": "ice",
+"self": true,
+"st": [
+{
+"id": "freeze",
+"dur": 1.5,
+"val": 0,
+"ch": 1.0
+}
+]
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "cf_c1",
+"job": "chef",
+"tier": 2,
+"cat": 2,
+"catName": "만찬과 회복",
+"idx": 1,
+"name": "특제 코스 요리",
+"type": "craft",
+"desc": "공격·방어·회복 계열 고급 음식을 만든다.",
+"maxLv": 5,
+"unlock": 30,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true,
+"recipes": [
+"r_course_atk",
+"r_course_def",
+"r_course_heal"
+]
+},
+{
+"id": "cf_c2",
+"job": "chef",
+"tier": 2,
+"cat": 2,
+"catName": "만찬과 회복",
+"idx": 2,
+"name": "생명의 스튜",
+"type": "support",
+"desc": "냄비를 놓아 주변을 회복하는 영역을 만든다.",
+"maxLv": 5,
+"unlock": 33,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 4,
+"mp": 28,
+"cd": 22,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "area",
+"kind": "heal",
+"r": 3.0,
+"dur": 8,
+"tick": 1.0,
+"heal": 0.025,
+"fx": "healing_mist",
+"prop": "cooking_pot",
+"living": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "cf_c3",
+"job": "chef",
+"tier": 2,
+"cat": 2,
+"catName": "만찬과 회복",
+"idx": 3,
+"name": "전투 배식",
+"type": "support",
+"desc": "요리를 먹어 즉시 회복하고 음식 효과를 잠시 증폭한다.",
+"maxLv": 5,
+"unlock": 36,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 10,
+"cd": 20,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "consume",
+"tag": "food",
+"ops": [
+{
+"op": "heal",
+"pct": 0.15,
+"flat": 0
+},
+{
+"op": "buff",
+"id": "foodup",
+"dur": 10,
+"val": 0.5,
+"target": "self"
+}
+]
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "cf_c4",
+"job": "chef",
+"tier": 2,
+"cat": 2,
+"catName": "만찬과 회복",
+"idx": 4,
+"name": "완벽한 레시피",
+"type": "passive",
+"desc": "직접 만든 음식의 지속시간과 회복량이 증가한다.",
+"maxLv": 5,
+"unlock": 40,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [
+{
+"stat": "foodPower",
+"add": 0.1,
+"addLv": 0.05
+}
+],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "cf_c5",
+"job": "chef",
+"tier": 2,
+"cat": 2,
+"catName": "만찬과 회복",
+"idx": 5,
+"name": "왕실의 풀코스",
+"type": "ultimate",
+"desc": "보호막 → 공격 강화 → 큰 회복을 순서대로 제공한다.",
+"maxLv": 3,
+"unlock": 45,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 65,
+"cd": 75,
+"cast": 0.4,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "shield",
+"base": 80,
+"coef": 2.0,
+"dur": 8
+},
+{
+"op": "buff",
+"id": "atkup",
+"dur": 10,
+"val": 0.3,
+"target": "self",
+"at": 1.5
+},
+{
+"op": "heal",
+"pct": 0.4,
+"flat": 0,
+"at": 3.0
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "bs1_a1",
+"job": "blacksmith",
+"tier": 1,
+"cat": 0,
+"catName": "망치와 도끼",
+"idx": 1,
+"name": "망치 내려찍기",
+"type": "attack",
+"desc": "강한 단일 타격과 짧은 경직.",
+"maxLv": 5,
+"unlock": 10,
+"prereq": [],
+"weapon": "hammer",
+"target": "enemy",
+"range": 2.0,
+"mp": 10,
+"cd": 5,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "attack",
+"ops": [
+{
+"op": "hit",
+"shape": "single",
+"coef": 2.5,
+"st": [
+{
+"id": "stagger",
+"dur": 0.6,
+"val": 0,
+"ch": 1.0
+}
+],
+"fx": {
+"slash": "smash",
+"burst": "hit_blunt"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "bs1_a2",
+"job": "blacksmith",
+"tier": 1,
+"cat": 0,
+"catName": "망치와 도끼",
+"idx": 2,
+"name": "도끼 가르기",
+"type": "attack",
+"desc": "전방 범위를 베어 출혈을 일으킨다.",
+"maxLv": 5,
+"unlock": 12,
+"prereq": [],
+"weapon": "hammer",
+"target": "dir",
+"range": 2.6,
+"mp": 12,
+"cd": 6,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "attack",
+"ops": [
+{
+"op": "hit",
+"shape": "cone",
+"coef": 1.8,
+"r": 2.6,
+"ang": 100,
+"st": [
+{
+"id": "bleed",
+"dur": 4,
+"val": 0.12,
+"ch": 1.0
+}
+],
+"fx": {
+"slash": "arc",
+"burst": "hit_slash"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "bs1_a3",
+"job": "blacksmith",
+"tier": 1,
+"cat": 0,
+"catName": "망치와 도끼",
+"idx": 3,
+"name": "갑옷 파쇄",
+"type": "attack",
+"desc": "피해와 함께 방어력을 낮춘다.",
+"maxLv": 5,
+"unlock": 15,
+"prereq": [],
+"weapon": "hammer",
+"target": "enemy",
+"range": 2.0,
+"mp": 12,
+"cd": 8,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "attack",
+"ops": [
+{
+"op": "hit",
+"shape": "single",
+"coef": 1.8,
+"st": [
+{
+"id": "defdown",
+"dur": 6,
+"val": 0.25,
+"ch": 1.0
+}
+],
+"fx": {
+"slash": "smash",
+"burst": "shield_break"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "bs1_a4",
+"job": "blacksmith",
+"tier": 1,
+"cat": 0,
+"catName": "망치와 도끼",
+"idx": 4,
+"name": "회전 망치",
+"type": "attack",
+"desc": "주변을 원형으로 휩쓴다.",
+"maxLv": 5,
+"unlock": 18,
+"prereq": [],
+"weapon": "hammer",
+"target": "self",
+"range": 2.4,
+"mp": 16,
+"cd": 9,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "attack",
+"ops": [
+{
+"op": "hit",
+"shape": "circle",
+"coef": 1.0,
+"r": 2.4,
+"hits": 3,
+"gap": 0.18,
+"fx": {
+"slash": "spin"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "bs1_a5",
+"job": "blacksmith",
+"tier": 1,
+"cat": 0,
+"catName": "망치와 도끼",
+"idx": 5,
+"name": "무거운 손맛",
+"type": "passive",
+"desc": "망치·도끼 경직이 강해지고 방어력 감소 상태의 적에게 추가 피해.",
+"maxLv": 5,
+"unlock": 20,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {
+"staggerBonus": [
+0.2,
+0.1
+],
+"vsDefdown": [
+0.1,
+0.04
+]
+},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "bs1_b1",
+"job": "blacksmith",
+"tier": 1,
+"cat": 1,
+"catName": "담금질과 방어",
+"idx": 1,
+"name": "담금질",
+"type": "support",
+"desc": "공격력을 높인다.",
+"maxLv": 5,
+"unlock": 10,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 12,
+"cd": 20,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "buff",
+"id": "atkup",
+"dur": 12,
+"val": 0.2,
+"target": "self"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "bs1_b2",
+"job": "blacksmith",
+"tier": 1,
+"cat": 1,
+"catName": "담금질과 방어",
+"idx": 2,
+"name": "철판 방어",
+"type": "support",
+"desc": "피해를 흡수하는 보호막.",
+"maxLv": 5,
+"unlock": 12,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 14,
+"cd": 16,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "shield",
+"base": 40,
+"coef": 1.0,
+"dur": 8,
+"power": "atk"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "bs1_b3",
+"job": "blacksmith",
+"tier": 1,
+"cat": 1,
+"catName": "담금질과 방어",
+"idx": 3,
+"name": "불티 튀기기",
+"type": "attack",
+"desc": "전방에 불티를 튀겨 피해와 화상.",
+"maxLv": 5,
+"unlock": 15,
+"prereq": [],
+"weapon": null,
+"target": "dir",
+"range": 3.0,
+"mp": 12,
+"cd": 6,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "attack",
+"ops": [
+{
+"op": "hit",
+"shape": "cone",
+"coef": 1.4,
+"r": 3.0,
+"ang": 70,
+"elem": "fire",
+"st": [
+{
+"id": "burn",
+"dur": 3,
+"val": 0.1,
+"ch": 1.0
+}
+],
+"fx": {
+"burst": "sparks",
+"slash": "fire_cone"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "bs1_b4",
+"job": "blacksmith",
+"tier": 1,
+"cat": 1,
+"catName": "담금질과 방어",
+"idx": 4,
+"name": "긴급 보강",
+"type": "support",
+"desc": "방어력과 밀려남 저항을 높인다.",
+"maxLv": 5,
+"unlock": 18,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 12,
+"cd": 18,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "buff",
+"id": "defup",
+"dur": 10,
+"val": 0.35,
+"target": "self"
+},
+{
+"op": "buff",
+"id": "knockres",
+"dur": 10,
+"val": 1,
+"target": "self"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "bs1_b5",
+"job": "blacksmith",
+"tier": 1,
+"cat": 1,
+"catName": "담금질과 방어",
+"idx": 5,
+"name": "강철 체력",
+"type": "passive",
+"desc": "최대 HP와 방어력이 증가한다.",
+"maxLv": 5,
+"unlock": 20,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [
+{
+"stat": "maxHp",
+"mul": 0.05,
+"mulLv": 0.025
+},
+{
+"stat": "def",
+"add": 3,
+"addLv": 2
+}
+],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "bs1_c1",
+"job": "blacksmith",
+"tier": 1,
+"cat": 2,
+"catName": "대장간과 거래",
+"idx": 1,
+"name": "기초 무기 제작",
+"type": "craft",
+"desc": "기본 망치·도끼와 일반 무기를 만든다.",
+"maxLv": 5,
+"unlock": 10,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true,
+"recipes": [
+"r_hammer",
+"r_axe"
+]
+},
+{
+"id": "bs1_c2",
+"job": "blacksmith",
+"tier": 1,
+"cat": 2,
+"catName": "대장간과 거래",
+"idx": 2,
+"name": "기초 방어구 제작",
+"type": "craft",
+"desc": "기본 금속 방어구를 만든다.",
+"maxLv": 5,
+"unlock": 12,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true,
+"recipes": [
+"r_metal"
+]
+},
+{
+"id": "bs1_c3",
+"job": "blacksmith",
+"tier": 1,
+"cat": 2,
+"catName": "대장간과 거래",
+"idx": 3,
+"name": "숫돌 연마",
+"type": "craft",
+"desc": "일시적으로 무기를 강화하는 숫돌을 만든다.",
+"maxLv": 5,
+"unlock": 15,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true,
+"recipes": [
+"r_whet"
+]
+},
+{
+"id": "bs1_c4",
+"job": "blacksmith",
+"tier": 1,
+"cat": 2,
+"catName": "대장간과 거래",
+"idx": 4,
+"name": "재료 회수",
+"type": "craft",
+"desc": "장비를 분해해 재료 일부를 얻는다.",
+"maxLv": 5,
+"unlock": 18,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true,
+"recipes": [
+"salvage"
+]
+},
+{
+"id": "bs1_c5",
+"job": "blacksmith",
+"tier": 1,
+"cat": 2,
+"catName": "대장간과 거래",
+"idx": 5,
+"name": "알뜰 공급",
+"type": "passive",
+"desc": "기본 제작 비용이 줄어든다. (제작·분해·판매로 이익이 나지 않도록 상한 적용)",
+"maxLv": 5,
+"unlock": 20,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {
+"craftDiscount": [
+0.05,
+0.03
+]
+},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "en_a1",
+"job": "engineer",
+"tier": 2,
+"cat": 0,
+"catName": "자동 병기",
+"idx": 1,
+"name": "자동 포탑",
+"type": "summon",
+"desc": "선택 대상을 우선 사격하는 포탑을 설치한다.",
+"maxLv": 5,
+"unlock": 30,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 6,
+"mp": 20,
+"cd": 8,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "summon",
+"kind": "turret",
+"ai": "turret",
+"life": 20,
+"hp": 1.0,
+"coef": 0.7,
+"rate": 0.8,
+"range": 8,
+"proj": "bullet",
+"limit": 2,
+"machine": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"res": {
+"type": "power",
+"cost": 2
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "en_a2",
+"job": "engineer",
+"tier": 2,
+"cat": 0,
+"catName": "자동 병기",
+"idx": 2,
+"name": "추적 지뢰",
+"type": "summon",
+"desc": "다가온 적을 짧게 추적한 뒤 폭발하는 지뢰.",
+"maxLv": 5,
+"unlock": 33,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 6,
+"mp": 16,
+"cd": 6,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "summon",
+"kind": "mine",
+"ai": "mine",
+"life": 25,
+"hp": 0.3,
+"trigger": 2.5,
+"chase": 3.0,
+"boom": {
+"r": 2.2,
+"coef": 3.2,
+"burst": "explosion_fire",
+"elem": "fire"
+},
+"limit": 3,
+"machine": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"res": {
+"type": "power",
+"cost": 1
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "en_a3",
+"job": "engineer",
+"tier": 2,
+"cat": 0,
+"catName": "자동 병기",
+"idx": 3,
+"name": "공격 드론 편대",
+"type": "summon",
+"desc": "주인 주변을 날며 선택 대상을 집중 공격하는 드론 3기.",
+"maxLv": 5,
+"unlock": 36,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 26,
+"cd": 18,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "summon",
+"kind": "drone",
+"ai": "follow_ranged",
+"n": 3,
+"life": 18,
+"hp": 0.4,
+"coef": 0.35,
+"rate": 0.5,
+"range": 7,
+"proj": "bullet",
+"limit": 3,
+"machine": true,
+"fly": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"res": {
+"type": "power",
+"cost": 3
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "en_a4",
+"job": "engineer",
+"tier": 2,
+"cat": 0,
+"catName": "자동 병기",
+"idx": 4,
+"name": "전자기 구속기",
+"type": "summon",
+"desc": "둔화 전기장을 만들고 기계 병기의 우선 표적을 지정한다.",
+"maxLv": 5,
+"unlock": 40,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 6,
+"mp": 22,
+"cd": 16,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "summon",
+"kind": "em_device",
+"ai": "aura",
+"life": 10,
+"hp": 0.8,
+"aura": {
+"r": 3.0,
+"tick": 0.5,
+"coef": 0.2,
+"elem": "shock",
+"st": [
+{
+"id": "slow",
+"dur": 1,
+"val": 0.4,
+"ch": 1.0
+}
+],
+"fx": "emfield"
+},
+"focus": true,
+"limit": 1,
+"machine": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"res": {
+"type": "power",
+"cost": 2
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "en_a5",
+"job": "engineer",
+"tier": 2,
+"cat": 0,
+"catName": "자동 병기",
+"idx": 5,
+"name": "이동 요새",
+"type": "ultimate",
+"desc": "대형 기계가 포격·기관총·미사일을 연속으로 쏟아낸다.",
+"maxLv": 3,
+"unlock": 45,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 60,
+"cd": 80,
+"cast": 0.8,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "summon",
+"kind": "fortress",
+"ai": "fortress",
+"life": 14,
+"hp": 4.0,
+"coef": 0.9,
+"rate": 0.35,
+"range": 10,
+"proj": "shell",
+"missiles": {
+"every": 3.0,
+"n": 4,
+"coef": 1.5
+},
+"limit": 1,
+"machine": true,
+"ultimate": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"res": {
+"type": "power",
+"cost": 5
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "en_b1",
+"job": "engineer",
+"tier": 2,
+"cat": 1,
+"catName": "총기와 고급 화기",
+"idx": 1,
+"name": "철갑 사격",
+"type": "attack",
+"desc": "방어력 일부를 무시하는 사격.",
+"maxLv": 5,
+"unlock": 30,
+"prereq": [],
+"weapon": null,
+"target": "enemy",
+"range": 9,
+"mp": 18,
+"cd": 5,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "throw",
+"ops": [
+{
+"op": "proj",
+"kind": "normal",
+"coef": 2.6,
+"speed": 26,
+"fx": "bullet",
+"burst": "hit_pierce",
+"armorPen": 0.4
+}
+],
+"mods": [],
+"flags": {},
+"fx": {
+"color": 16765024
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "en_b2",
+"job": "engineer",
+"tier": 2,
+"cat": 1,
+"catName": "총기와 고급 화기",
+"idx": 2,
+"name": "산탄 폭발",
+"type": "attack",
+"desc": "가까울수록 강한 부채꼴 산탄.",
+"maxLv": 5,
+"unlock": 33,
+"prereq": [],
+"weapon": null,
+"target": "dir",
+"range": 5,
+"mp": 20,
+"cd": 6,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "throw",
+"ops": [
+{
+"op": "hit",
+"shape": "cone",
+"coef": 2.8,
+"r": 5,
+"ang": 55,
+"falloff": 0.6,
+"fx": {
+"slash": "shotgun_cone"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "en_b3",
+"job": "engineer",
+"tier": 2,
+"cat": 1,
+"catName": "총기와 고급 화기",
+"idx": 3,
+"name": "유도 미사일",
+"type": "attack",
+"desc": "선택한 대상을 추적하는 미사일 여러 발.",
+"maxLv": 5,
+"unlock": 36,
+"prereq": [],
+"weapon": null,
+"target": "enemy",
+"range": 11,
+"mp": 28,
+"cd": 9,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "throw",
+"ops": [
+{
+"op": "proj",
+"kind": "homing",
+"coef": 1.1,
+"count": 4,
+"gap": 0.1,
+"speed": 10,
+"r": 1.2,
+"fx": "missile",
+"burst": "explosion_fire",
+"elem": "fire"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"res": {
+"type": "power",
+"gain": 1
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "en_b4",
+"job": "engineer",
+"tier": 2,
+"cat": 1,
+"catName": "총기와 고급 화기",
+"idx": 4,
+"name": "전자기 레일건",
+"type": "attack",
+"desc": "충전 후 긴 직선을 관통하는 레일건.",
+"maxLv": 5,
+"unlock": 40,
+"prereq": [],
+"weapon": null,
+"target": "dir",
+"range": 14,
+"mp": 32,
+"cd": 12,
+"cast": 0.9,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "telegraph",
+"shape": "line",
+"len": 14,
+"w": 1.2,
+"dur": 0.9
+},
+{
+"op": "hit",
+"shape": "line",
+"coef": 5.0,
+"len": 14,
+"w": 1.2,
+"elem": "shock",
+"fx": {
+"beam": "rail"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "en_b5",
+"job": "engineer",
+"tier": 2,
+"cat": 1,
+"catName": "총기와 고급 화기",
+"idx": 5,
+"name": "궤도 포격",
+"type": "ultimate",
+"desc": "넓은 범위를 예고한 뒤 대규모 연속 포격.",
+"maxLv": 3,
+"unlock": 45,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 9,
+"mp": 70,
+"cd": 75,
+"cast": 0.5,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "telegraph",
+"shape": "circle",
+"r": 5,
+"dur": 1.6,
+"atAim": true
+},
+{
+"op": "custom",
+"fn": "barrage",
+"n": 14,
+"r": 5,
+"blast": 1.6,
+"coef": 1.4,
+"start": 1.6,
+"gap": 0.12,
+"burst": "explosion_fire",
+"marker": "orbital_marker"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "en_c1",
+"job": "engineer",
+"tier": 2,
+"cat": 2,
+"catName": "제작·수리·개조",
+"idx": 1,
+"name": "총기 제작",
+"type": "craft",
+"desc": "권총·산탄총·소총을 만든다.",
+"maxLv": 5,
+"unlock": 30,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true,
+"recipes": [
+"r_pistol",
+"r_shotgun",
+"r_rifle"
+]
+},
+{
+"id": "en_c2",
+"job": "engineer",
+"tier": 2,
+"cat": 2,
+"catName": "제작·수리·개조",
+"idx": 2,
+"name": "병기 개조",
+"type": "craft",
+"desc": "공격 속도형·범위형 개조 모듈을 만든다. 유형마다 장단점이 있다.",
+"maxLv": 5,
+"unlock": 33,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true,
+"recipes": [
+"r_mod_speed",
+"r_mod_area"
+]
+},
+{
+"id": "en_c3",
+"job": "engineer",
+"tier": 2,
+"cat": 2,
+"catName": "제작·수리·개조",
+"idx": 3,
+"name": "현장 수리",
+"type": "support",
+"desc": "기계 소환물을 수리하고(손상이 클수록 효율 증가) 자신에게 작은 장갑 보호막을 씌운다.",
+"maxLv": 5,
+"unlock": 36,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 18,
+"cd": 10,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "repair",
+"pct": 0.35,
+"missingBonus": 0.5
+},
+{
+"op": "shield",
+"base": 30,
+"coef": 0.6,
+"dur": 6,
+"power": "atk"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "en_c4",
+"job": "engineer",
+"tier": 2,
+"cat": 2,
+"catName": "제작·수리·개조",
+"idx": 4,
+"name": "동력 회수",
+"type": "passive",
+"desc": "기계가 수명 종료로 사라지면 전력 일부를 돌려받는다. 파괴되면 덜 돌려받으며, 소비량보다 많이 돌려받지 않는다.",
+"maxLv": 5,
+"unlock": 40,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {
+"powerRefund": [
+0.3,
+0.1
+]
+},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "en_c5",
+"job": "engineer",
+"tier": 2,
+"cat": 2,
+"catName": "제작·수리·개조",
+"idx": 5,
+"name": "오버클럭",
+"type": "support",
+"desc": "기계의 화력·공격 속도를 높인다. 끝나면 냉각 상태(약화)가 된다.",
+"maxLv": 5,
+"unlock": 45,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 24,
+"cd": 30,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "overclock",
+"dur": 8,
+"mul": 0.5,
+"cool": 4,
+"coolMul": -0.3
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hd1_a1",
+"job": "hairdresser",
+"tier": 1,
+"cat": 0,
+"catName": "가위 기술",
+"idx": 1,
+"name": "가위 연격",
+"type": "attack",
+"desc": "빠르게 세 번 자른다.",
+"maxLv": 5,
+"unlock": 10,
+"prereq": [],
+"weapon": "scissors",
+"target": "enemy",
+"range": 1.8,
+"mp": 8,
+"cd": 4,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "attack",
+"ops": [
+{
+"op": "hit",
+"shape": "single",
+"coef": 0.75,
+"hits": 3,
+"gap": 0.1,
+"fx": {
+"slash": "scissor_snip",
+"burst": "hit_slash"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hd1_a2",
+"job": "hairdresser",
+"tier": 1,
+"cat": 0,
+"catName": "가위 기술",
+"idx": 2,
+"name": "앞머리 정리",
+"type": "attack",
+"desc": "짧고 빠른 전방 범위 공격.",
+"maxLv": 5,
+"unlock": 12,
+"prereq": [],
+"weapon": "scissors",
+"target": "dir",
+"range": 2.2,
+"mp": 8,
+"cd": 4,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "attack",
+"ops": [
+{
+"op": "hit",
+"shape": "cone",
+"coef": 1.4,
+"r": 2.2,
+"ang": 90,
+"fx": {
+"slash": "arc"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hd1_a3",
+"job": "hairdresser",
+"tier": 1,
+"cat": 0,
+"catName": "가위 기술",
+"idx": 3,
+"name": "끝단 자르기",
+"type": "attack",
+"desc": "체력이 낮은 적에게 추가 피해.",
+"maxLv": 5,
+"unlock": 15,
+"prereq": [],
+"weapon": "scissors",
+"target": "enemy",
+"range": 1.8,
+"mp": 10,
+"cd": 6,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "attack",
+"ops": [
+{
+"op": "hit",
+"shape": "single",
+"coef": 1.6,
+"vsLowHp": {
+"pct": 0.35,
+"mul": 1.8
+},
+"fx": {
+"slash": "scissor_snip",
+"burst": "hit_slash"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hd1_a4",
+"job": "hairdresser",
+"tier": 1,
+"cat": 0,
+"catName": "가위 기술",
+"idx": 4,
+"name": "스텝 커트",
+"type": "attack",
+"desc": "옆으로 짧게 이동하며 벤다. 무적 시간 없음.",
+"maxLv": 5,
+"unlock": 18,
+"prereq": [],
+"weapon": "scissors",
+"target": "dir",
+"range": 2.0,
+"mp": 10,
+"cd": 6,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "dash",
+"ops": [
+{
+"op": "dash",
+"dist": 2.2,
+"side": true,
+"invuln": false,
+"hit": {
+"op": "hit",
+"shape": "cone",
+"coef": 1.3,
+"r": 2.8,
+"ang": 150,
+"fx": {
+"slash": "arc"
+}
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hd1_a5",
+"job": "hairdresser",
+"tier": 1,
+"cat": 0,
+"catName": "가위 기술",
+"idx": 5,
+"name": "섬세한 손놀림",
+"type": "passive",
+"desc": "가위 공격 속도와 치명타 확률이 증가한다.",
+"maxLv": 5,
+"unlock": 20,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [
+{
+"stat": "atkSpeed",
+"mul": 0.04,
+"mulLv": 0.02
+},
+{
+"stat": "crit",
+"add": 0.03,
+"addLv": 0.015
+}
+],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hd1_b1",
+"job": "hairdresser",
+"tier": 1,
+"cat": 1,
+"catName": "빗과 드라이",
+"idx": 1,
+"name": "빗 투척",
+"type": "attack",
+"desc": "빗을 직선으로 던진다.",
+"maxLv": 5,
+"unlock": 10,
+"prereq": [],
+"weapon": null,
+"target": "enemy",
+"range": 8,
+"mp": 8,
+"cd": 3,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "throw",
+"ops": [
+{
+"op": "proj",
+"kind": "normal",
+"coef": 1.6,
+"speed": 16,
+"fx": "comb",
+"burst": "hit_pierce"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hd1_b2",
+"job": "hairdresser",
+"tier": 1,
+"cat": 1,
+"catName": "빗과 드라이",
+"idx": 2,
+"name": "드라이 돌풍",
+"type": "attack",
+"desc": "전방에 바람 피해와 밀치기.",
+"maxLv": 5,
+"unlock": 12,
+"prereq": [],
+"weapon": null,
+"target": "dir",
+"range": 3.6,
+"mp": 12,
+"cd": 7,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "hit",
+"shape": "cone",
+"coef": 1.3,
+"r": 3.6,
+"ang": 60,
+"knock": 2.5,
+"fx": {
+"slash": "wind_cone"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hd1_b3",
+"job": "hairdresser",
+"tier": 1,
+"cat": 1,
+"catName": "빗과 드라이",
+"idx": 3,
+"name": "온풍 드라이",
+"type": "attack",
+"desc": "근거리에 지속 공격. 이동하면 중단된다.",
+"maxLv": 5,
+"unlock": 15,
+"prereq": [],
+"weapon": null,
+"target": "dir",
+"range": 3.0,
+"mp": 14,
+"cd": 8,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "channel",
+"dur": 2.0,
+"tick": 0.25,
+"ops": [
+{
+"op": "hit",
+"shape": "cone",
+"coef": 0.35,
+"r": 3.0,
+"ang": 50,
+"elem": "fire",
+"fx": {
+"slash": "wind_cone"
+}
+}
+],
+"breakOnMove": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hd1_b4",
+"job": "hairdresser",
+"tier": 1,
+"cat": 1,
+"catName": "빗과 드라이",
+"idx": 4,
+"name": "냉풍 드라이",
+"type": "attack",
+"desc": "냉기 피해와 둔화.",
+"maxLv": 5,
+"unlock": 18,
+"prereq": [],
+"weapon": null,
+"target": "dir",
+"range": 3.4,
+"mp": 12,
+"cd": 7,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "hit",
+"shape": "cone",
+"coef": 1.4,
+"r": 3.4,
+"ang": 60,
+"elem": "ice",
+"st": [
+{
+"id": "slow",
+"dur": 3,
+"val": 0.35,
+"ch": 1.0
+}
+],
+"fx": {
+"slash": "wind_cone"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hd1_b5",
+"job": "hairdresser",
+"tier": 1,
+"cat": 1,
+"catName": "빗과 드라이",
+"idx": 5,
+"name": "헤어롤 덫",
+"type": "summon",
+"desc": "밟은 적을 잠시 속박하는 헤어롤 덫.",
+"maxLv": 5,
+"unlock": 20,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 6,
+"mp": 12,
+"cd": 10,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "throw",
+"ops": [
+{
+"op": "summon",
+"kind": "hair_roller",
+"ai": "trap",
+"life": 15,
+"hp": 0.2,
+"trigger": 1.0,
+"onTrigger": {
+"r": 1.2,
+"coef": 0.8,
+"st": [
+{
+"id": "root",
+"dur": 1.5,
+"val": 0,
+"ch": 1.0
+}
+],
+"burst": "dust"
+},
+"limit": 3,
+"machine": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hd1_c1",
+"job": "hairdresser",
+"tier": 1,
+"cat": 2,
+"catName": "스타일링과 관리",
+"idx": 1,
+"name": "산뜻한 스타일링",
+"type": "support",
+"desc": "이동 속도를 높인다.",
+"maxLv": 5,
+"unlock": 10,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 10,
+"cd": 16,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "buff",
+"id": "haste",
+"dur": 8,
+"val": 0.25,
+"target": "self"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hd1_c2",
+"job": "hairdresser",
+"tier": 1,
+"cat": 2,
+"catName": "스타일링과 관리",
+"idx": 2,
+"name": "헤어 코팅",
+"type": "support",
+"desc": "작은 보호막을 두른다.",
+"maxLv": 5,
+"unlock": 12,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 12,
+"cd": 14,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "shield",
+"base": 30,
+"coef": 0.9,
+"dur": 6
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hd1_c3",
+"job": "hairdresser",
+"tier": 1,
+"cat": 2,
+"catName": "스타일링과 관리",
+"idx": 3,
+"name": "기분 전환",
+"type": "support",
+"desc": "둔화를 없애고 잠시 둔화 저항을 얻는다.",
+"maxLv": 5,
+"unlock": 15,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 10,
+"cd": 14,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "cleanse",
+"n": 9,
+"ids": [
+"slow"
+]
+},
+{
+"op": "buff",
+"id": "slowres",
+"dur": 5,
+"val": 1,
+"target": "self"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "hd1_c4",
+"job": "hairdresser",
+"tier": 1,
+"cat": 2,
+"catName": "스타일링과 관리",
+"idx": 4,
+"name": "염색약 배합",
+"type": "craft",
+"desc": "외형 색을 바꾸는 염색약을 만든다.",
+"maxLv": 5,
+"unlock": 18,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true,
+"recipes": [
+"r_dye_red",
+"r_dye_blue",
+"r_dye_green",
+"r_dye_reset"
+]
+},
+{
+"id": "hd1_c5",
+"job": "hairdresser",
+"tier": 1,
+"cat": 2,
+"catName": "스타일링과 관리",
+"idx": 5,
+"name": "깔끔한 마무리",
+"type": "passive",
+"desc": "적을 처치하면 이동 속도가 증가한다. 중첩되지 않고 시간만 갱신.",
+"maxLv": 5,
+"unlock": 20,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {
+"killHaste": [
+0.15,
+0.03
+]
+},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ds_a1",
+"job": "designer",
+"tier": 2,
+"cat": 0,
+"catName": "실과 재단",
+"idx": 1,
+"name": "실크 속박",
+"type": "attack",
+"desc": "여러 적을 실로 연결해 묶는다. 보스는 둔화로 대체.",
+"maxLv": 5,
+"unlock": 30,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 7,
+"mp": 24,
+"cd": 10,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "hit",
+"shape": "circle",
+"coef": 1.2,
+"r": 3.0,
+"atAim": true,
+"st": [
+{
+"id": "root",
+"dur": 2.0,
+"val": 0,
+"ch": 1.0
+}
+],
+"mark": {
+"type": "pattern",
+"n": 1
+},
+"link": true,
+"fx": {
+"beam": "thread_link"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ds_a2",
+"job": "designer",
+"tier": 2,
+"cat": 0,
+"catName": "실과 재단",
+"idx": 2,
+"name": "패턴 절단",
+"type": "attack",
+"desc": "표식을 소비할수록 강해지는 가위 공격.",
+"maxLv": 5,
+"unlock": 33,
+"prereq": [],
+"weapon": null,
+"target": "enemy",
+"range": 2.2,
+"mp": 20,
+"cd": 6,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "attack",
+"ops": [
+{
+"op": "hit",
+"shape": "single",
+"coef": 2.0,
+"consume": {
+"type": "pattern",
+"mulPer": 0.6
+},
+"fx": {
+"slash": "scissor_snip",
+"burst": "hit_slash"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ds_a3",
+"job": "designer",
+"tier": 2,
+"cat": 0,
+"catName": "실과 재단",
+"idx": 3,
+"name": "바늘비",
+"type": "attack",
+"desc": "지정한 지역에 바늘을 반복해서 쏟아 표식을 남긴다.",
+"maxLv": 5,
+"unlock": 36,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 8,
+"mp": 26,
+"cd": 10,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "hit",
+"shape": "circle",
+"coef": 0.5,
+"r": 2.4,
+"atAim": true,
+"hits": 6,
+"gap": 0.2,
+"mark": {
+"type": "pattern",
+"n": 1,
+"every": 3
+},
+"fx": {
+"slash": "fan_needles"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ds_a4",
+"job": "designer",
+"tier": 2,
+"cat": 0,
+"catName": "실과 재단",
+"idx": 4,
+"name": "교차 재단",
+"type": "attack",
+"desc": "X자로 두 번 벤다. 교차 중심의 적은 추가 피해.",
+"maxLv": 5,
+"unlock": 40,
+"prereq": [],
+"weapon": null,
+"target": "dir",
+"range": 3.0,
+"mp": 22,
+"cd": 7,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "attack",
+"ops": [
+{
+"op": "hit",
+"shape": "cone",
+"coef": 1.6,
+"r": 3.0,
+"ang": 70,
+"hits": 2,
+"gap": 0.15,
+"centerBonus": 0.6,
+"fx": {
+"slash": "cross"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ds_a5",
+"job": "designer",
+"tier": 2,
+"cat": 0,
+"catName": "실과 재단",
+"idx": 5,
+"name": "운명의 재단선",
+"type": "ultimate",
+"desc": "넓은 재단선을 새긴 뒤 한꺼번에 자른다. 속박된 적에게 강화.",
+"maxLv": 3,
+"unlock": 45,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 70,
+"cd": 70,
+"cast": 0.8,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "telegraph",
+"shape": "circle",
+"r": 6,
+"dur": 0.8
+},
+{
+"op": "hit",
+"shape": "circle",
+"coef": 7.0,
+"r": 6,
+"vsStatus": {
+"id": "root",
+"mul": 1.5
+},
+"consume": {
+"type": "pattern",
+"mulPer": 0.4
+},
+"fx": {
+"slash": "cross"
+},
+"at": 0.8
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ds_b1",
+"job": "designer",
+"tier": 2,
+"cat": 1,
+"catName": "리본과 무대",
+"idx": 1,
+"name": "리본 대시",
+"type": "attack",
+"desc": "돌진하며 지나간 경로의 적을 공격하고 표식을 남긴다.",
+"maxLv": 5,
+"unlock": 30,
+"prereq": [],
+"weapon": null,
+"target": "dir",
+"range": 6,
+"mp": 20,
+"cd": 8,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "dash",
+"ops": [
+{
+"op": "dash",
+"dist": 5.0,
+"invuln": false,
+"path": {
+"op": "hit",
+"shape": "line",
+"coef": 1.8,
+"w": 1.4,
+"mark": {
+"type": "pattern",
+"n": 1
+},
+"fx": {
+"beam": "ribbon_line"
+}
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ds_b2",
+"job": "designer",
+"tier": 2,
+"cat": 1,
+"catName": "리본과 무대",
+"idx": 2,
+"name": "리본 회오리",
+"type": "attack",
+"desc": "적을 끌어당기며 반복 공격한다. 보스는 끌려오지 않는다.",
+"maxLv": 5,
+"unlock": 33,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 6,
+"mp": 26,
+"cd": 11,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "area",
+"kind": "dmg",
+"r": 2.8,
+"dur": 2.5,
+"tick": 0.3,
+"coef": 0.35,
+"pull": 1.2,
+"fx": "wind"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ds_b3",
+"job": "designer",
+"tier": 2,
+"cat": 1,
+"catName": "리본과 무대",
+"idx": 3,
+"name": "마네킹 대역",
+"type": "summon",
+"desc": "적의 주의를 끄는 마네킹을 남기고 뒤로 물러난다. 사라질 때 실을 방출.",
+"maxLv": 5,
+"unlock": 36,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 22,
+"cd": 16,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "dash",
+"ops": [
+{
+"op": "summon",
+"kind": "mannequin",
+"ai": "decoy",
+"life": 6,
+"hp": 1.6,
+"taunt": true,
+"onExpire": {
+"r": 2.6,
+"coef": 1.2,
+"st": [
+{
+"id": "root",
+"dur": 1.0,
+"val": 0,
+"ch": 1.0
+}
+],
+"burst": "dust"
+},
+"limit": 1
+},
+{
+"op": "dash",
+"dist": -3.0,
+"invuln": false
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ds_b4",
+"job": "designer",
+"tier": 2,
+"cat": 1,
+"catName": "리본과 무대",
+"idx": 4,
+"name": "스포트라이트",
+"type": "support",
+"desc": "대상이 받는 치명타 피해가 커지고 위장·은신이 풀린다.",
+"maxLv": 5,
+"unlock": 40,
+"prereq": [],
+"weapon": null,
+"target": "enemy",
+"range": 9,
+"mp": 16,
+"cd": 14,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "hit",
+"shape": "single",
+"coef": 0.0,
+"st": [
+{
+"id": "spotlit",
+"dur": 8,
+"val": 0.5,
+"ch": 1.0
+}
+],
+"fx": {
+"burst": "gold"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ds_b5",
+"job": "designer",
+"tier": 2,
+"cat": 1,
+"catName": "리본과 무대",
+"idx": 5,
+"name": "환상의 런웨이",
+"type": "ultimate",
+"desc": "리본과 분신의 연속 공격, 그리고 자신의 기동력 강화.",
+"maxLv": 3,
+"unlock": 45,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 70,
+"cd": 70,
+"cast": 0.4,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "buff",
+"id": "haste",
+"dur": 10,
+"val": 0.4,
+"target": "self"
+},
+{
+"op": "custom",
+"fn": "runway",
+"n": 5,
+"r": 5,
+"coef": 1.6,
+"gap": 0.25,
+"mark": {
+"type": "pattern",
+"n": 1
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ds_c1",
+"job": "designer",
+"tier": 2,
+"cat": 2,
+"catName": "의상과 마법 자수",
+"idx": 1,
+"name": "고급 의상 제작",
+"type": "craft",
+"desc": "직업별 고급 의상을 만든다.",
+"maxLv": 5,
+"unlock": 30,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true,
+"recipes": [
+"r_outfit"
+]
+},
+{
+"id": "ds_c2",
+"job": "designer",
+"tier": 2,
+"cat": 2,
+"catName": "의상과 마법 자수",
+"idx": 2,
+"name": "마법 자수",
+"type": "craft",
+"desc": "의상에 공격·방어·자원 회복 중 하나의 효과를 새긴다.",
+"maxLv": 5,
+"unlock": 33,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true,
+"recipes": [
+"r_emb_atk",
+"r_emb_def",
+"r_emb_mp"
+]
+},
+{
+"id": "ds_c3",
+"job": "designer",
+"tier": 2,
+"cat": 2,
+"catName": "의상과 마법 자수",
+"idx": 3,
+"name": "리본 장식 제작",
+"type": "craft",
+"desc": "이동·상태이상 저항 장신구를 만든다.",
+"maxLv": 5,
+"unlock": 36,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true,
+"recipes": [
+"r_ribbon"
+]
+},
+{
+"id": "ds_c4",
+"job": "designer",
+"tier": 2,
+"cat": 2,
+"catName": "의상과 마법 자수",
+"idx": 4,
+"name": "긴급 수선",
+"type": "support",
+"desc": "보호막을 만들고 출혈을 없앤다.",
+"maxLv": 5,
+"unlock": 40,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 18,
+"cd": 16,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "shield",
+"base": 50,
+"coef": 1.2,
+"dur": 8
+},
+{
+"op": "cleanse",
+"n": 9,
+"ids": [
+"bleed"
+]
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ds_c5",
+"job": "designer",
+"tier": 2,
+"cat": 2,
+"catName": "의상과 마법 자수",
+"idx": 5,
+"name": "완벽한 피팅",
+"type": "passive",
+"desc": "직접 만든 의상이나 자수 장비를 입으면 방어·이동 보너스.",
+"maxLv": 5,
+"unlock": 45,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {
+"fitting": [
+0.08,
+0.03
+]
+},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ar1_a1",
+"job": "artist",
+"tier": 1,
+"cat": 0,
+"catName": "기초 회화",
+"idx": 1,
+"name": "물감 탄환",
+"type": "attack",
+"desc": "작은 물감 투사체를 쏜다.",
+"maxLv": 5,
+"unlock": 10,
+"prereq": [],
+"weapon": null,
+"target": "enemy",
+"range": 8,
+"mp": 6,
+"cd": 2.5,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "throw",
+"ops": [
+{
+"op": "proj",
+"kind": "normal",
+"coef": 1.5,
+"speed": 15,
+"fx": "paint_blue",
+"burst": "explosion_ink",
+"paint": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"tags": [
+"paint"
+],
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ar1_a2",
+"job": "artist",
+"tier": 1,
+"cat": 0,
+"catName": "기초 회화",
+"idx": 2,
+"name": "붓 휘두르기",
+"type": "attack",
+"desc": "근거리 부채꼴 붓질.",
+"maxLv": 5,
+"unlock": 12,
+"prereq": [],
+"weapon": "brush",
+"target": "dir",
+"range": 2.4,
+"mp": 8,
+"cd": 4,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "attack",
+"ops": [
+{
+"op": "hit",
+"shape": "cone",
+"coef": 1.5,
+"r": 2.4,
+"ang": 100,
+"fx": {
+"slash": "brush_stroke"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"tags": [
+"paint"
+],
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ar1_a3",
+"job": "artist",
+"tier": 1,
+"cat": 0,
+"catName": "기초 회화",
+"idx": 3,
+"name": "잉크 웅덩이",
+"type": "attack",
+"desc": "지속 피해와 둔화를 주는 잉크 웅덩이.",
+"maxLv": 5,
+"unlock": 15,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 7,
+"mp": 14,
+"cd": 9,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "throw",
+"ops": [
+{
+"op": "area",
+"kind": "dmg",
+"r": 2.4,
+"dur": 6,
+"tick": 1.0,
+"coef": 0.35,
+"st": [
+{
+"id": "slow",
+"dur": 1.2,
+"val": 0.3,
+"ch": 1.0
+}
+],
+"fx": "ink_pool"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"tags": [
+"paint"
+],
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ar1_a4",
+"job": "artist",
+"tier": 1,
+"cat": 0,
+"catName": "기초 회화",
+"idx": 4,
+"name": "색칠 표식",
+"type": "support",
+"desc": "대상에 표식을 남겨 다음 물감 공격을 강화한다.",
+"maxLv": 5,
+"unlock": 18,
+"prereq": [],
+"weapon": null,
+"target": "enemy",
+"range": 8,
+"mp": 8,
+"cd": 8,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "hit",
+"shape": "single",
+"coef": 0.0,
+"st": [
+{
+"id": "painted",
+"dur": 8,
+"val": 0.6,
+"ch": 1.0
+}
+],
+"fx": {
+"burst": "explosion_ink"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"tags": [
+"paint"
+],
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ar1_a5",
+"job": "artist",
+"tier": 1,
+"cat": 0,
+"catName": "기초 회화",
+"idx": 5,
+"name": "붓끝 숙련",
+"type": "passive",
+"desc": "물감 사거리와 투사체 속도가 증가한다.",
+"maxLv": 5,
+"unlock": 20,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {
+"paintRange": [
+1.0,
+0.5
+],
+"projSpeed": [
+0.1,
+0.05
+]
+},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ar1_b1",
+"job": "artist",
+"tier": 1,
+"cat": 1,
+"catName": "기초 음악",
+"idx": 1,
+"name": "음파 파동",
+"type": "attack",
+"desc": "전방의 여러 적에게 음파를 보낸다.",
+"maxLv": 5,
+"unlock": 10,
+"prereq": [],
+"weapon": null,
+"target": "dir",
+"range": 4.5,
+"mp": 10,
+"cd": 5,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "hit",
+"shape": "cone",
+"coef": 1.4,
+"r": 4.5,
+"ang": 60,
+"elem": "sound",
+"fx": {
+"slash": "sound_cone"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"tags": [
+"music"
+],
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ar1_b2",
+"job": "artist",
+"tier": 1,
+"cat": 1,
+"catName": "기초 음악",
+"idx": 2,
+"name": "스타카토",
+"type": "attack",
+"desc": "빠른 음표 세 발.",
+"maxLv": 5,
+"unlock": 12,
+"prereq": [],
+"weapon": null,
+"target": "enemy",
+"range": 8,
+"mp": 10,
+"cd": 4,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "throw",
+"ops": [
+{
+"op": "proj",
+"kind": "normal",
+"coef": 0.7,
+"count": 3,
+"gap": 0.1,
+"speed": 16,
+"elem": "sound",
+"fx": "note",
+"burst": "explosion_note"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"tags": [
+"music"
+],
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ar1_b3",
+"job": "artist",
+"tier": 1,
+"cat": 1,
+"catName": "기초 음악",
+"idx": 3,
+"name": "작은 불협화음",
+"type": "attack",
+"desc": "근거리 피해와 일반 적의 동작을 끊는다.",
+"maxLv": 5,
+"unlock": 15,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.6,
+"mp": 12,
+"cd": 8,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "hit",
+"shape": "circle",
+"coef": 1.3,
+"r": 2.6,
+"elem": "sound",
+"st": [
+{
+"id": "stagger",
+"dur": 0.8,
+"val": 0,
+"ch": 1.0
+}
+],
+"fx": {
+"burst": "explosion_note"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"tags": [
+"music"
+],
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ar1_b4",
+"job": "artist",
+"tier": 1,
+"cat": 1,
+"catName": "기초 음악",
+"idx": 4,
+"name": "가벼운 행진곡",
+"type": "support",
+"desc": "이동 속도를 높인다.",
+"maxLv": 5,
+"unlock": 18,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 10,
+"cd": 16,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "buff",
+"id": "haste",
+"dur": 8,
+"val": 0.2,
+"target": "self"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"tags": [
+"music"
+],
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ar1_b5",
+"job": "artist",
+"tier": 1,
+"cat": 1,
+"catName": "기초 음악",
+"idx": 5,
+"name": "박자 감각",
+"type": "passive",
+"desc": "음악 스킬을 쓴 뒤 다음 기본 공격이 빨라진다.",
+"maxLv": 5,
+"unlock": 20,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {
+"beatHaste": [
+0.3,
+0.1
+]
+},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ar1_c1",
+"job": "artist",
+"tier": 1,
+"cat": 2,
+"catName": "영감과 창작",
+"idx": 1,
+"name": "영감 충전",
+"type": "support",
+"desc": "짧게 집중해 기력(MP)을 회복한다. 피격 시 중단.",
+"maxLv": 5,
+"unlock": 10,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 18,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "channel",
+"dur": 2.0,
+"tick": 0.5,
+"ops": [
+{
+"op": "mp",
+"pct": 0.05
+}
+],
+"breakOnHit": true,
+"breakOnMove": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ar1_c2",
+"job": "artist",
+"tier": 1,
+"cat": 2,
+"catName": "영감과 창작",
+"idx": 2,
+"name": "즉흥 창작",
+"type": "support",
+"desc": "다음 회화·음악 공격의 피해와 범위를 늘린다.",
+"maxLv": 5,
+"unlock": 12,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 12,
+"cd": 12,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "buff",
+"id": "inspired",
+"dur": 10,
+"val": 0.4,
+"target": "self"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ar1_c3",
+"job": "artist",
+"tier": 1,
+"cat": 2,
+"catName": "영감과 창작",
+"idx": 3,
+"name": "작은 걸작",
+"type": "summon",
+"desc": "그림 생명체가 잠시 나타나 공격한다.",
+"maxLv": 5,
+"unlock": 15,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 5,
+"mp": 18,
+"cd": 14,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "summon",
+"kind": "masterpiece",
+"ai": "chase_melee",
+"life": 10,
+"hp": 0.6,
+"coef": 0.8,
+"rate": 1.0,
+"range": 1.6,
+"limit": 1,
+"living": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"tags": [
+"paint"
+],
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ar1_c4",
+"job": "artist",
+"tier": 1,
+"cat": 2,
+"catName": "영감과 창작",
+"idx": 4,
+"name": "예술 부적 제작",
+"type": "craft",
+"desc": "공격·방어·기력 강화 부적을 만든다.",
+"maxLv": 5,
+"unlock": 18,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true,
+"recipes": [
+"r_charm_atk",
+"r_charm_def",
+"r_charm_mp"
+]
+},
+{
+"id": "ar1_c5",
+"job": "artist",
+"tier": 1,
+"cat": 2,
+"catName": "영감과 창작",
+"idx": 5,
+"name": "창작의 흐름",
+"type": "passive",
+"desc": "회화와 음악을 번갈아 쓰면 다음 스킬의 기력 소모가 줄어든다.",
+"maxLv": 5,
+"unlock": 20,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {
+"flow": [
+0.2,
+0.06
+]
+},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "pt_a1",
+"job": "painter",
+"tier": 2,
+"cat": 0,
+"catName": "잉크 소환술",
+"idx": 1,
+"name": "잉크 늑대",
+"type": "summon",
+"desc": "적을 쫓아 물어뜯는 잉크 늑대.",
+"maxLv": 5,
+"unlock": 30,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 6,
+"mp": 24,
+"cd": 12,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "summon",
+"kind": "ink_wolf",
+"ai": "chase_melee",
+"life": 16,
+"hp": 0.9,
+"coef": 1.0,
+"rate": 0.9,
+"range": 1.6,
+"limit": 2,
+"living": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "pt_a2",
+"job": "painter",
+"tier": 2,
+"cat": 0,
+"catName": "잉크 소환술",
+"idx": 2,
+"name": "종이학 무리",
+"type": "summon",
+"desc": "잉크 깃털을 떨어뜨리는 종이학 무리.",
+"maxLv": 5,
+"unlock": 33,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 24,
+"cd": 16,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "summon",
+"kind": "paper_crane",
+"ai": "follow_ranged",
+"n": 3,
+"life": 14,
+"hp": 0.3,
+"coef": 0.4,
+"rate": 0.9,
+"range": 7,
+"proj": "ink_blob",
+"limit": 3,
+"living": true,
+"fly": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "pt_a3",
+"job": "painter",
+"tier": 2,
+"cat": 0,
+"catName": "잉크 소환술",
+"idx": 3,
+"name": "채색 기사",
+"type": "summon",
+"desc": "적의 주의를 끌고 검으로 공격하는 그림 기사.",
+"maxLv": 5,
+"unlock": 36,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 6,
+"mp": 30,
+"cd": 24,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "summon",
+"kind": "painted_knight",
+"ai": "taunt_melee",
+"life": 20,
+"hp": 2.2,
+"coef": 1.1,
+"rate": 1.1,
+"range": 1.8,
+"taunt": true,
+"limit": 1,
+"living": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "pt_a4",
+"job": "painter",
+"tier": 2,
+"cat": 0,
+"catName": "잉크 소환술",
+"idx": 4,
+"name": "그림자 모사",
+"type": "summon",
+"desc": "적의 모습을 본뜬 분신. 고정된 소환 능력치를 쓰며 보스 스킬은 따라 하지 않는다.",
+"maxLv": 5,
+"unlock": 40,
+"prereq": [],
+"weapon": null,
+"target": "enemy",
+"range": 8,
+"mp": 28,
+"cd": 22,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "summon",
+"kind": "shadow_clone",
+"ai": "chase_melee",
+"life": 12,
+"hp": 1.2,
+"coef": 1.0,
+"rate": 1.0,
+"range": 1.8,
+"limit": 1,
+"living": true,
+"copyTarget": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "pt_a5",
+"job": "painter",
+"tier": 2,
+"cat": 0,
+"catName": "잉크 소환술",
+"idx": 5,
+"name": "살아 있는 용화",
+"type": "ultimate",
+"desc": "용이 전장을 가로지르며 먹물 숨결을 내뿜는다.",
+"maxLv": 3,
+"unlock": 45,
+"prereq": [],
+"weapon": null,
+"target": "dir",
+"range": 12,
+"mp": 75,
+"cd": 75,
+"cast": 0.8,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "telegraph",
+"shape": "line",
+"len": 12,
+"w": 3.0,
+"dur": 0.8
+},
+{
+"op": "custom",
+"fn": "dragon",
+"len": 12,
+"w": 3.0,
+"coef": 2.2,
+"hits": 4,
+"gap": 0.25,
+"color": "ink"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "pt_b1",
+"job": "painter",
+"tier": 2,
+"cat": 1,
+"catName": "채색과 폭발",
+"idx": 1,
+"name": "진홍의 붓질",
+"type": "attack",
+"desc": "붉은 궤적으로 피해를 주고 화상성 채색을 남긴다.",
+"maxLv": 5,
+"unlock": 30,
+"prereq": [],
+"weapon": null,
+"target": "dir",
+"range": 4.0,
+"mp": 20,
+"cd": 6,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "attack",
+"ops": [
+{
+"op": "hit",
+"shape": "cone",
+"coef": 2.2,
+"r": 4.0,
+"ang": 80,
+"elem": "fire",
+"color": "red",
+"st": [
+{
+"id": "burn",
+"dur": 3,
+"val": 0.12,
+"ch": 1.0
+}
+],
+"fx": {
+"slash": "brush_stroke"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {
+"color": 14692416
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "pt_b2",
+"job": "painter",
+"tier": 2,
+"cat": 1,
+"catName": "채색과 폭발",
+"idx": 2,
+"name": "청람의 물결",
+"type": "attack",
+"desc": "푸른 파도로 피해를 주고 둔화성 채색을 남긴다.",
+"maxLv": 5,
+"unlock": 33,
+"prereq": [],
+"weapon": null,
+"target": "dir",
+"range": 8,
+"mp": 22,
+"cd": 7,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "hit",
+"shape": "line",
+"coef": 2.0,
+"len": 8,
+"w": 2.2,
+"elem": "water",
+"color": "blue",
+"st": [
+{
+"id": "slow",
+"dur": 3,
+"val": 0.3,
+"ch": 1.0
+}
+],
+"fx": {
+"beam": "water_wave"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {
+"color": 3828479
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "pt_b3",
+"job": "painter",
+"tier": 2,
+"cat": 1,
+"catName": "채색과 폭발",
+"idx": 3,
+"name": "황금의 점묘",
+"type": "attack",
+"desc": "대상 주변에 금빛 점이 찍히고 차례로 터진다.",
+"maxLv": 5,
+"unlock": 36,
+"prereq": [],
+"weapon": null,
+"target": "enemy",
+"range": 8,
+"mp": 24,
+"cd": 9,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "custom",
+"fn": "dots",
+"n": 6,
+"r": 2.2,
+"blast": 1.0,
+"coef": 0.8,
+"start": 0.4,
+"gap": 0.15,
+"color": "gold",
+"burst": "explosion_gold"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {
+"color": 16764992
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "pt_b4",
+"job": "painter",
+"tier": 2,
+"cat": 1,
+"catName": "채색과 폭발",
+"idx": 4,
+"name": "혼색 반응",
+"type": "attack",
+"desc": "서로 다른 채색을 소비해 피해와 범위를 키운다.",
+"maxLv": 5,
+"unlock": 40,
+"prereq": [],
+"weapon": null,
+"target": "enemy",
+"range": 8,
+"mp": 26,
+"cd": 8,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "custom",
+"fn": "mix",
+"coef": 2.0,
+"perColor": 1.0,
+"r": 1.6,
+"rPer": 0.8
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "pt_b5",
+"job": "painter",
+"tier": 2,
+"cat": 1,
+"catName": "채색과 폭발",
+"idx": 5,
+"name": "프리즘 대폭발",
+"type": "ultimate",
+"desc": "다색 폭발. 주변 채색 영역도 각각 한 번씩만 반응한다.",
+"maxLv": 3,
+"unlock": 45,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 70,
+"cd": 70,
+"cast": 0.6,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "telegraph",
+"shape": "circle",
+"r": 6,
+"dur": 0.6
+},
+{
+"op": "custom",
+"fn": "prism",
+"r": 6,
+"coef": 6.0,
+"perColor": 1.2
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "pt_c1",
+"job": "painter",
+"tier": 2,
+"cat": 2,
+"catName": "풍경과 결계",
+"idx": 1,
+"name": "초원의 풍경화",
+"type": "support",
+"desc": "자신과 생명체 소환물을 회복하는 초원을 그린다.",
+"maxLv": 5,
+"unlock": 30,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 6,
+"mp": 26,
+"cd": 20,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "area",
+"kind": "heal",
+"r": 3.0,
+"dur": 8,
+"tick": 1.0,
+"heal": 0.025,
+"fx": "meadow",
+"landscape": true,
+"living": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "pt_c2",
+"job": "painter",
+"tier": 2,
+"cat": 2,
+"catName": "풍경과 결계",
+"idx": 2,
+"name": "성벽의 풍경화",
+"type": "summon",
+"desc": "적의 이동과 투사체를 막는 임시 성벽.",
+"maxLv": 5,
+"unlock": 33,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 5,
+"mp": 24,
+"cd": 18,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "summon",
+"kind": "painted_wall",
+"ai": "wall",
+"life": 8,
+"hp": 2.0,
+"width": 3.4,
+"limit": 2,
+"landscape": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "pt_c3",
+"job": "painter",
+"tier": 2,
+"cat": 2,
+"catName": "풍경과 결계",
+"idx": 3,
+"name": "폭풍의 풍경화",
+"type": "attack",
+"desc": "비와 번개가 쏟아지는 지속 피해 영역.",
+"maxLv": 5,
+"unlock": 36,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 7,
+"mp": 28,
+"cd": 14,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "area",
+"kind": "dmg",
+"r": 3.0,
+"dur": 7,
+"tick": 0.7,
+"coef": 0.45,
+"elem": "shock",
+"fx": "storm",
+"landscape": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "pt_c4",
+"job": "painter",
+"tier": 2,
+"cat": 2,
+"catName": "풍경과 결계",
+"idx": 4,
+"name": "화폭 확장",
+"type": "passive",
+"desc": "풍경 영역의 크기와 지속시간이 늘어난다.",
+"maxLv": 5,
+"unlock": 40,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {
+"landscapeSize": [
+0.15,
+0.05
+],
+"landscapeTime": [
+0.15,
+0.05
+]
+},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "pt_c5",
+"job": "painter",
+"tier": 2,
+"cat": 2,
+"catName": "풍경과 결계",
+"idx": 5,
+"name": "천지화폭",
+"type": "ultimate",
+"desc": "이미 그린 풍경 영역과 그림 소환물을 강화한다.",
+"maxLv": 3,
+"unlock": 45,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 60,
+"cd": 60,
+"cast": 0.5,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "empower",
+"landscapes": 0.6,
+"summons": 0.5,
+"dur": 12,
+"extend": 4
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "mu_a1",
+"job": "musician",
+"tier": 2,
+"cat": 0,
+"catName": "공격 선율",
+"idx": 1,
+"name": "음파 화살",
+"type": "attack",
+"desc": "관통하는 음표. 맞히면 악절을 얻는다.",
+"maxLv": 5,
+"unlock": 30,
+"prereq": [],
+"weapon": null,
+"target": "dir",
+"range": 10,
+"mp": 18,
+"cd": 4,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "throw",
+"ops": [
+{
+"op": "proj",
+"kind": "normal",
+"coef": 1.8,
+"speed": 18,
+"pierce": true,
+"range": 10,
+"elem": "sound",
+"fx": "note",
+"burst": "explosion_note",
+"gain": {
+"type": "phrase",
+"n": 1
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "mu_a2",
+"job": "musician",
+"tier": 2,
+"cat": 0,
+"catName": "공격 선율",
+"idx": 2,
+"name": "불협화음",
+"type": "attack",
+"desc": "범위 피해와 함께 적의 공격력을 낮춘다.",
+"maxLv": 5,
+"unlock": 33,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 3.2,
+"mp": 22,
+"cd": 8,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "hit",
+"shape": "circle",
+"coef": 1.8,
+"r": 3.2,
+"elem": "sound",
+"st": [
+{
+"id": "atkdown",
+"dur": 5,
+"val": 0.2,
+"ch": 1.0
+}
+],
+"gain": {
+"type": "phrase",
+"n": 1
+},
+"fx": {
+"burst": "explosion_note"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "mu_a3",
+"job": "musician",
+"tier": 2,
+"cat": 0,
+"catName": "공격 선율",
+"idx": 3,
+"name": "크레셴도",
+"type": "attack",
+"desc": "같은 적을 연속으로 맞히면 마지막 타격이 강해진다.",
+"maxLv": 5,
+"unlock": 36,
+"prereq": [],
+"weapon": null,
+"target": "enemy",
+"range": 8,
+"mp": 22,
+"cd": 7,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "proj",
+"kind": "homing",
+"coef": 0.8,
+"count": 4,
+"gap": 0.18,
+"speed": 14,
+"elem": "sound",
+"fx": "note",
+"burst": "explosion_note",
+"crescendo": 0.35,
+"gain": {
+"type": "phrase",
+"n": 1,
+"once": true
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "mu_a4",
+"job": "musician",
+"tier": 2,
+"cat": 0,
+"catName": "공격 선율",
+"idx": 4,
+"name": "공명 폭발",
+"type": "attack",
+"desc": "대상 주변이 폭발한다. 약화된 적에게 추가 파동.",
+"maxLv": 5,
+"unlock": 40,
+"prereq": [],
+"weapon": null,
+"target": "enemy",
+"range": 8,
+"mp": 24,
+"cd": 8,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "hit",
+"shape": "circle",
+"coef": 2.4,
+"r": 2.2,
+"atTarget": true,
+"elem": "sound",
+"react": {
+"need": "atkdown",
+"coef": 1.4,
+"r": 2.6,
+"burst": "explosion_note"
+},
+"gain": {
+"type": "phrase",
+"n": 1
+},
+"fx": {
+"burst": "explosion_note"
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "mu_a5",
+"job": "musician",
+"tier": 2,
+"cat": 0,
+"catName": "공격 선율",
+"idx": 5,
+"name": "파멸의 피날레",
+"type": "ultimate",
+"desc": "모은 악절을 소비해 거대한 음표와 충격파를 날린다.",
+"maxLv": 3,
+"unlock": 45,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 60,
+"cd": 60,
+"cast": 0.7,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "telegraph",
+"shape": "circle",
+"r": 6,
+"dur": 0.7
+},
+{
+"op": "hit",
+"shape": "circle",
+"coef": 4.0,
+"r": 6,
+"elem": "sound",
+"consume": {
+"type": "phrase",
+"mulPer": 0.35
+},
+"fx": {
+"burst": "explosion_big"
+},
+"at": 0.7
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "mu_b1",
+"job": "musician",
+"tier": 2,
+"cat": 1,
+"catName": "선율과 회복",
+"idx": 1,
+"name": "치유의 선율",
+"type": "support",
+"desc": "이동하며 자신과 생명체 소환물을 지속 회복한다. (지속 선율은 하나만)",
+"maxLv": 5,
+"unlock": 30,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 20,
+"cd": 6,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "melody",
+"id": "mel_heal",
+"dur": 20,
+"heal": 0.012,
+"tick": 1.0
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "mu_b2",
+"job": "musician",
+"tier": 2,
+"cat": 1,
+"catName": "선율과 회복",
+"idx": 2,
+"name": "용기의 행진곡",
+"type": "support",
+"desc": "공격력과 이동 속도를 높인다. (지속 선율)",
+"maxLv": 5,
+"unlock": 33,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 20,
+"cd": 6,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "melody",
+"id": "mel_courage",
+"dur": 20,
+"atk": 0.15,
+"speed": 0.12
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "mu_b3",
+"job": "musician",
+"tier": 2,
+"cat": 1,
+"catName": "선율과 회복",
+"idx": 3,
+"name": "수호의 찬가",
+"type": "support",
+"desc": "피해 감소와 상태이상 저항. (지속 선율)",
+"maxLv": 5,
+"unlock": 36,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 20,
+"cd": 6,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "melody",
+"id": "mel_guard",
+"dur": 20,
+"dr": 0.15,
+"ccres": 0.5
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "mu_b4",
+"job": "musician",
+"tier": 2,
+"cat": 1,
+"catName": "선율과 회복",
+"idx": 4,
+"name": "마나의 세레나데",
+"type": "support",
+"desc": "기력(MP)을 회복한다. (지속 선율)",
+"maxLv": 5,
+"unlock": 40,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 6,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "melody",
+"id": "mel_mana",
+"dur": 20,
+"mp": 0.02,
+"tick": 1.0
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "mu_b5",
+"job": "musician",
+"tier": 2,
+"cat": 1,
+"catName": "선율과 회복",
+"idx": 5,
+"name": "생명의 앙코르",
+"type": "ultimate",
+"desc": "크게 회복하고 보호막을 두르며 현재 선율을 강화한다.",
+"maxLv": 3,
+"unlock": 45,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 60,
+"cd": 70,
+"cast": 0.5,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "heal",
+"pct": 0.35,
+"flat": 0
+},
+{
+"op": "shield",
+"base": 80,
+"coef": 1.8,
+"dur": 10
+},
+{
+"op": "melodyBoost",
+"mul": 0.6,
+"dur": 12
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "mu_c1",
+"job": "musician",
+"tier": 2,
+"cat": 2,
+"catName": "악기와 무대",
+"idx": 1,
+"name": "메아리 연주",
+"type": "support",
+"desc": "다음 음악 공격을 약한 위력으로 한 번 더 연주한다. 메아리는 다시 메아리치지 않는다.",
+"maxLv": 5,
+"unlock": 30,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 14,
+"cd": 12,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "buff",
+"id": "echo",
+"dur": 10,
+"val": 0.5,
+"target": "self"
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "mu_c2",
+"job": "musician",
+"tier": 2,
+"cat": 2,
+"catName": "악기와 무대",
+"idx": 2,
+"name": "음향 증폭기",
+"type": "summon",
+"desc": "주변에서 내 음파 공격의 범위를 넓히는 증폭기.",
+"maxLv": 5,
+"unlock": 33,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 5,
+"mp": 22,
+"cd": 18,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "summon",
+"kind": "amplifier",
+"ai": "amp",
+"life": 15,
+"hp": 1.0,
+"amp": 0.35,
+"r": 5,
+"limit": 1,
+"machine": true
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "mu_c3",
+"job": "musician",
+"tier": 2,
+"cat": 2,
+"catName": "악기와 무대",
+"idx": 3,
+"name": "환영 악단",
+"type": "summon",
+"desc": "선택 대상에게 음표를 쏘는 환영 연주자.",
+"maxLv": 5,
+"unlock": 36,
+"prereq": [],
+"weapon": null,
+"target": "ground",
+"range": 6,
+"mp": 28,
+"cd": 20,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "summon",
+"kind": "phantom_musician",
+"ai": "turret",
+"n": 2,
+"life": 15,
+"hp": 0.8,
+"coef": 0.6,
+"rate": 0.9,
+"range": 8,
+"proj": "note",
+"limit": 2,
+"living": false
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "mu_c4",
+"job": "musician",
+"tier": 2,
+"cat": 2,
+"catName": "악기와 무대",
+"idx": 4,
+"name": "절대음감",
+"type": "passive",
+"desc": "악절 획득 효율이 오르고, 선율을 바꾼 뒤 첫 공격이 강해진다.",
+"maxLv": 5,
+"unlock": 40,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [],
+"flags": {
+"phraseGain": [
+0.25,
+0.1
+],
+"switchBonus": [
+0.2,
+0.08
+]
+},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "mu_c5",
+"job": "musician",
+"tier": 2,
+"cat": 2,
+"catName": "악기와 무대",
+"idx": 5,
+"name": "그랜드 심포니",
+"type": "ultimate",
+"desc": "악단의 연속 공격과 선율 강화, 그리고 합주 마무리.",
+"maxLv": 3,
+"unlock": 45,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 75,
+"cd": 75,
+"cast": 0.6,
+"recover": 0.35,
+"anim": "cast",
+"ops": [
+{
+"op": "telegraph",
+"shape": "circle",
+"r": 6,
+"dur": 0.6
+},
+{
+"op": "melodyBoost",
+"mul": 0.5,
+"dur": 10
+},
+{
+"op": "custom",
+"fn": "symphony",
+"n": 10,
+"r": 6,
+"coef": 0.9,
+"gap": 0.2,
+"finale": {
+"r": 6,
+"coef": 5.0
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+}
+],
+"statuses": [
+{
+"id": "burn",
+"name": "화상",
+"kind": "dot",
+"tick": 1.0,
+"debuff": true,
+"cleanse": true,
+"stack": "refresh",
+"cap": 1,
+"boss": "normal",
+"color": "#ff7a30"
+},
+{
+"id": "poison",
+"name": "독",
+"kind": "dot",
+"tick": 1.0,
+"debuff": true,
+"cleanse": true,
+"stack": "refresh",
+"cap": 1,
+"boss": "normal",
+"color": "#8ad040"
+},
+{
+"id": "bleed",
+"name": "출혈",
+"kind": "dot",
+"tick": 1.0,
+"debuff": true,
+"cleanse": true,
+"stack": "refresh",
+"cap": 1,
+"boss": "normal",
+"color": "#d03040"
+},
+{
+"id": "slow",
+"name": "둔화",
+"kind": "slow",
+"stat": "moveSpeed",
+"debuff": true,
+"cleanse": true,
+"stack": "max",
+"cap": 0.7,
+"boss": "half",
+"color": "#7ab8ff"
+},
+{
+"id": "freeze",
+"name": "빙결",
+"kind": "stun",
+"debuff": true,
+"cleanse": true,
+"stack": "refresh",
+"boss": "slow",
+"color": "#a8e8ff"
+},
+{
+"id": "root",
+"name": "속박",
+"kind": "root",
+"debuff": true,
+"cleanse": true,
+"stack": "refresh",
+"boss": "slow",
+"color": "#6ac060"
+},
+{
+"id": "stagger",
+"name": "경직",
+"kind": "stun",
+"debuff": true,
+"cleanse": false,
+"stack": "refresh",
+"boss": "immune",
+"color": "#ffffff"
+},
+{
+"id": "defdown",
+"name": "방어력 감소",
+"kind": "statMul",
+"stat": "def",
+"sign": -1,
+"debuff": true,
+"cleanse": true,
+"stack": "max",
+"cap": 0.5,
+"boss": "normal",
+"color": "#c08040"
+},
+{
+"id": "atkdown",
+"name": "공격력 감소",
+"kind": "statMul",
+"stat": "atk",
+"sign": -1,
+"debuff": true,
+"cleanse": true,
+"stack": "max",
+"cap": 0.5,
+"boss": "normal",
+"color": "#c04040"
+},
+{
+"id": "prescribed",
+"name": "표적 처방",
+"kind": "mark",
+"debuff": true,
+"cleanse": false,
+"boss": "normal",
+"color": "#5aa0ff"
+},
+{
+"id": "painted",
+"name": "색칠 표식",
+"kind": "mark",
+"debuff": true,
+"cleanse": false,
+"boss": "normal",
+"color": "#50c8c8"
+},
+{
+"id": "spotlit",
+"name": "스포트라이트",
+"kind": "mark",
+"debuff": true,
+"cleanse": false,
+"boss": "normal",
+"color": "#ffe080"
+},
+{
+"id": "atkup",
+"name": "공격력 증가",
+"kind": "statMul",
+"stat": "atk",
+"buff": true,
+"stack": "max",
+"cap": 1.0,
+"color": "#ff7060"
+},
+{
+"id": "defup",
+"name": "방어력 증가",
+"kind": "statMul",
+"stat": "def",
+"buff": true,
+"stack": "max",
+"cap": 1.0,
+"color": "#e0c060"
+},
+{
+"id": "haste",
+"name": "이동 속도 증가",
+"kind": "statMul",
+"stat": "moveSpeed",
+"buff": true,
+"stack": "max",
+"cap": 0.6,
+"color": "#80e0ff"
+},
+{
+"id": "mpregen",
+"name": "기력 회복",
+"kind": "statAdd",
+"stat": "spRegen",
+"buff": true,
+"stack": "max",
+"color": "#60a0ff"
+},
+{
+"id": "ccres",
+"name": "경직 저항",
+"kind": "flag",
+"buff": true,
+"stack": "max",
+"color": "#e0e0e0"
+},
+{
+"id": "slowres",
+"name": "둔화 저항",
+"kind": "flag",
+"buff": true,
+"stack": "max",
+"color": "#a0e0ff"
+},
+{
+"id": "knockres",
+"name": "밀려남 저항",
+"kind": "flag",
+"buff": true,
+"stack": "max",
+"color": "#c0c0c0"
+},
+{
+"id": "dmgreduce",
+"name": "피해 감소",
+"kind": "statAdd",
+"stat": "dmgReduce",
+"buff": true,
+"stack": "max",
+"cap": 0.6,
+"color": "#d0b080"
+},
+{
+"id": "frontguard",
+"name": "도마 방어",
+"kind": "flag",
+"buff": true,
+"stack": "max",
+"color": "#c09060"
+},
+{
+"id": "healup",
+"name": "회복량 증가",
+"kind": "statAdd",
+"stat": "healPower",
+"buff": true,
+"stack": "max",
+"color": "#70e070"
+},
+{
+"id": "maxhp",
+"name": "든든함",
+"kind": "statMul",
+"stat": "maxHp",
+"buff": true,
+"stack": "max",
+"cap": 0.5,
+"group": "food",
+"color": "#ffb060"
+},
+{
+"id": "foodup",
+"name": "음식 효과 증폭",
+"kind": "statAdd",
+"stat": "foodPower",
+"buff": true,
+"stack": "max",
+"group": "food",
+"color": "#ffd060"
+},
+{
+"id": "catalyst",
+"name": "반응 촉진",
+"kind": "flag",
+"buff": true,
+"stack": "max",
+"color": "#5aa0ff"
+},
+{
+"id": "inspired",
+"name": "영감",
+"kind": "flag",
+"buff": true,
+"stack": "max",
+"color": "#50c8c8"
+},
+{
+"id": "echo",
+"name": "메아리",
+"kind": "flag",
+"buff": true,
+"stack": "max",
+"color": "#60d0a0"
+},
+{
+"id": "overclock",
+"name": "오버클럭",
+"kind": "flag",
+"buff": true,
+"stack": "refresh",
+"color": "#ff9a30"
+},
+{
+"id": "cooldown_heat",
+"name": "냉각 중",
+"kind": "flag",
+"debuff": true,
+"cleanse": false,
+"stack": "refresh",
+"color": "#8090a0"
+},
+{
+"id": "well_fed2",
+"name": "탕약 기운",
+"kind": "statMul",
+"stat": "maxHp",
+"buff": true,
+"stack": "max",
+"cap": 0.3,
+"group": "food",
+"color": "#ffb060"
+},
+{
+"id": "whetted",
+"name": "숫돌 연마",
+"kind": "statMul",
+"stat": "atk",
+"buff": true,
+"stack": "max",
+"cap": 0.3,
+"color": "#c0c8d8"
+}
+],
+"items": [
+{
+"id": "m_bottle",
+"name": "빈 병",
+"desc": "약을 담는 유리병.",
+"type": "material",
+"job": "",
+"tier": 1,
+"levelReq": 1,
+"price": 4,
+"sellPrice": 1,
+"maxStack": 99,
+"icon": "m_bottle",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "m_iron",
+"name": "철괴",
+"desc": "대장간 기본 재료.",
+"type": "material",
+"job": "",
+"tier": 1,
+"levelReq": 1,
+"price": 12,
+"sellPrice": 3,
+"maxStack": 99,
+"icon": "m_iron",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "m_cloth",
+"name": "옷감",
+"desc": "의상 재료.",
+"type": "material",
+"job": "",
+"tier": 1,
+"levelReq": 1,
+"price": 10,
+"sellPrice": 2,
+"maxStack": 99,
+"icon": "m_cloth",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "m_flour",
+"name": "밀가루",
+"desc": "요리 재료.",
+"type": "material",
+"job": "",
+"tier": 1,
+"levelReq": 1,
+"price": 5,
+"sellPrice": 1,
+"maxStack": 99,
+"icon": "m_flour",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "m_meat",
+"name": "고기",
+"desc": "요리 재료.",
+"type": "material",
+"job": "",
+"tier": 1,
+"levelReq": 1,
+"price": 8,
+"sellPrice": 2,
+"maxStack": 99,
+"icon": "m_meat",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "m_veg",
+"name": "채소",
+"desc": "요리 재료.",
+"type": "material",
+"job": "",
+"tier": 1,
+"levelReq": 1,
+"price": 5,
+"sellPrice": 1,
+"maxStack": 99,
+"icon": "m_veg",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "m_pigment",
+"name": "안료",
+"desc": "부적·염색 재료.",
+"type": "material",
+"job": "",
+"tier": 1,
+"levelReq": 1,
+"price": 8,
+"sellPrice": 2,
+"maxStack": 99,
+"icon": "m_pigment",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "m_gear",
+"name": "톱니 부품",
+"desc": "병기 재료.",
+"type": "material",
+"job": "",
+"tier": 1,
+"levelReq": 1,
+"price": 20,
+"sellPrice": 5,
+"maxStack": 99,
+"icon": "m_gear",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "m_silk",
+"name": "마법 실",
+"desc": "자수 재료.",
+"type": "material",
+"job": "",
+"tier": 1,
+"levelReq": 1,
+"price": 24,
+"sellPrice": 6,
+"maxStack": 99,
+"icon": "m_silk",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "c_potion_l",
+"name": "농축 회복제",
+"desc": "HP를 크게 회복한다.",
+"type": "consumable",
+"job": "",
+"tier": 2,
+"levelReq": 1,
+"price": 0,
+"sellPrice": 10,
+"maxStack": 20,
+"icon": "c_potion_l",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0.45,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "c_regen_hp",
+"name": "지속 회복 제제",
+"desc": "15초 동안 HP를 회복한다.",
+"type": "consumable",
+"job": "",
+"tier": 2,
+"levelReq": 1,
+"price": 0,
+"sellPrice": 8,
+"maxStack": 20,
+"icon": "c_regen_hp",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "regen",
+"duration": 15,
+"value": 0.02,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "c_regen_sp",
+"name": "지속 활력 제제",
+"desc": "15초 동안 기력을 회복한다.",
+"type": "consumable",
+"job": "",
+"tier": 2,
+"levelReq": 1,
+"price": 0,
+"sellPrice": 8,
+"maxStack": 20,
+"icon": "c_regen_sp",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "mpregen",
+"duration": 15,
+"value": 6,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "f_lunch",
+"name": "간단한 도시락",
+"desc": "HP 회복 음식.",
+"type": "consumable",
+"job": "",
+"tier": 1,
+"levelReq": 1,
+"price": 0,
+"sellPrice": 3,
+"maxStack": 20,
+"icon": "f_lunch",
+"stats": [],
+"use": {
+"heal": 120,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "f_soup",
+"name": "따뜻한 수프",
+"desc": "20초 동안 HP를 회복하는 음식.",
+"type": "consumable",
+"job": "",
+"tier": 1,
+"levelReq": 1,
+"price": 0,
+"sellPrice": 4,
+"maxStack": 20,
+"icon": "f_soup",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "regen",
+"duration": 20,
+"value": 0.015,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "f_course_atk",
+"name": "특제 코스: 불꽃 스테이크",
+"desc": "공격력이 오르는 고급 음식. (음식 효과는 중첩되지 않음)",
+"type": "consumable",
+"job": "",
+"tier": 2,
+"levelReq": 1,
+"price": 0,
+"sellPrice": 12,
+"maxStack": 20,
+"icon": "f_course_atk",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "atkup",
+"duration": 60,
+"value": 0.15,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "f_course_def",
+"name": "특제 코스: 든든한 스튜",
+"desc": "방어력이 오르는 고급 음식.",
+"type": "consumable",
+"job": "",
+"tier": 2,
+"levelReq": 1,
+"price": 0,
+"sellPrice": 12,
+"maxStack": 20,
+"icon": "f_course_def",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "defup",
+"duration": 60,
+"value": 0.2,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "f_course_heal",
+"name": "특제 코스: 생명의 샐러드",
+"desc": "회복량이 오르는 고급 음식.",
+"type": "consumable",
+"job": "",
+"tier": 2,
+"levelReq": 1,
+"price": 0,
+"sellPrice": 12,
+"maxStack": 20,
+"icon": "f_course_heal",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "healup",
+"duration": 60,
+"value": 0.2,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "f_tonic",
+"name": "보양탕",
+"desc": "최대 HP와 자연 회복을 높이는 탕약.",
+"type": "consumable",
+"job": "",
+"tier": 2,
+"levelReq": 1,
+"price": 0,
+"sellPrice": 10,
+"maxStack": 20,
+"icon": "f_tonic",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "well_fed2",
+"duration": 90,
+"value": 0.15,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "t_whetstone",
+"name": "숫돌",
+"desc": "사용하면 60초 동안 공격력이 오른다.",
+"type": "consumable",
+"job": "",
+"tier": 1,
+"levelReq": 1,
+"price": 0,
+"sellPrice": 3,
+"maxStack": 20,
+"icon": "t_whetstone",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "whetted",
+"duration": 60,
+"value": 0.12,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "t_dye_red",
+"name": "진홍 염색약",
+"desc": "외형(옷) 색을 바꾼다.",
+"type": "consumable",
+"job": "",
+"tier": 1,
+"levelReq": 1,
+"price": 0,
+"sellPrice": 2,
+"maxStack": 20,
+"icon": "t_dye_red",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1,
+"dye": "#d84050"
+},
+"tags": []
+},
+{
+"id": "t_dye_blue",
+"name": "청람 염색약",
+"desc": "외형(옷) 색을 바꾼다.",
+"type": "consumable",
+"job": "",
+"tier": 1,
+"levelReq": 1,
+"price": 0,
+"sellPrice": 2,
+"maxStack": 20,
+"icon": "t_dye_blue",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1,
+"dye": "#4a70e0"
+},
+"tags": []
+},
+{
+"id": "t_dye_green",
+"name": "초록 염색약",
+"desc": "외형(옷) 색을 바꾼다.",
+"type": "consumable",
+"job": "",
+"tier": 1,
+"levelReq": 1,
+"price": 0,
+"sellPrice": 2,
+"maxStack": 20,
+"icon": "t_dye_green",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1,
+"dye": "#50b060"
+},
+"tags": []
+},
+{
+"id": "t_dye_reset",
+"name": "탈색제",
+"desc": "염색을 지운다.",
+"type": "consumable",
+"job": "",
+"tier": 1,
+"levelReq": 1,
+"price": 0,
+"sellPrice": 1,
+"maxStack": 20,
+"icon": "t_dye_reset",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1,
+"dye": ""
+},
+"tags": []
+},
+{
+"id": "t_mod_speed",
+"name": "속사 모듈",
+"desc": "장착 무기: 공격 속도 +12%, 공격력 -5%.",
+"type": "consumable",
+"job": "",
+"tier": 2,
+"levelReq": 1,
+"price": 0,
+"sellPrice": 10,
+"maxStack": 20,
+"icon": "t_mod_speed",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1,
+"mod": "speed"
+},
+"tags": []
+},
+{
+"id": "t_mod_area",
+"name": "확산 모듈",
+"desc": "장착 무기: 공격력 +10%, 공격 속도 -6%.",
+"type": "consumable",
+"job": "",
+"tier": 2,
+"levelReq": 1,
+"price": 0,
+"sellPrice": 10,
+"maxStack": 20,
+"icon": "t_mod_area",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1,
+"mod": "power"
+},
+"tags": []
+},
+{
+"id": "t_emb_atk",
+"name": "자수: 맹공",
+"desc": "장착 방어구: 공격력 +6%.",
+"type": "consumable",
+"job": "",
+"tier": 2,
+"levelReq": 1,
+"price": 0,
+"sellPrice": 10,
+"maxStack": 20,
+"icon": "t_emb_atk",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1,
+"emb": "atk"
+},
+"tags": []
+},
+{
+"id": "t_emb_def",
+"name": "자수: 수호",
+"desc": "장착 방어구: 방어력 +10%.",
+"type": "consumable",
+"job": "",
+"tier": 2,
+"levelReq": 1,
+"price": 0,
+"sellPrice": 10,
+"maxStack": 20,
+"icon": "t_emb_def",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1,
+"emb": "def"
+},
+"tags": []
+},
+{
+"id": "t_emb_mp",
+"name": "자수: 샘물",
+"desc": "장착 방어구: 기력 회복 +2.",
+"type": "consumable",
+"job": "",
+"tier": 2,
+"levelReq": 1,
+"price": 0,
+"sellPrice": 10,
+"maxStack": 20,
+"icon": "t_emb_mp",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1,
+"emb": "mp"
+},
+"tags": []
+},
+{
+"id": "w_hammer_c",
+"name": "장인 제작 망치",
+"desc": "대장장이가 직접 만든 망치.",
+"type": "weapon",
+"job": "blacksmith",
+"tier": 2,
+"levelReq": 10,
+"price": 0,
+"sellPrice": 30,
+"maxStack": 1,
+"icon": "w_hammer_c",
+"stats": [
+{
+"stat": "atk",
+"add": 14,
+"mul": 0
+}
+],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "w_axe_c",
+"name": "장인 제작 도끼",
+"desc": "대장장이가 직접 만든 도끼.",
+"type": "weapon",
+"job": "blacksmith",
+"tier": 2,
+"levelReq": 12,
+"price": 0,
+"sellPrice": 30,
+"maxStack": 1,
+"icon": "w_axe_c",
+"stats": [
+{
+"stat": "atk",
+"add": 16,
+"mul": 0
+},
+{
+"stat": "crit",
+"add": 0.03,
+"mul": 0
+}
+],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "a_metal_c",
+"name": "강철 흉갑",
+"desc": "기본 금속 방어구.",
+"type": "armor",
+"job": "",
+"tier": 2,
+"levelReq": 12,
+"price": 0,
+"sellPrice": 30,
+"maxStack": 1,
+"icon": "a_metal_c",
+"stats": [
+{
+"stat": "def",
+"add": 12,
+"mul": 0
+},
+{
+"stat": "maxHp",
+"add": 40,
+"mul": 0
+}
+],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "w_gun_pistol",
+"name": "권총",
+"desc": "엔지니어 전용 총기. 원거리 공격력 상승.",
+"type": "weapon",
+"job": "engineer",
+"tier": 3,
+"levelReq": 30,
+"price": 0,
+"sellPrice": 60,
+"maxStack": 1,
+"icon": "w_gun_pistol",
+"stats": [
+{
+"stat": "atk",
+"add": 30,
+"mul": 0
+},
+{
+"stat": "atkSpeed",
+"add": 0,
+"mul": 0.08
+}
+],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "w_gun_shotgun",
+"name": "산탄총",
+"desc": "엔지니어 전용 총기.",
+"type": "weapon",
+"job": "engineer",
+"tier": 3,
+"levelReq": 32,
+"price": 0,
+"sellPrice": 60,
+"maxStack": 1,
+"icon": "w_gun_shotgun",
+"stats": [
+{
+"stat": "atk",
+"add": 38,
+"mul": 0
+}
+],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "w_gun_rifle",
+"name": "소총",
+"desc": "엔지니어 전용 총기.",
+"type": "weapon",
+"job": "engineer",
+"tier": 3,
+"levelReq": 35,
+"price": 0,
+"sellPrice": 70,
+"maxStack": 1,
+"icon": "w_gun_rifle",
+"stats": [
+{
+"stat": "atk",
+"add": 34,
+"mul": 0
+},
+{
+"stat": "crit",
+"add": 0.06,
+"mul": 0
+}
+],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "a_outfit_c",
+"name": "고급 의상",
+"desc": "디자이너가 만든 고급 의상.",
+"type": "armor",
+"job": "",
+"tier": 3,
+"levelReq": 30,
+"price": 0,
+"sellPrice": 60,
+"maxStack": 1,
+"icon": "a_outfit_c",
+"stats": [
+{
+"stat": "def",
+"add": 18,
+"mul": 0
+},
+{
+"stat": "moveSpeed",
+"add": 0.2,
+"mul": 0
+}
+],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "ac_ribbon",
+"name": "리본 장식",
+"desc": "이동 속도와 상태이상 저항이 오르는 장신구.",
+"type": "accessory",
+"job": "",
+"tier": 3,
+"levelReq": 30,
+"price": 0,
+"sellPrice": 40,
+"maxStack": 1,
+"icon": "ac_ribbon",
+"stats": [
+{
+"stat": "moveSpeed",
+"add": 0.3,
+"mul": 0
+}
+],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "",
+"duration": 0,
+"value": 0,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "t_charm_atk",
+"name": "예술 부적: 열정",
+"desc": "60초 동안 공격력 증가.",
+"type": "consumable",
+"job": "",
+"tier": 1,
+"levelReq": 1,
+"price": 0,
+"sellPrice": 4,
+"maxStack": 20,
+"icon": "t_charm_atk",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "atkup",
+"duration": 60,
+"value": 0.1,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "t_charm_def",
+"name": "예술 부적: 평온",
+"desc": "60초 동안 방어력 증가.",
+"type": "consumable",
+"job": "",
+"tier": 1,
+"levelReq": 1,
+"price": 0,
+"sellPrice": 4,
+"maxStack": 20,
+"icon": "t_charm_def",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "defup",
+"duration": 60,
+"value": 0.15,
+"cooldown": 1
+},
+"tags": []
+},
+{
+"id": "t_charm_mp",
+"name": "예술 부적: 영감",
+"desc": "60초 동안 기력 회복 증가.",
+"type": "consumable",
+"job": "",
+"tier": 1,
+"levelReq": 1,
+"price": 0,
+"sellPrice": 4,
+"maxStack": 20,
+"icon": "t_charm_mp",
+"stats": [],
+"use": {
+"heal": 0,
+"healPercent": 0,
+"sp": 0,
+"cure": "",
+"status": "mpregen",
+"duration": 60,
+"value": 3,
+"cooldown": 1
+},
+"tags": []
+}
+],
+"recipes": [
+{
+"id": "r_potion_s",
+"skill": "ph1_c1",
+"inputs": [
+{
+"item": "m_herb",
+"count": 2
+},
+{
+"item": "m_bottle",
+"count": 1
+}
+],
+"output": {
+"item": "c_potion_s",
+"count": 2
+},
+"gold": 0,
+"group": "potion",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_potion_m",
+"skill": "ph1_c1",
+"inputs": [
+{
+"item": "m_herb",
+"count": 3
+},
+{
+"item": "m_bottle",
+"count": 1
+}
+],
+"output": {
+"item": "c_potion_m",
+"count": 1
+},
+"gold": 0,
+"group": "potion",
+"minLv": 3,
+"kind": "make"
+},
+{
+"id": "r_sp",
+"skill": "ph1_c2",
+"inputs": [
+{
+"item": "m_herb",
+"count": 2
+},
+{
+"item": "m_bottle",
+"count": 1
+},
+{
+"item": "m_spore",
+"count": 1
+}
+],
+"output": {
+"item": "c_sp_potion",
+"count": 2
+},
+"gold": 0,
+"group": "potion",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_potion_l",
+"skill": "wp_c1",
+"inputs": [
+{
+"item": "m_herb",
+"count": 4
+},
+{
+"item": "m_bottle",
+"count": 1
+},
+{
+"item": "m_wolf_fang",
+"count": 1
+}
+],
+"output": {
+"item": "c_potion_l",
+"count": 1
+},
+"gold": 0,
+"group": "potion",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_regen_hp",
+"skill": "wp_c2",
+"inputs": [
+{
+"item": "m_herb",
+"count": 3
+},
+{
+"item": "m_bottle",
+"count": 1
+}
+],
+"output": {
+"item": "c_regen_hp",
+"count": 1
+},
+"gold": 0,
+"group": "potion",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_regen_sp",
+"skill": "wp_c2",
+"inputs": [
+{
+"item": "m_herb",
+"count": 2
+},
+{
+"item": "m_spore",
+"count": 2
+},
+{
+"item": "m_bottle",
+"count": 1
+}
+],
+"output": {
+"item": "c_regen_sp",
+"count": 1
+},
+"gold": 0,
+"group": "potion",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_tonic",
+"skill": "hb_a1",
+"inputs": [
+{
+"item": "m_herb",
+"count": 4
+},
+{
+"item": "m_meat",
+"count": 1
+},
+{
+"item": "m_boar_tusk",
+"count": 1
+}
+],
+"output": {
+"item": "f_tonic",
+"count": 1
+},
+"gold": 0,
+"group": "food",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_lunch",
+"skill": "ck1_c1",
+"inputs": [
+{
+"item": "m_flour",
+"count": 1
+},
+{
+"item": "m_veg",
+"count": 1
+},
+{
+"item": "m_meat",
+"count": 1
+}
+],
+"output": {
+"item": "f_lunch",
+"count": 2
+},
+"gold": 0,
+"group": "food",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_soup",
+"skill": "ck1_c2",
+"inputs": [
+{
+"item": "m_veg",
+"count": 2
+},
+{
+"item": "m_meat",
+"count": 1
+}
+],
+"output": {
+"item": "f_soup",
+"count": 2
+},
+"gold": 0,
+"group": "food",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_course_atk",
+"skill": "cf_c1",
+"inputs": [
+{
+"item": "m_meat",
+"count": 2
+},
+{
+"item": "m_veg",
+"count": 1
+}
+],
+"output": {
+"item": "f_course_atk",
+"count": 1
+},
+"gold": 0,
+"group": "food",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_course_def",
+"skill": "cf_c1",
+"inputs": [
+{
+"item": "m_meat",
+"count": 1
+},
+{
+"item": "m_veg",
+"count": 2
+},
+{
+"item": "m_flour",
+"count": 1
+}
+],
+"output": {
+"item": "f_course_def",
+"count": 1
+},
+"gold": 0,
+"group": "food",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_course_heal",
+"skill": "cf_c1",
+"inputs": [
+{
+"item": "m_veg",
+"count": 3
+},
+{
+"item": "m_herb",
+"count": 1
+}
+],
+"output": {
+"item": "f_course_heal",
+"count": 1
+},
+"gold": 0,
+"group": "food",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_hammer",
+"skill": "bs1_c1",
+"inputs": [
+{
+"item": "m_iron",
+"count": 4
+},
+{
+"item": "m_moss_stone",
+"count": 1
+}
+],
+"output": {
+"item": "w_hammer_c",
+"count": 1
+},
+"gold": 40,
+"group": "smith",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_axe",
+"skill": "bs1_c1",
+"inputs": [
+{
+"item": "m_iron",
+"count": 5
+},
+{
+"item": "m_wolf_fang",
+"count": 1
+}
+],
+"output": {
+"item": "w_axe_c",
+"count": 1
+},
+"gold": 50,
+"group": "smith",
+"minLv": 2,
+"kind": "make"
+},
+{
+"id": "r_metal",
+"skill": "bs1_c2",
+"inputs": [
+{
+"item": "m_iron",
+"count": 6
+},
+{
+"item": "m_moss_stone",
+"count": 1
+}
+],
+"output": {
+"item": "a_metal_c",
+"count": 1
+},
+"gold": 50,
+"group": "smith",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_whet",
+"skill": "bs1_c3",
+"inputs": [
+{
+"item": "m_iron",
+"count": 1
+},
+{
+"item": "m_moss_stone",
+"count": 1
+}
+],
+"output": {
+"item": "t_whetstone",
+"count": 2
+},
+"gold": 0,
+"group": "smith",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_pistol",
+"skill": "en_c1",
+"inputs": [
+{
+"item": "m_iron",
+"count": 6
+},
+{
+"item": "m_gear",
+"count": 2
+}
+],
+"output": {
+"item": "w_gun_pistol",
+"count": 1
+},
+"gold": 120,
+"group": "gun",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_shotgun",
+"skill": "en_c1",
+"inputs": [
+{
+"item": "m_iron",
+"count": 8
+},
+{
+"item": "m_gear",
+"count": 3
+}
+],
+"output": {
+"item": "w_gun_shotgun",
+"count": 1
+},
+"gold": 150,
+"group": "gun",
+"minLv": 2,
+"kind": "make"
+},
+{
+"id": "r_rifle",
+"skill": "en_c1",
+"inputs": [
+{
+"item": "m_iron",
+"count": 8
+},
+{
+"item": "m_gear",
+"count": 4
+}
+],
+"output": {
+"item": "w_gun_rifle",
+"count": 1
+},
+"gold": 180,
+"group": "gun",
+"minLv": 3,
+"kind": "make"
+},
+{
+"id": "r_mod_speed",
+"skill": "en_c2",
+"inputs": [
+{
+"item": "m_gear",
+"count": 2
+},
+{
+"item": "m_iron",
+"count": 1
+}
+],
+"output": {
+"item": "t_mod_speed",
+"count": 1
+},
+"gold": 30,
+"group": "gun",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_mod_area",
+"skill": "en_c2",
+"inputs": [
+{
+"item": "m_gear",
+"count": 2
+},
+{
+"item": "m_iron",
+"count": 2
+}
+],
+"output": {
+"item": "t_mod_area",
+"count": 1
+},
+"gold": 30,
+"group": "gun",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_dye_red",
+"skill": "hd1_c4",
+"inputs": [
+{
+"item": "m_pigment",
+"count": 1
+},
+{
+"item": "m_bottle",
+"count": 1
+}
+],
+"output": {
+"item": "t_dye_red",
+"count": 1
+},
+"gold": 0,
+"group": "dye",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_dye_blue",
+"skill": "hd1_c4",
+"inputs": [
+{
+"item": "m_pigment",
+"count": 1
+},
+{
+"item": "m_bottle",
+"count": 1
+}
+],
+"output": {
+"item": "t_dye_blue",
+"count": 1
+},
+"gold": 0,
+"group": "dye",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_dye_green",
+"skill": "hd1_c4",
+"inputs": [
+{
+"item": "m_pigment",
+"count": 1
+},
+{
+"item": "m_herb",
+"count": 1
+}
+],
+"output": {
+"item": "t_dye_green",
+"count": 1
+},
+"gold": 0,
+"group": "dye",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_dye_reset",
+"skill": "hd1_c4",
+"inputs": [
+{
+"item": "m_bottle",
+"count": 1
+}
+],
+"output": {
+"item": "t_dye_reset",
+"count": 1
+},
+"gold": 0,
+"group": "dye",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_outfit",
+"skill": "ds_c1",
+"inputs": [
+{
+"item": "m_cloth",
+"count": 6
+},
+{
+"item": "m_silk",
+"count": 2
+}
+],
+"output": {
+"item": "a_outfit_c",
+"count": 1
+},
+"gold": 120,
+"group": "cloth",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_emb_atk",
+"skill": "ds_c2",
+"inputs": [
+{
+"item": "m_silk",
+"count": 2
+},
+{
+"item": "m_pigment",
+"count": 1
+}
+],
+"output": {
+"item": "t_emb_atk",
+"count": 1
+},
+"gold": 0,
+"group": "cloth",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_emb_def",
+"skill": "ds_c2",
+"inputs": [
+{
+"item": "m_silk",
+"count": 2
+},
+{
+"item": "m_cloth",
+"count": 1
+}
+],
+"output": {
+"item": "t_emb_def",
+"count": 1
+},
+"gold": 0,
+"group": "cloth",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_emb_mp",
+"skill": "ds_c2",
+"inputs": [
+{
+"item": "m_silk",
+"count": 2
+},
+{
+"item": "m_herb",
+"count": 1
+}
+],
+"output": {
+"item": "t_emb_mp",
+"count": 1
+},
+"gold": 0,
+"group": "cloth",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_ribbon",
+"skill": "ds_c3",
+"inputs": [
+{
+"item": "m_cloth",
+"count": 3
+},
+{
+"item": "m_silk",
+"count": 3
+},
+{
+"item": "m_fox_fur",
+"count": 2
+}
+],
+"output": {
+"item": "ac_ribbon",
+"count": 1
+},
+"gold": 80,
+"group": "cloth",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_charm_atk",
+"skill": "ar1_c4",
+"inputs": [
+{
+"item": "m_pigment",
+"count": 1
+},
+{
+"item": "m_jelly",
+"count": 1
+}
+],
+"output": {
+"item": "t_charm_atk",
+"count": 1
+},
+"gold": 0,
+"group": "art",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_charm_def",
+"skill": "ar1_c4",
+"inputs": [
+{
+"item": "m_pigment",
+"count": 1
+},
+{
+"item": "m_spore",
+"count": 1
+}
+],
+"output": {
+"item": "t_charm_def",
+"count": 1
+},
+"gold": 0,
+"group": "art",
+"minLv": 1,
+"kind": "make"
+},
+{
+"id": "r_charm_mp",
+"skill": "ar1_c4",
+"inputs": [
+{
+"item": "m_pigment",
+"count": 1
+},
+{
+"item": "m_herb",
+"count": 1
+}
+],
+"output": {
+"item": "t_charm_mp",
+"count": 1
+},
+"gold": 0,
+"group": "art",
+"minLv": 1,
+"kind": "make"
+}
+],
+"salvage": {
+"skill": "bs1_c4",
+"rate": 0.4,
+"table": {
+"w_hammer_c": [
+[
+"m_iron",
+2
+]
+],
+"w_axe_c": [
+[
+"m_iron",
+2
+]
+],
+"a_metal_c": [
+[
+"m_iron",
+3
+]
+],
+"w_gun_pistol": [
+[
+"m_iron",
+3
+],
+[
+"m_gear",
+1
+]
+],
+"w_gun_shotgun": [
+[
+"m_iron",
+4
+],
+[
+"m_gear",
+1
+]
+],
+"w_gun_rifle": [
+[
+"m_iron",
+4
+],
+[
+"m_gear",
+2
+]
+],
+"a_outfit_c": [
+[
+"m_cloth",
+3
+]
+],
+"w_hammer_1": [
+[
+"m_iron",
+1
+]
+],
+"w_hammer_2": [
+[
+"m_iron",
+2
+]
+],
+"w_hammer_3": [
+[
+"m_iron",
+3
+]
+],
+"a_armor_2": [
+[
+"m_cloth",
+1
+]
+]
+}
+},
+"shopAdd": {
+"shop_general": [
+"m_bottle",
+"m_flour",
+"m_meat",
+"m_veg",
+"m_pigment",
+"m_cloth"
+],
+"shop_smithy": [
+"m_iron",
+"m_gear"
+],
+"shop_arms": [
+"m_iron",
+"m_silk"
+]
+}
+}

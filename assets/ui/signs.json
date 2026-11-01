@@ -1,0 +1,16 @@
+{
+ "cell": 32,
+ "cols": 7,
+ "rows": 1,
+ "texW": 224,
+ "texH": 32,
+ "names": [
+  "pharmacy",
+  "restaurant",
+  "smithy",
+  "salon",
+  "atelier",
+  "shop",
+  "elder"
+ ]
+}
