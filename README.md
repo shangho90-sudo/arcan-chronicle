@@ -1,6 +1,6 @@
 # 아르칸 연대기 (Arcan Chronicle) — 웹 3D 액션 RPG
 
-쿼터뷰 3D 액션 RPG. three.js r160(ES 모듈, CDN import map)만 사용하며 빌드 단계가 없습니다.
+쿼터뷰 3D 액션 RPG. three.js r160(ES 모듈, 로컬 import map)만 사용하며 빌드 단계가 없습니다. 엔진 파일과 라이선스는 `vendor/three-r160/`에 포함되어 외부 CDN 연결 없이 실행됩니다.
 
 ## 실행
 

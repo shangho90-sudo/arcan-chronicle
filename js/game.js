@@ -468,4 +468,4 @@ class Game {
 const G = new Game();
 window.G = G; G.THREE = THREE;
 bindActors(G); bindUi(G); bindSkillUi(G); installDev(G, Monster);
-G.boot().catch(e => { console.error(e); const m = document.getElementById("loadmsg"); if (m) m.textContent = "불러오기 실패: " + e.message; });
+G.boot().catch(e => { console.error(e); if (window.showStartupFailure) window.showStartupFailure(e); else { const m = document.getElementById("loadmsg"); if (m) m.textContent = "불러오기 실패: " + e.message; } });
