@@ -5,7 +5,7 @@ from PIL import Image
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'assets', 'creatures')
 GLTFPACK = os.environ.get('GLTFPACK', '/tmp/meshoptimizer/gltfpack')
 SRC = sys.argv[1] if len(sys.argv) > 1 else '/home/claude/cute3d'
-NAMES = ['wolf', 'boar', 'bear', 'ram', 'toad', 'golem', 'dragon', 'boss_mushroom']
+NAMES = sys.argv[2].split(',') if len(sys.argv) > 2 else ['wolf', 'boar', 'bear', 'ram', 'toad', 'golem', 'dragon', 'boss_mushroom', 'rabbit', 'fox', 'squirrel', 'panda', 'slime']
 
 def read(path):
     b = open(path, 'rb').read(); off = 12; ch = []

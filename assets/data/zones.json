@@ -10023,6 +10023,15 @@
      ],
      "radius": 5,
      "count": 3
+    },
+    {
+     "monster": "mon_jelly",
+     "pos": [
+      -28,
+      -8
+     ],
+     "radius": 4.5,
+     "count": 4
     }
    ],
    "boss": {
@@ -14573,6 +14582,15 @@
      ],
      "radius": 4.0,
      "count": 1
+    },
+    {
+     "monster": "mon_panda",
+     "pos": [
+      -10,
+      -4
+     ],
+     "radius": 4.5,
+     "count": 3
     }
    ],
    "boss": {

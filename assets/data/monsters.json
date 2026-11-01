@@ -46,6 +46,45 @@
    "def": 2
   },
   {
+   "id": "mon_jelly",
+   "name": "새싹 젤리",
+   "level": 3,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 72,
+   "atk": 10,
+   "exp": 15,
+   "goldMin": 4,
+   "goldMax": 9,
+   "moveSpeed": 2.2,
+   "detectRange": 6,
+   "leashRange": 14,
+   "attackRange": 1.0,
+   "attackCooldown": 1.6,
+   "windup": 0.35,
+   "radius": 0.42,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 8,
+   "drops": [
+    {
+     "item": "m_jelly",
+     "chance": 0.8,
+     "min": 1,
+     "max": 2
+    },
+    {
+     "item": "c_potion_s",
+     "chance": 0.12,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 3
+  },
+  {
    "id": "mon_shroom",
    "name": "도토리 다람쥐",
    "level": 4,
@@ -467,6 +506,57 @@
    ],
    "hitSfx": "hit",
    "def": 22
+  },
+  {
+   "id": "mon_panda",
+   "name": "대나무 팬더",
+   "level": 16,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 690,
+   "atk": 96,
+   "exp": 44,
+   "goldMin": 26,
+   "goldMax": 52,
+   "moveSpeed": 2.6,
+   "detectRange": 7,
+   "leashRange": 14,
+   "attackRange": 1.4,
+   "attackCooldown": 1.8,
+   "windup": 0.5,
+   "radius": 0.6,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 14,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 0.12,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_sp_potion",
+     "chance": 0.08,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "m_herb",
+     "chance": 0.4,
+     "min": 1,
+     "max": 2
+    },
+    {
+     "item": "@jobweapon:2",
+     "chance": 0.02,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 24
   },
   {
    "id": "mon_mist_wolf",

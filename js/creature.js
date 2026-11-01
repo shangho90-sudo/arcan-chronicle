@@ -8,21 +8,23 @@ import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 const DEG = Math.PI / 180;
 /** per monster: model file, size (m, longest horizontal extent or height for 'h'), extra yaw (deg) */
 export const CREATURES = {
-  mon_slime:  { file: 'rabbit', size: 0.75 },
-  mon_fox:    { file: 'fox', size: 1.15 },
-  mon_shroom: { file: 'squirrel', size: 0.85 },
+  mon_slime:  { file: 'cute_rabbit', size: 0.8, height: true, rigless: true, yaw: -90 },
+  mon_jelly:  { file: 'cute_slime', size: 0.75, height: true, rigless: true, yaw: -90, jelly: true },
+  mon_fox:    { file: 'cute_fox', size: 0.95, height: true, rigless: true, yaw: -90 },
+  mon_shroom: { file: 'cute_squirrel', size: 0.85, height: true, rigless: true, yaw: -90 },
   mon_wolf:   { file: 'cute_wolf', size: 1.05, height: true, rigless: true, yaw: -90 },
   mon_boar:   { file: 'cute_boar', size: 1.0, height: true, rigless: true, yaw: -90 },
   mon_golem:  { file: 'cute_bear', size: 1.45, height: true, rigless: true, yaw: -90 },
   boss_mushroom: { file: 'cute_boss_mushroom', size: 3.6, height: true, rigless: true, yaw: -90 },
   // Lv10-50 zones (tint / recolor: see the constructor)
-  mon_mist_fox:      { file: 'fox', size: 1.25, tint: [0.72, 0.78, 0.95], recolor: 0.75 },
+  mon_mist_fox:      { file: 'cute_fox', size: 1.05, height: true, rigless: true, yaw: -90, tint: [0.78, 0.82, 0.98], recolor: 0.45 },
+  mon_panda:         { file: 'cute_panda', size: 1.5, height: true, rigless: true, yaw: -90 },
   mon_fog_toad:      { file: 'cute_toad', size: 0.95, height: true, rigless: true, yaw: -90 },
   mon_bog_boar:      { file: 'cute_boar', size: 1.1, height: true, rigless: true, yaw: -90, tint: [0.62, 0.78, 0.5], recolor: 0.45 },
   mon_mist_wolf:     { file: 'cute_wolf', size: 1.15, height: true, rigless: true, yaw: -90, tint: [0.7, 0.66, 0.95], recolor: 0.35 },
   mon_mist_bear:     { file: 'cute_bear', size: 2.1, height: true, rigless: true, yaw: -90, tint: [0.66, 0.66, 0.92], recolor: 0.5 },
   mon_frost_wolf:    { file: 'cute_wolf', size: 1.15, height: true, rigless: true, yaw: -90, tint: [0.88, 0.95, 1.0], recolor: 0.6 },
-  mon_ice_fox:       { file: 'fox', size: 1.2, tint: [0.74, 0.9, 1.0], recolor: 0.85 },
+  mon_ice_fox:       { file: 'cute_fox', size: 1.05, height: true, rigless: true, yaw: -90, tint: [0.8, 0.92, 1.0], recolor: 0.6 },
   mon_frost_ram:     { file: 'cute_ram', size: 1.1, height: true, rigless: true, yaw: -90 },
   mon_snow_bear:     { file: 'cute_bear', size: 1.7, height: true, rigless: true, yaw: -90, tint: [0.95, 0.97, 1.0], recolor: 0.7 },
   mon_ram_king:      { file: 'cute_ram', size: 1.9, height: true, rigless: true, yaw: -90, tint: [0.7, 0.85, 1.0], recolor: 0.35 },
@@ -122,7 +124,7 @@ export class CreatureBody {
       case 'walk': if (this.cfg.rigless) {                                // bouncy waddle: hop, squash on landing, side-to-side rock
         const ph = this.t * 7.5 * Math.max(0.6, this.speed), hop = Math.abs(Math.sin(ph));
         P.position.y = hop * Math.min(0.18, 0.07 * s); P.rotation.z = Math.sin(ph) * 0.09; P.rotation.x = 0.06;
-        sy = 1 + (hop - 0.35) * 0.08; sxz = 1 - (hop - 0.35) * 0.04;
+        sy = 1 + (hop - 0.35) * (this.cfg.jelly ? 0.28 : 0.08); sxz = 1 - (hop - 0.35) * (this.cfg.jelly ? 0.14 : 0.04);
       } break;
       case 'attack': case 'skill': case 'cast': case 'throw': {
         const wind = 0.45, k = u < wind ? -Math.sin(u / wind * Math.PI / 2) * 0.35 : Math.sin((u - wind) / (1 - wind) * Math.PI) * 1.0;
