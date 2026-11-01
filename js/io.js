@@ -86,6 +86,26 @@ export class Audio {
     const b = await this.buf("sfx_" + name); if (!b) return;
     const s = this.ctx.createBufferSource(); s.buffer = b; s.playbackRate.value = 0.94 + Math.random() * 0.12; s.connect(this.gSfx); s.start();
   }
+  /** small synthesized sounds (no audio file): 'exp' = bright bell whose pitch climbs with each orb, 'levelup' = rising shimmer chord */
+  chime(kind, n = 1) {
+    const C = this.ctx; if (!C || C.state !== 'running') return; const t0 = C.currentTime;
+    const bell = (f, at, dur, vol, type = 'sine') => {
+      const o = C.createOscillator(), o2 = C.createOscillator(), g = C.createGain();
+      o.type = type; o.frequency.value = f; o2.type = 'sine'; o2.frequency.value = f * 2.01;
+      g.gain.setValueAtTime(0.0001, t0 + at); g.gain.exponentialRampToValueAtTime(vol, t0 + at + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, t0 + at + dur);
+      const g2 = C.createGain(); g2.gain.value = 0.35; o.connect(g); o2.connect(g2); g2.connect(g); g.connect(this.gSfx);
+      o.start(t0 + at); o2.start(t0 + at); o.stop(t0 + at + dur + 0.05); o2.stop(t0 + at + dur + 0.05);
+    };
+    if (kind === 'exp') {
+      const now = performance.now(); if (now - (this._expT || 0) < 45) return; this._expT = now;
+      const scale = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21], f = 1046.5 * Math.pow(2, scale[Math.min(scale.length - 1, n - 1)] / 12);
+      bell(f, 0, 0.35, 0.09);
+    } else if (kind === 'levelup') {
+      const notes = [523.25, 659.25, 783.99, 1046.5, 1318.5, 1568];
+      notes.forEach((f, i) => bell(f, i * 0.07, 1.4 - i * 0.1, 0.07, 'triangle'));
+      [1046.5, 1318.5, 1568, 2093].forEach((f, i) => bell(f, 0.5 + i * 0.015, 1.8, 0.035));       // sustained sparkle chord
+    }
+  }
   async playMusic(name, force) {
     this.wantMusic = name;
     if (!this.ctx || (!force && name === this.curName)) return;

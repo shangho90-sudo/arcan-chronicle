@@ -142,7 +142,6 @@ export class UI {
     h.innerHTML = `
     <div class="charpanel panel-dark"><div class="badge"><span id="hBadge"></span></div><div class="lv" id="hLv"></div>
       <div class="cname" id="hName"></div>
-      <div class="bar sp"><i id="hSp"></i><span id="hSpT"></span></div>
       <div class="status" id="hStatus"></div></div>
     <div class="minimap panel-dark"><div class="mmhead"><span class="zone" id="hZone"></span><span class="gold" id="hGold"></span></div><canvas id="hMap"></canvas></div>
     <div class="tracker panel-dark" id="hQuests"></div>
@@ -151,6 +150,7 @@ export class UI {
     <div class="prompt panel-dark" id="hPrompt"></div>
     <div class="botbar">
       <div class="bar hp"><i id="hHp"></i><b id="hShield"></b><span id="hHpT"></span></div>
+      <div class="bar sp"><i id="hSp"></i><span id="hSpT"></span></div>
       <div class="expbar"><i id="hExp"></i><span id="hExpT"></span></div>
       <div class="menubtns">${[["inventory", "가방"], ["skills", "스킬"], ["craft", "제작"], ["quests", "퀘스트"], ["pause", "메뉴"]].map(([a, t]) => `<button class="btn" data-a="${a}">${MENU_ICON[a]}<span>${t}</span></button>`).join("")}</div></div>`;
     for (const b of h.querySelectorAll("[data-a]")) b.onclick = () => { G.audio.sfx("ui"); G.input.press({ skills: "skillWin", craft: "craftWin" }[b.dataset.a] || b.dataset.a); };
@@ -188,6 +188,14 @@ export class UI {
     this.interactAvail = !!npc;
   }
   setTarget(m) { this.target = m; this.targetT = 6; }
+  /** EXP bar glow when experience orbs reach the player */
+  flashExp() { const e = this.hud.querySelector(".expbar"); if (!e) return; e.classList.remove("flash"); void e.offsetWidth; e.classList.add("flash"); }
+  /** big golden "LEVEL UP" title in the middle of the screen */
+  levelBanner(lv) {
+    const old = this.hud.querySelector(".lvbanner"); if (old) old.remove();
+    const b = document.createElement("div"); b.className = "lvbanner"; b.innerHTML = `<div class="lvb-rays"></div><div class="lvb-t">LEVEL UP!</div><div class="lvb-l">Lv.${lv}</div>`;
+    this.hud.appendChild(b); setTimeout(() => b.remove(), 2600);
+  }
   updateTracker() {
     const p = G.player, ql = p.quests; let html = "<b class='gold'>진행 중인 퀘스트</b>"; let n = 0;
     for (const q of ql.active()) {

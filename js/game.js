@@ -245,6 +245,7 @@ class Game {
     this.fx = new Fx(this.render.scene); this.audio = new Audio(); this.input = new Input(this.render.r.domElement);
     bindSkillRt(this);
     // 3D skill effects (loaded separately so a problem there never blocks the game)
+    import('./rewardfx.js').then(m => { this.reward = new m.RewardFx(this); }).catch(e => console.warn('reward fx', e));
     import('./skillfx.js').then(m => { this.skillFx = new m.SkillFx(this.render.scene); this.skillFx.onShake = (a, d) => this.render.addShake(a, d); m.SkillFx.reduceFlash = !!this.reduceFlash; }).catch(e => console.warn('skillfx', e));
     this.ui = new UI(document.getElementById("ui"));
     this.loadSheet = loadSheet; this.timeScale = 1; this.simSteps = Math.max(1, Math.min(8, parseInt(new URLSearchParams(location.search).get("sim")) || 1)); this.timers = []; this.session = 0; this.autoSaveT = 0;
@@ -312,7 +313,7 @@ class Game {
     const S = this.sheet, Q = this.quests, ui = this.ui;
     S.events.levelUp.push(l => {
       ui.toast("레벨 업! Lv." + l); this.audio.sfx("levelup");
-      if (this.player) { const p = this.player; this.fx.play("levelup", { x: p.pos.x, y: p.pos.y + 0.8, z: p.pos.z }, 1.6); p.hp = p.maxHp; p.sp = p.maxSp; }
+      if (this.player) { const p = this.player; if (this.reward) this.reward.levelUp(); else this.fx.play("levelup", { x: p.pos.x, y: p.pos.y + 0.8, z: p.pos.z }, 1.6); p.hp = p.maxHp; p.sp = p.maxSp; }
       Q.refreshPassive(); this.autoSave();
     });
     S.events.skill.push(s => {
@@ -345,6 +346,7 @@ class Game {
   travel(zone, spawn) { if (this.loading) return; this.save(); this.loadZone(zone, spawn, false); }
   async fadeTo(a, dur) { const from = parseFloat(this.ui.fade.style.opacity || 0), t0 = performance.now(); while (true) { const k = Math.min(1, (performance.now() - t0) / 1000 / dur); this.ui.setFade(from + (a - from) * k); if (k >= 1) break; await new Promise(r => requestAnimationFrame(r)); } }
   async loadZone(zoneId, spawnId, usePos) {
+    if (this.reward) this.reward.clear();
     this.loading = true; this.input.block = true; const session = this.session;
     await this.fadeTo(1, 0.25);
     if (this.player) this.player.skills2.clearTemp(); if (this.skillFx) this.skillFx.clear();
@@ -420,6 +422,7 @@ class Game {
     const d = m.def, gold = d.goldMin + Math.floor(Math.random() * (d.goldMax - d.goldMin + 1));
     this.sheet.addGold(gold); this.sheet.addExp(d.exp);
     this.ui.floatText(m.pos, "+" + d.exp + " EXP", "#b8e0ff", 0.9, 1.6);
+    if (this.reward && d.exp > 0) this.reward.expOrbs(m.pos, d.exp);
     if (gold > 0) { this.ui.floatText(m.pos, "+" + gold + " G", "#ffd86b", 0.85, 1.1); this.audio.sfx("coin"); }
     for (const dr of d.drops || []) {
       if (Math.random() > dr.chance) continue;
@@ -510,6 +513,7 @@ class Game {
     if (!draw) return;
     this.ui.tick(rdt);
     if (this.skillFx) try { this.skillFx.update(rdt); } catch (e) { console.warn('skillfx update', e); this.skillFx = null; }
+    if (this.reward) try { this.reward.update(rdt); } catch (e) { console.warn('reward fx', e); this.reward.clear(); }
     this.render.render(rdt);
   }
 }
