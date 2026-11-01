@@ -43,13 +43,16 @@ def custom(fn, **k): return dict(op='custom', fn=fn, **k)
 # separate point pool (1 per character level, see js/skillsys.js), unlock Lv 1 / 5 / 10 / 3 / 7, no extra-hit rule (noExtra)
 J, C = 'novice', 0xcfe6ff
 S(J, 0, 0, '기본 검술', 1, 'nv_a1', '일격참', 'attack', '왼쪽·오른쪽으로 한 번씩 벤 뒤 뛰어올라 칼로 내려찍는다. 내려찍은 자리의 땅이 갈라진다.', range=2.4, mp=8, cd=5, anim='nv_ilgyeok', recover=0.25,
-  ops=[hit('cone', 0.75, r=2.3, ang=120, noExtra=True, at=0.0, fx=dict(slash='arc'), sweep=-1),
-       hit('cone', 0.75, r=2.3, ang=120, noExtra=True, at=0.24, fx=dict(slash='arc'), sweep=1),
-       hit('circle', 1.9, r=2.2, noExtra=True, at=0.58, fwd=1.1, knock=1.2, st=[st('stagger', 0.5)], fx=dict(burst='ground_crack', burstR=1.15), shake=[0.22, 0.3])], fx=dict(color=C))
+  ops=[dict(op='lunge', dist=0.7, dur=0.16, at=-0.08), hit('cone', 0.75, r=2.3, ang=120, noExtra=True, at=0.0, fx=dict(slash='blade', burst='hit_slash'), sweep=-1),
+       dict(op='lunge', dist=0.6, dur=0.14, at=0.16), hit('cone', 0.75, r=2.3, ang=120, noExtra=True, at=0.24, fx=dict(slash='blade', burst='hit_slash'), sweep=1),
+       dict(op='lunge', dist=1.7, dur=0.24, at=0.34),
+       hit('circle', 1.9, r=2.2, noExtra=True, at=0.58, fwd=0.8, knock=1.2, st=[st('stagger', 0.5)], fx=dict(burst='fire_crack', burstR=1.15), shake=[0.22, 0.3])], fx=dict(color=C))
 S(J, 0, 0, '기본 검술', 2, 'nv_a2', '연', 'attack', '칼을 이리저리 휘둘러 연속으로 벤다. 처음엔 2연타, 스킬 레벨이 오를 때마다 1타씩 늘어 최대 6연타.', range=2.2, mp=10, cd=6, anim='nv_yeon', recover=0.2,
-  ops=[hit('cone', 0.62, r=2.2, ang=110, hits=2, hitsPerLv=1, gap=0.13, noExtra=True, alt=True, fx=dict(slash='arc', burst='hit_slash'))], fx=dict(color=0xffe6a0))
+  ops=[dict(op='lunge', dist=1.0, dur=0.2, at=-0.1), dict(op='lunge', dist=0.8, dur=0.3, at=0.2),
+       hit('cone', 0.62, r=2.2, ang=110, hits=2, hitsPerLv=1, gap=0.13, noExtra=True, alt=True, fx=dict(slash='blade', burst='hit_slash'))], fx=dict(color=0xffe6a0))
 S(J, 0, 0, '기본 검술', 3, 'nv_a3', '비연참', 'attack', '칼을 크게 휘둘러 초승달 모양의 검풍을 멀리 날린다. 지나가는 길의 적을 모두 벤다.', range=9, mp=14, cd=7, anim='nv_biyeon', recover=0.3,
-  ops=[proj('normal', 2.0, speed=13, range=10, pierce=True, w=1.3, fx='sword_wave', burst='hit_slash')], fx=dict(color=0xbfe8ff))
+  ops=[dict(op='lunge', dist=0.9, dur=0.18, at=-0.12), proj('normal', 2.0, speed=13, range=10, pierce=True, w=1.3, fx='sword_wave', burst='hit_slash'),
+       dict(op='fx', slash='blade', r=1.7, ang=150, tilt=-0.35)], fx=dict(color=0xbfe8ff))
 S(J, 0, 1, '기본 검술', 4, 'nv_p1', '회복력 증가', 'passive', '움직이지 않고 3초 동안 쉬면 3초마다 최대 체력의 일정 비율을 회복한다.',
   flags=dict(restRegen=[0.02, 0.01]))
 S(J, 0, 1, '기본 검술', 5, 'nv_p2', '검수련', 'passive', '칼을 다루는 솜씨가 늘어 공격력이 조금씩 오른다.',

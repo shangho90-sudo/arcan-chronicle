@@ -1058,9 +1058,9 @@
    {
     "bob": 0.0,
     "lean": -4,
-    "twist": 32,
-    "legL": 10,
-    "legR": -8,
+    "twist": 43,
+    "legL": 16,
+    "legR": -13,
     "wOff": 110,
     "wSide": 0.0,
     "offOff": 60.0,
@@ -1072,39 +1072,39 @@
      72
     ],
     "armL": [
-     25,
-     18
+     55,
+     30
     ],
     "held": null
    },
    {
     "bob": 0.0,
-    "lean": 8,
-    "twist": -34,
-    "legL": 14,
-    "legR": -10,
+    "lean": 14,
+    "twist": -46,
+    "legL": 22,
+    "legR": -16,
     "wOff": 35,
     "wSide": 0.0,
     "offOff": 60.0,
     "fall": 0.0,
-    "sink": 0.0,
+    "sink": 0.1,
     "squint": true,
     "armR": [
      78,
      18
     ],
     "armL": [
-     25,
-     18
+     56,
+     12
     ],
     "held": null
    },
    {
     "bob": 0.0,
     "lean": 8,
-    "twist": -38,
-    "legL": 14,
-    "legR": -10,
+    "twist": -51,
+    "legL": 22,
+    "legR": -16,
     "wOff": 30,
     "wSide": 0.0,
     "offOff": 60.0,
@@ -1116,17 +1116,17 @@
      22
     ],
     "armL": [
-     25,
-     18
+     58,
+     12
     ],
     "held": null
    },
    {
     "bob": 0.0,
     "lean": -2,
-    "twist": -36,
-    "legL": -8,
-    "legR": 10,
+    "twist": -49,
+    "legL": -13,
+    "legR": 16,
     "wOff": 115,
     "wSide": 0.0,
     "offOff": 60.0,
@@ -1138,61 +1138,61 @@
      78
     ],
     "armL": [
-     25,
-     18
+     57,
+     12
     ],
     "held": null
    },
    {
     "bob": 0.0,
-    "lean": 8,
-    "twist": 34,
-    "legL": -12,
-    "legR": 14,
+    "lean": 14,
+    "twist": 46,
+    "legL": -19,
+    "legR": 22,
     "wOff": 35,
     "wSide": 0.0,
     "offOff": 60.0,
     "fall": 0.0,
-    "sink": 0.0,
+    "sink": 0.1,
     "squint": true,
     "armR": [
      80,
      16
     ],
     "armL": [
-     25,
-     18
+     56,
+     30
     ],
     "held": null
    },
    {
     "bob": 0.0,
-    "lean": 10,
-    "twist": 20,
-    "legL": 30,
-    "legR": 30,
+    "lean": 16,
+    "twist": 27,
+    "legL": 36,
+    "legR": 34,
     "wOff": 80,
     "wSide": 0.0,
     "offOff": 60.0,
     "fall": 0.0,
-    "sink": 0.12,
+    "sink": 0.24,
     "squint": false,
     "armR": [
      150,
      30
     ],
     "armL": [
-     120,
+     49,
      30
     ],
     "held": null
    },
    {
-    "bob": 0.32,
-    "lean": -8,
+    "bob": 0.55,
+    "lean": -10,
     "twist": 0,
-    "legL": 24,
-    "legR": 10,
+    "legL": 34,
+    "legR": 14,
     "wOff": 95,
     "wSide": 0.0,
     "offOff": 60.0,
@@ -1204,17 +1204,17 @@
      8
     ],
     "armL": [
-     170,
-     8
+     40,
+     12
     ],
     "held": null
    },
    {
-    "bob": 0.5,
-    "lean": -12,
+    "bob": 0.9,
+    "lean": -16,
     "twist": 0,
-    "legL": 34,
-    "legR": 22,
+    "legL": 40,
+    "legR": 30,
     "wOff": 105,
     "wSide": 0.0,
     "offOff": 60.0,
@@ -1226,17 +1226,17 @@
      4
     ],
     "armL": [
-     188,
-     4
+     40,
+     12
     ],
     "held": null
    },
    {
-    "bob": 0.28,
-    "lean": 16,
+    "bob": 0.45,
+    "lean": 22,
     "twist": 0,
-    "legL": 20,
-    "legR": 8,
+    "legL": 24,
+    "legR": 6,
     "wOff": 60,
     "wSide": 0.0,
     "offOff": 60.0,
@@ -1248,61 +1248,61 @@
      4
     ],
     "armL": [
-     122,
-     4
+     40,
+     12
     ],
     "held": null
    },
    {
     "bob": 0.0,
-    "lean": 30,
+    "lean": 36,
     "twist": 0,
-    "legL": 28,
-    "legR": -22,
+    "legL": 34,
+    "legR": -28,
     "wOff": 18,
     "wSide": 0.0,
     "offOff": 60.0,
     "fall": 0.0,
-    "sink": 0.14,
+    "sink": 0.26,
     "squint": true,
     "armR": [
      52,
      4
     ],
     "armL": [
-     48,
-     4
+     40,
+     12
     ],
     "held": null
    },
    {
     "bob": 0.0,
-    "lean": 28,
+    "lean": 32,
     "twist": 0,
-    "legL": 26,
-    "legR": -20,
+    "legL": 32,
+    "legR": -26,
     "wOff": 16,
     "wSide": 0.0,
     "offOff": 60.0,
     "fall": 0.0,
-    "sink": 0.12,
+    "sink": 0.22,
     "squint": false,
     "armR": [
      50,
      4
     ],
     "armL": [
-     46,
-     4
+     40,
+     12
     ],
     "held": null
    },
    {
     "bob": 0.0,
     "lean": 12,
-    "twist": -4,
-    "legL": 10,
-    "legR": -6,
+    "twist": -5,
+    "legL": 16,
+    "legR": -10,
     "wOff": 50,
     "wSide": 0.0,
     "offOff": 60.0,
@@ -1314,8 +1314,8 @@
      20
     ],
     "armL": [
-     30,
-     18
+     42,
+     12
     ],
     "held": null
    },
@@ -1373,222 +1373,222 @@
     "held": null
    },
    {
-    "bob": 0.0,
-    "lean": 8,
-    "twist": -32,
-    "legL": 12,
-    "legR": -10,
+    "bob": 0.1,
+    "lean": 14,
+    "twist": -43,
+    "legL": 19,
+    "legR": -16,
     "wOff": 30,
     "wSide": 0.0,
     "offOff": 60.0,
     "fall": 0.0,
-    "sink": 0.0,
+    "sink": 0.1,
     "squint": true,
     "armR": [
      70,
      15
     ],
     "armL": [
-     35,
-     22
+     55,
+     12
     ],
     "held": null
    },
    {
     "bob": 0.0,
-    "lean": 6,
-    "twist": 27,
-    "legL": -10,
-    "legR": 12,
+    "lean": 12,
+    "twist": 36,
+    "legL": -16,
+    "legR": 19,
     "wOff": 105,
     "wSide": 0.0,
     "offOff": 60.0,
     "fall": 0.0,
-    "sink": 0.0,
+    "sink": 0.1,
     "squint": true,
     "armR": [
      120,
      68
     ],
     "armL": [
-     35,
-     22
+     53,
+     30
     ],
     "held": null
    },
    {
-    "bob": 0.0,
-    "lean": 8,
-    "twist": -24,
-    "legL": 12,
-    "legR": -10,
+    "bob": 0.1,
+    "lean": 14,
+    "twist": -32,
+    "legL": 19,
+    "legR": -16,
     "wOff": 54,
     "wSide": 0.0,
     "offOff": 60.0,
     "fall": 0.0,
-    "sink": 0.0,
+    "sink": 0.1,
     "squint": true,
     "armR": [
      50,
      31
     ],
     "armL": [
-     35,
-     22
+     51,
+     12
     ],
     "held": null
    },
    {
     "bob": 0.0,
-    "lean": 6,
-    "twist": 21,
-    "legL": -10,
-    "legR": 12,
+    "lean": 12,
+    "twist": 28,
+    "legL": -16,
+    "legR": 19,
     "wOff": 95,
     "wSide": 0.0,
     "offOff": 60.0,
     "fall": 0.0,
-    "sink": 0.0,
+    "sink": 0.1,
     "squint": true,
     "armR": [
      100,
      60
     ],
     "armL": [
-     35,
-     22
+     50,
+     30
     ],
     "held": null
    },
    {
-    "bob": 0.0,
-    "lean": 8,
-    "twist": -32,
-    "legL": 12,
-    "legR": -10,
+    "bob": 0.1,
+    "lean": 14,
+    "twist": -43,
+    "legL": 19,
+    "legR": -16,
     "wOff": 42,
     "wSide": 0.0,
     "offOff": 60.0,
     "fall": 0.0,
-    "sink": 0.0,
+    "sink": 0.1,
     "squint": true,
     "armR": [
      65,
      23
     ],
     "armL": [
-     35,
-     22
+     55,
+     12
     ],
     "held": null
    },
    {
     "bob": 0.0,
-    "lean": 6,
-    "twist": 27,
-    "legL": -10,
-    "legR": 12,
+    "lean": 12,
+    "twist": 36,
+    "legL": -16,
+    "legR": 19,
     "wOff": 115,
     "wSide": 0.0,
     "offOff": 60.0,
     "fall": 0.0,
-    "sink": 0.0,
+    "sink": 0.1,
     "squint": true,
     "armR": [
      130,
      76
     ],
     "armL": [
-     35,
-     22
+     53,
+     30
     ],
     "held": null
    },
    {
-    "bob": 0.0,
-    "lean": 8,
-    "twist": -24,
-    "legL": 12,
-    "legR": -10,
+    "bob": 0.1,
+    "lean": 14,
+    "twist": -32,
+    "legL": 19,
+    "legR": -16,
     "wOff": 30,
     "wSide": 0.0,
     "offOff": 60.0,
     "fall": 0.0,
-    "sink": 0.0,
+    "sink": 0.1,
     "squint": true,
     "armR": [
      55,
      15
     ],
     "armL": [
-     35,
-     22
+     51,
+     12
     ],
     "held": null
    },
    {
     "bob": 0.0,
-    "lean": 6,
-    "twist": 21,
-    "legL": -10,
-    "legR": 12,
+    "lean": 12,
+    "twist": 28,
+    "legL": -16,
+    "legR": 19,
     "wOff": 105,
     "wSide": 0.0,
     "offOff": 60.0,
     "fall": 0.0,
-    "sink": 0.0,
+    "sink": 0.1,
     "squint": true,
     "armR": [
      110,
      68
     ],
     "armL": [
-     35,
-     22
+     50,
+     30
     ],
     "held": null
    },
    {
-    "bob": 0.0,
-    "lean": 8,
-    "twist": -32,
-    "legL": 12,
-    "legR": -10,
+    "bob": 0.1,
+    "lean": 14,
+    "twist": -43,
+    "legL": 19,
+    "legR": -16,
     "wOff": 54,
     "wSide": 0.0,
     "offOff": 60.0,
     "fall": 0.0,
-    "sink": 0.0,
+    "sink": 0.1,
     "squint": true,
     "armR": [
      75,
      31
     ],
     "armL": [
-     35,
-     22
+     55,
+     12
     ],
     "held": null
    },
    {
     "bob": 0.0,
-    "lean": 6,
-    "twist": 27,
-    "legL": -10,
-    "legR": 12,
+    "lean": 12,
+    "twist": 36,
+    "legL": -16,
+    "legR": 19,
     "wOff": 95,
     "wSide": 0.0,
     "offOff": 60.0,
     "fall": 0.0,
-    "sink": 0.0,
+    "sink": 0.1,
     "squint": true,
     "armR": [
      70,
      60
     ],
     "armL": [
-     35,
-     22
+     53,
+     30
     ],
     "held": null
    },
@@ -1647,76 +1647,76 @@
    },
    {
     "bob": 0.0,
-    "lean": -6,
-    "twist": 48,
-    "legL": -12,
-    "legR": 14,
+    "lean": -10,
+    "twist": 62,
+    "legL": -20,
+    "legR": 24,
     "wOff": 118,
     "wSide": 0.0,
     "offOff": 60.0,
     "fall": 0.0,
-    "sink": 0.05,
+    "sink": 0.14,
     "squint": false,
     "armR": [
      105,
      84
     ],
     "armL": [
-     25,
-     18
+     62,
+     30
     ],
     "held": null
    },
    {
     "bob": 0.0,
-    "lean": 16,
-    "twist": -52,
-    "legL": 22,
-    "legR": -16,
+    "lean": 24,
+    "twist": -62,
+    "legL": 34,
+    "legR": -26,
     "wOff": 28,
     "wSide": 0.0,
     "offOff": 60.0,
     "fall": 0.0,
-    "sink": 0.06,
+    "sink": 0.12,
     "squint": true,
     "armR": [
      88,
      8
     ],
     "armL": [
-     25,
-     18
+     62,
+     12
     ],
     "held": null
    },
    {
     "bob": 0.0,
-    "lean": 14,
-    "twist": -58,
-    "legL": 22,
-    "legR": -16,
+    "lean": 22,
+    "twist": -62,
+    "legL": 34,
+    "legR": -26,
     "wOff": 24,
     "wSide": 0.0,
     "offOff": 60.0,
     "fall": 0.0,
-    "sink": 0.05,
+    "sink": 0.1,
     "squint": false,
     "armR": [
      82,
      10
     ],
     "armL": [
-     25,
-     18
+     62,
+     12
     ],
     "held": null
    },
    {
     "bob": 0.0,
     "lean": 6,
-    "twist": -20,
-    "legL": 10,
-    "legR": -6,
+    "twist": -27,
+    "legL": 16,
+    "legR": -10,
     "wOff": 50,
     "wSide": 0.0,
     "offOff": 60.0,
@@ -1728,8 +1728,8 @@
      25
     ],
     "armL": [
-     25,
-     18
+     49,
+     12
     ],
     "held": null
    },

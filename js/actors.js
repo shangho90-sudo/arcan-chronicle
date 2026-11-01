@@ -157,10 +157,18 @@ export class SkillRunner {
       case "damage": {
         const sh = this.shape(a, p); const ts = Resolver.targets(pc, sh);
         const bmul = p.s.kind === "basic" && pc.sheet && pc.sheet.book ? 1 + pc.sheet.book.passive("basicDmg") : 1;
-        for (const t of ts) { t.takeDamage(Resolver.damage(pc, t, a.coef * bmul, a.power, a.knockback)); G.fx.play(a.fx === "hit" ? "hit" : (["paint_burst", "potion_splash"].includes(a.fx) ? a.fx : "hit"), { x: t.pos.x, y: t.pos.y + 0.6, z: t.pos.z }, a.fx === "hit" ? a.fxScale : 0.8); }
+        // melee swings (slash / blunt) use the 3D effect library: a bright crescent that alternates direction each swing
+        const fx3 = G.skillFx && !a.atTarget && a.shape === "cone" && (a.fx === "slash" || a.fx === "hit" || a.fx === "wind");
+        for (const t of ts) {
+          t.takeDamage(Resolver.damage(pc, t, a.coef * bmul, a.power, a.knockback));
+          if (fx3) G.skillFx.burst(a.fx === "hit" ? "hit_blunt" : "hit_slash", { x: t.pos.x, y: t.pos.y, z: t.pos.z }, { radius: 0.8 });
+          else G.fx.play(a.fx === "hit" ? "hit" : (["paint_burst", "potion_splash"].includes(a.fx) ? a.fx : "hit"), { x: t.pos.x, y: t.pos.y + 0.6, z: t.pos.z }, a.fx === "hit" ? 1.2 : 1);
+        }
         const reach = Math.max(0.6, (a.radius > 0 ? a.radius : a.length) * 0.5);
         const fp = a.atTarget ? { x: p.aim.x, y: p.aim.y + 0.3, z: p.aim.z } : { x: pc.pos.x + p.facing.x * reach, y: pc.pos.y + 0.7, z: pc.pos.z + p.facing.z * reach };
-        if (["slash", "wind", "paint_burst", "potion_splash", "ring"].includes(a.fx)) G.fx.play(a.fx, fp, a.fxScale, a.fx === "ring");
+        if (fx3) { this.swing = ((this.swing || 0) + 1) % 3;
+          G.skillFx.slash("blade", pc.pos, p.facing, { radius: a.radius * 1.05, angle: Math.max(110, a.angle + 20), mirror: this.swing === 1, tilt: [0.18, -0.22, 0.42][this.swing], grade: 3 }); }
+        else if (["slash", "wind", "paint_burst", "potion_splash", "ring"].includes(a.fx)) G.fx.play(a.fx, fp, a.fxScale, a.fx === "ring");
         if (ts.length) { G.audio.sfx(a.sfx || "hit"); pc.onHitLanded(a.coef >= 1.5); }
         else if (a.atTarget && a.sfx) G.audio.sfx(a.sfx);
         break;
@@ -243,6 +251,11 @@ export class Player extends Combatant {
     { const rr = this.sheet.book.passive("restRegen"), still = Math.hypot(this.vel.x, this.vel.z) < 0.05 && !this.skills.busy && this.dashT <= 0;
       if (rr > 0 && still && this.hp < this.maxHp) { this.restT = (this.restT || 0) + dt; if (this.restT >= 3) { this.restT -= 3; this.heal(this.maxHp * rr); G.fx.play("ring", { x: this.pos.x, y: this.pos.y + 0.05, z: this.pos.z }, 0.6, true, [0.6, 1, 0.7]); } }
       else this.restT = 0; }
+    if (this.lungeT > 0) {   // skill root motion: glide along the facing without touching the animation (eased out)
+      const L = this.lunge, u0 = 1 - this.lungeT / L.dur; this.lungeT = Math.max(0, this.lungeT - dt); const u1 = 1 - this.lungeT / L.dur;
+      const e = t => 1 - (1 - t) * (1 - t), k = (e(u1) - e(u0)) * L.dist; this.moveBy(L.dir.x * k, L.dir.z * k);
+      if (this.stunned || this.dead) this.lungeT = 0;
+    }
     if (this.dashT > 0) return this.updateDash(dt);
     if (this.stunned) { this.vel = { x: 0, z: 0 }; if (!this.skills.busy) this.body.play("hit", 0.5); return; }
     if (input.block) { this.vel = { x: 0, z: 0 }; this.idle(); return; }
@@ -327,6 +340,7 @@ export class Player extends Combatant {
     this.startDash(d, this.cfg.dodgeDistance, this.cfg.dodgeDistance / this.cfg.dodgeDuration, true);
     G.audio.sfx("dodge"); G.fx.play("smoke", { x: this.pos.x, y: this.pos.y + 0.3, z: this.pos.z }, 0.8);
   }
+  startLunge(d, dist, dur) { const m = Math.hypot(d.x, d.z) || 1; this.lunge = { dir: { x: d.x / m, z: d.z / m }, dist, dur: Math.max(0.05, dur) }; this.lungeT = this.lunge.dur; }
   startDash(d, dist, speed, inv) {
     const m = Math.hypot(d.x, d.z) || 1; this.dashDir = { x: d.x / m, z: d.z / m }; this.dashSpeed = Math.max(1, speed); this.dashT = dist / this.dashSpeed;
     if (inv) this.invuln = Math.max(this.invuln, this.dashT + 0.1);

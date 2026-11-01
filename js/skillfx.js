@@ -504,6 +504,23 @@ const texCrack = () => ctex('crack', 256, (g) => {
   const gr = g.createRadialGradient(128, 128, 0, 128, 128, 40); gr.addColorStop(0, 'rgba(40,30,20,0.6)'); gr.addColorStop(1, 'rgba(40,30,20,0)'); g.fillStyle = gr; g.fillRect(0, 0, 256, 256);
 });
 
+// burning crack: the same seeded crack pattern drawn twice -> charred lines (normal blend) + glowing lava core (additive)
+function fireCrackPaint(g, glow) {
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  g.lineCap = 'round'; g.lineJoin = 'round';
+  const segs = [];
+  const br = (x, y, a, len, w, d) => { if (d > 2 || len < 8) return; const pts = [[x, y]]; let cx = x, cy = y;
+    for (let k = 0; k < 4; k++) { a += (rnd() - 0.5) * 0.6; cx += Math.cos(a) * len / 4; cy += Math.sin(a) * len / 4; pts.push([cx, cy]); } segs.push([pts, w]);
+    br(cx, cy, a + 0.5, len * 0.6, w * 0.65, d + 1); if (rnd() < 0.7) br(cx, cy, a - 0.5, len * 0.55, w * 0.6, d + 1); };
+  for (let i = 0; i < 9; i++) br(128, 128, i / 9 * TAU + rnd() * 0.3, 78, 12, 0);
+  const stroke = (col, k, blur) => { g.strokeStyle = col; g.shadowColor = blur ? col : 'transparent'; g.shadowBlur = blur || 0;
+    for (const [pts, w] of segs) { g.lineWidth = w * k; g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.stroke(); } };
+  if (!glow) { stroke('rgba(22,14,10,0.95)', 1.25, 0); const gr = g.createRadialGradient(128, 128, 0, 128, 128, 46); gr.addColorStop(0, 'rgba(30,18,10,0.7)'); gr.addColorStop(1, 'rgba(30,18,10,0)'); g.fillStyle = gr; g.fillRect(0, 0, 256, 256); }
+  else { stroke('rgba(255,110,20,0.9)', 0.9, 10); stroke('rgba(255,220,120,1)', 0.38, 4); const gr = g.createRadialGradient(128, 128, 0, 128, 128, 40); gr.addColorStop(0, 'rgba(255,150,40,0.8)'); gr.addColorStop(1, 'rgba(255,90,10,0)'); g.fillStyle = gr; g.fillRect(0, 0, 256, 256); }
+}
+const texFireCrack = () => ctex('firecrack', 256, (g) => fireCrackPaint(g, false));
+const texFireCrackGlow = () => ctex('firecrack_glow', 256, (g) => fireCrackPaint(g, true));
+
 // ============================================================================================ layers (declarative rig parts)
 const CUSTOM = {};
 function mkLayer(L) {
@@ -670,6 +687,18 @@ const BURST = {
     P: [{ n: 6, tile: TL.bolt, shape: 'sphere', spd: [1.5, 2.5], size: [0.2, 0.3], life: [0.15, 0.25], col: 0xd8f4ff, y: 0.9 }, { n: 8, tile: TL.ember, mode: 2, shape: 'sphere', spd: [2, 4], size: [0.04, 0.06], life: [0.15, 0.3], col: 0xfff8a0, y: 0.9, tint: false }] },
   mark_pop: { dur: 0.9, col: 0xd060ff, L: [{ type: 'sprite', tile: TL.sigil, col: 0xe0a0ff, size: 1.2, dur: 0.35, y: 1.1, spin: 4 }, { type: 'vring', col: 0xd060ff, r: 1.1, dur: 0.35, w: 0.08, y: 1.1 }, { type: 'flash', col: 0xf0c0ff, size: 1.3, dur: 0.2, y: 1.1 }],
     P: [{ n: 12, add: false, tile: TL.star, shape: 'sphere', spd: [2, 3.5], drag: 2, size: [0.16, 0.26], life: [0.4, 0.7], col: [0xc050f0, 0xe090ff], y: 1.1, spin: 6 }, { n: 4, add: false, tile: TL.rune1, shape: 'sphere', spd: [1.2, 2], drag: 2, size: [0.25, 0.32], life: [0.5, 0.7], y: 1.1 }] },
+  // 일격참 finisher: the ground splits and fire bursts out of the cracks
+  fire_crack: { dur: 2.4, col: 0xff8a30, shake: [0.3, 0.32], L: [
+    { type: 'flash', col: 0xffd890, size: 2.4, dur: 0.22, y: 0.3 }, { type: 'shock', col: 0xffa040, r: 2.4, dur: 0.45, w: 0.1, trail: 0.3 },
+    { type: 'decal', tex: texFireCrack, col: 0xffffff, r: 2.0, dur: 2.6, add: false, tint: false, grow: true }, { type: 'decal', tex: texFireCrackGlow, col: 0xffffff, r: 2.0, dur: 2.2, add: true, tint: false, grow: true, y: 0.04 },
+    { type: 'decal', tex: texFireCrackGlow, col: 0xffc060, r: 2.0, dur: 0.9, add: true, tint: false, grow: true, y: 0.05 }, { type: 'debris', n: 10, dur: 1.4 }],
+    P: [ext(P.dustRing, { n: 16, spd: [3, 5], size: [0.4, 0.65] }),
+      // flame tongues licking up from the cracks, then lingering embers
+      { n: 34, tile: TL.flame, shape: 'disc', rad: 1.7, up: [2.6, 5], spd: [0.1, 0.4], size: [0.6, 1.0], grow: 0.7, life: [0.4, 0.75], col: [0xffe070, 0xff5a10], y: 0.05, tint: false },
+      { rate: 46, at: 0.15, until: 1.7, tile: TL.flame, shape: 'disc', rad: 1.6, up: [1.6, 3.4], spd: [0.1, 0.3], size: [0.45, 0.8], grow: 0.5, life: [0.3, 0.6], col: [0xffc050, 0xff4a10], y: 0.05, tint: false },
+      { rate: 10, at: 0.3, until: 1.8, add: false, tile: TL.smoke, col: 0x3a2c26, a: 0.45, shape: 'disc', rad: 1.3, up: [1, 1.8], spd: [0.1, 0.3], size: [0.4, 0.6], grow: 2.2, life: [0.8, 1.2], y: 0.4, tint: false },
+      ext(P.embers, { n: 24, spd: [1.5, 3.5], up: [2, 4.5], life: [0.6, 1.2], col: [0xffe0a0, 0xff7020], tint: false }),
+      { n: 8, at: 0.1, add: false, tile: TL.dust, col: 0x4a3a30, a: 0.55, shape: 'disc', rad: 1.2, up: [0.6, 1.2], size: [0.6, 0.9], grow: 2, life: [0.8, 1.3], y: 0.3, tint: false }] },
   // monster claw swipe: three bright parallel scratches
   claw_marks: { dur: 0.45, col: 0xffffff, L: [
     { type: 'sprite', tile: TL.streak, col: 0xffffff, size: 1.5, sx: 1, sy: 0.12, dur: 0.22, y: 1.0, rot: 0.95 }, { type: 'sprite', tile: TL.streak, col: 0xffeedd, size: 1.5, sx: 1, sy: 0.12, dur: 0.22, y: 0.82, rot: 0.95, at: 0.03 },
@@ -876,6 +905,20 @@ function sweep(m, e, u, tilt = -0.1, y = SLH) {
   m.position.y = y; return head;
 }
 const SLASH = {
+  // basic weapon swing: bright crescent with an additive glow edge, gold sparks and a short streak along the edge
+  blade: { dur: 0.3, col: 0xfff0c0, keyFn: (e) => Math.round(e.A / 5),
+    start(e, fx) { const r = e.rig, tl = (e.o && e.o.tilt) || 0;
+      if (!r.a1) { r.a1 = arcMesh(e, true, 0.3); r.a2 = arcMesh(e, true, 0.3); r.a3 = arcMesh(e, true, 0.3); r.root.add(r.a1, r.a2, r.a3); }
+      r.a1.scale.setScalar(e.R); r.a2.scale.setScalar(e.R * 1.07); r.a3.scale.setScalar(e.R * 0.92);
+      for (const m of [r.a1, r.a2, r.a3]) m.rotation.set(-0.12, 0, tl);
+      spray(fx, { n: 14, tile: TL.ember, mode: 2, shape: 'cone', spread: e.A / 2, off: e.R * 0.95, spd: [3, 6], up: [0.5, 2], grav: 5, size: [0.05, 0.08], life: [0.2, 0.4], col: [0xfff6d0, 0xffc860], y: SLH, str: 0.06, tint: false }, e.p.x, e.p.y, e.p.z, 1, e.col, e.dx, e.dz);
+      spray(fx, { n: 4, tile: TL.spark, shape: 'cone', spread: e.A / 2, off: e.R * 0.9, spd: [0.5, 1.2], size: [0.18, 0.3], life: [0.18, 0.3], col: 0xffffff, y: SLH, spin: 4, tint: false }, e.p.x, e.p.y, e.p.z, 1, e.col, e.dx, e.dz); },
+    tick(e) { const r = e.rig, u = e.lt / 0.3, tl = (e.o && e.o.tilt) || 0;
+      sweep(r.a1, e, u, -0.12); sweep(r.a2, e, Math.min(1, u * 1.08), -0.12); sweep(r.a3, e, u * 0.95, -0.12);
+      for (const m of [r.a1, r.a2, r.a3]) m.rotation.z = tl;
+      r.a1.fxu.c.setRGB(1, 1, 1); r.a1.fxu.c2.setRGB(0.35, 0.65, 1); r.a1.fxu.x.z = 0.5;
+      r.a2.fxu.c.setRGB(1, 0.85, 0.35); r.a2.fxu.c2.setRGB(1, 0.45, 0.08); r.a2.fxu.x.z = 0.32;
+      r.a3.fxu.c.setRGB(0.6, 0.85, 1); r.a3.fxu.c2.setRGB(0.2, 0.4, 1); r.a3.fxu.x.z = 0.22; r.a3.fxu.o *= 0.8; } },
   arc: { dur: 0.32, col: 0x5ab8ff, keyFn: (e) => Math.round(e.A / 5),
     build(rig, def) { },
     start(e, fx) { const r = e.rig; if (!r.arc) { r.arc = arcMesh(e); r.root.add(r.arc); } r.arc.scale.setScalar(e.R); r.arc.rotation.set(-0.1, 0, 0);

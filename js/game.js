@@ -78,11 +78,23 @@ class Zone {
   }
   async spawnFor(sp) {
     const md = G.data.monsters[sp.def.monster]; if (!md) return;
-    const a = Math.random() * Math.PI * 2, r = Math.sqrt(Math.random()) * sp.def.radius;
-    const pos = this.geo.nearestFree(sp.def.pos[0] + Math.cos(a) * r, sp.def.pos[1] + Math.sin(a) * r, md.radius);
+    const pos = this.spacedSpot(sp.def.pos[0], sp.def.pos[1], sp.def.radius, md.radius);
     const m = new Monster(this, md, pos, this.geo.ground(sp.def.pos[0], sp.def.pos[1]), sp.def.radius);
     m.onRemoved = mm => { sp.alive.splice(sp.alive.indexOf(mm), 1); sp.timers.push(md.respawn); };
     sp.alive.push(m); this.actors.push(m); await m.attachBody(); m.body.place(m.pos);
+  }
+  /** a free spot in the camp circle that keeps its distance from monsters already there (best of several tries) */
+  spacedSpot(cx, cz, R, rad) {
+    const others = this.actors.filter(a => a.def && !a.dead && a.faction !== "player");
+    const want = 2.2 + rad * 2; let best = null, bestD = -1;
+    for (let i = 0; i < 16; i++) {
+      const grow = i < 8 ? 1 : 1.35, a = Math.random() * Math.PI * 2, r = Math.sqrt(Math.random()) * R * grow;
+      const q = this.geo.nearestFree(cx + Math.cos(a) * r, cz + Math.sin(a) * r, rad);
+      let d = 99; for (const o of others) d = Math.min(d, Math.hypot(o.pos.x - q.x, o.pos.z - q.z) - (o.radius || 0.4) - rad);
+      if (d >= want) return q;
+      if (d > bestD) { bestD = d; best = q; }
+    }
+    return best;
   }
   async spawnBoss() {
     const b = this.def.boss, md = G.data.monsters[b.boss], pos = this.geo.ground(b.bossPos[0], b.bossPos[1]);
@@ -91,9 +103,9 @@ class Zone {
     this.boss = boss; this.actors.push(boss); await boss.attachBody(); boss.body.place(boss.pos);
   }
   summon(id, around, n) {
-    const md = G.data.monsters[id], list = []; if (!md) return list;
+    const md = G.data.monsters[id], list = [], a0 = Math.random() * Math.PI * 2; if (!md) return list;
     for (let i = 0; i < n; i++) {
-      const a = Math.random() * Math.PI * 2, pos = this.geo.nearestFree(around.x + Math.cos(a) * 3.5, around.z + Math.sin(a) * 3.5, md.radius);
+      const a = a0 + (i + Math.random() * 0.4) / n * Math.PI * 2, pos = this.geo.nearestFree(around.x + Math.cos(a) * 3.5, around.z + Math.sin(a) * 3.5, md.radius);
       const m = new Monster(this, md, pos, pos, 3); m.aggro = true; this.actors.push(m); list.push(m);
       m.attachBody().then(() => m.body.place(m.pos)); G.fx.play("smoke", { x: pos.x, y: pos.y + 0.3, z: pos.z }, 1.2);
     }

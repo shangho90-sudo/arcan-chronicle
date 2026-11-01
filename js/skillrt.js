@@ -168,9 +168,9 @@ export class SkillEngine {
   release(ctx) {
     const pc = this.pc, sh = pc.body.sh, d = ctx.d, anim = d.anim || 'cast';
     const ht = d.cast ? 0 : Math.min(0.35, (sh.actions[anim] ? sh.actions[anim].hitFrame / sh.actions[anim].fps : 0.2) || 0.2);
-    let span = 0; for (const op of d.ops) { const n = (op.hits || 1) + (op.hitsPerLv ? Math.floor(op.hitsPerLv * (ctx.L - 1)) : 0); span = Math.max(span, (op.at || 0) + (n - 1) * (op.gap || 0.13)); }
+    let span = 0; for (const op of d.ops) { if (op.op === 'lunge') continue; const n = (op.hits || 1) + (op.hitsPerLv ? Math.floor(op.hitsPerLv * (ctx.L - 1)) : 0); span = Math.max(span, (op.at || 0) + (n - 1) * (op.gap || 0.13)); }
     pc.skills.lock = Math.max(pc.skills.lock, ht + span + (d.recover || 0.3));
-    for (const op of d.ops) this.pending.push({ time: this.clock + ht + (op.at || 0), op, ctx });
+    for (const op of d.ops) this.pending.push({ time: this.clock + Math.max(0, ht + (op.at || 0)), op, ctx });
     if (d.type === 'ultimate') { G.render.addShake && !G.reduceFlash && G.render.addShake(0.12, 0.25); }
   }
   interruptCast(reason) {
@@ -299,6 +299,8 @@ export class SkillEngine {
         FX.aura('cleanse', () => pc.pos, { duration: 1 }); return;
       }
       case 'dash': return this.opDash(op, ctx);
+      // root motion during a skill: step / leap along the cast direction (keeps the skill animation playing)
+      case 'lunge': { const f = op.back ? { x: -ctx.facing.x, z: -ctx.facing.z } : ctx.facing; pc.startLunge(f, op.dist, op.dur || 0.2); return; }
       case 'summon': return this.opSummon(op, ctx);
       case 'consume': {
         const it = this.findConsumable(op.tag); if (!it) return;            // validated before; item may vanish -> skip effects
@@ -312,7 +314,7 @@ export class SkillEngine {
         const c = op.atAim ? ctx.aim : pc.pos;
         FX.telegraph(c, op.r || op.w || 2, op.dur, { color: 0xffb040, shape: op.shape, dir: ctx.facing, length: op.len, width: op.w }); return;
       }
-      case 'fx': FX.burst(op.burst, pc.pos, { radius: op.r || 2, color: col }); return;
+      case 'fx': if (op.slash) FX.slash(op.slash, pc.pos, ctx.facing, { radius: op.r || 1.6, angle: op.ang || 120, color: col, tilt: op.tilt || 0, mirror: !!op.mirror }); if (op.burst) FX.burst(op.burst, pc.pos, { radius: op.r || 2, color: col }); return;
       case 'repair': {
         for (const s of this.summons) if (s.machine && !s.dead) { const miss = 1 - s.hp / s.maxHp; s.hp = Math.min(s.maxHp, s.hp + s.maxHp * op.pct * ctx.mult * (1 + op.missingBonus * miss)); FX.burst('sparks', s.pos, { radius: 0.8 }); }
         return;
@@ -347,7 +349,7 @@ export class SkillEngine {
             // sweep / alt: swing direction (alt alternates every strike and tilts the arc a little so a flurry reads as many swings)
             const mir = op.alt ? h % 2 === 1 : op.sweep > 0, tilt = op.alt ? ((h * 37) % 5 - 2) * 0.12 : 0, ca = Math.cos(tilt), sa = Math.sin(tilt);
             const fd = { x: f.x * ca - f.z * sa, z: f.x * sa + f.z * ca };
-            FX.slash(op.fx.slash, op.shape === 'single' && ts[0] ? ts[0].pos : (op.atAim ? ctx.aim : pc.pos), fd, { color: op.alt && h % 3 === 2 ? 0xffd27a : col, radius: op.r || 2, angle: op.ang || 100, length: op.len, width: op.w, mirror: mir });
+            FX.slash(op.fx.slash, op.shape === 'single' && ts[0] ? ts[0].pos : (op.atAim ? ctx.aim : pc.pos), fd, { color: op.alt && h % 3 === 2 ? 0xffd27a : col, radius: op.r || 2, angle: op.ang || 100, length: op.len, width: op.w, mirror: mir, tilt: op.alt ? [0.22, -0.3, 0.45][h % 3] : (op.sweep || 0) * 0.2 });
           }
           if (op.fx.beam) FX.beam(op.fx.beam, pc.pos, { x: pc.pos.x + f.x * (op.len || 6), y: pc.pos.y, z: pc.pos.z + f.z * (op.len || 6) }, { color: col, width: op.w || 0.6 });
           if (op.fx.burst) { if (op.shape === 'circle') FX.burst(op.fx.burst, op.fwd ? fxp : pc.pos, { color: col, radius: op.fx.burstR || op.r }); else for (const t of ts.length ? ts : [{ pos: fxp }]) FX.burst(op.fx.burst, t.pos, { color: col, radius: 0.8 }); }
