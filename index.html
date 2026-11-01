@@ -275,6 +275,32 @@ small { font-size:.8em; }
 .target, .prompt { font-weight:700; }
 @media (max-width: 900px), (max-height: 520px) { .tracker { width:300px; } .topright { min-width:0; } .expbar { width:60vw; } }
 </style>
+<style>
+/* Full-screen illustrated title; native buttons align with the painted artwork. */
+.window.titlewin { inset:0; width:100% !important; height:100%; transform:none; padding:0; border:0 !important; border-radius:0; overflow:hidden; background:radial-gradient(ellipse at center,#47626b,#142330); }
+.titlewin .wbody { display:grid; place-items:center; isolation:isolate; }
+.titlewin .wbody::before { content:""; position:absolute; inset:0; background:#10233477; z-index:-1; }
+.title-art { position:relative; width:min(100vw,133.1187vh); aspect-ratio:1447 / 1087; flex:none; }
+.title-illustration { display:block; width:100%; height:100%; }
+.titlewin .title-action { position:absolute; border:0; border-image:none; padding:0; min-height:0; background:transparent; border-radius:999px; cursor:pointer; transition:box-shadow .15s,background .15s; }
+.title-continue { left:26%; top:57%; width:48%; height:8%; }
+.title-new { left:28.3%; top:72%; width:43.4%; height:7.5%; }
+.titlewin .title-action:hover:not(:disabled) { background:#fff3c525; box-shadow:0 0 24px #ffe1a088; filter:none; }
+.titlewin .title-action:focus-visible { outline:3px solid #fff3c5; outline-offset:4px; box-shadow:0 0 22px #fff0a0; }
+.titlewin .title-action:active:not(:disabled) { transform:none; background:#fff6da44; }
+.titlewin .title-action:disabled { opacity:1; background:#17273599; cursor:not-allowed; filter:none; }
+.title-save { position:absolute; left:24.5%; top:66%; width:51%; height:5%; display:flex; align-items:center; justify-content:center; padding:0 3%; border:1px solid #d9bc72; border-radius:999px; background:linear-gradient(#253447,#101d2c); color:#fff6de; font-family:"Malgun Gothic",sans-serif; font-size:clamp(9px,min(1.45vw,1.93vh),21px); text-align:center; line-height:1.25; overflow:hidden; }
+@media (max-aspect-ratio:3/4) {
+  .title-art { width:100vw; }
+  .titlewin .title-action { left:12%; width:76%; height:48px; border:2px solid #f6d58a; border-radius:16px; font-size:22px; font-family:"Malgun Gothic",sans-serif; }
+  .titlewin .title-continue { top:57%; background:linear-gradient(#ffdf93,#c48a30); color:#38250c; }
+  .title-continue::after { content:"이어하기"; }
+  .titlewin .title-new { top:calc(57% + 104px); background:linear-gradient(#149fdb,#07476f); color:#fff4d8; }
+  .title-new::after { content:"새 게임"; }
+  .title-save { left:8%; top:calc(57% + 51px); width:84%; height:50px; font-size:11px; padding:4px 12px; border-radius:12px; }
+}
+@media (prefers-reduced-motion:reduce) { .titlewin .title-action { transition:none; } }
+</style>
 </head>
 <body>
 <div id="view"></div>
