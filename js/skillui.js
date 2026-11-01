@@ -26,13 +26,13 @@ export function skillIcon(d, size = 48) {
 
 function fmt(n) { return Math.abs(n - Math.round(n)) < 1e-6 ? String(Math.round(n)) : n.toFixed(1); }
 /** one-line summary of what a level changes */
-const STAT_KO = { atkSpeed: '공격 속도', crit: '치명타', def: '방어력', foodPower: '요리 효과', maxHp: '최대 HP' };
-const FLAG_KO = { basicDmg: '기본 공격 피해', beatHaste: '박자 가속', centerBonus: '중심부 추가 피해', cheatDeath: '치명상 버티기', craftDiscount: '제작 재료 절약', 'craftExtra:potion': '포션 추가 제작', 'craftReturn:food': '요리 재료 반환', fitting: '완벽한 피팅', flow: '흐름 지속', ingredientDrop: '재료 획득률', killHaste: '처치 시 가속', landscapeSize: '풍경화 범위', landscapeTime: '풍경화 지속', paintRange: '붓 사거리', phraseGain: '악절 획득', powerRefund: '동력 환급', projSpeed: '투사체 속도', residue: '잔여 효과', staggerBonus: '경직 추가 피해', switchBonus: '전환 추가 피해', throwRange: '투척 사거리', vsDefdown: '방어 약화 대상 추가 피해' };
+const STAT_KO = { atk: '공격력', atkSpeed: '공격 속도', crit: '치명타', def: '방어력', foodPower: '요리 효과', maxHp: '최대 HP' };
+const FLAG_KO = { restRegen: '휴식 중 3초마다 체력 회복', basicDmg: '기본 공격 피해', beatHaste: '박자 가속', centerBonus: '중심부 추가 피해', cheatDeath: '치명상 버티기', craftDiscount: '제작 재료 절약', 'craftExtra:potion': '포션 추가 제작', 'craftReturn:food': '요리 재료 반환', fitting: '완벽한 피팅', flow: '흐름 지속', ingredientDrop: '재료 획득률', killHaste: '처치 시 가속', landscapeSize: '풍경화 범위', landscapeTime: '풍경화 지속', paintRange: '붓 사거리', phraseGain: '악절 획득', powerRefund: '동력 환급', projSpeed: '투사체 속도', residue: '잔여 효과', staggerBonus: '경직 추가 피해', switchBonus: '전환 추가 피해', throwRange: '투척 사거리', vsDefdown: '방어 약화 대상 추가 피해' };
 function levelText(d, L) {
   const m = 1 + (d.type === 'ultimate' ? 0.25 : 0.12) * (L - 1), out = [];
   for (const op of d.ops) {
     if (op.op === 'hit' && op.coef > 0) {
-      const phys = !op.elem && d.type !== 'ultimate' && op.shape !== 'circle' || !!d.weapon, b = op.hits || 1, h = b + (phys ? Math.floor((L - 1) / 2) : 0);
+      const phys = !op.elem && d.type !== 'ultimate' && op.shape !== 'circle' || !!d.weapon, b = (op.hits || 1) + (op.hitsPerLv ? Math.floor(op.hitsPerLv * (L - 1)) : 0), h = b + (phys && !op.noExtra && !op.hitsPerLv ? Math.floor((L - 1) / 2) : 0);
       const per = op.coef * m * b / h * (1 + 0.06 * (h - b));
       out.push(`피해 ${Math.round(per * 100)}%${h > 1 ? ` × ${h}회 (총 ${Math.round(per * h * 100)}%)` : ''}`);
     }
@@ -49,7 +49,7 @@ function levelText(d, L) {
   }
   if (d.type === 'passive') { for (const m2 of d.mods || []) out.push(`${STAT_KO[m2.stat] || m2.stat} ${m2.add ? '+' + fmt(m2.add + (m2.addLv || 0) * (L - 1)) : ''}${m2.mul ? '+' + fmt((m2.mul + (m2.mulLv || 0) * (L - 1)) * 100) + '%' : ''}`); for (const [k, v] of Object.entries(d.flags || {})) out.push(`${FLAG_KO[k] || k} ${fmt((v[0] + (v[1] || 0) * (L - 1)) * (v[0] < 1 ? 100 : 1))}${v[0] < 1 ? '%' : ''}`); }
   if (d.cd) out.push(`쿨타임 ${fmt(d.cd * (1 - 0.03 * (L - 1)))}초`);
-  if (!['passive', 'craft'].includes(d.type)) { const tier = G.data.job(d.job).tier, g = Math.min(10, (tier - 1) * 3 + L + (d.type === 'ultimate' ? 2 + L : 0)); out.push(`연출 등급 ${g}`); }
+  if (!['passive', 'craft'].includes(d.type)) { const tier = G.data.job(d.job).tier, g = Math.max(1, Math.min(10, Math.max(0, tier - 1) * 3 + L + (d.type === 'ultimate' ? 2 + L : 0))); out.push(`연출 등급 ${g}`); }
   return out.join(' · ');
 }
 
@@ -60,18 +60,18 @@ Object.assign(UI.prototype, {
     const lineage = book.lineage;
     const b = this.open('skills', '스킬', 1820, 960);
     const head = $('div', 'skhead', b);
-    head.innerHTML = `<b>${job.name}</b> <span class="muted">Lv${p.sheet.p.level}</span> · 스킬 포인트 <b class="goldtxt">${sk.points}</b> <span class="small muted">(사용 ${book.spent})</span>`;
+    head.innerHTML = `<b>${job.name}</b> <span class="muted">Lv${p.sheet.p.level}</span> · 기본 검술 포인트 <b class="goldtxt">${sk.npoints}</b>` + (job.id !== 'novice' ? ` · 직업 스킬 포인트 <b class="goldtxt">${sk.points}</b> <span class="small muted">(사용 ${book.spent})</span>` : ` <span class="small muted">· 레벨마다 1포인트 · 직업 스킬은 Lv${ADV1_LEVEL} 1차 전직 후</span>`);
     if (!lineage.length) { $('div', 'skempty', b, `<p>견습생은 레벨 ${ADV1_LEVEL}에 1차 전직을 하면 스킬을 배울 수 있습니다.</p><p class="small muted">Lv10이 되면 5포인트, 이후 레벨마다 1포인트를 얻습니다. 2차 전직(Lv${ADV2_LEVEL}·전직 시험) 때 5포인트를 더 받습니다.</p>`); this.slotBar(b); return; }
     const tabs = $('div', 'sktabs', head);
     const show = tabJob && lineage.includes(tabJob) ? tabJob : lineage[lineage.length - 1];
-    for (const jid of lineage) { const j = G.data.job(jid); const t = this.button(tabs, (j.tier === 1 ? '1차 ' : '2차 ') + j.name, jid === show ? 'gold' : 'ivory', () => this.showSkills(jid)); t.classList.add('small'); }
+    for (const jid of lineage) { const j = G.data.job(jid); const t = this.button(tabs, j.tier === 0 ? '기본 검술' : (j.tier === 1 ? '1차 ' : '2차 ') + j.name, jid === show ? 'gold' : 'ivory', () => this.showSkills(jid)); t.classList.add('small'); }
     const inTown = p.zone.def.kind === 'town';
     const rb = this.button(head, '포인트 초기화', 'red', () => { const e = book.reset(inTown, p.skills2.inCombat); if (e) return this.toast(e); this.toast('스킬 포인트를 모두 돌려받았습니다'); this.showSkills(show); });
     rb.title = inTown ? '' : '마을에서만 가능'; if (!inTown) rb.classList.add('locked');
     const cols = $('div', 'skcols', b);
     const list = G.data.skillsOf(show);
     for (let cat = 0; cat < 3; cat++) {
-      const items = list.filter(s => s.cat === cat).sort((a, c) => a.idx - c.idx);
+      const items = list.filter(s => s.cat === cat).sort((a, c) => a.idx - c.idx); if (!items.length) continue;
       const col = $('div', 'skcol panel-dark', cols, `<div class="skcat">${'ABC'[cat]}. ${items[0].catName}</div>`);
       for (const d of items) {
         const L = book.level(d.id), blk = book.learnBlock(d.id), max = L >= d.maxLv;

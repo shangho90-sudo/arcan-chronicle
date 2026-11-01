@@ -4,6 +4,7 @@ import { THREE, tex, CAM } from './render.js';
 import { ModelBody, loadPlayerModel, loadActions } from './model.js';
 import { renderItemIcons } from './items3d.js';
 import { renderPortrait } from './portrait.js';
+import { Minimap } from './minimap.js';
 
 let G = null;
 export function bindGame(g) { G = g; }
@@ -99,11 +100,33 @@ export class UI {
     const e = $("div", "float", this.floatLayer); e.textContent = text; e.style.color = color;
     this.floats.push({ e, pos: { x: pos.x + (Math.random() - 0.5) * 0.5, y: pos.y + h, z: pos.z + (Math.random() - 0.5) * 0.3 }, t: 0, scale });
   }
+  /** damage numbers with impact: kind = 'hit' (player hits a monster), 'crit', 'taken' (player is hit), 'dot' */
+  damageText(pos, amount, kind) {
+    if (!G.settings.damageNumbers) return;
+    const e = $("div", "dmg dmg-" + kind, this.floatLayer);
+    e.innerHTML = (kind === "crit" ? '<i class="dmg-burst"></i><b class="dmg-tag">CRITICAL</b>' : "") + '<span>' + amount + '</span>';
+    const side = Math.random() < 0.5 ? -1 : 1;
+    this.floats.push({ e, dmg: kind, pos: { x: pos.x + (Math.random() - 0.5) * 0.35, y: pos.y + (kind === "taken" ? 1.5 : 1.25), z: pos.z + (Math.random() - 0.5) * 0.2 }, t: 0,
+      scale: kind === "crit" ? 1 : 1, vx: side * (kind === "crit" ? 18 : 30 + Math.random() * 20), life: kind === "crit" ? 1.15 : 0.85 });
+  }
   tick(dt) {
     for (const e of [...this.toasts.children]) { e._t += dt; if (e._t > 2.6) e.remove(); }
     for (const e of [...this.feed.children]) { e._t += dt; if (e._t > 3.2) e.remove(); }
     for (const f of this.floats.slice()) {
-      f.t += dt; const k = f.t / 0.9;
+      f.t += dt;
+      if (f.dmg) {                                     // damage: big pop, little hop sideways, settle, fade
+        const L = f.life, k = f.t / L;
+        if (k >= 1) { f.e.remove(); this.floats.splice(this.floats.indexOf(f), 1); continue; }
+        const s = G.render.toScreen(f.pos), t = f.t;
+        const pop = f.dmg === "crit" ? (t < 0.09 ? 0.4 + t / 0.09 * 1.5 : t < 0.2 ? 1.9 - (t - 0.09) / 0.11 * 0.9 : 1) : (t < 0.07 ? 0.5 + t / 0.07 * 1.0 : t < 0.16 ? 1.5 - (t - 0.07) / 0.09 * 0.5 : 1);
+        const hop = -(Math.sin(Math.min(1, t / 0.45) * Math.PI) * (f.dmg === "crit" ? 34 : 26)) - k * 22;
+        const dx = f.vx * Math.min(1, t / 0.45);
+        const shake = f.dmg === "crit" && t < 0.25 ? (Math.random() - 0.5) * 6 : 0;
+        f.e.style.transform = `translate(${s.x + dx + shake}px,${s.y + hop}px) translate(-50%,-50%) scale(${pop})`;
+        f.e.style.opacity = k > 0.7 ? 1 - (k - 0.7) / 0.3 : 1;
+        continue;
+      }
+      const k = f.t / 0.9;
       if (k >= 1) { f.e.remove(); this.floats.splice(this.floats.indexOf(f), 1); continue; }
       const s = G.render.toScreen({ x: f.pos.x, y: f.pos.y + k * 0.9, z: f.pos.z });
       const pop = k < 0.15 ? 1 + (0.15 - k) * 3 : 1;
@@ -119,18 +142,20 @@ export class UI {
     h.innerHTML = `
     <div class="charpanel panel-dark"><div class="badge"><span id="hBadge"></span></div><div class="lv" id="hLv"></div>
       <div class="cname" id="hName"></div>
-      <div class="bar hp"><i id="hHp"></i><b id="hShield"></b><span id="hHpT"></span></div>
       <div class="bar sp"><i id="hSp"></i><span id="hSpT"></span></div>
       <div class="status" id="hStatus"></div></div>
-    <div class="topright panel-dark"><div class="zone" id="hZone"></div><div class="gold" id="hGold"></div>
-      <div class="menubtns">${[["inventory", "가방"], ["skills", "스킬"], ["craft", "제작"], ["quests", "퀘스트"], ["pause", "메뉴"]].map(([a, t]) => `<button class="btn" data-a="${a}">${MENU_ICON[a]}<span>${t}</span></button>`).join("")}</div></div>
+    <div class="minimap panel-dark"><div class="mmhead"><span class="zone" id="hZone"></span><span class="gold" id="hGold"></span></div><canvas id="hMap"></canvas></div>
     <div class="tracker panel-dark" id="hQuests"></div>
     <div class="target panel-dark" id="hTarget"><div id="hTName"></div><div class="bar hp"><i id="hTHp"></i><span id="hTHpT"></span></div></div>
     <div class="target boss panel-dark" id="hBoss"><div id="hBName"></div><div class="bar boss"><i id="hBHp"></i><span id="hBHpT"></span></div></div>
     <div class="prompt panel-dark" id="hPrompt"></div>
-    <div class="expbar"><i id="hExp"></i><span id="hExpT"></span></div>`;
+    <div class="botbar">
+      <div class="bar hp"><i id="hHp"></i><b id="hShield"></b><span id="hHpT"></span></div>
+      <div class="expbar"><i id="hExp"></i><span id="hExpT"></span></div>
+      <div class="menubtns">${[["inventory", "가방"], ["skills", "스킬"], ["craft", "제작"], ["quests", "퀘스트"], ["pause", "메뉴"]].map(([a, t]) => `<button class="btn" data-a="${a}">${MENU_ICON[a]}<span>${t}</span></button>`).join("")}</div></div>`;
     for (const b of h.querySelectorAll("[data-a]")) b.onclick = () => { G.audio.sfx("ui"); G.input.press({ skills: "skillWin", craft: "craftWin" }[b.dataset.a] || b.dataset.a); };
     this.h = id => h.querySelector("#" + id);
+    this.minimap = new Minimap(h.querySelector("#hMap"));
   }
   updateHud() {
     const p = G.player; if (!p) return; const P = p.sheet.p, job = p.sheet.job, h = this.h;
@@ -146,6 +171,7 @@ export class UI {
     const need = p.sheet.expToNext; h("hExp").style.width = (need ? 100 * P.exp / need : 100) + "%";
     h("hExpT").textContent = need ? `EXP ${P.exp} / ${need}  (${(100 * P.exp / need).toFixed(1)}%)` : "최고 레벨";
     h("hStatus").innerHTML = p.status.list.map(s => `<span style="color:${s.def.color}">${s.def.name} ${Math.ceil(s.remaining)}s</span>`).join(" ");
+    this.minimap.draw(G);
     h("hZone").textContent = G.zone ? G.zone.def.name : ""; h("hGold").textContent = P.gold.toLocaleString() + " G";
     this._qt = (this._qt || 0) - 1; if (this._qt <= 0) { this._qt = 15; this.updateTracker(); }
     const boss = G.zone && G.zone.boss, bossOn = boss && boss.fight && !boss.dead;
@@ -423,6 +449,11 @@ export class UI {
     const n = this.button(stage, "", "title-action title-new", ng);
     n.setAttribute("aria-label", "새 게임");
     (info ? c : n).focus({ preventScroll: true });
+    // the browser blocks sound until the first click / key: show a small speaker button while it is still muted
+    const snd = this.button(stage, "", "title-sound", () => { G.audio.unlock(); });
+    snd.setAttribute("aria-label", "배경음악 켜기"); snd.title = "배경음악 켜기"; snd.innerHTML = '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#f6dc94" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#f6dc94"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg><span>소리 켜기</span>';
+    const upd = () => { snd.style.display = G.audio.audible ? "none" : ""; }; upd();
+    G.audio.onState = upd; this._sndT = setInterval(() => { if (!document.body.contains(snd)) clearInterval(this._sndT); else upd(); }, 500);
   }
   showCreate(start, back) {
     const b = this.open("create", null, 1240, 0, false, false);

@@ -8,32 +8,32 @@ import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 const DEG = Math.PI / 180;
 /** per monster: model file, size (m, longest horizontal extent or height for 'h'), extra yaw (deg) */
 export const CREATURES = {
-  mon_slime:  { file: 'cute_rabbit', size: 0.8, height: true, rigless: true, yaw: -90 },
-  mon_jelly:  { file: 'cute_slime', size: 0.75, height: true, rigless: true, yaw: -90, jelly: true },
-  mon_fox:    { file: 'cute_fox', size: 0.95, height: true, rigless: true, yaw: -90 },
-  mon_shroom: { file: 'cute_squirrel', size: 0.85, height: true, rigless: true, yaw: -90 },
-  mon_wolf:   { file: 'cute_wolf', size: 1.05, height: true, rigless: true, yaw: -90 },
-  mon_boar:   { file: 'cute_boar', size: 1.0, height: true, rigless: true, yaw: -90 },
-  mon_golem:  { file: 'cute_bear', size: 1.45, height: true, rigless: true, yaw: -90 },
-  boss_mushroom: { file: 'cute_boss_mushroom', size: 3.6, height: true, rigless: true, yaw: -90 },
+  mon_slime:  { file: 'cute_rabbit', size: 0.8, height: true, rigless: true, yaw: -90, atk: 'tackle' },
+  mon_jelly:  { file: 'cute_slime', size: 0.75, height: true, rigless: true, yaw: -90, jelly: true, atk: 'bounce' },
+  mon_fox:    { file: 'cute_fox', size: 0.95, height: true, rigless: true, yaw: -90, atk: 'claw' },
+  mon_shroom: { file: 'cute_squirrel', size: 0.85, height: true, rigless: true, yaw: -90, atk: 'throw' },
+  mon_wolf:   { file: 'cute_wolf', size: 1.05, height: true, rigless: true, yaw: -90, atk: 'bite' },
+  mon_boar:   { file: 'cute_boar', size: 1.0, height: true, rigless: true, yaw: -90, atk: 'charge' },
+  mon_golem:  { file: 'cute_bear', size: 1.45, height: true, rigless: true, yaw: -90, atk: 'slam' },
+  boss_mushroom: { file: 'cute_boss_mushroom', size: 3.6, height: true, rigless: true, yaw: -90, atk: 'spit' },
   // Lv10-50 zones (tint / recolor: see the constructor)
-  mon_mist_fox:      { file: 'cute_fox', size: 1.05, height: true, rigless: true, yaw: -90, tint: [0.78, 0.82, 0.98], recolor: 0.45 },
-  mon_panda:         { file: 'cute_panda', size: 1.5, height: true, rigless: true, yaw: -90 },
-  mon_fog_toad:      { file: 'cute_toad', size: 0.95, height: true, rigless: true, yaw: -90 },
-  mon_bog_boar:      { file: 'cute_boar', size: 1.1, height: true, rigless: true, yaw: -90, tint: [0.62, 0.78, 0.5], recolor: 0.45 },
-  mon_mist_wolf:     { file: 'cute_wolf', size: 1.15, height: true, rigless: true, yaw: -90, tint: [0.7, 0.66, 0.95], recolor: 0.35 },
-  mon_mist_bear:     { file: 'cute_bear', size: 2.1, height: true, rigless: true, yaw: -90, tint: [0.66, 0.66, 0.92], recolor: 0.5 },
-  mon_frost_wolf:    { file: 'cute_wolf', size: 1.15, height: true, rigless: true, yaw: -90, tint: [0.88, 0.95, 1.0], recolor: 0.6 },
-  mon_ice_fox:       { file: 'cute_fox', size: 1.05, height: true, rigless: true, yaw: -90, tint: [0.8, 0.92, 1.0], recolor: 0.6 },
-  mon_frost_ram:     { file: 'cute_ram', size: 1.1, height: true, rigless: true, yaw: -90 },
-  mon_snow_bear:     { file: 'cute_bear', size: 1.7, height: true, rigless: true, yaw: -90, tint: [0.95, 0.97, 1.0], recolor: 0.7 },
-  mon_ram_king:      { file: 'cute_ram', size: 1.9, height: true, rigless: true, yaw: -90, tint: [0.7, 0.85, 1.0], recolor: 0.35 },
-  mon_ember_drake:   { file: 'drake', size: 1.55, height: true, rigless: true, yaw: -90 },
-  mon_cinder_lizard: { file: 'drake', size: 1.15, height: true, rigless: true, yaw: -90, tint: [1.0, 0.55, 0.12], recolor: 0.4 },
-  mon_lava_boar:     { file: 'cute_boar', size: 1.15, height: true, rigless: true, yaw: -90, tint: [0.95, 0.45, 0.3], recolor: 0.5 },
-  mon_ruin_golem:    { file: 'cute_golem', size: 1.9, height: true, rigless: true, yaw: -90 },
-  mon_drake_lord:    { file: 'drake', size: 2.7, height: true, rigless: true, yaw: -90, tint: [0.42, 0.22, 0.58], recolor: 0.45 },
-  boss_ancient_dragon: { file: 'cute_dragon', size: 4.0, height: true, rigless: true, yaw: -90 },
+  mon_mist_fox:      { file: 'cute_fox', size: 1.05, height: true, rigless: true, yaw: -90, tint: [0.78, 0.82, 0.98], recolor: 0.45, atk: 'claw' },
+  mon_panda:         { file: 'cute_panda', size: 1.5, height: true, rigless: true, yaw: -90, atk: 'bellybump' },
+  mon_fog_toad:      { file: 'cute_toad', size: 0.95, height: true, rigless: true, yaw: -90, atk: 'spit' },
+  mon_bog_boar:      { file: 'cute_boar', size: 1.1, height: true, rigless: true, yaw: -90, tint: [0.62, 0.78, 0.5], recolor: 0.45, atk: 'charge' },
+  mon_mist_wolf:     { file: 'cute_wolf', size: 1.15, height: true, rigless: true, yaw: -90, tint: [0.7, 0.66, 0.95], recolor: 0.35, atk: 'bite' },
+  mon_mist_bear:     { file: 'cute_bear', size: 2.1, height: true, rigless: true, yaw: -90, tint: [0.66, 0.66, 0.92], recolor: 0.5, atk: 'slam' },
+  mon_frost_wolf:    { file: 'cute_wolf', size: 1.15, height: true, rigless: true, yaw: -90, tint: [0.88, 0.95, 1.0], recolor: 0.6, atk: 'bite' },
+  mon_ice_fox:       { file: 'cute_fox', size: 1.05, height: true, rigless: true, yaw: -90, tint: [0.8, 0.92, 1.0], recolor: 0.6, atk: 'ice' },
+  mon_frost_ram:     { file: 'cute_ram', size: 1.1, height: true, rigless: true, yaw: -90, atk: 'headbutt' },
+  mon_snow_bear:     { file: 'cute_bear', size: 1.7, height: true, rigless: true, yaw: -90, tint: [0.95, 0.97, 1.0], recolor: 0.7, atk: 'slam' },
+  mon_ram_king:      { file: 'cute_ram', size: 1.9, height: true, rigless: true, yaw: -90, tint: [0.7, 0.85, 1.0], recolor: 0.35, atk: 'slam' },
+  mon_ember_drake:   { file: 'drake', size: 1.55, height: true, rigless: true, yaw: -90, atk: 'breath' },
+  mon_cinder_lizard: { file: 'drake', size: 1.15, height: true, rigless: true, yaw: -90, tint: [1.0, 0.55, 0.12], recolor: 0.4, atk: 'fire' },
+  mon_lava_boar:     { file: 'cute_boar', size: 1.15, height: true, rigless: true, yaw: -90, tint: [0.95, 0.45, 0.3], recolor: 0.5, atk: 'charge' },
+  mon_ruin_golem:    { file: 'cute_golem', size: 1.9, height: true, rigless: true, yaw: -90, atk: 'slam' },
+  mon_drake_lord:    { file: 'drake', size: 2.7, height: true, rigless: true, yaw: -90, tint: [0.42, 0.22, 0.58], recolor: 0.45, atk: 'breath' },
+  boss_ancient_dragon: { file: 'cute_dragon', size: 4.0, height: true, rigless: true, yaw: -90, atk: 'breath' },
 };
 const cache = new Map();
 function load(file) {
@@ -127,9 +127,22 @@ export class CreatureBody {
         sy = 1 + (hop - 0.35) * (this.cfg.jelly ? 0.28 : 0.08); sxz = 1 - (hop - 0.35) * (this.cfg.jelly ? 0.14 : 0.04);
       } break;
       case 'attack': case 'skill': case 'cast': case 'throw': {
-        const wind = 0.45, k = u < wind ? -Math.sin(u / wind * Math.PI / 2) * 0.35 : Math.sin((u - wind) / (1 - wind) * Math.PI) * 1.0;
-        P.position.z = k * s * 0.18;                                        // lunge forward (model faces local +z)
-        P.rotation.x = k * 0.18; sy = 1 - Math.max(0, -k) * 0.12; break;
+        // per-monster attack motion (cfg.atk): wind-up (w 0..1) then strike (k 0..1..0)
+        const wind = 0.45, w = u < wind ? Math.sin(u / wind * Math.PI / 2) : Math.max(0, 1 - (u - wind) / 0.12), k = u < wind ? 0 : Math.sin((u - wind) / (1 - wind) * Math.PI);
+        const sz = Math.min(1.6, s);                                        // motion amplitudes in body sizes, capped for huge bosses
+        switch (this.cfg.atk || 'tackle') {
+          case 'tackle': P.position.z = (k * 0.32 - w * 0.08) * sz; P.position.y = k * 0.2 * sz; P.rotation.x = k * 0.3 - w * 0.15; sy = 1 - w * 0.18 + k * 0.08; sxz = 1 + w * 0.08; break;
+          case 'bounce': P.position.y = k * 0.35 * sz; P.position.z = k * 0.25 * sz; sy = 1 - w * 0.35 + k * 0.25; sxz = 1 + w * 0.2 - k * 0.12; break;
+          case 'claw': P.rotation.x = -w * 0.45 + k * 0.35; P.rotation.y = (u < wind ? -w * 0.35 : -0.35 + (u - wind) / (1 - wind) * 0.9); P.rotation.z = k * 0.2; P.position.z = k * 0.18 * sz; P.position.y = w * 0.06 * sz; break;
+          case 'bite': P.position.z = (k * 0.3 - w * 0.06) * sz; P.rotation.x = -w * 0.2 + k * 0.35; sy = 1 - w * 0.08; break;
+          case 'charge': case 'headbutt': P.rotation.x = w * 0.28 + k * (this.cfg.atk === 'headbutt' ? 0.4 : 0.15); P.position.z = (k * 0.55 - w * 0.12) * sz; sy = 1 - w * 0.1; break;
+          case 'bellybump': P.position.z = k * 0.3 * sz; P.rotation.x = -w * 0.3 - k * 0.2; sxz = 1 + k * 0.12; sy = 1 - k * 0.06; break;
+          case 'throw': P.rotation.x = -w * 0.5 + k * 0.4; P.position.y = k * 0.1 * sz; P.position.z = k * 0.06 * sz; break;
+          case 'spit': case 'ice': case 'fire': sy = 1 + w * 0.14 - k * 0.08; sxz = 1 + w * 0.1; P.rotation.x = -w * 0.15 + k * 0.25; P.position.z = -k * 0.05 * sz; break;
+          case 'breath': P.rotation.x = -w * 0.4 + (u < wind ? 0 : 0.25 * Math.min(1, (u - wind) / 0.15)); P.position.z = k * 0.08 * sz; sy = 1 + w * 0.06; break;
+          case 'slam': P.position.y = (w * 0.45 + (u < wind ? 0 : Math.max(0, 0.45 - (u - wind) / 0.1 * 0.45))) * sz * (u < wind ? 1 : 1) * (u < wind ? 1 : 0.6); P.rotation.x = -w * 0.25 + k * 0.3; sy = 1 + w * 0.1 - k * 0.25; sxz = 1 + k * 0.15; break;
+        }
+        break;
       }
       case 'dash': P.position.z = Math.sin(u * Math.PI) * s * 0.25; P.rotation.x = 0.15; break;
       case 'hit': P.position.z = -Math.sin(u * Math.PI) * s * 0.08; P.rotation.x = -Math.sin(u * Math.PI) * 0.15; break;

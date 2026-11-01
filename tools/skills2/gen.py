@@ -9,7 +9,7 @@ Skill fields: id (stable), job, tier, cat (0..2), catName, idx (1..5), name, des
 import json, os
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 OUT = os.path.join(ROOT, 'assets', 'data', 'skills2.json')
-UNLOCK = {1: [10, 12, 15, 18, 20], 2: [30, 33, 36, 40, 45]}
+UNLOCK = {0: [1, 5, 10, 3, 7], 1: [10, 12, 15, 18, 20], 2: [30, 33, 36, 40, 45]}
 SK = []
 
 def S(job, tier, cat, catName, idx, sid, name, typ, desc, **kw):
@@ -37,6 +37,23 @@ def res(type_, n): return dict(op='res', type=type_, n=n)
 def channel(dur, tick, ops, **k): return dict(op='channel', dur=dur, tick=tick, ops=ops, **k)
 def st(id_, dur, val=0, ch=1.0): return dict(id=id_, dur=dur, val=val, ch=ch)
 def custom(fn, **k): return dict(op='custom', fn=fn, **k)
+
+
+# ======================================================================= 견습생 (novice) 기본 검술 — tier 0, every job keeps it
+# separate point pool (1 per character level, see js/skillsys.js), unlock Lv 1 / 5 / 10 / 3 / 7, no extra-hit rule (noExtra)
+J, C = 'novice', 0xcfe6ff
+S(J, 0, 0, '기본 검술', 1, 'nv_a1', '일격참', 'attack', '왼쪽·오른쪽으로 한 번씩 벤 뒤 뛰어올라 칼로 내려찍는다. 내려찍은 자리의 땅이 갈라진다.', range=2.4, mp=8, cd=5, anim='nv_ilgyeok', recover=0.25,
+  ops=[hit('cone', 0.75, r=2.3, ang=120, noExtra=True, at=0.0, fx=dict(slash='arc'), sweep=-1),
+       hit('cone', 0.75, r=2.3, ang=120, noExtra=True, at=0.24, fx=dict(slash='arc'), sweep=1),
+       hit('circle', 1.9, r=2.2, noExtra=True, at=0.58, fwd=1.1, knock=1.2, st=[st('stagger', 0.5)], fx=dict(burst='ground_crack', burstR=1.15), shake=[0.22, 0.3])], fx=dict(color=C))
+S(J, 0, 0, '기본 검술', 2, 'nv_a2', '연', 'attack', '칼을 이리저리 휘둘러 연속으로 벤다. 처음엔 2연타, 스킬 레벨이 오를 때마다 1타씩 늘어 최대 6연타.', range=2.2, mp=10, cd=6, anim='nv_yeon', recover=0.2,
+  ops=[hit('cone', 0.62, r=2.2, ang=110, hits=2, hitsPerLv=1, gap=0.13, noExtra=True, alt=True, fx=dict(slash='arc', burst='hit_slash'))], fx=dict(color=0xffe6a0))
+S(J, 0, 0, '기본 검술', 3, 'nv_a3', '비연참', 'attack', '칼을 크게 휘둘러 초승달 모양의 검풍을 멀리 날린다. 지나가는 길의 적을 모두 벤다.', range=9, mp=14, cd=7, anim='nv_biyeon', recover=0.3,
+  ops=[proj('normal', 2.0, speed=13, range=10, pierce=True, w=1.3, fx='sword_wave', burst='hit_slash')], fx=dict(color=0xbfe8ff))
+S(J, 0, 1, '기본 검술', 4, 'nv_p1', '회복력 증가', 'passive', '움직이지 않고 3초 동안 쉬면 3초마다 최대 체력의 일정 비율을 회복한다.',
+  flags=dict(restRegen=[0.02, 0.01]))
+S(J, 0, 1, '기본 검술', 5, 'nv_p2', '검수련', 'passive', '칼을 다루는 솜씨가 늘어 공격력이 조금씩 오른다.',
+  mods=[dict(stat='atk', add=2, addLv=2, mul=0.02, mulLv=0.02)])
 
 # ======================================================================= 약사 (pharmacist) — tier 1
 J, C = 'pharmacist', 0x48b080
@@ -517,8 +534,8 @@ for d in SK:
     if d['type'] == 'craft': d['recipes'] = [r['id'] for r in RECIPES if r['skill'] == d['id']] + (['salvage'] if d['id'] == 'bs1_c4' else [])
 by_job = {}
 for d in SK: by_job.setdefault(d['job'], []).append(d)
-assert len(SK) == 180, len(SK)
-for j, lst in by_job.items(): assert len(lst) == 15, (j, len(lst))
-assert len({d['id'] for d in SK}) == 180
+assert len(SK) == 185, len(SK)
+for j, lst in by_job.items(): assert len(lst) == (5 if j == 'novice' else 15), (j, len(lst))
+assert len({d['id'] for d in SK}) == 185
 json.dump(dict(version=1, skills=SK, statuses=STATUSES, items=ITEMS, recipes=RECIPES, salvage=SALVAGE, shopAdd=SHOP_ADD), open(OUT, 'w'), ensure_ascii=False, indent=0)
 print('wrote', OUT, len(SK), 'skills', {j: len(v) for j, v in by_job.items()})

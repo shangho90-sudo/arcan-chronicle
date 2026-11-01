@@ -149,13 +149,14 @@ export class SkillEngine {
     let at = d.target === 'ground' ? this.groundAim(d, aim) : tgt ? { ...tgt.pos } : (aim || { x: pc.pos.x + pc.facing.x, z: pc.pos.z + pc.facing.z });
     const dx = at.x - pc.pos.x, dz = at.z - pc.pos.z; if (dx * dx + dz * dz > 0.01) pc.setFacing(dx, dz);
     const Lv = Math.max(1, this.lvl(id)), tier = G.data.job(d.job).tier;
-    const grade = Math.min(10, (tier - 1) * 3 + Lv + (d.type === 'ultimate' ? 2 + Lv : 0));
+    const grade = Math.max(1, Math.min(10, Math.max(0, tier - 1) * 3 + Lv + (d.type === 'ultimate' ? 2 + Lv : 0)));
     const ctx = { d, id, L: Lv, grade, mult: this.mult(d), tgt, aim: at, facing: { ...pc.facing }, origin: { ...pc.pos }, cost, hitOnce: new Set() };
     if (d.tags) { if (d.tags.includes('music') || d.tags.includes('paint')) this.lastFamily = d.tags.includes('music') ? 'music' : 'paint'; }
     if (d.job === 'musician' && d.type === 'attack') this.lastFamily = 'music';
     // animation
     const anim = d.anim || 'cast', sh = pc.body.sh, act = sh.actions[anim] ? anim : 'attack';
-    pc.body.play(act, 1, true);
+    let aspd = 1; const hop = d.ops.find(o => o.hitsPerLv); if (hop && sh.actions[act]) { const hits = (hop.hits || 1) + Math.floor(hop.hitsPerLv * (Lv - 1)), a = sh.actions[act]; aspd = Math.max(0.6, (a.frames / a.fps) / Math.max(0.3, hits * (hop.gap || 0.13) + 0.25)); }
+    pc.body.play(act, aspd, true);
     const castT = d.cast || 0;
     if (castT > 0) { this.casting = { ctx, t: castT, cost }; G.ui.floatText(pc.pos, d.name, '#ffe08a', 1.0, 2.1); }
     else this.release(ctx);
@@ -167,7 +168,8 @@ export class SkillEngine {
   release(ctx) {
     const pc = this.pc, sh = pc.body.sh, d = ctx.d, anim = d.anim || 'cast';
     const ht = d.cast ? 0 : Math.min(0.35, (sh.actions[anim] ? sh.actions[anim].hitFrame / sh.actions[anim].fps : 0.2) || 0.2);
-    pc.skills.lock = Math.max(pc.skills.lock, ht + (d.recover || 0.3));
+    let span = 0; for (const op of d.ops) { const n = (op.hits || 1) + (op.hitsPerLv ? Math.floor(op.hitsPerLv * (ctx.L - 1)) : 0); span = Math.max(span, (op.at || 0) + (n - 1) * (op.gap || 0.13)); }
+    pc.skills.lock = Math.max(pc.skills.lock, ht + span + (d.recover || 0.3));
     for (const op of d.ops) this.pending.push({ time: this.clock + ht + (op.at || 0), op, ctx });
     if (d.type === 'ultimate') { G.render.addShake && !G.reduceFlash && G.render.addShake(0.12, 0.25); }
   }
@@ -254,7 +256,7 @@ export class SkillEngine {
     else this.res[type] = Math.min(10, (this.res[type] || 0) + n);
   }
   shapeOf(op, ctx, center) {
-    const pc = this.pc, f = ctx.facing, c = center || (op.atAim ? ctx.aim : op.atTarget && ctx.tgt ? ctx.tgt.pos : pc.pos);
+    const pc = this.pc, f = ctx.facing, c = center || (op.atAim ? ctx.aim : op.atTarget && ctx.tgt ? ctx.tgt.pos : op.fwd ? { x: pc.pos.x + f.x * op.fwd, z: pc.pos.z + f.z * op.fwd } : pc.pos);
     switch (op.shape) {
       case 'cone': return HitShape.cone(pc.pos.x, pc.pos.z, f.x, f.z, op.r * this.ampMul(ctx), op.ang);
       case 'line': return HitShape.rect(pc.pos.x, pc.pos.z, f.x, f.z, op.w, op.len);            // rect starts at the origin and extends forward
@@ -329,7 +331,8 @@ export class SkillEngine {
   opHit(op, ctx) {
     const pc = this.pc, d = ctx.d, col = d.fx && d.fx.color, f = ctx.facing;
     const physical = !op.elem && op.coef > 0 && ctx.d.type !== 'ultimate' && op.shape !== 'circle' || (ctx.d.weapon && op.coef > 0);
-    const baseHits = Math.max(1, op.hits || 1), extra = physical ? Math.floor((ctx.L - 1) / 2) : 0, hits = baseHits + extra;
+    // hitsPerLv: the skill's own hit count grows with its level (견습생 '연'); noExtra: no automatic extra strikes
+    const baseHits = Math.max(1, (op.hits || 1) + (op.hitsPerLv ? Math.floor(op.hitsPerLv * (ctx.L - 1)) : 0)), extra = physical && !op.noExtra && !op.hitsPerLv ? Math.floor((ctx.L - 1) / 2) : 0, hits = baseHits + extra;
     if (extra) op = { ...op, coef: op.coef * baseHits / hits * (1 + 0.06 * extra), gap: op.gap || 0.12 };   // total grows a little, split across more strikes
     for (let h = 0; h < hits; h++) {
       const run = () => {
@@ -338,11 +341,17 @@ export class SkillEngine {
         if (op.shape === 'single') { const t = ctx.tgt && !ctx.tgt.dead ? ctx.tgt : this.targetFor(d); ts = t && pc.dist(t) <= this.range(d) + t.radius + 1 ? [t] : []; }
         else ts = this.targets(this.shapeOf(op, ctx));
         // fx
-        const fxp = op.atAim ? ctx.aim : op.atTarget && ctx.tgt ? ctx.tgt.pos : { x: pc.pos.x + f.x * 1.0, y: pc.pos.y, z: pc.pos.z + f.z * 1.0 };
+        const fxp = op.atAim ? ctx.aim : op.atTarget && ctx.tgt ? ctx.tgt.pos : { x: pc.pos.x + f.x * (op.fwd || 1.0), y: pc.pos.y, z: pc.pos.z + f.z * (op.fwd || 1.0) };
         if (op.fx) {
-          if (op.fx.slash) FX.slash(op.fx.slash, op.shape === 'single' && ts[0] ? ts[0].pos : (op.atAim ? ctx.aim : pc.pos), f, { color: col, radius: op.r || 2, angle: op.ang || 100, length: op.len, width: op.w });
+          if (op.fx.slash) {
+            // sweep / alt: swing direction (alt alternates every strike and tilts the arc a little so a flurry reads as many swings)
+            const mir = op.alt ? h % 2 === 1 : op.sweep > 0, tilt = op.alt ? ((h * 37) % 5 - 2) * 0.12 : 0, ca = Math.cos(tilt), sa = Math.sin(tilt);
+            const fd = { x: f.x * ca - f.z * sa, z: f.x * sa + f.z * ca };
+            FX.slash(op.fx.slash, op.shape === 'single' && ts[0] ? ts[0].pos : (op.atAim ? ctx.aim : pc.pos), fd, { color: op.alt && h % 3 === 2 ? 0xffd27a : col, radius: op.r || 2, angle: op.ang || 100, length: op.len, width: op.w, mirror: mir });
+          }
           if (op.fx.beam) FX.beam(op.fx.beam, pc.pos, { x: pc.pos.x + f.x * (op.len || 6), y: pc.pos.y, z: pc.pos.z + f.z * (op.len || 6) }, { color: col, width: op.w || 0.6 });
-          if (op.fx.burst) for (const t of ts.length ? ts : [{ pos: fxp }]) FX.burst(op.fx.burst, t.pos, { color: col, radius: op.shape === 'circle' ? op.r : 0.8 });
+          if (op.fx.burst) { if (op.shape === 'circle') FX.burst(op.fx.burst, op.fwd ? fxp : pc.pos, { color: col, radius: op.fx.burstR || op.r }); else for (const t of ts.length ? ts : [{ pos: fxp }]) FX.burst(op.fx.burst, t.pos, { color: col, radius: 0.8 }); }
+          if (op.shake && G.render.addShake) G.render.addShake(op.shake[0], op.shake[1]);
         }
         let consumed = 0;
         if (op.consume) for (const t of ts) consumed = Math.max(consumed, takeMarks(t, op.consume.type === 'phrase' ? 'phrase' : op.consume.type));
@@ -545,7 +554,7 @@ class SkillProj {
     }
     for (const c of zone.actors) {
       if (c.dead || c.faction === 'player' || c.isSummon || this.hit.has(c)) continue;
-      if (Math.hypot(this.pos.x - c.pos.x, this.pos.z - c.pos.z) <= c.radius + 0.3) {
+      if (Math.hypot(this.pos.x - c.pos.x, this.pos.z - c.pos.z) <= c.radius + (op.w ? op.w / 2 : 0.3)) {
         this.hit.add(c);
         if (op.attach) { this.ctx.attached = c; this.ctx.attachedPos = { ...c.pos }; FX.burst('hit_pierce', c.pos, { radius: 0.5 }); this.eng.dmg(c, op.coef, this.ctx, op); return this.done(); }
         if (op.r) { this.landBlast({ ...c.pos }); return this.done(); }

@@ -13,6 +13,9 @@ export function ensureSk(p, data) {
   sk.points = Math.max(0, sk.points | 0);
   sk.granted = Array.isArray(sk.granted) ? sk.granted.filter(n => Number.isInteger(n) && n >= ADV1_LEVEL && n <= 99) : [];
   sk.adv2Bonus = !!sk.adv2Bonus;
+  // 견습생 기본 검술: its own pool, 1 point per character level from Lv1 (kept through every job change)
+  sk.npoints = Math.max(0, sk.npoints | 0);
+  sk.ngranted = Array.isArray(sk.ngranted) ? sk.ngranted.filter(n => Number.isInteger(n) && n >= 1 && n <= 99) : [];
   sk.learned = (sk.learned && typeof sk.learned === 'object') ? sk.learned : {};
   for (const id of Object.keys(sk.learned)) {
     const d = data.skill2(id); const lv = sk.learned[id] | 0;
@@ -38,15 +41,20 @@ export class SkillBook {
   constructor(data, sheet) { this.data = data; this.sheet = sheet; this.p = sheet.p; this.sk = ensureSk(this.p, data); this.grantPoints(); }
   get job() { return this.data.job(this.p.job); }
   /** jobs whose skills this character may learn: current job and (for 2nd jobs) its parent */
-  get lineage() { const j = this.job; if (!j || j.id === 'novice') return []; return j.parent ? [j.parent, j.id] : [j.id]; }
+  get lineage() { const j = this.job; if (!j || j.id === 'novice') return ['novice']; return j.parent ? ['novice', j.parent, j.id] : ['novice', j.id]; }
+  isNovice(d) { return d && d.job === 'novice'; }
+  /** spendable points for this skill's pool */
+  poolOf(d) { return this.isNovice(d) ? 'npoints' : 'points'; }
   // ---------------------------------------------------------------- points (idempotent: every grant is recorded)
   grantPoints() {
     const sk = this.sk; let gained = 0;
     for (let L = ADV1_LEVEL; L <= this.p.level; L++) if (!sk.granted.includes(L)) { sk.granted.push(L); const n = L === ADV1_LEVEL ? 5 : 1; sk.points += n; gained += n; }
     if (this.job && this.job.tier === 2 && !sk.adv2Bonus) { sk.adv2Bonus = true; sk.points += 5; gained += 5; }
+    for (let L = 1; L <= this.p.level; L++) if (!sk.ngranted.includes(L)) { sk.ngranted.push(L); sk.npoints += 1; this.ngained = (this.ngained || 0) + 1; }
     return gained;
   }
-  get spent() { return Object.values(this.sk.learned).reduce((a, b) => a + b, 0); }
+  get spent() { return Object.entries(this.sk.learned).reduce((a, [id, b]) => a + (this.isNovice(this.data.skill2(id)) ? 0 : b), 0); }
+  get nspent() { return Object.entries(this.sk.learned).reduce((a, [id, b]) => a + (this.isNovice(this.data.skill2(id)) ? b : 0), 0); }
   level(id) { return this.sk.learned[id] | 0; }
   unlockLevel(d) { return d.type === 'ultimate' ? Math.max(ULT_MIN_LEVEL, d.unlock) : d.unlock; }
   /** why this skill cannot be learned / upgraded right now (null = ok) */
@@ -61,13 +69,13 @@ export class SkillBook {
     const lv = this.level(id); if (lv >= d.maxLv) return '최대 레벨입니다';
     const need = this.unlockLevel(d); if (this.p.level < need) return `캐릭터 레벨 ${need} 필요`;
     for (const pr of d.prereq || []) { const pd = this.data.skill2(pr.id); if (this.level(pr.id) < pr.lv) return `선행: ${pd ? pd.name : pr.id} Lv${pr.lv}`; }
-    if (this.sk.points < 1) return '스킬 포인트가 부족합니다';
+    if (this.sk[this.poolOf(d)] < 1) return this.isNovice(d) ? '기본 검술 포인트가 부족합니다' : '스킬 포인트가 부족합니다';
     return null;
   }
   learn(id) {
     const e = this.learnBlock(id); if (e) return e;
-    this.sk.points -= 1; this.sk.learned[id] = this.level(id) + 1;
     const d = this.data.skill2(id);
+    this.sk[this.poolOf(d)] -= 1; this.sk.learned[id] = this.level(id) + 1;
     // first copy auto-equips into a free slot for convenience
     if (this.level(id) === 1) { if (isSlottable(d)) { const i = this.sk.slots.indexOf(''); if (i >= 0) this.sk.slots[i] = id; } else if (d.type === 'ultimate' && !this.sk.ult) this.sk.ult = id; }
     this.sheet.recalc(); return null;
@@ -92,7 +100,7 @@ export class SkillBook {
   reset(safeZone, inCombat) {
     if (inCombat) return '전투 중에는 초기화할 수 없습니다';
     if (!safeZone) return '마을에서만 초기화할 수 있습니다';
-    const n = this.spent; this.sk.points += n; this.sk.learned = {}; this.sk.slots = Array(NORMAL_SLOTS).fill(''); this.sk.ult = '';
+    this.sk.points += this.spent; this.sk.npoints += this.nspent; this.sk.learned = {}; this.sk.slots = Array(NORMAL_SLOTS).fill(''); this.sk.ult = '';
     this.sheet.recalc(); return null;
   }
   /** skills usable now (learned AND belonging to the current lineage) */

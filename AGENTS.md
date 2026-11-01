@@ -8,7 +8,7 @@
 ## 기본
 - 빌드 없음. `python3 -m http.server 8765` 후 `http://localhost:8765/index.html`.
 - three.js r160을 로컬 import map(`index.html`, `vendor/three-r160/`)으로 불러옵니다. CDN 장애 시 0% 멈춤을 방지하기 위해 동일 버전과 LICENSE를 저장소에 포함합니다. npm 의존성 없음. 새 라이브러리 추가 금지(필요하면 먼저 사용자에게 확인).
-- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs` (현재 323 통과/6 생략, 576 통과).
+- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs` (현재 323 통과/6 생략, 603 통과).
 - 테스트하지 않은 것을 "검증됨"이라고 보고하지 말 것.
 
 ## 데이터 우선
@@ -22,12 +22,14 @@
 - 판정은 발 위치 기준. 텔레그래프와 피격 판정은 같은 `HitShape`를 사용(rect는 시전 위치에서 앞으로 뻗음).
 - 스킬 이펙트 연출 등급: `(차수-1)*3 + 스킬Lv`(궁극기 `+2+Lv`), 최대 10. 물리 스킬은 Lv 2마다 연타 +1, 타당 계수 `coef*base/hits*(1+0.06*추가타)`.
 - 쿨타임은 슬롯 교체·재접속 후에도 유지. 스킬 초기화는 마을에서만.
+- 기본 검술(`job: novice`, `nv_*` 5종)은 모든 직업의 계보 맨 앞에 붙어 전직 후에도 유지되며, 직업 포인트(`sk.points`)와 별개인 `sk.npoints`를 씁니다(Lv1부터 레벨당 1).
+- 몬스터 공격 방식은 `js/creature.js` `CREATURES[id].atk`(동작)와 `js/actors.js` `Monster.resolve`(판정·이펙트)에서 함께 정합니다.
 - UI 문구는 한국어.
 
 ## 화면 연출 (그래픽 효과)
 - `js/post.js`: HDR 렌더 → 블룸, 따뜻한 색보정(필믹 커브·채도·대비), 비네트. 화면 위아래 흐림(tilt)은 사용자 요청으로 0(꺼짐) — 다시 켜지 말 것. 값은 `Post.params`. 설정의 "그래픽 효과"로 끌 수 있음(`settings.graphicsFx`).
 - 마을 바닥 텍스처는 `tools/town/texgen2.py`로 생성(`pave`, `cobble`). 장미 문양 바닥·꽃잎·나뭇잎 그림자(보이지 않는 나무 그늘 캐스터)·장식 가로등은 `js/town3d.js`.
-- HUD는 `index.html`의 "ornate gold HUD" CSS 블록과 `js/ui.js`의 `MENU_ICON`/`HUD_ICON`(SVG 아이콘).
+- HUD는 `index.html`의 "ornate gold HUD" CSS 블록과 `js/ui.js`의 `MENU_ICON`/`HUD_ICON`(SVG 아이콘). 배치: 왼쪽 위 초상화·기력, 오른쪽 위 미니맵(`js/minimap.js`)·퀘스트, 가운데 아래 체력·경험치·메뉴 버튼(`.botbar`). 화면 확인은 `tools/browser-tests/hudshots.js`.
 
 ## 숲 그래픽 (속삭이는 숲, `zones.json`의 `"nature"`가 있는 존)
 - `js/nature.js`가 빌더의 평평한 바닥·원뿔 나무·상자 소품을 숨기고 다시 그립니다: 손그림 지면 셰이더(햇빛 잔디/그늘 잔디/흙/이끼, 반복 완화), 곡선 흙길(마스크는 존의 `patches` 경로에서 생성), Tripo 나무·덤불·바위(모델·16 m 청크 단위 인스턴싱), 풀·꽃 카드(인스턴싱, 바람), 작은 돌, 플레이어를 가리는 나무 디더링.

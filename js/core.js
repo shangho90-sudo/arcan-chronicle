@@ -275,7 +275,7 @@ export class CharacterSheet {
     this.p.exp += n; let g = 0;
     while (!this.isMax && this.p.exp >= this.expToNext) { this.p.exp -= this.expToNext; this.p.level++; g++; this.recalc(); this.emit("levelUp", this.p.level); }
     if (this.isMax) this.p.exp = 0;
-    if (g > 0) { this.refreshSkills(true); const pts = this.book ? this.book.grantPoints() : 0; if (pts) this.emit("skill", "@points:" + pts); this.recalc(); this.p.hp = this.final.maxHp; this.p.sp = this.final.maxSp; }
+    if (g > 0) { this.refreshSkills(true); if (this.book) this.book.ngained = 0; const pts = this.book ? this.book.grantPoints() : 0; if (pts) this.emit("skill", "@points:" + pts); if (this.book && this.book.ngained) this.emit("skill", "@npoints:" + this.book.ngained); this.recalc(); this.p.hp = this.final.maxHp; this.p.sp = this.final.maxSp; }
     return g;
   }
   spendGold(n) { if (n < 0 || this.p.gold < n) return false; this.p.gold -= n; return true; }

@@ -670,6 +670,18 @@ const BURST = {
     P: [{ n: 6, tile: TL.bolt, shape: 'sphere', spd: [1.5, 2.5], size: [0.2, 0.3], life: [0.15, 0.25], col: 0xd8f4ff, y: 0.9 }, { n: 8, tile: TL.ember, mode: 2, shape: 'sphere', spd: [2, 4], size: [0.04, 0.06], life: [0.15, 0.3], col: 0xfff8a0, y: 0.9, tint: false }] },
   mark_pop: { dur: 0.9, col: 0xd060ff, L: [{ type: 'sprite', tile: TL.sigil, col: 0xe0a0ff, size: 1.2, dur: 0.35, y: 1.1, spin: 4 }, { type: 'vring', col: 0xd060ff, r: 1.1, dur: 0.35, w: 0.08, y: 1.1 }, { type: 'flash', col: 0xf0c0ff, size: 1.3, dur: 0.2, y: 1.1 }],
     P: [{ n: 12, add: false, tile: TL.star, shape: 'sphere', spd: [2, 3.5], drag: 2, size: [0.16, 0.26], life: [0.4, 0.7], col: [0xc050f0, 0xe090ff], y: 1.1, spin: 6 }, { n: 4, add: false, tile: TL.rune1, shape: 'sphere', spd: [1.2, 2], drag: 2, size: [0.25, 0.32], life: [0.5, 0.7], y: 1.1 }] },
+  // monster claw swipe: three bright parallel scratches
+  claw_marks: { dur: 0.45, col: 0xffffff, L: [
+    { type: 'sprite', tile: TL.streak, col: 0xffffff, size: 1.5, sx: 1, sy: 0.12, dur: 0.22, y: 1.0, rot: 0.95 }, { type: 'sprite', tile: TL.streak, col: 0xffeedd, size: 1.5, sx: 1, sy: 0.12, dur: 0.22, y: 0.82, rot: 0.95, at: 0.03 },
+    { type: 'sprite', tile: TL.streak, col: 0xffe0d0, size: 1.4, sx: 1, sy: 0.12, dur: 0.22, y: 0.64, rot: 0.95, at: 0.06 }, { type: 'flash', col: 0xffffff, size: 0.7, dur: 0.1, y: 0.8 }],
+    P: [{ n: 8, tile: TL.ember, mode: 2, shape: 'sphere', spd: [2.5, 4.5], size: [0.05, 0.07], life: [0.15, 0.3], col: 0xffffff, str: 0.05, y: 0.8, tint: false }] },
+  // 견습생 '일격참' finisher: the ground splits under the sword (crack decal, rocks thrown up, dust ring, white flash)
+  ground_crack: { dur: 2.2, col: 0xffe6b0, shake: [0.25, 0.3], L: [
+    { type: 'flash', col: 0xfff2d0, size: 2.2, dur: 0.2, y: 0.3 }, { type: 'shock', col: 0xffe0a0, r: 2.4, dur: 0.45, w: 0.09, trail: 0.3 },
+    { type: 'decal', tex: texCrack, col: 0xffffff, r: 2.0, dur: 2.2, add: false, tint: false, grow: true }, { type: 'decal', tex: texCrack, col: 0xffffff, r: 1.3, dur: 2.0, add: false, tint: false, at: 0.05 },
+    { type: 'debris', n: 10, dur: 1.4 }],
+    P: [ext(P.dustRing, { n: 18, spd: [3, 5], size: [0.45, 0.7] }), { n: 10, add: false, tile: TL.dust, col: 0xb09a78, a: 0.8, shape: 'disc', rad: 0.8, up: [0.8, 1.6], size: [0.5, 0.7], grow: 2, life: [0.6, 1.0], y: 0.1, tint: false },
+      ext(P.embers, { n: 10, spd: [2, 4], up: [1, 2], life: [0.2, 0.4], col: [0xfff2c0, 0xffd080], tint: false })] },
   dust: { dur: 1, col: 0xa89270, L: [], P: [ext(P.dustRing, { n: 12, tint: true }), { n: 5, add: false, tile: TL.dust, col: 0xa89270, a: 0.75, shape: 'disc', rad: 0.3, up: [0.4, 0.8], size: [0.4, 0.5], grow: 2, life: [0.6, 0.9], y: 0.1 }] },
 };
 
@@ -731,6 +743,14 @@ const PROJ = {
   wave_water: { col: 0x3a9aff, tr: [tr({ add: false, tile: TL.drop, col: [0xa8e4ff, 0x5ab0ff], size: [0.08, 0.14], life: [0.3, 0.5], spd: [0.8, 1.6], up: [0.8, 1.6], grav: 6, tint: false }, 0.07), tr({ add: false, tile: TL.dust, col: 0xffffff, a: 0.6, size: [0.2, 0.3], grow: 1.8, life: [0.3, 0.5], up: [0.1, 0.3], tint: false }, 0.12)],
     model(p, c) { const m = fxMesh(G.crescent(), fxMat('water', { add: false }), 4); m.scale.set(0.65, 0.55, 0.65); m.position.set(0, -0.35, 0.3); m.name = 'water'; m.fxu.c.set(0xb8f0ff); m.fxu.c2.set(c ?? 0x2a78e0); m.fxu.o = 0.92; p.add(m); },
     anim(p, t) { const m = p.getObjectByName('water'); if (m) m.fxu.t = t; } },
+  // monster fire spit (cinder lizard etc.)
+  fireball: { col: 0xff7a20, scale: 1.2, glow: [0xffa040, 1.3], rib: { w: 0.2, n: 12, col: 0xffc040, col2: 0xff3010 }, tr: [tr(TR.flame, 0.07), tr(TR.ember, 0.1)],
+    model(p, c) { mk(p, G.ico(0), lam(0xffd070, { em: 0xff7a10, ei: 1 }), null, 0.15); mk(p, G.ico(0), lam(0xff6010, { em: 0xff3a00, ei: 0.9, op: 0.6 }), null, 0.22); } },
+  // 견습생 '비연참': a crescent of sword wind (wide, bright, leaves a light streak)
+  sword_wave: { col: 0xbfe8ff, scale: 1.6, glow: [0xd8f2ff, 1.0], tr: [tr(TR.sparkle, 0.06, { col: 0xeaf8ff, size: [0.1, 0.18] }), tr({ add: true, tile: TL.streak, col: 0xcfeeff, a: 0.7, size: [0.5, 0.7], life: [0.12, 0.2], tint: false }, 0.04)],
+    model(p, c) { const m = fxMesh(G.crescent(), fxMat('water', { add: true }), 6); m.scale.set(0.95, 0.5, 0.75); m.position.set(0, -0.25, 0.25); m.name = 'wave'; m.fxu.c.set(0xffffff); m.fxu.c2.set(c ?? 0x7ac8ff); m.fxu.o = 0.95; p.add(m);
+      const m2 = fxMesh(G.crescent(), fxMat('water', { add: true }), 6); m2.scale.set(0.7, 0.35, 0.55); m2.position.set(0, -0.2, 0.05); m2.name = 'wave2'; m2.fxu.c.set(0xe8f6ff); m2.fxu.c2.set(0x5aa8ff); m2.fxu.o = 0.7; p.add(m2); },
+    anim(p, t) { for (const n of ['wave', 'wave2']) { const m = p.getObjectByName(n); if (m) m.fxu.t = t * 1.6; } } },
   meatball: { col: 0x8a4a2a, scale: 1.2, spin: ['x', 8], tr: [tr(TR.steam, 0.2), tr(TR.drip, 0.3, { col: 0xa06030 })],
     model(p, c) { mk(p, lumpy('meat', 1, 0.12, 2), lam(c ?? 0x8a4a2a), null, 0.17); for (let i = 0; i < 5; i++) mk(p, G.box(), lam(0x4a8a2a), [Math.cos(i * 2.4) * 0.15, Math.sin(i * 1.7) * 0.1, Math.sin(i * 2.4) * 0.13], [0.04, 0.02, 0.03], [i, i * 2, 0]); } },
   skewer: { col: 0xa0582a, spin: ['z', 6], tr: [tr(TR.steam, 0.2), tr(TR.ember, 0.25)],
@@ -1648,7 +1668,7 @@ export class SkillFx {
     const d = dir || { x: 0, z: 1 }, m = Math.hypot(d.x || 0, d.z || 0) || 1; e.dx = (d.x || 0) / m; e.dz = -(d.z ?? 1) / m;
     e.R = o.radius ?? def.radius ?? 1.6; e.A = o.angle ?? def.angle ?? 100; e.len = o.length ?? def.length ?? e.R; e.wid = o.width ?? def.width ?? 0.5; e.R *= e.gs; e.len *= e.gs; e.wid *= e.gs;
     e.rig = this._rig('slash', e.kind + (def.keyFn ? def.keyFn(e) : ''), def, def.build);
-    e.rig.root.position.copy(e.p); e.rig.root.rotation.y = Math.atan2(e.dx, e.dz);
+    e.rig.root.position.copy(e.p); e.rig.root.rotation.y = Math.atan2(e.dx, e.dz); e.rig.root.scale.x = o.mirror ? -1 : 1;   // mirror = swing the other way
     e.rig.ms.forEach((m, i) => startLayer(m, e.rig.L[i], e)); if (def.start) def.start(e, this);
     this._emitDue(e, 0); TICK.slash(this, e, 0); e.gp = new THREE.Vector3(e.p.x + e.dx * e.R * 0.5, e.p.y, e.p.z + e.dz * e.R * 0.5); gradeStart(this, e, 'once', e.R * 0.6);
     if (def.shake) this.shake(def.shake[0], def.shake[1]);

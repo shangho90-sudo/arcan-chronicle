@@ -66,9 +66,12 @@ export class Audio {
   constructor() {
     this.music = 0.6; this.sfxVol = 0.8; this.buffers = new Map(); this.last = new Map(); this.ctx = null; this.cur = null; this.curName = null;
   }
+  /** browsers only allow sound after a user gesture; `tryEarly` creates the context right away (it starts suspended
+   *  unless the browser already allows autoplay for this site) so the queued music starts the moment it is allowed */
+  get audible() { return !!this.ctx && this.ctx.state === "running"; }
   unlock() {
-    if (this.ctx) { if (this.ctx.state === "suspended") this.ctx.resume(); return; }
-    try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); this.gMusic = this.ctx.createGain(); this.gMusic.connect(this.ctx.destination); this.gSfx = this.ctx.createGain(); this.gSfx.connect(this.ctx.destination); this.apply(); if (this.wantMusic) this.playMusic(this.wantMusic, true); } catch (e) { this.ctx = null; }
+    if (this.ctx) { if (this.ctx.state === "suspended") this.ctx.resume().then(() => this.onState && this.onState()).catch(() => { }); return; }
+    try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); this.gMusic = this.ctx.createGain(); this.gMusic.connect(this.ctx.destination); this.gSfx = this.ctx.createGain(); this.gSfx.connect(this.ctx.destination); this.apply(); this.ctx.onstatechange = () => this.onState && this.onState(); if (this.ctx.state === "suspended") this.ctx.resume().catch(() => { }); if (this.wantMusic) this.playMusic(this.wantMusic, true); } catch (e) { this.ctx = null; }
   }
   apply() { if (this.ctx) { this.gMusic.gain.value = this.music * 0.5; this.gSfx.gain.value = this.sfxVol; } }
   async buf(name) {

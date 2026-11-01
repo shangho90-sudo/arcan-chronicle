@@ -43,8 +43,14 @@ export class Combatant {
     if (this.shield > 0) { const a = Math.min(this.shield, amount); this.shield -= a; amount -= a; }
     this.hp = Math.max(0, this.hp - amount);
     if (!d.silent) {
-      let col = this.faction === "player" ? "#ff7366" : (d.crit ? "#ffd940" : "#ffffff"); if (d.dot) col = "#cc80ff";
-      G.ui.floatText(this.pos, amount >= 1 ? Math.round(amount) + (d.crit ? "!" : "") : "흡수", col, d.crit ? 1.35 : 1);
+      if (amount < 1) G.ui.floatText(this.pos, "흡수", "#8ce6ff", 0.9);
+      else G.ui.damageText(this.pos, Math.round(amount), d.dot ? "dot" : this.faction === "player" ? "taken" : d.crit ? "crit" : "hit");
+      // critical hit on a monster: a beat of hit-stop, a camera kick and a star burst at the target
+      if (d.crit && !d.dot && this.faction !== "player") {
+        G.hitStop(0.07); G.render.addShake(0.14, 0.16);
+        G.fx.play("hit", { x: this.pos.x, y: this.pos.y + 0.7, z: this.pos.z }, 1.5, false, [1, 0.85, 0.3]);
+        if (G.skillFx) try { G.skillFx.burst('explosion_gold', { x: this.pos.x, y: this.pos.y + 0.6, z: this.pos.z }, { radius: 0.55 }); } catch (e) { }
+      }
     }
     if (!d.dot && this.body) this.body.flash(0.1);
     if (d.knockback > 0 && d.kdir) { const m = Math.hypot(d.kdir.x, d.kdir.z) || 1; this.knock = { x: d.kdir.x / m * d.knockback * 6, z: d.kdir.z / m * d.knockback * 6 }; }
@@ -233,6 +239,10 @@ export class Player extends Combatant {
     if (this.dead) { this.vel = { x: 0, z: 0 }; return; }
     this.sp = Math.min(this.maxSp, this.sp + this.stat("spRegen") * dt);
     this.sheet.p.playTime += dt;
+    // 견습생 '회복력 증가': standing still (no move, no skill) for 3 s -> heal a % of max HP every 3 s
+    { const rr = this.sheet.book.passive("restRegen"), still = Math.hypot(this.vel.x, this.vel.z) < 0.05 && !this.skills.busy && this.dashT <= 0;
+      if (rr > 0 && still && this.hp < this.maxHp) { this.restT = (this.restT || 0) + dt; if (this.restT >= 3) { this.restT -= 3; this.heal(this.maxHp * rr); G.fx.play("ring", { x: this.pos.x, y: this.pos.y + 0.05, z: this.pos.z }, 0.6, true, [0.6, 1, 0.7]); } }
+      else this.restT = 0; }
     if (this.dashT > 0) return this.updateDash(dt);
     if (this.stunned) { this.vel = { x: 0, z: 0 }; if (!this.skills.busy) this.body.play("hit", 0.5); return; }
     if (input.block) { this.vel = { x: 0, z: 0 }; this.idle(); return; }
@@ -467,17 +477,35 @@ export class Monster extends Combatant {
     const p = this.player; this.tele = null;
     if (this.def.ai === "ranged") {
       if (!p) return;
-      Projectile.straight(this.zone, this, { x: this.pos.x, y: this.pos.y + 0.6, z: this.pos.z }, { x: p.pos.x - this.pos.x, z: p.pos.z - this.pos.z }, this.def.projectileSpeed, this.def.attackRange + 2, 1, this.def.projectileFx);
+      const st = this.body.cfg && this.body.cfg.atk, kind = { throw: 'acorn', spit: 'spore', ice: 'ice_plate', fire: 'fireball' }[st];
+      const pr = Projectile.straight(this.zone, this, { x: this.pos.x, y: this.pos.y + 0.6, z: this.pos.z }, { x: p.pos.x - this.pos.x, z: p.pos.z - this.pos.z }, this.def.projectileSpeed, this.def.attackRange + 2, 1, kind && G.skillFx ? null : this.def.projectileFx);
+      if (kind && G.skillFx) { pr.vis = G.skillFx.projectile(kind, { scale: st === 'throw' ? 1.2 : 1 }); pr.hitBurst = { throw: 'hit_blunt', spit: 'explosion_acid', ice: 'explosion_ice', fire: 'explosion_fire' }[st]; }
       G.audio.sfx("throw");
     } else if (this.def.ai === "heavy") {
       const sh = this.heavyShape();
       for (const t of Resolver.targets(this, sh)) t.takeDamage(Resolver.damage(this, t, 1.6, "atk", 1.2));
-      const c = this.zone.geo.ground(sh.cx, sh.cz);
-      G.fx.play("ring", { x: c.x, y: c.y + 0.05, z: c.z }, this.def.attackRadius, true, [1, 0.8, 0.6]); G.fx.play("smoke", { x: c.x, y: c.y + 0.3, z: c.z }, 1.6);
+      const c = this.zone.geo.ground(sh.cx, sh.cz), st = this.body.cfg && this.body.cfg.atk;
+      if (G.skillFx && st === 'breath') G.skillFx.slash('fire_cone', this.pos, this.locked, { radius: this.def.attackRadius * 1.5, angle: 70, length: this.def.attackRadius * 1.8 });
+      else if (G.skillFx) G.skillFx.burst('ground_crack', c, { radius: this.def.attackRadius * 0.55 });
+      else { G.fx.play("ring", { x: c.x, y: c.y + 0.05, z: c.z }, this.def.attackRadius, true, [1, 0.8, 0.6]); G.fx.play("smoke", { x: c.x, y: c.y + 0.3, z: c.z }, 1.6); }
       G.audio.sfx("boss_slam"); if (p && this.dist(p) < 10) G.render.addShake(0.15, 0.25);
     } else {
-      const sh = HitShape.cone(this.pos.x, this.pos.z, this.locked.x, this.locked.z, this.def.attackRange + 0.35, 110);
-      for (const t of Resolver.targets(this, sh)) { t.takeDamage(Resolver.damage(this, t, 1, "atk", 0.4)); G.fx.play("hit", { x: t.pos.x, y: t.pos.y + 0.6, z: t.pos.z }, 0.7, false, [1, 0.7, 0.6]); }
+      const st = this.body.cfg && this.body.cfg.atk, L = this.locked;
+      // charge / headbutt: the body actually lunges forward a little; breath reaches further in a narrower cone
+      if (st === 'charge' || st === 'headbutt') this.moveBy(L.x * 0.6, L.z * 0.6);
+      const reach = this.def.attackRange + (st === 'breath' ? 1.4 : 0.35), ang = st === 'breath' ? 70 : 110;
+      const sh = HitShape.cone(this.pos.x, this.pos.z, L.x, L.z, reach, ang), F = G.skillFx;
+      if (F) {
+        if (st === 'breath') F.slash('fire_cone', this.pos, L, { radius: reach, angle: ang, length: reach });
+        else if (st === 'claw') F.slash('arc', this.pos, L, { radius: reach, angle: 90, color: 0xffe8e0 });
+        else if (st === 'charge' || st === 'headbutt' || st === 'tackle' || st === 'bounce' || st === 'bellybump') F.burst('dust', this.pos, { radius: 0.6 });
+      }
+      for (const t of Resolver.targets(this, sh)) {
+        t.takeDamage(Resolver.damage(this, t, 1, "atk", st === 'charge' || st === 'headbutt' || st === 'bellybump' ? 0.9 : 0.4));
+        const hp = { x: t.pos.x, y: t.pos.y, z: t.pos.z };
+        if (F) F.burst(st === 'claw' ? 'claw_marks' : st === 'bite' ? 'hit_pierce' : st === 'breath' ? 'explosion_fire' : 'hit_blunt', hp, { radius: st === 'breath' ? 0.6 : 0.8 });
+        else G.fx.play("hit", { x: t.pos.x, y: t.pos.y + 0.6, z: t.pos.z }, 0.7, false, [1, 0.7, 0.6]);
+      }
     }
   }
   cancelAttack() { if (this.state === "windup") this.state = "chase"; if (this.tele) { this.tele.cancel(); this.tele = null; } }
@@ -619,30 +647,32 @@ export class Npc {
 
 // ======================================================================================= projectiles / zones / loot
 export class Projectile {
-  static make(zone, fx, from) { const p = new Projectile(); p.zone = zone; p.pos = { ...from }; p.f = G.fx.play(fx, from, 1, false, null, true); p.gen = p.f ? p.f.gen : 0; zone.things.push(p); return p; }
+  static make(zone, fx, from) { const p = new Projectile(); p.zone = zone; p.pos = { ...from }; p.f = fx ? G.fx.play(fx, from, 1, false, null, true) : null; p.gen = p.f ? p.f.gen : 0; zone.things.push(p); return p; }
   static lob(zone, from, to, speed, fx, onLand) { const p = Projectile.make(zone, fx, from); Object.assign(p, { lob: true, from, to, onLand, t: 0, flight: Math.hypot(to.x - from.x, to.z - from.z) / Math.max(1, speed) }); return p; }
   static straight(zone, owner, from, dir, speed, range, coef, fx) { const p = Projectile.make(zone, fx, from); const m = Math.hypot(dir.x, dir.z) || 1; Object.assign(p, { owner, dir: { x: dir.x / m, z: dir.z / m }, speed, range, coef, travelled: 0 }); return p; }
   update(dt) {
     if (this.lob) {
       this.t += dt; const k = this.flight > 0 ? clamp01(this.t / this.flight) : 1;
       this.pos = { x: this.from.x + (this.to.x - this.from.x) * k, y: this.from.y + (this.to.y - this.from.y) * k + Math.sin(k * Math.PI) * Math.min(2.5, this.flight * 3), z: this.from.z + (this.to.z - this.from.z) * k };
-      G.fx.move(this.f, this.gen, this.pos);
+      if (this.f) G.fx.move(this.f, this.gen, this.pos);
       if (k >= 1) { if (this.onLand) this.onLand(this.to); this.done(); }
       return;
     }
     const sx = this.dir.x * this.speed * dt, sz = this.dir.z * this.speed * dt;
     this.pos = { x: this.pos.x + sx, y: this.pos.y, z: this.pos.z + sz }; this.travelled += Math.hypot(sx, sz);
-    G.fx.move(this.f, this.gen, this.pos);
+    if (this.f) G.fx.move(this.f, this.gen, this.pos); if (this.vis) this.vis.set(this.pos, { x: this.dir.x, y: 0, z: this.dir.z });
     if (this.zone.geo.blocked(this.pos.x, this.pos.z, 0.05) || this.travelled >= this.range) { G.fx.play("smoke", this.pos, 0.5); return this.done(); }
     for (const c of this.zone.actors) {
       if (c.dead || c.faction === this.owner.faction) continue;
       if (Math.hypot(this.pos.x - c.pos.x, this.pos.z - c.pos.z) <= c.radius + 0.2 && Math.abs(this.pos.y - (c.pos.y + 0.7)) < 1.6) {
-        c.takeDamage(Resolver.damage(this.owner, c, this.coef, "atk", 0.3)); G.fx.play("hit", this.pos, 0.7, false, [0.85, 0.6, 1]); G.audio.sfx("hit"); return this.done();
+        c.takeDamage(Resolver.damage(this.owner, c, this.coef, "atk", 0.3));
+        if (this.hitBurst && G.skillFx) G.skillFx.burst(this.hitBurst, { x: c.pos.x, y: c.pos.y, z: c.pos.z }, { radius: 0.7 }); else G.fx.play("hit", this.pos, 0.7, false, [0.85, 0.6, 1]);
+        G.audio.sfx("hit"); return this.done();
       }
     }
   }
-  done() { this.dead = true; G.fx.release(this.f, this.gen); }
-  dispose() { G.fx.release(this.f, this.gen); }
+  done() { this.dead = true; if (this.f) G.fx.release(this.f, this.gen); if (this.vis) { this.vis.dispose(); this.vis = null; } }
+  dispose() { if (this.f) G.fx.release(this.f, this.gen); if (this.vis) { this.vis.dispose(); this.vis = null; } }
 }
 
 export class GroundZone {

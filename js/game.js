@@ -114,6 +114,7 @@ class Zone {
     for (const n of this.npcs) n.update(dt);
     for (const t of this.things.slice()) { t.update(dt); }
     this.things = this.things.filter(t => !t.dead);
+    this.separate(dt);
     for (const a of this.actors) if (a.body) { a.body.place(a.pos); a.body.update(dt); }
     this.updatePortals(); this.updateArena();
     if (this.town3d) this.town3d.update(dt);
@@ -121,6 +122,27 @@ class Zone {
     for (const w of this.warps || []) w.update(dt);
     this.smokeT -= dt; if (this.smokeT <= 0) { this.smokeT = 0.7; for (const s of this.json.smoke || []) G.fx.play("smoke", { x: s[0], y: s[1], z: s[2] }, 1.2, false, [0.9, 0.9, 0.9, 0.8]); }
     this.sprayT -= dt; if (this.sprayT <= 0) { this.sprayT = 0.35; for (const f of this.json.fountain || []) G.fx.play("potion_splash", { x: f[0] + rnd(-0.3, 0.3), y: f[1], z: f[2] + rnd(-0.3, 0.3) }, 0.9, false, [0.7, 0.9, 1]); }
+  }
+  /** keep monsters from stacking on each other (or standing inside the player) when several rush in: overlapping pairs are
+   *  pushed apart along the line between them, softly and through the normal wall-aware movement. Body size counts, not
+   *  only the logic radius, so big cute models do not visually overlap either. */
+  separate(dt) {
+    const list = this.actors.filter(a => a && !a.dead && a.pos && a.radius > 0);
+    const R = a => Math.max(a.radius, a.body && a.body.size && a.faction !== "player" ? a.body.size * 0.36 : 0);
+    const k = Math.min(1, dt * 14);
+    for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++) {
+      const a = list[i], b = list[j];
+      if (a.faction === "player" && b.faction === "player") continue;
+      if (a.isBoss || b.isBoss) { if (a.faction !== "player" && b.faction !== "player") continue; }
+      let dx = b.pos.x - a.pos.x, dz = b.pos.z - a.pos.z, d = Math.hypot(dx, dz);
+      const min = R(a) + R(b) + 0.05; if (d >= min) continue;
+      if (d < 1e-4) { const ang = (i * 7 + j * 13) % 6.28; dx = Math.cos(ang); dz = Math.sin(ang); d = 1; } else { dx /= d; dz /= d; }
+      const push = (min - d) * k;
+      // the player is not shoved by monsters (that would steal control); monsters make room for the player and each other
+      const wa = a.faction === "player" ? 0 : b.faction === "player" ? 1 : 0.5, wb = 1 - wa;
+      if (wa > 0 && a.moveBy) a.moveBy(-dx * push * wa, -dz * push * wa);
+      if (wb > 0 && b.moveBy) b.moveBy(dx * push * wb, dz * push * wb);
+    }
   }
   updatePortals() {
     const p = G.player; if (!p || p.dead || p.zone !== this || G.loading) return;
@@ -227,7 +249,9 @@ class Game {
     progress(75, "텍스처 준비하는 중...");
     await preloadTextures([...sheetNames].map(n => "assets/sprites/" + n + ".png").concat(["assets/fx/effects.png", "assets/ui/icons.png", "assets/ui/shadow.png"]));
     const unlock = () => this.audio.unlock();
-    addEventListener("pointerdown", unlock); addEventListener("keydown", unlock);
+    // capture phase: the first click anywhere (even on a title button) starts the sound before the button acts
+    for (const ev of ["pointerdown", "keydown", "touchstart", "mousedown"]) addEventListener(ev, unlock, { capture: true, passive: true });
+    this.audio.unlock();                                   // plays right away where the browser already allows autoplay
     document.addEventListener("visibilitychange", () => { if (document.hidden) this.autoSave(); });
     addEventListener("pagehide", () => this.autoSave());
     this.applySettings();
@@ -279,7 +303,11 @@ class Game {
       if (this.player) { const p = this.player; this.fx.play("levelup", { x: p.pos.x, y: p.pos.y + 0.8, z: p.pos.z }, 1.6); p.hp = p.maxHp; p.sp = p.maxSp; }
       Q.refreshPassive(); this.autoSave();
     });
-    S.events.skill.push(s => { const d = this.data.skill(s); if (d) ui.toast("새 스킬 습득: " + d.name); });
+    S.events.skill.push(s => {
+      if (typeof s === "string" && s.startsWith("@points:")) return ui.toast(`직업 스킬 포인트 +${s.slice(8)} (스킬창 K)`);
+      if (typeof s === "string" && s.startsWith("@npoints:")) { const L = S.p.level, nv = this.data.skillsOf("novice").filter(d => d.unlock === L); return ui.toast(`기본 검술 포인트 +${s.slice(9)}` + (nv.length ? ` · 새 스킬: ${nv.map(d => d.name).join(", ")}` : "") + " (스킬창 K)"); }
+      const d = this.data.skill(s); if (d) ui.toast("새 스킬 습득: " + d.name);
+    });
     S.bag.onChange.push(() => { Q.refreshPassive(); ui.refresh(); });
     S.events.job.push(() => Q.refreshPassive());
     Q.events.accepted.push(q => { ui.toast("퀘스트 수락: " + q.name); this.audio.sfx("quest"); ui.updateTracker(); });
