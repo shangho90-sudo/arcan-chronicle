@@ -65,4 +65,4 @@ tools/                데이터 생성기·자산 파이프라인·브라우저 
 tests/                Node 테스트
 ```
 
-AI 도구로 수정할 때의 규칙은 [AGENTS.md](AGENTS.md)를 보세요.
+개발 현황은 [docs/STATUS.md](docs/STATUS.md), AI 도구로 수정할 때의 규칙은 [AGENTS.md](AGENTS.md)를 보세요.

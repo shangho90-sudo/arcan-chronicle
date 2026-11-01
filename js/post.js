@@ -55,7 +55,7 @@ void main(){
 export class Post {
   constructor(renderer) {
     this.r = renderer; this.enabled = true;
-    this.params = { bloom: 0.65, threshold: 2.6, exposure: 1.12, warmth: 1.0, sat: 1.25, contrast: 0.32, vignette: 0.4, tilt: 0.7 };
+    this.params = { bloom: 0.65, threshold: 2.6, exposure: 1.12, warmth: 1.0, sat: 1.25, contrast: 0.32, vignette: 0.4, tilt: 0 };   // tilt 0 = no top/bottom edge blur (the user asked to remove it)
     const hf = { type: THREE.HalfFloatType, depthBuffer: false };
     this.scene = new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, samples: 4 });
     this.b1 = [new THREE.WebGLRenderTarget(4, 4, hf), new THREE.WebGLRenderTarget(4, 4, hf)];   // 1/2
@@ -99,7 +99,7 @@ export class Post {
     this.pass(this.mBright, this.b1[0]); this.blur(this.b1, 1.2);
     this.mCopy.uniforms.tSrc.value = this.b1[0].texture; this.pass(this.mCopy, this.b2[0]); this.blur(this.b2, 1.5); this.blur(this.b2, 2.5);
     // tilt-shift source: scene at 1/4, blurred
-    this.mCopy.uniforms.tSrc.value = this.scene.texture; this.pass(this.mCopy, this.soft[0]); this.blur(this.soft, 1.0); this.blur(this.soft, 1.8);
+    if (p.tilt > 0) { this.mCopy.uniforms.tSrc.value = this.scene.texture; this.pass(this.mCopy, this.soft[0]); this.blur(this.soft, 1.0); this.blur(this.soft, 1.8); }
     const u = this.mFinal.uniforms;
     u.bloom.value = p.bloom; u.exposure.value = p.exposure; u.warmth.value = p.warmth; u.sat.value = p.sat; u.contrast.value = p.contrast; u.vignette.value = p.vignette; u.tilt.value = p.tilt; u.aspect.value = size.x / size.y;
     this.pass(this.mFinal, null);

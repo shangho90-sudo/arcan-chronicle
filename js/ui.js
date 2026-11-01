@@ -383,7 +383,7 @@ export class UI {
     const tog = (label, get, fn) => { const r = row(label, ""); const bt = this.button(r, get(), "ivory", () => { fn(); bt.textContent = get(); G.applySettings(); }); };
     tog("피해 숫자 표시", () => s.damageNumbers ? "켜짐" : "꺼짐", () => s.damageNumbers = !s.damageNumbers);
     tog("섬광 효과 줄이기", () => s.reduceFlash ? "켜짐" : "꺼짐", () => { s.reduceFlash = !s.reduceFlash; G.reduceFlash = s.reduceFlash; if (G.skillFx) G.skillFx.constructor.reduceFlash = s.reduceFlash; });
-    tog("그래픽 효과 (빛 번짐·색감·가장자리 흐림)", () => s.graphicsFx !== false ? "켜짐" : "꺼짐", () => s.graphicsFx = s.graphicsFx === false);
+    tog("그래픽 효과 (빛 번짐·색감)", () => s.graphicsFx !== false ? "켜짐" : "꺼짐", () => s.graphicsFx = s.graphicsFx === false);
     tog("모바일 조작 버튼", () => ["자동", "항상 표시", "숨김"][s.mobileControls], () => s.mobileControls = (s.mobileControls + 1) % 3);
     $("div", "help small muted", b, "PC: WASD/방향키 이동 · 클릭 이동/공격 · Space 공격 · 1~4 스킬 · R 궁극기 · K 스킬창 · N 제작 · Shift 회피 · Q 물약 · F 대화 · I 가방 · O 퀘스트 · Esc 메뉴");
     const bb = $("div", "pbtns", b);

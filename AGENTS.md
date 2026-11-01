@@ -1,5 +1,7 @@
 # AGENTS.md — AI 코딩 도구용 작업 안내
 
+개발 현황은 [docs/STATUS.md](docs/STATUS.md). 작업을 마치면 그 문서의 "변경 기록"과 해당 항목을 갱신하세요.
+
 이 문서는 Claude, Codex, Cursor, Copilot 등 어떤 AI 도구가 이 저장소를 수정하든 따라야 할 규칙입니다.
 (사람이 읽어도 됩니다. 응답과 UI 문구는 한국어로 작성하세요.)
 
@@ -23,7 +25,7 @@
 - UI 문구는 한국어.
 
 ## 화면 연출 (그래픽 효과)
-- `js/post.js`: HDR 렌더 → 블룸, 따뜻한 색보정(필믹 커브·채도·대비), 가장자리 틸트시프트 흐림, 비네트. 값은 `Post.params`. 설정의 "그래픽 효과"로 끌 수 있음(`settings.graphicsFx`).
+- `js/post.js`: HDR 렌더 → 블룸, 따뜻한 색보정(필믹 커브·채도·대비), 비네트. 화면 위아래 흐림(tilt)은 사용자 요청으로 0(꺼짐) — 다시 켜지 말 것. 값은 `Post.params`. 설정의 "그래픽 효과"로 끌 수 있음(`settings.graphicsFx`).
 - 마을 바닥 텍스처는 `tools/town/texgen2.py`로 생성(`pave`, `cobble`). 장미 문양 바닥·꽃잎·나뭇잎 그림자(보이지 않는 나무 그늘 캐스터)·장식 가로등은 `js/town3d.js`.
 - HUD는 `index.html`의 "ornate gold HUD" CSS 블록과 `js/ui.js`의 `MENU_ICON`/`HUD_ICON`(SVG 아이콘).
 
