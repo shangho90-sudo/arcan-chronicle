@@ -173,7 +173,7 @@ class Zone {
 }
 
 // ======================================================================================= game
-const DEFAULT_SETTINGS = { music: 0.6, sfx: 0.8, shake: 0.7, damageNumbers: true, mobileControls: 0 };
+const DEFAULT_SETTINGS = { music: 0.6, sfx: 0.8, shake: 0.7, damageNumbers: true, mobileControls: 0, graphicsFx: true };
 class Game {
   async boot() {
     const st = document.getElementById("loadmsg");
@@ -210,7 +210,7 @@ class Game {
     this.reduceFlash = !!(this.settings && this.settings.reduceFlash); if (this.skillFx) this.skillFx.constructor.reduceFlash = this.reduceFlash;
     const s = this.settings;
     this.audio.music = s.music; this.audio.sfxVol = s.sfx; this.audio.apply();
-    this.render.shakeScale = s.shake; this.ui.mobileSetting = s.mobileControls;
+    this.render.shakeScale = s.shake; if (this.render.post) this.render.post.enabled = s.graphicsFx !== false; this.ui.mobileSetting = s.mobileControls;
     try { localStorage.setItem("arcan_settings", JSON.stringify(s)); } catch (e) { }
   }
 

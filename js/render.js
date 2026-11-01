@@ -1,5 +1,6 @@
 // Rendering: three.js scene, zone meshes, upright pixel sprites, effects, telegraphs, camera, occlusion.
 // Logic uses Unity coordinates (x east, y up, z north). three.js is right-handed -> z is mirrored here.
+import { Post } from './post.js';
 import * as THREE from 'three';
 import { clamp01, DEG, artBasis, artWorldToImage, artImageToGround, artFootprint } from './core.js';
 
@@ -56,6 +57,7 @@ export class Renderer {
     this.lightFrom = rotYUnity(CAM.yaw, { x: -0.55, y: 0.85, z: -0.45 });
     this.shake = 0; this.shakeT = 0; this.shakeScale = 0.7;
     this.zoneRoot = null;
+    try { this.post = new Post(this.r); } catch (e) { console.warn('post', e); this.post = null; }
     this.resize();
     window.addEventListener("resize", () => this.resize());
   }
@@ -97,7 +99,7 @@ export class Renderer {
     this.sun.target.position.copy(T(f));
     this.sun.position.copy(T({ x: f.x + lf.x * 40, y: f.y + lf.y * 40, z: f.z + lf.z * 40 }));
     for (const w of this.waterTex || []) { w.offset.x = performance.now() * 0.00003; w.offset.y = performance.now() * 0.00002; }
-    this.r.render(this.scene, this.cam);
+    if (this.post) this.post.render(this.scene, this.cam); else this.r.render(this.scene, this.cam);
   }
   /** screen pixel -> Unity-space ray */
   screenRay(px, py) {

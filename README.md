@@ -45,6 +45,7 @@ js/
   core.js             데이터 로딩(GameData), 캐릭터 시트, 퀘스트, 상태이상, 저장 마이그레이션
   actors.js           플레이어/몬스터/보스/NPC/드롭 아이템
   render.js           three.js 렌더러, 카메라, 존 메시
+  post.js             후처리(블룸·색보정·틸트시프트·비네트)
   model.js            주인공·NPC 3D 모델, IK 보행
   creature.js         몬스터 3D 모델(Tripo GLB) + 절차 애니메이션
   town3d.js           3D 성 마을

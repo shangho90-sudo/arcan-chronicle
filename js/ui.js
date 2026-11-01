@@ -18,6 +18,29 @@ function modText(m) {
   return out.join(", ");
 }
 
+// painted-style SVG icons for the round action buttons
+const HUD_ICON = (() => {
+  const W = (d, extra = '') => `<svg viewBox="0 0 64 64" width="100%" height="100%" ${extra}><defs>
+    <linearGradient id="gS" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#c8d4e4"/><stop offset="1" stop-color="#7a8aa0"/></linearGradient>
+    <linearGradient id="gG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0b0"/><stop offset=".5" stop-color="#e0b048"/><stop offset="1" stop-color="#9a6416"/></linearGradient></defs>${d}</svg>`;
+  return {
+    skill_ui_attack: W('<path d="M46 10l8 0 0 8-26 26-8-8z" fill="url(#gS)" stroke="#2a3040" stroke-width="2"/><path d="M50 14L24 40" stroke="#fff" stroke-width="1.5" opacity=".7"/><path d="M16 36l12 12-4 4-12-12z" fill="url(#gG)" stroke="#4a2a08" stroke-width="2"/><path d="M14 46l4 4-6 6-4-4z" fill="#6a3a1a" stroke="#2a1608" stroke-width="2"/><circle cx="9" cy="55" r="3.5" fill="url(#gG)" stroke="#4a2a08" stroke-width="1.5"/>'),
+    skill_ui_dodge: W('<circle cx="38" cy="13" r="5.5" fill="#f4f0e8"/><path d="M33 21l-9 9 6 6-6 14M33 21l7 10 9 3M29 26l-9-1-6 6M30 36l9 5 3 12" fill="none" stroke="#f4f0e8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 30h10M4 38h10M8 46h8" stroke="#9ad0ff" stroke-width="3" stroke-linecap="round" opacity=".8"/>'),
+    skill_ui_interact: W('<path d="M12 14h40a6 6 0 0 1 6 6v20a6 6 0 0 1-6 6H30l-12 10v-10h-6a6 6 0 0 1-6-6V20a6 6 0 0 1 6-6z" fill="#f4f0e8" stroke="#3a3040" stroke-width="2"/><circle cx="22" cy="30" r="3.5" fill="#5a4a6a"/><circle cx="32" cy="30" r="3.5" fill="#5a4a6a"/><circle cx="42" cy="30" r="3.5" fill="#5a4a6a"/>'),
+    skill_ui_locked: W('<path d="M22 28v-7a10 10 0 0 1 20 0v7" fill="none" stroke="url(#gG)" stroke-width="5"/><rect x="16" y="28" width="32" height="24" rx="4" fill="url(#gG)" stroke="#4a2a08" stroke-width="2"/><circle cx="32" cy="38" r="3.5" fill="#4a2a08"/><path d="M32 40v6" stroke="#4a2a08" stroke-width="3"/>'),
+  };
+})();
+// gold line icons for the HUD menu buttons
+const MENU_ICON = (() => {
+  const W = (d) => `<svg viewBox="0 0 32 32" fill="none" stroke="#f6dc94" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+  return {
+    inventory: W('<path d="M8 12h16l2 15H6z" fill="#7a5230"/><path d="M12 12v-3a4 4 0 0 1 8 0v3"/><path d="M11 18h10"/>'),
+    skills: W('<path d="M16 3l9 13-9 13-9-13z" fill="#6a4aa0"/><path d="M16 9l5 7-5 7-5-7z" fill="#f6dc94" stroke="none"/>'),
+    craft: W('<path d="M7 25L21 11" /><path d="M18 6l8 8-3 3-8-8z" fill="#8a8f9a"/><path d="M25 25L11 11"/><path d="M6 8l5-3 3 3-3 5z" fill="#8a8f9a"/>'),
+    quests: W('<path d="M8 5h13l4 4v18H8z" fill="#a0742a"/><path d="M12 12h9M12 17h9M12 22h6"/>'),
+    pause: W('<path d="M7 9h18M7 16h18M7 23h18"/>'),
+  };
+})();
 export class UI {
   constructor(root) {
     this.root = root;
@@ -39,6 +62,7 @@ export class UI {
     try { this.itemIcons = renderItemIcons(G.data.itemList.map(i => i.icon || i.id)); } catch (e) { console.warn("3d icons", e); this.itemIcons = {}; }
   }
   icon(name, size = 48) {
+    if (HUD_ICON[name]) return `<span class="icon svgic" style="width:${size}px;height:${size}px;display:flex">${HUD_ICON[name]}</span>`;
     const img = this.itemIcons && this.itemIcons[name];
     if (img) return `<span class="icon i3d" style="width:${size}px;height:${size}px;background:url(${img}) center/contain no-repeat;image-rendering:auto"></span>`;
     const m = this.iconMeta; let i = m.names.indexOf(name); if (i < 0) i = m.names.indexOf("skill_ui_locked");
@@ -98,7 +122,7 @@ export class UI {
       <div class="bar sp"><i id="hSp"></i><span id="hSpT"></span></div>
       <div class="status" id="hStatus"></div></div>
     <div class="topright panel-dark"><div class="zone" id="hZone"></div><div class="gold" id="hGold"></div>
-      <div class="menubtns"><button class="btn ivory" data-a="inventory">가방</button><button class="btn ivory" data-a="skills">스킬</button><button class="btn ivory" data-a="craft">제작</button><button class="btn ivory" data-a="quests">퀘스트</button><button class="btn ivory" data-a="pause">메뉴</button></div></div>
+      <div class="menubtns">${[["inventory", "가방"], ["skills", "스킬"], ["craft", "제작"], ["quests", "퀘스트"], ["pause", "메뉴"]].map(([a, t]) => `<button class="btn" data-a="${a}">${MENU_ICON[a]}<span>${t}</span></button>`).join("")}</div></div>
     <div class="tracker panel-dark" id="hQuests"></div>
     <div class="target panel-dark" id="hTarget"><div id="hTName"></div><div class="bar hp"><i id="hTHp"></i><span id="hTHpT"></span></div></div>
     <div class="target boss panel-dark" id="hBoss"><div id="hBName"></div><div class="bar boss"><i id="hBHp"></i><span id="hBHpT"></span></div></div>
@@ -111,7 +135,7 @@ export class UI {
     const p = G.player; if (!p) return; const P = p.sheet.p, job = p.sheet.job, h = this.h;
     h("hName").innerHTML = `${esc(P.name)} <small>${job.name}</small>`; h("hLv").textContent = "Lv." + P.level; h("hBadge").textContent = job.name[0];
     const badge = h("hBadge").parentElement; badge.style.borderColor = job.color;
-    if (badge._g !== P.gender) { badge._g = P.gender; badge.style.backgroundImage = `url(assets/ui/portrait_${P.gender === "f" ? "girl" : "boy"}.png)`; badge.style.backgroundPosition = P.gender === "f" ? "-61px -53px" : "-61px -40px"; }
+    if (badge._g !== P.gender) { badge._g = P.gender; badge.style.backgroundImage = `url(assets/ui/portrait_${P.gender === "f" ? "girl" : "boy"}.png)`; badge.style.backgroundPosition = P.gender === "f" ? "-113px -98px" : "-113px -74px"; }
     h("hHp").style.width = (100 * p.hp / p.maxHp) + "%"; h("hShield").style.width = Math.min(100, 100 * p.shield / p.maxHp) + "%";
     h("hHpT").textContent = Math.ceil(p.hp) + " / " + Math.round(p.maxHp) + (p.shield > 0 ? `  (+${Math.round(p.shield)})` : "");
     h("hSp").style.width = (100 * p.sp / p.maxSp) + "%"; h("hSpT").textContent = "기력 " + Math.floor(p.sp) + " / " + Math.round(p.maxSp);
@@ -359,6 +383,7 @@ export class UI {
     const tog = (label, get, fn) => { const r = row(label, ""); const bt = this.button(r, get(), "ivory", () => { fn(); bt.textContent = get(); G.applySettings(); }); };
     tog("피해 숫자 표시", () => s.damageNumbers ? "켜짐" : "꺼짐", () => s.damageNumbers = !s.damageNumbers);
     tog("섬광 효과 줄이기", () => s.reduceFlash ? "켜짐" : "꺼짐", () => { s.reduceFlash = !s.reduceFlash; G.reduceFlash = s.reduceFlash; if (G.skillFx) G.skillFx.constructor.reduceFlash = s.reduceFlash; });
+    tog("그래픽 효과 (빛 번짐·색감·가장자리 흐림)", () => s.graphicsFx !== false ? "켜짐" : "꺼짐", () => s.graphicsFx = s.graphicsFx === false);
     tog("모바일 조작 버튼", () => ["자동", "항상 표시", "숨김"][s.mobileControls], () => s.mobileControls = (s.mobileControls + 1) % 3);
     $("div", "help small muted", b, "PC: WASD/방향키 이동 · 클릭 이동/공격 · Space 공격 · 1~4 스킬 · R 궁극기 · K 스킬창 · N 제작 · Shift 회피 · Q 물약 · F 대화 · I 가방 · O 퀘스트 · Esc 메뉴");
     const bb = $("div", "pbtns", b);

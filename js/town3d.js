@@ -41,7 +41,7 @@ function M(key) {
       water: 0x3a8ab8, earth: 0x5a4430, red: 0xb83a34, green: 0x4a8a4a, orange: 0xe08a2a, purple: 0x8a5ab0, pink: 0xe07ab0, white: 0xf2efe8,
       bread: 0xc88a40, crust: 0x9a5a24, steel: 0xc8ced8, blue: 0x3a4a9a, lavender: 0xb08ad8, yellow: 0xf0d050, sack: 0xd8c8a0, fabric1: 0xb04a6a, fabric2: 0x4a7ab0, fabric3: 0xd8b04a }[name] ?? 0xff00ff;
     m = new THREE.MeshStandardMaterial({ color: col, roughness: name === 'gold' || name === 'steel' ? 0.35 : 0.85, metalness: name === 'gold' || name === 'steel' || name === 'iron' ? 0.6 : 0 });
-    if (name === 'glow') { m.emissive = new THREE.Color(0xff8a2a); m.emissiveIntensity = 1.4; }
+    if (name === 'glow') { m.color.set(0xffd27a); m.emissive = new THREE.Color(0xffa040); m.emissiveIntensity = 3.2; }
     if (name === 'water') { m.roughness = 0.2; }
   }
   if (tint) { m = m.clone(); m.color = new THREE.Color('#' + tint); }
@@ -390,6 +390,36 @@ function drawBanner(g, w, h) {
   g.fillRect(-34, 10, 68, 10); g.fillRect(-6, 20, 12, 30);
 }
 
+// ---------------------------------------------------------------- ground ornaments (rosettes, leaf shadows)
+const ROSETTES = [[11.5, -9.5, 1.6, 0.3], [-12, -7, 1.4, 0.8], [13, 6, 1.5, 0.1], [-4, -14, 1.3, 0.5], [11, -2.5, 1.2, 0.2], [-17, 3, 1.3, 0.9]];
+const CANOPIES = [[9, -15, 4.5, 2.2], [24, -5, 4.5, 0.6], [-9, -18, 4, 1.3], [-24, 8, 5, 2.9], [10, 20, 4.5, 0.5], [16, -12, 5.5, 0.4], [21, 2, 5, 1.1], [14, 14, 5, 2.0], [-19, -10, 5.5, 0.8], [-15, 13, 5, 2.6], [5, -19, 4.5, 1.7], [-5, 21, 4.5, 0.2], [24, -14, 4, 0.9]];
+function mulberry(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function canvasTex(key, n, draw, srgb = true) {
+  const k = 'tex:' + key; if (canvasCache.has(k)) return canvasCache.get(k);
+  const c = document.createElement('canvas'); c.width = c.height = n; draw(c.getContext('2d'), n);
+  const t = new THREE.CanvasTexture(c); if (srgb) t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = ANISO; canvasCache.set(k, t); return t;
+}
+function drawRosette(g, n) {
+  const c = n / 2; g.translate(c, c);
+  const ring = (r0, r1, col) => { g.fillStyle = col; g.beginPath(); g.arc(0, 0, r1, 0, Math.PI * 2); g.arc(0, 0, r0, 0, Math.PI * 2, true); g.fill(); };
+  ring(c * 0.88, c * 0.97, 'rgba(120,104,88,0.85)'); ring(c * 0.8, c * 0.88, 'rgba(178,166,150,0.95)'); ring(c * 0.76, c * 0.8, 'rgba(120,104,88,0.8)');
+  g.fillStyle = 'rgba(160,150,138,0.92)'; g.beginPath(); g.arc(0, 0, c * 0.76, 0, Math.PI * 2); g.fill();
+  for (let i = 0; i < 8; i++) {                                  // eight petals, alternating tones
+    g.save(); g.rotate(i * Math.PI / 4); g.fillStyle = i % 2 ? 'rgba(132,122,112,0.95)' : 'rgba(198,188,172,0.97)';
+    g.beginPath(); g.moveTo(0, 0); g.quadraticCurveTo(c * 0.26, -c * 0.34, 0, -c * 0.7); g.quadraticCurveTo(-c * 0.26, -c * 0.34, 0, 0); g.fill();
+    g.strokeStyle = 'rgba(96,84,72,0.7)'; g.lineWidth = 3; g.stroke(); g.restore();
+  }
+  ring(0, c * 0.13, 'rgba(110,98,86,0.95)'); ring(c * 0.13, c * 0.16, 'rgba(210,198,180,0.95)');
+}
+function drawLeaves(g, n) {
+  const r = mulberry(11); g.fillStyle = '#fff';
+  for (let i = 0; i < 420; i++) {
+    const a = r() * Math.PI * 2, d = Math.pow(r(), 0.7) * n * 0.46, x = n / 2 + Math.cos(a) * d, y = n / 2 + Math.sin(a) * d;
+    const s = 6 + r() * 16 * (1 - d / n);
+    g.save(); g.translate(x, y); g.rotate(r() * Math.PI); g.beginPath(); g.ellipse(0, 0, s, s * 0.55, 0, 0, Math.PI * 2); g.fill(); g.restore();
+  }
+}
+
 // ---------------------------------------------------------------- castle
 function wallPiece(k, L, h, t, outward, crenel = true) {
   k.block(L, h, t, 'wallstone');
@@ -635,12 +665,71 @@ export async function buildTown3D(spec, renderer) {
     }
     const obj = k.build(); place(obj, at, d.h ?? 180); root.add(obj);
   }
-  // lantern posts
+  // ornate lamp posts: flower planter base, black iron pole with gold rings, glowing lantern, hanging blue banner
+  const bannerM = canvasMat('banner', 128, 384, drawBanner, { side: THREE.DoubleSide });
   for (const p of spec.lanterns) {
     const k = new Kit();
-    k.block(0.36, 0.3, 0.36, 'basestone'); k.cyl(0.07, 0.09, 3.0, 'iron', {}, 8); k.box(0.7, 0.06, 0.06, 'iron', { y: 2.9, x: 0.3 });
-    k.box(0.32, 0.42, 0.32, 'glow', { x: 0.62, y: 2.6 }); k.box(0.4, 0.08, 0.4, 'iron', { x: 0.62, y: 2.85 }); k.add(new THREE.ConeGeometry(0.28, 0.25, 4), 'iron', { x: 0.62, y: 3.0, ry: Math.PI / 4 });
-    const obj = k.build(); obj.position.copy(T({ x: p[0], y: 0, z: p[1] })); obj.rotation.y = Math.atan2(p[0], p[1]); root.add(obj);
+    k.block(0.9, 0.5, 0.9, 'basestone'); k.block(1.0, 0.1, 1.0, 'basestone', { y: 0.5 });
+    k.add(new THREE.PlaneGeometry(0.86, 0.86), 'earth', { y: 0.61, rx: -Math.PI / 2, uv: false });
+    for (let i = 0; i < 22; i++) {                                  // flowers spilling over the planter
+      const a = i * 2.39996, rr = 0.18 + (i % 5) * 0.07, x = Math.cos(a) * rr, z = Math.sin(a) * rr;
+      if (i % 3 === 0) k.sphere(0.16, 'green', { x, y: 0.72, z, s: [1, 0.7, 1] }, 7);
+      else k.sphere(0.075 + (i % 2) * 0.02, ['pink', 'white', 'pink', 'yellow', 'lavender'][i % 5], { x: x * 1.15, y: 0.78 + (i % 4) * 0.05, z: z * 1.15 }, 6);
+    }
+    for (const [sx, sz] of [[0.42, 0.1], [-0.1, 0.42], [-0.42, -0.2], [0.2, -0.42]]) k.sphere(0.13, 'green', { x: sx, y: 0.52, z: sz, s: [1, 1.3, 1] }, 6);   // trailing ivy
+    k.cyl(0.07, 0.085, 3.6, 'dark', { y: 0.6 }, 10);
+    for (const yy of [0.62, 1.5, 3.1]) k.cyl(0.11, 0.11, 0.08, 'gold', { y: yy }, 10);
+    k.sphere(0.1, 'gold', { y: 2.3 }, 8);
+    // lantern: dark frame, glowing panes, gold cap and finial
+    const ly = 4.25;
+    k.cyl(0.16, 0.12, 0.12, 'dark', { y: ly - 0.42 }, 8);
+    k.add(new THREE.CylinderGeometry(0.2, 0.15, 0.5, 6), 'glow', { y: ly - 0.05 });
+    for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2; k.box(0.03, 0.54, 0.03, 'dark', { x: Math.cos(a) * 0.19, y: ly - 0.05, z: Math.sin(a) * 0.19 }); }
+    k.add(new THREE.ConeGeometry(0.3, 0.28, 6), 'dark', { y: ly + 0.33 }); k.cyl(0.25, 0.25, 0.05, 'gold', { y: ly + 0.17 }, 12);
+    k.sphere(0.07, 'gold', { y: ly + 0.53 }, 8);
+    // banner bracket + banner
+    k.box(0.75, 0.05, 0.05, 'dark', { x: 0.38, y: 3.35 }); k.box(0.05, 0.05, 0.05, 'gold', { x: 0.76, y: 3.35 });
+    k.add(new THREE.TorusGeometry(0.16, 0.025, 6, 12, Math.PI), 'dark', { x: 0.24, y: 3.18, rz: Math.PI });
+    const b = new THREE.Mesh(new THREE.PlaneGeometry(0.62, 1.55), bannerM); b.position.set(0.42, 2.55, 0); b.rotation.y = Math.PI / 2; b.castShadow = true; b.userData.flag = true; k.mesh(b);
+    const obj = k.build(); obj.position.copy(T({ x: p[0], y: 0, z: p[1] })); obj.rotation.y = Math.atan2(p[0], p[1]) + Math.PI / 4; root.add(obj);
+    obj.traverse(o => { if (o.userData.flag) flags.push(o); });
+  }
+  // decorative stone rosettes set into the paving (open spots of the courtyard)
+  {
+    const rm = new THREE.MeshStandardMaterial({ map: canvasTex('rosette', 512, drawRosette), transparent: true, depthWrite: false, roughness: 0.9,
+      polygonOffset: true, polygonOffsetFactor: -2 });
+    for (const [x, z, r, a] of spec.rosettes || ROSETTES) {
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(r * 2, r * 2).rotateX(-Math.PI / 2).rotateY(a || 0), rm);
+      m.position.copy(T({ x, y: 0.03, z })); m.receiveShadow = true; m.renderOrder = -1; root.add(m);
+    }
+  }
+  // fallen petals around flower beds and lamp planters (one instanced draw)
+  {
+    const pts = [];
+    const rnd = mulberry(5);
+    const scatter = (cx, cz, r0, r1, n) => { for (let i = 0; i < n; i++) { const a = rnd() * Math.PI * 2, rr = r0 + Math.pow(rnd(), 1.6) * (r1 - r0); pts.push([cx + Math.cos(a) * rr, cz + Math.sin(a) * rr, rnd() * Math.PI, 0.7 + rnd() * 0.6, rnd()]); } };
+    scatter(0, 0, 9.5, 14, 260);
+    for (const p of spec.lanterns) scatter(p[0], p[1], 0.55, 2.4, 40);
+    for (const d of spec.decor) if (d.type === 'planter') scatter(d.pos[0], d.pos[1], d.r + 0.1, d.r + 2.2, 40);
+    const geo = new THREE.PlaneGeometry(0.085, 0.055).rotateX(-Math.PI / 2);
+    const mat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.8, side: THREE.DoubleSide });
+    const im = new THREE.InstancedMesh(geo, mat, pts.length); const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), c = new THREE.Color();
+    pts.forEach(([x, z, a, s, k], i) => {
+      q.setFromEuler(new THREE.Euler(0, a, 0)); m4.compose(T({ x, y: 0.035, z }), q, new THREE.Vector3(s, 1, s)); im.setMatrixAt(i, m4);
+      im.setColorAt(i, c.set(k < 0.7 ? 0xf28fb8 : k < 0.88 ? 0xfac0d6 : 0xffffff));
+    });
+    im.receiveShadow = true; root.add(im);
+  }
+  // dappled light: unseen tree canopies above the courtyard edges that only cast leaf-shaped shadows
+  {
+    const leafTex = canvasTex('leaves', 512, drawLeaves, false);
+    const depth = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: leafTex, alphaTest: 0.5 });
+    // three copies map/alphaTest from the object's own material into the shadow depth material, so the leaf mask lives here
+    const hide = new THREE.MeshBasicMaterial({ map: leafTex, alphaTest: 0.5, colorWrite: false, depthWrite: false, side: THREE.DoubleSide });
+    for (const [x, z, r, a] of spec.canopies || CANOPIES) {
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(r * 2, r * 2).rotateX(-Math.PI / 2).rotateY(a), hide);
+      m.position.copy(T({ x, y: 9, z })); m.castShadow = true; m.customDepthMaterial = depth; m.renderOrder = -5; root.add(m);
+    }
   }
   let t = 0;
   return {
