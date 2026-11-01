@@ -12,6 +12,36 @@ const $ = (tag, cls, parent, html) => { const e = document.createElement(tag); i
 const esc = s => String(s).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
 const STAT_KR = { maxHp: "최대 체력", maxSp: "최대 기력", atk: "공격력", matk: "마법력", def: "방어력", crit: "치명타", critDmg: "치명 피해", moveSpeed: "이동 속도", atkSpeed: "공격 속도", spRegen: "기력 회복", healPower: "회복 효율", foodPower: "음식 효과", dmgReduce: "피해 감소", cdr: "재사용 감소", shieldPower: "보호막 강화" };
 const PCT = new Set(["crit", "critDmg", "healPower", "foodPower", "dmgReduce", "cdr", "shieldPower"]);
+// ---- ornate window pieces (inventory / skills): inline SVG so they stay sharp at any scale
+const FANCY = new Set(["inventory", "skills"]);
+const G1 = '<linearGradient id="fgold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0b8"/><stop offset=".5" stop-color="#d9a640"/><stop offset="1" stop-color="#8a5a14"/></linearGradient>';
+export const STAR4 = '<svg viewBox="0 0 24 24"><path d="M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z" fill="#c9973a"/><path d="M12 5l1.3 5.7L19 12l-5.7 1.3L12 19l-1.3-5.7L5 12l5.7-1.3z" fill="#f6dc8e"/></svg>';
+const FLOURISH = `<svg viewBox="0 0 120 120"><defs>${G1}</defs><g fill="none" stroke="url(#fgold)" stroke-width="5" stroke-linecap="round"><path d="M6 114V30Q6 6 30 6h84"/><path d="M18 100V40q0-22 22-22h60" stroke-width="2.5"/><path d="M30 6q-6 22 10 30t26-8q4-14-10-14t-10 12" stroke-width="3.5"/><path d="M6 30q22 6 30-10t-8-26" stroke-width="3.5" opacity=".0"/></g><circle cx="30" cy="30" r="7" fill="url(#fgold)"/><path d="M30 18l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" fill="#fff4c4"/></svg>`;
+const PLAQUE_ORN = '<svg viewBox="0 0 90 30"><g fill="none" stroke="#e6c06a" stroke-width="2" stroke-linecap="round"><path d="M88 15H40"/><path d="M40 15q-10-12-22-4t2 12q10 2 8-8"/><path d="M40 15q-14 10-30 2"/></g><path d="M8 15l5-5 5 5-5 5z" fill="#f2d27a"/><path d="M64 15l4-4 4 4-4 4z" fill="#f2d27a"/></svg>';
+const FLEUR = '<svg class="fleur" viewBox="0 0 32 32"><path fill="#e8c46a" d="M16 2c3 4 4 8 2 12 3-2 7-2 9 1-3 0-5 2-6 4h-3l1 4h3v2h-4v4h-4v-4H10v-2h3l1-4h-3c-1-2-3-4-6-4 2-3 6-3 9-1-2-4-1-8 2-12z"/></svg>';
+const FLEUR_PENNANT = `<svg viewBox="0 0 70 110"><defs>${G1}</defs><path d="M4 2h62v80L35 104 4 82z" fill="#1d3a7a" stroke="url(#fgold)" stroke-width="4"/><path d="M10 8h50v70L35 96 10 78z" fill="none" stroke="#e6c06a" stroke-width="1.5" opacity=".7"/><g transform="translate(19 26) scale(1)">${'<path fill="#f0cf74" d="M16 2c3 4 4 8 2 12 3-2 7-2 9 1-3 0-5 2-6 4h-3l1 4h3v2h-4v4h-4v-4H10v-2h3l1-4h-3c-1-2-3-4-6-4 2-3 6-3 9-1-2-4-1-8 2-12z"/>'}</g><rect x="0" y="0" width="70" height="6" rx="3" fill="url(#fgold)"/></svg>`;
+const STAT_HEAD = '<svg class="fleur" viewBox="0 0 32 32"><g fill="#e8c46a"><rect x="4" y="18" width="5" height="10" rx="1"/><rect x="11" y="12" width="5" height="16" rx="1"/><rect x="18" y="6" width="5" height="22" rx="1"/><rect x="25" y="14" width="4" height="14" rx="1"/></g></svg>';
+const si = (body, col = "#b4842e") => `<svg class="sti" viewBox="0 0 24 24"><g fill="${col}" stroke="#5a3a10" stroke-width=".8" stroke-linejoin="round">${body}</g></svg>`;
+const STAT_ICON = {
+  maxHp: si('<path d="M12 21C5 15 2 12 2 8a5 5 0 0 1 10-1 5 5 0 0 1 10 1c0 4-3 7-10 13z"/>', "#d99a3a"),
+  maxSp: si('<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>', "#d9a640"),
+  atk: si('<path d="M20 2l2 2-11 11-2-2zM8 14l2 2-3 3 1 1-2 2-1-1-1 1-2-2 1-1-1-1 2-2 1 1z"/>', "#7a8aa0"),
+  matk: si('<circle cx="12" cy="12" r="9" fill="none" stroke="#5a3a10" stroke-width="2.5"/><circle cx="12" cy="12" r="5.5" fill="none" stroke="#b4842e" stroke-width="2"/><circle cx="12" cy="12" r="2.2"/>'),
+  def: si('<path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z" fill="#6a7690"/><path d="M12 4v16c3.5-2 6-5 6-9V6z" fill="#c9973a"/>'),
+  crit: si('<circle cx="12" cy="12" r="8" fill="none" stroke="#b4842e" stroke-width="2.4"/><path d="M12 1v6M12 17v6M1 12h6M17 12h6" stroke="#b4842e" stroke-width="2.4"/><circle cx="12" cy="12" r="2"/>'),
+  moveSpeed: si('<path d="M6 3h6l1 9 6 3c2 1 2 4 0 5H5c-1 0-2-1-2-2l2-7z" fill="#8a5a2a"/>'),
+  atkSpeed: si('<path d="M21 3c-6 1-11 6-14 12l2 2c6-3 11-8 12-14zM4 16l4 4-3 1-2-2z" fill="#c98a3a"/><path d="M2 8h7M1 12h5M4 4h6" stroke="#c98a3a" stroke-width="1.8"/>'),
+  spRegen: si('<path d="M12 1l2.2 8.8L23 12l-8.8 2.2L12 23l-2.2-8.8L1 12l8.8-2.2z" fill="#d9a640"/>'),
+  healPower: si('<path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z" fill="#5aa860"/>'),
+  dmgReduce: si('<path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z" fill="#8a9ab0"/>'),
+  cdr: si('<circle cx="12" cy="13" r="9" fill="#e8dcc0"/><path d="M12 8v5l3 3" stroke="#5a3a10" stroke-width="2" fill="none"/><rect x="9" y="1" width="6" height="3" rx="1"/>'),
+  def0: si('<circle cx="12" cy="12" r="6"/>'),
+};
+const EQ_EMPTY = {
+  weapon: '<svg viewBox="0 0 48 48" class="eqsil"><path d="M40 4l4 4-20 20-4-4zM14 26l4 4-6 6 2 2-4 4-2-2-2 2-4-4 2-2-2-2 4-4 2 2z" fill="#b8b0a0"/></svg>',
+  armor: '<svg viewBox="0 0 48 48" class="eqsil"><path d="M24 4l16 6v12c0 10-7 18-16 22C15 40 8 32 8 22V10z" fill="#b8b0a0"/><path d="M24 8v32c7-4 12-10 12-18V12z" fill="#cfc8b8"/></svg>',
+  accessory: '<svg viewBox="0 0 48 48" class="eqsil"><circle cx="24" cy="28" r="13" fill="none" stroke="#b8b0a0" stroke-width="5"/><path d="M18 12l6-8 6 8-6 5z" fill="#b8b0a0"/></svg>',
+};
 const TYPE_KR = { weapon: "무기", armor: "방어구", accessory: "장신구", consumable: "소비", material: "재료" };
 function modText(m) {
   const out = [];
@@ -277,10 +307,19 @@ export class UI {
   open(name, title, w, h, closable = true, dim = true) {
     this.close(false);
     if (dim) { this.dim = $("div", "dim", this.win); }
-    const wnd = $("div", "window panel " + name, this.win);
+    const fancy = FANCY.has(name);
+    const wnd = $("div", "window " + (fancy ? "fancy " : "panel ") + name, this.win);
     wnd.style.width = w + "px"; if (h) wnd.style.height = h + "px";
-    if (title) $("div", "wtitle", wnd, esc(title));
-    if (closable) { const x = $("button", "btn red wclose", wnd, "X"); x.onclick = () => this.close(); }
+    if (fancy) {
+      // ornate frame: gold corner flourishes, title plaque (inventory also gets the navy banner with pennant + castle)
+      for (const c of ["tl", "tr", "bl", "br"]) $("i", "fcorner " + c, wnd, FLOURISH);
+      if (name === "inventory") $("div", "fbanner", wnd, `<span class="fpennant">${FLEUR_PENNANT}</span><span class="fcastle"></span>`);
+      if (title) $("div", "wtitle fplaque", wnd, `<span class="fp-orn l">${PLAQUE_ORN}</span><span class="fp-t">${esc(title)}</span><span class="fp-orn r">${PLAQUE_ORN}</span>`);
+      if (closable) { const x = $("button", "fclose", wnd, "✕"); x.setAttribute("aria-label", "닫기"); x.onclick = () => this.close(); }
+    } else {
+      if (title) $("div", "wtitle", wnd, esc(title));
+      if (closable) { const x = $("button", "btn red wclose", wnd, "X"); x.onclick = () => this.close(); }
+    }
     const body = $("div", "wbody", wnd);
     this.current = wnd; this.currentName = name; this.closable = closable; this.root.classList.toggle("winopen", name !== "dialog" && name !== "title");
     G.input.block = true; this.fit();
@@ -318,41 +357,42 @@ export class UI {
     const sel = this.sel || {};
     let body;
     if (shopMode) body = $("div", "sellpane", this.current.querySelector(".wbody"));
-    else body = this.open("inventory", "가방 · 장비", 1460, 820);
+    else body = this.open("inventory", "가방 · 장비", 1640, 920);
     const left = $("div", "invleft", body);
     const grid = $("div", "grid", left);
     bag.slots.forEach((s, i) => {
       const d = s.count > 0 ? G.data.item(s.id) : null;
-      const c = $("div", "slot" + (sel.slot === i ? " sel" : ""), grid, d ? this.icon(d.icon, 64) + (s.count > 1 ? `<b>${s.count}</b>` : "") + (isEquipment(d) && bag.canEquip(d) ? "<em>✕</em>" : "") : "");
+      const c = $("div", "slot" + (sel.slot === i ? " sel" : "") + (d ? " full" : ""), grid, d ? this.icon(d.icon, 64) + (s.count > 1 ? `<b>${s.count}</b>` : "") + (isEquipment(d) && bag.canEquip(d) ? "<em>✕</em>" : "") : "");
+      if (d) c.title = d.name;
       c.onclick = () => { this.sel = { slot: i }; G.audio.sfx("ui"); shopMode ? this.showShop(shopMode) : this.showInventory(); };
     });
-    $("div", "invinfo", left, `${bag.slots.filter(s => s.count > 0).length} / ${bag.slots.length} 칸 사용 <span class="goldtxt">${P.gold.toLocaleString()} G</span>`);
+    $("div", "invinfo", left, `<span><b>${bag.slots.filter(s => s.count > 0).length}</b> / <span class="cap">${bag.slots.length}</span> 칸 사용</span><i class="fline">${STAR4}</i><span class="goldtxt"><i class="coin"></i>${P.gold.toLocaleString()} G</span>`);
     const det = $("div", "detail slotbg", left);
     let item = null, equipped = false;
     if (sel.equip) { item = G.data.item(P[sel.equip]); equipped = !!item; }
     else if (sel.slot !== undefined && bag.slots[sel.slot] && bag.slots[sel.slot].count > 0) item = G.data.item(bag.slots[sel.slot].id);
-    if (!item) det.innerHTML = `<div class="hint">${shopMode ? "판매할 아이템을 선택하세요." : "아이템을 선택하면 설명이 표시됩니다."}</div>`;
+    if (!item) det.innerHTML = `<div class="hint"><i class="fstar">${STAR4}</i><span>${shopMode ? "판매할 아이템을 선택하세요." : "아이템을 선택하면 설명이 표시됩니다."}</span><i class="fstar">${STAR4}</i></div>`;
     else {
-      const info = $("div", "dinfo", det, `<b>${item.name}</b> <small>${TYPE_KR[item.type]}${isEquipment(item) ? ` · ${item.tier}단계 · Lv${item.levelReq}` : ""}${item.job ? " · " + G.data.job(item.job).name + " 전용" : ""}</small><div class="small">${item.desc}</div><div class="mods">${(item.stats || []).map(modText).join(" ")}</div>${shopMode ? `<div class="small">판매가 <span class="goldtxt">${item.sellPrice} G</span></div>` : ""}`);
+      const info = $("div", "dinfo", det, `${this.icon(item.icon, 72)}<div><b>${item.name}</b> <small>${TYPE_KR[item.type]}${isEquipment(item) ? ` · ${item.tier}단계 · Lv${item.levelReq}` : ""}${item.job ? " · " + G.data.job(item.job).name + " 전용" : ""}</small><div class="small">${item.desc}</div><div class="mods">${(item.stats || []).map(modText).join(" ")}</div>${item.price ? `<div class="small muted">판매가 ${item.sellPrice} G</div>` : ""}</div>`);
       const btns = $("div", "dbtns", det);
       if (shopMode) {
         if (!equipped) { const slot = sel.slot, cnt = bag.slots[slot].count; this.button(btns, "1개 판매", "teal", () => this.sell(shopMode, slot, 1)); if (cnt > 1) this.button(btns, "모두 판매", "teal", () => this.sell(shopMode, slot, cnt)); }
       } else if (equipped) this.button(btns, "장착 해제", "teal", () => { const e = bag.unequip(sel.equip); if (e) this.toast(e); else this.sel = {}; this.showInventory(); });
-      else if (isEquipment(item)) this.button(btns, "장착", "teal", () => { const e = bag.equipFromSlot(sel.slot); if (e) this.toast(e); else { G.audio.sfx("shield"); this.toast(item.name + " 장착"); } this.showInventory(); });
-      else if (item.type === "consumable") this.button(btns, "사용", "teal", () => { p.useItem(item.id); this.showInventory(); });
+      else if (isEquipment(item)) this.button(btns, "장착", "gold", () => { const e = bag.equipFromSlot(sel.slot); if (e) this.toast(e); else { G.audio.sfx("shield"); this.toast(item.name + " 장착"); } this.showInventory(); });
+      else if (item.type === "consumable") this.button(btns, "사용", "gold", () => { p.useItem(item.id); this.showInventory(); });
       if (!shopMode && !equipped) this.button(btns, "버리기", "red", () => this.confirm(`「${item.name}」을(를) 버릴까요?`, () => { bag.removeAt(sel.slot, bag.slots[sel.slot].count); this.sel = {}; this.showInventory(); }, () => this.showInventory()));
     }
     if (shopMode) return;
-    const right = $("div", "invright slotbg", body);
-    $("div", "sect", right, "<b>장착 장비</b>");
+    const right = $("div", "invright", body);
+    const eqbox = $("div", "fbox", right, `<div class="fsect">${FLEUR}<b>장착 장비</b></div>`);
     [["weapon", "무기"], ["armor", "방어구"], ["accessory", "장신구"]].forEach(([s, kr]) => {
       const it = G.data.item(P[s]);
-      const r = $("div", "eqrow" + (sel.equip === s ? " sel" : ""), right, (it ? this.icon(it.icon, 60) : '<span class="icon empty"></span>') + `<div><small>${kr}</small><br>${it ? it.name : "<span class='muted'>(비어 있음)</span>"}</div>`);
+      const r = $("div", "eqrow" + (sel.equip === s ? " sel" : "") + (it ? "" : " empty"), eqbox, `<span class="eqic">${it ? this.icon(it.icon, 60) : EQ_EMPTY[s]}</span><div><small>${kr}</small><span>${it ? it.name : "(비어 있음)"}</span></div><i class="fstar">${STAR4}</i>`);
       r.onclick = () => { this.sel = { equip: s }; G.audio.sfx("ui"); this.showInventory(); };
     });
     const st = p.sheet.final;
     const show = ["maxHp", "maxSp", "atk", "matk", "def", "crit", "moveSpeed", "atkSpeed", "spRegen", "healPower", "dmgReduce", "cdr"].filter(k => !(["healPower", "dmgReduce", "cdr"].includes(k) && st[k] <= 1e-4));
-    $("div", "stats", right, `<b>능력치</b> <small>${p.sheet.job.name} Lv${P.level}</small><div class="statgrid">` + show.map(k => `<span>${STAT_KR[k]} <b>${PCT.has(k) ? Math.round(st[k] * 100) + "%" : (["moveSpeed", "atkSpeed", "spRegen"].includes(k) ? st[k].toFixed(2) : Math.round(st[k]))}</b></span>`).join("") + "</div>");
+    $("div", "fbox stats", right, `<div class="fsect">${STAT_HEAD}<b>능력치</b> <small>${p.sheet.job.name} Lv${P.level}</small></div><div class="statgrid">` + show.map(k => `<span>${STAT_ICON[k] || STAT_ICON.def0}<em>${STAT_KR[k]}</em><b>${PCT.has(k) ? Math.round(st[k] * 100) + "%" : (["moveSpeed", "atkSpeed", "spRegen"].includes(k) ? st[k].toFixed(2) : Math.round(st[k]))}</b></span>`).join("") + "</div>");
   }
 
   showShop(shop) {

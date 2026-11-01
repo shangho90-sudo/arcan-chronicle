@@ -10,17 +10,43 @@ const ELEM_ICON = { attack: 'skill_ui_attack', support: 'skill_ui_shield', summo
 
 /** small generated icon per skill: job colour disc + type glyph + category letter (temporary art) */
 const iconCache = new Map();
+// painted-style round icon: type-coloured glowing disc, gold bevel ring, white glyph, A/B/C badge
+const ICON_BG = { attack: ['#ffb08a', '#d8402a', '#4a0c08'], support: ['#bfe6ff', '#3a8ed8', '#0c2448'], summon: ['#d8ffb0', '#58b040', '#123a10'], passive: ['#c8ffd8', '#2fa860', '#08301a'],
+  craft: ['#ffe2a0', '#c88a2a', '#3a2408'], ultimate: ['#f0c8ff', '#9a48d8', '#2a0c44'] };
+const BADGE = ['#c0302a', '#2a5ab8', '#3a8a3a'];
+function glyph(g, d) {
+  g.save(); g.translate(48, 48); g.strokeStyle = '#fff'; g.fillStyle = '#fff'; g.lineCap = 'round'; g.lineJoin = 'round'; g.shadowColor = 'rgba(255,240,200,.9)'; g.shadowBlur = 8;
+  const slash = (n, w) => { for (let k = 0; k < n; k++) { const o = (k - (n - 1) / 2) * 11; g.lineWidth = w - k; g.beginPath(); g.moveTo(-24 + o, 22 + o * 0.2); g.quadraticCurveTo(-4 + o, 6, 22 + o * 0.6, -26 + o * 0.3); g.stroke(); } };
+  const id = d.id;
+  if (id === 'nv_a1') { slash(1, 9); g.lineWidth = 3; g.beginPath(); g.moveTo(-18, 26); g.lineTo(-6, 18); g.moveTo(-2, 28); g.lineTo(6, 20); g.stroke(); }
+  else if (id === 'nv_a2') slash(3, 7);
+  else if (id === 'nv_a3') { g.lineWidth = 7; g.beginPath(); g.arc(-10, 0, 22, -1.1, 1.1); g.stroke(); g.beginPath(); g.moveTo(-6, 0); g.lineTo(26, 0); g.stroke(); g.beginPath(); g.moveTo(16, -9); g.lineTo(28, 0); g.lineTo(16, 9); g.fill(); }
+  else if (id === 'nv_p1') { g.beginPath(); g.arc(0, -14, 8, 0, 7); g.fill(); g.beginPath(); g.moveTo(-14, 26); g.quadraticCurveTo(-14, -2, 0, -3); g.quadraticCurveTo(14, -2, 14, 26); g.fill();
+    g.lineWidth = 4; for (const [x, y, r] of [[-20, -16, 6], [20, -20, 7], [22, 4, 5]]) { g.beginPath(); g.moveTo(x - r, y); g.lineTo(x + r, y); g.moveTo(x, y - r); g.lineTo(x, y + r); g.stroke(); } }
+  else if (id === 'nv_p2') { g.rotate(-0.8); g.fillRect(-4, -30, 8, 40); g.beginPath(); g.moveTo(-4, -30); g.lineTo(0, -38); g.lineTo(4, -30); g.fill(); g.fillRect(-13, 10, 26, 5); g.fillRect(-3, 15, 6, 12); g.rotate(0.8);
+    g.lineWidth = 3; g.beginPath(); g.moveTo(14, -24); g.lineTo(26, -30); g.moveTo(18, -12); g.lineTo(30, -14); g.stroke(); }
+  else if (d.type === 'attack') slash(1 + (d.idx || 0) % 3, 8);
+  else if (d.type === 'support') { g.beginPath(); g.moveTo(0, -26); g.lineTo(20, -18); g.lineTo(18, 6); g.quadraticCurveTo(12, 20, 0, 28); g.quadraticCurveTo(-12, 20, -18, 6); g.lineTo(-20, -18); g.closePath(); g.lineWidth = 5; g.stroke(); }
+  else if (d.type === 'summon') { g.beginPath(); g.arc(0, -6, 14, Math.PI, 0); g.lineTo(14, 22); g.lineTo(7, 16); g.lineTo(0, 22); g.lineTo(-7, 16); g.lineTo(-14, 22); g.closePath(); g.fill(); g.fillStyle = '#333'; g.beginPath(); g.arc(-5, -6, 3, 0, 7); g.arc(5, -6, 3, 0, 7); g.fill(); }
+  else if (d.type === 'craft') { g.rotate(-0.6); g.fillRect(-3, -8, 6, 34); g.fillRect(-16, -22, 32, 14); g.rotate(0.6); }
+  else if (d.type === 'ultimate') { g.beginPath(); for (let k = 0; k < 16; k++) { const a = k / 16 * Math.PI * 2, r = k % 2 ? 11 : 28; g.lineTo(Math.cos(a) * r, Math.sin(a) * r); } g.closePath(); g.fill(); }
+  else { g.lineWidth = 6; g.beginPath(); g.moveTo(0, 24); g.lineTo(0, -20); g.moveTo(-14, -6); g.lineTo(0, -22); g.lineTo(14, -6); g.stroke(); }
+  g.restore();
+}
 export function skillIcon(d, size = 48) {
   const k = d.id + size; if (iconCache.has(k)) return iconCache.get(k);
   const c = document.createElement('canvas'); c.width = c.height = 96; const g = c.getContext('2d');
-  const job = G.data.job(d.job), col = job ? job.color : '#888', tcol = TYPE[d.type][1];
-  const gr = g.createRadialGradient(40, 36, 6, 48, 48, 48); gr.addColorStop(0, '#fff8e8'); gr.addColorStop(0.35, col); gr.addColorStop(1, '#1c2a30');
-  g.fillStyle = gr; g.beginPath(); g.arc(48, 48, 44, 0, Math.PI * 2); g.fill();
-  g.lineWidth = 6; g.strokeStyle = d.type === 'ultimate' ? '#ffd860' : tcol; g.stroke();
-  g.fillStyle = '#fff'; g.font = 'bold 40px Galmuri11, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
-  g.shadowColor = '#000'; g.shadowBlur = 6; g.fillText(d.name.slice(0, 1), 48, 50);
-  g.shadowBlur = 0; g.fillStyle = tcol; g.beginPath(); g.arc(78, 78, 13, 0, Math.PI * 2); g.fill(); g.fillStyle = '#fff'; g.font = 'bold 16px sans-serif'; g.fillText('ABC'[d.cat], 78, 79);
-  const url = c.toDataURL(); const html = `<span class="icon i3d" style="width:${size}px;height:${size}px;background:url(${url}) center/contain no-repeat;image-rendering:auto"></span>`;
+  const [c0, c1, c2] = ICON_BG[d.type] || ICON_BG.attack;
+  const gr = g.createRadialGradient(40, 34, 4, 48, 50, 44); gr.addColorStop(0, c0); gr.addColorStop(0.45, c1); gr.addColorStop(1, c2);
+  g.fillStyle = gr; g.beginPath(); g.arc(48, 48, 41, 0, Math.PI * 2); g.fill();
+  const sh = g.createRadialGradient(36, 28, 2, 36, 28, 30); sh.addColorStop(0, 'rgba(255,255,255,.35)'); sh.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = sh; g.fill();
+  glyph(g, d);
+  const ring = g.createLinearGradient(0, 4, 0, 92); ring.addColorStop(0, '#fff2b8'); ring.addColorStop(0.45, '#d4a040'); ring.addColorStop(1, '#7a4a10');
+  g.lineWidth = 6; g.strokeStyle = ring; g.beginPath(); g.arc(48, 48, 43, 0, Math.PI * 2); g.stroke();
+  g.lineWidth = 1.5; g.strokeStyle = 'rgba(60,30,0,.8)'; g.beginPath(); g.arc(48, 48, 39.5, 0, Math.PI * 2); g.stroke();
+  const bx = 78, by = 80; g.fillStyle = '#f4e2b0'; g.beginPath(); g.arc(bx, by, 13, 0, Math.PI * 2); g.fill(); g.fillStyle = BADGE[d.cat] || BADGE[0]; g.beginPath(); g.arc(bx, by, 10.5, 0, Math.PI * 2); g.fill();
+  g.fillStyle = '#fff'; g.font = 'bold 15px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('ABC'[d.cat] || 'A', bx, by + 1);
+  const url = c.toDataURL(); const html = `<span class="icon i3d skic" style="width:${size}px;height:${size}px;background:url(${url}) center/contain no-repeat;image-rendering:auto"></span>`;
   iconCache.set(k, html); return html;
 }
 
@@ -58,13 +84,13 @@ Object.assign(UI.prototype, {
   showSkills(tabJob) {
     const p = G.player, book = p.sheet.book, job = p.sheet.job, sk = book.sk;
     const lineage = book.lineage;
-    const b = this.open('skills', '스킬', 1820, 960);
+    const b = this.open('skills', '스킬', 1700, 0);
     const head = $('div', 'skhead', b);
-    head.innerHTML = `<b>${job.name}</b> <span class="muted">Lv${p.sheet.p.level}</span> · 기본 검술 포인트 <b class="goldtxt">${sk.npoints}</b>` + (job.id !== 'novice' ? ` · 직업 스킬 포인트 <b class="goldtxt">${sk.points}</b> <span class="small muted">(사용 ${book.spent})</span>` : ` <span class="small muted">· 레벨마다 1포인트 · 직업 스킬은 Lv${ADV1_LEVEL} 1차 전직 후</span>`);
-    if (!lineage.length) { $('div', 'skempty', b, `<p>견습생은 레벨 ${ADV1_LEVEL}에 1차 전직을 하면 스킬을 배울 수 있습니다.</p><p class="small muted">Lv10이 되면 5포인트, 이후 레벨마다 1포인트를 얻습니다. 2차 전직(Lv${ADV2_LEVEL}·전직 시험) 때 5포인트를 더 받습니다.</p>`); this.slotBar(b); return; }
+    head.innerHTML = `<i class="fstar4"></i><b class="skjob">${job.name} <span>Lv<em>${p.sheet.p.level}</em></span></b> · 기본 검술 포인트 <em class="skpt">${sk.npoints}</em>` + (job.id !== 'novice' ? ` · 직업 스킬 포인트 <em class="skpt">${sk.points}</em> <span class="small muted">(사용 ${book.spent})</span>` : ` · <span class="sknote">레벨마다 1포인트 · 직업 스킬은 Lv${ADV1_LEVEL} 1차 전직 후</span>`) + '<i class="fline"></i>';
+    if (!lineage.length) { $('div', 'skempty', b, `<p>견습생은 레벨 ${ADV1_LEVEL}에 1차 전직을 하면 스킬을 배울 수 있습니다.</p>`); this.slotBar(b); return; }
     const tabs = $('div', 'sktabs', head);
     const show = tabJob && lineage.includes(tabJob) ? tabJob : lineage[lineage.length - 1];
-    for (const jid of lineage) { const j = G.data.job(jid); const t = this.button(tabs, j.tier === 0 ? '기본 검술' : (j.tier === 1 ? '1차 ' : '2차 ') + j.name, jid === show ? 'gold' : 'ivory', () => this.showSkills(jid)); t.classList.add('small'); }
+    for (const jid of lineage) { const j = G.data.job(jid); const t = this.button(tabs, j.tier === 0 ? '기본 검술' : (j.tier === 1 ? '1차 ' : '2차 ') + j.name, jid === show ? 'gold sel' : 'ivory', () => this.showSkills(jid)); t.classList.add('small'); }
     const inTown = p.zone.def.kind === 'town';
     const rb = this.button(head, '포인트 초기화', 'red', () => { const e = book.reset(inTown, p.skills2.inCombat); if (e) return this.toast(e); this.toast('스킬 포인트를 모두 돌려받았습니다'); this.showSkills(show); });
     rb.title = inTown ? '' : '마을에서만 가능'; if (!inTown) rb.classList.add('locked');
@@ -72,27 +98,27 @@ Object.assign(UI.prototype, {
     const list = G.data.skillsOf(show);
     for (let cat = 0; cat < 3; cat++) {
       const items = list.filter(s => s.cat === cat).sort((a, c) => a.idx - c.idx); if (!items.length) continue;
-      const col = $('div', 'skcol panel-dark', cols, `<div class="skcat">${'ABC'[cat]}. ${items[0].catName}</div>`);
+      const col = $('div', 'skcol', cols, `<div class="skcat"><i class="fstar4"></i>${'ABC'[cat]}. ${items[0].catName}<i class="fstar4 r"></i></div>`);
       for (const d of items) {
         const L = book.level(d.id), blk = book.learnBlock(d.id), max = L >= d.maxLv;
         const [tn, tc] = TYPE[d.type];
         const equipped = sk.slots.includes(d.id) || sk.ult === d.id;
         const row = $('div', 'skrow' + (L ? ' learned' : '') + (this.skSel === d.id ? ' sel' : ''), col,
-          `${skillIcon(d, 52)}<div class="skinfo"><div><b>${d.name}</b> <span class="sktype" style="background:${tc}">${tn}</span>${equipped ? ' <span class="good small">장착</span>' : ''}</div>` +
+          `${skillIcon(d, 76)}<div class="skinfo"><div><b>${d.name}</b> <span class="sktype t-${d.type}" style="background:${tc}">${tn}</span>${equipped ? ' <span class="sktag eq">장착</span>' : ''}</div>` +
           `<div class="small">Lv <b>${L}</b>/${d.maxLv} · 해금 Lv${book.unlockLevel(d)}${d.mp ? ` · 기력 ${d.mp}` : ''}${d.cd ? ` · ${d.cd}초` : ''}${d.range && d.type !== 'passive' && d.type !== 'craft' ? ` · 사거리 ${d.range}m` : ''}</div></div>`);
-        row.onclick = () => { this.skSel = d.id; this.showSkills(show); };
-        if (!max) { const lb = this.button(row, L ? '강화' : '습득', blk ? 'ivory' : 'gold', () => { const e = book.learn(d.id); if (e) return this.toast(e); G.audio.sfx('levelup'); this.showSkills(show); }); lb.classList.add('small'); if (blk) { lb.classList.add('locked'); lb.title = blk; } }
+        row.onclick = () => { this.skSel = d.id; G.audio.sfx('ui'); this.showSkills(show); };
+        if (!max) { const lb = this.button(row, L ? '강화' : '습득', blk ? 'ivory lockb' : L ? 'gold' : 'blue', () => { const e = book.learn(d.id); if (e) return this.toast(e); G.audio.sfx('levelup'); this.showSkills(show); }); lb.classList.add('small'); if (blk) { lb.classList.add('locked'); lb.title = blk; } }
       }
     }
     // detail pane
     const sel = G.data.skill2(this.skSel) && lineage.includes(G.data.skill2(this.skSel).job) ? G.data.skill2(this.skSel) : null;
-    const det = $('div', 'skdetail panel-dark', b);
+    const det = $('div', 'skdetail', b);
     if (sel) {
       const L = book.level(sel.id), blk = book.learnBlock(sel.id);
-      det.innerHTML = `${skillIcon(sel, 64)}<div><b>${sel.name}</b> <span class="sktype" style="background:${TYPE[sel.type][1]}">${TYPE[sel.type][0]}</span> <span class="small muted">${sel.weapon ? '요구 무기: ' + (G.data.job(sel.job).parent ? G.data.job(G.data.job(sel.job).parent).name : G.data.job(sel.job).name) + ' 무기 · ' : ''}필요 포인트 1</span>` +
-        `<div class="small">${sel.desc}</div>` +
-        `<div class="small">현재: ${L ? levelText(sel, L) : '<span class="muted">미습득</span>'}</div>` +
-        (L < sel.maxLv ? `<div class="small goldtxt">다음 레벨: ${levelText(sel, L + 1)}</div>` : '<div class="small good">최대 레벨</div>') +
+      det.innerHTML = `${skillIcon(sel, 112)}<div class="skdtext"><div class="skdname"><b>${sel.name}</b> <span class="sktype t-${sel.type}" style="background:${TYPE[sel.type][1]}">${TYPE[sel.type][0]}</span>${L < sel.maxLv ? ' <span class="skneed">필요 포인트 <em>1</em></span>' : ''} <span class="small muted">${sel.weapon ? '요구 무기: ' + (G.data.job(sel.job).parent ? G.data.job(G.data.job(sel.job).parent).name : G.data.job(sel.job).name) + ' 무기' : ''}</span></div>` +
+        `<i class="fline"></i><div class="skdesc">${sel.desc}</div>` +
+        `<div class="skcur">현재: ${L ? levelText(sel, L) : '<span class="muted">미습득</span>'}</div>` +
+        (L < sel.maxLv ? `<div class="sknext">다음 레벨: ${levelText(sel, L + 1)}</div>` : '<div class="good">최대 레벨</div>') +
         (blk && L < sel.maxLv ? `<div class="small bad">잠금 사유: ${blk}</div>` : '') +
         ((sel.prereq || []).length ? `<div class="small">선행 조건: ${sel.prereq.map(x => (G.data.skill2(x.id)?.name || x.id) + ' Lv' + x.lv).join(', ')}</div>` : '') + `</div>`;
       if (L && ['attack', 'support', 'summon'].includes(sel.type)) {
@@ -106,13 +132,13 @@ Object.assign(UI.prototype, {
   },
   slotBar(b) {
     const p = G.player, book = p.sheet.book, sk = book.sk;
-    const bar = $('div', 'skslots', b, '<span class="small muted">장착 슬롯</span>');
+    const bar = $('div', 'skslots', b, '<span class="sklabel"><i class="fstar4"></i>장착 슬롯</span>');
     for (let i = 0; i <= NORMAL_SLOTS; i++) {
       const id = i < NORMAL_SLOTS ? sk.slots[i] : sk.ult, d = G.data.skill2(id);
-      const s = $('div', 'skslot' + (i === NORMAL_SLOTS ? ' ult' : ''), bar, (d ? skillIcon(d, 48) : '<span class="icon empty" style="width:48px;height:48px"></span>') + `<small>${i < NORMAL_SLOTS ? i + 1 : 'R 궁극'}</small>`);
+      const s = $('div', 'skslot' + (i === NORMAL_SLOTS ? ' ult' : ''), bar, (d ? skillIcon(d, 58) : '<span class="skempty-slot">+</span>') + `<small>${i < NORMAL_SLOTS ? i + 1 : 'R 궁극'}</small>`);
       if (d) { s.title = d.name + ' (클릭하여 해제)'; s.onclick = () => { const e = book.unequip(i < NORMAL_SLOTS ? i : 'ult', p.skills2.inCombat); if (e) return this.toast(e); this.showSkills(); }; }
     }
-    $('div', 'small muted', bar, p.skills2.inCombat ? '<span class="bad">전투 중에는 슬롯을 바꿀 수 없습니다</span>' : '쿨타임은 슬롯을 바꿔도 유지됩니다');
+    $('div', 'sknote', bar, p.skills2.inCombat ? '<span class="bad">전투 중에는 슬롯을 바꿀 수 없습니다</span>' : '쿨타임은 슬롯을 바꿔도 유지됩니다');
   },
 
   // ---------------------------------------------------------------- craft window
