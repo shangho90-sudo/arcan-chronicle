@@ -36,7 +36,10 @@
 - 그림자는 모델별 저폴리 사본(`*_lo`)만 그립니다(색 패스에서는 0개 인스턴스). 존별 후처리 값은 `zones.json`의 `"post"`.
 - 화면 비교: `tools/browser-tests/forestshots.js` (정지·이동·근접·나무 뒤·전투, `W`/`H`/`TOUCH`로 화면비).
 
-## 3D 자산
+## 캐릭터 보행 (`js/model.js`)
+- 걷기·달리기 다리는 절차 보행: `gaitParams`(속도·다리 길이 → 걸음/초, 보폭, 체공), `footAt`(발 궤적), `gaitPose`(3D 다리 IK, 상체), `ModelBody.lockFeet`(디딘 발 월드 고정). `alignLegs`는 키프레임 자세 전용.
+- 이동 속도(4.6 m/s)를 낮춰서 보행을 맞추지 말 것. 바꾼 뒤에는 `tools/browser-tests/gait_probe.js` + `gait_report.py`로 디딘 발 미끄러짐·걸음 수를 남녀 모두 비교하고, `gait_film.js`로 화면을 확인하세요.
+
 - 아티팩트 호스팅이 바이너리를 거부해서 GLB는 base64 JSON(`*.glb.json`)으로 래핑되어 있습니다. 원본 `.glb`가 함께 있는 것도 있습니다.
 - `tools/tripo/`는 Tripo3D API 파이프라인입니다. API 키는 `~/.tripo/key` 파일에서 읽습니다. **키를 저장소에 커밋하지 마세요.**
 

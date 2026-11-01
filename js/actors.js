@@ -298,7 +298,8 @@ export class Player extends Combatant {
       if (this.stuck > 0.6 && this.path.length) { this.setDest(this.path[this.path.length - 1]); this.stuck = 0.41; }
       const walk = action(this.body.sh, "walk");
       const rate = clamp(Math.hypot(this.vel.x, this.vel.z) / Math.max(0.5, this.cfg.footStride) * 6 / walk.fps, 0.4, 2.2);
-      this.body.play("walk", rate); this.body.speed = rate;
+      // pressing into a wall: stand facing it instead of running on the spot with sliding feet
+      if (Math.hypot(mv.x, mv.z) > speed * dt * 0.15 || !this.body.md) { this.body.play("walk", rate); this.body.speed = rate; } else this.idle();
     } else { this.vel = { x: 0, z: 0 }; this.idle(); }
   }
   idle() { if (!this.body || this.skills.busy) return; if (this.body.action === "hit" && !this.body.finished) return; this.body.play("idle", 1); }
