@@ -249,7 +249,7 @@ export class UI {
     if (name !== "dialog" && window.ResizeObserver) { const ro = new ResizeObserver(() => { if (this.current === wnd) this.fit(); else ro.disconnect(); }); ro.observe(wnd); }
     return body;
   }
-  fit() { if (!this.current || this.currentName === "dialog" || this.currentName === "title") return; const w = this.current; w.style.transform = ""; const s = Math.min(1, (innerWidth - 20) / w.offsetWidth, (innerHeight - 20) / w.offsetHeight); w.style.transform = `translate(-50%,-50%) scale(${s})`; }
+  fit() { if (!this.current || ["dialog", "title", "create"].includes(this.currentName)) return; const w = this.current; w.style.transform = ""; const s = Math.min(1, (innerWidth - 20) / w.offsetWidth, (innerHeight - 20) / w.offsetHeight); w.style.transform = `translate(-50%,-50%) scale(${s})`; }
   close(notify = true) {
     const was = !!this.current;
     if (this.current) this.current.remove(); if (this.dim) this.dim.remove();
@@ -421,26 +421,48 @@ export class UI {
     (info ? c : n).focus({ preventScroll: true });
   }
   showCreate(start, back) {
-    const b = this.open("create", "캐릭터 선택", 1240, 0, false);
+    const b = this.open("create", null, 1240, 0, false, false);
+    this.current.classList.add("create-art-window");
+    this.current.setAttribute("aria-label", "캐릭터 선택");
     let gender = "m";
-    const names = { m: "카이", f: "리아" }, typed = { m: false, f: false };
-    const row = $("div", "charcards", b), cards = {}, anims = [];
+    const names = { m: "카이", f: "리아" }, cards = {};
+    const stage = $("div", "create-art", b);
+    const art = $("img", "create-illustration", stage);
+    art.src = "assets/ui/character-select.png";
+    art.alt = "캐릭터 선택 — 소년 모험가와 소녀 모험가";
     for (const c of CHARACTERS) {
-      const card = $("div", "charcard slotbg", row, `<div class="portrait"><img src="assets/ui/portrait_${c.key}.png" alt=""></div>
-        <div class="cinfo"><div class="ctitle">${c.title}</div><div class="small">${c.desc}</div>
-        <div class="ingame"><canvas width="312" height="336"></canvas><div class="small muted">게임 속 모습</div></div></div>`);
-      card.onclick = () => { if (gender !== c.g) { gender = c.g; G.audio.sfx("ui"); upd(); } };
+      const card = this.button(stage, "", "create-choice choice-" + c.g, () => {
+        if (gender !== c.g) { gender = c.g; upd(); }
+      });
+      card.setAttribute("aria-label", c.title);
+      card.title = c.title + " 선택";
       cards[c.g] = card;
-      this.modelPreview(card.querySelector("canvas"), c.g, c.g === "m" ? 0 : 1.1);
     }
-    const form = $("div", "cform", b, `<label>이름</label><input id="cName" maxlength="8" placeholder="이름을 입력하세요 (최대 8자)"><div class="small muted">직업은 마을의 직업 마스터에게서 정합니다. 직업을 정해도 캐릭터의 얼굴·머리·복장은 그대로이고, 직업 장비와 무기가 더해집니다.</div>`);
+    const form = $("div", "create-form", stage, `<input id="cName" aria-label="캐릭터 이름" maxlength="8" autocomplete="off" placeholder="이름 (최대 8자)">`);
     const input = form.querySelector("#cName");
-    input.oninput = () => { typed[gender] = true; names[gender] = input.value; };
-    const upd = () => { for (const g of ["m", "f"]) cards[g].classList.toggle("sel", g === gender); input.value = names[gender]; };
+    input.oninput = () => { names[gender] = input.value; };
+    const upd = () => {
+      for (const g of ["m", "f"]) { cards[g].classList.toggle("sel", g === gender); cards[g].setAttribute("aria-pressed", String(g === gender)); }
+      input.value = names[gender];
+    };
     upd();
-    const bb = $("div", "pbtns", b);
-    this.button(bb, "뒤로", "ivory", back);
-    this.button(bb, "모험 시작", "gold", () => { const n = input.value.trim(); if (!n) return this.toast("이름을 입력하세요."); start(n, gender); });
+    const random = this.button(stage, "", "create-random", () => {
+      const pool = gender === "m" ? ["카이", "레온", "루카", "노아", "아렌"] : ["리아", "루나", "엘라", "유나", "세라"];
+      const options = pool.filter(n => n !== input.value);
+      names[gender] = options[Math.floor(Math.random() * options.length)]; upd();
+    });
+    random.setAttribute("aria-label", "이름 무작위 선택");
+    this.button(stage, "", "create-back", back).setAttribute("aria-label", "뒤로");
+    let starting = false;
+    const begin = () => {
+      if (starting) return;
+      const n = input.value.trim();
+      if (!n) { input.focus(); return this.toast("이름을 입력하세요."); }
+      starting = true; start(n, gender);
+    };
+    this.button(stage, "", "create-start", begin).setAttribute("aria-label", "모험 시작");
+    input.addEventListener("keydown", e => { if (e.key === "Enter" && !e.isComposing) { e.preventDefault(); begin(); } });
+    cards.m.focus({ preventScroll: true });
   }
   /** live 3D preview of a player character on its own small canvas (walks while turning around) */
   async modelPreview(cv, gender, phase = 0) {
