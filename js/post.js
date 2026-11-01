@@ -18,14 +18,15 @@ void main(){
 
 // bright pass + 2x downsample (4-tap box)
 const BRIGHT = `uniform sampler2D tSrc; uniform vec2 px; uniform float threshold; varying vec2 vUv;
+vec3 safe(vec3 c){ return (any(isnan(c)) || any(isinf(c))) ? vec3(0.0) : clamp(c, 0.0, 64.0); }
 void main(){
-  vec3 c = (texture2D(tSrc, vUv + px * vec2(-0.5,-0.5)).rgb + texture2D(tSrc, vUv + px * vec2(0.5,-0.5)).rgb
-          + texture2D(tSrc, vUv + px * vec2(-0.5,0.5)).rgb + texture2D(tSrc, vUv + px * vec2(0.5,0.5)).rgb) * 0.25;
+  vec3 c = (safe(texture2D(tSrc, vUv + px * vec2(-0.5,-0.5)).rgb) + safe(texture2D(tSrc, vUv + px * vec2(0.5,-0.5)).rgb)
+          + safe(texture2D(tSrc, vUv + px * vec2(-0.5,0.5)).rgb) + safe(texture2D(tSrc, vUv + px * vec2(0.5,0.5)).rgb)) * 0.25;
   float l = max(c.r, max(c.g, c.b));
   float k = smoothstep(threshold, threshold * 1.8, l);
   gl_FragColor = vec4(c * k, 1.0); }`;
 
-const COPY = `uniform sampler2D tSrc; varying vec2 vUv; void main(){ gl_FragColor = texture2D(tSrc, vUv); }`;
+const COPY = `uniform sampler2D tSrc; varying vec2 vUv; void main(){ vec4 c = texture2D(tSrc, vUv); gl_FragColor = (any(isnan(c)) || any(isinf(c))) ? vec4(0.0) : min(c, vec4(64.0)); }`;
 
 const FINAL = `uniform sampler2D tScene, tBloom1, tBloom2, tSoft; uniform float bloom, exposure, warmth, sat, contrast, vignette, tilt, aspect;
 varying vec2 vUv;
@@ -34,13 +35,16 @@ vec3 filmic(vec3 x){ // soft shoulder, keeps saturation (closer to a painted loo
 vec3 toSRGB(vec3 c){ c = clamp(c, 0.0, 1.0); return mix(c * 12.92, 1.055 * pow(c, vec3(1.0/2.4)) - 0.055, step(0.0031308, c)); }
 void main(){
   vec3 c = texture2D(tScene, vUv).rgb;
+  if (any(isnan(c)) || any(isinf(c))) c = vec3(0.0); c = min(c, vec3(64.0));
+  vec3 b1 = texture2D(tBloom1, vUv).rgb, b2 = texture2D(tBloom2, vUv).rgb;
+  if (any(isnan(b1)) || any(isinf(b1))) b1 = vec3(0.0); if (any(isnan(b2)) || any(isinf(b2))) b2 = vec3(0.0);
   // tilt-shift: blur toward the top / bottom edges and strongest in the corners
   vec2 d = vUv - 0.5; d.x *= aspect;
   float band = smoothstep(0.30, 0.52, abs(vUv.y - 0.48));
   float corner = smoothstep(0.55, 0.95, length(d * vec2(0.85, 1.0)));
   float b = clamp(max(band, corner) * tilt, 0.0, 1.0);
   c = mix(c, texture2D(tSoft, vUv).rgb, b);
-  c += (texture2D(tBloom1, vUv).rgb * 0.6 + texture2D(tBloom2, vUv).rgb * 0.9) * bloom;
+  c += (b1 * 0.6 + b2 * 0.9) * bloom;
   // warm grade: lift warm highlights, keep shadows slightly cool-violet, a touch more saturation
   c = filmic(c);
   c = mix(c, c * c * (3.0 - 2.0 * c), contrast);

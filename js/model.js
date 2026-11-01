@@ -180,7 +180,7 @@ function gaitParams(v, leg) {
   const cad = lerp(1.7 + 0.42 * v, 2.55 + 0.21 * v, run) * Math.sqrt(0.72 / L);
   const cycle = Math.max(0.2, 2 * v / cad);                               // metres travelled per full stride (two steps)
   const crouch = lerp(0.975, 0.845, run) * L;                             // hip-to-ankle height at mid-stance
-  const sMax = 2 * Math.sqrt(Math.max(0, L * L - crouch * crouch)) + 0.05 * run;
+  const sMax = Math.sqrt(Math.max(0, L * L - crouch * crouch)) / 0.56 + 0.05 * run;   // the front ~58 % of the stance must be reachable
   let duty = lerp(0.62, 0.38, run), S = duty * cycle;
   if (S > sMax) { S = sMax; duty = Math.max(0.28, S / cycle); S = duty * cycle; }
   return { run, L, duty, S: Math.max(0.08, S), cycle, crouch, cad, track: lerp(0.085, 0.065, run) };
@@ -189,21 +189,22 @@ function gaitParams(v, leg) {
 /** one foot over the cycle in body space: z along the walk (from the hip), lift above its rest height, pitch (deg, + = toes up),
  *  e = swing progress 0..1 */
 function footAt(ph, G, toe) {
-  const run = G.run, S = G.S;
+  // the stance is placed a little ahead of the hip (lands ~58 % of the stance length in front, leaves ~42 % behind),
+  // so the trailing leg is not stretched far back; the swing brings the foot forward early instead of kicking it up behind
+  const run = G.run, S = G.S, front = lerp(0.56, 0.6, run), back = 1 - front;
   if (ph < G.duty) {                                                       // stance: planted, moves back at exactly body speed
     const s = ph / G.duty;
-    const pf = lerp(22, 28, run) * sstep(lerp(0.55, 0.4, run), 1, s);    // heel raise / push-off
+    const pf = lerp(20, 24, run) * sstep(lerp(0.6, 0.5, run), 1, s);     // heel raise / push-off (late, short)
     const strike = lerp(8, 3, run) * (1 - sstep(0, 0.16, s));              // heel strike then foot flat
-    // heel raise pivots about the ball of the foot: the ankle rises and moves a little towards the toes, the toes stay put
     const roll = toe * (1 - Math.cos(pf * DEG));
-    return { z: S / 2 - S * s + roll, roll, lift: toe * Math.sin(pf * DEG), pitch: strike - pf, stance: true, s, e: 0 };
+    return { z: S * front - S * s + roll, roll, lift: toe * Math.sin(pf * DEG), pitch: strike - pf, stance: true, s, e: 0, land: S * front };
   }
-  const s = (ph - G.duty) / (1 - G.duty), pf0 = lerp(22, 28, run);
-  const e = sstep(0, 1, Math.min(1, Math.max(0, (s - 0.06 * run) / (1 - 0.06 * run))));
-  const H = lerp(0.07, 0.15, run);                                         // swing clearance (heel kick kept modest)
-  const lift = Math.max(H * Math.sin(Math.PI * Math.pow(s, lerp(0.85, 0.7, run))), toe * Math.sin(pf0 * DEG) * (1 - s) * (1 - s));
-  const pitch = s < 0.55 ? lerp(-pf0, 2, sstep(0, 0.55, s)) : lerp(2, lerp(8, 3, run), sstep(0.55, 1, s));
-  return { z: -S / 2 + S * e, lift, pitch, stance: false, s, e };
+  const s = (ph - G.duty) / (1 - G.duty), pf0 = lerp(20, 24, run);
+  const e = sstep(0, 1, Math.pow(s, 0.75));                                // foot travels forward early in the swing
+  const H = lerp(0.065, 0.12, run);                                        // clearance peaks mid-swing, little heel kick
+  const lift = Math.max(H * Math.sin(Math.PI * Math.pow(s, 0.9)), toe * Math.sin(pf0 * DEG) * (1 - s) * (1 - s) * (1 - s));
+  const pitch = s < 0.45 ? lerp(-pf0, 4, sstep(0, 0.45, s)) : lerp(4, lerp(8, 3, run), sstep(0.45, 1, s));
+  return { z: -S * back + S * e, lift, pitch, stance: false, s, e, land: S * front };
 }
 
 // ---- 3D two-bone leg IK in the model's own frame (metres, mesh-local: x = model left, y up, z forward)
@@ -263,7 +264,7 @@ function gaitPose(body, ph, v, base) {
   // (a foot dragged far behind in a sharp turn may not pull the pelvis down more than a little: the IK clamps it instead)
   for (const side of ['Left', 'Right']) if (tgt[side].stance) D = Math.min(D, want(nominal[side].f.s), Math.max(want(nominal[side].f.s) * 0.94, reach(side, tgt[side])));
   if (D === Infinity) {                                                    // flight (running): small ballistic rise between steps
-    const end = Math.min(want(1), Math.sqrt(Math.max(0, G.L * G.L - (G.S / 2) ** 2)) + leg.Left.toe * Math.sin(lerp(22, 28, run) * DEG));
+    const end = Math.min(want(1), Math.sqrt(Math.max(0, G.L * G.L - (G.S * 0.44) ** 2)) + leg.Left.toe * Math.sin(lerp(20, 24, run) * DEG));
     const u = fract(ph * 2 - G.duty * 2) / Math.max(1e-3, 1 - G.duty * 2);
     D = end + 0.022 * run * Math.sin(Math.PI * Math.min(1, Math.max(0, u)));
   }
@@ -392,7 +393,7 @@ export class ModelBody {
         // lift off from where the foot really was (heel-raise roll included)
         if (st.stance !== false) { st.lift = st.lastW || st.lock || toW(n.x, n.z); st.liftYaw = st.lastYaw !== undefined ? st.lastYaw : yaw + n.yaw; st.lock = null; }
         st.stance = false;
-        const a = toB(st.lift), e = f.e, landZ = n.z - f.z + G.S / 2;
+        const a = toB(st.lift), e = f.e, landZ = n.z - f.z + f.land;
         const fy0 = wrap(st.liftYaw - yaw);
         const o = { x: a.x + (n.x - a.x) * e, z: a.z + (landZ - a.z) * e, yaw: fy0 + wrap(n.yaw - fy0) * e, lift: f.lift, pitch: f.pitch, stance: false };
         out[side] = o; st.lastW = toW(o.x, o.z); st.lastYaw = yaw + o.yaw;

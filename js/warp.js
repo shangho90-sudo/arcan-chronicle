@@ -45,24 +45,24 @@ void main(){
   float sw2 = sin(a * 3.0 - r * 14.0 + time * 3.1) * 0.5 + 0.5;
   float core = smoothstep(0.35, 0.0, r) * 0.6;
   float edge = smoothstep(1.0, 0.85, r);
-  float v = (pow(sw, 3.0) * 0.8 + pow(sw2, 6.0) * 0.4) * (0.35 + 0.65 * r) + core * 0.9;
+  float v = (pow(max(sw, 0.0), 3.0) * 0.8 + pow(max(sw2, 0.0), 6.0) * 0.4) * (0.35 + 0.65 * r) + core * 0.9;
   vec3 col = mix(vec3(0.20, 0.50, 1.0), vec3(0.85, 0.97, 1.0), clamp(v, 0.0, 1.0));
   gl_FragColor = vec4(col * (0.35 + v) * 0.75, (0.25 + v * 0.75) * edge);
 }`;
 const beamFS = `uniform float time; uniform float seed; varying vec2 vUv;
 void main(){
   float x = abs(vUv.x - 0.5) * 2.0;
-  float fall = pow(1.0 - vUv.y, 1.6) * smoothstep(0.0, 0.06, vUv.y);
+  float fall = pow(clamp(1.0 - vUv.y, 0.0, 1.0), 1.6) * smoothstep(0.0, 0.06, vUv.y);
   float flick = 0.75 + 0.25 * sin(time * 3.0 + seed * 7.0 + vUv.y * 6.0);
-  float a = (1.0 - x * x) * fall * flick;
+  float a = max(0.0, 1.0 - x * x) * fall * flick;
   gl_FragColor = vec4(vec3(0.55, 0.78, 1.0) * a, a * 0.55);
 }`;
 const ribbonFS = `uniform float time; uniform float seed; varying vec2 vUv;
 void main(){
   float x = abs(vUv.x - 0.5) * 2.0;
   float flow = fract(vUv.y * 1.5 - time * 0.6 + seed);
-  float a = (1.0 - x) * smoothstep(0.0, 0.1, vUv.y) * smoothstep(1.0, 0.55, vUv.y) * (0.55 + 0.45 * smoothstep(0.0, 0.5, flow) * smoothstep(1.0, 0.5, flow));
-  vec3 col = mix(vec3(0.45, 0.75, 1.0), vec3(1.0), pow(1.0 - x, 3.0));
+  float a = max(0.0, 1.0 - x) * smoothstep(0.0, 0.1, vUv.y) * smoothstep(1.0, 0.55, vUv.y) * (0.55 + 0.45 * smoothstep(0.0, 0.5, flow) * smoothstep(1.0, 0.5, flow));
+  vec3 col = mix(vec3(0.45, 0.75, 1.0), vec3(1.0), pow(clamp(1.0 - x, 0.0, 1.0), 3.0));
   gl_FragColor = vec4(col * a * 1.4, a);
 }`;
 const VS = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
