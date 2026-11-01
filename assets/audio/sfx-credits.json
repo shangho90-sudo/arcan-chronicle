@@ -1,0 +1,130 @@
+{
+  "provider": "Runway",
+  "generatedOn": "2026-11-02",
+  "assets": [
+    {
+      "file": "sfx_hit.mp3",
+      "taskId": "7ff29c60-0d6d-4184-8186-e0b8152dfd44"
+    },
+    {
+      "file": "sfx_heavy.mp3",
+      "taskId": "25ab82a4-6740-4b55-82b6-99e7b3a66c98",
+      "prompt": "Heavy fantasy hammer strikes armor, immediate deep punch and metallic crunch, short decay",
+      "duration": 1
+    },
+    {
+      "file": "sfx_swing.mp3",
+      "taskId": "1b696f54-b0b2-42c1-b32c-6711bce1e67a",
+      "prompt": "Single fast sword swing through air, crisp light whoosh",
+      "duration": 0.5
+    },
+    {
+      "file": "sfx_magic.mp3",
+      "taskId": "60d397da-ca43-4e97-acb5-30f2a7c4977e",
+      "prompt": "Arcane spell release, immediate crystalline energy pulse and sparkling magical tail",
+      "duration": 1.2
+    },
+    {
+      "file": "sfx_fire.mp3",
+      "taskId": "40c3430b-11b4-4374-9d1f-3c9041ce5fd7",
+      "prompt": "Small fireball explodes, immediate fiery whoomp with brief crackling embers",
+      "duration": 1.2
+    },
+    {
+      "file": "sfx_ice.mp3",
+      "taskId": "3a570df9-86c8-4515-9128-ac0712741fa7",
+      "prompt": "Ice spell shatters, immediate bright frozen crystal crack and tinkling shards",
+      "duration": 1
+    },
+    {
+      "file": "sfx_splash.mp3",
+      "taskId": "f4794639-89f3-47b0-8d1e-bf8990f9eb16",
+      "prompt": "Alchemy flask breaks, glass pop and bubbling liquid splash",
+      "duration": 0.8
+    },
+    {
+      "file": "sfx_heal.mp3",
+      "taskId": "1152a683-0209-4625-9f52-96174835d9e9",
+      "prompt": "Healing spell, gentle ascending luminous bell shimmer, warm restorative glow",
+      "duration": 1.5
+    },
+    {
+      "file": "sfx_shield.mp3",
+      "taskId": "2dbec80d-e42e-434c-b3c9-5103ae1bcd44",
+      "prompt": "Magical shield activates, metallic ring and resonant protective energy pulse",
+      "duration": 1
+    },
+    {
+      "file": "sfx_dodge.mp3",
+      "taskId": "65605a5a-6ce1-4cfd-909e-173cd8fd7fd5",
+      "prompt": "Quick evasive dash, short airy cloth swoosh",
+      "duration": 0.5
+    },
+    {
+      "file": "sfx_throw.mp3",
+      "taskId": "163bb675-4c64-4141-b12b-70a702aad715",
+      "prompt": "Fantasy projectile launches, quick taut snap and whistling whoosh",
+      "duration": 0.6
+    },
+    {
+      "file": "sfx_boss_slam.mp3",
+      "taskId": "747b8568-989a-400a-bf0b-9e64b66711e6",
+      "prompt": "Huge stone monster slams ground, immediate weighty bass impact, cracking rock and short dust rumble",
+      "duration": 1.6
+    },
+    {
+      "file": "sfx_monster_attack.mp3",
+      "taskId": "a979ed97-08de-406c-ac7e-fecb6290d5ab",
+      "prompt": "Small fantasy beast claw attack, short rough swish and throaty animal huff",
+      "duration": 0.6
+    },
+    {
+      "file": "sfx_monster_die.mp3",
+      "taskId": "aea285c0-9d72-4e04-8475-fcfa86353ab1",
+      "prompt": "Cute fantasy monster defeated, short soft creature squeak fading into magical dust",
+      "duration": 1
+    },
+    {
+      "file": "sfx_hurt.mp3",
+      "taskId": "e560269b-4ed2-488c-8394-a68ebab8d4fb",
+      "prompt": "Hero armor takes a hit, short dull leather and metal impact",
+      "duration": 0.5
+    },
+    {
+      "file": "sfx_die.mp3",
+      "taskId": "8949b797-bf56-46c4-b81f-3060b37eb84d",
+      "prompt": "Fantasy hero defeat, descending hollow magical tones fading softly",
+      "duration": 2
+    },
+    {
+      "file": "sfx_levelup.mp3",
+      "taskId": "dc81c7aa-9614-40a4-8bca-51a22c562ff6",
+      "prompt": "Fantasy RPG level up reward, immediate brilliant rising bell arpeggio resolving into triumphant warm sparkling chord",
+      "duration": 2.5
+    },
+    {
+      "file": "sfx_quest.mp3",
+      "taskId": "68fd9f40-89c2-4698-a5ee-74a820715087",
+      "prompt": "Fantasy quest completed, short satisfying three bell ascending reward chime",
+      "duration": 1.5
+    },
+    {
+      "file": "sfx_coin.mp3",
+      "taskId": "b7862cf3-bbe8-4c65-b124-9b2950f36065",
+      "prompt": "A few gold coins collected, bright delicate metallic clinks",
+      "duration": 0.6
+    },
+    {
+      "file": "sfx_pickup.mp3",
+      "taskId": "ea525f42-ce9f-4846-aadd-6ce2e1af3b19",
+      "prompt": "Fantasy item collected, quick soft sparkling pop",
+      "duration": 0.5
+    },
+    {
+      "file": "sfx_crit.mp3",
+      "taskId": "22aa2fb1-1194-42e3-b291-fdecfde17ea4",
+      "prompt": "Critical sword strike, sharp metallic crack and deep forceful impact",
+      "duration": 0.8
+    }
+  ]
+}

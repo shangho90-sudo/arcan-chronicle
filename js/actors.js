@@ -47,6 +47,7 @@ export class Combatant {
       else G.ui.damageText(this.pos, Math.round(amount), d.dot ? "dot" : this.faction === "player" ? "taken" : d.crit ? "crit" : "hit");
       // critical hit on a monster: a beat of hit-stop, a camera kick and a star burst at the target
       if (d.crit && !d.dot && this.faction !== "player") {
+        G.audio.sfx("crit");
         G.hitStop(0.07); G.render.addShake(0.14, 0.16);
         G.fx.play("hit", { x: this.pos.x, y: this.pos.y + 0.7, z: this.pos.z }, 1.5, false, [1, 0.85, 0.3]);
         if (G.skillFx) try { G.skillFx.burst('explosion_gold', { x: this.pos.x, y: this.pos.y + 0.6, z: this.pos.z }, { radius: 0.55 }); } catch (e) { }
@@ -388,7 +389,7 @@ export class Player extends Combatant {
     if (d.dot) return;
     if (!this.skills.busy && this.dashT <= 0) this.body.play("hit", 1, true);
     if (loss > this.maxHp * 0.08) G.render.addShake(0.1, 0.15);
-    G.audio.sfx("hit");
+    G.audio.sfx("hurt");
   }
   onDeath() { this.skills.cancel(); this.skills2.clearTemp(); this.path = []; G.audio.sfx("die"); G.onPlayerDied(); }
   revive(f) {
@@ -505,6 +506,7 @@ export class Monster extends Combatant {
       G.audio.sfx("boss_slam"); if (p && this.dist(p) < 10) G.render.addShake(0.15, 0.25);
     } else {
       const st = this.body.cfg && this.body.cfg.atk, L = this.locked;
+      G.audio.sfx(st === 'breath' ? 'fire' : 'monster_attack');
       // charge / headbutt: the body actually lunges forward a little; breath reaches further in a narrower cone
       if (st === 'charge' || st === 'headbutt') this.moveBy(L.x * 0.6, L.z * 0.6);
       const reach = this.def.attackRange + (st === 'breath' ? 1.4 : 0.35), ang = st === 'breath' ? 70 : 110;

@@ -3,6 +3,7 @@
 // Visuals go through G.skillFx (js/skillfx.js, 3D effect library) with a generic fallback.
 import { THREE, T } from './render.js';
 import { HitShape, CombatMath, clamp, clamp01 } from './core.js';
+import { skillSound } from './sfx.js';
 
 let G = null; export function bindSkillRt(g) { G = g; }
 const DEG = Math.PI / 180;
@@ -167,6 +168,7 @@ export class SkillEngine {
   /** cast time finished (or instant): schedule every op */
   release(ctx) {
     const pc = this.pc, sh = pc.body.sh, d = ctx.d, anim = d.anim || 'cast';
+    G.audio.sfx(skillSound(d));
     const ht = d.cast ? 0 : Math.min(0.35, (sh.actions[anim] ? sh.actions[anim].hitFrame / sh.actions[anim].fps : 0.2) || 0.2);
     let span = 0; for (const op of d.ops) { if (op.op === 'lunge') continue; const n = (op.hits || 1) + (op.hitsPerLv ? Math.floor(op.hitsPerLv * (ctx.L - 1)) : 0); span = Math.max(span, (op.at || 0) + (n - 1) * (op.gap || 0.13)); }
     pc.skills.lock = Math.max(pc.skills.lock, ht + span + (d.recover || 0.3));
@@ -372,7 +374,7 @@ export class SkillEngine {
         }
         if (op.extendHerb) for (const a of this.areas) if (a.op.herb && this.shapeOf(op, ctx).overlaps(a.c.x, a.c.z, a.r)) a.extend(op.extendHerb, op.extendCap || 4);
         if (op.link && ts.length > 1) for (let i = 1; i < ts.length; i++) FX.beam('thread_link', ts[i - 1].pos, ts[i].pos, { duration: 2 });
-        if (ts.length) G.audio.sfx(d.type === 'ultimate' ? 'boss_slam' : 'hit');
+        if (ts.length) G.audio.sfx(skillSound(d, op));
       };
       if (h === 0) run(); else this.pending.push({ time: this.clock + h * (op.gap || 0.15), op: { op: '_run', run }, ctx });
     }
@@ -428,7 +430,7 @@ export class SkillEngine {
     }
     if (op.area) this.addArea({ op: 'area', ...op.area }, ctx, c);
     if (op.knock) for (const t of ts) if (!t.isBoss) { const dx = t.pos.x - c.x, dz = t.pos.z - c.z, m = Math.hypot(dx, dz) || 1; t.knock = { x: dx / m * op.knock * 3, z: dz / m * op.knock * 3 }; }
-    if (ts.length) G.audio.sfx('heavy');
+    G.audio.sfx(skillSound(ctx.d, op));
     if (op.chain && ts[0]) this.chain(ts[0], op.chain, ctx);
     return ts;
   }
@@ -558,6 +560,7 @@ class SkillProj {
       if (c.dead || c.faction === 'player' || c.isSummon || this.hit.has(c)) continue;
       if (Math.hypot(this.pos.x - c.pos.x, this.pos.z - c.pos.z) <= c.radius + (op.w ? op.w / 2 : 0.3)) {
         this.hit.add(c);
+        if (!op.r) G.audio.sfx(skillSound(this.ctx.d, op));
         if (op.attach) { this.ctx.attached = c; this.ctx.attachedPos = { ...c.pos }; FX.burst('hit_pierce', c.pos, { radius: 0.5 }); this.eng.dmg(c, op.coef, this.ctx, op); return this.done(); }
         if (op.r) { this.landBlast({ ...c.pos }); return this.done(); }
         let coef = op.coef;

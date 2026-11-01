@@ -193,7 +193,7 @@ export class RewardFx {
     const G = this.G, p = G.player; if (!p) return;
     this.items.push(new LevelUpWings(this.scene, p));
     if (G.skillFx) { G.skillFx.burst('explosion_gold', { x: p.pos.x, y: p.pos.y, z: p.pos.z }, { radius: 1.1 }); G.skillFx.burst('heal', { x: p.pos.x, y: p.pos.y, z: p.pos.z }, { radius: 1.2, color: 0xffe08a }); }
-    G.audio.chime && G.audio.chime('levelup');
+    // The levelUp game event plays the recorded fanfare once.
     G.ui.levelBanner && G.ui.levelBanner(G.sheet ? G.sheet.p.level : 0);
   }
   update(dt) {

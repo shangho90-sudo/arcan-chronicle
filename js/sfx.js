@@ -1,0 +1,24 @@
+// Skill audio selection uses the same operations as the visual/combat runtime.
+export function skillSound(d, op = null) {
+  if (op) {
+    if (op.sfx) return op.sfx;
+    if (op.elem === 'fire') return 'fire';
+    if (op.elem === 'ice') return 'ice';
+    if (op.elem) return 'magic';
+    if (op.tag === 'flask') return 'splash';
+    if (d.type === 'ultimate') return 'boss_slam';
+    return op.coef >= 2 ? 'heavy' : 'hit';
+  }
+  if (d.sfx) return d.sfx;
+  const ops = d.ops || [];
+  if (ops.some(o => o.op === 'shield')) return 'shield';
+  if (ops.some(o => ['heal', 'cleanse', 'consume'].includes(o.op))) return 'heal';
+  if (ops.some(o => o.op === 'proj')) return 'throw';
+  if (d.weapon || d.job === 'novice') return 'swing';
+  return 'magic';
+}
+
+export const SFX_NAMES = ['hit', 'heavy', 'swing', 'magic', 'fire', 'ice', 'splash',
+  'heal', 'shield', 'dodge', 'throw', 'boss_slam', 'monster_attack', 'monster_die',
+  'hurt', 'die', 'levelup', 'quest', 'coin', 'pickup', 'crit', 'ui', 'ui_back', 'warn'];
+export const SFX_REWARDS = new Set(['levelup', 'quest', 'coin', 'pickup', 'die']);
