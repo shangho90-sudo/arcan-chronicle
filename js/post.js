@@ -56,6 +56,7 @@ export class Post {
   constructor(renderer) {
     this.r = renderer; this.enabled = true;
     this.params = { bloom: 0.65, threshold: 2.6, exposure: 1.12, warmth: 1.0, sat: 1.25, contrast: 0.32, vignette: 0.4, tilt: 0 };   // tilt 0 = no top/bottom edge blur (the user asked to remove it)
+    this.defaults = { ...this.params };   // zones may override some values (zones.json "post"), restored on every zone load
     const hf = { type: THREE.HalfFloatType, depthBuffer: false };
     this.scene = new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, samples: 4 });
     this.b1 = [new THREE.WebGLRenderTarget(4, 4, hf), new THREE.WebGLRenderTarget(4, 4, hf)];   // 1/2

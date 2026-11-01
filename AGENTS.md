@@ -29,6 +29,13 @@
 - 마을 바닥 텍스처는 `tools/town/texgen2.py`로 생성(`pave`, `cobble`). 장미 문양 바닥·꽃잎·나뭇잎 그림자(보이지 않는 나무 그늘 캐스터)·장식 가로등은 `js/town3d.js`.
 - HUD는 `index.html`의 "ornate gold HUD" CSS 블록과 `js/ui.js`의 `MENU_ICON`/`HUD_ICON`(SVG 아이콘).
 
+## 숲 그래픽 (속삭이는 숲, `zones.json`의 `"nature"`가 있는 존)
+- `js/nature.js`가 빌더의 평평한 바닥·원뿔 나무·상자 소품을 숨기고 다시 그립니다: 손그림 지면 셰이더(햇빛 잔디/그늘 잔디/흙/이끼, 반복 완화), 곡선 흙길(마스크는 존의 `patches` 경로에서 생성), Tripo 나무·덤불·바위(모델·16 m 청크 단위 인스턴싱), 풀·꽃 카드(인스턴싱, 바람), 작은 돌, 플레이어를 가리는 나무 디더링.
+- 배치는 `tools/forest/layout.py --write`(시드 고정)로 `zones.json`의 forest `props`를 다시 씁니다. 나무·바위·그루터기만 충돌(`propFootprint`), `shrub`·`flowers`는 장식. 배치를 바꾸면 `node tools/forest/check_nav.mjs`로 모든 포털·캠프·보스 입구 도달을 확인하세요.
+- 모델 후처리 `tools/forest/process_models.py`, 텍스처 `tools/forest/texgen_forest.py`, 출처는 `assets/forest/README.md`.
+- 그림자는 모델별 저폴리 사본(`*_lo`)만 그립니다(색 패스에서는 0개 인스턴스). 존별 후처리 값은 `zones.json`의 `"post"`.
+- 화면 비교: `tools/browser-tests/forestshots.js` (정지·이동·근접·나무 뒤·전투, `W`/`H`/`TOUCH`로 화면비).
+
 ## 3D 자산
 - 아티팩트 호스팅이 바이너리를 거부해서 GLB는 base64 JSON(`*.glb.json`)으로 래핑되어 있습니다. 원본 `.glb`가 함께 있는 것도 있습니다.
 - `tools/tripo/`는 Tripo3D API 파이프라인입니다. API 키는 `~/.tripo/key` 파일에서 읽습니다. **키를 저장소에 커밋하지 마세요.**
@@ -40,5 +47,6 @@
 ## 알려진 미완료
 - 스킬 아이콘은 코드 생성 임시 아이콘.
 - 4족 몬스터는 걷기 애니메이션만 있고 공격/피격/죽음은 절차 동작.
+- 숲 그래픽 개편은 속삭이는 숲에만 적용(안개 골짜기·서리 고원·용의 유적은 예전 방식).
 - 휴대폰 레이아웃의 스킬 버튼 배치 미확인. 사람이 처음부터 끝까지 플레이한 검증 없음.
 - 원래 있던 Unity 프로젝트에는 미반영(이 저장소는 웹 버전만).

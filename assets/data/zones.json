@@ -2947,15 +2947,15 @@
    ],
    "groundTex": "forest_floor",
    "ambient": [
-    0.56,
-    0.62,
-    0.66
+    0.6,
+    0.6,
+    0.56
    ],
    "sun": [
     1.0,
-    0.95,
     0.86,
-    1.05
+    0.64,
+    1.4
    ],
    "spriteTint": [
     0.97,
@@ -3387,1242 +3387,6 @@
      "d": 0.0
     },
     {
-     "type": "tree",
-     "pos": [
-      -29.8,
-      -19.78
-     ],
-     "rot": 3.94,
-     "scale": 1.11,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -4.1,
-      -24.13
-     ],
-     "rot": 277.03,
-     "scale": 1.09,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -29.91,
-      -6.18
-     ],
-     "rot": 0.17,
-     "scale": 1.29,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      38.84,
-      -37.47
-     ],
-     "rot": 141.94,
-     "scale": 1.28,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -4.56,
-      -38.25
-     ],
-     "rot": 118.42,
-     "scale": 1.03,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -33.21,
-      -22.72
-     ],
-     "rot": 87.48,
-     "scale": 1.17,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      9.53,
-      -29.08
-     ],
-     "rot": 174.14,
-     "scale": 1.16,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -19.54,
-      -24.2
-     ],
-     "rot": 226.43,
-     "scale": 1.15,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -6.13,
-      -30.9
-     ],
-     "rot": 184.45,
-     "scale": 1.01,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -18.96,
-      25.25
-     ],
-     "rot": 176.76,
-     "scale": 1.13,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -29.14,
-      -1.61
-     ],
-     "rot": 306.86,
-     "scale": 1.18,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -22.43,
-      32.37
-     ],
-     "rot": 5.97,
-     "scale": 1.02,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -19.57,
-      -35.37
-     ],
-     "rot": 132.76,
-     "scale": 1.16,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -3.87,
-      -13.18
-     ],
-     "rot": 248.84,
-     "scale": 1.16,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      7.01,
-      33.04
-     ],
-     "rot": 327.68,
-     "scale": 1.22,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -37.34,
-      10.62
-     ],
-     "rot": 24.22,
-     "scale": 1.04,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      38.95,
-      -33.13
-     ],
-     "rot": 132.4,
-     "scale": 0.92,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -11.56,
-      14.44
-     ],
-     "rot": 313.6,
-     "scale": 1.09,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      28.35,
-      5.68
-     ],
-     "rot": 238.42,
-     "scale": 1.07,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      8.49,
-      -32.74
-     ],
-     "rot": 41.61,
-     "scale": 1.02,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      18.33,
-      6.31
-     ],
-     "rot": 166.54,
-     "scale": 1.14,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -14.8,
-      -32.16
-     ],
-     "rot": 82.88,
-     "scale": 1.21,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -1.07,
-      30.92
-     ],
-     "rot": 108.37,
-     "scale": 1.21,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      1.43,
-      19.79
-     ],
-     "rot": 237.6,
-     "scale": 1.1,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -13.5,
-      12.94
-     ],
-     "rot": 228.3,
-     "scale": 1.26,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      29.66,
-      -9.02
-     ],
-     "rot": 331.49,
-     "scale": 0.99,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -0.28,
-      26.29
-     ],
-     "rot": 256.04,
-     "scale": 1.33,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      25.1,
-      -30.2
-     ],
-     "rot": 99.06,
-     "scale": 1.0,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -14.01,
-      25.64
-     ],
-     "rot": 314.22,
-     "scale": 0.92,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      22.74,
-      -37.51
-     ],
-     "rot": 145.87,
-     "scale": 0.99,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -20.48,
-      -28.01
-     ],
-     "rot": 354.24,
-     "scale": 0.95,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      14.39,
-      -23.45
-     ],
-     "rot": 92.18,
-     "scale": 1.22,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      2.72,
-      -36.18
-     ],
-     "rot": 98.05,
-     "scale": 1.06,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -8.31,
-      22.77
-     ],
-     "rot": 31.4,
-     "scale": 1.32,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      34.65,
-      -2.83
-     ],
-     "rot": 353.64,
-     "scale": 0.94,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -14.01,
-      31.98
-     ],
-     "rot": 125.46,
-     "scale": 0.94,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -12.32,
-      -6.13
-     ],
-     "rot": 175.48,
-     "scale": 0.91,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      1.42,
-      13.88
-     ],
-     "rot": 340.47,
-     "scale": 1.12,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      20.11,
-      -4.73
-     ],
-     "rot": 104.46,
-     "scale": 1.23,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -9.27,
-      26.93
-     ],
-     "rot": 74.97,
-     "scale": 1.28,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      5.69,
-      -23.32
-     ],
-     "rot": 41.14,
-     "scale": 0.9,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -36.84,
-      36.61
-     ],
-     "rot": 330.25,
-     "scale": 1.14,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -33.86,
-      3.02
-     ],
-     "rot": 331.48,
-     "scale": 1.26,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      33.17,
-      -28.9
-     ],
-     "rot": 12.82,
-     "scale": 0.97,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -11.28,
-      9.34
-     ],
-     "rot": 179.88,
-     "scale": 1.16,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      29.54,
-      -37.19
-     ],
-     "rot": 148.82,
-     "scale": 1.14,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      2.98,
-      28.38
-     ],
-     "rot": 229.85,
-     "scale": 1.14,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -20.85,
-      18.78
-     ],
-     "rot": 324.96,
-     "scale": 1.04,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      30.47,
-      -23.81
-     ],
-     "rot": 319.52,
-     "scale": 0.96,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -28.66,
-      -32.12
-     ],
-     "rot": 34.93,
-     "scale": 1.27,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -12.21,
-      38.89
-     ],
-     "rot": 289.02,
-     "scale": 1.12,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -36.08,
-      4.03
-     ],
-     "rot": 325.84,
-     "scale": 1.12,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      33.3,
-      -31.57
-     ],
-     "rot": 48.4,
-     "scale": 1.21,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -37.97,
-      15.68
-     ],
-     "rot": 65.26,
-     "scale": 1.1,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -37.8,
-      30.67
-     ],
-     "rot": 315.23,
-     "scale": 1.31,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -29.93,
-      18.95
-     ],
-     "rot": 293.27,
-     "scale": 1.08,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -7.35,
-      17.37
-     ],
-     "rot": 287.04,
-     "scale": 1.04,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -38.17,
-      -11.26
-     ],
-     "rot": 324.97,
-     "scale": 0.92,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -8.61,
-      38.99
-     ],
-     "rot": 76.76,
-     "scale": 0.95,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -18.98,
-      -7.68
-     ],
-     "rot": 274.07,
-     "scale": 1.19,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      31.64,
-      3.9
-     ],
-     "rot": 149.65,
-     "scale": 1.13,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -33.06,
-      7.61
-     ],
-     "rot": 139.11,
-     "scale": 1.32,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -2.2,
-      -25.81
-     ],
-     "rot": 195.1,
-     "scale": 1.17,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      34.73,
-      -6.19
-     ],
-     "rot": 143.48,
-     "scale": 1.04,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -1.31,
-      -17.96
-     ],
-     "rot": 238.89,
-     "scale": 1.24,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -37.91,
-      -19.89
-     ],
-     "rot": 227.88,
-     "scale": 1.08,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -34.88,
-      -14.42
-     ],
-     "rot": 18.06,
-     "scale": 1.34,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -33.27,
-      31.63
-     ],
-     "rot": 258.88,
-     "scale": 1.01,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -27.74,
-      35.88
-     ],
-     "rot": 217.3,
-     "scale": 0.95,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      13.1,
-      -3.47
-     ],
-     "rot": 230.25,
-     "scale": 1.21,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      21.68,
-      2.4
-     ],
-     "rot": 342.95,
-     "scale": 1.23,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      27.03,
-      -17.57
-     ],
-     "rot": 246.61,
-     "scale": 1.15,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -34.26,
-      -17.87
-     ],
-     "rot": 9.69,
-     "scale": 0.92,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      3.25,
-      -33.35
-     ],
-     "rot": 328.64,
-     "scale": 0.97,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -1.67,
-      -22.57
-     ],
-     "rot": 177.99,
-     "scale": 0.96,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      23.58,
-      -4.11
-     ],
-     "rot": 301.68,
-     "scale": 1.25,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -5.9,
-      -18.87
-     ],
-     "rot": 132.82,
-     "scale": 1.19,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -16.31,
-      20.2
-     ],
-     "rot": 153.95,
-     "scale": 1.07,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      5.3,
-      24.59
-     ],
-     "rot": 107.59,
-     "scale": 1.25,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -21.94,
-      12.27
-     ],
-     "rot": 131.9,
-     "scale": 0.95,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -4.84,
-      23.64
-     ],
-     "rot": 164.98,
-     "scale": 1.0,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -32.43,
-      25.62
-     ],
-     "rot": 130.79,
-     "scale": 1.08,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -26.93,
-      7.11
-     ],
-     "rot": 63.57,
-     "scale": 1.24,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -15.92,
-      -37.26
-     ],
-     "rot": 23.06,
-     "scale": 1.15,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -30.78,
-      -14.52
-     ],
-     "rot": 228.29,
-     "scale": 0.96,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -12.65,
-      36.53
-     ],
-     "rot": 49.22,
-     "scale": 1.12,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -6.97,
-      25.45
-     ],
-     "rot": 125.7,
-     "scale": 0.9,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      1.86,
-      16.39
-     ],
-     "rot": 151.78,
-     "scale": 1.09,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -13.97,
-      -8.63
-     ],
-     "rot": 105.13,
-     "scale": 1.34,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -2.23,
-      18.0
-     ],
-     "rot": 233.27,
-     "scale": 1.25,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -37.66,
-      -1.48
-     ],
-     "rot": 112.52,
-     "scale": 0.99,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      -12.32,
-      3.69
-     ],
-     "rot": 173.74,
-     "scale": 1.0,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      22.44,
-      -34.48
-     ],
-     "rot": 321.19,
-     "scale": 1.29,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -6.13,
-      29.24
-     ],
-     "rot": 56.49,
-     "scale": 1.04,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      9.32,
-      1.24
-     ],
-     "rot": 54.24,
-     "scale": 1.25,
-     "variant": "leaves",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "rock",
-     "pos": [
-      15.11,
-      -32.54
-     ],
-     "rot": 195.63,
-     "scale": 0.95,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "bush",
-     "pos": [
-      -37.52,
-      -24.35
-     ],
-     "rot": 330.03,
-     "scale": 0.75,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "rock",
-     "pos": [
-      25.45,
-      -22.74
-     ],
-     "rot": 148.73,
-     "scale": 0.95,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "bush",
-     "pos": [
-      4.4,
-      38.79
-     ],
-     "rot": 129.5,
-     "scale": 1.04,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "bush",
-     "pos": [
-      -2.98,
-      36.42
-     ],
-     "rot": 235.42,
-     "scale": 0.71,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "bush",
-     "pos": [
-      -9.58,
-      16.38
-     ],
-     "rot": 105.65,
-     "scale": 0.76,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stump",
-     "pos": [
-      31.32,
-      -27.13
-     ],
-     "rot": 337.48,
-     "scale": 1.07,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "rock",
-     "pos": [
-      -9.17,
-      -31.05
-     ],
-     "rot": 33.98,
-     "scale": 1.04,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
      "type": "mushroom",
      "pos": [
       -37.8,
@@ -4647,54 +3411,6 @@
      "d": 0.0
     },
     {
-     "type": "bush",
-     "pos": [
-      3.03,
-      -15.72
-     ],
-     "rot": 126.92,
-     "scale": 0.95,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "rock",
-     "pos": [
-      -27.94,
-      16.65
-     ],
-     "rot": 359.41,
-     "scale": 1.05,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "bush",
-     "pos": [
-      34.0,
-      5.25
-     ],
-     "rot": 225.76,
-     "scale": 0.8,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "rock",
-     "pos": [
-      -32.51,
-      -19.92
-     ],
-     "rot": 150.3,
-     "scale": 0.87,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
      "type": "mushroom",
      "pos": [
       -31.84,
@@ -4703,18 +3419,6 @@
      "rot": 166.69,
      "scale": 0.76,
      "variant": "purple",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "rock",
-     "pos": [
-      -28.42,
-      31.52
-     ],
-     "rot": 196.61,
-     "scale": 0.73,
-     "variant": "",
      "w": 0.0,
      "d": 0.0
     },
@@ -4731,54 +3435,6 @@
      "d": 0.0
     },
     {
-     "type": "bush",
-     "pos": [
-      -24.95,
-      37.99
-     ],
-     "rot": 110.75,
-     "scale": 1.04,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "bush",
-     "pos": [
-      -36.05,
-      13.34
-     ],
-     "rot": 145.14,
-     "scale": 0.95,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "rock",
-     "pos": [
-      -31.0,
-      -12.06
-     ],
-     "rot": 328.7,
-     "scale": 0.98,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stump",
-     "pos": [
-      30.36,
-      -2.85
-     ],
-     "rot": 297.04,
-     "scale": 0.76,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
      "type": "mushroom",
      "pos": [
       -30.06,
@@ -4791,42 +3447,6 @@
      "d": 0.0
     },
     {
-     "type": "rock",
-     "pos": [
-      -13.99,
-      -34.73
-     ],
-     "rot": 324.05,
-     "scale": 1.07,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "bush",
-     "pos": [
-      -8.06,
-      -34.95
-     ],
-     "rot": 189.44,
-     "scale": 0.82,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "bush",
-     "pos": [
-      -31.31,
-      22.8
-     ],
-     "rot": 317.58,
-     "scale": 0.99,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
      "type": "mushroom",
      "pos": [
       -3.65,
@@ -4835,42 +3455,6 @@
      "rot": 8.61,
      "scale": 0.79,
      "variant": "orange",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "bush",
-     "pos": [
-      6.67,
-      -35.42
-     ],
-     "rot": 163.75,
-     "scale": 0.86,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "rock",
-     "pos": [
-      15.44,
-      4.67
-     ],
-     "rot": 227.66,
-     "scale": 0.8,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "bush",
-     "pos": [
-      -15.04,
-      16.42
-     ],
-     "rot": 96.82,
-     "scale": 1.06,
-     "variant": "",
      "w": 0.0,
      "d": 0.0
     },
@@ -4899,66 +3483,6 @@
      "d": 0.0
     },
     {
-     "type": "bush",
-     "pos": [
-      -17.41,
-      10.91
-     ],
-     "rot": 166.58,
-     "scale": 0.74,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "bush",
-     "pos": [
-      18.27,
-      -36.75
-     ],
-     "rot": 355.59,
-     "scale": 0.72,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stump",
-     "pos": [
-      -8.99,
-      33.48
-     ],
-     "rot": 21.68,
-     "scale": 0.73,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "bush",
-     "pos": [
-      -13.98,
-      -1.29
-     ],
-     "rot": 186.02,
-     "scale": 0.95,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "bush",
-     "pos": [
-      1.6,
-      35.22
-     ],
-     "rot": 213.79,
-     "scale": 1.09,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
      "type": "mushroom",
      "pos": [
       13.14,
@@ -4971,42 +3495,6 @@
      "d": 0.0
     },
     {
-     "type": "stump",
-     "pos": [
-      36.71,
-      -34.9
-     ],
-     "rot": 314.24,
-     "scale": 0.79,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stump",
-     "pos": [
-      -27.16,
-      -37.61
-     ],
-     "rot": 290.22,
-     "scale": 0.95,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "rock",
-     "pos": [
-      -25.1,
-      10.91
-     ],
-     "rot": 284.98,
-     "scale": 0.82,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
      "type": "mushroom",
      "pos": [
       -34.23,
@@ -5015,450 +3503,6 @@
      "rot": 251.51,
      "scale": 1.05,
      "variant": "red",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "bush",
-     "pos": [
-      19.08,
-      1.69
-     ],
-     "rot": 1.2,
-     "scale": 0.9,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      -11.35,
-      -27.7
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      -9.98,
-      -9.82
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      7.1,
-      13.67
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      -4.41,
-      1.7
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      8.92,
-      -3.21
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      -21.69,
-      -26.41
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      3.49,
-      -12.34
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      -31.13,
-      -21.32
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      -21.1,
-      12.48
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      6.54,
-      -21.74
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      -27.78,
-      -4.49
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      9.76,
-      2.66
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      -9.47,
-      10.86
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      4.8,
-      11.42
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      -27.02,
-      8.42
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      7.09,
-      -21.97
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      -17.96,
-      -29.69
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      -16.17,
-      -20.41
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      0.7,
-      5.8
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      -13.39,
-      -13.19
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      -8.28,
-      3.7
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      -13.73,
-      -8.96
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      -6.8,
-      -23.46
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      -13.08,
-      -6.6
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      -16.14,
-      -29.78
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      -22.56,
-      12.59
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      -7.06,
-      -7.61
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      -1.63,
-      -7.93
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      -9.47,
-      -1.48
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      -25.21,
-      -27.14
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      10.5,
-      36
-     ],
-     "rot": 0,
-     "scale": 1.2,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      13,
-      33.5
-     ],
-     "rot": 0,
-     "scale": 1.2,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      36,
-      12
-     ],
-     "rot": 0,
-     "scale": 1.2,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      35,
-      36
-     ],
-     "rot": 0,
-     "scale": 1.2,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      10.5,
-      11
-     ],
-     "rot": 0,
-     "scale": 1.2,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      36.5,
-      24
-     ],
-     "rot": 0,
-     "scale": 1.2,
-     "variant": "leaves_dark",
      "w": 0.0,
      "d": 0.0
     },
@@ -5495,6 +3539,6313 @@
      "rot": 90.0,
      "scale": 1,
      "variant": "boss",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      14.18,
+      -35.14
+     ],
+     "rot": 347.2,
+     "scale": 0.98,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      30.6,
+      -38.9
+     ],
+     "rot": 333.6,
+     "scale": 1.01,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -13.75,
+      26.55
+     ],
+     "rot": 275.2,
+     "scale": 0.98,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      10.73,
+      -0.3
+     ],
+     "rot": 56.4,
+     "scale": 1.05,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_d",
+     "pos": [
+      32.16,
+      -8.44
+     ],
+     "rot": 259.0,
+     "scale": 1.08,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      33.31,
+      0.41
+     ],
+     "rot": 136.3,
+     "scale": 1.11,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      -9.72,
+      -33.21
+     ],
+     "rot": 3.4,
+     "scale": 1.18,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      -22.67,
+      -27.76
+     ],
+     "rot": 62.7,
+     "scale": 1.19,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -7.74,
+      -17.52
+     ],
+     "rot": 228.0,
+     "scale": 1.24,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      6.79,
+      27.51
+     ],
+     "rot": 57.4,
+     "scale": 0.86,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      3.15,
+      -36.48
+     ],
+     "rot": 113.5,
+     "scale": 0.98,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      4.41,
+      37.37
+     ],
+     "rot": 13.5,
+     "scale": 0.88,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -2.51,
+      17.84
+     ],
+     "rot": 6.4,
+     "scale": 1.01,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      -3.35,
+      -20.41
+     ],
+     "rot": 84.5,
+     "scale": 0.91,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -7.19,
+      23.03
+     ],
+     "rot": 102.6,
+     "scale": 0.88,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -36.15,
+      -3.4
+     ],
+     "rot": 336.4,
+     "scale": 0.88,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      10.72,
+      -29.57
+     ],
+     "rot": 206.5,
+     "scale": 0.93,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_d",
+     "pos": [
+      -6.54,
+      -37.63
+     ],
+     "rot": 235.6,
+     "scale": 0.87,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      35.84,
+      -5.98
+     ],
+     "rot": 132.8,
+     "scale": 1.07,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -6.81,
+      16.19
+     ],
+     "rot": 319.9,
+     "scale": 0.92,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      9.43,
+      -23.03
+     ],
+     "rot": 103.8,
+     "scale": 1.06,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -34.28,
+      35.76
+     ],
+     "rot": 260.1,
+     "scale": 1.19,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      34.56,
+      -33.3
+     ],
+     "rot": 343.7,
+     "scale": 1.15,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -35.86,
+      18.31
+     ],
+     "rot": 340.1,
+     "scale": 1.04,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      -16.84,
+      -5.91
+     ],
+     "rot": 32.4,
+     "scale": 1.1,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -35.05,
+      -19.44
+     ],
+     "rot": 309.8,
+     "scale": 0.96,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      0.16,
+      31.98
+     ],
+     "rot": 31.3,
+     "scale": 1.05,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -34.59,
+      29.26
+     ],
+     "rot": 282.5,
+     "scale": 1.18,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -29.83,
+      -36.75
+     ],
+     "rot": 244.2,
+     "scale": 0.98,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      36.38,
+      5.38
+     ],
+     "rot": 167.8,
+     "scale": 0.98,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_d",
+     "pos": [
+      33.52,
+      -13.86
+     ],
+     "rot": 135.7,
+     "scale": 1.12,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -8.18,
+      34.16
+     ],
+     "rot": 344.6,
+     "scale": 1.24,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -13.28,
+      19.65
+     ],
+     "rot": 65.2,
+     "scale": 1.05,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -26.25,
+      -36.01
+     ],
+     "rot": 303.5,
+     "scale": 1.01,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -10.01,
+      16.15
+     ],
+     "rot": 265.9,
+     "scale": 0.99,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      36.62,
+      -11.62
+     ],
+     "rot": 170.5,
+     "scale": 0.96,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -4.8,
+      13.29
+     ],
+     "rot": 304.2,
+     "scale": 1.09,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -3.45,
+      -31.72
+     ],
+     "rot": 134.2,
+     "scale": 0.9,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      14.4,
+      10.63
+     ],
+     "rot": 327.7,
+     "scale": 0.88,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -38.79,
+      16.44
+     ],
+     "rot": 309.6,
+     "scale": 0.86,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -3.04,
+      -36.92
+     ],
+     "rot": 151.8,
+     "scale": 1.15,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -4.07,
+      31.76
+     ],
+     "rot": 97.8,
+     "scale": 1.17,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      7.19,
+      -38.1
+     ],
+     "rot": 142.0,
+     "scale": 1.08,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -18.7,
+      -26.88
+     ],
+     "rot": 357.4,
+     "scale": 0.99,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -38.69,
+      32.43
+     ],
+     "rot": 29.5,
+     "scale": 1.19,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      -16.67,
+      28.98
+     ],
+     "rot": 49.5,
+     "scale": 0.95,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      15.29,
+      -5.05
+     ],
+     "rot": 257.7,
+     "scale": 0.93,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      -1.12,
+      10.68
+     ],
+     "rot": 199.8,
+     "scale": 1.04,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -23.37,
+      -32.81
+     ],
+     "rot": 188.5,
+     "scale": 0.86,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -11.91,
+      32.93
+     ],
+     "rot": 140.9,
+     "scale": 1.05,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -16.24,
+      -38.55
+     ],
+     "rot": 309.9,
+     "scale": 0.99,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      -38.28,
+      4.79
+     ],
+     "rot": 346.1,
+     "scale": 0.87,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      15.69,
+      -26.06
+     ],
+     "rot": 134.9,
+     "scale": 1.2,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -36.48,
+      -15.06
+     ],
+     "rot": 14.9,
+     "scale": 0.9,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      36.29,
+      -1.54
+     ],
+     "rot": 59.4,
+     "scale": 0.88,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      -21.67,
+      -37.65
+     ],
+     "rot": 195.5,
+     "scale": 1.13,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      5.04,
+      -26.55
+     ],
+     "rot": 145.1,
+     "scale": 1.1,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -37.42,
+      13.47
+     ],
+     "rot": 241.0,
+     "scale": 0.9,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      3.66,
+      -19.83
+     ],
+     "rot": 67.8,
+     "scale": 1.15,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_d",
+     "pos": [
+      19.34,
+      -38.21
+     ],
+     "rot": 36.5,
+     "scale": 1.08,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      11.43,
+      -4.74
+     ],
+     "rot": 217.0,
+     "scale": 0.92,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -35.26,
+      9.27
+     ],
+     "rot": 277.3,
+     "scale": 1.22,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_d",
+     "pos": [
+      7.4,
+      -33.94
+     ],
+     "rot": 326.1,
+     "scale": 1.13,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -2.77,
+      37.13
+     ],
+     "rot": 82.5,
+     "scale": 0.91,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_d",
+     "pos": [
+      -19.74,
+      37.25
+     ],
+     "rot": 130.7,
+     "scale": 1.24,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      -32.15,
+      -12.34
+     ],
+     "rot": 82.5,
+     "scale": 0.88,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_d",
+     "pos": [
+      25.35,
+      -37.58
+     ],
+     "rot": 153.4,
+     "scale": 1.02,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -12.84,
+      -35.26
+     ],
+     "rot": 152.3,
+     "scale": 0.93,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -37.06,
+      0.55
+     ],
+     "rot": 316.6,
+     "scale": 0.87,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      4.26,
+      32.08
+     ],
+     "rot": 101.3,
+     "scale": 1.24,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -15.78,
+      23.44
+     ],
+     "rot": 144.9,
+     "scale": 1.22,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      10.72,
+      32.67
+     ],
+     "rot": 125.5,
+     "scale": 1.14,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_d",
+     "pos": [
+      -36.73,
+      25.07
+     ],
+     "rot": 227.4,
+     "scale": 1.09,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      26.97,
+      -34.4
+     ],
+     "rot": 125.2,
+     "scale": 0.95,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -36.54,
+      -10.92
+     ],
+     "rot": 57.9,
+     "scale": 0.85,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      -18.77,
+      -32.5
+     ],
+     "rot": 322.3,
+     "scale": 1.15,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -31.86,
+      -16.01
+     ],
+     "rot": 15.0,
+     "scale": 1.25,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_d",
+     "pos": [
+      -5.35,
+      25.64
+     ],
+     "rot": 177.4,
+     "scale": 0.94,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      -34.82,
+      4.99
+     ],
+     "rot": 286.1,
+     "scale": 1.0,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      -10.52,
+      23.51
+     ],
+     "rot": 78.4,
+     "scale": 1.16,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      -26.66,
+      36.53
+     ],
+     "rot": 46.4,
+     "scale": 1.01,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      0.1,
+      -32.93
+     ],
+     "rot": 20.2,
+     "scale": 0.92,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      32.68,
+      5.74
+     ],
+     "rot": 271.9,
+     "scale": 1.15,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -14.79,
+      37.09
+     ],
+     "rot": 118.0,
+     "scale": 0.97,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      0.19,
+      -24.28
+     ],
+     "rot": 193.3,
+     "scale": 1.21,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -4.98,
+      -24.98
+     ],
+     "rot": 170.1,
+     "scale": 1.23,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -18.88,
+      25.77
+     ],
+     "rot": 52.7,
+     "scale": 0.99,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      10.63,
+      36.29
+     ],
+     "rot": 322.6,
+     "scale": 0.92,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_d",
+     "pos": [
+      -16.95,
+      32.91
+     ],
+     "rot": 30.6,
+     "scale": 0.94,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      -38.21,
+      -26.04
+     ],
+     "rot": 26.9,
+     "scale": 1.18,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      -25.4,
+      31.77
+     ],
+     "rot": 104.3,
+     "scale": 1.04,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      20.28,
+      -33.65
+     ],
+     "rot": 279.7,
+     "scale": 0.91,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_d",
+     "pos": [
+      29.19,
+      -29.49
+     ],
+     "rot": 295.5,
+     "scale": 1.19,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      22.39,
+      -36.02
+     ],
+     "rot": 306.4,
+     "scale": 0.91,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -37.4,
+      -21.95
+     ],
+     "rot": 54.4,
+     "scale": 1.11,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -32.44,
+      -4.42
+     ],
+     "rot": 88.5,
+     "scale": 1.11,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      14.12,
+      -31.34
+     ],
+     "rot": 264.8,
+     "scale": 1.22,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -33.31,
+      0.2
+     ],
+     "rot": 102.5,
+     "scale": 1.19,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      27.25,
+      2.62
+     ],
+     "rot": 305.2,
+     "scale": 1.04,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -7.47,
+      29.48
+     ],
+     "rot": 172.3,
+     "scale": 1.18,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -32.81,
+      14.93
+     ],
+     "rot": 240.9,
+     "scale": 1.02,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      10.53,
+      -18.44
+     ],
+     "rot": 349.8,
+     "scale": 0.92,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -37.82,
+      21.11
+     ],
+     "rot": 327.1,
+     "scale": 0.91,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_d",
+     "pos": [
+      16.78,
+      -2.01
+     ],
+     "rot": 329.2,
+     "scale": 0.99,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_d",
+     "pos": [
+      13.02,
+      -38.66
+     ],
+     "rot": 240.0,
+     "scale": 1.21,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      0.01,
+      36.02
+     ],
+     "rot": 96.1,
+     "scale": 0.89,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -4.28,
+      9.44
+     ],
+     "rot": 154.3,
+     "scale": 0.95,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -13.83,
+      -32.28
+     ],
+     "rot": 323.4,
+     "scale": 0.97,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      30.46,
+      -35.23
+     ],
+     "rot": 184.2,
+     "scale": 0.96,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      -10.01,
+      -3.83
+     ],
+     "rot": 157.1,
+     "scale": 0.88,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      10.63,
+      4.54
+     ],
+     "rot": 238.5,
+     "scale": 1.2,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      22.17,
+      -30.01
+     ],
+     "rot": 2.5,
+     "scale": 0.89,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      -32.79,
+      23.03
+     ],
+     "rot": 280.2,
+     "scale": 1.22,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      34.91,
+      -29.09
+     ],
+     "rot": 312.6,
+     "scale": 0.98,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      24.67,
+      -31.74
+     ],
+     "rot": 189.5,
+     "scale": 0.87,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      36.03,
+      -37.07
+     ],
+     "rot": 179.7,
+     "scale": 1.23,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      15.79,
+      1.15
+     ],
+     "rot": 229.2,
+     "scale": 0.92,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_d",
+     "pos": [
+      2.12,
+      26.78
+     ],
+     "rot": 151.9,
+     "scale": 1.23,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      14.28,
+      7.33
+     ],
+     "rot": 65.4,
+     "scale": 1.05,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      -11.5,
+      36.77
+     ],
+     "rot": 312.8,
+     "scale": 0.92,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      19.34,
+      -23.77
+     ],
+     "rot": 200.3,
+     "scale": 0.96,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -21.82,
+      32.86
+     ],
+     "rot": 343.8,
+     "scale": 0.93,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -10.64,
+      -38.88
+     ],
+     "rot": 267.4,
+     "scale": 1.01,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -33.39,
+      -38.9
+     ],
+     "rot": 51.2,
+     "scale": 1.22,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      35.64,
+      10.73
+     ],
+     "rot": 65.3,
+     "scale": 0.98,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      30.7,
+      2.76
+     ],
+     "rot": 47.3,
+     "scale": 0.92,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_d",
+     "pos": [
+      14.17,
+      -22.98
+     ],
+     "rot": 136.2,
+     "scale": 0.88,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      36.03,
+      35.38
+     ],
+     "rot": 171.3,
+     "scale": 0.9,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      36.36,
+      14.35
+     ],
+     "rot": 321.9,
+     "scale": 0.88,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      3.52,
+      -32.69
+     ],
+     "rot": 245.7,
+     "scale": 0.98,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      20.59,
+      -7.03
+     ],
+     "rot": 260.3,
+     "scale": 0.99,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      28.11,
+      -2.64
+     ],
+     "rot": 131.0,
+     "scale": 1.21,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -26.84,
+      -32.15
+     ],
+     "rot": 184.2,
+     "scale": 1.22,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      32.12,
+      -3.75
+     ],
+     "rot": 206.5,
+     "scale": 1.06,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -37.94,
+      -17.88
+     ],
+     "rot": 17.6,
+     "scale": 1.02,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_d",
+     "pos": [
+      -2.85,
+      22.67
+     ],
+     "rot": 356.4,
+     "scale": 1.01,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -30.17,
+      31.56
+     ],
+     "rot": 92.4,
+     "scale": 1.07,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -13.53,
+      -2.84
+     ],
+     "rot": 74.9,
+     "scale": 0.96,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -0.48,
+      -19.03
+     ],
+     "rot": 6.1,
+     "scale": 0.96,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_d",
+     "pos": [
+      -38.55,
+      28.15
+     ],
+     "rot": 145.9,
+     "scale": 0.9,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      -8.53,
+      19.77
+     ],
+     "rot": 238.0,
+     "scale": 1.21,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      11.96,
+      -26.11
+     ],
+     "rot": 46.8,
+     "scale": 0.96,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      -32.62,
+      -21.98
+     ],
+     "rot": 72.4,
+     "scale": 1.0,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      11.1,
+      -35.64
+     ],
+     "rot": 129.8,
+     "scale": 0.9,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_d",
+     "pos": [
+      7.25,
+      35.75
+     ],
+     "rot": 35.4,
+     "scale": 0.94,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -23.21,
+      36.12
+     ],
+     "rot": 62.5,
+     "scale": 0.93,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -37.76,
+      37.14
+     ],
+     "rot": 63.9,
+     "scale": 1.01,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_d",
+     "pos": [
+      8.49,
+      -3.53
+     ],
+     "rot": 174.6,
+     "scale": 1.0,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_d",
+     "pos": [
+      -6.05,
+      -34.51
+     ],
+     "rot": 343.7,
+     "scale": 0.95,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      13.54,
+      35.4
+     ],
+     "rot": 155.3,
+     "scale": 0.88,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_d",
+     "pos": [
+      -6.71,
+      -28.92
+     ],
+     "rot": 27.2,
+     "scale": 0.98,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      -1.41,
+      14.61
+     ],
+     "rot": 24.1,
+     "scale": 0.91,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -6.43,
+      37.37
+     ],
+     "rot": 297.1,
+     "scale": 0.97,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -27.97,
+      28.23
+     ],
+     "rot": 0.2,
+     "scale": 0.94,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      32.49,
+      11.76
+     ],
+     "rot": 1.2,
+     "scale": 0.91,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      8.74,
+      -27.14
+     ],
+     "rot": 142.0,
+     "scale": 0.89,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      17.19,
+      -33.73
+     ],
+     "rot": 70.5,
+     "scale": 0.96,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -18.41,
+      -35.96
+     ],
+     "rot": 238.5,
+     "scale": 0.9,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      -32.06,
+      18.58
+     ],
+     "rot": 163.3,
+     "scale": 1.22,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -17.03,
+      17.89
+     ],
+     "rot": 9.2,
+     "scale": 0.89,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -30.82,
+      37.5
+     ],
+     "rot": 62.8,
+     "scale": 1.1,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_d",
+     "pos": [
+      -10.81,
+      28.68
+     ],
+     "rot": 109.5,
+     "scale": 0.86,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -0.28,
+      20.26
+     ],
+     "rot": 213.2,
+     "scale": 0.89,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      -38.9,
+      -4.54
+     ],
+     "rot": 336.7,
+     "scale": 0.86,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_d",
+     "pos": [
+      0.47,
+      -38.78
+     ],
+     "rot": 52.0,
+     "scale": 0.95,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_a",
+     "pos": [
+      17.61,
+      -29.67
+     ],
+     "rot": 299.6,
+     "scale": 1.02,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_c",
+     "pos": [
+      -38.92,
+      8.75
+     ],
+     "rot": 55.3,
+     "scale": 0.93,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_b",
+     "pos": [
+      7.09,
+      -30.08
+     ],
+     "rot": 273.1,
+     "scale": 0.97,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      15.01,
+      -33.93
+     ],
+     "rot": 236.6,
+     "scale": 0.88,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -11.73,
+      25.24
+     ],
+     "rot": 84.1,
+     "scale": 0.72,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -14.67,
+      25.64
+     ],
+     "rot": 320.9,
+     "scale": 0.83,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      9.22,
+      -2.34
+     ],
+     "rot": 223.0,
+     "scale": 1.09,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      33.57,
+      -10.05
+     ],
+     "rot": 65.6,
+     "scale": 0.96,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      29.98,
+      -9.31
+     ],
+     "rot": 38.8,
+     "scale": 1.02,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      30.91,
+      1.1
+     ],
+     "rot": 66.5,
+     "scale": 0.72,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -8.58,
+      -35.4
+     ],
+     "rot": 58.4,
+     "scale": 0.74,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -8.92,
+      -30.52
+     ],
+     "rot": 215.2,
+     "scale": 0.81,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -11.68,
+      -31.59
+     ],
+     "rot": 236.0,
+     "scale": 0.9,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -22.94,
+      -29.42
+     ],
+     "rot": 206.5,
+     "scale": 0.76,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -5.89,
+      -16.86
+     ],
+     "rot": 107.4,
+     "scale": 0.81,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      7.0,
+      26.27
+     ],
+     "rot": 353.8,
+     "scale": 1.09,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      4.98,
+      27.59
+     ],
+     "rot": 49.6,
+     "scale": 0.87,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      1.84,
+      -37.75
+     ],
+     "rot": 46.9,
+     "scale": 0.7,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      1.7,
+      -34.69
+     ],
+     "rot": 279.3,
+     "scale": 0.89,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      3.87,
+      -37.74
+     ],
+     "rot": 41.5,
+     "scale": 0.83,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      4.97,
+      36.04
+     ],
+     "rot": 40.0,
+     "scale": 1.08,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -4.31,
+      19.42
+     ],
+     "rot": 96.8,
+     "scale": 0.7,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -1.73,
+      19.24
+     ],
+     "rot": 164.2,
+     "scale": 0.75,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -2.63,
+      -21.69
+     ],
+     "rot": 298.1,
+     "scale": 0.93,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -5.17,
+      -19.36
+     ],
+     "rot": 344.6,
+     "scale": 1.02,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -5.49,
+      23.17
+     ],
+     "rot": 323.1,
+     "scale": 0.8,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -35.31,
+      -1.87
+     ],
+     "rot": 297.2,
+     "scale": 1.11,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -36.75,
+      -5.57
+     ],
+     "rot": 335.5,
+     "scale": 0.78,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      8.77,
+      -28.28
+     ],
+     "rot": 46.9,
+     "scale": 0.8,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      12.26,
+      -29.88
+     ],
+     "rot": 330.7,
+     "scale": 0.87,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -4.98,
+      -38.56
+     ],
+     "rot": 80.0,
+     "scale": 1.02,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      37.42,
+      -6.82
+     ],
+     "rot": 210.1,
+     "scale": 1.03,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      35.54,
+      -7.71
+     ],
+     "rot": 189.1,
+     "scale": 1.09,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -5.9,
+      17.49
+     ],
+     "rot": 205.3,
+     "scale": 1.07,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      12.03,
+      -22.6
+     ],
+     "rot": 327.6,
+     "scale": 0.94,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      10.78,
+      -23.56
+     ],
+     "rot": 72.5,
+     "scale": 0.72,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -33.16,
+      33.39
+     ],
+     "rot": 10.4,
+     "scale": 0.98,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -36.01,
+      35.16
+     ],
+     "rot": 117.7,
+     "scale": 0.88,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      36.34,
+      -33.19
+     ],
+     "rot": 165.0,
+     "scale": 0.73,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      32.35,
+      -34.1
+     ],
+     "rot": 334.9,
+     "scale": 0.92,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -37.5,
+      18.7
+     ],
+     "rot": 229.7,
+     "scale": 0.97,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -36.31,
+      17.03
+     ],
+     "rot": 217.4,
+     "scale": 0.79,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -17.7,
+      -7.27
+     ],
+     "rot": 330.1,
+     "scale": 0.92,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -16.65,
+      -3.5
+     ],
+     "rot": 140.8,
+     "scale": 0.77,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -15.97,
+      -7.94
+     ],
+     "rot": 149.0,
+     "scale": 0.78,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -33.62,
+      -19.0
+     ],
+     "rot": 286.3,
+     "scale": 0.78,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      0.96,
+      33.51
+     ],
+     "rot": 64.5,
+     "scale": 0.71,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -36.16,
+      28.81
+     ],
+     "rot": 297.7,
+     "scale": 0.76,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -37.61,
+      29.11
+     ],
+     "rot": 225.8,
+     "scale": 0.7,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -29.01,
+      -34.86
+     ],
+     "rot": 95.5,
+     "scale": 0.85,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      34.8,
+      6.4
+     ],
+     "rot": 273.9,
+     "scale": 0.85,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      35.29,
+      -15.27
+     ],
+     "rot": 106.0,
+     "scale": 1.05,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      33.54,
+      -16.37
+     ],
+     "rot": 173.6,
+     "scale": 0.81,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -10.92,
+      33.42
+     ],
+     "rot": 20.3,
+     "scale": 1.13,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -5.33,
+      33.82
+     ],
+     "rot": 318.3,
+     "scale": 0.81,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -8.97,
+      36.66
+     ],
+     "rot": 314.6,
+     "scale": 0.92,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -14.7,
+      19.63
+     ],
+     "rot": 204.0,
+     "scale": 0.81,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -11.54,
+      20.09
+     ],
+     "rot": 58.4,
+     "scale": 0.82,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -23.89,
+      -35.16
+     ],
+     "rot": 238.7,
+     "scale": 0.81,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -24.07,
+      -37.01
+     ],
+     "rot": 110.1,
+     "scale": 1.09,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -11.67,
+      14.55
+     ],
+     "rot": 335.8,
+     "scale": 0.91,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -9.4,
+      17.44
+     ],
+     "rot": 309.9,
+     "scale": 1.09,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -8.42,
+      15.62
+     ],
+     "rot": 14.6,
+     "scale": 1.09,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      37.67,
+      -13.69
+     ],
+     "rot": 257.2,
+     "scale": 0.95,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -2.13,
+      12.99
+     ],
+     "rot": 334.5,
+     "scale": 1.03,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -7.35,
+      13.05
+     ],
+     "rot": 246.2,
+     "scale": 0.75,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -4.95,
+      -32.51
+     ],
+     "rot": 162.4,
+     "scale": 0.87,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -2.04,
+      -31.66
+     ],
+     "rot": 72.5,
+     "scale": 0.93,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      15.03,
+      12.5
+     ],
+     "rot": 98.1,
+     "scale": 0.83,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -37.22,
+      15.91
+     ],
+     "rot": 61.0,
+     "scale": 0.72,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -1.03,
+      -38.45
+     ],
+     "rot": 159.0,
+     "scale": 0.71,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -2.6,
+      32.51
+     ],
+     "rot": 16.1,
+     "scale": 1.0,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -5.22,
+      28.98
+     ],
+     "rot": 59.7,
+     "scale": 1.03,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -3.98,
+      33.78
+     ],
+     "rot": 26.1,
+     "scale": 0.9,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      6.41,
+      -36.58
+     ],
+     "rot": 182.5,
+     "scale": 0.88,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -17.11,
+      -28.88
+     ],
+     "rot": 342.3,
+     "scale": 0.71,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -38.77,
+      30.6
+     ],
+     "rot": 269.3,
+     "scale": 0.93,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -18.06,
+      30.27
+     ],
+     "rot": 107.8,
+     "scale": 0.94,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      17.09,
+      -6.42
+     ],
+     "rot": 56.1,
+     "scale": 0.78,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      16.73,
+      -3.4
+     ],
+     "rot": 328.1,
+     "scale": 0.79,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      1.46,
+      10.5
+     ],
+     "rot": 104.2,
+     "scale": 1.02,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -1.22,
+      8.05
+     ],
+     "rot": 5.7,
+     "scale": 0.85,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -22.62,
+      -30.73
+     ],
+     "rot": 276.6,
+     "scale": 0.78,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -22.52,
+      -34.24
+     ],
+     "rot": 188.7,
+     "scale": 0.94,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -13.83,
+      31.81
+     ],
+     "rot": 128.8,
+     "scale": 0.72,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -12.76,
+      35.28
+     ],
+     "rot": 136.8,
+     "scale": 0.84,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -10.29,
+      32.31
+     ],
+     "rot": 280.0,
+     "scale": 0.81,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -37.85,
+      2.69
+     ],
+     "rot": 131.7,
+     "scale": 1.12,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -39.02,
+      6.85
+     ],
+     "rot": 45.1,
+     "scale": 1.03,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -37.23,
+      4.05
+     ],
+     "rot": 177.1,
+     "scale": 1.06,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      18.11,
+      -26.73
+     ],
+     "rot": 280.0,
+     "scale": 1.09,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      17.55,
+      -28.39
+     ],
+     "rot": 91.8,
+     "scale": 1.15,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      13.09,
+      -27.21
+     ],
+     "rot": 321.1,
+     "scale": 0.71,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -35.26,
+      -14.47
+     ],
+     "rot": 110.1,
+     "scale": 1.14,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -34.52,
+      -15.81
+     ],
+     "rot": 166.4,
+     "scale": 0.9,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      36.82,
+      -2.85
+     ],
+     "rot": 165.3,
+     "scale": 0.9,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -21.29,
+      -35.24
+     ],
+     "rot": 271.4,
+     "scale": 0.91,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      4.45,
+      -29.02
+     ],
+     "rot": 18.5,
+     "scale": 0.96,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      3.53,
+      -26.7
+     ],
+     "rot": 223.4,
+     "scale": 0.87,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -36.36,
+      14.89
+     ],
+     "rot": 5.8,
+     "scale": 0.89,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -35.14,
+      13.14
+     ],
+     "rot": 47.2,
+     "scale": 0.71,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      0.95,
+      -20.46
+     ],
+     "rot": 281.4,
+     "scale": 0.83,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      2.84,
+      -21.29
+     ],
+     "rot": 146.3,
+     "scale": 1.14,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      3.6,
+      -17.86
+     ],
+     "rot": 34.2,
+     "scale": 0.92,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      17.58,
+      -36.27
+     ],
+     "rot": 117.0,
+     "scale": 0.73,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      21.0,
+      -38.26
+     ],
+     "rot": 206.2,
+     "scale": 1.03,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      12.7,
+      -4.51
+     ],
+     "rot": 130.9,
+     "scale": 1.01,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -33.08,
+      9.15
+     ],
+     "rot": 158.4,
+     "scale": 1.04,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -35.75,
+      7.21
+     ],
+     "rot": 266.7,
+     "scale": 1.02,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -37.55,
+      8.99
+     ],
+     "rot": 198.8,
+     "scale": 0.75,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      5.87,
+      -34.2
+     ],
+     "rot": 192.2,
+     "scale": 0.86,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      7.28,
+      -31.05
+     ],
+     "rot": 35.1,
+     "scale": 0.98,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -3.72,
+      35.71
+     ],
+     "rot": 149.6,
+     "scale": 1.08,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -30.34,
+      -11.38
+     ],
+     "rot": 181.9,
+     "scale": 1.03,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -30.22,
+      -12.98
+     ],
+     "rot": 102.9,
+     "scale": 1.14,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -33.28,
+      -13.69
+     ],
+     "rot": 246.1,
+     "scale": 0.98,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      25.19,
+      -35.54
+     ],
+     "rot": 102.6,
+     "scale": 1.05,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -13.26,
+      -33.26
+     ],
+     "rot": 134.9,
+     "scale": 1.13,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -13.47,
+      -37.13
+     ],
+     "rot": 350.9,
+     "scale": 0.91,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -36.47,
+      1.91
+     ],
+     "rot": 155.7,
+     "scale": 0.79,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      2.41,
+      33.77
+     ],
+     "rot": 10.4,
+     "scale": 0.73,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -16.76,
+      25.1
+     ],
+     "rot": 108.6,
+     "scale": 1.0,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -13.15,
+      24.51
+     ],
+     "rot": 122.3,
+     "scale": 0.87,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      11.24,
+      34.54
+     ],
+     "rot": 150.6,
+     "scale": 0.9,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -38.61,
+      23.24
+     ],
+     "rot": 93.8,
+     "scale": 0.87,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      27.34,
+      -36.2
+     ],
+     "rot": 222.6,
+     "scale": 0.87,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -37.8,
+      -9.64
+     ],
+     "rot": 338.8,
+     "scale": 0.82,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -35.28,
+      -11.47
+     ],
+     "rot": 78.2,
+     "scale": 1.12,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -20.43,
+      -33.07
+     ],
+     "rot": 146.4,
+     "scale": 1.11,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -19.62,
+      -30.66
+     ],
+     "rot": 131.3,
+     "scale": 1.02,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -4.19,
+      26.25
+     ],
+     "rot": 174.4,
+     "scale": 0.84,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -35.42,
+      3.01
+     ],
+     "rot": 271.3,
+     "scale": 0.79,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -33.64,
+      6.51
+     ],
+     "rot": 329.7,
+     "scale": 0.95,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -8.98,
+      22.94
+     ],
+     "rot": 109.7,
+     "scale": 0.81,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -27.99,
+      34.86
+     ],
+     "rot": 274.3,
+     "scale": 0.74,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      30.53,
+      4.95
+     ],
+     "rot": 81.2,
+     "scale": 0.77,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -14.25,
+      35.44
+     ],
+     "rot": 61.5,
+     "scale": 1.08,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -2.19,
+      -23.79
+     ],
+     "rot": 82.7,
+     "scale": 0.87,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -4.7,
+      -23.37
+     ],
+     "rot": 307.2,
+     "scale": 1.06,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -4.13,
+      -26.59
+     ],
+     "rot": 62.3,
+     "scale": 0.71,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -17.82,
+      24.23
+     ],
+     "rot": 43.8,
+     "scale": 0.76,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -18.22,
+      32.13
+     ],
+     "rot": 292.9,
+     "scale": 0.73,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -23.28,
+      33.12
+     ],
+     "rot": 272.2,
+     "scale": 0.78,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -24.84,
+      30.21
+     ],
+     "rot": 63.3,
+     "scale": 1.07,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      20.2,
+      -32.02
+     ],
+     "rot": 312.4,
+     "scale": 1.01,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      30.86,
+      -27.21
+     ],
+     "rot": 72.5,
+     "scale": 0.84,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      22.08,
+      -34.51
+     ],
+     "rot": 304.1,
+     "scale": 0.94,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      20.84,
+      -36.2
+     ],
+     "rot": 152.0,
+     "scale": 0.99,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -36.08,
+      -23.18
+     ],
+     "rot": 163.8,
+     "scale": 0.78,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -33.83,
+      -3.13
+     ],
+     "rot": 288.5,
+     "scale": 0.75,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      16.13,
+      -31.82
+     ],
+     "rot": 57.9,
+     "scale": 1.06,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -32.65,
+      1.81
+     ],
+     "rot": 74.5,
+     "scale": 1.11,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      27.6,
+      1.15
+     ],
+     "rot": 230.2,
+     "scale": 0.82,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      27.91,
+      4.33
+     ],
+     "rot": 18.8,
+     "scale": 0.75,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -8.62,
+      27.57
+     ],
+     "rot": 345.5,
+     "scale": 1.14,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -10.36,
+      30.44
+     ],
+     "rot": 66.8,
+     "scale": 0.75,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -34.08,
+      15.65
+     ],
+     "rot": 340.3,
+     "scale": 0.92,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      9.73,
+      -17.54
+     ],
+     "rot": 300.8,
+     "scale": 0.88,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      12.43,
+      -18.72
+     ],
+     "rot": 237.7,
+     "scale": 0.71,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      11.27,
+      -20.41
+     ],
+     "rot": 352.4,
+     "scale": 1.09,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      15.21,
+      -2.51
+     ],
+     "rot": 316.7,
+     "scale": 1.05,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      0.06,
+      37.37
+     ],
+     "rot": 182.4,
+     "scale": 0.95,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -5.22,
+      10.48
+     ],
+     "rot": 277.9,
+     "scale": 0.78,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -13.31,
+      -30.47
+     ],
+     "rot": 358.1,
+     "scale": 0.79,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      31.52,
+      -36.63
+     ],
+     "rot": 285.5,
+     "scale": 0.84,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      30.2,
+      -33.94
+     ],
+     "rot": 54.7,
+     "scale": 1.02,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -10.35,
+      -5.08
+     ],
+     "rot": 297.9,
+     "scale": 0.9,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      10.09,
+      2.01
+     ],
+     "rot": 315.4,
+     "scale": 1.03,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      7.72,
+      4.74
+     ],
+     "rot": 211.5,
+     "scale": 0.79,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      21.71,
+      -31.86
+     ],
+     "rot": 12.2,
+     "scale": 0.91,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -32.12,
+      25.02
+     ],
+     "rot": 215.4,
+     "scale": 0.99,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -33.53,
+      25.4
+     ],
+     "rot": 220.7,
+     "scale": 1.12,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      34.18,
+      -31.34
+     ],
+     "rot": 50.5,
+     "scale": 0.73,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      36.86,
+      -28.29
+     ],
+     "rot": 202.6,
+     "scale": 1.07,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      36.24,
+      -30.09
+     ],
+     "rot": 29.8,
+     "scale": 1.05,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      26.63,
+      -31.06
+     ],
+     "rot": 168.6,
+     "scale": 1.14,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      25.7,
+      -32.72
+     ],
+     "rot": 277.0,
+     "scale": 1.07,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      34.41,
+      -35.36
+     ],
+     "rot": 166.3,
+     "scale": 0.93,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      17.56,
+      1.32
+     ],
+     "rot": 216.9,
+     "scale": 0.86,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      3.32,
+      24.68
+     ],
+     "rot": 302.2,
+     "scale": 1.12,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      12.99,
+      5.51
+     ],
+     "rot": 37.2,
+     "scale": 0.93,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      21.04,
+      -24.6
+     ],
+     "rot": 7.8,
+     "scale": 0.93,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -19.73,
+      33.85
+     ],
+     "rot": 70.6,
+     "scale": 0.72,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -22.01,
+      34.9
+     ],
+     "rot": 185.8,
+     "scale": 0.77,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -8.69,
+      -39.06
+     ],
+     "rot": 265.1,
+     "scale": 0.82,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -31.71,
+      -38.36
+     ],
+     "rot": 122.5,
+     "scale": 0.82,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      15.49,
+      -23.47
+     ],
+     "rot": 309.3,
+     "scale": 0.78,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      35.08,
+      13.63
+     ],
+     "rot": 68.4,
+     "scale": 0.92,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      4.83,
+      -33.4
+     ],
+     "rot": 176.3,
+     "scale": 0.93,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      3.52,
+      -30.59
+     ],
+     "rot": 125.6,
+     "scale": 0.91,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      1.3,
+      -32.32
+     ],
+     "rot": 252.0,
+     "scale": 1.1,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      21.91,
+      -7.57
+     ],
+     "rot": 266.1,
+     "scale": 0.76,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      21.16,
+      -5.16
+     ],
+     "rot": 41.1,
+     "scale": 0.78,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      29.72,
+      -1.44
+     ],
+     "rot": 222.5,
+     "scale": 1.12,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -25.31,
+      -31.68
+     ],
+     "rot": 263.8,
+     "scale": 0.93,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      29.85,
+      -3.85
+     ],
+     "rot": 211.4,
+     "scale": 1.13,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      32.25,
+      -1.46
+     ],
+     "rot": 212.1,
+     "scale": 0.73,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -3.73,
+      21.61
+     ],
+     "rot": 253.5,
+     "scale": 0.99,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -1.27,
+      20.81
+     ],
+     "rot": 263.5,
+     "scale": 0.98,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -12.91,
+      -3.97
+     ],
+     "rot": 37.6,
+     "scale": 1.14,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -36.49,
+      27.38
+     ],
+     "rot": 308.3,
+     "scale": 0.77,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -6.56,
+      19.75
+     ],
+     "rot": 250.0,
+     "scale": 1.14,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      13.43,
+      -25.72
+     ],
+     "rot": 98.3,
+     "scale": 0.85,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -32.25,
+      -20.55
+     ],
+     "rot": 113.6,
+     "scale": 1.0,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -35.02,
+      -21.72
+     ],
+     "rot": 85.4,
+     "scale": 1.02,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      11.9,
+      -36.94
+     ],
+     "rot": 124.5,
+     "scale": 0.93,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      12.76,
+      -35.33
+     ],
+     "rot": 158.8,
+     "scale": 0.99,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      9.71,
+      -36.16
+     ],
+     "rot": 8.6,
+     "scale": 1.03,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      5.82,
+      37.55
+     ],
+     "rot": 307.5,
+     "scale": 0.74,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -25.5,
+      35.54
+     ],
+     "rot": 38.6,
+     "scale": 0.71,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -38.64,
+      35.89
+     ],
+     "rot": 177.9,
+     "scale": 0.84,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      10.85,
+      -3.96
+     ],
+     "rot": 218.8,
+     "scale": 0.88,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      7.07,
+      -3.47
+     ],
+     "rot": 40.0,
+     "scale": 1.05,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -6.34,
+      -32.91
+     ],
+     "rot": 32.8,
+     "scale": 1.08,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      12.52,
+      34.31
+     ],
+     "rot": 239.6,
+     "scale": 0.93,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -6.49,
+      -26.76
+     ],
+     "rot": 278.8,
+     "scale": 1.01,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -2.76,
+      15.69
+     ],
+     "rot": 158.7,
+     "scale": 1.03,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -5.91,
+      35.17
+     ],
+     "rot": 229.3,
+     "scale": 1.06,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -25.97,
+      28.53
+     ],
+     "rot": 312.7,
+     "scale": 1.1,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -28.7,
+      29.3
+     ],
+     "rot": 288.9,
+     "scale": 1.03,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      34.17,
+      12.55
+     ],
+     "rot": 297.1,
+     "scale": 0.7,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      7.2,
+      -25.71
+     ],
+     "rot": 331.3,
+     "scale": 0.98,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      17.81,
+      -35.04
+     ],
+     "rot": 298.0,
+     "scale": 0.71,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -33.45,
+      17.66
+     ],
+     "rot": 216.9,
+     "scale": 1.05,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -33.64,
+      19.24
+     ],
+     "rot": 190.5,
+     "scale": 1.08,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -15.76,
+      16.11
+     ],
+     "rot": 184.6,
+     "scale": 0.87,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -32.8,
+      35.45
+     ],
+     "rot": 164.3,
+     "scale": 0.8,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -12.42,
+      29.65
+     ],
+     "rot": 109.0,
+     "scale": 0.84,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -0.46,
+      18.05
+     ],
+     "rot": 239.9,
+     "scale": 1.1,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      0.91,
+      19.92
+     ],
+     "rot": 147.7,
+     "scale": 0.84,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -37.45,
+      -2.88
+     ],
+     "rot": 248.2,
+     "scale": 0.76,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -0.58,
+      -37.26
+     ],
+     "rot": 0.5,
+     "scale": 1.11,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      15.59,
+      -30.45
+     ],
+     "rot": 44.4,
+     "scale": 0.87,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      9.5,
+      -29.41
+     ],
+     "rot": 220.3,
+     "scale": 1.04,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      5.35,
+      -31.7
+     ],
+     "rot": 267.1,
+     "scale": 1.03,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -31.93,
+      -22.61
+     ],
+     "rot": 58.9,
+     "scale": 0.8,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      -20.78,
+      -23.98
+     ],
+     "rot": 348.0,
+     "scale": 0.66,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -7.48,
+      -14.46
+     ],
+     "rot": 127.4,
+     "scale": 0.85,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_a",
+     "pos": [
+      -6.42,
+      -13.76
+     ],
+     "rot": 120.2,
+     "scale": 0.65,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "bush_b",
+     "pos": [
+      3.34,
+      -6.08
+     ],
+     "rot": 354.8,
+     "scale": 0.69,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "rock",
+     "model": "rock_b",
+     "pos": [
+      5.33,
+      25.38
+     ],
+     "rot": 159.7,
+     "scale": 0.78,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "rock",
+     "model": "rock_a",
+     "pos": [
+      -0.15,
+      25.34
+     ],
+     "rot": 237.6,
+     "scale": 1.0,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "rock",
+     "model": "rock_b",
+     "pos": [
+      8.32,
+      -0.18
+     ],
+     "rot": 129.8,
+     "scale": 0.95,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "rock",
+     "model": "rock_b",
+     "pos": [
+      -2.29,
+      -13.03
+     ],
+     "rot": 195.5,
+     "scale": 1.0,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "rock",
+     "model": "rock_b",
+     "pos": [
+      1.86,
+      -21.5
+     ],
+     "rot": 121.1,
+     "scale": 0.73,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "rock",
+     "model": "rock_b",
+     "pos": [
+      -29.76,
+      -19.35
+     ],
+     "rot": 235.5,
+     "scale": 0.96,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "rock",
+     "model": "rock_a",
+     "pos": [
+      13.96,
+      -0.95
+     ],
+     "rot": 239.8,
+     "scale": 0.97,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "rock",
+     "model": "rock_a",
+     "pos": [
+      1.52,
+      10.55
+     ],
+     "rot": 350.1,
+     "scale": 1.06,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "rock",
+     "model": "rock_a",
+     "pos": [
+      -30.8,
+      -34.13
+     ],
+     "rot": 307.2,
+     "scale": 1.07,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "rock",
+     "model": "rock_a",
+     "pos": [
+      4.7,
+      -5.21
+     ],
+     "rot": 82.8,
+     "scale": 1.02,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "rock",
+     "model": "rock_a",
+     "pos": [
+      17.23,
+      -22.53
+     ],
+     "rot": 232.0,
+     "scale": 1.14,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "rock",
+     "model": "rock_a",
+     "pos": [
+      -10.23,
+      -17.73
+     ],
+     "rot": 189.9,
+     "scale": 1.08,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "rock",
+     "model": "rock_a",
+     "pos": [
+      -11.39,
+      -7.48
+     ],
+     "rot": 81.4,
+     "scale": 1.0,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "rock",
+     "model": "rock_b",
+     "pos": [
+      -6.53,
+      -13.75
+     ],
+     "rot": 209.5,
+     "scale": 0.75,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "rock",
+     "model": "rock_b",
+     "pos": [
+      10.63,
+      11.74
+     ],
+     "rot": 269.8,
+     "scale": 0.93,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "rock",
+     "model": "rock_b",
+     "pos": [
+      1.8,
+      -17.69
+     ],
+     "rot": 352.1,
+     "scale": 0.91,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stump",
+     "model": "stump",
+     "pos": [
+      5.73,
+      -36.39
+     ],
+     "rot": 115.9,
+     "scale": 0.83,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stump",
+     "model": "stump",
+     "pos": [
+      -18.08,
+      35.42
+     ],
+     "rot": 223.0,
+     "scale": 0.95,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stump",
+     "model": "stump",
+     "pos": [
+      -27.82,
+      30.85
+     ],
+     "rot": 144.9,
+     "scale": 0.94,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stump",
+     "model": "stump",
+     "pos": [
+      -15.63,
+      -29.0
+     ],
+     "rot": 125.4,
+     "scale": 0.91,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stump",
+     "model": "stump",
+     "pos": [
+      -3.55,
+      -34.6
+     ],
+     "rot": 330.5,
+     "scale": 0.96,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stump",
+     "model": "stump",
+     "pos": [
+      -19.15,
+      -29.53
+     ],
+     "rot": 93.8,
+     "scale": 0.99,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -26.96,
+      -28.51
+     ],
+     "rot": 0.0,
+     "scale": 1.47,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -28.74,
+      -22.93
+     ],
+     "rot": 0.0,
+     "scale": 1.49,
+     "variant": "yellow",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -28.11,
+      -21.2
+     ],
+     "rot": 0.0,
+     "scale": 1.27,
+     "variant": "yellow",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -23.31,
+      -17.98
+     ],
+     "rot": 0.0,
+     "scale": 1.02,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -20.35,
+      -16.58
+     ],
+     "rot": 0.0,
+     "scale": 1.56,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -20.47,
+      -15.75
+     ],
+     "rot": 0.0,
+     "scale": 1.12,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -11.14,
+      -16.41
+     ],
+     "rot": 0.0,
+     "scale": 1.07,
+     "variant": "yellow",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -12.41,
+      -10.5
+     ],
+     "rot": 0.0,
+     "scale": 0.94,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -9.71,
+      -6.95
+     ],
+     "rot": 0.0,
+     "scale": 0.91,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -7.52,
+      -6.17
+     ],
+     "rot": 0.0,
+     "scale": 1.44,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      0.3,
+      -6.88
+     ],
+     "rot": 0.0,
+     "scale": 1.48,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      2.58,
+      -4.8
+     ],
+     "rot": 0.0,
+     "scale": 1.36,
+     "variant": "yellow",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      0.66,
+      1.02
+     ],
+     "rot": 0.0,
+     "scale": 1.53,
+     "variant": "yellow",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      7.56,
+      1.01
+     ],
+     "rot": 0.0,
+     "scale": 1.16,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      1.08,
+      2.88
+     ],
+     "rot": 0.0,
+     "scale": 1.08,
+     "variant": "yellow",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      2.28,
+      5.08
+     ],
+     "rot": 0.0,
+     "scale": 1.25,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      3.25,
+      8.14
+     ],
+     "rot": 0.0,
+     "scale": 1.39,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      8.47,
+      8.42
+     ],
+     "rot": 0.0,
+     "scale": 1.15,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      3.04,
+      11.63
+     ],
+     "rot": 0.0,
+     "scale": 1.03,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      3.45,
+      13.05
+     ],
+     "rot": 0.0,
+     "scale": 1.49,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      3.54,
+      13.99
+     ],
+     "rot": 0.0,
+     "scale": 1.59,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -2.79,
+      -10.53
+     ],
+     "rot": 0.0,
+     "scale": 1.58,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      3.38,
+      -7.29
+     ],
+     "rot": 0.0,
+     "scale": 1.33,
+     "variant": "yellow",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      3.0,
+      -12.89
+     ],
+     "rot": 0.0,
+     "scale": 1.38,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      3.36,
+      -14.28
+     ],
+     "rot": 0.0,
+     "scale": 1.17,
+     "variant": "yellow",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      10.16,
+      -10.89
+     ],
+     "rot": 0.0,
+     "scale": 1.56,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      11.62,
+      -10.94
+     ],
+     "rot": 0.0,
+     "scale": 1.23,
+     "variant": "yellow",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      13.91,
+      -11.84
+     ],
+     "rot": 0.0,
+     "scale": 1.19,
+     "variant": "yellow",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      13.92,
+      -16.7
+     ],
+     "rot": 0.0,
+     "scale": 1.01,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      14.55,
+      -16.98
+     ],
+     "rot": 0.0,
+     "scale": 1.54,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      4.37,
+      25.53
+     ],
+     "rot": 0.0,
+     "scale": 0.84,
+     "variant": "yellow",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      6.01,
+      25.6
+     ],
+     "rot": 0.0,
+     "scale": 0.8,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      0.77,
+      25.85
+     ],
+     "rot": 0.0,
+     "scale": 0.71,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -1.25,
+      25.74
+     ],
+     "rot": 0.0,
+     "scale": 0.78,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      9.24,
+      0.54
+     ],
+     "rot": 0.0,
+     "scale": 0.85,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -1.41,
+      -12.66
+     ],
+     "rot": 0.0,
+     "scale": 1.08,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      1.64,
+      -22.27
+     ],
+     "rot": 0.0,
+     "scale": 0.9,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      1.79,
+      -22.25
+     ],
+     "rot": 0.0,
+     "scale": 0.85,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -29.08,
+      -18.54
+     ],
+     "rot": 0.0,
+     "scale": 1.04,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      13.92,
+      0.14
+     ],
+     "rot": 0.0,
+     "scale": 0.94,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      15.19,
+      -0.67
+     ],
+     "rot": 0.0,
+     "scale": 0.79,
+     "variant": "yellow",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      2.47,
+      9.66
+     ],
+     "rot": 0.0,
+     "scale": 0.92,
+     "variant": "yellow",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -29.87,
+      -34.64
+     ],
+     "rot": 0.0,
+     "scale": 0.86,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      4.26,
+      -6.28
+     ],
+     "rot": 0.0,
+     "scale": 0.96,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      18.42,
+      -22.86
+     ],
+     "rot": 0.0,
+     "scale": 0.77,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -10.31,
+      -16.25
+     ],
+     "rot": 0.0,
+     "scale": 0.73,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -12.77,
+      -7.48
+     ],
+     "rot": 0.0,
+     "scale": 1.02,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -11.27,
+      -6.54
+     ],
+     "rot": 0.0,
+     "scale": 1.07,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -6.04,
+      -14.28
+     ],
+     "rot": 0.0,
+     "scale": 1.0,
+     "variant": "yellow",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -7.2,
+      -13.6
+     ],
+     "rot": 0.0,
+     "scale": 1.09,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      1.65,
+      -16.67
+     ],
+     "rot": 0.0,
+     "scale": 0.93,
+     "variant": "yellow",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      1.59,
+      -16.78
+     ],
+     "rot": 0.0,
+     "scale": 1.02,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -26.78,
+      -14.32
+     ],
+     "rot": 0.0,
+     "scale": 1.47,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -20.24,
+      -15.31
+     ],
+     "rot": 0.0,
+     "scale": 1.27,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -24.24,
+      -14.94
+     ],
+     "rot": 0.0,
+     "scale": 1.5,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -25.77,
+      -18.62
+     ],
+     "rot": 0.0,
+     "scale": 1.2,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -25.75,
+      -19.24
+     ],
+     "rot": 0.0,
+     "scale": 1.79,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -23.58,
+      -9.86
+     ],
+     "rot": 0.0,
+     "scale": 1.14,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -20.88,
+      -12.0
+     ],
+     "rot": 0.0,
+     "scale": 1.67,
+     "variant": "yellow",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -22.6,
+      -9.87
+     ],
+     "rot": 0.0,
+     "scale": 1.43,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -21.39,
+      -13.9
+     ],
+     "rot": 0.0,
+     "scale": 1.4,
+     "variant": "yellow",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -22.88,
+      -10.99
+     ],
+     "rot": 0.0,
+     "scale": 1.76,
+     "variant": "yellow",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      -18.16,
+      -11.49
+     ],
+     "rot": 0.0,
+     "scale": 1.57,
+     "variant": "white",
      "w": 0.0,
      "d": 0.0
     }
@@ -5693,7 +10044,18 @@
     "respawn": 120
    },
    "respawnZone": "town",
-   "respawnSpawn": "revive"
+   "respawnSpawn": "revive",
+   "nature": {
+    "style": "storybook_forest",
+    "seed": 20261101
+   },
+   "post": {
+    "vignette": 0.22,
+    "bloom": 0.35,
+    "sat": 1.12,
+    "contrast": 0.22,
+    "exposure": 1.04
+   }
   },
   {
    "id": "mist_valley",

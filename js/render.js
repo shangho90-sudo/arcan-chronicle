@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { clamp01, DEG, artBasis, artWorldToImage, artImageToGround, artFootprint } from './core.js';
 
 export const T = (p) => new THREE.Vector3(p.x, p.y, -p.z);
-export const CAM = { pitch: 38, yaw: 45, dist: 30, ortho: 5.625, minWidth: 17, sharp: 12, lookAhead: 0.6, depthOffset: 0.6 };
+export const CAM = { pitch: 38, yaw: 45, dist: 30, ortho: 5.2, minWidth: 12, sharp: 12, lookAhead: 0.6, depthOffset: 0.6 };
 
 const loader = new THREE.TextureLoader();
 const texCache = new Map();

@@ -3,6 +3,7 @@ import { QS, Shop, isEquipment, slotOf, EQUIP_SLOTS } from './core.js';
 import { THREE, tex, CAM } from './render.js';
 import { ModelBody, loadPlayerModel, loadActions } from './model.js';
 import { renderItemIcons } from './items3d.js';
+import { renderPortrait } from './portrait.js';
 
 let G = null;
 export function bindGame(g) { G = g; }
@@ -135,7 +136,10 @@ export class UI {
     const p = G.player; if (!p) return; const P = p.sheet.p, job = p.sheet.job, h = this.h;
     h("hName").innerHTML = `${esc(P.name)} <small>${job.name}</small>`; h("hLv").textContent = "Lv." + P.level; h("hBadge").textContent = job.name[0];
     const badge = h("hBadge").parentElement; badge.style.borderColor = job.color;
-    if (badge._g !== P.gender) { badge._g = P.gender; badge.style.backgroundImage = `url(assets/ui/portrait_${P.gender === "f" ? "girl" : "boy"}.png)`; badge.style.backgroundPosition = P.gender === "f" ? "-113px -98px" : "-113px -74px"; }
+    if (badge._g !== P.gender) { badge._g = P.gender; badge._3d = null; badge.style.backgroundImage = `url(assets/ui/portrait_${P.gender === "f" ? "girl" : "boy"}.png)`; badge.style.backgroundPosition = P.gender === "f" ? "-113px -98px" : "-113px -74px"; badge.style.backgroundSize = ""; }
+    // sharper portrait rendered from the actual 3D model once it is loaded (falls back to the picture above)
+    const pk = P.gender + "|" + (P.dye || "");
+    if (badge._3d !== pk && p.body && p.body.bones && p.body.bones.length) { badge._3d = pk; const url = renderPortrait(p.body); if (url) { badge.style.backgroundImage = `url(${url})`; badge.style.backgroundPosition = "center"; badge.style.backgroundSize = "cover"; } }
     h("hHp").style.width = (100 * p.hp / p.maxHp) + "%"; h("hShield").style.width = Math.min(100, 100 * p.shield / p.maxHp) + "%";
     h("hHpT").textContent = Math.ceil(p.hp) + " / " + Math.round(p.maxHp) + (p.shield > 0 ? `  (+${Math.round(p.shield)})` : "");
     h("hSp").style.width = (100 * p.sp / p.maxSp) + "%"; h("hSpT").textContent = "기력 " + Math.floor(p.sp) + " / " + Math.round(p.maxSp);

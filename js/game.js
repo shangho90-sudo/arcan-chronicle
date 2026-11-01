@@ -5,6 +5,7 @@ import { Player, Monster, Boss, Npc, Loot, bindGame as bindActors } from './acto
 import { Input, Audio } from './io.js';
 import { UI, bindGame as bindUi, rewardText } from './ui.js';
 import { loadPlayerModel, loadActions } from './model.js';
+import { buildNature } from './nature.js';
 import { buildTown3D } from './town3d.js';
 import { Warp } from './warp.js';
 import { bindSkillRt } from './skillrt.js';
@@ -40,6 +41,7 @@ class Zone {
   }
   async build() {
     G.render.buildZone(this.json); G.render.setZoneLight(this.def);
+    if (G.render.post) Object.assign(G.render.post.params, G.render.post.defaults, this.def.post || {});
     await G.render.buildImageArt(this.def.imageArt || []);
     if (this.def.town3d) {
       // 3D castle town: user's models + modelled shops, walls, courtyard ground (replaces the builder's grass ground)
@@ -50,6 +52,12 @@ class Zone {
       G.render.groups.push(...t3.fade);
       this.json.smoke = [...(this.json.smoke || []), ...t3.smoke]; this.json.fountain = [];   // no 2D splash sprites over the 3D fountain
       this.town3d = t3;
+    }
+    if (this.def.nature) {
+      // storybook forest: painted ground, Tripo trees / shrubs / rocks, grass and flower cards (js/nature.js)
+      for (const g of G.render.groups) if (['ground', 'patches', 'props', 'tree'].includes(g.name)) for (const m of g.meshes) m.visible = false;
+      this.nature = await buildNature(this, G.render.r);
+      G.render.zoneRoot.add(this.nature.root);
     }
     // the old builder's flat flower clusters (untextured little cubes on the ground) look like stray debris: hide them
     for (const g of G.render.groups) if (g.name === 'props') for (const m of g.meshes) {
@@ -109,6 +117,7 @@ class Zone {
     for (const a of this.actors) if (a.body) { a.body.place(a.pos); a.body.update(dt); }
     this.updatePortals(); this.updateArena();
     if (this.town3d) this.town3d.update(dt);
+    if (this.nature) this.nature.update(dt);
     for (const w of this.warps || []) w.update(dt);
     this.smokeT -= dt; if (this.smokeT <= 0) { this.smokeT = 0.7; for (const s of this.json.smoke || []) G.fx.play("smoke", { x: s[0], y: s[1], z: s[2] }, 1.2, false, [0.9, 0.9, 0.9, 0.8]); }
     this.sprayT -= dt; if (this.sprayT <= 0) { this.sprayT = 0.35; for (const f of this.json.fountain || []) G.fx.play("potion_splash", { x: f[0] + rnd(-0.3, 0.3), y: f[1], z: f[2] + rnd(-0.3, 0.3) }, 0.9, false, [0.7, 0.9, 1]); }
@@ -451,7 +460,7 @@ class Game {
       } else if (!this.inWorld) {
         const t = performance.now() / 1000;
         for (const n of z.npcs) n.update(rdt);
-        for (const w of z.warps || []) w.update(rdt); if (z.town3d) z.town3d.update(rdt);
+        for (const w of z.warps || []) w.update(rdt); if (z.town3d) z.town3d.update(rdt); if (z.nature) z.nature.update(rdt);
         this.render.setFocus({ x: Math.sin(t * 0.12) * 6, y: 0, z: Math.cos(t * 0.12) * 5 - 2 }, false, rdt, 2);
         z.smokeT -= rdt; if (z.smokeT <= 0) { z.smokeT = 0.7; for (const s of z.json.smoke || []) this.fx.play("smoke", { x: s[0], y: s[1], z: s[2] }, 1.2, false, [0.9, 0.9, 0.9, 0.8]); }
         z.sprayT -= rdt; if (z.sprayT <= 0) { z.sprayT = 0.35; for (const f of z.json.fountain || []) this.fx.play("potion_splash", { x: f[0] + rnd(-0.3, 0.3), y: f[1], z: f[2] + rnd(-0.3, 0.3) }, 0.9, false, [0.7, 0.9, 1]); }
