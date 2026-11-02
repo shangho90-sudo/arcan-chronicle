@@ -22,5 +22,19 @@ const W = +process.env.W || 1672, H = +process.env.H || 941;
   await ev(() => { G.ui.close(); G.ui.skSel = 'nv_p1'; G.ui.showSkills(); }); await wait(800); await pg.screenshot({ path: `${OUT}/win_skills.png`, timeout: 300000 });
   // a 2nd-job character: three category columns
   await ev(() => { const S = G.sheet; S.p.level = 32; S.p.job = 'chef'; S.book.grantPoints(); S.recalc(); G.ui.close(); G.ui.skSel = null; G.ui.showSkills(); }); await wait(800); await pg.screenshot({ path: `${OUT}/win_skills_chef.png`, timeout: 300000 });
+  // the other windows in the same frame
+  for (const k of ['shop', 'quests', 'craft', 'jobs', 'pause', 'confirm', 'death']) {
+    if (process.env.ONLY && !process.env.ONLY.split(',').includes(k)) continue;
+    await ev(k => { const U = G.ui, S = G.sheet; U.close();
+      if (k === 'shop') { const id = Object.keys(G.data.shops)[0]; U.shopSel = G.data.shops[id].items[0]; U.sel = { slot: 0 }; U.showShop(G.data.shops[id]); }
+      if (k === 'quests') U.showQuests();
+      if (k === 'craft') { S.p.level = 12; S.p.job = 'cook'; S.book.grantPoints(); S.recalc(); const c = G.data.skill2List.find(d => d.job === 'cook' && d.type === 'craft'); if (c) S.book.learn(c.id); const r = c && (c.recipes || []).find(x => x !== 'salvage'); U.crSel = r || null; U.showCraft(); }
+      if (k === 'jobs') { S.p.job = 'novice'; S.p.level = 10; S.recalc(); U.showJobs(); }
+      if (k === 'pause') U.showPause();
+      if (k === 'confirm') U.confirm('「작은 회복 물약」을(를) 버릴까요?', () => {}, () => {});
+      if (k === 'death') U.showDeath(30, true, () => {}, () => {});
+    }, k);
+    await wait(600); await pg.screenshot({ path: `${OUT}/win_${k}.png`, timeout: 300000 });
+  }
   console.log('errors', errs.slice(0, 6)); await b.close();
 })();

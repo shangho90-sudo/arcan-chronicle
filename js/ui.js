@@ -13,7 +13,8 @@ const esc = s => String(s).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", 
 const STAT_KR = { maxHp: "최대 체력", maxSp: "최대 기력", atk: "공격력", matk: "마법력", def: "방어력", crit: "치명타", critDmg: "치명 피해", moveSpeed: "이동 속도", atkSpeed: "공격 속도", spRegen: "기력 회복", healPower: "회복 효율", foodPower: "음식 효과", dmgReduce: "피해 감소", cdr: "재사용 감소", shieldPower: "보호막 강화" };
 const PCT = new Set(["crit", "critDmg", "healPower", "foodPower", "dmgReduce", "cdr", "shieldPower"]);
 // ---- ornate window pieces (inventory / skills): inline SVG so they stay sharp at any scale
-const FANCY = new Set(["inventory", "skills"]);
+// every game window uses the ornate frame except the conversation box and the illustrated title / character screens
+const PLAIN = new Set(["dialog", "title", "create"]), BANNER = new Set(["inventory", "shop", "quests", "craft", "jobs"]);
 const G1 = '<linearGradient id="fgold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0b8"/><stop offset=".5" stop-color="#d9a640"/><stop offset="1" stop-color="#8a5a14"/></linearGradient>';
 export const STAR4 = '<svg viewBox="0 0 24 24"><path d="M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z" fill="#c9973a"/><path d="M12 5l1.3 5.7L19 12l-5.7 1.3L12 19l-1.3-5.7L5 12l5.7-1.3z" fill="#f6dc8e"/></svg>';
 const FLOURISH = `<svg viewBox="0 0 120 120"><defs>${G1}</defs><g fill="none" stroke="url(#fgold)" stroke-width="5" stroke-linecap="round"><path d="M6 114V30Q6 6 30 6h84"/><path d="M18 100V40q0-22 22-22h60" stroke-width="2.5"/><path d="M30 6q-6 22 10 30t26-8q4-14-10-14t-10 12" stroke-width="3.5"/><path d="M6 30q22 6 30-10t-8-26" stroke-width="3.5" opacity=".0"/></g><circle cx="30" cy="30" r="7" fill="url(#fgold)"/><path d="M30 18l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" fill="#fff4c4"/></svg>`;
@@ -307,13 +308,13 @@ export class UI {
   open(name, title, w, h, closable = true, dim = true) {
     this.close(false);
     if (dim) { this.dim = $("div", "dim", this.win); }
-    const fancy = FANCY.has(name);
-    const wnd = $("div", "window " + (fancy ? "fancy " : "panel ") + name, this.win);
+    const fancy = !PLAIN.has(name);
+    const wnd = $("div", "window " + (fancy ? "fancy " + (BANNER.has(name) ? "banner " : "") + (title ? "" : "notitle ") : "panel ") + name, this.win);
     wnd.style.width = w + "px"; if (h) wnd.style.height = h + "px";
     if (fancy) {
       // ornate frame: gold corner flourishes, title plaque (inventory also gets the navy banner with pennant + castle)
       for (const c of ["tl", "tr", "bl", "br"]) $("i", "fcorner " + c, wnd, FLOURISH);
-      if (name === "inventory") $("div", "fbanner", wnd, `<span class="fpennant">${FLEUR_PENNANT}</span><span class="fcastle"></span>`);
+      if (BANNER.has(name)) $("div", "fbanner", wnd, `<span class="fpennant">${FLEUR_PENNANT}</span><span class="fcastle"></span>`);
       if (title) $("div", "wtitle fplaque", wnd, `<span class="fp-orn l">${PLAQUE_ORN}</span><span class="fp-t">${esc(title)}</span><span class="fp-orn r">${PLAQUE_ORN}</span>`);
       if (closable) { const x = $("button", "fclose", wnd, "✕"); x.setAttribute("aria-label", "닫기"); x.onclick = () => this.close(); }
     } else {
