@@ -49,8 +49,8 @@ export class Combatant {
       if (d.crit && !d.dot && this.faction !== "player") {
         G.audio.sfx("crit");
         G.hitStop(0.05); G.render.addShake(0.06, 0.12);
-        G.fx.play("hit", { x: this.pos.x, y: this.pos.y + 0.7, z: this.pos.z }, 1.5, false, [1, 0.85, 0.3]);
-        if (G.skillFx) try { G.skillFx.burst('explosion_gold', { x: this.pos.x, y: this.pos.y + 0.6, z: this.pos.z }, { radius: 0.55 }); } catch (e) { }
+        if (G.swingFx && G.swingFx.ready) G.swingFx.hit(this.pos, { crit: true });
+        else if (G.skillFx) try { G.skillFx.burst('explosion_gold', { x: this.pos.x, y: this.pos.y + 0.6, z: this.pos.z }, { radius: 0.55 }); } catch (e) { }
       }
     }
     if (!d.dot && this.body) this.body.flash(0.1);
@@ -162,14 +162,18 @@ export class SkillRunner {
         const bmul = p.s.kind === "basic" && pc.sheet && pc.sheet.book ? 1 + pc.sheet.book.passive("basicDmg") : 1;
         // melee swings (slash / blunt) use the 3D effect library: a bright crescent that alternates direction each swing
         const fx3 = G.skillFx && !a.atTarget && a.shape === "cone" && (a.fx === "slash" || a.fx === "hit" || a.fx === "wind");
+        const SF = G.swingFx && G.swingFx.ready ? G.swingFx : null;
         for (const t of ts) {
-          t.takeDamage(Resolver.damage(pc, t, a.coef * bmul, a.power, a.knockback));
-          if (fx3) G.skillFx.burst(a.fx === "hit" ? "hit_blunt" : "hit_slash", { x: t.pos.x, y: t.pos.y, z: t.pos.z }, { radius: 0.5, grade: 1 });
+          const dd = Resolver.damage(pc, t, a.coef * bmul, a.power, a.knockback); t.takeDamage(dd);
+          if (SF && !a.atTarget) { if (!dd.crit) SF.hit(t.pos, { scale: a.fx === "hit" ? 1.15 : 1 }); }
+          else if (fx3) G.skillFx.burst(a.fx === "hit" ? "hit_blunt" : "hit_slash", { x: t.pos.x, y: t.pos.y, z: t.pos.z }, { radius: 0.5, grade: 1 });
           else G.fx.play(a.fx === "hit" ? "hit" : (["paint_burst", "potion_splash"].includes(a.fx) ? a.fx : "hit"), { x: t.pos.x, y: t.pos.y + 0.6, z: t.pos.z }, a.fx === "hit" ? 1.2 : 1);
         }
         const reach = Math.max(0.6, (a.radius > 0 ? a.radius : a.length) * 0.5);
         const fp = a.atTarget ? { x: p.aim.x, y: p.aim.y + 0.3, z: p.aim.z } : { x: pc.pos.x + p.facing.x * reach, y: pc.pos.y + 0.7, z: pc.pos.z + p.facing.z * reach };
         const trail = pc.body && pc.body.md && pc.body.sh.actions[pc.body.action] && pc.body.sh.actions[pc.body.action].trail;
+        // melee swing: Tripo crescent sweeping the same way as the swing (forehand / backhand)
+        if (SF && !a.atTarget && (a.shape === "cone" || a.shape === "rect")) SF.slash(pc.pos, p.facing, pc.body && pc.body.action === "attack2" ? -1 : 1, { radius: Math.max(1.0, (a.radius || a.length || 1.5) * 0.85) });
         if (fx3 && !trail) { this.swing = ((this.swing || 0) + 1) % 3;
           G.skillFx.slash("blade", pc.pos, p.facing, { radius: a.radius * 1.05, angle: Math.max(110, a.angle + 20), mirror: this.swing === 1, tilt: [0.18, -0.22, 0.42][this.swing], grade: 3 }); }
         else if (["slash", "wind", "paint_burst", "potion_splash", "ring"].includes(a.fx)) G.fx.play(a.fx, fp, a.fxScale, a.fx === "ring");
