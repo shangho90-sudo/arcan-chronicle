@@ -185,41 +185,51 @@ const sstep = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a)
 const lerp = (a, b, k) => a + (b - a) * k;
 const fract = x => x - Math.floor(x);
 
-/** gait shape for a ground speed v (m/s).
- *  Cadence (steps / s) is chosen first, scaled to the model's leg length (Froude scaling: shorter legs -> quicker
- *  steps), so a 4.6 m/s run uses ~3.5 steps/s instead of the previous ~5. The stance length is then limited by what a
- *  bent leg can reach; any remaining distance is covered in flight (run) - feet never have to cycle faster to keep up. */
+/** gait shape for a ground speed v (m/s). One CYCLE = left heel strike -> next left heel strike (two steps).
+ *  1. cadence (steps / s) from the speed, Froude-scaled to the model's leg length (shorter legs -> quicker steps);
+ *  2. reach limits from the real leg: the knee never locks straight (hip-ankle distance <= kr * L), the landing foot
+ *     may be at most Rf in front of the hip, the push-off foot at most Rb behind it (Rb < Rf: no long trailing leg);
+ *  3. stance length S = v * stance time. If S does not fit in Rf + Rb, the stance gets shorter (more flight - it turns
+ *     into a run) down to a minimum duty; only if it still does not fit does the cadence go up. S is recomputed after
+ *     every adjustment and checked against the limit, so no clamp is undone by a later step. */
 function gaitParams(v, leg) {
   v = Math.min(v, 5.2);                                                     // dashes are key-framed; the gait only blends out
   const L = Math.min(leg.Left.L1 + leg.Left.L2, leg.Right.L1 + leg.Right.L2) * 0.995;
-  const run = sstep(1.8, 3.0, v);
-  const cad = lerp(1.7 + 0.42 * v, 2.55 + 0.21 * v, run) * Math.sqrt(0.72 / L);
-  const cycle = Math.max(0.2, 2 * v / cad);                               // metres travelled per full stride (two steps)
-  const crouch = lerp(0.975, 0.845, run) * L;                             // hip-to-ankle height at mid-stance
-  const sMax = Math.sqrt(Math.max(0, L * L - crouch * crouch)) / 0.56 + 0.05 * run;   // the front ~58 % of the stance must be reachable
-  let duty = lerp(0.62, 0.38, run), S = duty * cycle;
-  if (S > sMax) { S = sMax; duty = Math.max(0.28, S / cycle); S = duty * cycle; }
-  return { run, L, duty, S: Math.max(0.08, S), cycle, crouch, cad, track: lerp(0.085, 0.065, run) };
+  const run = sstep(1.9, 3.1, v);
+  let cad = lerp(1.75 + 0.42 * v, 2.6 + 0.26 * v, run) * Math.sqrt(0.72 / L);
+  const crouch = lerp(0.955, 0.88, run) * L;                               // hip-to-ankle height at mid-stance (knee flexed to take the weight)
+  const kr = lerp(0.975, 0.955, run), R = kr * L;                           // longest hip-ankle distance allowed (knee keeps some bend)
+  // the leg may swing at most ~28/24 deg (walk) or ~22/19 deg (run) in front of / behind the vertical at that length
+  const Rf = R * Math.sin(lerp(28, 22, run) * DEG);                       // landing, in front of the hip
+  const Rb = R * Math.sin(lerp(24, 19, run) * DEG);                       // push-off, behind the hip (heel already up)
+  const Smax = Rf + Rb, front = Rf / Smax;
+  let Tc = 2 / cad, duty = lerp(0.6, 0.34, run);
+  const dutyMin = lerp(0.52, 0.2, run);
+  let S = v * duty * Tc;
+  if (S > Smax) { duty = Math.max(dutyMin, Smax / (v * Tc)); S = v * duty * Tc; }
+  if (S > Smax + 1e-6) { Tc = Smax / (v * duty); S = Smax; }               // last resort: quicker steps, never a longer stance
+  cad = 2 / Tc;
+  return { run, L, duty, S: Math.max(0.05, S), Smax, cycle: Math.max(0.2, v * Tc), Tc, crouch, cad, front, Rf, Rb, kr,
+    track: lerp(0.085, 0.065, run), H: lerp(0.1, 0.22, run) * L };
 }
 
 /** one foot over the cycle in body space: z along the walk (from the hip), lift above its rest height, pitch (deg, + = toes up),
- *  e = swing progress 0..1 */
+ *  e = swing progress 0..1.  Stance: lands in front of the hip, the body passes over it, the heel rises and the foot rolls
+ *  onto the toes before it leaves. Swing: the foot lifts with the knee bent, comes forward UNDER the hip (low, knee leading)
+ *  and reaches out only at the end, then sets down. */
 function footAt(ph, G, toe) {
-  // the stance is placed a little ahead of the hip (lands ~58 % of the stance length in front, leaves ~42 % behind),
-  // so the trailing leg is not stretched far back; the swing brings the foot forward early instead of kicking it up behind
-  const run = G.run, S = G.S, front = lerp(0.56, 0.6, run), back = 1 - front;
+  const run = G.run, S = G.S, front = G.front, back = 1 - front;
   if (ph < G.duty) {                                                       // stance: planted, moves back at exactly body speed
     const s = ph / G.duty;
-    const pf = lerp(20, 24, run) * sstep(lerp(0.6, 0.5, run), 1, s);     // heel raise / push-off (late, short)
+    const pf = lerp(22, 26, run) * sstep(lerp(0.5, 0.35, run), 1, s);     // heel rise / push-off starts once the hip is past the foot
     const strike = lerp(8, 3, run) * (1 - sstep(0, 0.16, s));              // heel strike then foot flat
     const roll = toe * (1 - Math.cos(pf * DEG));
     return { z: S * front - S * s + roll, roll, lift: toe * Math.sin(pf * DEG), pitch: strike - pf, stance: true, s, e: 0, land: S * front };
   }
-  const s = (ph - G.duty) / (1 - G.duty), pf0 = lerp(20, 24, run);
-  const e = sstep(0, 1, Math.pow(s, 0.75));                                // foot travels forward early in the swing
-  const H = lerp(0.065, 0.12, run);                                        // clearance peaks mid-swing, little heel kick
-  const lift = Math.max(H * Math.sin(Math.PI * Math.pow(s, 0.9)), toe * Math.sin(pf0 * DEG) * (1 - s) * (1 - s) * (1 - s));
-  const pitch = s < 0.45 ? lerp(-pf0, 4, sstep(0, 0.45, s)) : lerp(4, lerp(8, 3, run), sstep(0.45, 1, s));
+  const s = (ph - G.duty) / (1 - G.duty), pf0 = lerp(22, 26, run);
+  const e = sstep(0.08, 0.9, s);                                           // stays behind briefly (knee folds), passes under the hip mid-swing
+  const lift = Math.max(G.H * Math.sin(Math.PI * Math.min(1, Math.pow(s, 0.72))), toe * Math.sin(pf0 * DEG) * (1 - s) ** 3);
+  const pitch = s < 0.4 ? lerp(-pf0 * 0.8, 0, sstep(0, 0.4, s)) : lerp(0, lerp(8, 3, run), sstep(0.4, 1, s));
   return { z: -S * back + S * e, lift, pitch, stance: false, s, e, land: S * front };
 }
 
@@ -257,7 +267,8 @@ function solveLeg(c, Hn, A, pole, yaw, pitch) {
   const Rsh = rotBetween(_v().subVectors(c.A, c.K), bindPole, _v().subVectors(An, K), pole);
   const el = c.tilt + pitch, f = _v(Math.sin(yaw) * Math.cos(el), Math.sin(el), Math.cos(yaw) * Math.cos(el));
   const Rft = rotBetween(c.fwd, _v(0, 1, 0), f, _v(0, 1, 0));
-  return { Rth, Rsh, Rft, reached: len <= max + 1e-4 };
+  const knee = 180 - _v().subVectors(c.K, c.H).angleTo(_v().subVectors(c.A, c.K)) / DEG * 0 - _v().subVectors(Hn, K).angleTo(_v().subVectors(An, K)) / DEG;
+  return { Rth, Rsh, Rft, reached: len <= max + 1e-4, over: Math.max(0, len - max), len, knee };
 }
 const rotOnly = m => _m().extractRotation(m);
 
@@ -291,59 +302,77 @@ function solveArm(c, Sn, T, pole, blade) {
   return { Rua, Rla, Rh, W: Wn };
 }
 
-/** bone rotations + pelvis height for the gait. body = ModelBody (for the world-locked feet), ph 0..1 (left heel strike at 0) */
-function gaitPose(body, ph, v, base) {
-  const md = body.md, leg = md.leg, G = gaitParams(v, leg), run = G.run, Q = {}, ch = legChain(md);
+/** idle footprint in body space (same spot and toe-out the key-framed idle stance uses via alignLegs) */
+function idleFoot(md, side) {
+  const c = legChain(md)[side], g = md.leg[side];
+  return { x: c.sg * (g.ankX - Math.min(STAND_IN, Math.max(0, g.ankX - 0.09))), z: c.A.z, yaw: c.sg * Math.min(g.toeOut, TOE_OUT) * DEG };
+}
+/** bone rotations + pelvis height / sway for the gait. body = ModelBody (world-locked feet), ph 0..1 (left heel strike at 0).
+ *  settle 0..1: the run is ending - targets move to the idle footprint (finishing steps), body motion fades out. */
+function gaitPose(body, ph, v, base, settle = 0) {
+  const md = body.md, leg = md.leg, G = gaitParams(v, leg), run = G.run * (1 - settle), Q = {}, ch = legChain(md), live = 1 - settle;
+  const dbg = body.gdbg = { v: +v.toFixed(2), cad: +G.cad.toFixed(2), S: +G.S.toFixed(3), Smax: +G.Smax.toFixed(3), duty: +G.duty.toFixed(3), run: +G.run.toFixed(2), ph: +ph.toFixed(3), settle: +settle.toFixed(2), miss: {}, knee: {}, reach: {}, stance: {} };
   const toeOut = lerp(6, 4, run) * DEG;
   const nominal = {};
   for (const [side, off] of [['Left', 0], ['Right', 0.5]]) {
-    const c = ch[side], f = footAt(fract(ph + off), G, leg[side].toe);
+    const c = ch[side];
+    if (settle > 0) { const f0 = idleFoot(md, side); nominal[side] = { f: { stance: true, s: 0.5, lift: 0, pitch: 0, roll: 0, e: 0, z: 0, land: 0 }, x: f0.x, z: f0.z, yaw: f0.yaw, idle: true }; continue; }
+    const f = footAt(fract(ph + off), G, leg[side].toe);
     // nominal ankle target in body space: narrow track, foot under the hip in z, toes slightly out
     nominal[side] = { f, x: c.sg * G.track, z: c.H.z + f.z, yaw: c.sg * toeOut };
   }
-  // world-locked feet: a planted foot keeps its spot and heading on the ground even while the body turns, speeds up or stops
+  // world-locked feet: a planted foot keeps its spot and heading on the ground while the body turns, speeds up or stops;
+  // when it can no longer stay (too far / too twisted) it takes a short re-step instead of being dragged
   const tgt = body.lockFeet(nominal, G);
-  // pelvis height: as high as the planted feet allow (compass gait when walking, bent-knee compression when running)
-  const reach = (side, t) => { const c = ch[side], dx = t.x - c.H.x, dz = t.z - c.H.z; return Math.sqrt(Math.max(0, G.L * G.L - dx * dx - dz * dz)) + t.lift; };
-  const want = s => lerp(G.L * 0.985, G.crouch - 0.03 * Math.sin(Math.PI * s), run);
+  // pelvis height: as high as the planted feet allow with the knee still a little bent (never a locked, stretched leg)
+  const Rk = G.kr * G.L;
+  const reach = (side, t) => { const c = ch[side], dx = t.x - c.H.x, dz = t.z - c.H.z; return Math.sqrt(Math.max(0, Rk * Rk - dx * dx - dz * dz)) + t.lift; };
+  const want = s => lerp(lerp(G.L * 0.975, G.crouch - 0.025 * Math.sin(Math.PI * s), G.run), (md.leg.Left.Lv + md.leg.Right.Lv) / 2 * 0.995, settle);
   let D = Infinity;
-  // (a foot dragged far behind in a sharp turn may not pull the pelvis down more than a little: the IK clamps it instead)
-  for (const side of ['Left', 'Right']) if (tgt[side].stance) D = Math.min(D, want(nominal[side].f.s), Math.max(want(nominal[side].f.s) * 0.94, reach(side, tgt[side])));
+  for (const side of ['Left', 'Right']) if (tgt[side].stance) D = Math.min(D, want(nominal[side].f.s), Math.max(want(nominal[side].f.s) * 0.92, reach(side, tgt[side])));
   if (D === Infinity) {                                                    // flight (running): small ballistic rise between steps
-    const end = Math.min(want(1), Math.sqrt(Math.max(0, G.L * G.L - (G.S * 0.44) ** 2)) + leg.Left.toe * Math.sin(lerp(20, 24, run) * DEG));
+    const end = Math.min(want(1), Math.sqrt(Math.max(0, Rk * Rk - (G.S * (1 - G.front)) ** 2)) + leg.Left.toe * Math.sin(lerp(22, 26, run) * DEG));
     const u = fract(ph * 2 - G.duty * 2) / Math.max(1e-3, 1 - G.duty * 2);
-    D = end + 0.022 * run * Math.sin(Math.PI * Math.min(1, Math.max(0, u)));
+    D = end + 0.03 * run * Math.sin(Math.PI * Math.min(1, Math.max(0, u)));
   }
   const hipH = D + (leg.Left.ha + leg.Right.ha) / 2;
   const bodyY = hipH - (leg.Left.hip + leg.Right.hip) / 2;
-  const sw = Math.cos(2 * Math.PI * ph);                                   // +1 when the left leg is forward
-  const yawA = lerp(4, 6, run), rollA = lerp(2.5, 1.5, run);
-  Q.Hips = mul(ry(-yawA * sw), rz(rollA * Math.sin(4 * Math.PI * ph)));
+  // ---- pelvis: turns with the swinging leg, drops on the swing side, shifts over the supporting foot (once per cycle each)
+  const sw = Math.cos(2 * Math.PI * ph), sl = Math.sin(2 * Math.PI * ph);    // sw +1: left leg forward; sl +: left foot supporting
+  const yawA = lerp(7, 9, run) * live, rollA = lerp(4, 2.5, run) * live, swayA = lerp(0.024, 0.009, run) * live;
+  const sway = swayA * sl;                                                  // metres towards the model's left (+x) = over the left foot
+  const lean = lerp(4, 11, run) + 2 * live;
+  Q.Hips = mul(ry(-yawA * sw), rz(rollA * sl), rx(lean * 0.3));
   const RH = rotOnly(Q.Hips), RHi = RH.clone().invert();
   for (const side of ['Left', 'Right']) {
     const c = ch[side], t = tgt[side];
-    // hip joint carried by the pelvis twist / tilt (the IK accounts for it, so the planted foot does not slide)
+    // hip joint carried by the pelvis twist / tilt / sway (the IK accounts for it, so the planted foot does not slide)
     const Hn = c.H.clone().sub(ch.pelvis).applyMatrix4(RH).add(ch.pelvis);
-    const A = _v(t.x, -bodyY + leg[side].ha + t.lift, t.z);
+    const A = _v(t.x - sway, -bodyY + leg[side].ha + t.lift, t.z);
     const pole = _v(Math.sin(t.yaw) * 0.9 + c.sg * 0.12, 0, Math.cos(t.yaw)).normalize();   // knee over the toes, a touch outward
     const r = solveLeg(c, Hn, A, pole, t.yaw, t.pitch * DEG);
+    dbg.miss[side] = r.reached ? 0 : +(r.over || 0).toFixed(3); dbg.knee[side] = +r.knee.toFixed(1); dbg.reach[side] = +(r.len / (c.L1 + c.L2)).toFixed(3); dbg.stance[side] = t.stance ? 1 : 0;
     Q[side + '_UpperLeg'] = mul(RHi, r.Rth);
     Q[side + '_LowerLeg'] = mul(r.Rth.clone().invert(), r.Rsh);
     Q[side + '_Foot'] = mul(r.Rsh.clone().invert(), r.Rft);
   }
-  // upper body: slight lean into the run, shoulders counter-rotate the pelvis, arms swing opposite the legs (not pumped)
-  const lean = lerp(2.5, 8, run);
-  Q.Spine = mul(ry(yawA * 0.9 * sw), rx(lean * 0.55));
-  Q.Chest = mul(ry(yawA * 0.6 * sw), rx(lean * 0.45));
-  Q.Head = rx(-lean * 0.8 + md.cfg.headPitch);
-  const armA = lerp(18, 28, run), armF = lerp(4, 10, run);
+  // ---- trunk: shoulders counter-rotate the pelvis (net ~ -0.6 x pelvis yaw), spine levels the pelvic drop, lean into the run
+  Q.Spine = mul(ry(yawA * 0.8 * sw), rz(-rollA * sl * 0.55), rx(lean * 0.4));
+  Q.Chest = mul(ry(yawA * 0.8 * sw), rz(-rollA * sl * 0.3), rx(lean * 0.35));
+  // head steadier than the trunk: undo most of the shoulder turn and the lean, keep a little life
+  Q.Head = mul(ry(-yawA * 0.45 * sw), rz(-rollA * sl * 0.15), rx(-lean * 0.8 + md.cfg.headPitch));
+  // ---- arms opposite the legs; elbows bend into a pump when running; the hand holding a weapon / tool swings less
+  const armA = lerp(17, 30, run) * live, armF = lerp(5, 12, run);
   for (const [side, nm, sgn] of [[-1, 'Right', 1], [1, 'Left', -1]]) {
-    const f = armF + sgn * armA * sw, down = Math.max(0, 90 - (base[side > 0 ? 'armL' : 'armR'][1] || 12)) - 4 * run;
-    const bend = lerp(16, 68, run) + Math.max(0, f) * lerp(0.3, 0.22, run);  // elbow: bends more as the arm swings forward
+    const held = side < 0 ? !!body.weapon : !!body.off, k = held ? 0.55 : 1;
+    const f = armF + sgn * armA * k * sw, down = Math.max(0, 90 - (base[side > 0 ? 'armL' : 'armR'][1] || 12)) - 4 * run;
+    const bend = lerp(18, 82, run) + (held ? 10 : 0) + Math.max(0, f) * lerp(0.35, 0.2, run);
     Q[nm + '_UpperArm'] = mul(rx(-f), rz(side > 0 ? -down : down));
     Q[nm + '_LowerArm'] = ry(side > 0 ? -bend : bend);
+    Q[nm + '_Shoulder'] = ry(sgn * side * -3.5 * sw * live);              // the shoulder girdle follows its arm a little
   }
-  return { Q, hipH, G };
+  dbg.sway = +sway.toFixed(3); dbg.bodyY = +bodyY.toFixed(3);
+  return { Q, hipH, G, sway };
 }
 /** standing / key-framed poses (idle, attacks, hit, dash): the models stand with feet ~0.37 m apart and toes turned out
  *  (up to 18 deg); bring the ankles a little closer and turn the toes in a bit. Walking and running do not use this:
@@ -456,40 +485,59 @@ export class ModelBody {
   /** continuous facing from a Unity-space ground vector */
   setFacing(x, z) { if (x * x + z * z < 1e-6) return; this.targetYaw = Math.atan2(x, -z); }
   flash(d) { this.flashT = Math.max(this.flashT, d); }
-  /** world-locked feet for the gait: nominal = body-space foot targets from the gait cycle. A foot that lands keeps its
-   *  ground position and heading in world space until it lifts (no sliding or twisting with the body while turning,
-   *  accelerating, stopping or pushing into a wall); a lifted foot swings from where it really left the ground to its next
-   *  nominal landing spot. If the body gets too far from a planted foot (very sharp turn) the foot is dragged only by the
-   *  excess, never teleported. */
+  /** world-locked feet for the gait: nominal = body-space foot targets from the gait cycle (or the idle footprint while
+   *  settling). A foot that lands keeps its ground position and heading in world space until it lifts; a lifted foot
+   *  swings from where it really left the ground to its next nominal landing spot. If a planted foot can no longer stay
+   *  (the body got too far from it, or it would twist more than ~50 deg in a sharp turn, or the run ended and it is not
+   *  on the idle footprint) it takes a short re-step (lift, move, set down in ~0.12-0.16 s) - never dragged, never teleported. */
   lockFeet(nom, G) {
     if (!this.feet) this.feet = { Left: {}, Right: {} };
-    const yaw = this.yaw, R = this.root.position, c = Math.cos(yaw), s = Math.sin(yaw);
+    const yaw = this.yaw, R = this.root.position, c = Math.cos(yaw), s = Math.sin(yaw), dt = this.ldt || 1 / 60;
     const toW = (x, z) => ({ x: R.x + x * c + z * s, z: R.z - x * s + z * c });
     const toB = w => { const dx = w.x - R.x, dz = w.z - R.z; return { x: dx * c - dz * s, z: dx * s + dz * c }; };
     const wrap = a => Math.atan2(Math.sin(a), Math.cos(a));
-    const out = {};
+    const out = {}, F = this.feet, lim = G.S * 0.35 + 0.1;
+    if (this.startFeet) {
+      this.startFeet = false; const c0 = Math.cos(this.yaw0 ?? yaw), s0 = Math.sin(this.yaw0 ?? yaw);
+      for (const side of ['Left', 'Right']) { const f0 = idleFoot(this.md, side), w = { x: R.x + f0.x * c0 + f0.z * s0, z: R.z - f0.x * s0 + f0.z * c0 };
+        Object.assign(F[side], { stance: true, lock: w, lockYaw: (this.yaw0 ?? yaw) + f0.yaw, lastW: w, lastYaw: (this.yaw0 ?? yaw) + f0.yaw }); }
+    }
+    const stepping = side => !!F[side].rs;
+    const startStep = (side, from, fromYaw, dur) => { F[side].rs = { from, fromYaw, t: 0, dur }; F[side].lock = null; this.restepN = (this.restepN || 0) + 1; };
     for (const side of ['Left', 'Right']) {
-      const st = this.feet[side], n = nom[side], f = n.f;
+      const st = F[side], n = nom[side], f = n.f, other = side === 'Left' ? 'Right' : 'Left';
+      if (st.rs) {                                                          // short re-step in progress
+        const r = st.rs; r.t += dt; const e = sstep(0, 1, r.t / r.dur), a = toB(r.from);
+        const fy0 = wrap(r.fromYaw - yaw), o = { x: a.x + (n.x - a.x) * e, z: a.z + (n.z - a.z) * e, yaw: fy0 + wrap(n.yaw - fy0) * e, lift: 0.045 * Math.sin(Math.PI * e), pitch: 0, stance: false };
+        st.lastW = toW(o.x, o.z); st.lastYaw = yaw + o.yaw; out[side] = o;
+        if (r.t >= r.dur) { st.rs = null; st.stance = true; st.lock = toW(n.x, n.z); st.lockYaw = yaw + n.yaw; }
+        continue;
+      }
       if (f.stance) {
         // plant where the swing actually put the foot down (no pop on contact)
-        if (!st.stance || !st.lock) { st.lock = st.lastW && st.stance === false ? st.lastW : toW(n.x, n.z); st.lockYaw = st.lastW && st.stance === false ? st.lastYaw : yaw + n.yaw; }
-        let b = toB(st.lock); const dx = b.x - n.x, dz = b.z - n.z, d = Math.hypot(dx, dz), lim = G.S * 0.35 + 0.12;
-        if (d > lim) { const k = lim / d; b = { x: n.x + dx * k, z: n.z + dz * k }; st.lock = toW(b.x, b.z); }
-        let fy = wrap(st.lockYaw - yaw);
-        if (Math.abs(wrap(fy - n.yaw)) > 0.9) { fy = n.yaw + Math.sign(wrap(fy - n.yaw)) * 0.9; st.lockYaw = yaw + fy; }   // never more than ~50 deg twisted
+        if (!st.stance || !st.lock) {
+          if (n.idle && st.stance === false && st.lastW && !stepping(other)) { startStep(side, st.lastW, st.lastYaw, 0.14); out[side] = { x: toB(st.lastW).x, z: toB(st.lastW).z, yaw: wrap(st.lastYaw - yaw), lift: 0, pitch: 0, stance: false }; continue; }
+          st.lock = st.lastW && st.stance === false ? st.lastW : toW(n.x, n.z); st.lockYaw = st.lastW && st.stance === false ? st.lastYaw : yaw + n.yaw;
+        }
+        const b = toB(st.lock), d = Math.hypot(b.x - n.x, b.z - n.z), fy = wrap(st.lockYaw - yaw), tw = Math.abs(wrap(fy - n.yaw));
+        const far = n.idle ? d > 0.06 || tw > 0.35 : d > lim || tw > 0.9;
+        if (far && !stepping(other)) { startStep(side, st.lock, st.lockYaw, n.idle ? 0.16 : 0.12); out[side] = { x: b.x, z: b.z, yaw: fy, lift: 0, pitch: f.pitch, stance: false }; st.stance = false; continue; }
         const rx_ = b.x + Math.sin(fy) * (f.roll || 0), rz_ = b.z + Math.cos(fy) * (f.roll || 0);   // heel raise: ankle moves towards the toes, toes stay
         out[side] = { x: rx_, z: rz_, yaw: fy, lift: f.lift, pitch: f.pitch, stance: true };
         st.stance = true; st.dbg = toW(b.x, b.z); st.lastW = toW(rx_, rz_); st.lastYaw = yaw + fy;
       } else {
         // lift off from where the foot really was (heel-raise roll included)
-        if (st.stance !== false) { st.lift = st.lastW || st.lock || toW(n.x, n.z); st.liftYaw = st.lastYaw !== undefined ? st.lastYaw : yaw + n.yaw; st.lock = null; }
+        // (the lift-off point is kept in BODY space: once in the air the foot travels with the body - a world-fixed start
+        //  point would recede behind a fast runner and stretch the leg straight at the start of every swing)
+        if (st.stance !== false) { const w = st.lastW || st.lock || toW(n.x, n.z); st.liftB = toB(w); st.liftYawB = wrap((st.lastYaw !== undefined ? st.lastYaw : yaw + n.yaw) - yaw); st.lock = null; }
         st.stance = false;
-        const a = toB(st.lift), e = f.e, landZ = n.z - f.z + f.land;
-        const fy0 = wrap(st.liftYaw - yaw);
+        const a = st.liftB, e = f.e, landZ = n.z - f.z + f.land;
+        const fy0 = st.liftYawB;
         const o = { x: a.x + (n.x - a.x) * e, z: a.z + (landZ - a.z) * e, yaw: fy0 + wrap(n.yaw - fy0) * e, lift: f.lift, pitch: f.pitch, stance: false };
         out[side] = o; st.lastW = toW(o.x, o.z); st.lastYaw = yaw + o.yaw;
       }
     }
+    this.settled = !!nom.Left.idle && ['Left', 'Right'].every(sd => F[sd].stance && !F[sd].rs && F[sd].lock && Math.hypot(toB(F[sd].lock).x - nom[sd].x, toB(F[sd].lock).z - nom[sd].z) <= 0.06);
     return out;
   }
   setTint(r, g, b) { this.tint = [r, g, b]; this.applyColor(); }
@@ -512,6 +560,7 @@ export class ModelBody {
     if (this.fadeDur > 0) this.fadeT += dt;
     if (this.flashT > 0) this.flashT -= dt;
     this.mat.emissiveIntensity = this.flashT > 0 ? 0.7 : 0;
+    this.yaw0 = this.yaw;                                                   // facing before this frame's turn (start of a run)
     let dy = this.targetYaw - this.yaw; dy = Math.atan2(Math.sin(dy), Math.cos(dy));
     const swing = this.sh.actions[this.action] && this.sh.actions[this.action].keys;
     this.yaw += dy * Math.min(1, dt * (swing ? 30 : 18));                  // a swing turns to its target during the wind-up
@@ -519,9 +568,22 @@ export class ModelBody {
     const dist = this.treadmill > 0 ? this.treadmill * dt : this.moved; this.moved = 0;
     if (dt > 0) this.gaitV += (dist / dt - this.gaitV) * Math.min(1, dt * 12);
     const loco = this.action === 'walk' && this.gaitV > 0.15;
-    this.gaitW += ((loco ? 1 : 0) - this.gaitW) * Math.min(1, dt * (loco ? 22 : 14));   // blend in fast: the body is already at full speed
-    if (this.gaitW > 0.01) this.gaitPh = fract(this.gaitPh + dist / gaitParams(Math.max(0.3, this.gaitV), this.md.leg).cycle);
-    else this.gaitPh = 0.15;                                               // next start: mid-stance, not mid-stride
+    this.ldt = dt;
+    // stopping: keep the gait IK running a moment with the idle footprint as the target, so the feet finish with a short
+    // step onto the idle stance (no blend that slides the feet), then hand over to the key-framed idle pose
+    if (loco) this.settleT = -1;
+    else if (this.action === 'idle' && this.gaitW > 0.5 && !(this.settleT >= 0)) this.settleT = 0;
+    const settling = this.settleT >= 0 && this.action === 'idle';
+    if (settling) { this.settleT += dt; if (this.settleT < 0.5 && !(this.settled && this.settleT > 0.12)) this.gaitW = 1; else this.gaitW += (0 - this.gaitW) * Math.min(1, dt * 14); if (this.gaitW < 0.01) this.settleT = -1; }
+    else {
+      if (!loco) this.settleT = -1;
+      // starting from a standing pose: take over at once with both feet locked where the idle stance put them (IK = pose on
+      // screen, no pop); the first step then leaves from there, and a foot that would twist in a turning start re-steps
+      if (loco && this.gaitW < 0.05 && this.md.leg && !this.md.cfg.npc) { this.gaitW = 1; this.feet = null; this.startFeet = true; }
+      else this.gaitW += ((loco ? 1 : 0) - this.gaitW) * Math.min(1, dt * (loco ? 22 : 14));
+    }
+    if (this.gaitW > 0.01 && !settling) this.gaitPh = fract(this.gaitPh + dist / gaitParams(Math.max(0.3, this.gaitV), this.md.leg).cycle);
+    else if (this.gaitW <= 0.01) this.gaitPh = 0.15;                       // next start: mid-stance, not mid-stride
     this.apply();
     // swing afterimage from the real blade while the action's trail window [start, end] (seconds) is open
     const a = this.sh.actions[this.action], tw = a && a.trail;
@@ -554,15 +616,16 @@ export class ModelBody {
     if (this.fadeDur > 0 && this.fromPose) { const k = this.fadeT / this.fadeDur; if (k < 1) p = lerpPose(this.fromPose, p, EASE.s(k)); else this.fadeDur = 0; }
     this.lastPose = p;
     let Q = md.cfg.npc ? npcIdle(this.t, this.lookYaw || 0) : poseToBones(p, md.cfg.headPitch);
-    let bodyY = md.cfg.npc ? 0 : (p.bob || 0) - (p.sink || 0);
+    let bodyY = md.cfg.npc ? 0 : (p.bob || 0) - (p.sink || 0), swayX = 0;
     if (!md.cfg.npc && md.leg) Q = alignLegs(md, Q);
     // swings: feet stay planted in a fighting stance while the pelvis twists and sinks (knees solved by IK)
     if (!md.cfg.npc && md.leg && p.plant > 0.01 && p.step) Q = blendBones(Q, this.plantLegs(p, Q, bodyY), Math.min(1, p.plant));
     if (!md.cfg.npc && this.gaitW > 0.01 && md.leg) {
-      const gp = gaitPose(this, this.gaitPh, Math.max(0.3, this.gaitV), p), w = Math.min(1, this.gaitW);
+      const settle = this.settleT >= 0 && this.action === 'idle' ? Math.min(1, this.settleT / 0.15) : 0;
+      const gp = gaitPose(this, this.gaitPh, Math.max(0.3, this.gaitV), p, settle), w = Math.min(1, this.gaitW);
       Q = blendBones(Q, gp.Q, w);
       const hipBind = (md.leg.Left.hip + md.leg.Right.hip) / 2;
-      bodyY = lerp(bodyY, gp.hipH - hipBind, w);
+      bodyY = lerp(bodyY, gp.hipH - hipBind, w); swayX = gp.sway * w;
     } else this.feet = null;
     // world (model-space) matrix of every bone: parent's change applied to the bind matrix rotated about the joint
     let W = this.worldOf(Q);
@@ -583,7 +646,7 @@ export class ModelBody {
       bone.matrixWorldNeedsUpdate = true;
     }
     // body bob / sink (metres) and facing
-    this.mesh.position.y = bodyY;
+    this.mesh.position.y = bodyY; this.mesh.position.x = swayX;   // visual weight shift only: collision / camera follow the root
     this.root.rotation.y = this.yaw;
     const wid = !p.held && this.weaponId ? this.weaponId() : null;
     this.updateProp('R', p.held || (wid && isWeaponModel(wid) ? 'item:' + wid : this.weapon), (p.wOff - 90) * (1 - (this.swingW || 0)));

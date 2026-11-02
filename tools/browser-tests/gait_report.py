@@ -10,6 +10,8 @@ def ang(a):
 def gaitflag(f): return bool(f.get('st')) and f['gw'] > 0.95
 
 def analyse(frames, leg):
+    global FPS
+    FPS = round(1 / (frames[1]['t'] - frames[0]['t'])) if len(frames) > 1 and frames[1]['t'] > frames[0]['t'] else 60
     ha = leg['ha']
     # toe-joint height when the foot is flat: take it from the idle frames
     idle = [f for f in frames if f['seg'] == 'idle'][10:] or frames[:20]
@@ -22,7 +24,7 @@ def analyse(frames, leg):
     for name, F in segs.items():
         r = {'n': len(F)}
         dist = sum(math.hypot(F[i]['pos'][0] - F[i - 1]['pos'][0], F[i]['pos'][1] - F[i - 1]['pos'][1]) for i in range(1, len(F)))
-        T = len(F) / 60; r['speed'] = dist / T
+        T = len(F) / FPS; r['speed'] = dist / T
         slips, onsets, rots, toeouts, lats, pen = [], 0, [], [], [], 0.0
         jumps = []
         for side in ('l', 'r'):
@@ -38,9 +40,9 @@ def analyse(frames, leg):
                 if gaitflag(f) and gaitflag(F[i - 1] if i else f):
                     # gait frames: the model's own stance flag; planted ankle should only move by the heel-raise roll (< 1.5 cm)
                     if c and prev is not None and prev['c'] and not tele:
-                        slips.append(math.hypot(f[a][0] - F[i - 1][a][0], f[a][2] - F[i - 1][a][2]) * 60)
+                        slips.append(math.hypot(f[a][0] - F[i - 1][a][0], f[a][2] - F[i - 1][a][2]) * FPS)
                 elif c and prev is not None and prev['c'] and prev['which'] == (heel <= toe) and not tele:
-                    slips.append(math.hypot(anc[0] - prev['anc'][0], anc[2] - prev['anc'][2]) * 60)
+                    slips.append(math.hypot(anc[0] - prev['anc'][0], anc[2] - prev['anc'][2]) * FPS)
                 if c and (prev is None or not prev['c']):
                     if prev is not None: onsets += 1
                     yaw0 = fy
@@ -52,9 +54,9 @@ def analyse(frames, leg):
                         dx, dz = anc[0] - f['pos'][0], anc[2] - f['pos'][1]
                         lats.append(abs(dx * math.cos(mv) - dz * math.sin(mv)))
                 if i > 0:
-                    jumps.append(math.hypot(f[a][0] - F[i - 1][a][0] - (f['pos'][0] - F[i - 1]['pos'][0]), f[a][1] - F[i - 1][a][1], f[a][2] - F[i - 1][a][2] - (f['pos'][1] - F[i - 1]['pos'][1])) * 60)
+                    jumps.append(math.hypot(f[a][0] - F[i - 1][a][0] - (f['pos'][0] - F[i - 1]['pos'][0]), f[a][1] - F[i - 1][a][1], f[a][2] - F[i - 1][a][2] - (f['pos'][1] - F[i - 1]['pos'][1])) * FPS)
                 prev = {'c': c, 'anc': anc, 'which': heel <= toe}
-        hipj = [abs(F[i]['hip'][1] - F[i - 1]['hip'][1]) * 60 for i in range(1, len(F))]
+        hipj = [abs(F[i]['hip'][1] - F[i - 1]['hip'][1]) * FPS for i in range(1, len(F))]
         slips.sort(); jumps.sort()
         q = lambda L, p: L[min(len(L) - 1, int(len(L) * p))] if L else 0
         r.update({'slip_mean': sum(slips) / len(slips) if slips else 0, 'slip_p90': q(slips, 0.9), 'cadence': onsets / T,
