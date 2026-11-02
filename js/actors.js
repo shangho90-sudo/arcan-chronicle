@@ -1,7 +1,7 @@
 // Actors: combatant base, player, monsters, boss, NPCs, projectiles, poison zones, loot, skill runner.
 // Port of Assets/Arcan/Scripts/Runtime/{Actors,Combat} (C#).
 import { CombatMath, HitShape, StatusSet, clamp, clamp01, DEG } from './core.js';
-import { SpriteBody, dirFromWorld, hitTime, duration, action, TelegraphView, T, THREE } from './render.js';
+import { SpriteBody, dirFromWorld, hitTime, duration, lockTime, action, TelegraphView, T, THREE } from './render.js';
 import { lootModel, hasItemModel } from './items3d.js';
 import { SkillEngine, applyStatus, clearMarks } from './skillrt.js';
 import { CreatureBody, loadCreature, CREATURES } from './creature.js';
@@ -48,7 +48,7 @@ export class Combatant {
       // critical hit on a monster: a beat of hit-stop, a camera kick and a star burst at the target
       if (d.crit && !d.dot && this.faction !== "player") {
         G.audio.sfx("crit");
-        G.hitStop(0.07); G.render.addShake(0.14, 0.16);
+        G.hitStop(0.05); G.render.addShake(0.06, 0.12);
         G.fx.play("hit", { x: this.pos.x, y: this.pos.y + 0.7, z: this.pos.z }, 1.5, false, [1, 0.85, 0.3]);
         if (G.skillFx) try { G.skillFx.burst('explosion_gold', { x: this.pos.x, y: this.pos.y + 0.6, z: this.pos.z }, { radius: 0.55 }); } catch (e) { }
       }
@@ -126,10 +126,12 @@ export class SkillRunner {
     if (s.targeting === "ground") { const m = Math.hypot(dx, dz); if (m > s.range) { aim = { x: o.x + dx / m * s.range, z: o.z + dz / m * s.range }; } aim = pc.zone.geo.ground(aim.x, aim.z); }
     if (dx * dx + dz * dz > 0.01) pc.setFacing(dx, dz);
     const facing = { ...pc.facing };
-    const anim = s.anim || "attack", sh = pc.body.sh;
+    let anim = s.anim || "attack"; const sh = pc.body.sh;
+    // basic attacks alternate forehand / backhand while the button is held (the 2nd swing starts where the 1st ended)
+    if (basic && anim === "attack" && sh.actions.attack2) { this.combo = this.clock - (this.lastBasic ?? -9) < 0.9 ? ((this.combo || 0) + 1) % 2 : 0; this.lastBasic = this.clock; if (this.combo) anim = "attack2"; }
     const ht = hitTime(sh, anim) / animSpeed, du = duration(sh, anim) / animSpeed;
     pc.body.play(anim, animSpeed, true);
-    this.lock = anim === "dash" ? 0 : du;
+    this.lock = anim === "dash" ? 0 : lockTime(sh, anim) / animSpeed;   // the recovery of a swing can blend into moving / the next swing
     if (s.sfx) G.audio.sfx(s.sfx);
     let extra = 0;
     for (const a of s.actions) {
@@ -162,12 +164,13 @@ export class SkillRunner {
         const fx3 = G.skillFx && !a.atTarget && a.shape === "cone" && (a.fx === "slash" || a.fx === "hit" || a.fx === "wind");
         for (const t of ts) {
           t.takeDamage(Resolver.damage(pc, t, a.coef * bmul, a.power, a.knockback));
-          if (fx3) G.skillFx.burst(a.fx === "hit" ? "hit_blunt" : "hit_slash", { x: t.pos.x, y: t.pos.y, z: t.pos.z }, { radius: 0.8 });
+          if (fx3) G.skillFx.burst(a.fx === "hit" ? "hit_blunt" : "hit_slash", { x: t.pos.x, y: t.pos.y, z: t.pos.z }, { radius: 0.5, grade: 1 });
           else G.fx.play(a.fx === "hit" ? "hit" : (["paint_burst", "potion_splash"].includes(a.fx) ? a.fx : "hit"), { x: t.pos.x, y: t.pos.y + 0.6, z: t.pos.z }, a.fx === "hit" ? 1.2 : 1);
         }
         const reach = Math.max(0.6, (a.radius > 0 ? a.radius : a.length) * 0.5);
         const fp = a.atTarget ? { x: p.aim.x, y: p.aim.y + 0.3, z: p.aim.z } : { x: pc.pos.x + p.facing.x * reach, y: pc.pos.y + 0.7, z: pc.pos.z + p.facing.z * reach };
-        if (fx3) { this.swing = ((this.swing || 0) + 1) % 3;
+        const trail = pc.body && pc.body.md && pc.body.sh.actions[pc.body.action] && pc.body.sh.actions[pc.body.action].trail;
+        if (fx3 && !trail) { this.swing = ((this.swing || 0) + 1) % 3;
           G.skillFx.slash("blade", pc.pos, p.facing, { radius: a.radius * 1.05, angle: Math.max(110, a.angle + 20), mirror: this.swing === 1, tilt: [0.18, -0.22, 0.42][this.swing], grade: 3 }); }
         else if (["slash", "wind", "paint_burst", "potion_splash", "ring"].includes(a.fx)) G.fx.play(a.fx, fp, a.fxScale, a.fx === "ring");
         if (ts.length) { G.audio.sfx(a.sfx || "hit"); pc.onHitLanded(a.coef >= 1.5); }
@@ -384,7 +387,7 @@ export class Player extends Combatant {
     this.sheet.recalc(); G.ui.toast(d.name + " 적용"); G.audio.sfx("heal"); return true;
   }
   onKilledMonster(m) { this.skills2.onKill(m); }
-  onHitLanded(heavy) { G.render.addShake(heavy ? 0.12 : 0.05, heavy ? 0.18 : 0.08); if (heavy) G.hitStop(this.cfg.hitStop); }
+  onHitLanded(heavy) { G.render.addShake(heavy ? 0.1 : 0.03, heavy ? 0.16 : 0.07); if (heavy) G.hitStop(this.cfg.hitStop); }
   onDamaged(d, loss) {
     if (d.dot) return;
     if (!this.skills.busy && this.dashT <= 0) this.body.play("hit", 1, true);

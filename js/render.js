@@ -312,8 +312,10 @@ export async function loadSheet(name) {
 }
 export const sheet = (name) => sheets.get(name);
 export function action(sh, name) { return sh.actions[name] || sh.actions.idle; }
-export function hitTime(sh, name) { const a = action(sh, name); const hf = a.hitFrame >= 0 ? a.hitFrame : Math.floor(a.frames / 2); return hf / Math.max(1, a.fps); }
-export function duration(sh, name) { const a = action(sh, name); return a.frames / Math.max(1, a.fps); }
+export function hitTime(sh, name) { const a = action(sh, name); if (a.hitT != null) return a.hitT; const hf = a.hitFrame >= 0 ? a.hitFrame : Math.floor(a.frames / 2); return hf / Math.max(1, a.fps); }
+export function duration(sh, name) { const a = action(sh, name); return a.dur != null ? a.dur : a.frames / Math.max(1, a.fps); }
+/** how long an action blocks movement / the next action (its recovery can blend into whatever comes next) */
+export function lockTime(sh, name) { const a = action(sh, name); return a.lock != null ? a.lock : duration(sh, name); }
 function resolveDir(sh, dir) {
   dir = ((dir % 8) + 8) % 8;
   if (sh.meta.dirMode === "8") return [dir, false];

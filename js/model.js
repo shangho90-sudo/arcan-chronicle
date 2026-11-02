@@ -117,11 +117,27 @@ function npcIdle(t, look) {
   };
 }
 const NUM = ['bob', 'lean', 'twist', 'legL', 'legR', 'wOff', 'offOff', 'fall', 'sink'];
+// weapon-swing keys (see SWING below): hand = [azimuth, elevation, reach] of the sword hand around the right shoulder,
+// blade = [azimuth, elevation] of the blade, elbow = pole the elbow points at, step = [left, right] foot offsets (m)
+const VEC = ['hand', 'blade', 'elbow', 'step'];
+const ikW = p => (p.hand ? (p.ik ?? 1) : 0), plantW = p => (p.step ? (p.plant ?? 1) : 0);
 function lerpPose(a, b, k) {
   const o = { armR: [a.armR[0] + (b.armR[0] - a.armR[0]) * k, a.armR[1] + (b.armR[1] - a.armR[1]) * k], armL: [a.armL[0] + (b.armL[0] - a.armL[0]) * k, a.armL[1] + (b.armL[1] - a.armL[1]) * k], squint: k < 0.5 ? a.squint : b.squint, held: a.held };
   for (const f of NUM) o[f] = (a[f] || 0) + ((b[f] || 0) - (a[f] || 0)) * k;
+  for (const f of VEC) { const A = a[f], B = b[f]; o[f] = A && B ? A.map((v, i) => v + (B[i] - v) * k) : (A || B); }
+  o.ik = ikW(a) + (ikW(b) - ikW(a)) * k; o.plant = plantW(a) + (plantW(b) - plantW(a)) * k;
   return o;
 }
+/** Catmull-Rom through four keys (smooth, continuous velocity through the middle keys) */
+function crPose(p0, p1, p2, p3, k) {
+  const c = (a, b, c_, d) => { const k2 = k * k, k3 = k2 * k; return 0.5 * (2 * b + (-a + c_) * k + (2 * a - 5 * b + 4 * c_ - d) * k2 + (-a + 3 * b - 3 * c_ + d) * k3); };
+  const o = lerpPose(p1, p2, k);
+  for (const f of NUM) o[f] = c(p0[f] || 0, p1[f] || 0, p2[f] || 0, p3[f] || 0);
+  for (const arm of ['armR', 'armL']) o[arm] = [0, 1].map(i => c(p0[arm][i], p1[arm][i], p2[arm][i], p3[arm][i]));
+  for (const f of ['hand', 'blade']) if (p1[f] && p2[f]) { const A = p0[f] || p1[f], D = p3[f] || p2[f]; o[f] = p1[f].map((v, i) => c(A[i], v, p2[f][i], D[i])); }
+  return o;
+}
+const EASE = { i: t => t * t * t, o: t => 1 - (1 - t) ** 3, io: t => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2), s: t => t * t * (3 - 2 * t) };
 
 // ---------------------------------------------------------------- held items (same shapes as the sprite baker)
 function makeProp(kind) {
@@ -245,6 +261,36 @@ function solveLeg(c, Hn, A, pole, yaw, pitch) {
 }
 const rotOnly = m => _m().extractRotation(m);
 
+// ---- sword arm: two-bone IK so the weapon hand follows a designed arc and the blade stays fixed in the grip
+/** bind-pose arm chain in model units (mesh-local: x = model left, y up, z forward) */
+function armChain(md) {
+  if (md._arm) return md._arm;
+  const P = n => md.bones[md.byName[n]].t.clone();
+  const S = P('Right_UpperArm'), E = P('Right_LowerArm'), W = P('Right_Hand');
+  return (md._arm = { S, E, W, L1: S.distanceTo(E), L2: E.distanceTo(W), hand: _v().subVectors(P('Right_MiddleProximal'), W).normalize() });
+}
+/** unit vector from [azimuth, elevation] in body space (az 0 = forward, + = towards the character's left) */
+const dirAE = (az, el) => _v(Math.sin(az * DEG) * Math.cos(el * DEG), Math.sin(el * DEG), Math.cos(az * DEG) * Math.cos(el * DEG));
+/** rotations (model space, relative to bind) for upper arm / forearm / hand: hand at target T, elbow towards pole,
+ *  blade (prop +z) as close to `blade` as a wrist can bend (within -20..60 deg off perpendicular) */
+function solveArm(c, Sn, T, pole, blade) {
+  let d = _v().subVectors(T, Sn); const len = d.length(), max = (c.L1 + c.L2) * 0.995, min = Math.abs(c.L1 - c.L2) + 1e-3;
+  const dl = Math.min(max, Math.max(min, len)); d.multiplyScalar(dl / (len || 1));
+  const dir = d.clone().normalize(), pp = pole.clone().addScaledVector(dir, -pole.dot(dir)).normalize();
+  const a = (c.L1 * c.L1 - c.L2 * c.L2 + dl * dl) / (2 * dl), h = Math.sqrt(Math.max(0, c.L1 * c.L1 - a * a));
+  const E = Sn.clone().addScaledVector(dir, a).addScaledVector(pp, h), Wn = Sn.clone().add(d);
+  const bindPole = _v(0, 0, -1);                                              // T-pose: the elbow "points" backwards
+  const Rua = rotBetween(_v().subVectors(c.E, c.S), bindPole, _v().subVectors(E, Sn), pole);
+  const Rla = rotBetween(_v().subVectors(c.W, c.E), bindPole, _v().subVectors(Wn, E), pole);
+  // hand: length axis follows the forearm, bent at the wrist so the blade can point where the swing wants it
+  const F = _v().subVectors(Wn, E).normalize(), Bd = blade.clone().normalize();
+  let Bp = Bd.clone().addScaledVector(F, -Bd.dot(F)); if (Bp.lengthSq() < 1e-6) Bp = pole.clone().addScaledVector(F, -pole.dot(F)); Bp.normalize();
+  const th = Math.acos(Math.max(-1, Math.min(1, Bd.dot(F)))), w = Math.max(-20 * DEG, Math.min(60 * DEG, Math.PI / 2 - th));
+  const axis = F.clone().multiplyScalar(Math.cos(w)).addScaledVector(Bp, -Math.sin(w)), bl = Bp.clone().multiplyScalar(Math.cos(w)).addScaledVector(F, Math.sin(w));
+  const Rh = rotBetween(c.hand, _v(0, 0, 1), axis, bl);
+  return { Rua, Rla, Rh, W: Wn };
+}
+
 /** bone rotations + pelvis height for the gait. body = ModelBody (for the world-locked feet), ph 0..1 (left heel strike at 0) */
 function gaitPose(body, ph, v, base) {
   const md = body.md, leg = md.leg, G = gaitParams(v, leg), run = G.run, Q = {}, ch = legChain(md);
@@ -325,6 +371,48 @@ function blendBones(A, B, w) {
   return out;
 }
 
+// ---------------------------------------------------------------- swing trail: a short, soft crescent behind the real blade
+/** Samples the actual blade (base + tip) every frame while the action's `trail` window is open and draws a fading
+ *  ribbon through them (Catmull-Rom smoothed), so the afterimage always matches the sword - in every facing. */
+const TRAIL_LIFE = 0.11, TRAIL_SUB = 4, TRAIL_MAX = 24;
+class SwingTrail {
+  constructor(scene) {
+    this.scene = scene; this.s = []; this.mesh = null;
+  }
+  build() {
+    const n = TRAIL_MAX * TRAIL_SUB * 2, g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3).setUsage(THREE.DynamicDrawUsage));
+    g.setAttribute('color', new THREE.BufferAttribute(new Float32Array(n * 4), 4).setUsage(THREE.DynamicDrawUsage));
+    const idx = []; for (let i = 0; i < n / 2 - 1; i++) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); } g.setIndex(idx);
+    const m = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, toneMapped: false });
+    this.mesh = new THREE.Mesh(g, m); this.mesh.frustumCulled = false; this.mesh.renderOrder = 8; this.scene.add(this.mesh);
+  }
+  update(dt, pts, color) {
+    for (const q of this.s) q.age += dt;
+    while (this.s.length && this.s[0].age > TRAIL_LIFE) this.s.shift();
+    if (pts) { this.s.push({ a: pts[0], b: pts[1], age: 0 }); if (this.s.length > TRAIL_MAX) this.s.shift(); }
+    if (!this.s.length) { if (this.mesh) this.mesh.visible = false; return; }
+    if (!this.mesh) this.build();
+    const S = this.s, P = this.mesh.geometry.attributes.position, C = this.mesh.geometry.attributes.color, cr = (p0, p1, p2, p3, t) => {
+      const t2 = t * t, t3 = t2 * t; return _v().addScaledVector(p0, -0.5 * t3 + t2 - 0.5 * t).addScaledVector(p1, 1.5 * t3 - 2.5 * t2 + 1).addScaledVector(p2, -1.5 * t3 + 2 * t2 + 0.5 * t).addScaledVector(p3, 0.5 * t3 - 0.5 * t2); };
+    let v = 0; const c = color || [1, 1, 1];
+    for (let i = 0; i < S.length; i++) {
+      const s0 = S[Math.max(0, i - 1)], s1 = S[i], s2 = S[Math.min(S.length - 1, i + 1)], s3 = S[Math.min(S.length - 1, i + 2)];
+      const sub = i < S.length - 1 ? TRAIL_SUB : 1;
+      for (let j = 0; j < sub; j++) {
+        const t = j / sub, A = cr(s0.a, s1.a, s2.a, s3.a, t), B = cr(s0.b, s1.b, s2.b, s3.b, t), age = s1.age + (s2.age - s1.age) * t;
+        const k = Math.max(0, 1 - age / TRAIL_LIFE), al = k * k * 0.85;
+        // base end of the strip faint, tip end bright: reads as a thin crescent along the edge, not a filled fan
+        const Am = A.clone().lerp(B, 0.35);
+        P.setXYZ(v, Am.x, Am.y, Am.z); C.setXYZ(v, c[0], c[1], c[2]); C.setW(v, 0); v++;
+        P.setXYZ(v, B.x, B.y, B.z); C.setXYZ(v, c[0], c[1], c[2]); C.setW(v, al); v++;
+      }
+    }
+    this.mesh.geometry.setDrawRange(0, Math.max(0, (v / 2 - 1) * 6)); P.needsUpdate = true; C.needsUpdate = true; this.mesh.visible = v >= 4;
+  }
+  dispose() { if (this.mesh) { this.scene.remove(this.mesh); this.mesh.geometry.dispose(); this.mesh.material.dispose(); } }
+}
+
 let shadowMat = null;
 const shadowGeo = new THREE.PlaneGeometry(1, 0.85);
 
@@ -359,6 +447,9 @@ export class ModelBody {
     if (!this.sh.actions[name]) name = 'idle';
     this.speed = speed;
     if (name === this.action && !restart) return;
+    // cross-fade from the pose on screen right now (no pop when an attack starts, chains or ends)
+    const a = this.sh.actions[name], prev = this.sh.actions[this.action];
+    if (this.lastPose) { this.fromPose = this.lastPose; this.fadeT = 0; this.fadeDur = a.fadeIn ?? (prev && prev.fadeOut) ?? 0.1; }
     this.action = name; this.t = 0; this.finished = false;
   }
   setDir(d) { this.dir = ((d % 8) + 8) % 8; this.targetYaw = this.dir * 45 * DEG; }
@@ -410,7 +501,7 @@ export class ModelBody {
     this.mat.color.copy(c);
   }
   setVisible(v) { this.visible = v; this.root.visible = v; this.shadow.visible = v; }
-  get time01() { const a = this.sh.actions[this.action]; return Math.min(1, this.t * a.fps / a.frames); }
+  get time01() { const a = this.sh.actions[this.action]; return Math.min(1, a.dur ? this.t / a.dur : this.t * a.fps / a.frames); }
   place(p) {
     if (this.lastXZ) { const d = Math.hypot(p.x - this.lastXZ.x, p.z - this.lastXZ.z); if (d < 1) this.moved += d; }
     this.lastXZ = { x: p.x, z: p.z };
@@ -418,10 +509,12 @@ export class ModelBody {
   }
   update(dt) {
     this.t += dt * Math.max(0, this.speed);
+    if (this.fadeDur > 0) this.fadeT += dt;
     if (this.flashT > 0) this.flashT -= dt;
     this.mat.emissiveIntensity = this.flashT > 0 ? 0.7 : 0;
     let dy = this.targetYaw - this.yaw; dy = Math.atan2(Math.sin(dy), Math.cos(dy));
-    this.yaw += dy * Math.min(1, dt * 18);
+    const swing = this.sh.actions[this.action] && this.sh.actions[this.action].keys;
+    this.yaw += dy * Math.min(1, dt * (swing ? 30 : 18));                  // a swing turns to its target during the wind-up
     // ground speed from real displacement (or a fixed demo speed for previews standing still)
     const dist = this.treadmill > 0 ? this.treadmill * dt : this.moved; this.moved = 0;
     if (dt > 0) this.gaitV += (dist / dt - this.gaitV) * Math.min(1, dt * 12);
@@ -430,6 +523,10 @@ export class ModelBody {
     if (this.gaitW > 0.01) this.gaitPh = fract(this.gaitPh + dist / gaitParams(Math.max(0.3, this.gaitV), this.md.leg).cycle);
     else this.gaitPh = 0.15;                                               // next start: mid-stance, not mid-stride
     this.apply();
+    // swing afterimage from the real blade while the action's trail window [start, end] (seconds) is open
+    const a = this.sh.actions[this.action], tw = a && a.trail;
+    const on = tw && this.t >= tw[0] && this.t <= tw[1] && this.swingW > 0.5;
+    if (on || (this.trail && this.trail.s.length)) { if (!this.trail) this.trail = new SwingTrail(this.scene); this.trail.update(dt, on ? this.bladePoints() : null, a && a.trailColor); }
   }
   poseOf(name) {
     const a = this.sh.actions[name]; if (!a) return this.currentPose();
@@ -437,6 +534,13 @@ export class ModelBody {
   }
   currentPose() {
     const a = this.sh.actions[this.action], n = a.frames;
+    if (a.keys) {                                                          // timed keys (seconds) with per-segment easing
+      const K = a.keys, P = a.poses, t = this.t;
+      if (t >= K[n - 1]) { this.finished = true; return P[n - 1]; }
+      let i = 0; while (i < n - 2 && t >= K[i + 1]) i++;
+      const u = (t - K[i]) / Math.max(1e-4, K[i + 1] - K[i]), e = EASE[P[i + 1].e] || (x => x);
+      return crPose(P[Math.max(0, i - 1)], P[i], P[i + 1], P[Math.min(n - 1, i + 2)], e(Math.min(1, Math.max(0, u))));
+    }
     let f = this.t * a.fps;
     if (a.loop) { f %= n; const i = Math.floor(f), j = (i + 1) % n; return lerpPose(a.poses[i], a.poses[j], f - i); }
     if (f >= n - 1) { if (f >= n) this.finished = true; return a.poses[n - 1]; }
@@ -446,9 +550,14 @@ export class ModelBody {
     const md = this.md;
     // walking / running: legs and upper body come from the procedural gait; underneath it is the idle stance, never the
     // key-framed walk cycle (that one slid its feet while the gait blended in or when the character pushed into a wall)
-    const p = this.action === 'walk' && md.leg && !md.cfg.npc ? this.poseOf('idle') : this.currentPose(); let Q = md.cfg.npc ? npcIdle(this.t, this.lookYaw || 0) : poseToBones(p, md.cfg.headPitch);
+    let p = this.action === 'walk' && md.leg && !md.cfg.npc ? this.poseOf('idle') : this.currentPose();
+    if (this.fadeDur > 0 && this.fromPose) { const k = this.fadeT / this.fadeDur; if (k < 1) p = lerpPose(this.fromPose, p, EASE.s(k)); else this.fadeDur = 0; }
+    this.lastPose = p;
+    let Q = md.cfg.npc ? npcIdle(this.t, this.lookYaw || 0) : poseToBones(p, md.cfg.headPitch);
     let bodyY = md.cfg.npc ? 0 : (p.bob || 0) - (p.sink || 0);
     if (!md.cfg.npc && md.leg) Q = alignLegs(md, Q);
+    // swings: feet stay planted in a fighting stance while the pelvis twists and sinks (knees solved by IK)
+    if (!md.cfg.npc && md.leg && p.plant > 0.01 && p.step) Q = blendBones(Q, this.plantLegs(p, Q, bodyY), Math.min(1, p.plant));
     if (!md.cfg.npc && this.gaitW > 0.01 && md.leg) {
       const gp = gaitPose(this, this.gaitPh, Math.max(0.3, this.gaitV), p), w = Math.min(1, this.gaitW);
       Q = blendBones(Q, gp.Q, w);
@@ -456,12 +565,17 @@ export class ModelBody {
       bodyY = lerp(bodyY, gp.hipH - hipBind, w);
     } else this.feet = null;
     // world (model-space) matrix of every bone: parent's change applied to the bind matrix rotated about the joint
-    const W = new Array(md.bones.length);
-    for (let i = 0; i < md.bones.length; i++) {
-      const b = md.bones[i], q = Q[b.name];
-      let local = b.bind;
-      if (q) local = mul(_m().makeTranslation(b.t.x, b.t.y, b.t.z), q, _m().makeTranslation(-b.t.x, -b.t.y, -b.t.z), b.bind);
-      W[i] = b.parent < 0 ? local.clone() : mul(W[b.parent], md.bones[b.parent].inv, local);
+    let W = this.worldOf(Q);
+    // sword arm by IK on top of the finished torso: the hand follows the authored arc around the (twisted) shoulder
+    this.swingW = !md.cfg.npc && p.hand && md.byName.Right_UpperArm !== undefined ? Math.min(1, p.ik) : 0;
+    if (this.swingW > 0.01) {
+      const c = armChain(md), sh = md.byName.Right_Shoulder, dSh = mul(_m().copy(W[sh]), md.bones[sh].inv);
+      const Rp = rotOnly(dSh), Sn = c.S.clone().applyMatrix4(dSh), L = c.L1 + c.L2;
+      const T = Sn.clone().addScaledVector(dirAE(p.hand[0], p.hand[1]), L * p.hand[2]);
+      const pole = p.elbow ? _v(...p.elbow).normalize() : _v(-0.6, -1, -0.35).normalize();
+      const r = solveArm(c, Sn, T, pole, p.blade ? dirAE(p.blade[0], p.blade[1]) : _v(0, 0.3, 1));
+      const Rpi = Rp.clone().invert(), ik = { Right_UpperArm: mul(Rpi, r.Rua), Right_LowerArm: mul(r.Rua.clone().invert(), r.Rla), Right_Hand: mul(r.Rla.clone().invert(), r.Rh) };
+      Q = blendBones(Q, ik, this.swingW); W = this.worldOf(Q);
     }
     for (let i = 0; i < md.bones.length; i++) {
       const b = md.bones[i], bone = this.bones[i];
@@ -472,8 +586,43 @@ export class ModelBody {
     this.mesh.position.y = bodyY;
     this.root.rotation.y = this.yaw;
     const wid = !p.held && this.weaponId ? this.weaponId() : null;
-    this.updateProp('R', p.held || (wid && isWeaponModel(wid) ? 'item:' + wid : this.weapon), p.wOff - 90);
+    this.updateProp('R', p.held || (wid && isWeaponModel(wid) ? 'item:' + wid : this.weapon), (p.wOff - 90) * (1 - (this.swingW || 0)));
     this.updateProp('L', p.held ? null : this.off, p.offOff - 90);
+  }
+  worldOf(Q) {
+    const md = this.md, W = new Array(md.bones.length);
+    for (let i = 0; i < md.bones.length; i++) {
+      const b = md.bones[i], q = Q[b.name];
+      let local = b.bind;
+      if (q) local = mul(_m().makeTranslation(b.t.x, b.t.y, b.t.z), q, _m().makeTranslation(-b.t.x, -b.t.y, -b.t.z), b.bind);
+      W[i] = b.parent < 0 ? local.clone() : mul(W[b.parent], md.bones[b.parent].inv, local);
+    }
+    return W;
+  }
+  /** fighting stance: both ankles fixed on the ground (left a step forward, right back, toes turned like a fencer);
+   *  the pelvis twist / sink of the pose is absorbed by the knees, so the feet never slide during a swing */
+  // (step = extra forward offset per foot; 0 keeps the idle footprint)
+  plantLegs(p, Q, bodyY) {
+    const md = this.md, leg = md.leg, ch = legChain(md), out = {};
+    const RH = rotOnly(Q.Hips || _m()), RHi = RH.clone().invert();
+    for (const [side, i] of [['Left', 0], ['Right', 1]]) {
+      // same spot and toe-out as the idle stance (alignLegs), so blending in / out of a swing does not move the feet
+      const c = ch[side], g = leg[side], yaw = c.sg * Math.min(g.toeOut, TOE_OUT) * DEG;
+      const Hn = c.H.clone().sub(ch.pelvis).applyMatrix4(RH).add(ch.pelvis);
+      const A = _v(c.sg * (g.ankX - Math.min(STAND_IN, Math.max(0, g.ankX - 0.09))), -bodyY + g.ha, c.A.z + p.step[i]);
+      const pole = _v(Math.sin(yaw) * 0.9 + c.sg * 0.15, 0, Math.cos(yaw)).normalize();
+      const r = solveLeg(c, Hn, A, pole, yaw, 0);
+      out[side + '_UpperLeg'] = mul(RHi, r.Rth); out[side + '_LowerLeg'] = mul(r.Rth.clone().invert(), r.Rsh); out[side + '_Foot'] = mul(r.Rsh.clone().invert(), r.Rft);
+    }
+    return out;
+  }
+  /** blade base / tip of the right-hand weapon in world space (for the swing trail), or null */
+  bladePoints() {
+    const h = this.props.R; if (!h || !this.visible) return null;
+    this.root.updateMatrixWorld(true);
+    if (h.userData.len === undefined) { const bb = new THREE.Box3().setFromObject(h.children[0]).applyMatrix4(_m().copy(h.matrixWorld).invert()); h.userData.len = Math.max(0.1, bb.max.z); }
+    const L = h.userData.len, mw = h.matrixWorld;
+    return [_v(0, 0, L * 0.38).applyMatrix4(mw), _v(0, 0, L).applyMatrix4(mw)];
   }
   updateProp(side, kind, tilt) {
     if (this.propKind[side] !== kind) {
@@ -492,6 +641,7 @@ export class ModelBody {
     h.matrix.copy(mul(b.inv, bindM)); h.matrixWorldNeedsUpdate = true;
   }
   dispose() {
+    if (this.trail) this.trail.dispose();
     this.scene.remove(this.root, this.shadow);
     this.mat.dispose();
     this.root.traverse(o => { if (o.isMesh && o !== this.mesh) { o.geometry.dispose(); o.material.dispose(); } });
