@@ -307,7 +307,11 @@ class Game {
     this.profile = prof; this.sheet = new CharacterSheet(this.data, prof); this.quests = new QuestLog(this.data, this.sheet);
     this.wireEvents(); this.inWorld = true; this.ui.showGameplay(true);
     const zone = this.data.zones[prof.zone] ? prof.zone : this.data.levels.startZone;
-    if (fresh) { this.ui.toast("아르칸 마을에 오신 것을 환영합니다!"); this.ui.toast("분수 옆 촌장에게 말을 걸어 보세요. (F 키 / 대화 버튼)"); this.pendingFirstSave = true; }
+    // a brand-new character gets a one-time welcome notice after the area name (profile.ui.welcomed is saved)
+    prof.ui = prof.ui && typeof prof.ui === "object" ? prof.ui : {};
+    this.pendingWelcome = fresh && !prof.ui.welcomed;
+    if (fresh) this.pendingFirstSave = true;
+    this.ui.qprev = null; this.ui.qflash = null;
     return this.loadZone(zone, prof.hasPos ? null : this.data.levels.startSpawn, prof.hasPos);
   }
   wireEvents() {
@@ -324,13 +328,14 @@ class Game {
     });
     S.bag.onChange.push(() => { Q.refreshPassive(); ui.refresh(); });
     S.events.job.push(() => Q.refreshPassive());
-    Q.events.accepted.push(q => { ui.toast("퀘스트 수락: " + q.name); this.audio.sfx("quest"); ui.updateTracker(); });
+    // quest progress is shown inside the quest window (check mark + highlight), not as centre notices
+    Q.events.accepted.push(() => { this.audio.sfx("quest"); ui.updateTracker(); });
     Q.events.ready.push(q => {
       const pr = Q.find(q.id); if (pr) { if (pr._toasted) return; pr._toasted = true; pr._readyNotified = true; }
-      const n = this.data.npcs[q.turnIn || q.giver]; ui.toast(`목표 달성: ${q.name} → ${n.title} ${n.name}에게 보고`); this.audio.sfx("quest"); ui.updateTracker();
+      this.audio.sfx("quest"); ui.updateTracker();
     });
     Q.events.updated.push(() => ui.updateTracker());
-    Q.events.completed.push(q => { ui.toast("퀘스트 완료: " + q.name); this.audio.sfx("quest"); ui.updateTracker(); this.autoSave(); });
+    Q.events.completed.push(() => { this.audio.sfx("quest"); ui.updateTracker(); this.autoSave(); });
   }
 
   // ------------------------------------------------------------------ zones
@@ -369,7 +374,9 @@ class Game {
     this.audio.playMusic(def.bgm);
     this.quests.notify("visit", zoneId, 1); this.quests.refreshPassive(); this.ui.updateTracker();
     await this.fadeTo(0, 0.3);
-    this.ui.toast(def.name);
+    const welcome = this.pendingWelcome; this.pendingWelcome = false;
+    if (welcome) P.ui.welcomed = true;
+    this.ui.areaBanner(def.name, welcome ? () => { if (this.inWorld) this.ui.notice("아르칸 마을에 오신 것을 환영합니다!"); } : null);
     this.input.block = !!this.ui.current; this.loading = false;
     if (this.pendingFirstSave) { this.pendingFirstSave = false; this.save(); }
   }

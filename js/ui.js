@@ -5,9 +5,10 @@ import { ModelBody, loadPlayerModel, loadActions } from './model.js';
 import { renderItemIcons } from './items3d.js';
 import { renderPortrait } from './portrait.js';
 import { Minimap } from './minimap.js';
+import { installQuestHud, bindQuestHud } from './questhud.js';
 
 let G = null;
-export function bindGame(g) { G = g; }
+export function bindGame(g) { G = g; bindQuestHud(g); }
 const $ = (tag, cls, parent, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html !== undefined) e.innerHTML = html; if (parent) parent.appendChild(e); return e; };
 const esc = s => String(s).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
 const STAT_KR = { maxHp: "최대 체력", maxSp: "최대 기력", atk: "공격력", matk: "마법력", def: "방어력", crit: "치명타", critDmg: "치명 피해", moveSpeed: "이동 속도", atkSpeed: "공격 속도", spRegen: "기력 회복", healPower: "회복 효율", foodPower: "음식 효과", dmgReduce: "피해 감소", cdr: "재사용 감소", shieldPower: "보호막 강화" };
@@ -175,7 +176,6 @@ export class UI {
       <div class="cname" id="hName"></div>
       <div class="status" id="hStatus"></div></div>
     <div class="minimap panel-dark"><div class="mmhead"><span class="zone" id="hZone"></span><span class="gold" id="hGold"></span></div><canvas id="hMap"></canvas></div>
-    <div class="tracker panel-dark" id="hQuests"></div>
     <div class="target panel-dark" id="hTarget"><div id="hTName"></div><div class="bar hp"><i id="hTHp"></i><span id="hTHpT"></span></div></div>
     <div class="target boss panel-dark" id="hBoss"><div id="hBName"></div><div class="bar boss"><i id="hBHp"></i><span id="hBHpT"></span></div></div>
     <div class="prompt panel-dark" id="hPrompt"></div>
@@ -187,6 +187,7 @@ export class UI {
     for (const b of h.querySelectorAll("[data-a]")) b.onclick = () => { G.audio.sfx("ui"); G.input.press({ skills: "skillWin", craft: "craftWin" }[b.dataset.a] || b.dataset.a); };
     this.h = id => h.querySelector("#" + id);
     this.minimap = new Minimap(h.querySelector("#hMap"));
+    this.buildQuestHud();
   }
   updateHud() {
     const p = G.player; if (!p) return; const P = p.sheet.p, job = p.sheet.job, h = this.h;
@@ -227,17 +228,7 @@ export class UI {
     const b = document.createElement("div"); b.className = "lvbanner"; b.innerHTML = `<div class="lvb-rays"></div><div class="lvb-t">LEVEL UP!</div><div class="lvb-l">Lv.${lv}</div>`;
     this.hud.appendChild(b); setTimeout(() => b.remove(), 2600);
   }
-  updateTracker() {
-    const p = G.player, ql = p.quests; let html = "<b class='gold'>진행 중인 퀘스트</b>"; let n = 0;
-    for (const q of ql.active()) {
-      if (n >= 3) { html += "<div class='small'>... (O) 퀘스트 창</div>"; break; }
-      const st = ql.stateOf(q);
-      html += st === QS.Completable ? `<div class='done'>★ ${q.name} - 보고 가능</div>` : `<div>· ${q.name}</div>` + q.objectives.map((o, i) => `<div class='small'>&nbsp;&nbsp;${ql.objectiveText(q, i)}</div>`).join("");
-      n++;
-    }
-    if (!n) html += G.data.questList.some(q => ql.stateOf(q) === QS.Available) ? "<div class='small'>마을 사람들에게 말을 걸어 보세요. (머리 위 <b class='gold'>!</b>)</div>" : "<div class='small'>모든 퀘스트를 완료했습니다!</div>";
-    this.h("hQuests").innerHTML = html;
-  }
+  updateTracker() { this.renderQuestHud(); }
 
   // ------------------------------------------------------------------ action buttons + stick
   buildControls() {
@@ -340,6 +331,7 @@ export class UI {
     if (down.pause) { if (this.current) { if (this.closable) this.close(); } else this.showPause(); return; }
     if (down.inventory) { if (this.currentName === "inventory") this.close(); else if (!this.current || this.currentName === "quests") this.showInventory(); }
     if (down.quests) { if (this.currentName === "quests") this.close(); else if (!this.current || this.currentName === "inventory") this.showQuests(); }
+    if (down.questHud && !this.current) this.toggleQuestHud();
   }
   refresh() { if (this.currentName === "inventory") this.showInventory(); else if (this.currentName === "shop") this.showShop(this.shop); }
   button(parent, label, cls, fn) { const b = $("button", "btn " + (cls || "teal"), parent, label); b.onclick = () => { G.audio.sfx("ui"); fn(); }; return b; }
@@ -596,3 +588,5 @@ export function rewardText(q) {
   for (const it of r.items || []) parts.push(G.data.item(it.id).name + " x" + it.count);
   return parts.join("  ");
 }
+
+installQuestHud(UI);

@@ -49,8 +49,6 @@ small { font-size:.8em; }
 .bar span { position:relative; display:block; text-align:center; font-size:12px; line-height:18px; color:#fff; text-shadow:0 1px 0 #000, 1px 0 0 #000, -1px 0 0 #000, 0 -1px 0 #000; }
 .status { font-size:12px; margin-top:4px; min-height:0; }
 .menubtns { display:flex; gap:4px; } .menubtns .btn { font-size:15px; min-height:40px; padding:2px 10px; }
-.tracker { position:absolute; right:12px; top:128px; width:300px; padding:8px 10px; font-size:13px; line-height:1.55; pointer-events:none; }
-.tracker .gold { color:var(--gold); } .tracker .done { color:#8fe3a0; }
 .target { position:absolute; left:50%; top:12px; transform:translateX(-50%); width:360px; padding:6px 10px; text-align:center; font-size:14px; pointer-events:none; }
 .target.boss { width:520px; font-size:16px; } .target.boss .bar { height:22px; } .target.boss .bar span { line-height:22px; }
 .prompt { position:absolute; left:50%; bottom:190px; transform:translateX(-50%); padding:8px 16px; font-size:16px; pointer-events:none; }
@@ -181,7 +179,6 @@ small { font-size:.8em; }
 @media (max-width: 900px), (max-height: 520px) {
   .charpanel { transform:scale(.8); transform-origin:left top; }
   .minimap { transform:scale(.8); transform-origin:right top; }
-  .tracker { transform:scale(.8); transform-origin:right top; top:196px; width:260px; }
   .botbar { transform:translateX(-50%) scale(.8); transform-origin:center bottom; }
   .target { top:92px; width:300px; } .target.boss { width:min(480px,70vw); top:86px; }
   .feed { top:118px; transform:scale(.85); transform-origin:left top; }
@@ -189,7 +186,6 @@ small { font-size:.8em; }
   .actions { transform:scale(.8); transform-origin:right bottom; right:8px; bottom:18px; }
   .prompt { bottom:auto; top:40%; font-size:14px; }
 }
-@media (max-height: 520px) { .tracker { display:none; } }
 
 /* ---------- skills / craft ---------- */
 .abtn.skill4 { right:28px; bottom:214px; } .abtn.ult { right:206px; bottom:186px; background-image:url(assets/ui/circle_attack.png); }
@@ -243,7 +239,6 @@ small { font-size:.8em; }
   background: linear-gradient(180deg, #33456f, #1a2546) padding-box, linear-gradient(180deg, #f6e0a0, #a06a10) border-box; box-shadow:0 3px 6px rgba(0,0,0,.5); }
 .hud .menubtns .btn:hover { filter:brightness(1.15); }
 .hud .menubtns .btn svg { width:30px; height:30px; filter:drop-shadow(0 2px 0 rgba(0,0,0,.6)); }
-.tracker { right:14px; top:262px; width:300px; padding:10px 40px 10px 14px; font-size:14px; font-weight:500; }
 .minimap { position:absolute; right:14px; top:14px; padding:6px 8px 8px; }
 .minimap .mmhead { display:flex; justify-content:space-between; align-items:center; gap:10px; margin:0 2px 5px; }
 .minimap .zone { font-size:16px; color:#fbf3df; text-shadow:0 2px 0 rgba(0,0,0,.6); white-space:nowrap; }
@@ -266,9 +261,6 @@ small { font-size:.8em; }
 @keyframes lvbspin { to { transform:rotate(60deg); } }
 @media (max-width: 600px) { .lvb-t { font-size:40px; } .lvb-l { font-size:22px; } .lvb-rays { width:340px; height:340px; margin:-170px 0 0 -170px; } }
 .botbar .menubtns { pointer-events:auto; display:flex; justify-content:center; gap:6px; margin-top:2px; }
-.tracker .gold { color:#f6c64e; font-size:17px; font-weight:700; }
-.tracker > b.gold:first-child::before { content:"!"; display:inline-block; width:22px; height:22px; margin-right:8px; border-radius:50%; text-align:center; line-height:22px; font-size:15px; color:#2a1a08; background:radial-gradient(circle at 35% 35%, #fff2b0, #e8b440 55%, #a06a10); box-shadow:0 0 0 2px #5a3a10; vertical-align:1px; }
-.tracker::after { content:"›"; position:absolute; right:12px; top:50%; transform:translateY(-55%); font-size:34px; color:#fbf3df; font-weight:400; }
 .expbar { left:50%; right:auto; width:min(580px, 46vw); transform:translateX(-50%); bottom:8px; height:24px; border-radius:12px; border:1.5px solid transparent;
   background: linear-gradient(#111a32, #1e2a4a) padding-box, linear-gradient(180deg, #f6e0a0, #a06a10) border-box; box-shadow:0 3px 8px rgba(0,0,0,.5); overflow:hidden; }
 .expbar::before, .expbar::after { content:""; position:absolute; top:50%; width:10px; height:10px; transform:translateY(-50%) rotate(45deg); background:linear-gradient(135deg,#f6e0a0,#a06a10); z-index:1; }
@@ -290,7 +282,6 @@ small { font-size:.8em; }
 .controls:not(.mobile) .actions { transform:scale(.95); }
 .resbar { border:1.5px solid #d6ac54; background:rgba(15,22,42,.9); }
 .target, .prompt { font-weight:700; }
-@media (max-width: 900px), (max-height: 520px) { .tracker { width:300px; } }
 </style>
 <style>
 /* Full-screen illustrated title; native buttons align with the painted artwork. */
@@ -354,7 +345,6 @@ small { font-size:.8em; }
   .minimap { right:6px; top:6px; transform:none; padding:4px; } .minimap canvas { width:92px; height:92px; } .minimap .mmhead { display:none; }
   .botbar { left:12px; top:108px; bottom:auto; width:min(300px, 76vw); transform:none; }
   .botbar .menubtns .btn { width:48px; min-height:46px; font-size:11px; } .botbar .menubtns .btn svg { width:22px; height:22px; }
-  .tracker { top:284px; } .stickbase { left:80px; } .prompt { bottom:auto; }
 }
 @media (max-height: 520px) and (min-width: 601px) {   /* phones held sideways: compact bottom block between the stick and the action buttons */
   .botbar { width:min(330px, 40vw); transform:translateX(-50%) scale(.72); }
@@ -558,6 +548,73 @@ small { font-size:.8em; }
 .window.fancy .ctext { padding:14px 10px 4px; font-size:22px; text-align:center; line-height:1.6; color:#3b2a17; }
 .window.fancy.death .fplaque .fp-t { color:#ffd8cc; }
 .window.fancy .fplaque { white-space:nowrap; } .window.fancy.pause .fplaque, .window.fancy.death .fplaque { font-size:36px; padding-left:44px; padding-right:44px; }
+
+/* ---------- quest window (fixed HUD, right side under the minimap) + area name banner ---------- */
+.qhud { position:absolute; right:14px; top:264px; width:320px; z-index:4; box-sizing:border-box; color:#ece4d0;
+  font-family:"Noto Sans KR","Noto Sans CJK KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif; font-weight:500; font-size:15px; line-height:1.5; text-align:left;
+  background:rgba(16,22,36,.84); border:1px solid rgba(201,160,82,.55); border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,.28);
+  display:flex; flex-direction:column; max-height:max(60px, calc(100vh - 536px)); touch-action:manipulation; -webkit-user-select:none; user-select:none; }
+.winopen .qhud { z-index:auto; }
+.qhud.closed { display:none; }
+.qh-head { display:flex; align-items:center; gap:4px; padding:7px 8px 6px 16px; border-bottom:1px solid rgba(201,160,82,.32); flex:none; }
+.qh-title { flex:1; font-size:17px; font-weight:700; color:#f1d48a; letter-spacing:.02em; }
+.qh-btn { width:30px; height:28px; border:0; border-radius:5px; background:transparent; color:#cbbf9f; font:15px/28px sans-serif; cursor:pointer; padding:0; }
+.qh-btn:hover, .qh-btn:focus-visible { background:rgba(255,255,255,.08); color:#fff; outline:none; }
+.qh-body { padding:10px 16px 12px; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:rgba(201,160,82,.5) transparent; }
+.qhud.min .qh-body { padding:8px 16px 10px; overflow:hidden; }
+.qh-main h3 { margin:0 0 4px; font-size:16px; font-weight:700; color:#fff6df; }
+.qh-tag { font-style:normal; font-size:12px; font-weight:700; color:#16220f; background:#9fd68a; border-radius:3px; padding:1px 6px; margin-left:4px; vertical-align:2px; }
+.qh-main ul { list-style:none; margin:0; padding:0; }
+.qh-main li { display:flex; align-items:flex-start; gap:8px; padding:3px 0; border-radius:4px; }
+.qh-obj { flex:1; min-width:0; overflow-wrap:anywhere; }
+.qh-prog { flex:none; color:#d9c48c; font-size:14px; font-variant-numeric:tabular-nums; }
+.qh-main li.done .qh-obj { color:#a9b7a3; } .qh-main li.done .qh-prog { color:#9fd68a; }
+.qh-dot { flex:none; width:7px; height:7px; margin:8px 4px 0 3px; border-radius:50%; background:#d9b45f; }
+.qh-ck { flex:none; width:14px; height:14px; margin-top:4px; color:#9fd68a; } .qh-ck svg { display:block; width:14px; height:14px; }
+.qh-hint { margin:8px 0 0; padding-top:7px; border-top:1px solid rgba(255,255,255,.08); font-size:14px; color:#bfc6d2; }
+.qh-hint::before { content:"조작 안내 · "; color:#8f9bb0; }
+.qh-main.flash, .qh-main li.flash, .qh-line.flash { animation:qhflash 1.6s ease-out; }
+@keyframes qhflash { 0% { background:rgba(159,214,138,.28); } 100% { background:transparent; } }
+.qh-others { margin-top:12px; padding-top:8px; border-top:1px solid rgba(201,160,82,.22); display:flex; flex-direction:column; gap:2px; }
+.qh-other { display:block; width:100%; text-align:left; border:0; background:transparent; color:inherit; font:inherit; font-size:14px; padding:5px 6px; margin:0 -6px; border-radius:5px; cursor:pointer; width:calc(100% + 12px); }
+.qh-other:hover { background:rgba(255,255,255,.06); }
+.qh-other b { display:block; font-weight:700; color:#e9dcbc; } .qh-other span { display:block; color:#aab1bd; font-size:13px; overflow-wrap:anywhere; }
+.qh-line { display:flex; align-items:flex-start; gap:8px; } .qh-line span { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.qh-empty { margin:0; color:#cfd3db; } .qh-empty span { font-size:14px; color:#aab1bd; } .qh-empty b { color:#f1d48a; }
+.qh-reopen { position:absolute; right:14px; top:264px; width:42px; height:42px; display:none; padding:8px; z-index:4; border-radius:8px; cursor:pointer;
+  background:rgba(16,22,36,.84); border:1px solid rgba(201,160,82,.55); box-shadow:0 2px 6px rgba(0,0,0,.28); }
+.qh-reopen.show { display:block; } .qh-reopen svg { display:block; width:100%; height:100%; } .winopen .qh-reopen { z-index:auto; }
+.areabanner { position:absolute; left:50%; top:92px; transform:translateX(-50%); display:flex; align-items:center; gap:14px; pointer-events:none !important; white-space:nowrap;
+  color:#fbf1d6; font-family:"Noto Sans KR","Noto Sans CJK KR",serif; font-weight:700; font-size:26px; letter-spacing:.08em; text-shadow:0 2px 6px rgba(0,0,0,.75);
+  animation:abin .5s ease-out both; transition:opacity .45s; }
+.areabanner .ab-line { display:block; width:72px; height:1px; background:linear-gradient(90deg, transparent, #e2c27a); position:relative; }
+.areabanner .ab-line.r { background:linear-gradient(90deg, #e2c27a, transparent); }
+.areabanner .ab-line::after { content:""; position:absolute; right:-3px; top:-3px; width:6px; height:6px; transform:rotate(45deg); border:1px solid #e2c27a; }
+.areabanner .ab-line.r::after { right:auto; left:-3px; }
+.areabanner.notice { font-size:18px; letter-spacing:.02em; padding:8px 18px; border-radius:8px; background:rgba(16,22,36,.72); border:1px solid rgba(201,160,82,.4); }
+.areabanner.out { opacity:0; }
+@keyframes abin { from { opacity:0; transform:translate(-50%, -6px); } to { opacity:1; transform:translate(-50%, 0); } }
+@media (max-width: 900px), (max-height: 520px) { .qhud { top:224px; width:300px; max-height:max(60px, calc(100vh - 492px)); } .qh-reopen { top:224px; } }
+@media (max-width: 600px) {   /* portrait phones: right column under the HP/menu block, clear of the stick area (left 42%) and the action buttons */
+  .qhud { right:6px; top:238px; width:min(250px, 56vw); font-size:14px; max-height:max(96px, calc(100vh - 238px - 270px)); }
+  .qh-reopen { right:6px; top:238px; }
+  .qh-head { padding:6px 4px 6px 12px; } .qh-body { padding:9px 12px 11px; } .qh-title { font-size:15px; } .qh-main h3 { font-size:15px; }
+  .qh-btn { width:36px; height:34px; line-height:34px; }
+  .areabanner { font-size:20px; } .areabanner .ab-line { width:40px; }
+  .qh-main li { flex-wrap:wrap; row-gap:0; } .qh-prog { flex-basis:100%; padding-left:22px; font-size:13px; }
+  .prompt { left:8px; top:238px; transform:none; max-width:calc(44vw - 16px); padding:6px 10px; white-space:normal; text-align:left; }   /* left of the quest window */
+  .feed { top:296px; left:8px; transform:scale(.75); }   /* loot feed: left column under the talk prompt, clear of the quest window */
+}
+@media (max-height: 520px) and (min-width: 601px) {   /* landscape phones: under the character panel, above the stick */
+  .qhud { left:12px; right:auto; top:102px; width:min(300px, 36vw); font-size:13px; max-height:max(64px, calc(100vh - 102px - 174px)); }
+  .qh-reopen { left:12px; right:auto; top:102px; width:38px; height:38px; }
+  .target { left:auto; right:160px; transform:none; width:min(300px, calc(64vw - 200px)); } .target.boss { width:min(360px, calc(64vw - 200px)); }   /* monster bar between the quest window and the minimap */
+  .feed { left:calc(min(300px, 36vw) + 26px); top:146px; transform:scale(.8); }   /* loot feed right of the quest window */
+  .stickbase { bottom:16px; }   /* default pad ring sits lower so it stays clear of the quest window (touch area unchanged) */
+  .qh-head { padding:4px 4px 4px 12px; } .qh-body { padding:7px 12px 9px; } .qh-title { font-size:14px; } .qh-main h3 { font-size:14px; } .qh-hint { font-size:12px; }
+  .qh-btn { width:34px; height:30px; line-height:30px; }
+  .areabanner { top:64px; font-size:20px; }
+}
 </style>
 </head>
 <body>
