@@ -302,6 +302,7 @@ export class UI {
     const fancy = !PLAIN.has(name);
     const wnd = $("div", "window " + (fancy ? "fancy " + (BANNER.has(name) ? "banner " : "") + (title ? "" : "notitle ") : "panel ") + name, this.win);
     wnd.style.width = w + "px"; if (h) wnd.style.height = h + "px";
+    wnd.dataset.w = w; wnd.dataset.h = h || 0;
     if (fancy) {
       // ornate frame: gold corner flourishes, title plaque (inventory also gets the navy banner with pennant + castle)
       for (const c of ["tl", "tr", "bl", "br"]) $("i", "fcorner " + c, wnd, FLOURISH);
@@ -318,7 +319,24 @@ export class UI {
     if (name !== "dialog" && window.ResizeObserver) { const ro = new ResizeObserver(() => { if (this.current === wnd) this.fit(); else ro.disconnect(); }); ro.observe(wnd); }
     return body;
   }
-  fit() { if (!this.current || ["dialog", "title", "create"].includes(this.currentName)) return; const w = this.current; w.style.transform = ""; const s = Math.min(1, (innerWidth - 20) / w.offsetWidth, (innerHeight - 20) / w.offsetHeight); w.style.transform = `translate(-50%,-50%) scale(${s})`; }
+  fit() {
+    if (!this.current || ["dialog", "title", "create"].includes(this.currentName)) return; const w = this.current; w.style.transform = "";
+    // phones: the windows are laid out for ~1600 px and only scaled down, which made text unreadably small. There the
+    // window is laid out narrower (columns stack when it gets narrow: CSS .window.narrow), never scaled below PHONE_S,
+    // and whatever does not fit in height scrolls inside the window.
+    const phone = Math.min(innerWidth, innerHeight) <= 520;
+    w.classList.toggle("phone", phone);
+    if (phone) {
+      const PHONE_S = 0.64, dw = Math.min(+w.dataset.w || w.offsetWidth, Math.floor((innerWidth - 12) / PHONE_S));
+      if (w.style.width !== dw + "px") w.style.width = dw + "px";
+      w.style.height = ""; w.classList.toggle("narrow", dw < 900);
+      const s = Math.min(1, (innerWidth - 12) / w.offsetWidth), mh = Math.floor((innerHeight - 14) / s) + "px";
+      if (w.style.maxHeight !== mh) w.style.maxHeight = mh;
+      w.style.transform = `translate(-50%,-50%) scale(${s})`; return;
+    }
+    if (w.classList.contains("narrow") || w.style.maxHeight) { w.classList.remove("narrow"); w.style.maxHeight = ""; w.style.width = w.dataset.w + "px"; if (+w.dataset.h) w.style.height = w.dataset.h + "px"; }
+    const s = Math.min(1, (innerWidth - 20) / w.offsetWidth, (innerHeight - 20) / w.offsetHeight); w.style.transform = `translate(-50%,-50%) scale(${s})`;
+  }
   close(notify = true) {
     const was = !!this.current;
     if (this.current) this.current.remove(); if (this.dim) this.dim.remove();

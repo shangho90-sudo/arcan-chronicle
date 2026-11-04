@@ -615,6 +615,53 @@ small { font-size:.8em; }
   .qh-btn { width:34px; height:30px; line-height:30px; }
   .areabanner { top:64px; font-size:20px; }
 }
+
+/* ---------- phone compact layout (2026-11-04): keep the middle of the screen free ----------
+   portrait: one top-left block (portrait + name + HP/SP/EXP inside the character panel, small icon menu row under it),
+   quest window under it on the left (ends above the stick area), minimap + loot feed top-right, monster bar / talk prompt /
+   notices just above the action buttons. landscape: smaller character panel and quest window, rest unchanged. */
+@media (max-width: 600px) {
+  .charpanel { left:6px; top:6px; width:calc((100vw - 118px) / .66); max-width:440px; min-height:112px; padding:10px 12px 10px 104px; transform:scale(.66); transform-origin:left top; }
+  .charpanel .cname { font-size:22px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .charpanel .status { position:absolute; left:104px; top:118px; margin:0; }
+  .botbar { left:75px; top:30px; bottom:auto; width:calc(100vw - 75px - 118px); transform:none; gap:3px; }
+  .hud .botbar .bar.hp { height:16px; } .hud .botbar .bar.hp span { font-size:11px; line-height:16px; }
+  .hud .botbar .bar.sp { height:11px; } .hud .botbar .bar.sp span { font-size:9px; line-height:11px; }
+  .hud .botbar .expbar { height:11px; border-width:1px; } .hud .botbar .expbar span { font-size:9px; line-height:9px; }
+  .hud .botbar .expbar::before, .hud .botbar .expbar::after { display:none; }
+  .botbar .menubtns { position:absolute; left:-69px; top:64px; margin:0; gap:4px; justify-content:flex-start; }
+  .hud .botbar .menubtns .btn { width:42px; min-height:0; height:40px; padding:2px 0 1px; font-size:9.5px; gap:0; border-radius:7px; }
+  .hud .botbar .menubtns .btn svg { width:19px; height:19px; }
+  .qhud { left:6px; right:auto; top:140px; width:min(236px, 61vw); max-height:max(70px, calc(44vh - 146px)); }
+  .qh-reopen { left:6px; right:auto; top:140px; width:38px; height:38px; padding:7px; }
+  .qh-others .qh-other:nth-child(n+2) { display:none; }
+  .feed { left:auto; right:6px; top:114px; align-items:flex-end; transform:scale(.72); transform-origin:right top; }
+  .target, .target.boss { top:auto; bottom:300px; left:8px; right:auto; transform:none; width:min(300px, calc(100vw - 16px)); }
+  .prompt { left:50%; top:auto; bottom:356px; transform:translateX(-50%); max-width:calc(100vw - 24px); white-space:nowrap; text-align:center; }
+  .toasts { top:auto; bottom:400px; } .toast { font-size:13px; }
+  .stickbase { left:76px; bottom:60px; }
+}
+@media (max-height: 520px) and (min-width: 601px) {
+  .charpanel { transform:scale(.7); }
+  .qhud { top:90px; width:min(260px, 31vw); max-height:max(64px, calc(100vh - 90px - 174px)); }
+  .qh-reopen { top:90px; }
+  .feed { left:calc(min(260px, 31vw) + 24px); }
+  .qh-main li { flex-wrap:wrap; row-gap:0; } .qh-prog { flex-basis:100%; padding-left:22px; font-size:12px; }
+  .qh-others .qh-other:nth-child(n+2) { display:none; }
+}
+
+/* phone windows (ui.fit): laid out narrower instead of shrunk, scroll inside; .narrow = stacked columns (portrait) */
+.window.phone .wbody { overflow-y:auto !important; overflow-x:hidden; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; touch-action:pan-y; }
+.window.phone .wbody > * { flex-shrink:0; }
+.window.phone .crleft { height:auto; } .window.phone .qbody { max-height:none; overflow:visible; }
+.window.narrow.inventory .wbody, .window.narrow.shop .wbody, .window.narrow.craft .wbody { flex-direction:column; }
+.window.narrow .invright, .window.narrow .shoplist, .window.narrow .crleft { width:auto; }
+.window.narrow .grid { grid-template-columns:repeat(6, 1fr); }
+.window.narrow .detail, .window.narrow .skdetail, .window.narrow .skslots { flex-wrap:wrap; }
+.window.narrow .skdtext { max-width:none; }
+.window.narrow .skhead { flex-wrap:wrap; white-space:normal; row-gap:8px; } .window.narrow .sknote { white-space:normal; }
+.window.narrow .skcols, .window.narrow .jobcards { flex-direction:column; }
+.window.narrow .fpennant, .window.narrow .fcastle { display:none; }
 </style>
 </head>
 <body>
