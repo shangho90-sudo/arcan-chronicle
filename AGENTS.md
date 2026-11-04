@@ -31,8 +31,16 @@
 - 마을 바닥 텍스처는 `tools/town/texgen2.py`로 생성(`pave`, `cobble`). 장미 문양 바닥·꽃잎·나뭇잎 그림자(보이지 않는 나무 그늘 캐스터)·장식 가로등은 `js/town3d.js`.
 - HUD는 `index.html`의 "ornate gold HUD" CSS 블록과 `js/ui.js`의 `MENU_ICON`/`HUD_ICON`(SVG 아이콘). 배치: 왼쪽 위 초상화·이름, 오른쪽 위 미니맵(`js/minimap.js`)·퀘스트, 가운데 아래 체력·기력·경험치·메뉴 버튼(`.botbar`). 경험치 구슬·레벨업 날개는 `js/rewardfx.js`, 합성 효과음은 `Audio.chime`. 화면 확인은 `tools/browser-tests/hudshots.js`. 퀘스트 창(미니맵 아래 고정 HUD, 접기·닫기·`L` 키, 상태는 `profile.ui`)과 지역 이름 배너·첫 시작 환영 문구는 `js/questhud.js` — 퀘스트 진행을 화면 가운데 토스트로 다시 띄우지 말 것, 확인 `questhud.js`(브라우저 테스트). 휴대폰 배치는 `index.html` 끝의 "phone compact layout" 블록(세로: 체력 막대를 초상화 패널 안에, 가운데 비우기), 휴대폰 게임 창은 `ui.fit`이 폭에 맞춰 재배치(`.window.phone`/`.narrow`, 최소 0.64배, 안에서 스크롤) — 확인 `mobileshots.js`. 모든 게임 창은 장식 창(`ui.js`의 `PLAIN`/`BANNER`, CSS `.window.fancy`, 확인 `windowshots.js`). 대화·타이틀·캐릭터 만들기만 예외.
 
+## Blender 자산 (2026-11-04, `tools/blender/`, 자세한 내용 `tools/blender/README.md`)
+- 나무·바위·덤불·풀/꽃·마을 소품은 Blender(bpy)로 절차 제작합니다: `paint.py`(손그림 텍스처) → `assets.py`(모델, LOD `_l0`/게임용/`_l2`/`_lo`) → `wrap.py`(→ `assets/forest/bl/`) → `validate_assets.py`. 직접 GLB를 고치지 말고 스크립트를 고친 뒤 다시 만드세요.
+- GLB에는 이미지를 넣지 않습니다. 재질 이름이 공유 텍스처를 고릅니다(`tools/blender/texmap.py` ↔ `js/nature.js` `MAT_TEX`). 칠한 빛(AO·그라데이션)은 정점 색입니다.
+- 잎 카드(`M_leaf*`)는 4정점이 한 점에 모인 카메라 빌보드(두 번째 UV = 크기·회전)입니다. 잘라낸 재질(`M_leaf*`, `M_plants`)은 뒷면 노멀을 뒤집지 않습니다.
+- 마을 장식 배치는 `python3 tools/town/props_layout.py --write`(`town3d.blprops` + 충돌용 `props`의 `bl: true` 항목). 숲 배치는 `tools/forest/layout.py --write`. 둘 다 바꾼 뒤 `node tools/forest/check_nav.mjs forest|town`(마을은 boss_gate 실패가 원래 상태).
+- 카메라는 약한 원근(`render.js` `CAM`: 피치 48°, 거리 26 m, `ortho` = 초점 거리에서의 화면 반높이). 화면 → 땅 광선은 `Renderer.screenRay`.
+- 화면 비교 캡처: `tools/browser-tests/styleshots.js`(마을 분수·대화, 숲 입구·길·나무·전투, 프레임 시간·draw call·삼각형).
+
 ## 숲 그래픽 (속삭이는 숲, `zones.json`의 `"nature"`가 있는 존)
-- `js/nature.js`가 빌더의 평평한 바닥·원뿔 나무·상자 소품을 숨기고 다시 그립니다: 손그림 지면 셰이더(햇빛 잔디/그늘 잔디/흙/이끼, 반복 완화), 곡선 흙길(마스크는 존의 `patches` 경로에서 생성), Tripo 나무·덤불·바위(모델·16 m 청크 단위 인스턴싱), 풀·꽃 카드(인스턴싱, 바람), 작은 돌, 플레이어를 가리는 나무 디더링.
+- `js/nature.js`가 빌더의 평평한 바닥·원뿔 나무·상자 소품을 숨기고 다시 그립니다: 손그림 지면 셰이더(햇빛 잔디/그늘 잔디/흙/이끼, 반복 완화), 곡선 흙길(마스크는 존의 `patches` 경로에서 생성), Blender 나무·덤불·바위(모델·24 m 청크 단위 인스턴싱), 풀·꽃 덩어리(청크별 한 메시로 합침, 바람), 작은 돌, 플레이어를 가리는 나무 디더링.
 - 배치는 `tools/forest/layout.py --write`(시드 고정)로 `zones.json`의 forest `props`를 다시 씁니다. 나무·바위·그루터기만 충돌(`propFootprint`), `shrub`·`flowers`는 장식. 배치를 바꾸면 `node tools/forest/check_nav.mjs`로 모든 포털·캠프·보스 입구 도달을 확인하세요.
 - 모델 후처리 `tools/forest/process_models.py`, 텍스처 `tools/forest/texgen_forest.py`, 출처는 `assets/forest/README.md`.
 - 그림자는 모델별 저폴리 사본(`*_lo`)만 그립니다(색 패스에서는 0개 인스턴스). 존별 후처리 값은 `zones.json`의 `"post"`.

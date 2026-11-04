@@ -656,6 +656,7 @@ export async function buildTown3D(spec, renderer) {
     else if (d.type === 'banner') {
       k.cyl(0.07, 0.08, 4.4, 'wood', {}, 8); k.sphere(0.13, 'gold', { y: 4.5 }, 8); k.box(1.2, 0.07, 0.07, 'wood', { y: 4.1, z: 0.0 });
       const b = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 2.6), canvasMat('banner', 128, 384, drawBanner, { side: THREE.DoubleSide })); b.position.set(0, 2.75, 0.06); b.rotation.y = 0; k.mesh(b);
+    } else if (d.type === 'planter' && spec.blprops) { continue;          // drawn as a Blender planter (blprops)
     } else if (d.type === 'planter') {
       k.add(towerWall(d.r, 0.6, 'basestone'), 'basestone', { y: 0.3, uv: false }); k.add(new THREE.CircleGeometry(d.r, 18), 'earth', { y: 0.55, rx: -Math.PI / 2 });
       k.add(new THREE.RingGeometry(d.r - 0.1, d.r + 0.1, 18), 'basestone', { y: 0.6, rx: -Math.PI / 2 });
@@ -665,6 +666,9 @@ export async function buildTown3D(spec, renderer) {
     }
     const obj = k.build(); place(obj, at, d.h ?? 180); root.add(obj);
   }
+  // Blender-made decoration (planters, flower boxes, barrels, crates, benches, banners, signs, trees, shrubs, flowers):
+  // layout from tools/town/props_layout.py, models from tools/blender/assets.py
+  if (spec.blprops) { const { placeBlProps } = await import('./nature.js'); root.add(await placeBlProps(spec.blprops, ANISO)); }
   // ornate lamp posts: flower planter base, black iron pole with gold rings, glowing lantern, hanging blue banner
   const bannerM = canvasMat('banner', 128, 384, drawBanner, { side: THREE.DoubleSide });
   for (const p of spec.lanterns) {

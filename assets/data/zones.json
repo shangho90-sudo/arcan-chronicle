@@ -211,6 +211,370 @@
      "variant": "",
      "w": 0.0,
      "d": 0.0
+    },
+    {
+     "pos": [
+      -2.04,
+      11.05
+     ],
+     "rot": 249.5,
+     "scale": 0.96,
+     "variant": "",
+     "w": 1.6,
+     "d": 1.6,
+     "type": "flowerbed",
+     "bl": true
+    },
+    {
+     "pos": [
+      -10.79,
+      0.13
+     ],
+     "rot": 4.3,
+     "scale": 1.05,
+     "variant": "",
+     "w": 1.6,
+     "d": 1.6,
+     "type": "flowerbed",
+     "bl": true
+    },
+    {
+     "pos": [
+      5.61,
+      -9.38
+     ],
+     "rot": 32.8,
+     "scale": 1.07,
+     "variant": "",
+     "w": 1.6,
+     "d": 1.6,
+     "type": "flowerbed",
+     "bl": true
+    },
+    {
+     "pos": [
+      12.79,
+      7.79
+     ],
+     "rot": 58.6,
+     "scale": 1.0,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0,
+     "type": "bench",
+     "bl": true
+    },
+    {
+     "pos": [
+      -10.38,
+      -12.25
+     ],
+     "rot": 220.3,
+     "scale": 1.0,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0,
+     "type": "bench",
+     "bl": true
+    },
+    {
+     "pos": [
+      -9.23,
+      -13.22
+     ],
+     "rot": 104.1,
+     "scale": 0.75,
+     "variant": "",
+     "w": 1.2,
+     "d": 1.2,
+     "type": "flowerbed",
+     "bl": true
+    },
+    {
+     "pos": [
+      8.89,
+      -13.03
+     ],
+     "rot": 349.4,
+     "scale": 0.89,
+     "variant": "",
+     "w": 2.2,
+     "d": 2.2,
+     "type": "flowerbed",
+     "bl": true
+    },
+    {
+     "pos": [
+      -1.75,
+      9.69
+     ],
+     "rot": 289.9,
+     "scale": 0.65,
+     "variant": "",
+     "w": 1.0,
+     "d": 1.0,
+     "type": "flowerbed",
+     "bl": true
+    },
+    {
+     "pos": [
+      -0.06,
+      9.82
+     ],
+     "rot": 12.5,
+     "scale": 1.0,
+     "variant": "",
+     "w": 1.3,
+     "d": 0.45,
+     "type": "flowerbed",
+     "bl": true
+    },
+    {
+     "pos": [
+      8.62,
+      5.31
+     ],
+     "rot": 280.5,
+     "scale": 0.95,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0,
+     "type": "barrel",
+     "bl": true
+    },
+    {
+     "pos": [
+      11.21,
+      -4.51
+     ],
+     "rot": 122.6,
+     "scale": 1.0,
+     "variant": "",
+     "w": 1.3,
+     "d": 0.45,
+     "type": "flowerbed",
+     "bl": true
+    },
+    {
+     "pos": [
+      -26.05,
+      12.1
+     ],
+     "rot": 180,
+     "scale": 1.0,
+     "variant": "",
+     "w": 1.3,
+     "d": 0.45,
+     "type": "flowerbed",
+     "bl": true
+    },
+    {
+     "pos": [
+      17.4,
+      10.44
+     ],
+     "rot": 225,
+     "scale": 1.0,
+     "variant": "",
+     "w": 1.3,
+     "d": 0.45,
+     "type": "flowerbed",
+     "bl": true
+    },
+    {
+     "pos": [
+      16.18,
+      11.66
+     ],
+     "rot": 225,
+     "scale": 1.0,
+     "variant": "",
+     "w": 1.3,
+     "d": 0.45,
+     "type": "flowerbed",
+     "bl": true
+    },
+    {
+     "pos": [
+      16.92,
+      9.58
+     ],
+     "rot": 344.7,
+     "scale": 0.94,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0,
+     "type": "barrel",
+     "bl": true
+    },
+    {
+     "pos": [
+      17.99,
+      8.82
+     ],
+     "rot": 44.0,
+     "scale": 0.92,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0,
+     "type": "barrel",
+     "bl": true
+    },
+    {
+     "pos": [
+      15.1,
+      5.7
+     ],
+     "rot": 270,
+     "scale": 1.0,
+     "variant": "",
+     "w": 1.3,
+     "d": 0.45,
+     "type": "flowerbed",
+     "bl": true
+    },
+    {
+     "pos": [
+      14.84,
+      -2.5
+     ],
+     "rot": 138.1,
+     "scale": 0.91,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0,
+     "type": "barrel",
+     "bl": true
+    },
+    {
+     "pos": [
+      14.24,
+      -1.67
+     ],
+     "rot": 358.2,
+     "scale": 1.1,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0,
+     "type": "barrel",
+     "bl": true
+    },
+    {
+     "pos": [
+      14.9,
+      -13.85
+     ],
+     "rot": 270,
+     "scale": 1.0,
+     "variant": "",
+     "w": 1.3,
+     "d": 0.45,
+     "type": "flowerbed",
+     "bl": true
+    },
+    {
+     "pos": [
+      -6.68,
+      12.1
+     ],
+     "rot": 180,
+     "scale": 1.0,
+     "variant": "",
+     "w": 1.3,
+     "d": 0.45,
+     "type": "flowerbed",
+     "bl": true
+    },
+    {
+     "pos": [
+      -14.52,
+      12.1
+     ],
+     "rot": 180,
+     "scale": 1.0,
+     "variant": "",
+     "w": 1.3,
+     "d": 0.45,
+     "type": "flowerbed",
+     "bl": true
+    },
+    {
+     "pos": [
+      -15.95,
+      11.88
+     ],
+     "rot": 56.9,
+     "scale": 0.89,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0,
+     "type": "crate",
+     "bl": true
+    },
+    {
+     "pos": [
+      -25.05,
+      9.06
+     ],
+     "rot": 260.9,
+     "scale": 0.72,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0,
+     "type": "tree",
+     "bl": true
+    },
+    {
+     "pos": [
+      -5.96,
+      -17.46
+     ],
+     "rot": 339.8,
+     "scale": 0.81,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0,
+     "type": "tree",
+     "bl": true
+    },
+    {
+     "pos": [
+      21.73,
+      -19.22
+     ],
+     "rot": 295.2,
+     "scale": 0.83,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0,
+     "type": "tree",
+     "bl": true
+    },
+    {
+     "pos": [
+      -20.12,
+      -17.08
+     ],
+     "rot": 317.0,
+     "scale": 0.77,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0,
+     "type": "tree",
+     "bl": true
+    },
+    {
+     "pos": [
+      -19.32,
+      -19.65
+     ],
+     "rot": 171.5,
+     "scale": 0.75,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0,
+     "type": "tree",
+     "bl": true
     }
    ],
    "npcs": [
@@ -2931,7 +3295,1510 @@
       6.8,
       -19.4
      ]
+    ],
+    "blprops": [
+     {
+      "model": "town_planter",
+      "pos": [
+       -2.04,
+       11.05
+      ],
+      "rot": 249.5,
+      "scale": 0.96
+     },
+     {
+      "model": "grass_short",
+      "pos": [
+       -2.32,
+       12.05
+      ],
+      "rot": 310.4,
+      "scale": 0.62
+     },
+     {
+      "model": "flower_yellow",
+      "pos": [
+       -1.38,
+       11.91
+      ],
+      "rot": 295.8,
+      "scale": 0.7
+     },
+     {
+      "model": "flower_yellow",
+      "pos": [
+       -2.71,
+       12.38
+      ],
+      "rot": 269.3,
+      "scale": 0.75
+     },
+     {
+      "model": "town_border",
+      "pos": [
+       -3.42,
+       10.8
+      ],
+      "rot": -100.5,
+      "scale": 0.9
+     },
+     {
+      "model": "town_planter",
+      "pos": [
+       -10.79,
+       0.13
+      ],
+      "rot": 4.3,
+      "scale": 1.05
+     },
+     {
+      "model": "flower_mixed",
+      "pos": [
+       -12.32,
+       0.17
+      ],
+      "rot": 284.1,
+      "scale": 0.5
+     },
+     {
+      "model": "flower_yellow",
+      "pos": [
+       -11.66,
+       -0.59
+      ],
+      "rot": 229.5,
+      "scale": 0.53
+     },
+     {
+      "model": "town_border",
+      "pos": [
+       -10.81,
+       -1.27
+      ],
+      "rot": -179.3,
+      "scale": 0.9
+     },
+     {
+      "model": "town_planter",
+      "pos": [
+       5.61,
+       -9.38
+      ],
+      "rot": 32.8,
+      "scale": 1.07
+     },
+     {
+      "model": "flower_white",
+      "pos": [
+       5.23,
+       -10.28
+      ],
+      "rot": 202.5,
+      "scale": 0.64
+     },
+     {
+      "model": "grass_short",
+      "pos": [
+       5.29,
+       -10.54
+      ],
+      "rot": 214.8,
+      "scale": 0.65
+     },
+     {
+      "model": "flower_pink",
+      "pos": [
+       5.74,
+       -10.58
+      ],
+      "rot": 260.6,
+      "scale": 0.62
+     },
+     {
+      "model": "town_border",
+      "pos": [
+       6.82,
+       -8.66
+      ],
+      "rot": -300.9,
+      "scale": 0.9
+     },
+     {
+      "model": "town_bench",
+      "pos": [
+       12.79,
+       7.79
+      ],
+      "rot": 58.6,
+      "scale": 1.0
+     },
+     {
+      "model": "town_bench",
+      "pos": [
+       -10.38,
+       -12.25
+      ],
+      "rot": 220.3,
+      "scale": 1.0
+     },
+     {
+      "model": "town_planter",
+      "pos": [
+       -9.23,
+       -13.22
+      ],
+      "rot": 104.1,
+      "scale": 0.75
+     },
+     {
+      "model": "flower_white",
+      "pos": [
+       -8.31,
+       -13.53
+      ],
+      "rot": 181.7,
+      "scale": 0.54
+     },
+     {
+      "model": "town_border",
+      "pos": [
+       10.04,
+       -12.91
+      ],
+      "rot": 84.2,
+      "scale": 0.62
+     },
+     {
+      "model": "town_border",
+      "pos": [
+       9.43,
+       -12.01
+      ],
+      "rot": 27.7,
+      "scale": 0.62
+     },
+     {
+      "model": "town_border",
+      "pos": [
+       8.17,
+       -12.13
+      ],
+      "rot": -38.6,
+      "scale": 0.62
+     },
+     {
+      "model": "town_border",
+      "pos": [
+       7.74,
+       -12.98
+      ],
+      "rot": -87.8,
+      "scale": 0.62
+     },
+     {
+      "model": "town_border",
+      "pos": [
+       8.44,
+       -14.09
+      ],
+      "rot": -157.1,
+      "scale": 0.62
+     },
+     {
+      "model": "town_border",
+      "pos": [
+       9.49,
+       -14.01
+      ],
+      "rot": -211.6,
+      "scale": 0.62
+     },
+     {
+      "model": "shrub_b",
+      "pos": [
+       8.89,
+       -13.03
+      ],
+      "rot": 349.4,
+      "scale": 0.89
+     },
+     {
+      "model": "flower_pink",
+      "pos": [
+       8.92,
+       -13.86
+      ],
+      "rot": 74.9,
+      "scale": 0.69
+     },
+     {
+      "model": "flower_white",
+      "pos": [
+       9.24,
+       -13.08
+      ],
+      "rot": 72.6,
+      "scale": 0.52
+     },
+     {
+      "model": "flower_yellow",
+      "pos": [
+       9.18,
+       -13.32
+      ],
+      "rot": 155.8,
+      "scale": 0.61
+     },
+     {
+      "model": "flower_white",
+      "pos": [
+       9.69,
+       -13.01
+      ],
+      "rot": 284.8,
+      "scale": 0.53
+     },
+     {
+      "model": "flower_yellow",
+      "pos": [
+       8.89,
+       -13.48
+      ],
+      "rot": 45.8,
+      "scale": 0.69
+     },
+     {
+      "model": "flower_white",
+      "pos": [
+       9.48,
+       -13.26
+      ],
+      "rot": 303.0,
+      "scale": 0.62
+     },
+     {
+      "model": "flower_white",
+      "pos": [
+       8.9,
+       -13.82
+      ],
+      "rot": 250.2,
+      "scale": 0.52
+     },
+     {
+      "model": "flower_white",
+      "pos": [
+       8.59,
+       4.41
+      ],
+      "rot": 337.3,
+      "scale": 0.51
+     },
+     {
+      "model": "flower_yellow",
+      "pos": [
+       8.91,
+       4.04
+      ],
+      "rot": 290.1,
+      "scale": 0.63
+     },
+     {
+      "model": "clover",
+      "pos": [
+       8.86,
+       4.29
+      ],
+      "rot": 357.5,
+      "scale": 0.65
+     },
+     {
+      "model": "town_planter",
+      "pos": [
+       -1.75,
+       9.69
+      ],
+      "rot": 289.9,
+      "scale": 0.65
+     },
+     {
+      "model": "flower_pink",
+      "pos": [
+       -9.47,
+       1.72
+      ],
+      "rot": 34.5,
+      "scale": 0.53
+     },
+     {
+      "model": "flower_white",
+      "pos": [
+       -9.19,
+       1.14
+      ],
+      "rot": 166.2,
+      "scale": 0.52
+     },
+     {
+      "model": "clover",
+      "pos": [
+       4.58,
+       -9.79
+      ],
+      "rot": 73.4,
+      "scale": 0.52
+     },
+     {
+      "model": "flower_mixed",
+      "pos": [
+       4.48,
+       -10.46
+      ],
+      "rot": 26.3,
+      "scale": 0.5
+     },
+     {
+      "model": "flower_white",
+      "pos": [
+       -9.14,
+       2.36
+      ],
+      "rot": 88.9,
+      "scale": 0.66
+     },
+     {
+      "model": "clover",
+      "pos": [
+       -9.43,
+       2.14
+      ],
+      "rot": 324.8,
+      "scale": 0.62
+     },
+     {
+      "model": "grass_short",
+      "pos": [
+       -11.83,
+       3.98
+      ],
+      "rot": 358.7,
+      "scale": 0.75
+     },
+     {
+      "model": "flower_yellow",
+      "pos": [
+       -11.4,
+       3.63
+      ],
+      "rot": 4.0,
+      "scale": 0.6
+     },
+     {
+      "model": "clover",
+      "pos": [
+       -11.17,
+       4.18
+      ],
+      "rot": 200.2,
+      "scale": 0.67
+     },
+     {
+      "model": "shrub_b",
+      "pos": [
+       -4.84,
+       8.51
+      ],
+      "rot": 100.0,
+      "scale": 0.75
+     },
+     {
+      "model": "town_flowerbox",
+      "pos": [
+       -0.06,
+       9.82
+      ],
+      "rot": 12.5,
+      "scale": 1.0
+     },
+     {
+      "model": "town_barrel",
+      "pos": [
+       8.62,
+       5.31
+      ],
+      "rot": 280.5,
+      "scale": 0.95
+     },
+     {
+      "model": "grass_short",
+      "pos": [
+       13.78,
+       10.84
+      ],
+      "rot": 131.5,
+      "scale": 0.74
+     },
+     {
+      "model": "flower_mixed",
+      "pos": [
+       13.39,
+       10.59
+      ],
+      "rot": 17.2,
+      "scale": 0.66
+     },
+     {
+      "model": "flower_yellow",
+      "pos": [
+       14.06,
+       10.24
+      ],
+      "rot": 37.7,
+      "scale": 0.67
+     },
+     {
+      "model": "flower_white",
+      "pos": [
+       10.76,
+       13.9
+      ],
+      "rot": 169.4,
+      "scale": 0.51
+     },
+     {
+      "model": "flower_yellow",
+      "pos": [
+       10.9,
+       13.33
+      ],
+      "rot": 222.2,
+      "scale": 0.71
+     },
+     {
+      "model": "flower_white",
+      "pos": [
+       10.49,
+       13.74
+      ],
+      "rot": 168.5,
+      "scale": 0.7
+     },
+     {
+      "model": "flower_yellow",
+      "pos": [
+       11.68,
+       -0.87
+      ],
+      "rot": 257.6,
+      "scale": 0.63
+     },
+     {
+      "model": "flower_white",
+      "pos": [
+       11.74,
+       -1.42
+      ],
+      "rot": 58.2,
+      "scale": 0.74
+     },
+     {
+      "model": "flower_white",
+      "pos": [
+       11.23,
+       -1.24
+      ],
+      "rot": 343.1,
+      "scale": 0.58
+     },
+     {
+      "model": "town_flowerbox",
+      "pos": [
+       11.21,
+       -4.51
+      ],
+      "rot": 122.6,
+      "scale": 1.0
+     },
+     {
+      "model": "grass_short",
+      "pos": [
+       -9.33,
+       -2.77
+      ],
+      "rot": 128.9,
+      "scale": 0.67
+     },
+     {
+      "model": "clover",
+      "pos": [
+       -9.14,
+       -2.34
+      ],
+      "rot": 175.9,
+      "scale": 0.61
+     },
+     {
+      "model": "town_flowerbox",
+      "pos": [
+       -26.05,
+       12.1
+      ],
+      "rot": 180,
+      "scale": 1.0
+     },
+     {
+      "model": "flower_white",
+      "pos": [
+       -25.46,
+       11.49
+      ],
+      "rot": 358.9,
+      "scale": 0.57
+     },
+     {
+      "model": "grass_short",
+      "pos": [
+       -25.81,
+       10.93
+      ],
+      "rot": 172.7,
+      "scale": 0.59
+     },
+     {
+      "model": "town_flowerbox",
+      "pos": [
+       17.4,
+       10.44
+      ],
+      "rot": 225,
+      "scale": 1.0
+     },
+     {
+      "model": "town_flowerbox",
+      "pos": [
+       16.18,
+       11.66
+      ],
+      "rot": 225,
+      "scale": 1.0
+     },
+     {
+      "model": "town_barrel",
+      "pos": [
+       16.92,
+       9.58
+      ],
+      "rot": 344.7,
+      "scale": 0.94
+     },
+     {
+      "model": "town_barrel",
+      "pos": [
+       17.99,
+       8.82
+      ],
+      "rot": 44.0,
+      "scale": 0.92
+     },
+     {
+      "model": "town_flowerbox",
+      "pos": [
+       15.1,
+       5.7
+      ],
+      "rot": 270,
+      "scale": 1.0
+     },
+     {
+      "model": "town_barrel",
+      "pos": [
+       14.84,
+       -2.5
+      ],
+      "rot": 138.1,
+      "scale": 0.91
+     },
+     {
+      "model": "town_barrel",
+      "pos": [
+       14.24,
+       -1.67
+      ],
+      "rot": 358.2,
+      "scale": 1.1
+     },
+     {
+      "model": "grass_short",
+      "pos": [
+       14.12,
+       4.72
+      ],
+      "rot": 58.3,
+      "scale": 0.66
+     },
+     {
+      "model": "flower_yellow",
+      "pos": [
+       14.37,
+       5.69
+      ],
+      "rot": 32.7,
+      "scale": 0.53
+     },
+     {
+      "model": "flower_white",
+      "pos": [
+       14.78,
+       4.28
+      ],
+      "rot": 255.8,
+      "scale": 0.65
+     },
+     {
+      "model": "town_flowerbox",
+      "pos": [
+       14.9,
+       -13.85
+      ],
+      "rot": 270,
+      "scale": 1.0
+     },
+     {
+      "model": "town_flowerbox",
+      "pos": [
+       -6.68,
+       12.1
+      ],
+      "rot": 180,
+      "scale": 1.0
+     },
+     {
+      "model": "town_flowerbox",
+      "pos": [
+       -14.52,
+       12.1
+      ],
+      "rot": 180,
+      "scale": 1.0
+     },
+     {
+      "model": "town_crate",
+      "pos": [
+       -15.95,
+       11.88
+      ],
+      "rot": 56.9,
+      "scale": 0.89
+     },
+     {
+      "model": "flower_pink",
+      "pos": [
+       -7.67,
+       11.57
+      ],
+      "rot": 244.9,
+      "scale": 0.62
+     },
+     {
+      "model": "flower_pink",
+      "pos": [
+       -8.01,
+       12.09
+      ],
+      "rot": 94.7,
+      "scale": 0.61
+     },
+     {
+      "model": "flower_white",
+      "pos": [
+       6.5,
+       10.94
+      ],
+      "rot": 315.0,
+      "scale": 0.67
+     },
+     {
+      "model": "flower_yellow",
+      "pos": [
+       5.38,
+       11.98
+      ],
+      "rot": 47.8,
+      "scale": 0.75
+     },
+     {
+      "model": "grass_short",
+      "pos": [
+       6.8,
+       11.36
+      ],
+      "rot": 288.1,
+      "scale": 0.52
+     },
+     {
+      "model": "flower_yellow",
+      "pos": [
+       5.96,
+       11.8
+      ],
+      "rot": 157.9,
+      "scale": 0.67
+     },
+     {
+      "model": "tree_forest_round",
+      "pos": [
+       -25.05,
+       9.06
+      ],
+      "rot": 260.9,
+      "scale": 0.72
+     },
+     {
+      "model": "flower_yellow",
+      "pos": [
+       -26.48,
+       8.17
+      ],
+      "rot": 121.2,
+      "scale": 0.7
+     },
+     {
+      "model": "clover",
+      "pos": [
+       -22.87,
+       8.18
+      ],
+      "rot": 39.1,
+      "scale": 0.75
+     },
+     {
+      "model": "flower_white",
+      "pos": [
+       -26.66,
+       8.69
+      ],
+      "rot": 317.2,
+      "scale": 0.51
+     },
+     {
+      "model": "shrub_a",
+      "pos": [
+       22.13,
+       9.65
+      ],
+      "rot": 274.0,
+      "scale": 0.95
+     },
+     {
+      "model": "shrub_b",
+      "pos": [
+       -27.92,
+       -10.8
+      ],
+      "rot": 101.2,
+      "scale": 0.76
+     },
+     {
+      "model": "shrub_b",
+      "pos": [
+       -10.43,
+       -20.62
+      ],
+      "rot": 93.4,
+      "scale": 0.73
+     },
+     {
+      "model": "shrub_b",
+      "pos": [
+       -12.38,
+       -18.03
+      ],
+      "rot": 160.4,
+      "scale": 0.79
+     },
+     {
+      "model": "shrub_a",
+      "pos": [
+       -11.05,
+       -18.73
+      ],
+      "rot": 213.6,
+      "scale": 0.79
+     },
+     {
+      "model": "shrub_b",
+      "pos": [
+       -28.74,
+       -2.33
+      ],
+      "rot": 59.8,
+      "scale": 1.02
+     },
+     {
+      "model": "shrub_a",
+      "pos": [
+       17.6,
+       -19.46
+      ],
+      "rot": 274.3,
+      "scale": 0.84
+     },
+     {
+      "model": "tree_broad_a",
+      "pos": [
+       -5.96,
+       -17.46
+      ],
+      "rot": 339.8,
+      "scale": 0.81
+     },
+     {
+      "model": "flower_white",
+      "pos": [
+       -5.09,
+       -15.55
+      ],
+      "rot": 38.6,
+      "scale": 0.71
+     },
+     {
+      "model": "flower_mixed",
+      "pos": [
+       -5.77,
+       -15.36
+      ],
+      "rot": 269.7,
+      "scale": 0.6
+     },
+     {
+      "model": "shrub_b",
+      "pos": [
+       -7.29,
+       -20.05
+      ],
+      "rot": 153.0,
+      "scale": 0.86
+     },
+     {
+      "model": "shrub_b",
+      "pos": [
+       -27.94,
+       16.65
+      ],
+      "rot": 171.7,
+      "scale": 0.78
+     },
+     {
+      "model": "shrub_b",
+      "pos": [
+       22.32,
+       -17.39
+      ],
+      "rot": 245.1,
+      "scale": 1.01
+     },
+     {
+      "model": "tree_forest_round",
+      "pos": [
+       21.73,
+       -19.22
+      ],
+      "rot": 295.2,
+      "scale": 0.83
+     },
+     {
+      "model": "flower_yellow",
+      "pos": [
+       21.79,
+       -20.6
+      ],
+      "rot": 25.7,
+      "scale": 0.51
+     },
+     {
+      "model": "flower_white",
+      "pos": [
+       20.13,
+       -18.06
+      ],
+      "rot": 69.5,
+      "scale": 0.69
+     },
+     {
+      "model": "shrub_b",
+      "pos": [
+       12.69,
+       -20.28
+      ],
+      "rot": 87.0,
+      "scale": 0.75
+     },
+     {
+      "model": "shrub_a",
+      "pos": [
+       20.07,
+       -20.44
+      ],
+      "rot": 222.3,
+      "scale": 0.85
+     },
+     {
+      "model": "shrub_a",
+      "pos": [
+       -15.6,
+       -18.42
+      ],
+      "rot": 169.1,
+      "scale": 0.97
+     },
+     {
+      "model": "shrub_a",
+      "pos": [
+       -28.52,
+       13.23
+      ],
+      "rot": 247.5,
+      "scale": 0.82
+     },
+     {
+      "model": "shrub_b",
+      "pos": [
+       -27.89,
+       3.08
+      ],
+      "rot": 251.6,
+      "scale": 0.98
+     },
+     {
+      "model": "shrub_b",
+      "pos": [
+       -26.3,
+       -2.67
+      ],
+      "rot": 129.4,
+      "scale": 0.98
+     },
+     {
+      "model": "shrub_b",
+      "pos": [
+       21.39,
+       -3.61
+      ],
+      "rot": 72.9,
+      "scale": 0.78
+     },
+     {
+      "model": "shrub_b",
+      "pos": [
+       -28.81,
+       -11.98
+      ],
+      "rot": 268.3,
+      "scale": 0.7
+     },
+     {
+      "model": "shrub_a",
+      "pos": [
+       -22.54,
+       -17.4
+      ],
+      "rot": 97.4,
+      "scale": 0.92
+     },
+     {
+      "model": "shrub_a",
+      "pos": [
+       -25.25,
+       0.17
+      ],
+      "rot": 164.5,
+      "scale": 0.92
+     },
+     {
+      "model": "shrub_b",
+      "pos": [
+       -28.32,
+       7.47
+      ],
+      "rot": 10.7,
+      "scale": 0.96
+     },
+     {
+      "model": "shrub_b",
+      "pos": [
+       -9.39,
+       -20.44
+      ],
+      "rot": 356.0,
+      "scale": 0.94
+     },
+     {
+      "model": "shrub_b",
+      "pos": [
+       -28.58,
+       14.92
+      ],
+      "rot": 146.9,
+      "scale": 0.71
+     },
+     {
+      "model": "shrub_b",
+      "pos": [
+       -28.27,
+       1.05
+      ],
+      "rot": 177.1,
+      "scale": 0.79
+     },
+     {
+      "model": "shrub_b",
+      "pos": [
+       -14.15,
+       -19.41
+      ],
+      "rot": 147.7,
+      "scale": 0.84
+     },
+     {
+      "model": "shrub_a",
+      "pos": [
+       -28.84,
+       9.32
+      ],
+      "rot": 31.4,
+      "scale": 0.98
+     },
+     {
+      "model": "shrub_a",
+      "pos": [
+       23.31,
+       11.11
+      ],
+      "rot": 320.1,
+      "scale": 1.01
+     },
+     {
+      "model": "shrub_b",
+      "pos": [
+       -8.56,
+       -17.84
+      ],
+      "rot": 161.6,
+      "scale": 0.82
+     },
+     {
+      "model": "shrub_a",
+      "pos": [
+       -9.08,
+       -18.91
+      ],
+      "rot": 58.0,
+      "scale": 0.76
+     },
+     {
+      "model": "tree_forest_round",
+      "pos": [
+       -20.12,
+       -17.08
+      ],
+      "rot": 317.0,
+      "scale": 0.77
+     },
+     {
+      "model": "flower_mixed",
+      "pos": [
+       -19.19,
+       -14.88
+      ],
+      "rot": 93.2,
+      "scale": 0.65
+     },
+     {
+      "model": "clover",
+      "pos": [
+       -18.57,
+       -15.71
+      ],
+      "rot": 142.0,
+      "scale": 0.65
+     },
+     {
+      "model": "flower_white",
+      "pos": [
+       -18.02,
+       -17.81
+      ],
+      "rot": 289.1,
+      "scale": 0.56
+     },
+     {
+      "model": "grass_short",
+      "pos": [
+       -20.52,
+       -15.15
+      ],
+      "rot": 30.2,
+      "scale": 0.56
+     },
+     {
+      "model": "shrub_b",
+      "pos": [
+       -27.46,
+       11.69
+      ],
+      "rot": 121.8,
+      "scale": 0.77
+     },
+     {
+      "model": "shrub_a",
+      "pos": [
+       -28.32,
+       -15.62
+      ],
+      "rot": 264.8,
+      "scale": 1.05
+     },
+     {
+      "model": "shrub_a",
+      "pos": [
+       19.23,
+       -17.68
+      ],
+      "rot": 48.6,
+      "scale": 0.86
+     },
+     {
+      "model": "shrub_a",
+      "pos": [
+       -26.32,
+       -8.84
+      ],
+      "rot": 116.0,
+      "scale": 0.8
+     },
+     {
+      "model": "shrub_b",
+      "pos": [
+       10.88,
+       19.04
+      ],
+      "rot": 104.6,
+      "scale": 0.99
+     },
+     {
+      "model": "tree_broad_a",
+      "pos": [
+       -19.32,
+       -19.65
+      ],
+      "rot": 171.5,
+      "scale": 0.75
+     },
+     {
+      "model": "flower_pink",
+      "pos": [
+       -20.78,
+       -20.05
+      ],
+      "rot": 227.6,
+      "scale": 0.72
+     },
+     {
+      "model": "flower_mixed",
+      "pos": [
+       -21.37,
+       -19.36
+      ],
+      "rot": 160.2,
+      "scale": 0.74
+     },
+     {
+      "model": "grass_short",
+      "pos": [
+       -17.69,
+       -18.12
+      ],
+      "rot": 265.8,
+      "scale": 0.56
+     },
+     {
+      "model": "clover",
+      "pos": [
+       -24.35,
+       -16.42
+      ],
+      "rot": 144.5,
+      "scale": 0.72
+     },
+     {
+      "model": "clover",
+      "pos": [
+       -25.0,
+       -16.2
+      ],
+      "rot": 265.0,
+      "scale": 0.69
+     },
+     {
+      "model": "flower_yellow",
+      "pos": [
+       -25.55,
+       -15.64
+      ],
+      "rot": 64.5,
+      "scale": 0.52
+     },
+     {
+      "model": "flower_mixed",
+      "pos": [
+       -26.45,
+       6.86
+      ],
+      "rot": 193.9,
+      "scale": 0.59
+     },
+     {
+      "model": "flower_mixed",
+      "pos": [
+       -26.21,
+       4.79
+      ],
+      "rot": 173.0,
+      "scale": 0.65
+     },
+     {
+      "model": "flower_white",
+      "pos": [
+       -29.01,
+       7.9
+      ],
+      "rot": 9.4,
+      "scale": 0.65
+     },
+     {
+      "model": "clover",
+      "pos": [
+       -29.32,
+       4.54
+      ],
+      "rot": 288.8,
+      "scale": 0.51
+     },
+     {
+      "model": "grass_short",
+      "pos": [
+       -26.12,
+       5.64
+      ],
+      "rot": 139.6,
+      "scale": 0.68
+     },
+     {
+      "model": "grass_short",
+      "pos": [
+       -26.62,
+       3.95
+      ],
+      "rot": 350.5,
+      "scale": 0.73
+     },
+     {
+      "model": "flower_yellow",
+      "pos": [
+       22.78,
+       -16.46
+      ],
+      "rot": 330.7,
+      "scale": 0.63
+     },
+     {
+      "model": "flower_mixed",
+      "pos": [
+       10.13,
+       7.24
+      ],
+      "rot": 281.8,
+      "scale": 0.52
+     },
+     {
+      "model": "flower_pink",
+      "pos": [
+       11.26,
+       8.6
+      ],
+      "rot": 119.5,
+      "scale": 0.72
+     },
+     {
+      "model": "clover",
+      "pos": [
+       9.23,
+       11.85
+      ],
+      "rot": 295.1,
+      "scale": 0.59
+     },
+     {
+      "model": "flower_white",
+      "pos": [
+       10.41,
+       7.07
+      ],
+      "rot": 140.3,
+      "scale": 0.68
+     },
+     {
+      "model": "flower_white",
+      "pos": [
+       11.06,
+       8.11
+      ],
+      "rot": 11.9,
+      "scale": 0.7
+     },
+     {
+      "model": "clover",
+      "pos": [
+       10.62,
+       7.34
+      ],
+      "rot": 174.1,
+      "scale": 0.55
+     },
+     {
+      "model": "town_banner",
+      "pos": [
+       -14.82,
+       5.75
+      ],
+      "rot": -60.9,
+      "scale": 1.0
+     },
+     {
+      "model": "town_banner",
+      "pos": [
+       -9.34,
+       6.96
+      ],
+      "rot": -42.4,
+      "scale": 1.0
+     },
+     {
+      "model": "town_banner",
+      "pos": [
+       12.99,
+       -5.69
+      ],
+      "rot": 122.6,
+      "scale": 1.0
+     },
+     {
+      "model": "town_planter",
+      "pos": [
+       -24.0,
+       6.0
+      ],
+      "rot": 178.9,
+      "scale": 1.75
+     },
+     {
+      "model": "grass_short",
+      "pos": [
+       -25.52,
+       6.9
+      ],
+      "rot": 83.2,
+      "scale": 0.53
+     },
+     {
+      "model": "flower_yellow",
+      "pos": [
+       -22.21,
+       7.49
+      ],
+      "rot": 288.1,
+      "scale": 0.64
+     },
+     {
+      "model": "flower_white",
+      "pos": [
+       -23.65,
+       8.02
+      ],
+      "rot": 152.5,
+      "scale": 0.5
+     },
+     {
+      "model": "flower_mixed",
+      "pos": [
+       -21.85,
+       5.76
+      ],
+      "rot": 116.9,
+      "scale": 0.62
+     },
+     {
+      "model": "town_planter",
+      "pos": [
+       -26.6,
+       -12.6
+      ],
+      "rot": 229.8,
+      "scale": 1.75
+     },
+     {
+      "model": "grass_short",
+      "pos": [
+       -24.58,
+       -12.4
+      ],
+      "rot": 321.7,
+      "scale": 0.54
+     },
+     {
+      "model": "grass_short",
+      "pos": [
+       -26.59,
+       -14.9
+      ],
+      "rot": 251.9,
+      "scale": 0.63
+     },
+     {
+      "model": "town_planter",
+      "pos": [
+       9.8,
+       9.6
+      ],
+      "rot": 173.1,
+      "scale": 1.38
+     },
+     {
+      "model": "clover",
+      "pos": [
+       8.06,
+       10.52
+      ],
+      "rot": 0.9,
+      "scale": 0.6
+     },
+     {
+      "model": "grass_short",
+      "pos": [
+       10.33,
+       7.71
+      ],
+      "rot": 155.0,
+      "scale": 0.6
+     }
     ]
+   },
+   "post": {
+    "vignette": 0.2,
+    "bloom": 0.14,
+    "sat": 1.2,
+    "contrast": 0.3,
+    "exposure": 1.02
    }
   },
   {

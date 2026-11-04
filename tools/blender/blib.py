@@ -99,12 +99,14 @@ def join(objs, name):
     bpy.ops.object.join(); ob = bpy.context.view_layer.objects.active; ob.name = name; ob.data.name = name
     return ob
 
-def box_uv(ob, scale=1.0, mats_scale=None):
-    """per-face dominant-axis projection (seams vanish in busy painted textures)"""
+def box_uv(ob, scale=1.0, mats_scale=None, skip=()):
+    """per-face dominant-axis projection (seams vanish in busy painted textures); faces of `skip` materials keep their UVs"""
     me = ob.data
     if not me.uv_layers: me.uv_layers.new(name='UV')
+    if me.uv_layers.active is None: me.uv_layers.active = me.uv_layers[0]
     uv = me.uv_layers.active.data
     for p in me.polygons:
+        if p.material_index in skip: continue
         n = p.normal; ax = max(range(3), key=lambda i: abs(n[i]))
         k = scale * (mats_scale.get(p.material_index, 1.0) if mats_scale else 1.0)
         for li in p.loop_indices:

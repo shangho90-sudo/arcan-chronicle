@@ -262,6 +262,159 @@ def build_plant(name, sp):
         ca.data[li].color = (min(1, g), min(1, g), min(1, g * 0.97), 1)
     return ob
 
+
+# ---------------------------------------------------------------------------------------------- town props
+def _mesh(bm, name, mats):
+    return B.obj_from_bmesh(bm, name, mats)
+
+def prim(kind, mats, mat, name='p', **k):
+    """small primitive as an object: kind in box / cyl / cone / sphere / lathe; k: size, loc, rot, seg, bevel"""
+    bm = bmesh.new(); seg = k.get('seg', 12)
+    if kind == 'box':
+        r = bmesh.ops.create_cube(bm, size=1.0); sx, sy, sz = k['size']
+        for v in r['verts']: v.co = Vector((v.co.x * sx, v.co.y * sy, v.co.z * sz + sz / 2))
+        if k.get('bevel'): bmesh.ops.bevel(bm, geom=list(bm.edges), offset=k['bevel'], segments=2, profile=0.6, affect='EDGES', clamp_overlap=True)
+    elif kind in ('cyl', 'cone'):
+        r0, r1, h = k['size']
+        bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=seg, radius1=r0, radius2=r1, depth=h)
+        for v in bm.verts: v.co.z += h / 2
+        if k.get('bevel'): bmesh.ops.bevel(bm, geom=[e for e in bm.edges if len(e.link_faces) == 2 and abs(e.link_faces[0].normal.dot(e.link_faces[1].normal)) < 0.5], offset=k['bevel'], segments=2, profile=0.6, affect='EDGES', clamp_overlap=True)
+    elif kind == 'sphere':
+        bmesh.ops.create_uvsphere(bm, u_segments=seg, v_segments=max(6, seg // 2), radius=k['size'])
+    elif kind == 'lathe':                                   # profile [(r, z)...] revolved
+        prof = k['profile']; rings = []
+        for (r, z) in prof:
+            rings.append([bm.verts.new((math.cos(a / seg * 2 * math.pi) * r, math.sin(a / seg * 2 * math.pi) * r, z)) for a in range(seg)])
+        for i in range(len(rings) - 1):
+            for a in range(seg): bm.faces.new((rings[i][a], rings[i][(a + 1) % seg], rings[i + 1][(a + 1) % seg], rings[i + 1][a]))
+        bm.faces.new(list(reversed(rings[0]))); bm.faces.new(rings[-1])
+    if k.get('scale'): bmesh.ops.scale(bm, vec=Vector(k['scale']), verts=bm.verts)
+    if k.get('rot'): bmesh.ops.rotate(bm, cent=Vector((0, 0, 0)), matrix=__import__('mathutils').Euler(k['rot']).to_matrix(), verts=bm.verts)
+    if k.get('loc'): bmesh.ops.translate(bm, vec=Vector(k['loc']), verts=bm.verts)
+    for f in bm.faces: f.material_index = mat
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    return _mesh(bm, name, mats)
+
+def flowers_on(mats, mi, centre, radius, n, cells, h, seed):
+    """crossed flower / leaf cards (plants atlas) scattered over a disc - for planters and flower boxes"""
+    rnd = random.Random(seed); bm = bmesh.new(); uvl = bm.loops.layers.uv.new('UV')
+    for k in range(n):
+        a = rnd.uniform(0, 2 * math.pi); d = math.sqrt(rnd.random()) * radius; c = Vector(centre) + Vector((math.cos(a) * d * (radius[0] if isinstance(radius, tuple) else 1), math.sin(a) * d, 0)) if False else Vector(centre) + Vector((math.cos(a) * d, math.sin(a) * d, 0))
+        cell = rnd.choice(cells); u0, u1 = (cell % 4) / 4, (cell % 4 + 1) / 4; v1 = 1 - (cell // 4) / 2; v0 = v1 - 0.5
+        hh = h * rnd.uniform(0.8, 1.2); w = hh * 0.6
+        for j in range(2):
+            t = a + j * math.pi / 2 + rnd.uniform(-0.3, 0.3); dv = Vector((math.cos(t), math.sin(t), 0)) * w
+            vs = [bm.verts.new(c - dv), bm.verts.new(c + dv), bm.verts.new(c + dv + Vector((0, 0, hh * 2))), bm.verts.new(c - dv + Vector((0, 0, hh * 2)))]
+            f = bm.faces.new(vs); f.material_index = mi
+            for l, uv in zip(f.loops, ((u0, v0), (u1, v0), (u1, v1), (u0, v1))): l[uvl].uv = uv
+    return _mesh(bm, 'fl', mats)
+
+def shrub_blob(mats, mi, centre, R, seed, sub=2):
+    rnd = random.Random(seed); balls = cluster(Vector(centre), R, rnd, 0.85, 5, 0.2)
+    o = B.ball_cloud('sb', balls, sub, max(1, sub - 1), seed=seed)
+    for m in mats: o.data.materials.append(m)
+    for p in o.data.polygons: p.material_index = mi
+    B.box_uv(o, 1.0); return o, [(Vector(centre), R)]
+
+TOWN_MATS = ['M_stone_warm', 'M_wood', 'M_wood_dark', 'M_iron', 'M_gold', 'M_navy', 'M_glow', 'M_soil', 'M_foliage', 'M_plants', 'M_cream', 'M_stone']
+def tmats():
+    return [B.material(n, alpha=(n == 'M_plants'), double=(n == 'M_plants' or n == 'M_navy')) for n in TOWN_MATS]
+TI = {n: i for i, n in enumerate(TOWN_MATS)}
+
+def build_town(name, lod):
+    mats = tmats(); P = []; blob = []; seg = {'l0': 20, '': 14, 'l2': 10, 'lo': 6}[lod]; flo = lod != 'lo'
+    S, W, WD, IR, GD, NV, GL, SO, FO, PL, CR, ST = [TI[n] for n in TOWN_MATS]
+    if name == 'town_lamp':
+        P += [prim('box', mats, S, size=(0.95, 0.95, 0.5), bevel=0.05), prim('box', mats, S, size=(1.05, 1.05, 0.1), loc=(0, 0, 0.5), bevel=0.03),
+              prim('box', mats, SO, size=(0.86, 0.86, 0.04), loc=(0, 0, 0.58))]
+        P += [prim('cyl', mats, IR, size=(0.08, 0.06, 3.0), loc=(0, 0, 0.6), seg=seg), prim('cyl', mats, GD, size=(0.12, 0.12, 0.08), loc=(0, 0, 0.62), seg=seg),
+              prim('cyl', mats, GD, size=(0.1, 0.1, 0.07), loc=(0, 0, 1.9), seg=seg), prim('cyl', mats, GD, size=(0.11, 0.11, 0.07), loc=(0, 0, 3.3), seg=seg)]
+        # lantern: glowing glass, iron frame, roof, gold finial
+        P += [prim('cyl', mats, GL, size=(0.2, 0.24, 0.42), loc=(0, 0, 3.45), seg=6), prim('cyl', mats, IR, size=(0.27, 0.27, 0.05), loc=(0, 0, 3.42), seg=6),
+              prim('cone', mats, IR, size=(0.34, 0.04, 0.32), loc=(0, 0, 3.86), seg=6), prim('sphere', mats, GD, size=0.07, loc=(0, 0, 4.22), seg=8)]
+        for a in range(6):
+            t = a / 6 * 2 * math.pi + math.pi / 6; P.append(prim('box', mats, IR, size=(0.025, 0.025, 0.44), loc=(math.cos(t) * 0.24, math.sin(t) * 0.24, 3.44)))
+        # small hanging banner on an arm
+        P += [prim('box', mats, IR, size=(0.7, 0.04, 0.04), loc=(0.35, 0, 2.95)), prim('box', mats, NV, size=(0.5, 0.02, 0.9), loc=(0.42, 0, 2.0)),
+              prim('box', mats, GD, size=(0.52, 0.025, 0.05), loc=(0.42, 0, 2.88)), prim('box', mats, GD, size=(0.14, 0.03, 0.14), loc=(0.42, 0, 2.45), rot=(0, math.radians(45), 0))]
+        if flo:
+            o, c = shrub_blob(mats, FO, (0, 0, 0.72), 0.32, 7, 2 if lod != 'l2' else 1); P.append(o); blob += c
+            P.append(flowers_on(mats, PL, (0, 0, 0.6), 0.36, 9, [2, 4, 5, 3], 0.2, 8))
+    elif name == 'town_banner':
+        P += [prim('cyl', mats, IR, size=(0.07, 0.06, 4.4), seg=seg), prim('sphere', mats, GD, size=0.13, loc=(0, 0, 4.5), seg=10),
+              prim('box', mats, IR, size=(1.3, 0.05, 0.05), loc=(0, 0, 4.1)), prim('cyl', mats, GD, size=(0.12, 0.1, 0.12), seg=seg)]
+        # cloth: gently waved navy banner with gold border and a gold lozenge, pointed bottom
+        bm = bmesh.new(); W0, H0, nx, ny = 1.1, 2.5, 6, 10; grid = []
+        for j in range(ny + 1):
+            row = []
+            for i in range(nx + 1):
+                u, v = i / nx, j / ny; x = (u - 0.5) * W0; z = 4.05 - v * H0
+                if j == ny: z -= (0.5 - abs(u - 0.5)) * 0.6
+                row.append(bm.verts.new((x, 0.04 + math.sin(u * 3 + v * 2) * 0.05, z)))
+            grid.append(row)
+        for j in range(ny):
+            for i in range(nx):
+                f = bm.faces.new((grid[j][i], grid[j][i + 1], grid[j + 1][i + 1], grid[j + 1][i]))
+                f.material_index = GD if (i == 0 or i == nx - 1 or j == 0) else NV
+        P.append(_mesh(bm, 'cloth', mats))
+        P.append(prim('box', mats, GD, size=(0.32, 0.03, 0.32), loc=(0, 0.08, 2.9), rot=(0, math.radians(45), 0)))
+    elif name == 'town_planter':
+        P += [prim('lathe', mats, S, profile=[(0.0, 0), (0.62, 0), (0.7, 0.08), (0.66, 0.16), (0.72, 0.5), (0.8, 0.56), (0.8, 0.64), (0.68, 0.66), (0.0, 0.62)], seg=seg + 4)]
+        if flo:
+            o, c = shrub_blob(mats, FO, (0, 0, 0.95), 0.52, 11, 3 if lod == 'l0' else 2); P.append(o); blob += c
+            P.append(flowers_on(mats, PL, (0, 0, 0.66), 0.62, 14, [2, 4, 5, 3, 4], 0.22, 12))
+    elif name == 'town_flowerbox':
+        P += [prim('box', mats, W, size=(1.3, 0.42, 0.36), bevel=0.03), prim('box', mats, WD, size=(1.36, 0.46, 0.06), loc=(0, 0, 0.36)), prim('box', mats, SO, size=(1.2, 0.34, 0.03), loc=(0, 0, 0.37))]
+        if flo:
+            bm = flowers_on(mats, PL, (0, 0, 0.38), 0.55, 12, [2, 4, 5, 3, 0], 0.2, 21)
+            for v in bm.data.vertices: v.co.y *= 0.3
+            P.append(bm)
+    elif name == 'town_barrel':
+        prof = [(0.0, 0.0), (0.34, 0.0)] + [(0.34 + 0.07 * math.sin(math.pi * t / 8), t / 8 * 0.9) for t in range(1, 8)] + [(0.34, 0.9), (0.3, 0.92), (0.0, 0.9)]
+        P += [prim('lathe', mats, W, profile=prof, seg=seg)]
+        for z in (0.12, 0.45, 0.78): P.append(prim('cyl', mats, IR, size=(0.375 + 0.06 * math.sin(math.pi * z / 0.9), 0.375 + 0.06 * math.sin(math.pi * z / 0.9), 0.05), loc=(0, 0, z - 0.025), seg=seg))
+    elif name == 'town_crate':
+        P += [prim('box', mats, W, size=(0.8, 0.8, 0.8), bevel=0.03)]
+        for sx in (-1, 1):
+            for sy in (-1, 1): P.append(prim('box', mats, WD, size=(0.09, 0.09, 0.82), loc=(sx * 0.37, sy * 0.37, 0)))
+        for z in (0.0, 0.74): P += [prim('box', mats, WD, size=(0.84, 0.09, 0.08), loc=(0, sy * 0.37, z)) for sy in (-1, 1)]
+    elif name == 'town_bench':
+        for k in range(3): P.append(prim('box', mats, W, size=(1.8, 0.14, 0.05), loc=(0, -0.18 + k * 0.17, 0.45), bevel=0.012))
+        for k in range(2): P.append(prim('box', mats, W, size=(1.8, 0.05, 0.12), loc=(0, 0.27, 0.62 + k * 0.17), bevel=0.012))
+        for sx in (-0.75, 0.75):
+            P += [prim('box', mats, IR, size=(0.06, 0.5, 0.06), loc=(sx, 0, 0.4)), prim('box', mats, IR, size=(0.05, 0.05, 0.45), loc=(sx, -0.2, 0)),
+                  prim('box', mats, IR, size=(0.05, 0.05, 0.92), loc=(sx, 0.25, 0)), prim('box', mats, GD, size=(0.07, 0.07, 0.05), loc=(sx, 0.25, 0.92))]
+    elif name == 'town_sign':
+        P += [prim('box', mats, WD, size=(0.12, 0.12, 2.0), bevel=0.02), prim('box', mats, W, size=(1.0, 0.07, 0.55), loc=(0.35, 0, 1.35), bevel=0.02),
+              prim('box', mats, CR, size=(0.84, 0.08, 0.38), loc=(0.35, 0, 1.43)), prim('box', mats, GD, size=(0.16, 0.09, 0.16), loc=(0.35, 0, 1.55), rot=(0, math.radians(45), 0)),
+              prim('cone', mats, WD, size=(0.12, 0.0, 0.18), loc=(0, 0, 2.0), seg=4)]
+    elif name == 'town_fence':
+        for x in (-0.95, 0.0, 0.95): P += [prim('box', mats, WD, size=(0.1, 0.1, 0.9), loc=(x, 0, 0), bevel=0.015), prim('cone', mats, WD, size=(0.075, 0.0, 0.12), loc=(x, 0, 0.9), seg=4)]
+        for z in (0.32, 0.66): P.append(prim('box', mats, W, size=(2.0, 0.05, 0.1), loc=(0, 0.06, z), bevel=0.01))
+    elif name == 'town_border':
+        for k in range(5):
+            P.append(prim('box', mats, S, size=(0.42, 0.26, 0.2 + 0.03 * (k % 2)), loc=(-0.88 + k * 0.44, 0, 0), bevel=0.04))
+    ob = B.join(P, name + ('_' + lod if lod else '')) if len(P) > 1 else P[0]
+    ob.name = name + ('_' + lod if lod else '')
+    if lod == 'lo': return ob
+    B.box_uv(ob, 1.0, skip=(PL,))
+    if blob:
+        me = ob.data; out = []
+        for p in me.polygons: pass
+        fol = set(v for p in me.polygons if p.material_index in (FO, PL) for v in p.vertices)
+        for v in me.vertices:
+            if v.index in fol:
+                c, R = min(blob, key=lambda cr: (v.co - cr[0]).length / cr[1]); d = (v.co - c).normalized() if (v.co - c).length > 1e-6 else Vector((0, 0, 1))
+                out.append((d * 0.8 + Vector((0, 0, 0.5))).normalized())
+            else: out.append(v.normal.copy())
+        me.normals_split_custom_set_from_vertices(out)
+    B.bake_ao(ob, samples=20)
+    top = max(v.co.z for v in ob.data.vertices)
+    B.paint_light(ob, ao_pow=1.15, ao_min=0.35, h0=0, h1=top, bottom=0.78, top=1.06, up=0.12, hue=0.04, seed=len(name),
+                  per_mat={GL: (1.4, 1.3, 1.0)})
+    return ob
+TOWN = ['town_lamp', 'town_banner', 'town_planter', 'town_flowerbox', 'town_barrel', 'town_crate', 'town_bench', 'town_sign', 'town_fence', 'town_border']
+
 # ---------------------------------------------------------------------------------------------- main
 def run(names):
     for name in names:
@@ -272,10 +425,11 @@ def run(names):
             if name in TREES: ob = build_tree(name, TREES[name], lod)
             elif name in SHRUBS: ob = build_shrub(name, SHRUBS[name], lod)
             elif name in ROCKS: ob = build_rock(name, ROCKS[name], lod)
+            elif name in TOWN: ob = build_town(name, lod)
             else: raise SystemExit('unknown asset ' + name)
             fn = name + ('_' + lod if lod else '')
             B.export_glb(ob, os.path.join(OUT, fn + '.glb')); print(fn, B.tri_count(ob), flush=True)
 
 if __name__ == '__main__':
     args = [a for a in sys.argv[1:] if not a.startswith('-')]
-    run(args or list(TREES) + list(SHRUBS) + list(ROCKS) + list(PLANTS))
+    run(args or list(TREES) + list(SHRUBS) + list(ROCKS) + list(PLANTS) + TOWN)

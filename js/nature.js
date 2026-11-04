@@ -457,3 +457,27 @@ transformed.xz += vec2(sw, sw * .4) * aRoot.z * aRoot.z;`);
     },
   };
 }
+
+/** Blender props placed at their real modelled size (town decoration etc.): list = [{ model, pos:[x,z], rot, scale }].
+ *  One instanced mesh per model (+ low-poly shadow caster), shared materials. Used by js/town3d.js. */
+export async function placeBlProps(list, aniso = 4, groundY = () => 0) {
+  const root = new THREE.Group(); root.name = 'blprops';
+  const by = new Map(); for (const p of list) { if (!by.has(p.model)) by.set(p.model, []); by.get(p.model).push(p); }
+  const m4 = new THREE.Matrix4(), qt = new THREE.Quaternion(), sc = new THREE.Vector3(), yA = new THREE.Vector3(0, 1, 0), col = new THREE.Color();
+  await Promise.all([...by.entries()].map(async ([name, items]) => {
+    const low = (G.input && G.input.mobile) && !/^(grass|flower|clover|fern)/.test(name);   // plants have a single LOD
+    let md; try { md = await loadModel(name, aniso, low ? '_l2' : ''); } catch (e) { console.warn('blprop', name, e); return; }
+    const im = new THREE.InstancedMesh(md.geo, md.mats, items.length);
+    items.forEach((p, k) => {
+      const s = (p.scale || 1) * md.xf.H; qt.setFromAxisAngle(yA, -(p.rot || 0) * DEG);
+      im.setMatrixAt(k, m4.compose(T({ x: p.pos[0], y: groundY(p.pos[0], p.pos[1]), z: p.pos[1] }), qt, sc.set(s, s, s)));
+      const v = 0.95 + hash(k * 17 + name.length) * 0.1; im.setColorAt(k, col.setRGB(v, v, v));
+    });
+    im.receiveShadow = true; im.castShadow = false; im.computeBoundingSphere(); im.name = 'bl:' + name; root.add(im);
+    const lo = /^(grass|flower|clover|fern)/.test(name) ? null : await loadShadowLod(name, md);
+    if (lo) { const sm = new THREE.InstancedMesh(lo, SHADOW_ONLY, items.length); sm.instanceMatrix = im.instanceMatrix; sm.castShadow = true; sm.boundingSphere = im.boundingSphere;
+      const n = items.length; sm.onBeforeRender = () => { sm.count = 0; }; sm.onAfterRender = () => { sm.count = n; }; root.add(sm); }
+    else im.castShadow = !/^(grass|flower|clover|fern)/.test(name);
+  }));
+  return root;
+}

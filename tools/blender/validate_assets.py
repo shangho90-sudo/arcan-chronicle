@@ -8,7 +8,7 @@ from texmap import TEXMAP, tex_path
 from wrap import info
 import glob
 BUDGET = {'tree': {'l0': 30000, '': 8000, 'l2': 6000, 'lo': 1300}, 'shrub': {'l0': 4000, '': 1500, 'l2': 1000, 'lo': 300},
-          'rock': {'l0': 3000, '': 1500, 'l2': 700, 'lo': 150}, 'town': {'l0': 6000, '': 3000, 'l2': 1500, 'lo': 400}}
+          'rock': {'l0': 3000, '': 1500, 'l2': 700, 'lo': 150}, 'town': {'l0': 6000, '': 3000, 'l2': 1500, 'lo': 700}}
 def main():
     bad = []; out = os.path.join(HERE, 'out')
     names = sorted({re.sub(r'_(l0|l2|lo)$', '', os.path.basename(p)[:-4]) for p in glob.glob(os.path.join(out, '*.glb'))})
