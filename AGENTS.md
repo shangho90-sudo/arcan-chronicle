@@ -39,7 +39,7 @@
 - 카메라는 약한 원근(`render.js` `CAM`: 피치 48°, 거리 26 m, `ortho` = 초점 거리에서의 화면 반높이). 화면 → 땅 광선은 `Renderer.screenRay`.
 - 화면 비교 캡처: `tools/browser-tests/styleshots.js`(마을 분수·대화, 숲 입구·길·나무·전투, 프레임 시간·draw call·삼각형).
 
-## 숲 그래픽 (속삭이는 숲, `zones.json`의 `"nature"`가 있는 존)
+## 필드 그래픽 (`zones.json`의 `"nature"`가 있는 존: 속삭이는 숲·안개 골짜기·서리 고원·용의 유적)
 - `js/nature.js`가 빌더의 평평한 바닥·원뿔 나무·상자 소품을 숨기고 다시 그립니다: 손그림 지면 셰이더(햇빛 잔디/그늘 잔디/흙/이끼, 반복 완화), 곡선 흙길(마스크는 존의 `patches` 경로에서 생성), Blender 나무·덤불·바위(모델·24 m 청크 단위 인스턴싱), 풀·꽃 덩어리(청크별 한 메시로 합침, 바람), 작은 돌, 플레이어를 가리는 나무 디더링.
 - 배치는 `tools/forest/layout.py --write`(시드 고정)로 `zones.json`의 forest `props`를 다시 씁니다. 나무·바위·그루터기만 충돌(`propFootprint`), `shrub`·`flowers`는 장식. 배치를 바꾸면 `node tools/forest/check_nav.mjs`로 모든 포털·캠프·보스 입구 도달을 확인하세요.
 - 모델 후처리 `tools/forest/process_models.py`, 텍스처 `tools/forest/texgen_forest.py`, 출처는 `assets/forest/README.md`.
@@ -66,6 +66,6 @@
 ## 알려진 미완료
 - 스킬 아이콘은 코드 생성 임시 아이콘.
 - 몬스터: 귀여운 모델(`cute_*`)은 리깅이 없어 모든 동작이 절차 동작. 불씨 비룡 계열(drake)만 예전 모델.
-- 숲 그래픽 개편은 속삭이는 숲에만 적용(안개 골짜기·서리 고원·용의 유적은 예전 방식).
+- 네 필드 모두 `js/nature.js` 렌더(존별 `nature.ground`/`tint`/`rockTint`/`grass`/`lod`). 서리 고원은 색조만 차갑게(눈 덮인 잎 없음).
 - 휴대폰 화면은 자동 화면 확인만 함(실기기 미확인). 사람이 처음부터 끝까지 플레이한 검증 없음.
 - 원래 있던 Unity 프로젝트에는 미반영(이 저장소는 웹 버전만).

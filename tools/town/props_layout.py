@@ -30,7 +30,7 @@ def poly_dist(x, z, pts):
     return min(seg_dist(x, z, pts[i], pts[(i + 1) % len(pts)]) for i in range(len(pts)))
 
 blockers = [p['pts'] for p in Z['blockPolys']]
-avoid = [(n['pos'][0], n['pos'][1], 2.4) for n in Z.get('npcs', [])] + [(s['pos'][0], s['pos'][1], 2.8) for s in Z['spawns']] + \
+avoid = [(n['pos'][0], n['pos'][1], 2.0) for n in Z.get('npcs', [])] + [(s['pos'][0], s['pos'][1], 2.2) for s in Z['spawns']] + \
         [(p['pos'][0], p['pos'][1], 4.0) for p in Z['portals']] + [(d['pos'][0], d['pos'][1], 2.2) for d in T3['decor'] if d['type'] != 'planter'] + \
         [(p[0], p[1], 1.1) for p in T3['lanterns']] + [(p['pos'][0], p['pos'][1], 1.2) for p in Z['props'] if p['type'] in ('signpost', 'easel')]
 
@@ -64,11 +64,21 @@ def try_put(model, x, z, rot, scale=1.0, r=0.4, solid=None, **kw):
     if free(x, z, r, **kw): put(model, x, z, rot, scale, r, solid); return True
     return False
 
+def flower_bed(x, z):
+    """round bed: curb stones around a dense flower clump (flowers never stand loose on the paving)"""
+    placed.append((x, z, 1.0)); coll.append({'type': 'flowerbed', 'pos': [round(x, 2), round(z, 2)], 'rot': 0.0, 'scale': 1.0, 'variant': '', 'w': 1.6, 'd': 1.6})
+    for j in range(7):
+        b = j / 7 * math.tau; out.append({'model': 'town_border', 'pos': [round(x + math.cos(b) * 0.95, 2), round(z + math.sin(b) * 0.95, 2)], 'rot': round(math.degrees(-b) + 90, 1), 'scale': 0.45})
+    out.append({'model': rnd.choice(['shrub_a', 'shrub_b']), 'pos': [round(x, 2), round(z, 2)], 'rot': round(rnd.uniform(0, 360), 1), 'scale': 0.55})
+    for j in range(9):
+        b = rnd.uniform(0, math.tau); d = rnd.uniform(0.2, 0.75)
+        out.append({'model': rnd.choice(FLOWERS), 'pos': [round(x + math.cos(b) * d, 2), round(z + math.sin(b) * d, 2)], 'rot': round(rnd.uniform(0, 360), 1), 'scale': round(rnd.uniform(0.6, 0.85), 2)})
+
 FLOWERS = ['flower_white', 'flower_white', 'flower_pink', 'flower_yellow', 'flower_mixed']
 def flower_patch(cx, cz, n, spread):
     for k in range(n):
         a = rnd.uniform(0, math.tau); d = math.sqrt(rnd.random()) * spread
-        try_put(rnd.choice(FLOWERS) if rnd.random() < 0.75 else rnd.choice(['grass_short', 'clover']), cx + math.cos(a) * d, cz + math.sin(a) * d, rnd.uniform(0, 360), rnd.uniform(0.5, 0.75), 0.15, road=0.05)
+        try_put(rnd.choice(FLOWERS) if rnd.random() < 0.75 else rnd.choice(['grass_short', 'clover']), cx + math.cos(a) * d, cz + math.sin(a) * d, rnd.uniform(0, 360), rnd.uniform(0.6, 0.85), 0.15, road=0.05)
 
 # 1) fountain plaza: planters just outside the ring road, each with flowers and curb stones, in uneven spacing
 a = 0.3
@@ -106,8 +116,8 @@ for r in T3['ground']['roads']:
         while a < math.tau:
             R = r['r1'] + 0.75; x, z = math.cos(a) * R, math.sin(a) * R
             if rnd.random() < 0.7:
-                if rnd.random() < 0.35: try_put('town_planter', x + math.cos(a) * 0.3, z + math.sin(a) * 0.3, rnd.uniform(0, 360), 0.65, 0.6, {'type': 'flowerbed', 'w': 1.0, 'd': 1.0}, road=0.1)
-                else: flower_patch(x, z, 3, 0.6)
+                if rnd.random() < 0.5: try_put('town_planter', x + math.cos(a) * 0.3, z + math.sin(a) * 0.3, rnd.uniform(0, 360), 0.65, 0.6, {'type': 'flowerbed', 'w': 1.0, 'd': 1.0}, road=0.1)
+                elif free(x + math.cos(a) * 0.5, z + math.sin(a) * 0.5, 1.0, road=0.05): flower_bed(x + math.cos(a) * 0.5, z + math.sin(a) * 0.5)
             a += rnd.uniform(0.28, 0.5)
         continue
     for (ax, az), (bx, bz) in zip(r['pts'], r['pts'][1:]):
@@ -117,7 +127,8 @@ for r in T3['ground']['roads']:
                 if rnd.random() < 0.35: continue
                 off = r['w'] / 2 + rnd.uniform(0.35, 0.8); x, z = ax + (bx - ax) * t / L + nx * off * side, az + (bz - az) * t / L + nz * off * side
                 k = rnd.choice(ROW); yaw = math.degrees(math.atan2(bx - ax, bz - az))
-                if k == 'flowers': flower_patch(x, z, 3, 0.5)
+                if k == 'flowers':
+                    if free(x, z, 1.0, road=0.05): flower_bed(x, z)
                 elif k == 'planter': try_put('town_planter', x, z, rnd.uniform(0, 360), 0.6, 0.55, {'type': 'flowerbed', 'w': 0.95, 'd': 0.95}, road=0.1)
                 elif k == 'flowerbox': try_put('town_flowerbox', x, z, yaw, 1.0, 0.55, {'type': 'flowerbed', 'w': 1.3, 'd': 0.45}, road=0.1)
                 elif k == 'shrub': try_put(rnd.choice(['shrub_a', 'shrub_b']), x, z, rnd.uniform(0, 360), 0.75, 0.55, road=0.1)
@@ -140,6 +151,28 @@ for (pos, w, d, h) in fronts:
     if rnd.random() < 0.6: try_put('town_bench', ox, oz, h + 180, 1.0, 0.95, {'type': 'bench'}, wall_ok=0.05)
     else: try_put('town_sign', ox, oz, h + rnd.uniform(-20, 20), 1.0, 0.4)
     flower_patch(fx - rt[0] * side * w * 0.3 + f[0] * 0.5, fz - rt[1] * side * w * 0.3 + f[1] * 0.5, 4, 0.9)
+
+# 2b) on the buildings: gold ridge finials on every shop roof, a flowered balcony on the timber-framed upper floors
+for hs in T3['houses']:
+    w, d, h = hs['w'], hs['d'], hs['h']; f = (math.sin(math.radians(h)), math.cos(math.radians(h))); rt = (f[1], -f[0])
+    jetty = 0 if hs['style'] == 'arms' else 0.35; top = 0.35 + 3.3 + 2.7; ridge = top + (d + jetty) * 0.62
+    for sx in (-1, 1):
+        x = hs['pos'][0] + rt[0] * sx * w / 2 + f[0] * jetty / 2; z = hs['pos'][1] + rt[1] * sx * w / 2 + f[1] * jetty / 2
+        out.append({'model': 'town_finial', 'pos': [round(x, 2), round(z, 2)], 'y': round(ridge - 0.05, 2), 'rot': h, 'scale': 1.0})
+    if jetty:
+        off = rnd.choice((-0.22, 0.22)) * w; x = hs['pos'][0] + rt[0] * off + f[0] * (d / 2 + jetty + 0.45); z = hs['pos'][1] + rt[1] * off + f[1] * (d / 2 + jetty + 0.45)
+        out.append({'model': 'town_balcony', 'pos': [round(x, 2), round(z, 2)], 'y': 3.9, 'rot': h, 'scale': 1.0})
+
+# 1d) more plaza islands anywhere in the open paving (random sampling, still clear of roads / NPCs / spawns)
+for k in range(600):
+    a = rnd.uniform(0, math.tau); R = rnd.uniform(9.8, 18); x, z = math.cos(a) * R, math.sin(a) * R
+    kind = rnd.random()
+    if kind < 0.45 and free(x, z, 1.2, road=0.4):
+        put('town_planter', x, z, rnd.uniform(0, 360), rnd.uniform(0.8, 1.0), 0.9, {'type': 'flowerbed', 'w': 1.4, 'd': 1.4}); flower_patch(x, z, 5, 1.5)
+        for j in range(rnd.randint(1, 3)):
+            b = rnd.uniform(0, math.tau); try_put('town_border', x + math.cos(b) * 1.3, z + math.sin(b) * 1.3, math.degrees(-b) + 90, 0.7, 0.3, road=0.1)
+    elif kind < 0.7 and free(x, z, 1.0, road=0.3): flower_bed(x, z)
+    elif kind < 0.8 and free(x, z, 1.0, road=0.5): put('town_bench', x, z, math.degrees(math.atan2(-x, -z)) + 180, 1.0, 1.0, {'type': 'bench'})
 
 # 3) wall foot and corners: trees with shrub + flower skirts, fences around the grass corners
 for k in range(500):

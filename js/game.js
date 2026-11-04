@@ -55,7 +55,10 @@ class Zone {
     }
     if (this.def.nature) {
       // storybook forest: painted ground, Tripo trees / shrubs / rocks, grass and flower cards (js/nature.js)
-      for (const g of G.render.groups) if (['ground', 'patches', 'props', 'tree'].includes(g.name)) for (const m of g.meshes) m.visible = false;
+      // patches: roads / dirt / forest floor are painted by the nature ground; water, ice, stone floors stay
+      const PAINTED = /\/(dirt|cobble|cobble_warm|forest_floor|grass[a-z_]*)$/;
+      for (const g of G.render.groups) if (['ground', 'props', 'tree'].includes(g.name)) for (const m of g.meshes) m.visible = false;
+      for (const g of G.render.groups) if (g.name === 'patches') for (const m of g.meshes) if (!m.userData.water && PAINTED.test(m.userData.tex || '')) m.visible = false;
       this.nature = await buildNature(this, G.render.r);
       G.render.zoneRoot.add(this.nature.root);
     }

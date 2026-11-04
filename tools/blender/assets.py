@@ -311,7 +311,7 @@ def flowers_on(mats, mi, centre, radius, n, cells, h, seed):
 
 def shrub_blob(mats, mi, centre, R, seed, sub=2):
     rnd = random.Random(seed); balls = cluster(Vector(centre), R, rnd, 0.85, 5, 0.2)
-    o = B.ball_cloud('sb', balls, sub, max(1, sub - 1), seed=seed)
+    o = B.ball_cloud('sb', balls, sub + 1, sub, seed=seed)
     for m in mats: o.data.materials.append(m)
     for p in o.data.polygons: p.material_index = mi
     B.box_uv(o, 1.0); return o, [(Vector(centre), R)]
@@ -361,8 +361,8 @@ def build_town(name, lod):
     elif name == 'town_planter':
         P += [prim('lathe', mats, S, profile=[(0.0, 0), (0.62, 0), (0.7, 0.08), (0.66, 0.16), (0.72, 0.5), (0.8, 0.56), (0.8, 0.64), (0.68, 0.66), (0.0, 0.62)], seg=seg + 4)]
         if flo:
-            o, c = shrub_blob(mats, FO, (0, 0, 0.95), 0.52, 11, 3 if lod == 'l0' else 2); P.append(o); blob += c
-            P.append(flowers_on(mats, PL, (0, 0, 0.66), 0.62, 14, [2, 4, 5, 3, 4], 0.22, 12))
+            o, c = shrub_blob(mats, FO, (0, 0, 0.9), 0.46, 11, 2 if lod != 'l2' else 1); P.append(o); blob += c
+            P.append(flowers_on(mats, PL, (0, 0, 0.62), 0.66, 24, [2, 4, 5, 3, 4], 0.3, 12))
     elif name == 'town_flowerbox':
         P += [prim('box', mats, W, size=(1.3, 0.42, 0.36), bevel=0.03), prim('box', mats, WD, size=(1.36, 0.46, 0.06), loc=(0, 0, 0.36)), prim('box', mats, SO, size=(1.2, 0.34, 0.03), loc=(0, 0, 0.37))]
         if flo:
@@ -391,6 +391,15 @@ def build_town(name, lod):
     elif name == 'town_fence':
         for x in (-0.95, 0.0, 0.95): P += [prim('box', mats, WD, size=(0.1, 0.1, 0.9), loc=(x, 0, 0), bevel=0.015), prim('cone', mats, WD, size=(0.075, 0.0, 0.12), loc=(x, 0, 0.9), seg=4)]
         for z in (0.32, 0.66): P.append(prim('box', mats, W, size=(2.0, 0.05, 0.1), loc=(0, 0.06, z), bevel=0.01))
+    elif name == 'town_finial':
+        P += [prim('cyl', mats, GD, size=(0.09, 0.06, 0.5), seg=10), prim('sphere', mats, GD, size=0.13, loc=(0, 0, 0.6), seg=10),
+              prim('cone', mats, GD, size=(0.08, 0.0, 0.55), loc=(0, 0, 0.7), seg=8), prim('box', mats, GD, size=(0.42, 0.04, 0.04), loc=(0, 0, 0.95))]
+    elif name == 'town_balcony':
+        P += [prim('box', mats, WD, size=(2.4, 0.9, 0.12), bevel=0.02)]
+        for x in (-1.0, 0.0, 1.0): P.append(prim('box', mats, WD, size=(0.1, 0.5, 0.1), loc=(x, 0.2, -0.45), rot=(math.radians(-35), 0, 0)))
+        for k in range(13): P.append(prim('cyl', mats, W, size=(0.035, 0.035, 0.62), loc=(-1.14 + k * 0.19, -0.4, 0.12), seg=6))
+        P += [prim('box', mats, WD, size=(2.45, 0.08, 0.08), loc=(0, -0.4, 0.74)), prim('box', mats, W, size=(2.2, 0.32, 0.26), loc=(0, -0.58, 0.5), bevel=0.02)]
+        if flo: P.append(flowers_on(mats, PL, (0, -0.58, 0.76), 0.9, 10, [2, 4, 5, 3], 0.18, 31))
     elif name == 'town_border':
         for k in range(5):
             P.append(prim('box', mats, S, size=(0.42, 0.26, 0.2 + 0.03 * (k % 2)), loc=(-0.88 + k * 0.44, 0, 0), bevel=0.04))
@@ -413,7 +422,7 @@ def build_town(name, lod):
     B.paint_light(ob, ao_pow=1.15, ao_min=0.35, h0=0, h1=top, bottom=0.78, top=1.06, up=0.12, hue=0.04, seed=len(name),
                   per_mat={GL: (1.4, 1.3, 1.0)})
     return ob
-TOWN = ['town_lamp', 'town_banner', 'town_planter', 'town_flowerbox', 'town_barrel', 'town_crate', 'town_bench', 'town_sign', 'town_fence', 'town_border']
+TOWN = ['town_finial', 'town_balcony', 'town_lamp', 'town_banner', 'town_planter', 'town_flowerbox', 'town_barrel', 'town_crate', 'town_bench', 'town_sign', 'town_fence', 'town_border']
 
 # ---------------------------------------------------------------------------------------------- main
 def run(names):

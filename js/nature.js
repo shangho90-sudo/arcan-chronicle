@@ -247,8 +247,11 @@ function paintMask(def, props, S = 1024) {
   g.globalCompositeOperation = 'lighter';
   // R: paths with gently varying width, soft shoulders
   g.filter = 'blur(' + Math.round(px * 0.35) + 'px)';
+  const PATHY = new Set(['dirt', 'cobble', 'cobble_warm']);
   for (const p of def.patches || []) {
-    if (p.tex !== 'dirt') continue;
+    if (p.tex === 'forest_floor' && p.shape === 'disc') { const [cx, cy] = P(p.pos[0], p.pos[1]), r = p.radius * px; const gr = g.createRadialGradient(cx, cy, 0, cx, cy, r);
+      gr.addColorStop(0, 'rgba(0,170,60,1)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, S, S); continue; }
+    if (!PATHY.has(p.tex)) continue;
     if (p.shape === 'path') {
       const pts = []; for (let i = 0; i < p.pos.length; i += 2) pts.push([p.pos[i], p.pos[i + 1]]);
       const sm = smoothPath(pts, 10); let s = 0;
@@ -288,8 +291,9 @@ export async function buildNature(zone, renderer) {
   const root = new THREE.Group(); root.name = 'nature';
   const loader = new THREE.TextureLoader();
   const tl = (n, srgb = true) => { const t = loader.load(BASE + 'tex/' + n); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = aniso; if (srgb) t.colorSpace = THREE.SRGBColorSpace; return t; };
-  const tex = { grass: tl('g_grass.jpg'), grass_shadow: tl('g_grass_shadow.jpg'), grass_dry: tl('g_grass_dry.jpg'), moss: tl('g_moss.jpg'), path: tl('g_path.jpg'),
-    path_edge: tl('g_path_edge.jpg'), soil_dark: tl('g_soil_dark.jpg'), pebble: tl('g_pebble.jpg'), grass_n: tl('g_grass_n.jpg', false), path_n: tl('g_path_n.jpg', false) };
+  const NV = def.nature || {}, pre = NV.ground ? 'g_' + NV.ground + '_' : 'g_';           // per-zone painted ground set
+  const tex = { grass: tl(pre + 'grass.jpg'), grass_shadow: tl(pre + 'grass_shadow.jpg'), grass_dry: tl(pre + 'grass_dry.jpg'), moss: tl(pre + 'moss.jpg'), path: tl(pre + 'path.jpg'),
+    path_edge: tl(pre + 'path_edge.jpg'), soil_dark: tl(pre + 'soil_dark.jpg'), pebble: tl(pre + 'pebble.jpg'), grass_n: tl('g_grass_n.jpg', false), path_n: tl('g_path_n.jpg', false) };
   const props = def.props || [];
   const mask = paintMask(def, props);
 
@@ -308,7 +312,7 @@ export async function buildNature(zone, renderer) {
     if (!byKey.has(ck)) byKey.set(ck, { name, items: [] }); byKey.get(ck).items.push([q, i]);
   });
   const mats = new Map();
-  const LOD = (G.input && G.input.mobile) || (G.settings && G.settings.graphicsFx === false) ? '_l2' : '';   // phones / effects off: low LOD
+  const LOD = (G.input && G.input.mobile) || (G.settings && G.settings.graphicsFx === false) || (def.nature && def.nature.lod === 'l2') ? '_l2' : '';   // phones / effects off / dense fields: low LOD
   const lm = n => loadModel(n, aniso, MODELS[n] && !MODELS[n].old ? LOD : '');
   const m4 = new THREE.Matrix4(), qt = new THREE.Quaternion(), sc = new THREE.Vector3(), col = new THREE.Color();
   let instances = 0;
@@ -325,7 +329,7 @@ export async function buildNature(zone, renderer) {
       qt.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -(q.rot || 0) * DEG);
       im.setMatrixAt(k, m4.compose(T({ x: g0.x, y: g0.y - 0.04 * s * (spec.trunk ? 0.3 : 1), z: g0.z }), qt, sc.set(s, s, s)));
       const v = hash(i * 13 + 5), w = hash(i * 31 + 9);          // gentle per-instance hue / value variation
-      const tn = spec.tint || [1, 1, 1], kv = 0.94 + v * 0.1;   // per-model colour correction x gentle per-instance value / hue shift
+      const tn = NV.tint && /^(tree|shrub)/.test(name) ? NV.tint : NV.rockTint && name.startsWith('rock') ? NV.rockTint : [1, 1, 1], kv = 0.94 + v * 0.1;   // per-model colour correction x gentle per-instance value / hue shift
       col.setRGB(tn[0] * kv * (0.97 + w * 0.06), tn[1] * kv, tn[2] * kv * (1.03 - w * 0.06)); im.setColorAt(k, col);
     });
     im.receiveShadow = true; im.castShadow = false;
@@ -353,6 +357,20 @@ export async function buildNature(zone, renderer) {
     g.position.copy(T(g0)); g.rotation.y = -(q.rot || 0) * DEG; root.add(g);
   }
 
+  // ruined walls (type 'wall', footprint w x d): weathered stone blocks with a broken top, painted-light vertex colours
+  for (const q of props) if (q.type === 'wall') {
+    const w = q.w > 0 ? q.w : 2, d = q.d > 0 ? q.d : 0.6, h0 = 1.6 + hash(q.pos[0] * 13 | 0) * 1.2, g0 = geo.ground(q.pos[0], q.pos[1]);
+    const parts = [], n = Math.max(2, Math.round(w / 0.9));
+    for (let i = 0; i < n; i++) {
+      const hh = h0 * (0.55 + 0.45 * hash(i * 7 + (q.pos[1] * 5 | 0))), bx = new THREE.BoxGeometry(w / n * 0.98, hh, d, 1, 2, 1).translate(-w / 2 + (i + 0.5) * w / n, hh / 2, 0);
+      const c = new Float32Array(bx.attributes.position.count * 3);
+      for (let k = 0; k < bx.attributes.position.count; k++) { const y = bx.attributes.position.getY(k) / h0; const l = 0.62 + 0.42 * y; c[k * 3] = l; c[k * 3 + 1] = l * 0.98; c[k * 3 + 2] = l * 0.94; }
+      bx.setAttribute('color', new THREE.BufferAttribute(c, 3)); parts.push(bx);
+    }
+    const wm = new THREE.Mesh(mergeGeometries(parts), blMaterial('M_stone_warm', aniso));
+    wm.position.copy(T(g0)); wm.rotation.y = -(q.rot || 0) * DEG; wm.castShadow = wm.receiveShadow = true; wm.name = 'nature:wall'; root.add(wm);
+  }
+
   // grass + flower cards
   const fm = { userData: { U: { uTime: { value: 0 } } } };          // shared wind clock for the plant clumps
   const cards = [];      // [x, z, w, h, cell]
@@ -372,7 +390,7 @@ export async function buildNature(zone, renderer) {
   }
   // grass tufts: dense along forest edges and path shoulders, sparse on the open meadows and around monster camps
   const area = (x1 - x0) * (z1 - z0);
-  for (let k = 0; k < area * 2.6; k++) {
+  for (let k = 0; k < area * 2.6 * (NV.grass ?? 1); k++) {
     const x = x0 + rnd() * (x1 - x0), z = z0 + rnd() * (z1 - z0);
     if (onPlat(x, z)) continue;
     const [r, g, b] = maskAt(x, z);
@@ -470,7 +488,7 @@ export async function placeBlProps(list, aniso = 4, groundY = () => 0) {
     const im = new THREE.InstancedMesh(md.geo, md.mats, items.length);
     items.forEach((p, k) => {
       const s = (p.scale || 1) * md.xf.H; qt.setFromAxisAngle(yA, -(p.rot || 0) * DEG);
-      im.setMatrixAt(k, m4.compose(T({ x: p.pos[0], y: groundY(p.pos[0], p.pos[1]), z: p.pos[1] }), qt, sc.set(s, s, s)));
+      im.setMatrixAt(k, m4.compose(T({ x: p.pos[0], y: p.y ?? groundY(p.pos[0], p.pos[1]), z: p.pos[1] }), qt, sc.set(s, s, s)));
       const v = 0.95 + hash(k * 17 + name.length) * 0.1; im.setColorAt(k, col.setRGB(v, v, v));
     });
     im.receiveShadow = true; im.castShadow = false; im.computeBoundingSphere(); im.name = 'bl:' + name; root.add(im);

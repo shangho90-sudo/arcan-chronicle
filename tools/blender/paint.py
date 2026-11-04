@@ -284,6 +284,27 @@ def ground_set(S=1024):
     ground_soil('g_soil_dark', S, 43, '#6e4c30', '#8a6440', 80)
     ground_soil('g_pebble', S, 44, '#a88a66', '#c9ab80', 1400)
 
+def ground_variant(pre, S, grass, shadow, dry, moss, path, edge, soil, pebble, flowers=(0.2, 0.05), peb_path=340):
+    """another field's ground set with the same channel layout as ground_set (g_<pre>_*.jpg); normals are shared"""
+    G = lambda *h: [hexc(x) for x in h]
+    ground_grass(f'g_{pre}_grass', S, 131, G(*grass), 26000, flowers=flowers[0])
+    ground_grass(f'g_{pre}_grass_shadow', S, 132, G(*shadow), 22000, flowers=flowers[1])
+    ground_grass(f'g_{pre}_grass_dry', S, 133, G(*dry), 20000, flowers=0.05)
+    ground_grass(f'g_{pre}_moss', S, 134, G(*moss), 30000)
+    ground_soil(f'g_{pre}_path', S, 141, path[0], path[1], peb_path, hi=path[2])
+    ground_soil(f'g_{pre}_path_edge', S, 142, edge[0], edge[1], 120)
+    ground_soil(f'g_{pre}_soil_dark', S, 143, soil[0], soil[1], 80)
+    ground_soil(f'g_{pre}_pebble', S, 144, pebble[0], pebble[1], 1400)
+
+def ground_variants(S=1024):
+    # 안개 골짜기: cool, blue-green, mossy; 서리 고원: frosted grass, snow drifts, grey-blue stone road; 용의 유적: dry gold grass, ash
+    ground_variant('mist', S, ('#3f7a4a', '#5d9a5c', '#9cc48a'), ('#284f44', '#3a6a54', '#5e8c6c'), ('#6f8c5a', '#8fa66c', '#bccb94'), ('#2f5c44', '#4c7c50', '#78a468'),
+                   ('#9a8a72', '#b9a88a', '#d2c4a6'), ('#6e604c', '#857360'), ('#4c4234', '#62543f'), ('#8a8274', '#a89e8c'), flowers=(0.12, 0.04))
+    ground_variant('frost', S, ('#c8d6dc', '#e2ecf0', '#ffffff'), ('#9fb3c0', '#b8c8d4', '#dce6ec'), ('#a9b88c', '#c4cfa8', '#e6ecd8'), ('#7e9a8a', '#a0b8a8', '#d0e0d8'),
+                   ('#8c949c', '#a8b0b8', '#c8d0d8'), ('#6c747c', '#848c94'), ('#5c646c', '#747c84'), ('#9aa2aa', '#b8c0c8'), flowers=(0.0, 0.0), peb_path=900)
+    ground_variant('ruins', S, ('#8a8a3a', '#b0a64a', '#dccb72'), ('#5e5a30', '#7a7038', '#a29450'), ('#a8863e', '#c8a452', '#e8c878'), ('#5a6630', '#76823c', '#9ca452'),
+                   ('#8a6448', '#a87c58', '#c89a70'), ('#5e4030', '#74503a'), ('#3a2c26', '#4c3a30'), ('#7a6a5c', '#988674'), flowers=(0.06, 0.02), peb_path=700)
+
 if __name__ == '__main__':
     foliage_tile(1024, 1, FOL, 'foliage')
     leaf_card(512, 3, FOL, 'leafcard')
@@ -296,5 +317,5 @@ if __name__ == '__main__':
     for n, c in [('iron', '#2e3440'), ('gold', '#d6aa4a'), ('navy', '#22386e'), ('cream', '#efe2c4'), ('roof_blue', '#3c5aa8'), ('terracotta', '#c87a4a'), ('plaster', '#efe0c0'), ('lampglow', '#ffe9a8'), ('red', '#b8443a'), ('soilpot', '#6a4a30')]:
         flat(n, c)
     plants_atlas()
-    ground_set()
+    ground_set(); ground_variants()
     print('ok')

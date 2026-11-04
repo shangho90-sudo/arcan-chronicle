@@ -7,7 +7,7 @@ import { clamp01, DEG, artBasis, artWorldToImage, artImageToGround, artFootprint
 export const T = (p) => new THREE.Vector3(p.x, p.y, -p.z);
 // quarter view with a weak perspective (long lens): `ortho` = half the visible height (m) at the focus distance, so sizes
 // on screen match the old orthographic camera at the player; things nearer the camera get slightly bigger (2.5D depth).
-export const CAM = { pitch: 48, yaw: 45, dist: 26, ortho: 4.75, minWidth: 11.5, sharp: 12, lookAhead: 0.6, depthOffset: 0.6 };
+export const CAM = { pitch: 48, yaw: 45, dist: 26, ortho: 4.75, minWidth: 8.5, sharp: 12, lookAhead: 0.6, depthOffset: 0.6 };
 
 const loader = new THREE.TextureLoader();
 const texCache = new Map();
@@ -148,7 +148,7 @@ export class Renderer {
         else mat = new THREE.MeshBasicMaterial({ color: col, opacity: m.color[3], transparent: true, vertexColors: !!m.c, depthWrite: false, side: THREE.DoubleSide, map });
         matCache.set(key, mat);
       }
-      const mesh = new THREE.Mesh(g, mat);
+      const mesh = new THREE.Mesh(g, mat); mesh.userData.tex = m.tex; mesh.userData.water = !!m.water;
       mesh.castShadow = m.shadow && m.kind !== "trans";
       mesh.receiveShadow = m.kind === "lit";
       root.add(mesh);

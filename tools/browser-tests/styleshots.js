@@ -42,6 +42,12 @@ const ONLY = (process.env.ONLY || 'town,forest').split(',');
       const m = await ev(() => { const p = G.player, m = G.zone.actors.find(a => a !== p && a.hp > 0 && a.def && !a.def.boss); return m ? [m.pos.x, m.pos.z] : null; });
       if (m) { await go(m[0] - 1.2, m[1] - 1.2); for (let i = 0; i < 4; i++) { await ev(() => G.input.press('attack')); await frames(5); } await shot('forest_combat'); }
     }
+    if (ONLY.includes('fields')) for (const zid of ['mist_valley', 'frost_highland', 'dragon_ruins']) {
+      await ev(z => G.loadZone(z, G.data.zones[z].spawns[0].id, false), zid); await pg.waitForFunction(z => !G.loading && G.zone.def.id === z, zid, { timeout: 600000 });
+      await shot(zid + '_entry');
+      const m = await ev(() => { const p = G.player, m = G.zone.actors.find(a => a !== p && a.hp > 0 && a.def && !a.def.boss); return m ? [m.pos.x, m.pos.z] : null; });
+      if (m) { await go(m[0] - 2, m[1] - 2); await shot(zid + '_camp'); }
+    }
     console.log(sz, 'errors', JSON.stringify(errs.slice(0, 5)));
     await pg.close();
   }
