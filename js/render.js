@@ -5,7 +5,9 @@ import * as THREE from 'three';
 import { clamp01, DEG, artBasis, artWorldToImage, artImageToGround, artFootprint } from './core.js';
 
 export const T = (p) => new THREE.Vector3(p.x, p.y, -p.z);
-export const CAM = { pitch: 38, yaw: 45, dist: 30, ortho: 5.2, minWidth: 12, sharp: 12, lookAhead: 0.6, depthOffset: 0.6 };
+// quarter view with a weak perspective (long lens): `ortho` = half the visible height (m) at the focus distance, so sizes
+// on screen match the old orthographic camera at the player; things nearer the camera get slightly bigger (2.5D depth).
+export const CAM = { pitch: 48, yaw: 45, dist: 26, ortho: 4.75, minWidth: 11.5, sharp: 12, lookAhead: 0.6, depthOffset: 0.6 };
 
 const loader = new THREE.TextureLoader();
 const texCache = new Map();
@@ -45,7 +47,7 @@ export class Renderer {
     canvasParent.appendChild(this.r.domElement);
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x5c855c);
-    this.cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.3, 120);
+    this.cam = new THREE.PerspectiveCamera(20, 1, 1, 160);
     this.focus = new THREE.Vector3(); this.focusU = { x: 0, y: 0, z: 0 };
     this.sun = new THREE.DirectionalLight(0xffffff, 2.6);
     this.sun.castShadow = true;
@@ -66,7 +68,7 @@ export class Renderer {
     this.r.setSize(w, h);
     const aspect = w / h;
     this.ortho = Math.max(CAM.ortho, CAM.minWidth / 2 / aspect);
-    this.cam.left = -this.ortho * aspect; this.cam.right = this.ortho * aspect; this.cam.top = this.ortho; this.cam.bottom = -this.ortho;
+    this.cam.fov = 2 * Math.atan(this.ortho / CAM.dist) / DEG; this.cam.aspect = aspect;
     this.cam.updateProjectionMatrix();
     this.aspect = aspect;
   }
@@ -107,8 +109,8 @@ export class Renderer {
     const w = window.innerWidth, h = window.innerHeight;
     const nx = (px / w) * 2 - 1, ny = 1 - (py / h) * 2;
     const camPos = T(this.cam.position); // back to unity (T is its own inverse for positions)
-    const ox = nx * this.ortho * this.aspect, oy = ny * this.ortho;
-    return { o: { x: camPos.x + b.r.x * ox + b.u.x * oy, y: camPos.y + b.u.y * oy, z: camPos.z + b.r.z * ox + b.u.z * oy }, d: b.f };
+    const k = this.ortho / CAM.dist, ox = nx * k * this.aspect, oy = ny * k;          // perspective: rays fan out from the eye
+    return { o: { x: camPos.x, y: camPos.y, z: camPos.z }, d: { x: b.f.x + b.r.x * ox + b.u.x * oy, y: b.f.y + b.u.y * oy, z: b.f.z + b.r.z * ox + b.u.z * oy } };
   }
   /** Unity point -> screen pixel */
   toScreen(u) {

@@ -6,3 +6,7 @@ node_modules/
 .tripo/
 *.key
 .env
+
+# Blender pipeline outputs (regenerate: tools/blender/paint.py, assets.py)
+tools/blender/out/
+tools/blender/tex/

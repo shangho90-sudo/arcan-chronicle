@@ -6,6 +6,9 @@ Rules (from the art brief):
   * flowers / shrubs are decoration only (no collision); trees, rocks, stumps keep their collision footprints
   * same seed -> same layout (re-running gives identical output)
 Kept as they were: boss-arena rocks, ruins, signposts, mushrooms.
+2026-11-04 (Blender asset set): cluster placement - outer forest dense (big trees), path kept open, mid area = tree +
+rock + shrub groups, roadside = flowers + grass + small stones; models are the Blender ones (tools/blender/assets.py).
+Small decorative stones are type 'stone' (no collision).
 Usage: python3 tools/forest/layout.py [--write]"""
 import json, math, os, random, sys
 
@@ -69,10 +72,10 @@ def vnoise(x, z, s, seed):
 
 def density(x, z):
     edge = min(x - x0, x1 - x, z - z0, z1 - z)
-    e = max(0.0, 1 - edge / 9.0)                                  # dense rim
-    g = max(0.0, (vnoise(x, z, 11, 7) - 0.52) * 2.6)              # interior groves
-    pc = path_clear(x, z); near_path = 0.22 if 3.5 < pc < 7.5 else 0  # a few trees lining the path, canopies kept off it
-    return min(1.0, e * 1.1 + g + near_path)
+    e = max(0.0, 1 - edge / 12.0)                                 # dense outer forest
+    g = max(0.0, (vnoise(x, z, 10, 7) - 0.46) * 2.8)              # interior groves (clusters)
+    pc = path_clear(x, z); near_path = 0.4 if 3.0 < pc < 8.0 else 0  # trees lining the path, canopies kept off it
+    return min(1.0, e * 1.25 + g + near_path)
 
 # ---------------------------------------------------------------- trees (Poisson-ish with density acceptance)
 trees = []
@@ -81,10 +84,12 @@ for _ in range(26000):
     if rnd.random() > density(x, z): continue
     if not free(x, z, 3.2): continue
     s = rnd.uniform(0.85, 1.25)
-    if any(math.hypot(x - t['pos'][0], z - t['pos'][1]) < 3.3 * (s + t['scale']) / 2 for t in trees): continue
+    if any(math.hypot(x - t['pos'][0], z - t['pos'][1]) < 2.9 * (s + t['scale']) / 2 for t in trees): continue
+    roll = rnd.random(); rim = min(x - x0, x1 - x, z - z0, z1 - z) < 8
+    tall = roll < (0.45 if rim else 0.2)                              # the outer forest leans to tall forest trees
     roll = rnd.random()
-    model = 'tree_a' if roll < 0.34 else 'tree_c' if roll < 0.58 else 'tree_b' if roll < 0.85 else 'tree_d'
-    trees.append({'type': 'pine' if model == 'tree_b' else 'tree', 'model': model, 'pos': [round(x, 2), round(z, 2)], 'rot': round(rnd.uniform(0, 360), 1), 'scale': round(s, 2), 'variant': '', 'w': 0.0, 'd': 0.0})
+    model = 'tree_forest_tall' if tall else 'tree_broad_a' if roll < 0.38 else 'tree_broad_b' if roll < 0.68 else 'tree_forest_round'
+    trees.append({'type': 'pine' if tall else 'tree', 'model': model, 'pos': [round(x, 2), round(z, 2)], 'rot': round(rnd.uniform(0, 360), 1), 'scale': round(s, 2), 'variant': '', 'w': 0.0, 'd': 0.0})
 
 # ---------------------------------------------------------------- shrubs clustered round trees and along grove edges (decoration)
 shrubs = []
@@ -92,9 +97,9 @@ def add_shrub(x, z, s):
     if not free(x, z, 0.6): return
     if any(math.hypot(x - t['pos'][0], z - t['pos'][1]) < 0.9 for t in trees): return
     if any(math.hypot(x - b['pos'][0], z - b['pos'][1]) < 1.2 for b in shrubs): return
-    shrubs.append({'type': 'shrub', 'model': 'bush_a' if rnd.random() < 0.55 else 'bush_b', 'pos': [round(x, 2), round(z, 2)], 'rot': round(rnd.uniform(0, 360), 1), 'scale': round(s, 2), 'variant': '', 'w': 0.0, 'd': 0.0})
+    shrubs.append({'type': 'shrub', 'model': 'shrub_a' if rnd.random() < 0.55 else 'shrub_b', 'pos': [round(x, 2), round(z, 2)], 'rot': round(rnd.uniform(0, 360), 1), 'scale': round(s, 2), 'variant': '', 'w': 0.0, 'd': 0.0})
 for t in trees:
-    for k in range(rnd.randint(1, 3)):
+    for k in range(rnd.randint(2, 4)):
         a = rnd.uniform(0, math.tau); r = rnd.uniform(1.3, 2.6) * t['scale']
         add_shrub(t['pos'][0] + math.cos(a) * r, t['pos'][1] + math.sin(a) * r, rnd.uniform(0.7, 1.15))
 
@@ -103,21 +108,40 @@ for pts, w in paths:
     for a, b in zip(pts, pts[1:]):
         L = math.hypot(b[0] - a[0], b[1] - a[1]); n = int(L / 4.5)
         for i in range(n):
-            if rnd.random() < 0.5: continue
+            if rnd.random() < 0.3: continue
             t = (i + rnd.random()) / max(1, n); px, pz = a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t
-            nx, nz = -(b[1] - a[1]) / L, (b[0] - a[0]) / L; side = 1 if rnd.random() < 0.5 else -1; off = w / 2 + rnd.uniform(1.6, 3.4)
+            nx, nz = -(b[1] - a[1]) / L, (b[0] - a[0]) / L; side = 1 if rnd.random() < 0.5 else -1; off = w / 2 + rnd.uniform(1.4, 3.2)
             add_shrub(px + nx * off * side, pz + nz * off * side, rnd.uniform(0.6, 0.95))
 
 # ---------------------------------------------------------------- rocks (collision) and stumps
-rocks = []
-for _ in range(4000):
-    if len(rocks) >= 16: break
+rocks = []; stones = []
+for _ in range(9000):
+    if len(rocks) >= 42: break
     x, z = rnd.uniform(x0 + 2, x1 - 2), rnd.uniform(z0 + 2, z1 - 2)
     pc = path_clear(x, z)
     if not (1.5 < pc < 9) or not free(x, z, 1.6) or rnd.random() > 0.25 + density(x, z) * 0.5: continue
     if any(math.hypot(x - q['pos'][0], z - q['pos'][1]) < 2.4 for q in trees + rocks): continue
-    big = rnd.random() < 0.55
-    rocks.append({'type': 'rock', 'model': 'rock_a' if big else 'rock_b', 'pos': [round(x, 2), round(z, 2)], 'rot': round(rnd.uniform(0, 360), 1), 'scale': round(rnd.uniform(0.85, 1.2) if big else rnd.uniform(0.7, 1.0), 2), 'variant': '', 'w': 0.0, 'd': 0.0})
+    roll = rnd.random()
+    if roll < 0.18 and pc > 3.0 and free(x, z, 2.4):
+        model, sc = 'rock_large', rnd.uniform(1.6, 2.0)
+    else:
+        model = 'rock_moss' if roll < 0.45 else 'rock_medium' if roll < 0.75 else 'rock_roadside'; sc = rnd.uniform(0.8, 1.2)
+    rocks.append({'type': 'rock', 'model': model, 'pos': [round(x, 2), round(z, 2)], 'rot': round(rnd.uniform(0, 360), 1), 'scale': round(sc, 2), 'variant': '', 'w': 0.0, 'd': 0.0})
+    for k in range(rnd.randint(1, 3)):                                # small stones around it (decoration, walk-through)
+        a = rnd.uniform(0, math.tau); r = rnd.uniform(0.9, 1.6) * sc
+        sx, sz = x + math.cos(a) * r, z + math.sin(a) * r
+        if path_clear(sx, sz) > 0.3 and x0 + 1 < sx < x1 - 1 and z0 + 1 < sz < z1 - 1:
+            stones.append({'type': 'stone', 'model': 'rock_small', 'pos': [round(sx, 2), round(sz, 2)], 'rot': round(rnd.uniform(0, 360), 1), 'scale': round(rnd.uniform(0.7, 1.3), 2), 'variant': '', 'w': 0.0, 'd': 0.0})
+# roadside stones in little groups
+for pts, w in paths:
+    for a, b in zip(pts, pts[1:]):
+        L = math.hypot(b[0] - a[0], b[1] - a[1])
+        for i in range(int(L / 5)):
+            if rnd.random() < 0.45: continue
+            t = rnd.random(); px, pz = a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t
+            nx, nz = -(b[1] - a[1]) / L, (b[0] - a[0]) / L; side = rnd.choice((-1, 1)); off = w / 2 + rnd.uniform(0.2, 1.0)
+            for k in range(rnd.randint(1, 3)):
+                stones.append({'type': 'stone', 'model': 'rock_small', 'pos': [round(px + nx * off * side + rnd.uniform(-0.5, 0.5), 2), round(pz + nz * off * side + rnd.uniform(-0.5, 0.5), 2)], 'rot': round(rnd.uniform(0, 360), 1), 'scale': round(rnd.uniform(0.6, 1.1), 2), 'variant': '', 'w': 0.0, 'd': 0.0})
 stumps = []
 for _ in range(3000):
     if len(stumps) >= 6: break
@@ -136,15 +160,15 @@ def add_flowers(x, z, kind, r):
 kinds = ['white'] * 5 + ['yellow'] * 3 + ['mixed'] * 2
 for pts, w in paths:
     for a, b in zip(pts, pts[1:]):
-        L = math.hypot(b[0] - a[0], b[1] - a[1]); n = int(L / 1.8)
+        L = math.hypot(b[0] - a[0], b[1] - a[1]); n = int(L / 1.1)
         for i in range(n):
-            if rnd.random() < 0.3: continue                          # gaps: clusters, not a hedge
+            if rnd.random() < 0.25: continue                         # gaps: clusters, not a hedge
             t = (i + rnd.random()) / max(1, n); px, pz = a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t
             nx, nz = -(b[1] - a[1]) / L, (b[0] - a[0]) / L; side = 1 if rnd.random() < 0.5 else -1
             off = w / 2 + rnd.uniform(0.5, 1.8)
             add_flowers(px + nx * off * side, pz + nz * off * side, rnd.choice(kinds), rnd.uniform(0.9, 1.6))
 for q in rocks:
-    for k in range(rnd.randint(1, 2)):
+    for k in range(rnd.randint(2, 3)):
         a = rnd.uniform(0, math.tau); r = rnd.uniform(0.9, 1.4) * q['scale']
         add_flowers(q['pos'][0] + math.cos(a) * r, q['pos'][1] + math.sin(a) * r, rnd.choice(['white', 'yellow', 'white']), rnd.uniform(0.7, 1.1))
 for d in discs:
@@ -153,9 +177,14 @@ for d in discs:
         a = rnd.uniform(0, math.tau); r = d[2] * math.sqrt(rnd.random())
         add_flowers(d[0] + math.cos(a) * r, d[1] + math.sin(a) * r, rnd.choice(kinds), rnd.uniform(1.0, 1.8))
 
-props = kept + trees + shrubs + rocks + stumps + flowers
-print(f'trees {len(trees)} (a {sum(t["model"] == "tree_a" for t in trees)}, b {sum(t["model"] == "tree_b" for t in trees)}, c {sum(t["model"] == "tree_c" for t in trees)}, d {sum(t["model"] == "tree_d" for t in trees)}), '
-      f'shrubs {len(shrubs)}, rocks {len(rocks)}, stumps {len(stumps)}, flower clusters {len(flowers)}, kept {len(kept)}')
+for t in trees:                                                      # flowers at the sunny edge of tree groups
+    if rnd.random() < 0.35:
+        a = rnd.uniform(0, math.tau); r = rnd.uniform(2.6, 3.6) * t['scale']
+        add_flowers(t['pos'][0] + math.cos(a) * r, t['pos'][1] + math.sin(a) * r, rnd.choice(kinds), rnd.uniform(0.8, 1.3))
+props = kept + trees + shrubs + rocks + stones + stumps + flowers
+from collections import Counter
+print('trees', len(trees), dict(Counter(t['model'] for t in trees)), 'rocks', dict(Counter(r['model'] for r in rocks)), 'stones', len(stones),
+      f'shrubs {len(shrubs)}, stumps {len(stumps)}, flower clusters {len(flowers)}, kept {len(kept)}')
 if '--write' in sys.argv:
     Z['props'] = props; Z['nature'] = {'style': 'storybook_forest', 'seed': SEED}
     raw = json.dumps(zones, ensure_ascii=False, indent=1)
