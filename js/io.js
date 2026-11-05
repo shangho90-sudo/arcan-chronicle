@@ -4,7 +4,7 @@ import { SFX_NAMES, SFX_REWARDS } from './sfx.js';
 
 const KEYS = {
   attack: ["Space", "KeyJ"], skill1: ["Digit1", "Numpad1"], skill2: ["Digit2", "Numpad2"], skill3: ["Digit3", "Numpad3"], skill4: ["Digit4", "Numpad4"], ult: ["KeyR", "Digit5"], skillWin: ["KeyK"], craftWin: ["KeyN"],
-  dodge: ["ShiftLeft", "ShiftRight"], potion: ["KeyQ"], interact: ["KeyF", "KeyE"], inventory: ["KeyI", "KeyB", "KeyC"], quests: ["KeyO"], questHud: ["KeyL"], pause: ["Escape"]
+  dodge: ["ShiftLeft", "ShiftRight"], potion: ["KeyQ"], interact: ["KeyF", "KeyE"], inventory: ["KeyI", "KeyB", "KeyC"], quests: ["KeyO"], questHud: ["KeyL"], stats: ["KeyP"], pause: ["Escape"]
 };
 
 /**

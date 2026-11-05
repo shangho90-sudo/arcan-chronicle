@@ -2,7 +2,22 @@
 // World coordinates follow the Unity project: x = east, y = up, z = north.
 import { SkillBook, ensureSk, advanceBlock, ADV1_LEVEL } from "./skillsys.js";
 
-export const STATS = ["maxHp", "maxSp", "atk", "matk", "def", "crit", "critDmg", "moveSpeed", "atkSpeed", "spRegen", "healPower", "foodPower", "dmgReduce", "cdr", "shieldPower"];
+export const STATS = ["maxHp", "maxSp", "atk", "matk", "def", "crit", "critDmg", "moveSpeed", "atkSpeed", "spRegen", "healPower", "foodPower", "dmgReduce", "cdr", "shieldPower", "hit", "eva", "craftRate"];
+/** 능력치 (attribute points): 3 per level gained, spent freely; every character also has ATTR_BASE in each.
+ *  Effects are per point spent (the base 5 is already part of the job's base stats):
+ *  힘 str -> atk, 지능 int -> matk, 민첩 dex -> hit (명중) + eva (회피), 생명력 vit -> maxHp + maxSp, 행운 luk -> crit + craftRate */
+export const ATTRS = ["str", "int", "dex", "vit", "luk"];
+export const ATTR_KR = { str: "힘", int: "지능", dex: "민첩", vit: "생명력", luk: "행운" };
+export const ATTR_BASE = 5, ATTR_PER_LEVEL = 3;
+export const ATTR_FX = { str: { atk: 1.5 }, int: { matk: 1.5 }, dex: { hit: 0.01, eva: 0.006 }, vit: { maxHp: 12, maxSp: 4 }, luk: { crit: 0.004, craftRate: 0.01 } };
+export const EVA_CAP = 0.4, MISS_CAP = 0.5;
+/** chance that an attack from src misses tgt: monsters dodge a little (more at higher level, less vs 명중), players dodge by 회피 */
+export function missChance(src, tgt) {
+  if (!src || !tgt || src.faction === tgt.faction) return 0;
+  if (src.faction === "player") return clamp(0.03 + 0.0015 * (tgt.level || 1) - (src.stat ? src.stat("hit") : 0), 0, MISS_CAP);
+  if (tgt.faction === "player") return clamp(tgt.stat ? tgt.stat("eva") : 0, 0, EVA_CAP);
+  return 0;
+}
 export const clamp = (v, a, b) => v < a ? a : (v > b ? b : v);
 export const clamp01 = v => clamp(v, 0, 1);
 export const lerp = (a, b, t) => a + (b - a) * clamp01(t);
@@ -248,7 +263,25 @@ export class CharacterSheet {
     if (!data.job(profile.job)) profile.job = "novice";
     profile.level = clamp(profile.level, 1, data.levels.maxLevel);
     this.book = new SkillBook(data, this);
+    // 능력치: additive save fields (older saves get the points of every level they already gained, nothing spent)
+    if (!profile.attr || typeof profile.attr !== "object") { profile.attr = {}; profile.apoints = (profile.level - 1) * ATTR_PER_LEVEL; }
+    for (const k of ATTRS) profile.attr[k] = Math.max(0, profile.attr[k] | 0);
+    profile.apoints = Math.max(0, profile.apoints | 0);
     this.refreshSkills(false); this.recalc();
+  }
+  attr(k) { return ATTR_BASE + (this.p.attr[k] | 0); }
+  /** spend n attribute points on k; returns an error message or null */
+  spendAttr(k, n = 1) {
+    if (!ATTRS.includes(k)) return "알 수 없는 능력치";
+    n = Math.min(n | 0, this.p.apoints); if (n <= 0) return "남은 능력치 포인트가 없습니다";
+    this.p.attr[k] += n; this.p.apoints -= n; this.recalc(); return null;
+  }
+  /** give every spent point back (town only, like the skill reset) */
+  resetAttr(inTown) {
+    if (!inTown) return "능력치 초기화는 마을에서만 할 수 있습니다";
+    let n = 0; for (const k of ATTRS) { n += this.p.attr[k]; this.p.attr[k] = 0; }
+    if (!n) return "돌려받을 포인트가 없습니다";
+    this.p.apoints += n; this.recalc(); return null;
   }
   emit(k, v) { for (const f of this.events[k]) f(v); }
   get job() { return this.data.job(this.p.job); }
@@ -260,8 +293,10 @@ export class CharacterSheet {
     for (const id of this.p.learnedSkills) { const sk = this.data.skill(id); if (sk && sk.kind === "passive" && sk.job === this.p.job) apply(sk.passiveMods); }
     if (this.book) apply(this.book.passiveMods());
     for (const f of CharacterSheet.modProviders) apply(f(this));
+    if (this.p.attr) for (const a of ATTRS) { const n = this.p.attr[a] | 0; if (n) for (const [k, v] of Object.entries(ATTR_FX[a])) flat[k] += v * n; }
     const f = addStats(Object.assign({}, base), flat);
     for (const k of STATS) if (Math.abs(pct[k]) > 1e-6) f[k] *= 1 + pct[k];
+    f.eva = clamp(f.eva, 0, EVA_CAP); f.hit = Math.max(0, f.hit); f.craftRate = Math.max(0, f.craftRate);
     f.crit = clamp01(f.crit); f.dmgReduce = clamp(f.dmgReduce, 0, 0.8); f.cdr = clamp(f.cdr, 0, 0.5); f.atkSpeed = Math.max(0.3, f.atkSpeed);
     this.final = f;
     if (this.p.hp < 0 || this.p.hp > f.maxHp) this.p.hp = f.maxHp;
@@ -273,7 +308,7 @@ export class CharacterSheet {
   addExp(n) {
     if (!(n > 0) || this.isMax) return 0;
     this.p.exp += n; let g = 0;
-    while (!this.isMax && this.p.exp >= this.expToNext) { this.p.exp -= this.expToNext; this.p.level++; g++; this.recalc(); this.emit("levelUp", this.p.level); }
+    while (!this.isMax && this.p.exp >= this.expToNext) { this.p.exp -= this.expToNext; this.p.level++; g++; if (this.p.attr) this.p.apoints = (this.p.apoints | 0) + ATTR_PER_LEVEL; this.recalc(); this.emit("levelUp", this.p.level); }
     if (this.isMax) this.p.exp = 0;
     if (g > 0) { this.refreshSkills(true); if (this.book) this.book.ngained = 0; const pts = this.book ? this.book.grantPoints() : 0; if (pts) this.emit("skill", "@points:" + pts); if (this.book && this.book.ngained) this.emit("skill", "@npoints:" + this.book.ngained); this.recalc(); this.p.hp = this.final.maxHp; this.p.sp = this.final.maxSp; }
     return g;

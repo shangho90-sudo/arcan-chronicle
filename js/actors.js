@@ -1,6 +1,6 @@
 // Actors: combatant base, player, monsters, boss, NPCs, projectiles, poison zones, loot, skill runner.
 // Port of Assets/Arcan/Scripts/Runtime/{Actors,Combat} (C#).
-import { CombatMath, HitShape, StatusSet, clamp, clamp01, DEG } from './core.js';
+import { CombatMath, HitShape, StatusSet, clamp, clamp01, DEG, missChance } from './core.js';
 import { SpriteBody, dirFromWorld, hitTime, duration, lockTime, action, TelegraphView, T, THREE } from './render.js';
 import { lootModel, hasItemModel } from './items3d.js';
 import { SkillEngine, applyStatus, clearMarks } from './skillrt.js';
@@ -32,6 +32,11 @@ export class Combatant {
   setFacing(x, z) { const m = Math.hypot(x, z); if (m < 1e-4) return; this.facing = { x: x / m, z: z / m }; if (this.body) { if (this.body.setFacing) this.body.setFacing(x, z); else this.body.setDir(dirFromWorld(x, z)); } }
   takeDamage(d) {
     if (this.dead || (this.invuln > 0 && !d.dot)) return;
+    // 명중 / 회피 (능력치 민첩): direct hits can miss; damage over time and scripted damage never do
+    if (!d.dot && !d.noMiss && d.source && d.source !== this && Math.random() < missChance(d.source, this)) {
+      if (!d.silent) G.ui.floatText(this.pos, this.faction === "player" ? "회피" : "MISS", this.faction === "player" ? "#bfe4ff" : "#e8e2d4", 1);
+      d.missed = true; return;
+    }
     let amount = d.amount;
     if (this.faction === "player" && this.skills2) {
       if (!d.dot) this._hits = (this._hits || 0) + 1;

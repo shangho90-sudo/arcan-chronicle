@@ -176,7 +176,8 @@ Object.assign(UI.prototype, {
       if (!inSafe) return this.toast('마을에서만 제작할 수 있습니다');
       const r = craft(G.data, p.sheet, book, rc, n);
       if (r.err) return this.toast(r.err);
-      G.audio.sfx('levelup'); this.toast(`${out.name} x${r.made} 제작${r.bonus ? ` (추가 생산 +${r.bonus})` : ''}${r.returned ? ` · 재료 ${r.returned}개 반환` : ''}`); G.autoSave(); this.showCraft();
+      if (r.made > 0) G.audio.sfx('levelup'); else G.audio.sfx('ui_back');
+      this.toast(r.made > 0 ? `${out.name} x${r.made} 제작${r.failed ? ` (${r.failed}번 실패)` : ''}${r.bonus ? ` (추가 생산 +${r.bonus})` : ''}${r.returned ? ` · 재료 ${r.returned}개 반환` : ''}` : `제작 실패 — 재료가 사라졌습니다 (성공 확률 ${Math.round(r.rate * 100)}%)`); G.autoSave(); this.showCraft();
     });
   },
   salvagePane(right, inSafe) {

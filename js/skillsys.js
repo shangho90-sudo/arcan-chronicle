@@ -147,6 +147,10 @@ export function advanceBlock(data, sheet, quests, jobId) {
 
 // ---------------------------------------------------------------- crafting (atomic)
 /** recipe: {id, skill, minLv, inputs:[{item,count}], output:{item,count}, gold?} ; returns {ok, err, made, bonus, returned} */
+export function craftSuccessRate(sheet, tier = 1) {
+  return clamp(1.06 - 0.06 * Math.max(1, tier) + ((sheet.final && sheet.final.craftRate) || 0), 0.4, 1);
+}
+/** rng: bonus / material-return rolls; optional 7th argument: success-roll rng (default Math.random) */
 export function craft(data, sheet, book, recipe, times = 1, rng = Math.random) {
   times = clamp(times | 0, 1, 99);
   const bag = sheet.bag, inv = sheet.p.inventory;
@@ -165,20 +169,25 @@ export function craft(data, sheet, book, recipe, times = 1, rng = Math.random) {
     if (extraP > 0 && rng() < extraP) bonus += recipe.output.count;
     if (retP > 0) for (const x of recipe.inputs) if (data.item(x.item)?.tier <= 1 && rng() < retP) ret.push(x.item);
   }
-  const outN = recipe.output.count * times + bonus;
+  // 제작 성공 확률: tier-1 results always work; each tier above costs 6 %, 행운 adds sheet.final.craftRate (1 %/point)
+  const od0 = data.item(recipe.output.item), tier = (od0 && od0.tier) || 1;
+  const rate = craftSuccessRate(sheet, tier); let failed = 0;
+  if (rate < 1) { const sr = arguments[6] || Math.random; for (let i = 0; i < times; i++) if (sr() >= rate) failed++; }
+  if (failed) bonus = Math.max(0, bonus - failed * recipe.output.count);
+  const outN = recipe.output.count * (times - failed) + bonus;
   // simulate on a copy: remove inputs, add outputs -> must all fit
   const snap = JSON.stringify(inv), snapGold = sheet.p.gold;
   const restore = () => { sheet.p.inventory.splice(0, sheet.p.inventory.length, ...JSON.parse(snap)); sheet.p.gold = snapGold; bag.changed(); };
   for (const n of need) if (!bag.remove(n.item, n.count)) { restore(); return { err: '재료 처리 실패' }; }
-  const got = bag.add(recipe.output.item, outN);
+  const got = outN > 0 ? bag.add(recipe.output.item, outN) : 0;
   let okRet = true; for (const r of ret) okRet = bag.add(r, 1) === 1 && okRet;
   if (got < outN || !okRet) { restore(); return { err: '가방 공간이 부족합니다' }; }
   sheet.p.gold -= gold;
   // maker record for equipment (stored in profile, keyed by item id)
   const od = data.item(recipe.output.item);
-  if (od && ['weapon', 'armor', 'accessory'].includes(od.type)) { sheet.p.crafted = sheet.p.crafted || {}; sheet.p.crafted[od.id] = { by: sheet.p.name, recipe: recipe.id }; }
+  if (od && outN > 0 && ['weapon', 'armor', 'accessory'].includes(od.type)) { sheet.p.crafted = sheet.p.crafted || {}; sheet.p.crafted[od.id] = { by: sheet.p.name, recipe: recipe.id }; }
   bag.changed();
-  return { ok: true, made: outN, bonus, returned: ret.length };
+  return { ok: true, made: outN, bonus, returned: ret.length, failed, rate };
 }
 
 /** buy -> craft -> sell loop must never profit: returns list of offending recipe ids */

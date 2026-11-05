@@ -1,5 +1,5 @@
 // HTML/CSS user interface (ivory / teal / gold, Galmuri pixel font). Port of the Unity uGUI views.
-import { QS, Shop, isEquipment, slotOf, EQUIP_SLOTS } from './core.js';
+import { QS, Shop, isEquipment, slotOf, EQUIP_SLOTS, ATTRS, ATTR_KR, ATTR_BASE, ATTR_FX } from './core.js';
 import { THREE, tex, CAM } from './render.js';
 import { ModelBody, loadPlayerModel, loadActions } from './model.js';
 import { renderItemIcons } from './items3d.js';
@@ -72,6 +72,7 @@ const MENU_ICON = (() => {
     skills: W('<path d="M16 3l9 13-9 13-9-13z" fill="#6a4aa0"/><path d="M16 9l5 7-5 7-5-7z" fill="#f6dc94" stroke="none"/>'),
     craft: W('<path d="M7 25L21 11" /><path d="M18 6l8 8-3 3-8-8z" fill="#8a8f9a"/><path d="M25 25L11 11"/><path d="M6 8l5-3 3 3-3 5z" fill="#8a8f9a"/>'),
     quests: W('<path d="M8 5h13l4 4v18H8z" fill="#a0742a"/><path d="M12 12h9M12 17h9M12 22h6"/>'),
+    stats: W('<path d="M6 26V16M12 26V10M18 26V13M24 26V6" stroke-width="3.4"/><path d="M4 27h24"/>'),
     pause: W('<path d="M7 9h18M7 16h18M7 23h18"/>'),
   };
 })();
@@ -183,7 +184,7 @@ export class UI {
       <div class="bar hp"><i id="hHp"></i><b id="hShield"></b><span id="hHpT"></span></div>
       <div class="bar sp"><i id="hSp"></i><span id="hSpT"></span></div>
       <div class="expbar"><i id="hExp"></i><span id="hExpT"></span></div>
-      <div class="menubtns">${[["inventory", "가방"], ["skills", "스킬"], ["craft", "제작"], ["quests", "퀘스트"], ["pause", "메뉴"]].map(([a, t]) => `<button class="btn" data-a="${a}">${MENU_ICON[a]}<span>${t}</span></button>`).join("")}</div></div>`;
+      <div class="menubtns">${[["inventory", "가방"], ["stats", "능력치"], ["skills", "스킬"], ["craft", "제작"], ["quests", "퀘스트"], ["pause", "메뉴"]].map(([a, t]) => `<button class="btn" data-a="${a}">${MENU_ICON[a]}<span>${t}</span></button>`).join("")}</div></div>`;
     for (const b of h.querySelectorAll("[data-a]")) b.onclick = () => { G.audio.sfx("ui"); G.input.press({ skills: "skillWin", craft: "craftWin" }[b.dataset.a] || b.dataset.a); };
     this.h = id => h.querySelector("#" + id);
     this.minimap = new Minimap(h.querySelector("#hMap"));
@@ -350,6 +351,7 @@ export class UI {
     if (down.inventory) { if (this.currentName === "inventory") this.close(); else if (!this.current || this.currentName === "quests") this.showInventory(); }
     if (down.quests) { if (this.currentName === "quests") this.close(); else if (!this.current || this.currentName === "inventory") this.showQuests(); }
     if (down.questHud && !this.current) this.toggleQuestHud();
+    if (down.stats) { if (this.currentName === "stats") this.close(); else if (!this.current || ["inventory", "quests"].includes(this.currentName)) this.showStats(); }
   }
   refresh() { if (this.currentName === "inventory") this.showInventory(); else if (this.currentName === "shop") this.showShop(this.shop); }
   button(parent, label, cls, fn) { const b = $("button", "btn " + (cls || "teal"), parent, label); b.onclick = () => { G.audio.sfx("ui"); fn(); }; return b; }
@@ -427,6 +429,30 @@ export class UI {
   }
   buy(shop, id, n) { const e = Shop.buy(G.player.sheet, shop, id, n); if (e) this.toast(e); else { G.audio.sfx("coin"); this.toast(G.data.item(id).name + " x" + n + " 구매"); G.autoSave(); } this.showShop(shop); }
   sell(shop, slot, n) { const p = G.player, d = G.data.item(p.sheet.p.inventory[slot].id); const e = Shop.sell(p.sheet, slot, n); if (e) this.toast(e); else { G.audio.sfx("coin"); this.toast(`${d.name} x${n} 판매 (+${d.sellPrice * n} G)`); if (!(p.sheet.p.inventory[slot].count > 0)) this.sel = {}; } this.showShop(shop); }
+
+  /** 능력치 창: 5 attributes (+1 / +5), unspent points, what each point gives, the resulting combat numbers */
+  showStats() {
+    const p = G.player, S = p.sheet, P = S.p, f = S.final, b = this.open("stats", "능력치", 1180, 0);
+    const inTown = G.zone && G.zone.def.kind === "town";
+    const pct = v => (v * 100).toFixed(v * 100 < 10 ? 1 : 0) + "%";
+    const DESC = { str: "물리 공격력 +1.5", int: "마법 공격력 +1.5", dex: "명중률 +1% · 회피율 +0.6%", vit: "최대 체력 +12 · 최대 기력 +4", luk: "치명타 확률 +0.4% · 제작 성공 확률 +1%" };
+    const ICON = { str: "⚔", int: "✦", dex: "➶", vit: "♥", luk: "♣" };
+    const head = $("div", "athead", b, `<span>${esc(P.name)} <small>${S.job.name} Lv${P.level}</small></span><span class="atpts">남은 포인트 <b>${P.apoints}</b></span>`);
+    const rb = this.button(head, "포인트 초기화", "red", () => { const e = S.resetAttr(inTown); if (e) return this.toast(e); this.toast("능력치 포인트를 모두 돌려받았습니다"); G.autoSave(); this.showStats(); });
+    if (!inTown) rb.classList.add("locked");
+    const list = $("div", "atlist", b);
+    for (const k of ATTRS) {
+      const n = P.attr[k] | 0, fx = ATTR_FX[k];
+      const gain = Object.entries(fx).map(([st, v]) => st === "hit" || st === "eva" || st === "crit" || st === "craftRate" ? `${{ hit: "명중", eva: "회피", crit: "치명타", craftRate: "제작 성공" }[st]} +${pct(v * n)}` : `${{ atk: "공격력", matk: "마법력", maxHp: "체력", maxSp: "기력" }[st]} +${Number.isInteger(v * n) ? v * n : (v * n).toFixed(1)}`).join(" · ");
+      const row = $("div", "atrow", list, `<i class="atic at-${k}">${ICON[k]}</i><div class="atname"><b>${ATTR_KR[k]}</b><small>${DESC[k]}</small></div><div class="atval"><b>${ATTR_BASE + n}</b>${n ? `<small>(+${n})</small>` : ""}</div><div class="atgain">${n ? gain : "—"}</div>`);
+      const bt = $("div", "atbtns", row);
+      for (const m of [1, 5]) { const x = this.button(bt, "+" + m, "blue", () => { const e = S.spendAttr(k, m); if (e) return this.toast(e); G.audio.sfx("ui"); G.autoSave(); this.showStats(); }); if (P.apoints < 1) x.classList.add("locked"); }
+    }
+    $("div", "atsum", b, `<div class="sect"><b>현재 능력</b> <small>장비·스킬·능력치 포함</small></div><div class="atgrid">` + [
+      ["공격력", Math.round(f.atk)], ["마법력", Math.round(f.matk)], ["최대 체력", Math.round(f.maxHp)], ["최대 기력", Math.round(f.maxSp)],
+      ["명중 보너스", "+" + pct(f.hit)], ["회피율", pct(f.eva)], ["치명타 확률", pct(f.crit)], ["제작 성공 보너스", "+" + pct(f.craftRate)],
+    ].map(([a, v]) => `<span><em>${a}</em><b>${v}</b></span>`).join("") + `</div><p class="small muted">레벨이 오를 때마다 능력치 포인트 3을 얻습니다. 몬스터는 레벨이 높을수록 공격을 조금 더 잘 피하고, 명중 보너스가 그만큼을 줄여 줍니다. 회피율은 최대 40%입니다. 제작은 1단계 결과물은 항상 성공하고, 단계가 오를 때마다 성공 확률이 6%씩 낮아지며 행운이 그만큼을 채워 줍니다.</p>`);
+  }
 
   showQuests() {
     const p = G.player, ql = p.quests, b = this.open("quests", "퀘스트", 1240, 800);

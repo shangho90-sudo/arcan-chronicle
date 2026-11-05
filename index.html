@@ -662,6 +662,29 @@ small { font-size:.8em; }
 .window.narrow .skhead { flex-wrap:wrap; white-space:normal; row-gap:8px; } .window.narrow .sknote { white-space:normal; }
 .window.narrow .skcols, .window.narrow .jobcards { flex-direction:column; }
 .window.narrow .fpennant, .window.narrow .fcastle { display:none; }
+
+/* ---------- 능력치 창 ---------- */
+.window.fancy.stats .wbody { display:flex; flex-direction:column; gap:14px; }
+.athead { display:flex; align-items:center; gap:18px; font-size:26px; color:var(--ink); } .athead small { font-size:19px; color:#7a6448; margin-left:8px; }
+.athead .atpts { margin-left:auto; font-size:22px; } .athead .atpts b { font-size:34px; color:#b07a10; margin-left:6px; } .athead .btn { width:auto; }
+.atlist { display:flex; flex-direction:column; gap:10px; }
+.atrow { display:grid; grid-template-columns:60px 1.6fr 0.6fr 1.3fr auto; align-items:center; gap:16px; padding:10px 16px; border-radius:12px; color:#f4ead2;
+  background:linear-gradient(#1f3a66, #172d52); box-shadow:inset 0 0 0 1.5px rgba(201,151,58,.6); }
+.atic { display:flex; align-items:center; justify-content:center; width:52px; height:52px; border-radius:50%; font-style:normal; font-size:28px; color:#fff;
+  box-shadow:inset 0 0 0 2px #e8c46a, 0 2px 5px rgba(0,0,0,.5); }
+.at-str { background:radial-gradient(circle at 40% 35%, #f08a6a, #a8321e); } .at-int { background:radial-gradient(circle at 40% 35%, #a89af0, #4a3aa8); }
+.at-dex { background:radial-gradient(circle at 40% 35%, #8ae0a0, #2a8a4a); } .at-vit { background:radial-gradient(circle at 40% 35%, #ff9ab0, #b82a4a); }
+.at-luk { background:radial-gradient(circle at 40% 35%, #ffe08a, #b8861e); }
+.atname b { display:block; font-size:26px; color:#fff8e4; } .atname small { font-size:17px; color:#d8c8a0; }
+.atval { font-size:34px; font-weight:800; color:#f2c040; text-align:center; } .atval small { display:block; font-size:16px; color:#9fe8d4; font-weight:600; }
+.atgain { font-size:17px; color:#cfe2ff; }
+.atbtns { display:flex; gap:8px; } .window.fancy .atbtns .btn { min-width:70px; padding:10px 14px; font-size:20px; }
+.atsum { padding:10px; border-radius:12px; background:linear-gradient(#f8f1e0, #efe4ca); box-shadow:inset 0 0 0 2px #c9973a, inset 0 0 0 5px #fbf5e6; }
+.atgrid { display:grid; grid-template-columns:repeat(4, 1fr); gap:4px 18px; padding:4px 10px; font-size:19px; }
+.atgrid span { display:flex; justify-content:space-between; padding:6px 2px; border-bottom:1px solid rgba(180,140,70,.3); } .atgrid em { font-style:normal; color:#3b2a17; } .atgrid b { color:#1d3f7a; }
+.atsum p { margin:8px 10px 2px; }
+.window.narrow .atrow { grid-template-columns:52px 1fr auto; } .window.narrow .atgain { grid-column:2 / 4; } .window.narrow .atbtns { grid-column:1 / 4; justify-content:flex-end; }
+.window.narrow .atgrid { grid-template-columns:repeat(2, 1fr); } .window.narrow .athead { flex-wrap:wrap; }
 </style>
 </head>
 <body>

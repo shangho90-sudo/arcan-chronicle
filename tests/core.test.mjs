@@ -578,12 +578,37 @@ function FindSlot(ch, id) {
   return -1;
 }
 
+function TestAttributes() {
+  const d = LoadData(); const ch = NewChar(d);
+  Eq(ch.p.apoints, 0, "new character: no attribute points at Lv1");
+  for (const k of core.ATTRS) Eq(ch.attr(k), core.ATTR_BASE, "base " + k);
+  ch.addExp(ch.expToNext); Eq(ch.p.level, 2, "level up"); Eq(ch.p.apoints, 3, "3 attribute points per level");
+  const atk0 = ch.final.atk, matk0 = ch.final.matk, hp0 = ch.final.maxHp, sp0 = ch.final.maxSp, crit0 = ch.final.crit;
+  Ok(ch.spendAttr("str") == null && Math.abs(ch.final.atk - atk0 - 1.5) < 1e-6, "힘 -> 공격력 +1.5");
+  Ok(ch.spendAttr("int") == null && Math.abs(ch.final.matk - matk0 - 1.5) < 1e-6, "지능 -> 마법력 +1.5");
+  Ok(ch.spendAttr("vit") == null && Math.abs(ch.final.maxHp - hp0 - 12) < 1e-6 && Math.abs(ch.final.maxSp - sp0 - 4) < 1e-6, "생명력 -> 체력 +12, 기력 +4");
+  Eq(ch.p.apoints, 0, "points spent"); Ok(ch.spendAttr("luk") != null, "cannot spend without points");
+  ch.p.apoints = 10; ch.spendAttr("dex", 10); Ok(Math.abs(ch.final.hit - 0.1) < 1e-6 && Math.abs(ch.final.eva - 0.06) < 1e-6, "민첩 10 -> 명중 +10%, 회피 6%");
+  ch.p.apoints = 5; ch.spendAttr("luk", 5); Ok(Math.abs(ch.final.crit - crit0 - 0.02) < 1e-6 && Math.abs(ch.final.craftRate - 0.05) < 1e-6, "행운 5 -> 치명타 +2%, 제작 +5%");
+  ch.p.apoints = 500; ch.spendAttr("dex", 500); Ok(ch.final.eva <= core.EVA_CAP + 1e-9, "evasion capped at " + core.EVA_CAP);
+  Ok(ch.resetAttr(false) != null, "attribute reset only in town"); const spent = ch.p.attr.str + ch.p.attr.int + ch.p.attr.vit + ch.p.attr.dex + ch.p.attr.luk;
+  Ok(ch.resetAttr(true) == null && ch.p.apoints === spent && core.ATTRS.every(k => ch.p.attr[k] === 0), "reset returns every point");
+  // older save without attributes: gets the points of the levels it already has
+  const p2 = newProfile(d, "old", "f"); p2.level = 10; delete p2.attr; delete p2.apoints;
+  const old = new CharacterSheet(d, migrate(JSON.parse(JSON.stringify(p2)))); Eq(old.p.apoints, 27, "old save Lv10 -> 27 points");
+  // hit / evasion chances
+  const mon = { faction: "monster", level: 20, stat: () => 0 }, pl = { faction: "player", stat: s => (s === "hit" ? 0.2 : s === "eva" ? 0.15 : 0) };
+  Ok(Math.abs(core.missChance(pl, mon) - 0) < 1e-9, "명중 0.2 beats Lv20 monster evasion (6%)");
+  Ok(Math.abs(core.missChance({ faction: "player", stat: () => 0 }, mon) - 0.06) < 1e-9, "Lv20 monster evades 6% without 명중");
+  Ok(Math.abs(core.missChance(mon, pl) - 0.15) < 1e-9, "player evades by 회피");
+}
+
 // ---------------------------------------------------------------------------------------------------
 const tests = [
   ["Data", TestData], ["Inventory", TestInventory], ["Shop", TestShop], ["Stats & equipment", TestStats],
   ["Leveling", TestLeveling], ["Jobs", TestJobs], ["Quests", TestQuests], ["Save/Load", TestSave],
   ["Hit shapes", TestShapes], ["Combat math", TestCombat], ["Status effects", TestStatus],
-  ["Geometry & nav", TestGeometry], ["Layouts", TestLayouts], ["Balance", TestBalance], ["Full flow", TestFullFlow],
+  ["Geometry & nav", TestGeometry], ["Layouts", TestLayouts], ["Balance", TestBalance], ["Full flow", TestFullFlow], ["Attributes", TestAttributes],
 ];
 for (const [name, fn] of tests) {
   const p0 = pass, f0 = fail;

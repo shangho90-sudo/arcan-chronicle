@@ -109,6 +109,11 @@ ch = make(20); ch.p.job = "pharmacist"; ch.recalc(); ch.book.learn("ph1_c1"); ch
 ch.bag.add("m_herb", 2); ch.bag.add("m_bottle", 1);
 const r3 = sys.craft(d, ch, ch.book, rc, 1, () => 0); Eq(r3.made, 4, "bonus output = one extra batch only");
 
+// ---- craft success rate (행운): tier 1 always works, higher tiers can fail and consume the materials
+Eq(sys.craftSuccessRate({ final: { craftRate: 0 } }, 1), 1, "tier 1 always succeeds");
+Ok(Math.abs(sys.craftSuccessRate({ final: { craftRate: 0 } }, 3) - 0.88) < 1e-9, "tier 3 = 88%");
+Ok(Math.abs(sys.craftSuccessRate({ final: { craftRate: 0.05 } }, 3) - 0.93) < 1e-9, "luck adds to the rate");
+
 // ---- save / migrate
 ch = make(12); ch.p.job = "cook"; ch.recalc(); ch.book.learn("ck1_a1"); ch.book.learn("ck1_a1"); ch.book.equip("ck1_a1", 1, false);
 ch.p.sk.cds = { ck1_a1: Date.now() + 50000 };

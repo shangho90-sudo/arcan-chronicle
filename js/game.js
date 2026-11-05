@@ -320,7 +320,7 @@ class Game {
   wireEvents() {
     const S = this.sheet, Q = this.quests, ui = this.ui;
     S.events.levelUp.push(l => {
-      ui.toast("레벨 업! Lv." + l); this.audio.sfx("levelup");
+      ui.toast("레벨 업! Lv." + l); ui.toast("능력치 포인트 +3 (능력치 창: P 키 / 능력치 버튼)"); this.audio.sfx("levelup");
       if (this.player) { const p = this.player; if (this.reward) this.reward.levelUp(); else this.fx.play("levelup", { x: p.pos.x, y: p.pos.y + 0.8, z: p.pos.z }, 1.6); p.hp = p.maxHp; p.sp = p.maxSp; }
       Q.refreshPassive(); this.autoSave();
     });
