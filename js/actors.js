@@ -707,8 +707,7 @@ export class GroundZone {
   static spawn(zone, owner, x, z, r, life) {
     const g = new GroundZone(); g.zone = zone; g.owner = owner; g.shape = HitShape.circle(x, z, r); g.life = life; g.tick = 0;
     g.view = new TelegraphView(G.render.scene, g.shape, zone.geo, [0.62, 0.25, 0.85], true);
-    const p = zone.geo.ground(x, z); G.fx.play("poison", { x: p.x, y: p.y + 0.5, z: p.z }, r * 0.9, false, null, true, life);
-    zone.things.push(g); return g;
+    zone.things.push(g); return g;                          // bubbles / rim are drawn by the zone's painted decal shader
   }
   update(dt) {
     this.life -= dt; this.tick -= dt;
@@ -716,7 +715,7 @@ export class GroundZone {
     if (this.tick > 0) return; this.tick = 0.5;
     const p = G.player;
     if (p && !p.dead && this.owner && this.shape.overlaps(p.pos.x, p.pos.z, p.radius)) {
-      p.takeDamage(Resolver.damage(this.owner, p, 0.25, "atk", 0));
+      p.takeDamage(Object.assign(Resolver.damage(this.owner, p, 0.25, "atk", 0), { noMiss: true }));
       if (!p.dead) p.status.apply(G.data.status("poison"), 3, Math.max(2, this.owner.stat("atk") * 0.12), this.owner);
     }
   }

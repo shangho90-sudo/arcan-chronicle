@@ -28,7 +28,7 @@
 - UI 문구는 한국어.
 
 ## 화면 연출 (그래픽 효과)
-- `js/post.js`: HDR 렌더 → 블룸, 따뜻한 색보정(필믹 커브·채도·대비), 비네트. 화면 위아래 흐림(tilt)은 사용자 요청으로 0(꺼짐) — 다시 켜지 말 것. 값은 `Post.params`. 설정의 "그래픽 효과"로 끌 수 있음(`settings.graphicsFx`).
+- `js/post.js`: HDR 렌더 → 블룸, 따뜻한 색보정(필믹 커브·채도·대비), 비네트. 화면 위아래 흐림(tilt)은 사용자 요청으로 0(꺼짐) — 다시 켜지 말 것. 값은 `Post.params`(옅은 보라 대기 `haze`·`hazeCol` 포함, 존별 `zones.json` "post"). 설정의 "그래픽 효과"로 끌 수 있음(`settings.graphicsFx`).
 - 마을 바닥 텍스처는 `tools/town/texgen2.py`로 생성(`pave`, `cobble`). 장미 문양 바닥·꽃잎·나뭇잎 그림자(보이지 않는 나무 그늘 캐스터)·장식 가로등은 `js/town3d.js`.
 - HUD는 `index.html`의 "ornate gold HUD" CSS 블록과 `js/ui.js`의 `MENU_ICON`/`HUD_ICON`(SVG 아이콘). 배치: 왼쪽 위 초상화·이름, 오른쪽 위 미니맵(`js/minimap.js`)·퀘스트, 가운데 아래 체력·기력·경험치·메뉴 버튼(`.botbar`). 경험치 구슬·레벨업 날개는 `js/rewardfx.js`, 합성 효과음은 `Audio.chime`. 화면 확인은 `tools/browser-tests/hudshots.js`. 퀘스트 창(미니맵 아래 고정 HUD, 접기·닫기·`L` 키, 상태는 `profile.ui`)과 지역 이름 배너·첫 시작 환영 문구는 `js/questhud.js` — 퀘스트 진행을 화면 가운데 토스트로 다시 띄우지 말 것, 확인 `questhud.js`(브라우저 테스트). 휴대폰 배치는 `index.html` 끝의 "phone compact layout" 블록(세로: 체력 막대를 초상화 패널 안에, 가운데 비우기), 휴대폰 게임 창은 `ui.fit`이 폭에 맞춰 재배치(`.window.phone`/`.narrow`, 최소 0.64배, 안에서 스크롤) — 확인 `mobileshots.js`. 모든 게임 창은 장식 창(`ui.js`의 `PLAIN`/`BANNER`, CSS `.window.fancy`, 확인 `windowshots.js`). 대화·타이틀·캐릭터 만들기만 예외.
 
@@ -37,7 +37,7 @@
 - GLB에는 이미지를 넣지 않습니다. 재질 이름이 공유 텍스처를 고릅니다(`tools/blender/texmap.py` ↔ `js/nature.js` `MAT_TEX`). 칠한 빛(AO·그라데이션)은 정점 색입니다.
 - 잎 카드(`M_leaf*`)는 4정점이 한 점에 모인 카메라 빌보드(두 번째 UV = 크기·회전)입니다. 잘라낸 재질(`M_leaf*`, `M_plants`)은 뒷면 노멀을 뒤집지 않습니다.
 - 마을 장식 배치는 `python3 tools/town/props_layout.py --write`(`town3d.blprops` + 충돌용 `props`의 `bl: true` 항목). 숲 배치는 `tools/forest/layout.py --write`. 둘 다 바꾼 뒤 `node tools/forest/check_nav.mjs forest|town`(마을은 boss_gate 실패가 원래 상태).
-- 카메라는 약한 원근(`render.js` `CAM`: 피치 48°, 거리 26 m, `ortho` = 초점 거리에서의 화면 반높이). 화면 → 땅 광선은 `Renderer.screenRay`.
+- 카메라는 약한 원근(`render.js` `CAM`: 피치 44°(2026-11-06, 48°→44°), 거리 26 m, `ortho` = 초점 거리에서의 화면 반높이). 미리 그린 배경 그림 투영은 `CAM.artPitch`(48°, 바꾸지 말 것). 화면 → 땅 광선은 `Renderer.screenRay`.
 - 화면 비교 캡처: `tools/browser-tests/styleshots.js`(마을 분수·대화, 숲 입구·길·나무·전투, 프레임 시간·draw call·삼각형).
 
 ## 필드 그래픽 (`zones.json`의 `"nature"`가 있는 존: 속삭이는 숲·안개 골짜기·서리 고원·용의 유적)
@@ -46,6 +46,15 @@
 - 모델 후처리 `tools/forest/process_models.py`, 텍스처 `tools/forest/texgen_forest.py`, 출처는 `assets/forest/README.md`.
 - 그림자는 모델별 저폴리 사본(`*_lo`)만 그립니다(색 패스에서는 0개 인스턴스). 존별 후처리 값은 `zones.json`의 `"post"`.
 - 화면 비교: `tools/browser-tests/forestshots.js` (정지·이동·근접·나무 뒤·전투, `W`/`H`/`TOUCH`로 화면비).
+
+## 보스 전장 (속삭이는 숲 버섯 보스, 2026-11-06)
+- 바닥: `nature.js` `arenaMaterial`(빌더 `boss_floor` 지형에 적용) — 보라 흙·짙은 보라·갈색·이끼 색 덩어리, 붓 터치, 갈라짐, 낙엽·조약돌·포자, 흔들리는 잎 그늘. 텍스처는 `paint.py` `magic_floor()`(g_magic_*)를 잔결로만 씀.
+- 배치: `tools/forest/layout.py`의 "mushroom boss grove" 구간(플랫폼 위 가장자리 빽빽, 가운데 비움, 1 큰 + 2~4 중간 + 5~15 작은 묶음, 경계 밖 배경 나무 벽). 원형 바위는 `rock_magic*`. 타입 `mushdecor`(장식, 충돌 없음)·`mushtree`(충돌 `propFootprint`).
+- 에셋(Blender `assets.py`): `mush_small_purple/blue`, `mush_glow_purple/blue`(약한 발광 + 바닥 빛 원판), `mush_orange`, `mush_cluster`, `mush_tree`, `rock_magic(_low)`, `tree_violet(_round)`. 발광 재질은 `MAT_TEX`의 `ec`/`ei`.
+- 경고 표시: `render.js` `TelegraphView`(셰이더 하나: 바깥 빛 번짐·밝은 테두리·안쪽 그라데이션·룬 점선·전진 파동/맥동·입자, 공격은 산호색, 독 웅덩이는 보라 액체+거품, `seal`=봉인 마법진). 시간은 `TG_TIME`. 판정은 그대로 `HitShape`.
+- 결계: `game.js` `setBarrier` — 봉인 마법진 + 거의 투명한 에너지 벽(위로 오르는 입자).
+- 캐릭터/몬스터 재질: `render.js` `paintMat`(3단 밴딩·보라 그늘·아래쪽 따뜻한 차폐·림). 그림자 원판은 `contactShadowTex`(부드러운 보라).
+- 화면 비교: `tools/browser-tests/bossshots.js`(같은 위치: gate·grove·arena·fight·barrier·rim, `ONLY`로 일부만, `TAG`로 이전/이후 구분). SwiftShader에서 전투 장면은 프레임당 1~2초라 한 번에 15~25분 걸림.
 
 ## 캐릭터 보행 (`js/model.js`)
 - 걷기·달리기 다리는 절차 보행: `gaitParams`(속도·다리 길이 → 걸음/초, 보폭, 체공), `footAt`(발 궤적), `gaitPose`(3D 다리 IK, 상체), `ModelBody.lockFeet`(디딘 발 월드 고정). `alignLegs`는 키프레임 자세 전용.

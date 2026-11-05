@@ -28,7 +28,7 @@ void main(){
 
 const COPY = `uniform sampler2D tSrc; varying vec2 vUv; void main(){ vec4 c = texture2D(tSrc, vUv); gl_FragColor = (any(isnan(c)) || any(isinf(c))) ? vec4(0.0) : min(c, vec4(64.0)); }`;
 
-const FINAL = `uniform sampler2D tScene, tBloom1, tBloom2, tSoft; uniform float bloom, exposure, warmth, sat, contrast, vignette, tilt, aspect;
+const FINAL = `uniform sampler2D tScene, tBloom1, tBloom2, tSoft; uniform float bloom, exposure, warmth, sat, contrast, vignette, tilt, aspect, haze; uniform vec3 hazeCol;
 varying vec2 vUv;
 vec3 filmic(vec3 x){ // soft shoulder, keeps saturation (closer to a painted look than ACES)
   x *= exposure; return x * (1.0 + x / 9.0) / (1.0 + x); }
@@ -51,6 +51,8 @@ void main(){
   float l = dot(c, vec3(0.299, 0.587, 0.114));
   c = mix(vec3(l), c, sat);
   c *= mix(vec3(0.97, 0.96, 1.03), vec3(1.05, 1.0, 0.9), smoothstep(0.05, 0.8, l) * warmth + (1.0 - warmth) * 0.5);
+  // atmospheric haze: soft lavender veil toward the far (upper) part of the view + lifted, never-black shadows
+  c = mix(c, hazeCol, haze * (0.35 * smoothstep(0.25, 1.0, vUv.y) + 0.25 * (1.0 - smoothstep(0.0, 0.35, l))));
   // vignette (warm brown, not black)
   float v = smoothstep(0.45, 1.15, length(d * vec2(0.9, 1.15)));
   c = mix(c, c * vec3(0.62, 0.5, 0.4), v * vignette);
@@ -59,7 +61,7 @@ void main(){
 export class Post {
   constructor(renderer) {
     this.r = renderer; this.enabled = true;
-    this.params = { bloom: 0.65, threshold: 2.6, exposure: 1.12, warmth: 1.0, sat: 1.25, contrast: 0.32, vignette: 0.4, tilt: 0 };   // tilt 0 = no top/bottom edge blur (the user asked to remove it)
+    this.params = { bloom: 0.65, threshold: 2.6, exposure: 1.12, warmth: 1.0, sat: 1.25, contrast: 0.32, vignette: 0.4, tilt: 0, haze: 0, hazeCol: [0.72, 0.66, 0.86] };   // tilt 0 = no top/bottom edge blur (the user asked to remove it)
     this.defaults = { ...this.params };   // zones may override some values (zones.json "post"), restored on every zone load
     const hf = { type: THREE.HalfFloatType, depthBuffer: false };
     this.scene = new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, samples: 4 });
@@ -72,7 +74,7 @@ export class Post {
     this.mBlur = mat(BLUR, { tSrc: { value: null }, dir: { value: new THREE.Vector2() } });
     this.mCopy = mat(COPY, { tSrc: { value: null } });
     this.mFinal = mat(FINAL, { tScene: { value: this.scene.texture }, tBloom1: { value: this.b1[0].texture }, tBloom2: { value: this.b2[0].texture }, tSoft: { value: this.soft[0].texture },
-      bloom: { value: 0 }, exposure: { value: 1 }, warmth: { value: 1 }, sat: { value: 1 }, contrast: { value: 0 }, vignette: { value: 0 }, tilt: { value: 0 }, aspect: { value: 1 } });
+      bloom: { value: 0 }, exposure: { value: 1 }, warmth: { value: 1 }, sat: { value: 1 }, contrast: { value: 0 }, vignette: { value: 0 }, tilt: { value: 0 }, aspect: { value: 1 }, haze: { value: 0 }, hazeCol: { value: new THREE.Vector3(0.72, 0.66, 0.86) } });
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.Float32BufferAttribute([-1, -1, 0, 3, -1, 0, -1, 3, 0], 3));
     g.setAttribute('uv', new THREE.Float32BufferAttribute([0, 0, 2, 0, 0, 2], 2));
@@ -106,7 +108,7 @@ export class Post {
     // tilt-shift source: scene at 1/4, blurred
     if (p.tilt > 0) { this.mCopy.uniforms.tSrc.value = this.scene.texture; this.pass(this.mCopy, this.soft[0]); this.blur(this.soft, 1.0); this.blur(this.soft, 1.8); }
     const u = this.mFinal.uniforms;
-    u.bloom.value = p.bloom; u.exposure.value = p.exposure; u.warmth.value = p.warmth; u.sat.value = p.sat; u.contrast.value = p.contrast; u.vignette.value = p.vignette; u.tilt.value = p.tilt; u.aspect.value = size.x / size.y;
+    u.bloom.value = p.bloom; u.exposure.value = p.exposure; u.warmth.value = p.warmth; u.sat.value = p.sat; u.contrast.value = p.contrast; u.vignette.value = p.vignette; u.tilt.value = p.tilt; u.aspect.value = size.x / size.y; u.haze.value = p.haze || 0; u.hazeCol.value.set(...(p.hazeCol || [0.72, 0.66, 0.86]));
     this.pass(this.mFinal, null);
   }
 }

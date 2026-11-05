@@ -1,6 +1,6 @@
 // Game orchestrator + zone runtime. Port of Boot/ArcanGame.cs and World/ZoneRuntime.cs.
-import { GameData, SaveStore, CharacterSheet, QuestLog, QS, ZoneGeometry, NavGrid, newProfile, DEG, clamp } from './core.js';
-import { Renderer, Fx, TelegraphView, loadSheet, preloadTextures, THREE, T } from './render.js';
+import { GameData, SaveStore, CharacterSheet, QuestLog, QS, ZoneGeometry, NavGrid, newProfile, DEG, clamp, HitShape } from './core.js';
+import { Renderer, Fx, TelegraphView, TG_TIME, loadSheet, preloadTextures, THREE, T } from './render.js';
 import { Player, Monster, Boss, Npc, Loot, bindGame as bindActors } from './actors.js';
 import { Input, Audio } from './io.js';
 import { UI, bindGame as bindUi, rewardText } from './ui.js';
@@ -60,6 +60,7 @@ class Zone {
       for (const g of G.render.groups) if (['ground', 'props', 'tree'].includes(g.name)) for (const m of g.meshes) m.visible = false;
       for (const g of G.render.groups) if (g.name === 'patches') for (const m of g.meshes) if (!m.userData.water && PAINTED.test(m.userData.tex || '')) m.visible = false;
       this.nature = await buildNature(this, G.render.r);
+      for (const g of G.render.groups) if (g.name === 'terrain') for (const m of g.meshes) if (/boss_floor$/.test(m.userData.tex || '')) { m.material = this.nature.magicFloor; m.receiveShadow = true; }
       G.render.zoneRoot.add(this.nature.root);
     }
     // the old builder's flat flower clusters (untextured little cubes on the ground) look like stray debris: hide them
@@ -183,11 +184,28 @@ class Zone {
     const b = this.def.boss; if (!b || !b.gate || b.gate.length < 2) return;
     this.geo.removeTag("arena_gate");
     if (this.barrier) { G.render.scene.remove(this.barrier); this.barrier.geometry.dispose(); this.barrier.material.dispose(); this.barrier = null; }
+    if (this.barrierRing) { this.barrierRing.dispose(); this.barrierRing = null; }
     if (!closed) return;
     this.geo.addCircle(b.gate[0], b.gate[1], b.gateRadius, "arena_gate");
     const gp = this.geo.ground(b.gate[0], b.gate[1]);
-    const m = new THREE.Mesh(new THREE.CylinderGeometry(b.gateRadius, b.gateRadius, 2.6, 24, 1, true), new THREE.MeshBasicMaterial({ color: 0xb359f2, transparent: true, opacity: 0.4, depthWrite: false, side: THREE.DoubleSide }));
-    m.position.copy(T({ x: gp.x, y: gp.y + 1.3, z: gp.z })); m.renderOrder = 4; G.render.scene.add(m); this.barrier = m;
+    // magic containment: a rune circle on the ground + an almost clear energy wall (bright at the foot, fading upward,
+    // thin vertical streaks and rising motes) instead of a solid tinted cylinder
+    this.barrierRing = new TelegraphView(G.render.scene, HitShape.circle(b.gate[0], b.gate[1], b.gateRadius), this.geo, [0.66, 0.42, 1.0], true, true);
+    const wallMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide, uniforms: { uT: TG_TIME },
+      vertexShader: `varying vec2 vU; void main(){ vU = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+      fragmentShader: `uniform float uT; varying vec2 vU;
+float h(float x){ return fract(sin(x * 91.7) * 4375.85); }
+void main(){
+  float y = vU.y, x = vU.x * 48.;
+  float foot = exp(-y * 5.) * .55, fade = (1. - smoothstep(.55, 1., y)) * .1;
+  float streak = smoothstep(.06, .0, abs(fract(x) - .5) - .38) * .06 * (1. - y);
+  float c = floor(x), ph = fract(uT * (.25 + h(c) * .3) + h(c + 3.)); float mote = smoothstep(.05, .0, abs(y - ph)) * smoothstep(.2, .0, abs(fract(x) - .5)) * step(.6, h(c + 9.)) * (1. - ph);
+  float a = foot + fade + streak + mote * .8;
+  gl_FragColor = vec4(mix(vec3(.72, .5, 1.), vec3(.95, .88, 1.), foot + mote), a);
+  #include <colorspace_fragment>
+}` });
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(b.gateRadius, b.gateRadius, 2.4, 48, 1, true), wallMat);
+    m.position.copy(T({ x: gp.x, y: gp.y + 1.2, z: gp.z })); m.renderOrder = 4; G.render.scene.add(m); this.barrier = m;
   }
   nearestEnemy(from, range) {
     let best = null, bd = range;

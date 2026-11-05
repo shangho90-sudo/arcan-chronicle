@@ -7,7 +7,7 @@ import { clamp01, DEG, artBasis, artWorldToImage, artImageToGround, artFootprint
 export const T = (p) => new THREE.Vector3(p.x, p.y, -p.z);
 // quarter view with a weak perspective (long lens): `ortho` = half the visible height (m) at the focus distance, so sizes
 // on screen match the old orthographic camera at the player; things nearer the camera get slightly bigger (2.5D depth).
-export const CAM = { pitch: 48, yaw: 45, dist: 26, ortho: 4.75, minWidth: 8.5, sharp: 12, lookAhead: 0.6, depthOffset: 0.6 };
+export const CAM = { pitch: 44, artPitch: 48, yaw: 45, dist: 26, ortho: 4.75, minWidth: 8.5, sharp: 12, lookAhead: 0.6, depthOffset: 0.6 };
 
 const loader = new THREE.TextureLoader();
 const texCache = new Map();
@@ -101,6 +101,7 @@ export class Renderer {
     this.sun.target.position.copy(T(f));
     this.sun.position.copy(T({ x: f.x + lf.x * 40, y: f.y + lf.y * 40, z: f.z + lf.z * 40 }));
     for (const w of this.waterTex || []) { w.offset.x = performance.now() * 0.00003; w.offset.y = performance.now() * 0.00002; }
+    TG_TIME.value = performance.now() / 1000;
     if (this.post) this.post.render(this.scene, this.cam); else this.r.render(this.scene, this.cam);
   }
   /** screen pixel -> Unity-space ray */
@@ -121,6 +122,8 @@ export class Renderer {
     const a = def.ambient, s = def.sun;
     this.hemi.color.setRGB(a[0] * 1.1, a[1] * 1.1, a[2] * 1.1); this.hemi.groundColor.setRGB(a[0] * 0.7, a[1] * 0.7, a[2] * 0.7);
     this.sun.color.setRGB(s[0], s[1], s[2]); this.sun.intensity = s[3] * 2.3;
+    // optional painterly fill: cool violet-blue sky light (what shadows are lit by) and a warm bounce from below
+    if (def.shade) { const k = def.shade; this.hemi.color.setRGB(...k.sky); this.hemi.groundColor.setRGB(...k.ground); }
   }
 
   // ------------------------------------------------------------------ zone meshes (exported from the C# builder)
@@ -168,7 +171,7 @@ export class Renderer {
   async buildImageArt(list) {
     for (const a of this.art || []) { a.mesh.geometry.dispose(); a.mat.dispose(); a.tex.dispose(); }
     this.art = [];
-    const B = artBasis(CAM.pitch, CAM.yaw), maxAniso = this.r.capabilities.getMaxAnisotropy();
+    const B = artBasis(CAM.artPitch, CAM.yaw), maxAniso = this.r.capabilities.getMaxAnisotropy();
     const loader = new THREE.TextureLoader();
     await Promise.all(list.map(async a => {
       const t = await loader.loadAsync('assets/town/' + a.image + '.png');
@@ -351,7 +354,7 @@ export class SpriteBody {
     this.mesh = new THREE.Mesh(g, this.mat);
     this.mesh.rotation.y = -CAM.yaw * DEG;
     this.mesh.frustumCulled = false;
-    if (!shadowMat) shadowMat = new THREE.MeshBasicMaterial({ map: tex("assets/ui/shadow.png"), transparent: true, depthWrite: false });
+    if (!shadowMat) shadowMat = new THREE.MeshBasicMaterial({ map: contactShadowTex(), transparent: true, depthWrite: false });
     this.shadow = new THREE.Mesh(shadowGeo, shadowMat);
     this.shadow.rotation.x = -Math.PI / 2;
     this.shadowSize = shadowRadius * 2.2;
@@ -521,19 +524,153 @@ export function edgeGeometry(shape, geo, lift) {
   return { pos, idx };
 }
 
-export class TelegraphView {
-  constructor(scene, shape, geo, color, persistent = false) {
-    this.scene = scene; this.shape = shape; this.geo = geo; this.persistent = persistent;
-    const mk = (op, order) => { const m = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ color: new THREE.Color(...color), transparent: true, opacity: op, depthWrite: false, side: THREE.DoubleSide })); m.renderOrder = order; m.frustumCulled = false; scene.add(m); return m; };
-    this.area = mk(0.3, 2); this.fill = mk(persistent ? 0.4 : 0.45, 3);
-    this.edge = mk(1, 4); this.edge.material.color.setRGB(Math.min(1, color[0] + 0.1), Math.min(1, color[1] + 0.45), Math.min(1, color[2] + 0.25));
-    this.set(this.area, shapeGeometry(shape, geo, 1, 0.04));
-    const e = edgeGeometry(shape, geo, 0.055); if (e) this.set(this.edge, e);
-    this.setProgress(persistent ? 1 : 0);
+// ---------------------------------------------------------------- attack warning / ground zone (painted magic decal)
+// One mesh per telegraph: the shape is built once with local coordinates (aL = radius 0..1 + angle / lateral -1..1),
+// the shader draws a soft inner gradient, a thin bright rim with an outer glow, a slowly turning rune ring, twinkling
+// motes, a fill that sweeps out with the wind-up and pulses faster near the hit; persistent zones (poison) get rising
+// bubbles instead of the sweep. Progress / time are uniforms: no geometry rebuild per frame.
+export const TG_TIME = { value: 0 };
+const TG_VS = `attribute vec2 aL; varying vec2 vL; varying vec2 vW;
+void main(){ vL = aL; vec4 w = modelMatrix * vec4(position, 1.0); vW = vec2(w.x, -w.z); gl_Position = projectionMatrix * viewMatrix * w; }`;
+const TG_FS = `uniform float uP, uKind, uHalf, uR, uR0, uLen, uHW, uPersist, uAlpha; uniform float uT; uniform vec3 uCol, uRim;
+varying vec2 vL; varying vec2 vW;
+float h21(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f);
+  return mix(mix(h21(i), h21(i+vec2(1,0)), f.x), mix(h21(i+vec2(0,1)), h21(i+vec2(1,1)), f.x), f.y); }
+void main(){
+  float r = vL.x, a = vL.y, e;
+  if (uKind < 0.5) e = (1. - r) * uR;                                                             // circle
+  else if (uKind < 1.5) e = min((1. - r) * uR, (1. - abs(a)) * uHalf * max(r, .02) * uR);          // cone
+  else if (uKind < 2.5) e = min(min((1. - r) * uLen, r * uLen), (1. - abs(a)) * uHW);              // rect (r = along)
+  else e = min(r, 1. - r) * (uR - uR0);                                                          // ring
+  float t = uT, rr = clamp(r, 0., 1.);
+  if (e < 0.) {                                                                                  // soft outer glow skirt
+    float og = exp(e * 7.) * (.42 + .1 * sin(t * 3.)); gl_FragColor = vec4(mix(uCol, uRim, .55), og * uAlpha);
+    #include <colorspace_fragment>
+    return; }
+  float rim = smoothstep(.07, .015, e), glow = exp(-e * 4.);
+  // rune ring: dashes just inside the rim, slowly turning
+  float runeBand = smoothstep(.0, .04, e - .2) * smoothstep(.1, .04, e - .2);
+  float dash = step(.5, fract((uKind < 1.5 ? a * (uKind < .5 ? 16. : 7.) : r * uLen * .9) - t * .1));
+  float rune = runeBand * dash;
+  vec3 col; float al;
+  if (uPersist < .5) {
+    // attack: saturated coral fill that thickens toward the edge, a bright leading wave sweeping out with the wind-up
+    float fill = mix(.34, .60, pow(rr, 1.4));
+    float front = smoothstep(uP - .10, uP, rr) * smoothstep(uP + .015, uP, rr);
+    float done = smoothstep(uP, uP - .02, rr) * .22;
+    float pulse = uP * uP * (.5 + .5 * sin(t * (6. + 16. * uP))) * .18;
+    vec2 g = vW * 1.6, c = floor(g), f = fract(g) - .5; float rnd = h21(c);
+    float mote = smoothstep(.07, .0, length(f - vec2(h21(c + 7.) - .5, fract(h21(c + 3.) - t * .4) - .5) * .7)) * step(.75, rnd) * (.5 + .5 * sin(t * 5. + rnd * 30.));
+    al = fill + done + pulse + front * .45 + glow * .35 + rim * .95 + rune * .4 + mote * .5;
+    col = mix(uCol * (.8 + .25 * rr), uRim, clamp(rim + front * .8 + glow * .2 + mote + rune * .55, 0., 1.));
+  } else if (uPersist > 1.5) {
+    // sealing magic circle: double outer ring, turning rune band, inner hexagram, faint centre glow
+    float R = uR, d = r * R, th = a * 3.14159265;
+    float ring1 = smoothstep(.05, .0, abs(d - R + .06)), ring2 = smoothstep(.035, .0, abs(d - R + .42)), ring3 = smoothstep(.03, .0, abs(d - R * .52));
+    float band = step(R - .38, d) * step(d, R - .1);
+    float ru = band * step(.62, fract((th + t * .25) / 6.2831853 * 28.)) * smoothstep(.0, .05, abs(fract((d - R + .38) / .28 * 2.) - .5) - .08);
+    float hex = 0.; for (int k = 0; k < 6; k++) { float ang = float(k) * 1.0471976 + t * -.12; vec2 n = vec2(cos(ang), sin(ang));
+      vec2 pp = vec2(cos(th), sin(th)) * d; hex = max(hex, smoothstep(.035, .0, abs(dot(pp, n) - R * .26)) * step(d, R * .52 + .02)); }
+    float centre = exp(-d * 1.4) * .25, beat = .8 + .2 * sin(t * 2.2);
+    float m = max(max(ring1, ring2 * .85), max(ring3 * .8, max(ru * .9, hex * .75)));
+    al = (m + centre + glow * .25) * beat;
+    col = mix(uCol, uRim, clamp(m + centre, 0., 1.));
+  } else {
+    // persistent pool: deeper violet liquid, slow swirl pattern, lavender rim, rising bubbles, slow pulse
+    float sw = vn(vW * 1.3 + vec2(sin(t * .3), cos(t * .25)) * 1.5 + vn(vW * .7 - t * .1) * 2.);
+    float fill = mix(.42, .58, pow(rr, 2.)) * (.85 + .15 * sin(t * 1.6));
+    vec3 deep = uCol * vec3(.62, .5, .78);
+    vec2 g = vW * 1.8, c = floor(g), f = fract(g) - .5; float rnd = h21(c);
+    vec2 o = vec2(h21(c + 7.) - .5, h21(c + 3.) - .5) * .55;
+    float ph = fract(t * (.35 + rnd * .3) + rnd), br = .06 + ph * .14, d = length(f - o), on = step(.5, rnd) * smoothstep(.12, .3, e);
+    float bub = smoothstep(.028, .0, abs(d - br)) * (1. - ph) * on, core = smoothstep(br * .6, .0, d) * (1. - ph) * on;
+    al = fill + glow * .3 + rim * .9 + rune * .3 + bub * .6 + core * .25;
+    col = mix(deep, uCol * 1.15, smoothstep(.45, .75, sw) * .6);
+    col = mix(col, uRim, clamp(rim + glow * .3 + bub * .9 + core * .5 + rune * .4, 0., 1.));
   }
-  set(mesh, g) { mesh.geometry.dispose(); const bg = new THREE.BufferGeometry(); bg.setAttribute("position", new THREE.Float32BufferAttribute(g.pos, 3)); bg.setIndex(g.idx); mesh.geometry = bg; }
-  setProgress(p) { this.set(this.fill, shapeGeometry(this.shape, this.geo, p, 0.05)); this.fill.material.opacity = 0.35 + 0.25 * p; }
-  dispose() { for (const m of [this.area, this.fill, this.edge]) { this.scene.remove(m); m.geometry.dispose(); m.material.dispose(); } }
+  gl_FragColor = vec4(col, clamp(al, 0., 1.) * uAlpha);
+  #include <colorspace_fragment>
+}`;
+const SKIRT = 0.45;   // m of soft glow outside the hit edge (visual only)
+function tgGeometry(shape, geo, lift = 0.05) {
+  const pos = [], L = [], idx = [];
+  const fwd = { x: shape.fx, z: shape.fz }, right = { x: shape.fz, z: -shape.fx };
+  const V = (x, z, l0, l1) => { pos.push(x, geo.height(x, z) + lift, -z); L.push(l0, l1); return pos.length / 3 - 1; };
+  const grid = (nu, nv, at) => {          // at(u, v) -> [x, z, l0, l1]
+    const base = pos.length / 3;
+    for (let j = 0; j <= nv; j++) for (let i = 0; i <= nu; i++) V(...at(i / nu, j / nv));
+    for (let j = 0; j < nv; j++) for (let i = 0; i < nu; i++) { const a = base + j * (nu + 1) + i, b = a + 1, c = a + nu + 2, d = a + nu + 1; idx.push(a, b, c, a, c, d); }
+  };
+  const polar = (r0, r1, a0, a1, half) => grid(48, 8, (u, v) => {
+    const t = (a0 + (a1 - a0) * u) * DEG, rr = r0 + (r1 - r0) * v, dx = fwd.x * Math.cos(t) + right.x * Math.sin(t), dz = fwd.z * Math.cos(t) + right.z * Math.sin(t);
+    return [shape.cx + dx * rr, shape.cz + dz * rr, shape.kind === 'ring' ? v : rr / shape.r, half ? (a0 + (a1 - a0) * u) / half : (u * 2 - 1)];
+  });
+  switch (shape.kind) {
+    case 'circle': polar(0, shape.r + SKIRT, -180, 180, 0); break;
+    case 'ring': polar(shape.inner, shape.r, -180, 180, 0); break;
+    case 'cone': polar(0, shape.r + SKIRT, -shape.half, shape.half, shape.half); break;
+    case 'rect': grid(4, 12, (u, v) => { const lat = (u * 2 - 1) * shape.hw, al = v * shape.len;
+      return [shape.cx + right.x * lat + fwd.x * al, shape.cz + right.z * lat + fwd.z * al, v, u * 2 - 1]; }); break;
+  }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('aL', new THREE.Float32BufferAttribute(L, 2)); g.setIndex(idx);
+  return g;
+}
+export class TelegraphView {
+  constructor(scene, shape, geo, color, persistent = false, seal = false) {
+    this.scene = scene; this.shape = shape; this.geo = geo; this.persistent = persistent;
+    // attacks: warm coral / red; zones keep their own hue (poison violet)
+    const base = persistent ? new THREE.Color(...color) : new THREE.Color(1.0, 0.24, 0.16);
+    const rim = persistent ? new THREE.Color(0.88, 0.76, 1.0) : new THREE.Color(1.0, 0.86, 0.6);
+    const kind = { circle: 0, cone: 1, rect: 2, ring: 3 }[shape.kind] ?? 0;
+    this.u = { uP: { value: persistent ? 1 : 0 }, uT: TG_TIME, uKind: { value: kind }, uHalf: { value: (shape.half || 0) * DEG }, uR: { value: shape.r || 1 }, uR0: { value: shape.inner || 0 },
+      uLen: { value: shape.len || 1 }, uHW: { value: shape.hw || 1 }, uPersist: { value: seal ? 2 : persistent ? 1 : 0 }, uAlpha: { value: 1 }, uCol: { value: base }, uRim: { value: rim } };
+    this.mesh = new THREE.Mesh(tgGeometry(shape, geo), new THREE.ShaderMaterial({ uniforms: this.u, vertexShader: TG_VS, fragmentShader: TG_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide }));
+    this.mesh.renderOrder = persistent ? 2 : 3; this.mesh.frustumCulled = false; scene.add(this.mesh);
+  }
+  setProgress(p) { this.u.uP.value = p; }
+  dispose() { this.scene.remove(this.mesh); this.mesh.geometry.dispose(); this.mesh.material.dispose(); }
+}
+
+// ---------------------------------------------------------------- painterly character / creature shading
+// Chained onto a lit material (Standard or Lambert): soft 3-tone banding from the sun direction, shadows tinted
+// violet-blue instead of grey, warm reddish occlusion on down-facing surfaces, light saturation lift and a fresnel
+// rim. o = { rim: [r,g,b], rimK, sat } — the player gets a warm, slightly stronger rim so it reads over the floor.
+export function paintMat(m, o = {}) {
+  const rim = o.rim || [0.75, 0.62, 1.0], rk = (o.rimK ?? 0.22).toFixed(3), sat = (o.sat ?? 1.08).toFixed(3);
+  if (m.isMeshStandardMaterial) { m.roughness = Math.max(m.roughness ?? 1, 0.85); m.metalness = 0; }
+  const prev = m.onBeforeCompile, key = m.customProgramCacheKey ? m.customProgramCacheKey() : '';
+  m.onBeforeCompile = (sh, r) => {
+    if (prev) prev.call(m, sh, r);
+    sh.fragmentShader = sh.fragmentShader.replace('#include <opaque_fragment>', `{
+  vec3 vN = normalize(normal), vV = normalize(vViewPosition);
+  vec3 wN = normalize((vec4(vN, 0.) * viewMatrix).xyz);
+  float band = .5;
+  #if NUM_DIR_LIGHTS > 0
+    float nl = dot(vN, directionalLights[0].direction); band = smoothstep(-.08, .08, nl) * .55 + smoothstep(.42, .55, nl) * .45;
+  #endif
+  float L = dot(outgoingLight, vec3(.299, .587, .114));
+  outgoingLight *= mix(vec3(.80, .78, 1.0), vec3(1.05, 1.0, .94), band);                 // cool violet shade, warm light
+  outgoingLight *= mix(vec3(.86, .72, .74), vec3(1.), smoothstep(-.75, .1, wN.y));        // warm occlusion underneath
+  outgoingLight = mix(vec3(dot(outgoingLight, vec3(.299, .587, .114))), outgoingLight, ${sat});
+  float fr = pow(1. - clamp(dot(vN, vV), 0., 1.), 3.);
+  outgoingLight += vec3(${rim.map(v => v.toFixed(3)).join(', ')}) * fr * ${rk} * (.4 + .6 * smoothstep(-.2, .6, wN.y));
+}
+#include <opaque_fragment>`);
+  };
+  m.customProgramCacheKey = () => key + '|paint' + rk + sat + rim.join(',');
+  m.needsUpdate = true; return m;
+}
+
+// soft contact shadow under characters (grounding): smooth radial falloff, deep violet instead of black
+let _contactTex = null;
+export function contactShadowTex() {
+  if (_contactTex) return _contactTex;
+  const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d');
+  const g = x.createRadialGradient(64, 64, 0, 64, 64, 64);
+  g.addColorStop(0, 'rgba(34,20,52,0.62)'); g.addColorStop(0.45, 'rgba(38,24,60,0.42)'); g.addColorStop(0.8, 'rgba(44,30,70,0.12)'); g.addColorStop(1, 'rgba(44,30,70,0)');
+  x.fillStyle = g; x.fillRect(0, 0, 128, 128);
+  _contactTex = new THREE.CanvasTexture(c); _contactTex.colorSpace = THREE.SRGBColorSpace; return _contactTex;
 }
 
 export { THREE };

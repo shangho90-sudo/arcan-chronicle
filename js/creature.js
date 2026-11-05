@@ -1,7 +1,7 @@
 // 3D monsters made from the user's creature sheet (Tripo image->3D, quadruped rig + baked walk cycle) and the boss
 // (Tripo text->3D, unrigged). Same interface as SpriteBody so actors.js / skills keep working; action timing
 // (frames / fps / hitFrame) still comes from the monster's original sprite sheet meta, so combat balance is unchanged.
-import { THREE, T, tex } from './render.js';
+import { THREE, T, tex, paintMat, contactShadowTex } from './render.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 
@@ -81,9 +81,10 @@ export class CreatureBody {
         m.customProgramCacheKey = () => key; m.needsUpdate = true;
       }
     }
+    for (const m of this.mats) paintMat(m, this.cfg.boss || /boss/.test(this.cfg.file) ? { rimK: 0.26, sat: 1.1 } : {});
     this.mixer = null;
     if (d.clips.length) { this.mixer = new THREE.AnimationMixer(this.model); this.walk = this.mixer.clipAction(d.clips[0]); this.walk.play(); this.walkDur = d.clips[0].duration; }
-    if (!shadowMat) shadowMat = new THREE.MeshBasicMaterial({ map: tex('assets/ui/shadow.png'), transparent: true, depthWrite: false });
+    if (!shadowMat) shadowMat = new THREE.MeshBasicMaterial({ map: contactShadowTex(), transparent: true, depthWrite: false });
     this.shadow = new THREE.Mesh(shadowGeo, shadowMat); this.shadow.rotation.x = -Math.PI / 2; const ss = radius * 2.8; this.shadow.scale.set(ss, ss, 1);
     scene.add(this.root, this.shadow);
     this.size = this.cfg.size; this.phase = Math.random() * 10;

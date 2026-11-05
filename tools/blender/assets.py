@@ -13,7 +13,7 @@ Plants: crossed multi-card clumps on the plants atlas.
 import os, sys, math, random
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import bpy, bmesh
-from mathutils import Vector, noise
+from mathutils import Vector, Quaternion, noise
 import blib as B
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'out'); os.makedirs(OUT, exist_ok=True)
@@ -77,6 +77,15 @@ TREES = {
         branches=[((0.05, 0, 2.3), (0.7, 0.2, 2.9)), ((0.05, 0, 2.4), (-0.6, -0.3, 3.0))],
         clusters=[((0.0, 0.0, 3.35), 1.4, 0.9, 9, 0.25), ((0.75, 0.25, 2.95), 0.8, 0.9, 5, 0.3), ((-0.7, -0.3, 3.0), 0.8, 0.9, 5, 0.3),
                   ((0.1, 0.1, 4.25), 0.85, 0.9, 6, 0)]),
+    # violet canopy for the mushroom boss grove (same builder, violet foliage / leaf cards)
+    'tree_violet': dict(trunk=[(0, 0, 0), (0.12, 0.08, 1.6), (0.2, 0.0, 3.1)], r=0.25, var='_violet', seed=91,
+        branches=[((0.2, 0.0, 2.5), (1.1, 0.2, 3.4)), ((0.2, 0.0, 2.7), (-0.95, -0.3, 3.5)), ((0.2, 0, 3.0), (0.1, 0.95, 3.8))],
+        clusters=[((0.15, 0.0, 4.1), 1.25, 0.9, 7, 0.1), ((1.15, 0.25, 3.6), 0.95, 0.88, 6, 0.2), ((-1.0, -0.3, 3.6), 0.92, 0.88, 6, 0.2),
+                  ((0.1, 1.0, 3.9), 0.85, 0.9, 5, 0.1), ((0.3, -0.8, 3.95), 0.8, 0.9, 5, 0.1), ((0.2, 0.1, 4.85), 0.75, 0.9, 6, 0)]),
+    'tree_violet_round': dict(trunk=[(0, 0, 0), (-0.1, 0.05, 1.3), (-0.05, 0.0, 2.4)], r=0.23, var='_violet', seed=93,
+        branches=[((-0.05, 0, 2.2), (0.65, 0.25, 2.8)), ((-0.05, 0, 2.3), (-0.6, -0.25, 2.9))],
+        clusters=[((0.0, 0.0, 3.2), 1.35, 0.9, 9, 0.3), ((0.7, 0.3, 2.85), 0.8, 0.9, 5, 0.3), ((-0.7, -0.3, 2.9), 0.78, 0.9, 5, 0.3),
+                  ((0.05, 0.1, 4.05), 0.82, 0.9, 6, 0)]),
 }
 
 def tiers_clusters(rnd):
@@ -191,6 +200,8 @@ ROCKS = {   # size (x,y,z), points, moss amount, extra lumps, stone variant
     'rock_medium': dict(size=(1.05, 0.9, 0.72), n=18, moss=0.0, seed=62, mat='M_stone'),
     'rock_moss': dict(size=(1.35, 1.1, 0.95), n=20, moss=0.45, seed=63, mat='M_stone'),
     'rock_roadside': dict(size=(1.05, 0.7, 0.42), n=16, moss=0.0, seed=64, mat='M_stone_warm'),
+    'rock_magic': dict(size=(1.25, 1.05, 0.95), n=19, moss=0.5, seed=66, mat='M_stone_violet', flowers=10),
+    'rock_magic_low': dict(size=(1.5, 1.0, 0.55), n=17, moss=0.6, seed=67, mat='M_stone_violet', flowers=8),
     'rock_large': dict(size=(1.6, 1.3, 1.6), n=22, moss=0.25, seed=65, mat='M_stone', lumps=[((0.95, 0.35, 0), (1.0, 0.85, 0.85)), ((-0.6, -0.65, 0), (0.85, 0.75, 0.6))]),
 }
 def hull(bm0, centre, size, n, rnd, bevel, segs):
@@ -210,7 +221,7 @@ def hull(bm0, centre, size, n, rnd, bevel, segs):
 
 def build_rock(name, sp, lod):
     rnd = random.Random(sp['seed']); segs = {'l0': 3, '': 2, 'l2': 1, 'lo': 0}[lod]
-    mats = [B.material(sp['mat']), B.material('M_moss')]
+    mats = [B.material(sp['mat']), B.material('M_moss_violet' if sp['mat'] == 'M_stone_violet' else 'M_moss')]
     bm = bmesh.new(); s = sp['size']; bev = min(s) * 0.07
     hull(bm, (0, 0), s, sp['n'], rnd, bev, segs)
     for (off, k) in sp.get('lumps', []):
@@ -235,7 +246,21 @@ def build_rock(name, sp, lod):
     bm2.free()
     B.bake_ao(ob, samples=24)
     B.paint_light(ob, ao_pow=1.3, ao_min=0.28, h0=-0.05, h1=s[2] * 1.05, bottom=0.68, top=1.12, up=0.16, hue=0.06, seed=sp['seed'],
-                  per_mat={1: (0.78, 0.86, 0.66)}, edge=edge)
+                  per_mat={1: (0.85, 0.92, 0.82), 0: (0.98, 0.9, 1.1)} if sp['mat'] == 'M_stone_violet' else {1: (0.78, 0.86, 0.66)}, edge=edge)
+    if sp.get('flowers') and lod != 'l2':                               # tiny violet / white flowers tucked into the moss
+        top = [p.center.copy() for p in me.polygons if p.material_index == 1] or [Vector((0, 0, s[2] * 0.8))]
+        rnd2 = random.Random(sp['seed'] + 1); fm = B.material('M_plants', alpha=True, double=True); bm = bmesh.new(); uvl = bm.loops.layers.uv.new('UV')
+        for k in range(sp['flowers']):
+            c = rnd2.choice(top); cell = rnd2.choice([4, 4, 2, 5]); u0, u1 = (cell % 4) / 4, (cell % 4 + 1) / 4; v1 = 1 - (cell // 4) / 2; v0 = v1 - 0.5
+            hh = rnd2.uniform(0.1, 0.16); w = hh * 0.55
+            for j in range(2):
+                t = rnd2.uniform(0, math.pi) + j * math.pi / 2; dv = Vector((math.cos(t), math.sin(t), 0)) * w
+                vs = [bm.verts.new(c - dv - Vector((0, 0, 0.02))), bm.verts.new(c + dv - Vector((0, 0, 0.02))), bm.verts.new(c + dv + Vector((0, 0, hh * 2))), bm.verts.new(c - dv + Vector((0, 0, hh * 2)))]
+                f = bm.faces.new(vs); f.material_index = 2
+                for l, uv in zip(f.loops, ((u0, v0), (u1, v0), (u1, v1), (u0, v1))): l[uvl].uv = uv
+        fl = B.obj_from_bmesh(bm, 'fl', [mats[0], mats[1], fm]); ca = B.ensure_col(fl)
+        for li, l in enumerate(fl.data.loops): z = fl.data.vertices[l.vertex_index].co.z; ca.data[li].color = (1, 1, 1, 1)
+        ob = B.join([ob, fl], ob.name)
     return ob
 
 # ---------------------------------------------------------------------------------------------- plants (multi-card clumps)
@@ -424,6 +449,70 @@ def build_town(name, lod):
     return ob
 TOWN = ['town_finial', 'town_balcony', 'town_lamp', 'town_banner', 'town_planter', 'town_flowerbox', 'town_barrel', 'town_crate', 'town_bench', 'town_sign', 'town_fence', 'town_border']
 
+# ---------------------------------------------------------------------------------------------- mushrooms (boss grove)
+MUSH_MATS = ['M_stem', 'M_cap_purple', 'M_cap_blue', 'M_cap_orange', 'M_glow_purple', 'M_glow_blue', 'M_spot']
+CAPM = {'P': 1, 'B': 2, 'O': 3, 'GP': 4, 'GB': 5}
+def _m(x, y, h, R, lean, cap, shape='dome', spots=0): return dict(p=(x, y), h=h, R=R, lean=lean, cap=cap, shape=shape, spots=spots)
+MUSH = {   # one asset = a small group (cluster placement inside the model: 1 large + medium + small)
+    'mush_small_purple': [_m(0, 0, 0.42, 0.21, (0.05, 0), 'P', 'dome', 3), _m(0.24, 0.12, 0.3, 0.15, (0.09, 0.04), 'P', 'dome', 2), _m(-0.16, 0.2, 0.22, 0.11, (-0.06, 0.06), 'P')],
+    'mush_small_blue': [_m(0, 0, 0.38, 0.19, (-0.04, 0.02), 'B', 'dome', 3), _m(-0.22, -0.1, 0.28, 0.14, (-0.08, -0.03), 'B', 'dome', 2), _m(0.18, 0.18, 0.2, 0.1, (0.05, 0.06), 'B')],
+    'mush_glow_purple': [_m(0, 0, 0.55, 0.14, (0.04, 0), 'GP', 'bell'), _m(0.17, -0.1, 0.4, 0.11, (0.08, -0.04), 'GP', 'bell'), _m(-0.13, 0.1, 0.3, 0.09, (-0.06, 0.05), 'GP', 'bell'),
+                         _m(0.06, 0.22, 0.22, 0.07, (0.02, 0.07), 'GP', 'bell')],
+    'mush_glow_blue': [_m(0, 0, 0.5, 0.13, (-0.03, 0.02), 'GB', 'bell'), _m(-0.18, 0.08, 0.36, 0.1, (-0.08, 0.03), 'GB', 'bell'), _m(0.14, 0.14, 0.26, 0.08, (0.06, 0.05), 'GB', 'bell')],
+    'mush_orange': [_m(0, 0, 0.8, 0.42, (0.06, 0), 'O', 'dome', 7), _m(0.42, 0.22, 0.45, 0.22, (0.1, 0.05), 'O', 'dome', 4), _m(-0.3, 0.3, 0.26, 0.12, (-0.05, 0.06), 'O')],
+    'mush_cluster': [_m(0, 0, 1.15, 0.6, (0.05, 0.02), 'P', 'dome', 9), _m(0.62, 0.25, 0.62, 0.3, (0.12, 0.05), 'B', 'dome', 4), _m(-0.55, 0.3, 0.55, 0.27, (-0.1, 0.06), 'O', 'dome', 4),
+                     _m(0.1, -0.6, 0.5, 0.24, (0.02, -0.1), 'P', 'flat', 3), _m(0.85, -0.25, 0.3, 0.08, (0.06, -0.03), 'GP', 'bell'), _m(-0.85, -0.2, 0.34, 0.09, (-0.06, -0.02), 'GB', 'bell'),
+                     _m(0.4, 0.7, 0.26, 0.12, (0.05, 0.07), 'P'), _m(-0.25, 0.75, 0.22, 0.1, (-0.03, 0.08), 'B'), _m(0.6, -0.65, 0.2, 0.09, (0.05, -0.05), 'O'), _m(-0.75, 0.75, 0.25, 0.07, (-0.05, 0.05), 'GP', 'bell')],
+    'mush_tree': [_m(0, 0, 3.4, 2.0, (0.35, 0.12), 'P', 'flat', 16), _m(0.75, 0.35, 0.55, 0.26, (0.1, 0.05), 'P', 'dome', 3), _m(-0.6, 0.5, 0.42, 0.11, (-0.06, 0.05), 'GP', 'bell'),
+                  _m(0.3, -0.75, 0.36, 0.17, (0.04, -0.08), 'B', 'dome', 2), _m(-0.55, -0.45, 0.3, 0.08, (-0.05, -0.04), 'GB', 'bell')],
+}
+CAP_PROFILE = {   # (r, z) in cap radii, underside (from the stem) -> rim -> top
+    'dome': [(0.16, 0.06), (0.6, 0.02), (0.96, 0.03), (1.0, 0.12), (0.93, 0.34), (0.74, 0.56), (0.46, 0.7), (0.18, 0.76), (0.02, 0.77)],
+    'flat': [(0.14, 0.05), (0.6, 0.0), (0.97, 0.0), (1.0, 0.08), (0.92, 0.22), (0.7, 0.36), (0.4, 0.44), (0.15, 0.47), (0.02, 0.48)],
+    'bell': [(0.3, 0.1), (0.85, 0.0), (1.0, 0.06), (0.95, 0.35), (0.78, 0.7), (0.5, 0.95), (0.22, 1.08), (0.02, 1.12)],
+}
+def build_mush(name, lod):
+    mats = [B.material(n) for n in MUSH_MATS]; seg = {'l0': 22, '': 14, 'l2': 9, 'lo': 6}[lod]; rnd = random.Random(len(name) * 31 + 7)
+    parts = []
+    for i, m in enumerate(MUSH[name]):
+        if lod == 'l2' and m['h'] < 0.25 and i > 0: continue
+        h, R = m['h'], m['R']; base = Vector((m['p'][0], m['p'][1], -0.04)); top = base + Vector((m['lean'][0], m['lean'][1], h))
+        bend = Vector((-m['lean'][1], m['lean'][0], 0)) * 0.6 + Vector((m['lean'][0], m['lean'][1], 0)) * -0.4
+        pts = curve(base, top, bend, 5 if h > 1 else 3)
+        rs = R * (0.18 if m['shape'] != 'bell' else 0.22) * (1.25 if h > 2 else 1.0)
+        radii = [rs * (1.35 - 0.5 * (k / (len(pts) - 1))) for k in range(len(pts))]
+        bm = bmesh.new(); uvl = bm.loops.layers.uv.new('UV')
+        tube(bm, pts, radii, seg if h > 1 else max(5, seg // 2 + 1), uvl, flare=(lambda t, a: 1 + max(0, 1 - t / 0.25) ** 1.5 * (0.35 + 0.12 * math.cos(5 * a))) if h > 2 else None)
+        stem = B.obj_from_bmesh(bm, 'stem%d' % i, mats); parts.append(stem)
+        d = (pts[-1] - pts[-2]).normalized(); q = Vector((0, 0, 1)).rotation_difference(d); q = Quaternion().slerp(q, 0.7)
+        prof = [(r * R, z * R) for r, z in CAP_PROFILE[m['shape']]]
+        capo = prim('lathe', mats, CAPM[m['cap']], profile=prof, seg=seg)
+        for v in capo.data.vertices:
+            co = v.co.copy(); n = noise.noise(co * (3.0 / max(R, 0.1)) + Vector((i, 0, 0)))
+            co.x *= 1 + 0.05 * n; co.y *= 1 + 0.05 * n; co.z += 0.03 * R * n
+            v.co = q @ co + top - d * R * 0.08
+        parts.append(capo)
+        if lod != 'lo' and m['spots']:
+            for k in range(m['spots'] if lod != 'l2' else max(1, m['spots'] // 2)):
+                a = rnd.uniform(0, 2 * math.pi); t = rnd.uniform(0.2, 0.75); j = int(t * (len(prof) - 4)) + 3
+                r0, z0 = prof[min(j, len(prof) - 1)]; r1, z1 = prof[min(j + 1, len(prof) - 1)]; rr, zz = r0 + (r1 - r0) * 0.5, z0 + (z1 - z0) * 0.5
+                lp = Vector((math.cos(a) * rr, math.sin(a) * rr, zz)); nrm = Vector((math.cos(a) * (z0 - z1), math.sin(a) * (z0 - z1), r0 - r1)).normalized()
+                if nrm.z < 0: nrm = -nrm
+                sz = R * rnd.uniform(0.09, 0.15)
+                sp_ = prim('sphere', mats, 6, size=sz, seg=8, scale=(1, rnd.uniform(0.8, 1.0), 0.32))
+                rq = Vector((0, 0, 1)).rotation_difference(nrm)
+                for v in sp_.data.vertices: v.co = q @ (rq @ v.co + lp + nrm * sz * 0.05) + top - d * R * 0.08
+                parts.append(sp_)
+    ob = B.join(parts, name + ('_' + lod if lod else ''))
+    if lod == 'lo': return ob
+    B.box_uv(ob, 1.6)
+    B.bake_ao(ob, samples=16 if lod == 'l2' else 24)
+    top = max(v.co.z for v in ob.data.vertices)
+    # caps: soft 3-tone (AO x up-facing light); glow caps stay bright; stems a touch warm
+    B.paint_light(ob, ao_pow=1.2, ao_min=0.34, h0=0.0, h1=top, bottom=0.74, top=1.08, up=0.22, hue=0.05, seed=len(name),
+                  per_mat={0: (1.02, 0.97, 0.9), 4: (1.25, 1.2, 1.25), 5: (1.2, 1.25, 1.3), 6: (1.1, 1.08, 1.04)})
+    return ob
+
 # ---------------------------------------------------------------------------------------------- main
 def run(names):
     for name in names:
@@ -435,10 +524,11 @@ def run(names):
             elif name in SHRUBS: ob = build_shrub(name, SHRUBS[name], lod)
             elif name in ROCKS: ob = build_rock(name, ROCKS[name], lod)
             elif name in TOWN: ob = build_town(name, lod)
+            elif name in MUSH: ob = build_mush(name, lod)
             else: raise SystemExit('unknown asset ' + name)
             fn = name + ('_' + lod if lod else '')
             B.export_glb(ob, os.path.join(OUT, fn + '.glb')); print(fn, B.tri_count(ob), flush=True)
 
 if __name__ == '__main__':
     args = [a for a in sys.argv[1:] if not a.startswith('-')]
-    run(args or list(TREES) + list(SHRUBS) + list(ROCKS) + list(PLANTS) + TOWN)
+    run(args or list(TREES) + list(SHRUBS) + list(ROCKS) + list(PLANTS) + TOWN + list(MUSH))

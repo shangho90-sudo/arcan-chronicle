@@ -537,7 +537,7 @@ export function propFootprint(p) {
   const c = r => ({ r }), b = (hw, hd) => ({ hw, hd });
   switch (p.type) {
     case "tree": return c(0.45 * s); case "pine": return c(0.4 * s); case "bush": return c(0.55 * s); case "lamp": return c(0.18);
-    case "barrel": return c(0.38 * s); case "crate": return b(0.4 * s, 0.4 * s); case "rock": return c(0.6 * s); case "mushroom": return c(0.45 * s);
+    case "barrel": return c(0.38 * s); case "crate": return b(0.4 * s, 0.4 * s); case "rock": return c(0.6 * s); case "mushroom": return c(0.45 * s); case "mushtree": return c(0.6 * s);
     case "stump": return c(0.4 * s); case "well": return c(1.0 * s); case "fountain": return c(2.5 * s); case "anvil": return b(0.45, 0.3);
     case "bench": return b(0.9 * s, 0.3 * s); case "flowerbed": return b((p.w > 0 ? p.w : 2) / 2, (p.d > 0 ? p.d : 0.8) / 2);
     case "fence": return b((p.w > 0 ? p.w : 2) / 2, 0.1); case "wall": return b((p.w > 0 ? p.w : 2) / 2, (p.d > 0 ? p.d : 0.6) / 2);

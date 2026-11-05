@@ -9,7 +9,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { T, CAM } from './render.js';
+import { T, CAM, TG_TIME } from './render.js';
 
 const BASE = 'assets/forest/';
 const BL = 'assets/forest/bl/';
@@ -23,18 +23,26 @@ const MODELS = {
   shrub_a: { h: 1.0 }, shrub_b: { h: 0.85 },
   rock_small: { h: 0.3 }, rock_medium: { h: 0.8, dither: true }, rock_moss: { h: 1.1, dither: true }, rock_roadside: { h: 0.5 }, rock_large: { h: 1.1, dither: true },
   grass_short: { h: 1 }, grass_tall: { h: 1 }, flower_white: { h: 1 }, flower_yellow: { h: 1 }, flower_pink: { h: 1 }, flower_mixed: { h: 1 }, fern: { h: 1 }, clover: { h: 1 },
+  // mushroom boss grove (tools/blender/assets.py MUSH, rock_magic*, tree_violet*)
+  tree_violet: { h: 5.3, trunk: true, dither: true }, tree_violet_round: { h: 4.6, trunk: true, dither: true },
+  rock_magic: { h: 1.0, dither: true }, rock_magic_low: { h: 0.62 },
+  mush_small_purple: { h: 0.48 }, mush_small_blue: { h: 0.44 }, mush_glow_purple: { h: 0.62, glow: [0.78, 0.5, 1.0] }, mush_glow_blue: { h: 0.56, glow: [0.5, 0.75, 1.0] },
+  mush_orange: { h: 0.95 }, mush_cluster: { h: 1.35, glow: [0.7, 0.5, 1.0] }, mush_tree: { h: 4.3, trunk: true, dither: true, glow: [0.72, 0.5, 1.0] },
   // older Tripo models still used for the few one-off props
   stump: { h: 0.75, old: true }, ruin: { h: 2.3, dither: true, old: true }, mushroom: { h: 1.0, old: true },
 };
 const TYPE_MODEL = { tree: ['tree_broad_a', 'tree_broad_b', 'tree_forest_round', 'tree_broad_a'], pine: ['tree_forest_tall'], shrub: ['shrub_a', 'shrub_b'], bush: ['shrub_a', 'shrub_b'],
-  rock: ['rock_medium', 'rock_moss', 'rock_roadside', 'rock_medium'], stone: ['rock_small'], stump: ['stump'], ruin: ['ruin'], mushroom: ['mushroom'] };
+  rock: ['rock_medium', 'rock_moss', 'rock_roadside', 'rock_medium'], stone: ['rock_small'], stump: ['stump'], ruin: ['ruin'], mushroom: ['mush_orange', 'mush_cluster'], mushdecor: ['mush_small_purple', 'mush_small_blue', 'mush_glow_purple'], mushtree: ['mush_tree'] };
 export const MAT_TEX = {
   M_bark: { t: 'bark.jpg' }, M_foliage: { t: 'foliage.jpg' }, M_foliage_warm: { t: 'foliage_warm.jpg' }, M_foliage_cool: { t: 'foliage_cool.jpg' },
   M_leaf: { t: 'leafcard.png', a: true }, M_leaf_warm: { t: 'leafcard_warm.png', a: true }, M_leaf_cool: { t: 'leafcard_cool.png', a: true },
   M_stone: { t: 'stone.jpg' }, M_stone_warm: { t: 'stone_warm.jpg' }, M_moss: { t: 'foliage.jpg', s: 1.6 }, M_plants: { t: 'plants.png', a: true },
   M_wood: { t: 'wood.jpg' }, M_wood_dark: { t: 'wood_dark.jpg' }, M_iron: { t: 'iron.jpg' }, M_gold: { t: 'gold.jpg', metal: 0.35 }, M_navy: { t: 'navy.jpg' },
   M_cream: { t: 'cream.jpg' }, M_roof_blue: { t: 'roof_blue.jpg' }, M_terracotta: { t: 'terracotta.jpg' }, M_plaster: { t: 'plaster.jpg' },
-  M_glow: { t: 'lampglow.jpg', e: true }, M_red: { t: 'red.jpg' }, M_soil: { t: 'soilpot.jpg' },
+  M_glow: { t: 'lampglow.jpg', e: true },
+  M_foliage_violet: { t: 'foliage_violet.jpg' }, M_leaf_violet: { t: 'leafcard_violet.png', a: true }, M_stone_violet: { t: 'stone_violet.jpg' }, M_moss_violet: { t: 'foliage_cool.jpg', s: 1.6 },
+  M_cap_purple: { t: 'cap_purple.jpg' }, M_cap_blue: { t: 'cap_blue.jpg' }, M_cap_orange: { t: 'cap_orange.jpg' }, M_stem: { t: 'stem.jpg' }, M_spot: { t: 'spot.jpg' },
+  M_glow_purple: { t: 'glow_purple.jpg', e: true, ec: 0xc79bff, ei: 0.55 }, M_glow_blue: { t: 'glow_blue.jpg', e: true, ec: 0x9cd2ff, ei: 0.55 }, M_red: { t: 'red.jpg' }, M_soil: { t: 'soilpot.jpg' },
 };
 const CHUNK = 24;            // instancing / culling cell (m): bigger cells = fewer draw calls, the camera sees ~30 x 25 m
 
@@ -56,7 +64,7 @@ export function blMaterial(name, aniso = 4) {
   const d = MAT_TEX[name] || { t: 'cream.jpg' };
   const m = new THREE.MeshStandardMaterial({ map: sharedTex(d.t, aniso, d.s || 1), vertexColors: true, roughness: 1, metalness: d.metal || 0,
     side: d.a ? THREE.DoubleSide : THREE.FrontSide, alphaTest: d.a ? 0.5 : 0, alphaToCoverage: !!d.a });
-  if (d.e) { m.emissive = new THREE.Color(0xffd890); m.emissiveIntensity = 1.6; m.emissiveMap = m.map; }
+  if (d.e) { m.emissive = new THREE.Color(d.ec ?? 0xffd890); m.emissiveIntensity = d.ei ?? 1.6; m.emissiveMap = m.map; }
   if (d.a) {
     const leaf = name.startsWith('M_leaf');
     m.onBeforeCompile = sh => {
@@ -217,11 +225,96 @@ diffuseColor.rgb *= col;
 gDirt = dirt;
 gN = mix(tri(tNG, vW, 9.).rgb, tri(tNP, vW, 6.).rgb, dirt) * 2. - 1.;
 `).replace('#include <normal_fragment_maps>', `
-{ vec3 nn = normalize(vec3(gN.xy * .9, 1.));
+{ vec3 nn = normalize(vec3(gN.xy * .3, 1.));
   vec3 wn = normalize(vec3(nn.x, nn.z, -nn.y));                    // tangent x = world x, bitangent = world -z (vW.y)
   normal = normalize((viewMatrix * vec4(wn, 0.)).xyz); }`);
   };
   m.customProgramCacheKey = () => 'forestground2';
+  return m;
+}
+
+// hand-painted violet arena floor (boss platform): large painterly colour masses (violet soil / deep violet / warm
+// brown / moss) with brush-like domain-warped edges, worn lighter centre, mossy rim, thin cracks, leaf litter and
+// stones from the magic texture set (used as low-contrast micro detail), soft drifting leaf shadows and warm light pools.
+function arenaMaterial(tex, boss) {
+  const m = new THREE.MeshStandardMaterial({ roughness: 1, metalness: 0 });
+  const c = boss && boss.center || [0, 0], r = boss && boss.radius || 10;
+  const U = { tSoil: { value: tex.grass }, tDeep: { value: tex.grass_shadow }, tBrown: { value: tex.grass_dry }, tMoss: { value: tex.moss },
+    tPeb: { value: tex.pebble }, tEdge: { value: tex.path_edge }, tNG: { value: tex.grass_n }, uA: { value: new THREE.Vector3(c[0], -c[1], r) }, uTime: TG_TIME };
+  m.onBeforeCompile = sh => {
+    Object.assign(sh.uniforms, U);
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\n' + GROUND_VS)
+      .replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvec4 wpG = modelMatrix * vec4(transformed, 1.0); vW = vec2(wpG.x, -wpG.z);');
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>
+varying vec2 vW; uniform sampler2D tSoil, tDeep, tBrown, tMoss, tPeb, tEdge, tNG; uniform vec3 uA; uniform float uTime;
+float h21(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
+vec2 h22(vec2 p){ return vec2(h21(p), h21(p + 17.3)); }
+float vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f);
+  return mix(mix(h21(i), h21(i+vec2(1,0)), f.x), mix(h21(i+vec2(0,1)), h21(i+vec2(1,1)), f.x), f.y); }
+float fbm(vec2 p){ return vn(p)*.5 + vn(p*2.03+7.1)*.25 + vn(p*4.11+3.3)*.125 + vn(p*8.3+1.7)*.0625; }
+vec4 tri(sampler2D t, vec2 w, float s){ vec2 a = w / s; vec2 b = mat2(.8,-.6,.6,.8) * w / (s*1.37) + vec2(.31,.77);
+  return mix(texture2D(t, a), texture2D(t, b), smoothstep(.3, .7, vn(w * .06))); }
+float lum(vec3 c){ return dot(c, vec3(.299, .587, .114)); }
+// brush mask: domain-warped noise with a soft but definite edge (painted shapes, not gradients)
+float brush(vec2 p, float th, float soft){ vec2 q = p + vec2(fbm(p * 1.7 + 3.), fbm(p * 1.7 + 9.)) * .9; return smoothstep(th - soft, th + soft, fbm(q)); }
+// voronoi edge distance -> thin cracks
+float crack(vec2 p){ vec2 i = floor(p), f = fract(p); float d1 = 8., d2 = 8.;
+  for (int y = -1; y <= 1; y++) for (int x = -1; x <= 1; x++) { vec2 g = vec2(x, y), o = h22(i + g); float d = length(g + o - f); if (d < d1) { d2 = d1; d1 = d; } else if (d < d2) d2 = d; }
+  return d2 - d1; }
+vec3 gN;
+`).replace('#include <map_fragment>', `
+vec2 w = vW; float rd = length(w - uA.xy) / uA.z;                      // 0 centre .. 1 arena edge
+// micro detail: texture luminance around its mean (keeps grain, drops the speckled colour)
+float g1 = lum(tri(tSoil, w, 13.).rgb) / .46, g2 = lum(tri(tDeep, w, 6.).rgb) / .24, g3 = lum(tri(tBrown, w, 8.).rgb) / .40, gm = lum(tri(tMoss, w, 3.).rgb) / .32;
+// brush dabs: short strokes in two fixed directions, blended by a slow mask (no swirls)
+float bd = smoothstep(.35, .65, vn(w * .12 + 9.));
+float stroke = mix(vn(vec2(w.x * 1.3 + w.y * .4, w.y * 5.5 - w.x * 1.6)), vn(vec2(w.x * 5.5 + w.y * 1.4, w.y * 1.3 - w.x * .5) + 3.), bd);
+vec3 cSoil = vec3(.47, .36, .61) * mix(1., g1, .22), cDeep = vec3(.35, .26, .49) * mix(1., g1, .15);
+vec3 cBrown = vec3(.53, .40, .33) * mix(1., g3, .5), cMoss = mix(vec3(.27, .40, .27), vec3(.42, .54, .30), stroke) * mix(1., gm, .4);
+vec3 col = cSoil;
+col = mix(col, cDeep, brush(w * .16 + 2., .58, .035) * .5);                          // large deep-violet pools
+col = mix(col, mix(col, vec3(.62, .52, .76), .45), brush(w * .22 + 7., .64, .03) * (1. - rd * .6));  // lilac light masses
+col = mix(col, cBrown, brush(w * .3 + 13., .65, .03) * .7);                            // warm brown soil
+float moss = brush(w * .45 + 21., .76 - smoothstep(.7, 1.15, rd) * .16, .025);           // moss tufts, denser toward the rim
+col = mix(col, cMoss, moss * .85);
+col *= mix(.94, 1.05, stroke) * mix(.92, 1.05, fbm(w * .5 + 4.));                       // brush dabs + mid value drift
+// worn centre: lighter, slightly warm; rim darker (dense growth around)
+col = mix(col, col * vec3(1.08, 1.04, 1.0) + .025, (1. - smoothstep(.0, .7, rd)) * .5);
+col *= 1. - smoothstep(.85, 1.25, rd) * .2;
+// thin dark cracks in bare soil
+float ck = crack(w * .8 + vec2(fbm(w * .4) * 1.2)); float cl = (1. - smoothstep(.0, .025, ck)) * (1. - moss) * smoothstep(.58, .72, fbm(w * .2 + 33.));
+col = mix(col, col * vec3(.5, .42, .6), cl * .7);
+// stones / pebbles and leaf litter from the painted texture set
+vec4 pb = tri(tPeb, w, 4.); float st = smoothstep(.66, .85, lum(pb.rgb)) * brush(w * .4 + 41., .5, .12);
+col = mix(col, vec3(.76, .72, .80) * (.8 + .4 * lum(pb.rgb)), st * .75);
+vec4 lf = tri(tEdge, w, 3.5); float leaf = smoothstep(.5, .8, lum(lf.rgb)) * smoothstep(.4, .75, fbm(w * .6 + 51.));
+col = mix(col, vec3(.78, .48, .30), leaf * .45);
+// painted fallen leaves (small oriented almonds, warm orange / brown / dusty violet) and round pebbles with a lit top
+{ vec2 g = w / 1.1, c = floor(g), f = fract(g); float r = h21(c);
+  if (r > .62) { vec2 o = h22(c + 3.) * .6 + .2; float a = r * 40.; vec2 d = f - o; d = mat2(cos(a), -sin(a), sin(a), cos(a)) * d;
+    float e = length(d / vec2(.13, .055)); float lf2 = 1. - smoothstep(.85, 1., e);
+    vec3 lc = r > .88 ? vec3(.80, .50, .30) : r > .75 ? vec3(.60, .38, .28) : vec3(.56, .42, .64);
+    lc *= .9 + .25 * smoothstep(-.1, .1, d.y); col = mix(col, lc, lf2 * (1. - moss * .6) * .8); } }
+{ vec2 g = w / 1.7, c = floor(g), f = fract(g); float r = h21(c + 11.);
+  if (r > .7) { vec2 o = h22(c + 5.) * .6 + .2; float rad = .05 + .07 * h21(c + 2.); vec2 d = (f - o) * 1.7;
+    float e = length(d * vec2(1., 1.25)) / rad;
+    col *= 1. - (1. - smoothstep(1., 1.6, e)) * smoothstep(.9, 1., e) * .35;                    // contact shadow
+    vec3 pc = vec3(.62, .58, .68) * (.82 + .35 * smoothstep(.2, -.6, (d.x - d.y) / rad));       // lit from the upper left
+    col = mix(col, pc, 1. - smoothstep(.85, 1., e)); } }
+// glowing spores: sparse tiny lilac dots that breathe
+vec2 sc = floor(w * 2.2); float sp = step(.985, h21(sc)); vec2 sf = fract(w * 2.2) - h22(sc) * .6 - .2;
+col += vec3(.75, .55, 1.) * sp * (1. - smoothstep(.0, .06, length(sf))) * (.35 + .25 * sin(uTime * 2. + h21(sc) * 30.));
+// soft leaf shadows drifting slowly, and warm sun pools (never black: tinted violet-blue)
+float ls = smoothstep(.48, .62, fbm(w * .32 + vec2(uTime * .05, uTime * .03)));
+float sun = smoothstep(.55, .75, fbm(w * .09 + 61.)) * (1. - ls * .7);
+col *= mix(vec3(1.), vec3(.80, .78, .95), ls * .55);
+col *= 1. + sun * vec3(.16, .11, .02);
+diffuseColor.rgb *= col;
+gN = tri(tNG, w, 6.).rgb * 2. - 1.;
+`).replace('#include <normal_fragment_maps>', `
+{ vec3 nn = normalize(vec3(gN.xy * .25, 1.)); vec3 wn = normalize(vec3(nn.x, nn.z, -nn.y)); normal = normalize((viewMatrix * vec4(wn, 0.)).xyz); }`);
+  };
+  m.customProgramCacheKey = () => 'arenafloor1';
   return m;
 }
 
@@ -296,6 +389,10 @@ export async function buildNature(zone, renderer) {
     path_edge: tl(pre + 'path_edge.jpg'), soil_dark: tl(pre + 'soil_dark.jpg'), pebble: tl(pre + 'pebble.jpg'), grass_n: tl('g_grass_n.jpg', false), path_n: tl('g_path_n.jpg', false) };
   const props = def.props || [];
   const mask = paintMask(def, props);
+  // painted violet forest floor for raised arenas (builder 'boss_floor' terrain): same splat shader, magic texture set
+  const mgp = 'g_magic_', magicTex = { grass: tl(mgp + 'grass.jpg'), grass_shadow: tl(mgp + 'grass_shadow.jpg'), grass_dry: tl(mgp + 'grass_dry.jpg'), moss: tl(mgp + 'moss.jpg'), path: tl(mgp + 'path.jpg'),
+    path_edge: tl(mgp + 'path_edge.jpg'), soil_dark: tl(mgp + 'soil_dark.jpg'), pebble: tl(mgp + 'pebble.jpg'), grass_n: tl('g_grass_n.jpg', false), path_n: tl('g_path_n.jpg', false) };
+  const magicFloor = arenaMaterial(magicTex, def.boss);
 
   // ground plane (bounds + margin); the boss platform / ramp from the builder's 'terrain' group stay on top
   const [x0, z0, x1, z1] = def.bounds, mg = 30;
@@ -329,7 +426,7 @@ export async function buildNature(zone, renderer) {
       qt.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -(q.rot || 0) * DEG);
       im.setMatrixAt(k, m4.compose(T({ x: g0.x, y: g0.y - 0.04 * s * (spec.trunk ? 0.3 : 1), z: g0.z }), qt, sc.set(s, s, s)));
       const v = hash(i * 13 + 5), w = hash(i * 31 + 9);          // gentle per-instance hue / value variation
-      const tn = NV.tint && /^(tree|shrub)/.test(name) ? NV.tint : NV.rockTint && name.startsWith('rock') ? NV.rockTint : [1, 1, 1], kv = 0.94 + v * 0.1;   // per-model colour correction x gentle per-instance value / hue shift
+      const tn = NV.tint && /^(tree|shrub)/.test(name) && !/violet/.test(name) ? NV.tint : NV.rockTint && name.startsWith('rock') && !/magic/.test(name) ? NV.rockTint : [1, 1, 1], kv = 0.94 + v * 0.1;   // per-model colour correction x gentle per-instance value / hue shift
       col.setRGB(tn[0] * kv * (0.97 + w * 0.06), tn[1] * kv, tn[2] * kv * (1.03 - w * 0.06)); im.setColorAt(k, col);
     });
     im.receiveShadow = true; im.castShadow = false;
@@ -344,6 +441,20 @@ export async function buildNature(zone, renderer) {
         const n = items.length; sm.onBeforeRender = () => { sm.count = 0; }; sm.onAfterRender = () => { sm.count = n; };
         root.add(sm);
       } else im.castShadow = true;
+    }
+  }
+
+  // faint ground glow under glowing mushrooms (additive soft disc, one instanced mesh)
+  {
+    const gl = []; props.forEach((q, i) => { const list = TYPE_MODEL[q.type]; if (!list) return; const n = q.model && MODELS[q.model] ? q.model : list[Math.floor(hash(i * 7 + 3) * list.length)]; if (MODELS[n].glow) gl.push([q, MODELS[n]]); });
+    if (gl.length) {
+      const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d'), gr = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+      gr.addColorStop(0, 'rgba(255,255,255,0.55)'); gr.addColorStop(0.5, 'rgba(255,255,255,0.18)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = gr; x.fillRect(0, 0, 64, 64);
+      const gm = new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false });
+      const im = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), gm, gl.length);
+      gl.forEach(([q, sp], k) => { const g0 = geo.ground(q.pos[0], q.pos[1]), r = (q.scale || 1) * sp.h * (sp.trunk ? 1.1 : 2.6);
+        im.setMatrixAt(k, m4.compose(T({ x: g0.x, y: g0.y + 0.03, z: g0.z }), qt.identity(), sc.set(r, 1, r))); im.setColorAt(k, col.setRGB(...sp.glow).multiplyScalar(0.55)); });
+      im.renderOrder = 1; im.computeBoundingSphere(); im.name = 'nature:glow'; root.add(im);
     }
   }
 
@@ -462,7 +573,7 @@ transformed.xz += vec2(sw, sw * .4) * aRoot.z * aRoot.z;`);
 
   const v3 = new THREE.Vector3(); let t = 0;
   return {
-    root, stats: { instances, cards: cards.length }, dither: DITHER,
+    root, stats: { instances, cards: cards.length }, dither: DITHER, magicFloor,
     update(dt) {
       t += dt; fm.userData.U.uTime.value = t;
       const p = G.player, R = G.render; if (!p || !R) return;

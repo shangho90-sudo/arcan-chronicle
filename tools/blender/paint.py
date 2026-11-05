@@ -296,6 +296,32 @@ def ground_variant(pre, S, grass, shadow, dry, moss, path, edge, soil, pebble, f
     ground_soil(f'g_{pre}_soil_dark', S, 143, soil[0], soil[1], 80)
     ground_soil(f'g_{pre}_pebble', S, 144, pebble[0], pebble[1], 1400)
 
+def litter(name, S, seed, leaves=600, spores=900, cracks=0, leaf_cols=('#8a5a3a', '#b0743e', '#6e4a5e'), spore_col='#d8b8ff'):
+    """adds leaf litter, glowing spores and hairline cracks on top of an existing ground texture (tiles)"""
+    path = os.path.join(GROUND, name + '.jpg'); base = np.asarray(Image.open(path).convert('RGB')).astype(np.float32)
+    rng = np.random.default_rng(seed); cv = Canvas(S)
+    for _ in range(cracks):
+        x, y = rng.uniform(0, S), rng.uniform(0, S); pts = [(x, y)]
+        for k in range(rng.integers(3, 8)): x += rng.uniform(-30, 30); y += rng.uniform(-30, 30); pts.append((x, y))
+        cv.line(pts, (30, 18, 40, 150), rng.uniform(1.5, 3))
+    for _ in range(leaves):
+        x, y = rng.uniform(0, S), rng.uniform(0, S); L = rng.uniform(9, 18) * S / 1024; col = hexc(leaf_cols[rng.integers(0, len(leaf_cols))]) * rng.uniform(0.85, 1.15)
+        cv.poly(leaf(x, y, rng.uniform(0, 6.28), L, L * 0.5), (*np.minimum(col, 255), 230))
+    for _ in range(spores):
+        x, y = rng.uniform(0, S), rng.uniform(0, S); r = rng.uniform(1.2, 2.6) * S / 1024
+        cv.ellipse(x, y, r * 2.2, r * 2.2, (*hexc(spore_col), 40)); cv.ellipse(x, y, r, r, (*hexc(spore_col), 230))
+    top = np.asarray(cv.get()).astype(np.float32); a = top[..., 3:] / 255
+    Image.fromarray(clamp8(base * (1 - a) + top[..., :3] * a)).save(path, quality=90)
+
+def magic_floor(S=1024):
+    # 속삭이는 숲 보스 단: painted violet forest floor (light / dark violet soil, warm brown soil, violet-green moss,
+    # stones, cracked dark earth) + leaf litter and faint glowing spores
+    ground_variant('magic', S, ('#6c5480', '#8a70a0', '#a993bf'), ('#3e2e52', '#523e68', '#6c5888'), ('#7a5a48', '#94704f', '#b08a64'), ('#3e5a48', '#56705a', '#7e9070'),
+                   ('#8a6a7a', '#a48496', '#c2a4b2'), ('#5a4058', '#6e5268'), ('#2e2234', '#3e2e44'), ('#7c7088', '#9a8ea6'), flowers=(0.0, 0.0), peb_path=500)
+    for n, sd, kw in [('g_magic_grass', 1, dict(leaves=500, spores=700)), ('g_magic_grass_shadow', 2, dict(leaves=350, spores=1100)), ('g_magic_grass_dry', 3, dict(leaves=900, spores=200)),
+                      ('g_magic_soil_dark', 4, dict(leaves=200, spores=300, cracks=70)), ('g_magic_path', 5, dict(leaves=300, spores=150))]:
+        litter(n, S, sd, **kw)
+
 def ground_variants(S=1024):
     # 안개 골짜기: cool, blue-green, mossy; 서리 고원: frosted grass, snow drifts, grey-blue stone road; 용의 유적: dry gold grass, ash
     ground_variant('mist', S, ('#3f7a4a', '#5d9a5c', '#9cc48a'), ('#284f44', '#3a6a54', '#5e8c6c'), ('#6f8c5a', '#8fa66c', '#bccb94'), ('#2f5c44', '#4c7c50', '#78a468'),
@@ -304,6 +330,30 @@ def ground_variants(S=1024):
                    ('#8c949c', '#a8b0b8', '#c8d0d8'), ('#6c747c', '#848c94'), ('#5c646c', '#747c84'), ('#9aa2aa', '#b8c0c8'), flowers=(0.0, 0.0), peb_path=900)
     ground_variant('ruins', S, ('#8a8a3a', '#b0a64a', '#dccb72'), ('#5e5a30', '#7a7038', '#a29450'), ('#a8863e', '#c8a452', '#e8c878'), ('#5a6630', '#76823c', '#9ca452'),
                    ('#8a6448', '#a87c58', '#c89a70'), ('#5e4030', '#74503a'), ('#3a2c26', '#4c3a30'), ('#7a6a5c', '#988674'), flowers=(0.06, 0.02), peb_path=700)
+
+# ---------------------------------------------------------------------------------------------- mushroom caps / stems (boss forest)
+def cap(name, c0, c1, c2, S=512, seed=71, streaks=True):
+    """painted cap: soft value masses + radial-ish brush streaks (box-mapped, so plain strokes in two directions)"""
+    rng = np.random.default_rng(seed)
+    n = pnoise(S, 3, seed); n2 = pnoise(S, 9, seed + 1)
+    rgb = mix(hexc(c0)[None, None], hexc(c1)[None, None], n[..., None]); rgb *= (0.9 + 0.18 * n2)[..., None]
+    cv = Canvas(S)
+    for _ in range(260 if streaks else 80):
+        x, y = rng.uniform(0, S), rng.uniform(0, S); L = rng.uniform(18, 60); a = rng.choice([0.0, math.pi / 2]) + rng.uniform(-0.35, 0.35)
+        col = hexc(c2) if rng.random() < 0.45 else hexc(c0) * 0.9
+        cv.line([(x, y), (x + math.cos(a) * L, y + math.sin(a) * L)], (*col, rng.uniform(40, 90)), rng.uniform(2, 6))
+    top = np.asarray(cv.get()).astype(np.float32); a = top[..., 3:] / 255
+    rgb = rgb * (1 - a) + top[..., :3] * a
+    Image.fromarray(clamp8(rgb)).filter(ImageFilter.GaussianBlur(0.8)).save(os.path.join(TEX, name + '.png'))
+
+def mushroom_set():
+    cap('cap_purple', '#6a3fa0', '#9a6ad0', '#c9a6f0', seed=71)
+    cap('cap_blue', '#2f5aa8', '#5a8ad8', '#a6ccf6', seed=72)
+    cap('cap_orange', '#c0562a', '#e8873e', '#f6c27a', seed=73)
+    cap('glow_purple', '#b98af0', '#dcc0ff', '#f6ecff', seed=74, streaks=False)
+    cap('glow_blue', '#7ab6f0', '#bfe2ff', '#f0faff', seed=75, streaks=False)
+    cap('stem', '#d8c6a6', '#efe2c8', '#fff4e0', seed=76)
+    cap('spot', '#efe4cc', '#fbf3e2', '#ffffff', seed=77, streaks=False)
 
 if __name__ == '__main__':
     foliage_tile(1024, 1, FOL, 'foliage')
@@ -317,5 +367,9 @@ if __name__ == '__main__':
     for n, c in [('iron', '#2e3440'), ('gold', '#d6aa4a'), ('navy', '#22386e'), ('cream', '#efe2c4'), ('roof_blue', '#3c5aa8'), ('terracotta', '#c87a4a'), ('plaster', '#efe0c0'), ('lampglow', '#ffe9a8'), ('red', '#b8443a'), ('soilpot', '#6a4a30')]:
         flat(n, c)
     plants_atlas()
-    ground_set(); ground_variants()
+    FOLV = dict(deep=hexc('#2a1f4e'), dark=hexc('#45307a'), mid=hexc('#6c4fae'), light=hexc('#9a7ad6'), hi=hexc('#c6a8f2'), warm=hexc('#e6cff8'))
+    foliage_tile(1024, 8, FOLV, 'foliage_violet'); leaf_card(512, 9, FOLV, 'leafcard_violet')
+    stone(512, 15, 'stone_violet', '#a49ab4', '#8a86a0', '#5e5672')
+    mushroom_set()
+    ground_set(); ground_variants(); magic_floor()
     print('ok')

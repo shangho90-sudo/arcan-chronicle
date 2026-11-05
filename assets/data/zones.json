@@ -8185,9 +8185,9 @@
    ],
    "sun": [
     1.0,
-    0.88,
-    0.66,
-    1.55
+    0.86,
+    0.62,
+    1.42
    ],
    "spriteTint": [
     0.97,
@@ -8232,7 +8232,8 @@
      "scale": 1.22,
      "variant": "boss",
      "w": 0.0,
-     "d": 0.0
+     "d": 0.0,
+     "model": "rock_magic"
     },
     {
      "type": "rock",
@@ -8244,7 +8245,8 @@
      "scale": 1.19,
      "variant": "boss",
      "w": 0.0,
-     "d": 0.0
+     "d": 0.0,
+     "model": "rock_magic_low"
     },
     {
      "type": "rock",
@@ -8256,7 +8258,8 @@
      "scale": 1.23,
      "variant": "boss",
      "w": 0.0,
-     "d": 0.0
+     "d": 0.0,
+     "model": "rock_magic"
     },
     {
      "type": "rock",
@@ -8268,7 +8271,8 @@
      "scale": 1.2,
      "variant": "boss",
      "w": 0.0,
-     "d": 0.0
+     "d": 0.0,
+     "model": "rock_magic"
     },
     {
      "type": "rock",
@@ -8280,7 +8284,8 @@
      "scale": 1.32,
      "variant": "boss",
      "w": 0.0,
-     "d": 0.0
+     "d": 0.0,
+     "model": "rock_magic_low"
     },
     {
      "type": "rock",
@@ -8292,7 +8297,8 @@
      "scale": 1.12,
      "variant": "boss",
      "w": 0.0,
-     "d": 0.0
+     "d": 0.0,
+     "model": "rock_magic"
     },
     {
      "type": "rock",
@@ -8304,7 +8310,8 @@
      "scale": 1.32,
      "variant": "boss",
      "w": 0.0,
-     "d": 0.0
+     "d": 0.0,
+     "model": "rock_magic"
     },
     {
      "type": "rock",
@@ -8316,7 +8323,8 @@
      "scale": 1.02,
      "variant": "boss",
      "w": 0.0,
-     "d": 0.0
+     "d": 0.0,
+     "model": "rock_magic_low"
     },
     {
      "type": "rock",
@@ -8328,7 +8336,8 @@
      "scale": 1.39,
      "variant": "boss",
      "w": 0.0,
-     "d": 0.0
+     "d": 0.0,
+     "model": "rock_magic"
     },
     {
      "type": "rock",
@@ -8340,7 +8349,8 @@
      "scale": 1.25,
      "variant": "boss",
      "w": 0.0,
-     "d": 0.0
+     "d": 0.0,
+     "model": "rock_magic"
     },
     {
      "type": "rock",
@@ -8352,7 +8362,8 @@
      "scale": 1.01,
      "variant": "boss",
      "w": 0.0,
-     "d": 0.0
+     "d": 0.0,
+     "model": "rock_magic_low"
     },
     {
      "type": "rock",
@@ -8364,7 +8375,8 @@
      "scale": 1.02,
      "variant": "boss",
      "w": 0.0,
-     "d": 0.0
+     "d": 0.0,
+     "model": "rock_magic"
     },
     {
      "type": "rock",
@@ -8376,7 +8388,8 @@
      "scale": 1.1,
      "variant": "boss",
      "w": 0.0,
-     "d": 0.0
+     "d": 0.0,
+     "model": "rock_magic"
     },
     {
      "type": "rock",
@@ -8388,7 +8401,8 @@
      "scale": 1.19,
      "variant": "boss",
      "w": 0.0,
-     "d": 0.0
+     "d": 0.0,
+     "model": "rock_magic_low"
     },
     {
      "type": "rock",
@@ -8400,7 +8414,8 @@
      "scale": 1.34,
      "variant": "boss",
      "w": 0.0,
-     "d": 0.0
+     "d": 0.0,
+     "model": "rock_magic"
     },
     {
      "type": "rock",
@@ -8412,7 +8427,8 @@
      "scale": 1.26,
      "variant": "boss",
      "w": 0.0,
-     "d": 0.0
+     "d": 0.0,
+     "model": "rock_magic"
     },
     {
      "type": "rock",
@@ -8424,7 +8440,8 @@
      "scale": 1.26,
      "variant": "boss",
      "w": 0.0,
-     "d": 0.0
+     "d": 0.0,
+     "model": "rock_magic_low"
     },
     {
      "type": "rock",
@@ -8436,7 +8453,8 @@
      "scale": 1.11,
      "variant": "boss",
      "w": 0.0,
-     "d": 0.0
+     "d": 0.0,
+     "model": "rock_magic"
     },
     {
      "type": "rock",
@@ -8448,7 +8466,8 @@
      "scale": 1.4,
      "variant": "boss",
      "w": 0.0,
-     "d": 0.0
+     "d": 0.0,
+     "model": "rock_magic"
     },
     {
      "type": "rock",
@@ -8460,7 +8479,8 @@
      "scale": 1.28,
      "variant": "boss",
      "w": 0.0,
-     "d": 0.0
+     "d": 0.0,
+     "model": "rock_magic_low"
     },
     {
      "type": "rock",
@@ -8472,7 +8492,8 @@
      "scale": 1.09,
      "variant": "boss",
      "w": 0.0,
-     "d": 0.0
+     "d": 0.0,
+     "model": "rock_magic"
     },
     {
      "type": "rock",
@@ -8484,7 +8505,8 @@
      "scale": 1.03,
      "variant": "boss",
      "w": 0.0,
-     "d": 0.0
+     "d": 0.0,
+     "model": "rock_magic"
     },
     {
      "type": "rock",
@@ -8496,7 +8518,8 @@
      "scale": 1.16,
      "variant": "boss",
      "w": 0.0,
-     "d": 0.0
+     "d": 0.0,
+     "model": "rock_magic_low"
     },
     {
      "type": "rock",
@@ -8508,55 +8531,8 @@
      "scale": 1.15,
      "variant": "boss",
      "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "mushroom",
-     "pos": [
-      20,
-      30
-     ],
-     "rot": 344.9,
-     "scale": 1.5,
-     "variant": "purple",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "mushroom",
-     "pos": [
-      30,
-      20
-     ],
-     "rot": 305.03,
-     "scale": 1.5,
-     "variant": "purple",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "mushroom",
-     "pos": [
-      29,
-      31
-     ],
-     "rot": 0.2,
-     "scale": 1.5,
-     "variant": "purple",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "mushroom",
-     "pos": [
-      19,
-      21.5
-     ],
-     "rot": 75.5,
-     "scale": 1.5,
-     "variant": "purple",
-     "w": 0.0,
-     "d": 0.0
+     "d": 0.0,
+     "model": "rock_magic"
     },
     {
      "type": "ruin",
@@ -10037,19 +10013,6 @@
     },
     {
      "type": "tree",
-     "model": "tree_broad_a",
-     "pos": [
-      10.72,
-      32.67
-     ],
-     "rot": 140.0,
-     "scale": 1.14,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
      "model": "tree_forest_round",
      "pos": [
       -30.58,
@@ -10057,19 +10020,6 @@
      ],
      "rot": 345.5,
      "scale": 1.04,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "model": "tree_forest_round",
-     "pos": [
-      12.38,
-      11.28
-     ],
-     "rot": 2.3,
-     "scale": 1.19,
      "variant": "",
      "w": 0.0,
      "d": 0.0
@@ -10842,19 +10792,6 @@
      "d": 0.0
     },
     {
-     "type": "tree",
-     "model": "tree_forest_round",
-     "pos": [
-      12.45,
-      35.68
-     ],
-     "rot": 328.6,
-     "scale": 1.06,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
      "type": "pine",
      "model": "tree_forest_tall",
      "pos": [
@@ -10986,19 +10923,6 @@
     },
     {
      "type": "tree",
-     "model": "tree_broad_a",
-     "pos": [
-      33.55,
-      12.26
-     ],
-     "rot": 77.9,
-     "scale": 1.05,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
      "model": "tree_forest_round",
      "pos": [
       -7.79,
@@ -11110,19 +11034,6 @@
      ],
      "rot": 144.3,
      "scale": 1.04,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "model": "tree_forest_tall",
-     "pos": [
-      36.36,
-      14.35
-     ],
-     "rot": 343.1,
-     "scale": 0.88,
      "variant": "",
      "w": 0.0,
      "d": 0.0
@@ -11441,19 +11352,6 @@
     },
     {
      "type": "tree",
-     "model": "tree_broad_a",
-     "pos": [
-      15.46,
-      11.26
-     ],
-     "rot": 78.1,
-     "scale": 0.93,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
      "model": "tree_broad_b",
      "pos": [
       -4.35,
@@ -11661,19 +11559,6 @@
      "d": 0.0
     },
     {
-     "type": "pine",
-     "model": "tree_forest_tall",
-     "pos": [
-      35.89,
-      35.61
-     ],
-     "rot": 112.8,
-     "scale": 1.11,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
      "type": "tree",
      "model": "tree_broad_a",
      "pos": [
@@ -11838,19 +11723,6 @@
      ],
      "rot": 220.4,
      "scale": 1.05,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "model": "tree_forest_tall",
-     "pos": [
-      30.17,
-      10.8
-     ],
-     "rot": 251.8,
-     "scale": 1.23,
      "variant": "",
      "w": 0.0,
      "d": 0.0
@@ -14444,19 +14316,6 @@
     },
     {
      "type": "shrub",
-     "model": "shrub_b",
-     "pos": [
-      12.5,
-      33.02
-     ],
-     "rot": 125.0,
-     "scale": 0.89,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "shrub",
      "model": "shrub_a",
      "pos": [
       -30.27,
@@ -14477,19 +14336,6 @@
      ],
      "rot": 189.0,
      "scale": 0.89,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "shrub",
-     "model": "shrub_a",
-     "pos": [
-      14.51,
-      11.32
-     ],
-     "rot": 168.8,
-     "scale": 0.92,
      "variant": "",
      "w": 0.0,
      "d": 0.0
@@ -15757,32 +15603,6 @@
     },
     {
      "type": "shrub",
-     "model": "shrub_a",
-     "pos": [
-      14.36,
-      34.81
-     ],
-     "rot": 89.7,
-     "scale": 1.12,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "shrub",
-     "model": "shrub_b",
-     "pos": [
-      10.9,
-      36.11
-     ],
-     "rot": 269.9,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "shrub",
      "model": "shrub_b",
      "pos": [
       -15.54,
@@ -15998,32 +15818,6 @@
      ],
      "rot": 198.8,
      "scale": 0.83,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "shrub",
-     "model": "shrub_a",
-     "pos": [
-      35.72,
-      13.1
-     ],
-     "rot": 94.9,
-     "scale": 0.94,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "shrub",
-     "model": "shrub_b",
-     "pos": [
-      33.49,
-      13.93
-     ],
-     "rot": 79.2,
-     "scale": 0.81,
      "variant": "",
      "w": 0.0,
      "d": 0.0
@@ -16726,19 +16520,6 @@
      ],
      "rot": 139.8,
      "scale": 0.74,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "shrub",
-     "model": "shrub_b",
-     "pos": [
-      16.81,
-      12.22
-     ],
-     "rot": 134.5,
-     "scale": 0.96,
      "variant": "",
      "w": 0.0,
      "d": 0.0
@@ -17564,19 +17345,6 @@
     },
     {
      "type": "rock",
-     "model": "rock_medium",
-     "pos": [
-      12.31,
-      13.86
-     ],
-     "rot": 145.5,
-     "scale": 1.14,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "rock",
      "model": "rock_large",
      "pos": [
       12.03,
@@ -17675,19 +17443,6 @@
      ],
      "rot": 323.8,
      "scale": 1.17,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "rock",
-     "model": "rock_roadside",
-     "pos": [
-      10.64,
-      27.23
-     ],
-     "rot": 113.3,
-     "scale": 0.86,
      "variant": "",
      "w": 0.0,
      "d": 0.0
@@ -18125,45 +17880,6 @@
      "type": "stone",
      "model": "rock_small",
      "pos": [
-      12.43,
-      14.93
-     ],
-     "rot": 171.7,
-     "scale": 1.11,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stone",
-     "model": "rock_small",
-     "pos": [
-      11.25,
-      15.08
-     ],
-     "rot": 163.6,
-     "scale": 0.9,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stone",
-     "model": "rock_small",
-     "pos": [
-      12.1,
-      15.33
-     ],
-     "rot": 182.6,
-     "scale": 0.93,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stone",
-     "model": "rock_small",
-     "pos": [
       14.39,
       -8.39
      ],
@@ -18398,45 +18114,6 @@
      "type": "stone",
      "model": "rock_small",
      "pos": [
-      9.82,
-      26.88
-     ],
-     "rot": 156.2,
-     "scale": 1.14,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stone",
-     "model": "rock_small",
-     "pos": [
-      11.24,
-      26.66
-     ],
-     "rot": 355.0,
-     "scale": 1.02,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stone",
-     "model": "rock_small",
-     "pos": [
-      10.68,
-      28.53
-     ],
-     "rot": 269.1,
-     "scale": 0.75,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stone",
-     "model": "rock_small",
-     "pos": [
       -34.88,
       -24.74
      ],
@@ -18559,19 +18236,6 @@
      ],
      "rot": 105.5,
      "scale": 0.76,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stone",
-     "model": "rock_small",
-     "pos": [
-      9.38,
-      16.4
-     ],
-     "rot": 41.2,
-     "scale": 0.98,
      "variant": "",
      "w": 0.0,
      "d": 0.0
@@ -21168,6 +20832,3779 @@
      "variant": "white",
      "w": 0.0,
      "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet",
+     "pos": [
+      12.0,
+      31.81
+     ],
+     "rot": 1.5,
+     "scale": 0.86,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushtree",
+     "model": "mush_tree",
+     "pos": [
+      29.7,
+      11.14
+     ],
+     "rot": 85.8,
+     "scale": 1.03,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet",
+     "pos": [
+      16.89,
+      10.95
+     ],
+     "rot": 85.5,
+     "scale": 1.19,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushtree",
+     "model": "mush_tree",
+     "pos": [
+      10.43,
+      25.96
+     ],
+     "rot": 87.9,
+     "scale": 0.88,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushtree",
+     "model": "mush_tree",
+     "pos": [
+      13.46,
+      10.82
+     ],
+     "rot": 227.7,
+     "scale": 1.08,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushtree",
+     "model": "mush_tree",
+     "pos": [
+      24.65,
+      10.67
+     ],
+     "rot": 79.8,
+     "scale": 0.99,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushtree",
+     "model": "mush_tree",
+     "pos": [
+      20.92,
+      10.94
+     ],
+     "rot": 33.7,
+     "scale": 1.13,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet",
+     "pos": [
+      35.43,
+      14.9
+     ],
+     "rot": 167.3,
+     "scale": 1.04,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet_round",
+     "pos": [
+      13.01,
+      34.98
+     ],
+     "rot": 143.8,
+     "scale": 0.87,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet_round",
+     "pos": [
+      36.48,
+      11.76
+     ],
+     "rot": 256.2,
+     "scale": 0.85,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet",
+     "pos": [
+      32.91,
+      10.41
+     ],
+     "rot": 229.3,
+     "scale": 0.95,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet",
+     "pos": [
+      35.16,
+      35.08
+     ],
+     "rot": 75.8,
+     "scale": 1.16,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet",
+     "pos": [
+      16.44,
+      36.37
+     ],
+     "rot": 117.0,
+     "scale": 1.0,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "shrub_a",
+     "pos": [
+      13.51,
+      33.31
+     ],
+     "rot": 120.8,
+     "scale": 0.99,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_cluster",
+     "pos": [
+      14.03,
+      32.11
+     ],
+     "rot": 58.6,
+     "scale": 0.89,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_orange",
+     "pos": [
+      13.15,
+      30.42
+     ],
+     "rot": 348.6,
+     "scale": 0.84,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_blue",
+     "pos": [
+      11.57,
+      33.17
+     ],
+     "rot": 114.4,
+     "scale": 1.24,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      10.86,
+      30.57
+     ],
+     "rot": 301.6,
+     "scale": 0.86,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      9.72,
+      31.89
+     ],
+     "rot": 157.7,
+     "scale": 1.29,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      12.23,
+      33.13
+     ],
+     "rot": 123.4,
+     "scale": 1.05,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      14.49,
+      31.63
+     ],
+     "rot": 286.3,
+     "scale": 1.14,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_blue",
+     "pos": [
+      11.1,
+      32.04
+     ],
+     "rot": 213.0,
+     "scale": 0.94,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      12.25,
+      33.43
+     ],
+     "rot": 316.3,
+     "scale": 1.16,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      11.78,
+      29.56
+     ],
+     "rot": 319.6,
+     "scale": 1.08,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      10.46,
+      29.33
+     ],
+     "rot": 341.0,
+     "scale": 1.27,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_blue",
+     "pos": [
+      11.14,
+      30.74
+     ],
+     "rot": 24.5,
+     "scale": 1.02,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "shrub_b",
+     "pos": [
+      31.07,
+      12.44
+     ],
+     "rot": 241.0,
+     "scale": 0.73,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_cluster",
+     "pos": [
+      29.05,
+      12.81
+     ],
+     "rot": 336.8,
+     "scale": 0.96,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      27.4,
+      10.36
+     ],
+     "rot": 0.0,
+     "scale": 1.23,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_blue",
+     "pos": [
+      27.28,
+      9.95
+     ],
+     "rot": 159.1,
+     "scale": 0.91,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      27.83,
+      12.48
+     ],
+     "rot": 170.1,
+     "scale": 1.04,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      30.87,
+      11.89
+     ],
+     "rot": 218.3,
+     "scale": 1.23,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      31.29,
+      10.43
+     ],
+     "rot": 124.8,
+     "scale": 0.98,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      30.24,
+      13.69
+     ],
+     "rot": 76.8,
+     "scale": 1.12,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_cluster",
+     "pos": [
+      18.32,
+      10.48
+     ],
+     "rot": 356.1,
+     "scale": 0.88,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_cluster",
+     "pos": [
+      15.85,
+      11.28
+     ],
+     "rot": 34.4,
+     "scale": 0.81,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_orange",
+     "pos": [
+      14.8,
+      11.42
+     ],
+     "rot": 150.9,
+     "scale": 0.78,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_orange",
+     "pos": [
+      16.52,
+      12.05
+     ],
+     "rot": 204.8,
+     "scale": 0.76,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      16.73,
+      13.03
+     ],
+     "rot": 0.0,
+     "scale": 1.15,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      18.11,
+      11.5
+     ],
+     "rot": 7.2,
+     "scale": 1.15,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_blue",
+     "pos": [
+      15.6,
+      10.35
+     ],
+     "rot": 165.7,
+     "scale": 1.19,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      19.25,
+      9.74
+     ],
+     "rot": 0.0,
+     "scale": 0.83,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      16.96,
+      10.14
+     ],
+     "rot": 310.4,
+     "scale": 1.08,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      16.3,
+      12.2
+     ],
+     "rot": 266.3,
+     "scale": 0.95,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      18.06,
+      10.37
+     ],
+     "rot": 323.2,
+     "scale": 1.27,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_blue",
+     "pos": [
+      18.68,
+      10.04
+     ],
+     "rot": 68.2,
+     "scale": 1.03,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      17.43,
+      12.78
+     ],
+     "rot": 131.7,
+     "scale": 1.08,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      16.27,
+      13.29
+     ],
+     "rot": 0.0,
+     "scale": 1.01,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_blue",
+     "pos": [
+      18.99,
+      9.62
+     ],
+     "rot": 347.7,
+     "scale": 0.89,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_blue",
+     "pos": [
+      15.69,
+      12.94
+     ],
+     "rot": 81.2,
+     "scale": 0.91,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_orange",
+     "pos": [
+      11.11,
+      24.55
+     ],
+     "rot": 57.3,
+     "scale": 0.95,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_cluster",
+     "pos": [
+      11.97,
+      27.38
+     ],
+     "rot": 340.8,
+     "scale": 0.97,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      11.01,
+      25.22
+     ],
+     "rot": 22.9,
+     "scale": 1.04,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_blue",
+     "pos": [
+      11.62,
+      24.79
+     ],
+     "rot": 173.1,
+     "scale": 1.17,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      11.87,
+      24.09
+     ],
+     "rot": 93.9,
+     "scale": 0.82,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      11.76,
+      27.82
+     ],
+     "rot": 159.5,
+     "scale": 1.11,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_blue",
+     "pos": [
+      10.53,
+      27.07
+     ],
+     "rot": 295.5,
+     "scale": 0.92,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_blue",
+     "pos": [
+      10.02,
+      26.75
+     ],
+     "rot": 51.6,
+     "scale": 1.07,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_cluster",
+     "pos": [
+      15.0,
+      10.51
+     ],
+     "rot": 78.3,
+     "scale": 0.89,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_cluster",
+     "pos": [
+      12.35,
+      10.91
+     ],
+     "rot": 244.1,
+     "scale": 0.78,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_orange",
+     "pos": [
+      14.65,
+      11.2
+     ],
+     "rot": 133.5,
+     "scale": 0.95,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      11.68,
+      9.82
+     ],
+     "rot": 83.7,
+     "scale": 0.96,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_blue",
+     "pos": [
+      15.26,
+      12.72
+     ],
+     "rot": 186.9,
+     "scale": 1.04,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      12.7,
+      13.47
+     ],
+     "rot": 0.0,
+     "scale": 1.16,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      15.99,
+      12.18
+     ],
+     "rot": 67.8,
+     "scale": 0.87,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      14.44,
+      10.33
+     ],
+     "rot": 0.0,
+     "scale": 0.89,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_orange",
+     "pos": [
+      25.57,
+      10.03
+     ],
+     "rot": 105.4,
+     "scale": 0.87,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_orange",
+     "pos": [
+      23.41,
+      9.79
+     ],
+     "rot": 186.8,
+     "scale": 0.82,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      23.83,
+      10.3
+     ],
+     "rot": 235.5,
+     "scale": 1.21,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_blue",
+     "pos": [
+      22.85,
+      11.57
+     ],
+     "rot": 336.5,
+     "scale": 1.18,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      23.07,
+      10.07
+     ],
+     "rot": 245.3,
+     "scale": 1.17,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      23.96,
+      12.84
+     ],
+     "rot": 139.3,
+     "scale": 0.8,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      22.81,
+      10.14
+     ],
+     "rot": 227.6,
+     "scale": 1.08,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_blue",
+     "pos": [
+      23.91,
+      12.1
+     ],
+     "rot": 354.4,
+     "scale": 0.92,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_cluster",
+     "pos": [
+      19.74,
+      10.7
+     ],
+     "rot": 275.6,
+     "scale": 1.0,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_cluster",
+     "pos": [
+      22.17,
+      11.62
+     ],
+     "rot": 205.8,
+     "scale": 0.78,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_orange",
+     "pos": [
+      19.75,
+      12.71
+     ],
+     "rot": 289.2,
+     "scale": 0.92,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_blue",
+     "pos": [
+      19.33,
+      11.15
+     ],
+     "rot": 52.1,
+     "scale": 1.07,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      20.09,
+      10.78
+     ],
+     "rot": 218.0,
+     "scale": 1.19,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      21.73,
+      11.58
+     ],
+     "rot": 27.1,
+     "scale": 1.26,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      19.27,
+      11.02
+     ],
+     "rot": 283.3,
+     "scale": 0.97,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "shrub_b",
+     "pos": [
+      37.22,
+      14.43
+     ],
+     "rot": 167.5,
+     "scale": 0.81,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "shrub_a",
+     "pos": [
+      34.32,
+      13.54
+     ],
+     "rot": 126.5,
+     "scale": 1.03,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_cluster",
+     "pos": [
+      34.62,
+      16.9
+     ],
+     "rot": 355.9,
+     "scale": 0.97,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "shrub_b",
+     "pos": [
+      36.33,
+      15.83
+     ],
+     "rot": 67.9,
+     "scale": 0.83,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      36.89,
+      14.32
+     ],
+     "rot": 0.0,
+     "scale": 1.08,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      34.66,
+      13.84
+     ],
+     "rot": 214.6,
+     "scale": 0.92,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      36.35,
+      15.5
+     ],
+     "rot": 239.2,
+     "scale": 1.13,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      36.24,
+      14.65
+     ],
+     "rot": 0.0,
+     "scale": 1.24,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      35.98,
+      16.89
+     ],
+     "rot": 199.4,
+     "scale": 0.73,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_blue",
+     "pos": [
+      33.83,
+      15.07
+     ],
+     "rot": 94.7,
+     "scale": 1.28,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      34.37,
+      17.01
+     ],
+     "rot": 0.0,
+     "scale": 0.94,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      35.21,
+      12.38
+     ],
+     "rot": 32.1,
+     "scale": 1.19,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      35.02,
+      16.83
+     ],
+     "rot": 0.0,
+     "scale": 1.23,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_blue",
+     "pos": [
+      33.97,
+      16.47
+     ],
+     "rot": 305.2,
+     "scale": 0.91,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      35.02,
+      13.58
+     ],
+     "rot": 124.1,
+     "scale": 1.22,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "shrub_b",
+     "pos": [
+      13.43,
+      36.81
+     ],
+     "rot": 72.8,
+     "scale": 1.03,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_cluster",
+     "pos": [
+      14.6,
+      35.52
+     ],
+     "rot": 69.5,
+     "scale": 0.76,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_orange",
+     "pos": [
+      11.92,
+      35.74
+     ],
+     "rot": 96.4,
+     "scale": 0.88,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      14.04,
+      35.09
+     ],
+     "rot": 29.4,
+     "scale": 0.98,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      14.47,
+      36.77
+     ],
+     "rot": 353.5,
+     "scale": 1.27,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      13.2,
+      33.78
+     ],
+     "rot": 140.5,
+     "scale": 0.8,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_blue",
+     "pos": [
+      14.78,
+      33.24
+     ],
+     "rot": 282.7,
+     "scale": 0.94,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      13.49,
+      37.47
+     ],
+     "rot": 17.9,
+     "scale": 0.96,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      14.09,
+      33.9
+     ],
+     "rot": 48.5,
+     "scale": 0.82,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_blue",
+     "pos": [
+      10.97,
+      32.94
+     ],
+     "rot": 278.5,
+     "scale": 1.13,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      15.45,
+      34.96
+     ],
+     "rot": 0.0,
+     "scale": 0.88,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_blue",
+     "pos": [
+      11.66,
+      33.82
+     ],
+     "rot": 166.8,
+     "scale": 0.88,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "shrub_b",
+     "pos": [
+      35.02,
+      12.67
+     ],
+     "rot": 17.0,
+     "scale": 0.83,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_orange",
+     "pos": [
+      36.92,
+      12.85
+     ],
+     "rot": 56.3,
+     "scale": 0.77,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      36.71,
+      10.19
+     ],
+     "rot": 90.2,
+     "scale": 1.07,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      37.39,
+      11.39
+     ],
+     "rot": 0.0,
+     "scale": 1.15,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      35.85,
+      12.98
+     ],
+     "rot": 292.8,
+     "scale": 1.16,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      35.67,
+      13.24
+     ],
+     "rot": 261.4,
+     "scale": 0.72,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_blue",
+     "pos": [
+      37.49,
+      12.34
+     ],
+     "rot": 184.7,
+     "scale": 0.89,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "shrub_a",
+     "pos": [
+      34.54,
+      11.21
+     ],
+     "rot": 117.1,
+     "scale": 0.88,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      34.06,
+      11.49
+     ],
+     "rot": 229.7,
+     "scale": 1.16,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      33.9,
+      11.86
+     ],
+     "rot": 51.3,
+     "scale": 1.23,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      33.78,
+      9.74
+     ],
+     "rot": 137.8,
+     "scale": 0.82,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      32.5,
+      11.52
+     ],
+     "rot": 0.0,
+     "scale": 1.18,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      32.08,
+      12.98
+     ],
+     "rot": 256.5,
+     "scale": 1.28,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      30.71,
+      9.8
+     ],
+     "rot": 280.6,
+     "scale": 0.98,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      32.92,
+      12.8
+     ],
+     "rot": 244.2,
+     "scale": 1.19,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "shrub_a",
+     "pos": [
+      37.28,
+      35.48
+     ],
+     "rot": 80.2,
+     "scale": 0.9,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_cluster",
+     "pos": [
+      34.21,
+      34.53
+     ],
+     "rot": 60.4,
+     "scale": 0.93,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      36.59,
+      34.65
+     ],
+     "rot": 245.0,
+     "scale": 1.06,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      34.5,
+      32.41
+     ],
+     "rot": 0.0,
+     "scale": 1.19,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      33.83,
+      35.62
+     ],
+     "rot": 358.1,
+     "scale": 0.84,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      34.2,
+      35.36
+     ],
+     "rot": 124.2,
+     "scale": 1.05,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      36.38,
+      33.96
+     ],
+     "rot": 224.7,
+     "scale": 1.07,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_blue",
+     "pos": [
+      35.57,
+      34.28
+     ],
+     "rot": 352.7,
+     "scale": 1.15,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_blue",
+     "pos": [
+      33.22,
+      35.3
+     ],
+     "rot": 214.1,
+     "scale": 1.02,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_blue",
+     "pos": [
+      35.19,
+      36.74
+     ],
+     "rot": 268.3,
+     "scale": 0.92,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_cluster",
+     "pos": [
+      14.61,
+      37.36
+     ],
+     "rot": 88.3,
+     "scale": 0.87,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "shrub",
+     "model": "shrub_b",
+     "pos": [
+      17.97,
+      37.49
+     ],
+     "rot": 139.7,
+     "scale": 0.9,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_blue",
+     "pos": [
+      14.8,
+      36.4
+     ],
+     "rot": 293.8,
+     "scale": 1.15,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_blue",
+     "pos": [
+      17.15,
+      34.32
+     ],
+     "rot": 118.3,
+     "scale": 1.03,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      15.31,
+      35.31
+     ],
+     "rot": 0.0,
+     "scale": 1.16,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      17.49,
+      37.33
+     ],
+     "rot": 118.5,
+     "scale": 0.86,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      17.3,
+      36.25
+     ],
+     "rot": 12.0,
+     "scale": 1.23,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_blue",
+     "pos": [
+      16.88,
+      37.09
+     ],
+     "rot": 7.5,
+     "scale": 0.99,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      17.82,
+      36.34
+     ],
+     "rot": 198.5,
+     "scale": 0.83,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_blue",
+     "pos": [
+      14.41,
+      34.75
+     ],
+     "rot": 318.3,
+     "scale": 0.98,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      17.55,
+      37.24
+     ],
+     "rot": 354.6,
+     "scale": 0.97,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      35.34,
+      25.84
+     ],
+     "rot": 308.7,
+     "scale": 0.71,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      35.41,
+      25.74
+     ],
+     "rot": 347.0,
+     "scale": 0.94,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_blue",
+     "pos": [
+      37.02,
+      25.06
+     ],
+     "rot": 60.1,
+     "scale": 0.83,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      35.41,
+      29.51
+     ],
+     "rot": 229.3,
+     "scale": 0.91,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      35.66,
+      29.02
+     ],
+     "rot": 0.0,
+     "scale": 0.91,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      34.96,
+      28.45
+     ],
+     "rot": 254.9,
+     "scale": 1.06,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      35.05,
+      29.07
+     ],
+     "rot": 42.5,
+     "scale": 0.91,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      35.38,
+      26.05
+     ],
+     "rot": 307.5,
+     "scale": 1.15,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      35.64,
+      31.03
+     ],
+     "rot": 171.4,
+     "scale": 1.09,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      33.64,
+      30.68
+     ],
+     "rot": 0.0,
+     "scale": 0.97,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      35.54,
+      27.76
+     ],
+     "rot": 329.7,
+     "scale": 0.89,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      35.9,
+      30.76
+     ],
+     "rot": 17.3,
+     "scale": 1.01,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      34.3,
+      31.07
+     ],
+     "rot": 260.9,
+     "scale": 0.99,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      34.33,
+      32.59
+     ],
+     "rot": 0.0,
+     "scale": 0.8,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      34.7,
+      30.09
+     ],
+     "rot": 0.0,
+     "scale": 1.06,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_blue",
+     "pos": [
+      34.77,
+      32.51
+     ],
+     "rot": 187.0,
+     "scale": 1.12,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      32.67,
+      34.55
+     ],
+     "rot": 0.0,
+     "scale": 1.02,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      33.84,
+      32.55
+     ],
+     "rot": 0.0,
+     "scale": 0.8,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      30.29,
+      33.84
+     ],
+     "rot": 0.0,
+     "scale": 1.05,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      32.34,
+      34.53
+     ],
+     "rot": 0.0,
+     "scale": 0.89,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      30.92,
+      35.13
+     ],
+     "rot": 188.0,
+     "scale": 0.85,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      30.7,
+      34.63
+     ],
+     "rot": 0.0,
+     "scale": 0.96,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_blue",
+     "pos": [
+      28.45,
+      35.51
+     ],
+     "rot": 327.7,
+     "scale": 1.17,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      29.09,
+      35.48
+     ],
+     "rot": 285.6,
+     "scale": 0.89,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      26.4,
+      35.93
+     ],
+     "rot": 0.0,
+     "scale": 1.04,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      25.72,
+      36.03
+     ],
+     "rot": 211.3,
+     "scale": 0.89,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      26.39,
+      36.98
+     ],
+     "rot": 148.2,
+     "scale": 0.83,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      26.47,
+      35.9
+     ],
+     "rot": 0.0,
+     "scale": 0.95,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      26.92,
+      35.14
+     ],
+     "rot": 0.0,
+     "scale": 0.82,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      21.45,
+      35.2
+     ],
+     "rot": 347.2,
+     "scale": 0.86,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_blue",
+     "pos": [
+      21.38,
+      34.89
+     ],
+     "rot": 303.8,
+     "scale": 1.01,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      19.96,
+      36.25
+     ],
+     "rot": 0.0,
+     "scale": 0.93,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      23.12,
+      37.25
+     ],
+     "rot": 0.0,
+     "scale": 0.88,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_blue",
+     "pos": [
+      19.84,
+      33.69
+     ],
+     "rot": 283.1,
+     "scale": 0.88,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      21.79,
+      35.75
+     ],
+     "rot": 329.4,
+     "scale": 0.84,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      20.41,
+      36.49
+     ],
+     "rot": 0.0,
+     "scale": 1.06,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      20.03,
+      33.88
+     ],
+     "rot": 271.0,
+     "scale": 0.81,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      18.15,
+      35.14
+     ],
+     "rot": 136.3,
+     "scale": 0.99,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_blue",
+     "pos": [
+      16.77,
+      33.01
+     ],
+     "rot": 31.6,
+     "scale": 0.84,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      19.86,
+      33.94
+     ],
+     "rot": 0.0,
+     "scale": 0.89,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      17.41,
+      34.13
+     ],
+     "rot": 35.9,
+     "scale": 1.13,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      16.69,
+      32.91
+     ],
+     "rot": 114.5,
+     "scale": 0.93,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      16.59,
+      30.7
+     ],
+     "rot": 10.1,
+     "scale": 0.88,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      15.68,
+      31.21
+     ],
+     "rot": 94.3,
+     "scale": 1.04,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      17.32,
+      32.89
+     ],
+     "rot": 171.1,
+     "scale": 0.94,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      16.55,
+      31.36
+     ],
+     "rot": 133.3,
+     "scale": 0.85,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      13.52,
+      29.01
+     ],
+     "rot": 315.7,
+     "scale": 1.1,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      16.4,
+      30.45
+     ],
+     "rot": 225.7,
+     "scale": 0.89,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      13.52,
+      28.6
+     ],
+     "rot": 236.7,
+     "scale": 0.68,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      15.86,
+      31.16
+     ],
+     "rot": 168.2,
+     "scale": 0.74,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      13.54,
+      26.66
+     ],
+     "rot": 144.1,
+     "scale": 1.05,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      13.22,
+      28.24
+     ],
+     "rot": 167.1,
+     "scale": 0.99,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      15.24,
+      27.97
+     ],
+     "rot": 277.0,
+     "scale": 1.01,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_blue",
+     "pos": [
+      13.28,
+      28.87
+     ],
+     "rot": 236.2,
+     "scale": 1.09,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      14.19,
+      26.19
+     ],
+     "rot": 308.7,
+     "scale": 0.82,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      14.6,
+      26.23
+     ],
+     "rot": 265.0,
+     "scale": 0.85,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      14.81,
+      23.73
+     ],
+     "rot": 153.6,
+     "scale": 0.97,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      13.42,
+      23.8
+     ],
+     "rot": 145.3,
+     "scale": 1.03,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      13.81,
+      26.65
+     ],
+     "rot": 61.4,
+     "scale": 1.07,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      13.55,
+      26.83
+     ],
+     "rot": 351.6,
+     "scale": 1.09,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      14.03,
+      26.76
+     ],
+     "rot": 0.0,
+     "scale": 0.98,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_blue",
+     "pos": [
+      14.12,
+      23.64
+     ],
+     "rot": 7.0,
+     "scale": 0.92,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_blue",
+     "pos": [
+      14.69,
+      24.24
+     ],
+     "rot": 302.0,
+     "scale": 0.84,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      20.58,
+      14.88
+     ],
+     "rot": 241.0,
+     "scale": 1.07,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      26.85,
+      12.83
+     ],
+     "rot": 141.4,
+     "scale": 1.07,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      24.35,
+      12.92
+     ],
+     "rot": 247.6,
+     "scale": 0.98,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      26.53,
+      12.76
+     ],
+     "rot": 182.3,
+     "scale": 0.95,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_blue",
+     "pos": [
+      24.09,
+      13.43
+     ],
+     "rot": 335.4,
+     "scale": 1.15,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_blue",
+     "pos": [
+      28.78,
+      14.93
+     ],
+     "rot": 338.3,
+     "scale": 1.11,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      28.45,
+      13.79
+     ],
+     "rot": 0.0,
+     "scale": 0.95,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      28.37,
+      13.16
+     ],
+     "rot": 66.4,
+     "scale": 1.03,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      31.16,
+      15.65
+     ],
+     "rot": 0.0,
+     "scale": 1.08,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      31.45,
+      14.72
+     ],
+     "rot": 0.0,
+     "scale": 0.81,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      30.71,
+      16.45
+     ],
+     "rot": 143.9,
+     "scale": 1.03,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      31.65,
+      14.69
+     ],
+     "rot": 0.0,
+     "scale": 1.09,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_blue",
+     "pos": [
+      32.9,
+      16.17
+     ],
+     "rot": 200.6,
+     "scale": 0.83,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      33.06,
+      16.61
+     ],
+     "rot": 172.5,
+     "scale": 1.1,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "stone",
+     "model": "rock_small",
+     "pos": [
+      30.18,
+      15.06
+     ],
+     "rot": 145.3,
+     "scale": 0.62,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_blue",
+     "pos": [
+      34.73,
+      17.32
+     ],
+     "rot": 160.8,
+     "scale": 0.87,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      34.9,
+      18.04
+     ],
+     "rot": 63.3,
+     "scale": 0.83,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      32.03,
+      17.28
+     ],
+     "rot": 194.6,
+     "scale": 0.96,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      33.89,
+      19.3
+     ],
+     "rot": 169.3,
+     "scale": 0.82,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_glow_purple",
+     "pos": [
+      34.89,
+      19.26
+     ],
+     "rot": 117.4,
+     "scale": 0.88,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      33.55,
+      19.49
+     ],
+     "rot": 0.0,
+     "scale": 0.7,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      36.07,
+      24.13
+     ],
+     "rot": 254.9,
+     "scale": 0.7,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushdecor",
+     "model": "mush_small_purple",
+     "pos": [
+      35.62,
+      23.62
+     ],
+     "rot": 126.7,
+     "scale": 0.94,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet",
+     "pos": [
+      23.21,
+      43.28
+     ],
+     "rot": 4.3,
+     "scale": 1.22,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushtree",
+     "model": "mush_tree",
+     "pos": [
+      43.22,
+      9.45
+     ],
+     "rot": 195.8,
+     "scale": 0.95,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet",
+     "pos": [
+      11.33,
+      43.27
+     ],
+     "rot": 258.5,
+     "scale": 1.01,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_broad_b",
+     "pos": [
+      44.63,
+      31.74
+     ],
+     "rot": 226.3,
+     "scale": 1.01,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet",
+     "pos": [
+      30.27,
+      46.96
+     ],
+     "rot": 117.8,
+     "scale": 1.24,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_broad_b",
+     "pos": [
+      41.35,
+      34.4
+     ],
+     "rot": 94.9,
+     "scale": 1.05,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_forest_tall",
+     "pos": [
+      41.89,
+      37.25
+     ],
+     "rot": 118.4,
+     "scale": 1.23,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_forest_tall",
+     "pos": [
+      10.78,
+      46.79
+     ],
+     "rot": 11.7,
+     "scale": 1.07,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushtree",
+     "model": "mush_tree",
+     "pos": [
+      41.13,
+      6.17
+     ],
+     "rot": 356.7,
+     "scale": 1.17,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_forest_tall",
+     "pos": [
+      22.26,
+      40.2
+     ],
+     "rot": 13.9,
+     "scale": 1.06,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushtree",
+     "model": "mush_tree",
+     "pos": [
+      18.52,
+      41.79
+     ],
+     "rot": 101.2,
+     "scale": 0.91,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_broad_b",
+     "pos": [
+      34.43,
+      44.98
+     ],
+     "rot": 209.6,
+     "scale": 0.96,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_broad_b",
+     "pos": [
+      13.9,
+      44.12
+     ],
+     "rot": 35.1,
+     "scale": 1.07,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushtree",
+     "model": "mush_tree",
+     "pos": [
+      43.35,
+      44.76
+     ],
+     "rot": 162.7,
+     "scale": 1.18,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_broad_b",
+     "pos": [
+      5.14,
+      41.2
+     ],
+     "rot": 12.8,
+     "scale": 1.03,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushtree",
+     "model": "mush_tree",
+     "pos": [
+      44.96,
+      28.74
+     ],
+     "rot": 44.0,
+     "scale": 1.15,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushtree",
+     "model": "mush_tree",
+     "pos": [
+      47.45,
+      16.32
+     ],
+     "rot": 281.8,
+     "scale": 1.08,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet",
+     "pos": [
+      28.63,
+      44.82
+     ],
+     "rot": 340.2,
+     "scale": 0.97,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushtree",
+     "model": "mush_tree",
+     "pos": [
+      5.95,
+      44.81
+     ],
+     "rot": 187.8,
+     "scale": 1.08,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushtree",
+     "model": "mush_tree",
+     "pos": [
+      39.57,
+      42.54
+     ],
+     "rot": 12.1,
+     "scale": 1.24,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_broad_b",
+     "pos": [
+      16.65,
+      44.58
+     ],
+     "rot": 197.8,
+     "scale": 1.23,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet",
+     "pos": [
+      42.18,
+      42.4
+     ],
+     "rot": 24.8,
+     "scale": 1.12,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet",
+     "pos": [
+      40.48,
+      12.2
+     ],
+     "rot": 276.8,
+     "scale": 1.28,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_broad_b",
+     "pos": [
+      38.71,
+      45.91
+     ],
+     "rot": 154.1,
+     "scale": 1.17,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet_round",
+     "pos": [
+      40.58,
+      39.8
+     ],
+     "rot": 207.3,
+     "scale": 1.21,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_forest_tall",
+     "pos": [
+      43.41,
+      39.88
+     ],
+     "rot": 226.7,
+     "scale": 1.14,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_forest_tall",
+     "pos": [
+      32.29,
+      42.95
+     ],
+     "rot": 25.9,
+     "scale": 1.05,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushtree",
+     "model": "mush_tree",
+     "pos": [
+      45.44,
+      46.88
+     ],
+     "rot": 192.5,
+     "scale": 0.93,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_broad_b",
+     "pos": [
+      46.18,
+      22.63
+     ],
+     "rot": 270.3,
+     "scale": 1.08,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_forest_tall",
+     "pos": [
+      26.41,
+      46.55
+     ],
+     "rot": 322.1,
+     "scale": 1.01,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_broad_b",
+     "pos": [
+      46.01,
+      5.83
+     ],
+     "rot": 82.6,
+     "scale": 1.16,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet",
+     "pos": [
+      27.79,
+      39.4
+     ],
+     "rot": 289.7,
+     "scale": 1.08,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet",
+     "pos": [
+      43.82,
+      19.61
+     ],
+     "rot": 272.3,
+     "scale": 1.01,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_broad_b",
+     "pos": [
+      25.06,
+      40.54
+     ],
+     "rot": 149.5,
+     "scale": 1.13,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet_round",
+     "pos": [
+      45.79,
+      11.33
+     ],
+     "rot": 39.9,
+     "scale": 1.0,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet",
+     "pos": [
+      47.4,
+      19.09
+     ],
+     "rot": 205.5,
+     "scale": 1.16,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_broad_b",
+     "pos": [
+      47.46,
+      33.69
+     ],
+     "rot": 237.4,
+     "scale": 1.11,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet",
+     "pos": [
+      22.16,
+      47.35
+     ],
+     "rot": 127.3,
+     "scale": 1.0,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet",
+     "pos": [
+      43.94,
+      34.84
+     ],
+     "rot": 34.9,
+     "scale": 0.99,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_forest_tall",
+     "pos": [
+      40.65,
+      18.92
+     ],
+     "rot": 10.9,
+     "scale": 1.01,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_forest_tall",
+     "pos": [
+      35.01,
+      40.88
+     ],
+     "rot": 280.5,
+     "scale": 1.17,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet",
+     "pos": [
+      41.33,
+      29.1
+     ],
+     "rot": 303.6,
+     "scale": 1.07,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushtree",
+     "model": "mush_tree",
+     "pos": [
+      28.43,
+      42.01
+     ],
+     "rot": 355.4,
+     "scale": 1.12,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_broad_b",
+     "pos": [
+      43.92,
+      14.95
+     ],
+     "rot": 210.4,
+     "scale": 1.01,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet_round",
+     "pos": [
+      9.69,
+      39.8
+     ],
+     "rot": 327.7,
+     "scale": 1.02,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_broad_b",
+     "pos": [
+      46.41,
+      41.76
+     ],
+     "rot": 101.1,
+     "scale": 1.1,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet_round",
+     "pos": [
+      44.83,
+      37.29
+     ],
+     "rot": 265.8,
+     "scale": 1.2,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet",
+     "pos": [
+      41.46,
+      23.46
+     ],
+     "rot": 6.9,
+     "scale": 0.97,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet",
+     "pos": [
+      47.26,
+      26.87
+     ],
+     "rot": 6.1,
+     "scale": 1.21,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet_round",
+     "pos": [
+      40.86,
+      26.12
+     ],
+     "rot": 123.6,
+     "scale": 1.08,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet",
+     "pos": [
+      41.21,
+      14.86
+     ],
+     "rot": 142.9,
+     "scale": 1.25,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet",
+     "pos": [
+      13.81,
+      41.02
+     ],
+     "rot": 267.2,
+     "scale": 0.95,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushtree",
+     "model": "mush_tree",
+     "pos": [
+      15.6,
+      47.23
+     ],
+     "rot": 170.9,
+     "scale": 0.96,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_broad_b",
+     "pos": [
+      41.11,
+      47.3
+     ],
+     "rot": 27.6,
+     "scale": 1.07,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet",
+     "pos": [
+      8.17,
+      46.74
+     ],
+     "rot": 324.3,
+     "scale": 1.12,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_violet_round",
+     "pos": [
+      20.36,
+      44.95
+     ],
+     "rot": 106.9,
+     "scale": 1.08,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_forest_tall",
+     "pos": [
+      8.37,
+      42.22
+     ],
+     "rot": 175.8,
+     "scale": 1.17,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_broad_b",
+     "pos": [
+      44.46,
+      25.39
+     ],
+     "rot": 249.0,
+     "scale": 1.13,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushtree",
+     "model": "mush_tree",
+     "pos": [
+      26.14,
+      43.62
+     ],
+     "rot": 115.0,
+     "scale": 1.18,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushtree",
+     "model": "mush_tree",
+     "pos": [
+      31.0,
+      40.5
+     ],
+     "rot": 169.8,
+     "scale": 1.14,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "mushtree",
+     "model": "mush_tree",
+     "pos": [
+      47.02,
+      30.36
+     ],
+     "rot": 299.4,
+     "scale": 1.03,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "tree",
+     "model": "tree_broad_b",
+     "pos": [
+      36.86,
+      43.69
+     ],
+     "rot": 342.1,
+     "scale": 1.2,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "pine",
+     "model": "tree_forest_tall",
+     "pos": [
+      39.92,
+      9.52
+     ],
+     "rot": 323.0,
+     "scale": 1.01,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
     }
    ],
    "npcs": [],
@@ -21379,11 +24816,24 @@
     "seed": 20261101
    },
    "post": {
-    "vignette": 0.2,
-    "bloom": 0.12,
+    "vignette": 0.24,
+    "bloom": 0.16,
     "sat": 1.16,
     "contrast": 0.26,
-    "exposure": 1.06
+    "exposure": 1.06,
+    "haze": 0.1
+   },
+   "shade": {
+    "sky": [
+     0.92,
+     0.9,
+     1.12
+    ],
+    "ground": [
+     0.62,
+     0.52,
+     0.58
+    ]
    }
   },
   {

@@ -2,7 +2,7 @@
 // Same interface as SpriteBody (play / setDir / flash / setTint / setVisible / place / update / dispose / sh),
 // so actors.js keeps working; animation comes from the game's pose table, applied to the skeleton and
 // interpolated every frame, and the body turns smoothly to any angle.
-import { THREE, T, tex } from './render.js';
+import { THREE, T, tex, paintMat, contactShadowTex } from './render.js';
 import { itemModel, isWeaponModel } from './items3d.js';
 
 const DEG = Math.PI / 180;
@@ -454,6 +454,7 @@ export class ModelBody {
     this.gaitPh = 0; this.gaitW = 0; this.gaitV = 0; this.moved = 0; this.lastXZ = null; this.treadmill = 0;
     this.root = new THREE.Group();
     this.mat = new THREE.MeshLambertMaterial({ map: md.texture, emissive: 0xffffff, emissiveIntensity: 0 });
+    paintMat(this.mat, { rim: [1.0, 0.86, 0.62], rimK: 0.34, sat: 1.12 });   // reads a touch brighter than the painted ground
     this.mesh = new THREE.SkinnedMesh(md.geometry, this.mat);
     this.mesh.castShadow = true; this.mesh.frustumCulled = false;
     this.mesh.scale.setScalar(md.scale);
@@ -463,7 +464,7 @@ export class ModelBody {
     md.bones.forEach((b, i) => (b.parent >= 0 ? this.bones[b.parent] : this.mesh).add(this.bones[i]));
     this.skeleton = new THREE.Skeleton(this.bones, md.bones.map(b => b.inv.clone()));
     this.mesh.bind(this.skeleton, new THREE.Matrix4());
-    if (!shadowMat) shadowMat = new THREE.MeshBasicMaterial({ map: tex('assets/ui/shadow.png'), transparent: true, depthWrite: false });
+    if (!shadowMat) shadowMat = new THREE.MeshBasicMaterial({ map: contactShadowTex(), transparent: true, depthWrite: false });
     this.shadow = new THREE.Mesh(shadowGeo, shadowMat); this.shadow.rotation.x = -Math.PI / 2;
     const ss = shadowRadius * 2.6; this.shadow.scale.set(ss, ss, 1);
     scene.add(this.root, this.shadow);
