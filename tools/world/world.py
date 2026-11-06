@@ -21,8 +21,8 @@ from scale_fields import build_mesh, seg_dist   # zone mesh (terrain + water dis
 REGIONS = [
     dict(id='kreutz', name='크로이츠 제국', x=650, y=28), dict(id='lumiere', name='루미에르', x=150, y=178),
     dict(id='baltern', name='발테른 공국', x=88, y=472), dict(id='kairion', name='카이리온 왕국', x=500, y=262),
-    dict(id='marseon', name='마르세온', x=700, y=492), dict(id='baltazar', name='발타자르 왕국', x=995, y=425, anchor='end'),
-    dict(id='silvern', name='실베른 영지', x=118, y=640), dict(id='gravel', name='그라벨 변경령', x=440, y=560),
+    dict(id='marseon', name='마르세온', x=715, y=532), dict(id='baltazar', name='발타자르 왕국', x=962, y=250),
+    dict(id='silvern', name='실베른 영지', x=118, y=640), dict(id='gravel', name='그라벨 변경령', x=455, y=602),
     dict(id='berg', name='베르그 고원', x=762, y=684), dict(id='zirat', name='지라트', x=470, y=748),
 ]
 # towns (story places).  W, D = half size of the walled courtyard; keep = palace / temple / fortress behind the north wall
