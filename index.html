@@ -93,6 +93,21 @@ small { font-size:.8em; }
 @media (max-width:600px) { .plate.npc .pname { font-size:26px; -webkit-text-stroke:4px #1a1008; } }
 @keyframes qmbob { 0%,100% { transform:translateY(0) scale(1); } 50% { transform:translateY(-7px) scale(1.06); } }
 .phb { width:56px; height:6px; margin:2px auto 0; background:#2a2228; border:1px solid #000; } .phb i { display:block; height:100%; background:#e05a4a; }
+/* monster-kill reward stack (js/rewardfx.js RewardStack): EXP (white-blue, navy shadow, gold ornaments) above gold (gold-orange) */
+.rwstack { position:absolute; left:0; top:0; display:flex; flex-direction:column; align-items:center; gap:2px; pointer-events:none; white-space:nowrap; will-change:transform,opacity; }
+.rwstack b { font-family:ArcanSerif, Georgia, "Times New Roman", serif; font-style:italic; font-weight:900; letter-spacing:.5px; display:inline-block; -webkit-background-clip:text; background-clip:text; color:transparent; }
+.rw-exp, .rw-gold { position:relative; display:flex; flex-direction:column; align-items:center; opacity:0; }
+.rwstack.show-x .rw-exp, .rwstack.show-g .rw-gold { animation:rwpop .32s ease-out forwards; }
+.rw-exp { order:0; filter:drop-shadow(0 2px 0 #0d1a3a) drop-shadow(0 0 1.5px #0d1a3a) drop-shadow(0 0 7px rgba(140,200,255,.55)); }
+.rw-exp b { font-size:34px; background-image:linear-gradient(#ffffff 15%, #d6f0ff 50%, #7cc4ff 85%); -webkit-text-stroke:1px rgba(20,40,90,.55); }
+.rw-gold { order:1; filter:drop-shadow(0 2px 0 #3a1c06) drop-shadow(0 0 1.5px #2a1404) drop-shadow(0 0 7px rgba(255,180,60,.5)); }
+.rw-gold b { font-size:38px; background-image:linear-gradient(#fff6c8 10%, #ffd04a 48%, #f08a18 88%); -webkit-text-stroke:1px rgba(90,40,4,.6); }
+.rw-gold small { font-size:20px; }
+.rw-orn { display:block; width:150px; height:9px; margin:1px 0; background:linear-gradient(90deg, transparent, rgba(255,214,120,.95) 30%, rgba(255,240,190,1) 50%, rgba(255,214,120,.95) 70%, transparent) center/100% 1.5px no-repeat; position:relative; }
+.rw-orn::after { content:""; position:absolute; left:50%; top:50%; width:7px; height:7px; transform:translate(-50%,-50%) rotate(45deg); background:linear-gradient(135deg, #e8f6ff, #6ab8ff); box-shadow:0 0 0 1px #c8a050, 0 0 6px rgba(140,200,255,.9); }
+.rw-orn.g { width:110px; } .rw-orn.g::after { background:linear-gradient(135deg, #fff2c0, #ffb030); box-shadow:0 0 0 1px #8a5a18, 0 0 6px rgba(255,190,80,.9); }
+@keyframes rwpop { 0% { opacity:0; transform:scale(.8); } 50% { opacity:1; transform:scale(1.1); } 100% { opacity:1; transform:scale(1); } }
+@media (max-width:600px) { .rw-exp b { font-size:22px; } .rw-gold b { font-size:25px; } .rw-orn { width:110px; } .rw-orn.g { width:80px; } }
 .float { position:absolute; left:0; top:0; font-size:20px; white-space:nowrap; text-shadow:0 2px 0 #000, 2px 0 0 #000, -2px 0 0 #000, 0 -2px 0 #000; will-change:transform; }
 
 /* ---------- toasts ---------- */

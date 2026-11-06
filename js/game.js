@@ -471,9 +471,10 @@ class Game {
     if (!this.player) return;
     const d = m.def, gold = d.goldMin + Math.floor(Math.random() * (d.goldMax - d.goldMin + 1));
     this.sheet.addGold(gold); this.sheet.addExp(d.exp);
-    this.ui.floatText(m.pos, "+" + d.exp + " EXP", "#b8e0ff", 0.9, 1.6);
-    if (this.reward && d.exp > 0) this.reward.expOrbs(m.pos, d.exp);
-    if (gold > 0) { this.ui.floatText(m.pos, "+" + gold + " G", "#ffd86b", 0.85, 1.1); this.audio.sfx("coin"); }
+    if (this.reward) this.reward.kill(m.pos, d.exp, gold);                     // light shafts, rune, stars, EXP / gold stack
+    else { this.ui.floatText(m.pos, "+" + d.exp + " EXP", "#b8e0ff", 0.9, 1.6); if (gold > 0) this.ui.floatText(m.pos, "+" + gold + " G", "#ffd86b", 0.85, 1.1); }
+    // coin sound after the gold number appears; several kills at once share one
+    if (gold > 0) { const now = performance.now(); if (now - (this._coinT || 0) > 160) { this._coinT = now; this.timers.push({ t: 0.3, f: () => this.audio.sfx("coin") }); } }
     for (const dr of d.drops || []) {
       if (Math.random() > dr.chance) continue;
       let item = dr.item; if (item.startsWith("@jobweapon:")) item = this.data.weaponFor(this.profile.job, parseInt(item.slice(11)));

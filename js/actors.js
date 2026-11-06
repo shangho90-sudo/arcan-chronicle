@@ -545,8 +545,10 @@ export class Monster extends Combatant {
   onDeath() { this.cancelAttack(); this.state = "dead"; this.deadT = 0; G.audio.sfx("monster_die"); G.onMonsterKilled(this); }
   updateDead(dt) {
     this.deadT += dt; const total = duration(this.body.sh, "death");
-    if (this.deadT > total + 0.4) this.body.setVisible(Math.floor(this.deadT * 12) % 2 === 0);
-    if (this.deadT > total + 1.2) { this.remove(); }
+    // dissolve into light (overlaps the reward sequence) instead of blinking: whitens, shrinks a little, gone
+    const u = (this.deadT - total * 0.7) / 0.45;
+    if (u > 0) { this.body.flash(0.12); const k = 1 - u * u * (3 - 2 * u); if (this.body.root) this.body.root.scale.setScalar(Math.max(0.001, 0.35 + 0.65 * k)); if (u >= 1) this.body.setVisible(false); }
+    if (u > 1.1) { this.remove(); }
   }
   remove() { if (this.removed) return; this.removed = true; if (this.onRemoved) this.onRemoved(this); this.zone.removeActor(this); this.body.dispose(); }
 }
@@ -730,7 +732,7 @@ export class Loot {
     const def = G.data.item(id);
     this.is3d = hasItemModel(id);
     this.mesh = this.is3d ? lootModel(id) : G.ui.iconMesh(def ? def.icon : null); G.render.scene.add(this.mesh);
-    G.fx.play("levelup", { x: this.pos.x, y: this.pos.y + 0.3, z: this.pos.z }, 0.5);
+    if (G.skillFx) G.skillFx.burst("sparks", { x: this.pos.x, y: this.pos.y + 0.3, z: this.pos.z }, { radius: 0.35, color: 0xffe08a });
   }
   update(dt) {
     this.t += dt; this.life -= dt; if (this.warn > 0) this.warn -= dt;
