@@ -58,6 +58,15 @@ function sharedTex(file, aniso, scale = 1) {
   texCache.set(k, t); return t;
 }
 const matCache = new Map();
+/** per-field foliage colour (zone nature.foliage = crimson / azure / ash / snow): same models, leaf textures swapped */
+const folCache = new Map();
+function folSwap(m, f, aniso) {
+  const n = m.name || '', leaf = /^M_leaf(_warm|_cool)?$/.test(n), fol = /^M_foliage(_warm|_cool)?$/.test(n);
+  if (!leaf && !fol) return m;
+  const key = n + '@' + f; if (folCache.has(key)) return folCache.get(key);
+  const c = cloneMat(m); c.map = sharedTex(leaf ? `leafcard_${f}.png` : `foliage_${f}.jpg`, aniso, 1); c.name = n;
+  folCache.set(key, c); return c;
+}
 /** one shared material per material name (so every Blender asset using M_bark shares the program + texture) */
 export function blMaterial(name, aniso = 4) {
   if (matCache.has(name)) return matCache.get(name);
@@ -333,17 +342,18 @@ function smoothPath(pts, sub = 8) {
 
 function paintMask(def, props, S = 1024) {
   const [x0, z0, x1, z1] = def.bounds, W = x1 - x0, Hh = z1 - z0;
-  const c = document.createElement('canvas'); c.width = c.height = S; const g = c.getContext('2d');
-  g.fillStyle = '#000'; g.fillRect(0, 0, S, S);
+  const c = document.createElement('canvas'); c.width = c.height = S; const g0 = c.getContext('2d', { willReadFrequently: true });
+  g0.fillStyle = '#000'; g0.fillRect(0, 0, S, S);
   const P = (x, z) => [(x - x0) / W * S, (z1 - z) / Hh * S], px = S / W;
   const rnd = mulberry(77);
+  // R: paths with gently varying width, soft shoulders. Drawn sharp on a layer and blurred once when composited:
+  // a blur filter on every path segment cost minutes on software GL (2026-11-06, 140 m world fields)
+  const L = document.createElement('canvas'); L.width = L.height = S; const g = L.getContext('2d', { willReadFrequently: true });
   g.globalCompositeOperation = 'lighter';
-  // R: paths with gently varying width, soft shoulders
-  g.filter = 'blur(' + Math.round(px * 0.35) + 'px)';
   const PATHY = new Set(['dirt', 'cobble', 'cobble_warm']);
   for (const p of def.patches || []) {
     if (p.tex === 'forest_floor' && p.shape === 'disc') { const [cx, cy] = P(p.pos[0], p.pos[1]), r = p.radius * px; const gr = g.createRadialGradient(cx, cy, 0, cx, cy, r);
-      gr.addColorStop(0, 'rgba(0,170,60,1)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, S, S); continue; }
+      gr.addColorStop(0, 'rgba(0,170,60,1)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(cx - r, cy - r, 2 * r, 2 * r); continue; }
     if (!PATHY.has(p.tex)) continue;
     if (p.shape === 'path') {
       const pts = []; for (let i = 0; i < p.pos.length; i += 2) pts.push([p.pos[i], p.pos[i + 1]]);
@@ -358,13 +368,15 @@ function paintMask(def, props, S = 1024) {
       for (let k = 0; k < 9; k++) {                       // lumpy, not a perfect circle
         const a = k / 9 * Math.PI * 2, rr = r * (0.45 + rnd() * 0.25);
         const gr = g.createRadialGradient(cx + Math.cos(a) * r * 0.4, cy + Math.sin(a) * r * 0.4, 0, cx + Math.cos(a) * r * 0.4, cy + Math.sin(a) * r * 0.4, rr);
-        gr.addColorStop(0, 'rgba(230,0,0,1)'); gr.addColorStop(1, 'rgba(230,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, S, S);
+        gr.addColorStop(0, 'rgba(230,0,0,1)'); gr.addColorStop(1, 'rgba(230,0,0,0)'); g.fillStyle = gr; g.fillRect(cx - r * 1.2, cy - r * 1.2, r * 2.4, r * 2.4);
       }
-      const gr = g.createRadialGradient(cx, cy, 0, cx, cy, r * 0.8); gr.addColorStop(0, 'rgba(200,0,0,1)'); gr.addColorStop(1, 'rgba(200,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, S, S);
+      const gr = g.createRadialGradient(cx, cy, 0, cx, cy, r * 0.8); gr.addColorStop(0, 'rgba(200,0,0,1)'); gr.addColorStop(1, 'rgba(200,0,0,0)'); g.fillStyle = gr; g.fillRect(cx - r, cy - r, 2 * r, 2 * r);
     }
   }
+  g0.globalCompositeOperation = 'lighter'; g0.filter = 'blur(' + Math.round(px * 0.35) + 'px)'; g0.drawImage(L, 0, 0); g0.filter = 'none';
   // G: shaded grass under canopies; B: moss + contact darkening at trunks and rocks
-  g.filter = 'none';
+  {
+  const g = g0;
   for (const q of props) {
     const [cx, cy] = P(q.pos[0], q.pos[1]), s = q.scale || 1;
     const blob = (r, col0) => { const gr = g.createRadialGradient(cx, cy, 0, cx, cy, r); gr.addColorStop(0, col0); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.beginPath(); g.arc(cx, cy, r, 0, 7); g.fill(); };
@@ -374,8 +386,9 @@ function paintMask(def, props, S = 1024) {
     else if (q.type === 'stump' || q.type === 'ruin') blob(0.9 * s * px, 'rgba(0,30,170,1)');
     else if (q.type === 'shrub') blob(0.8 * s * px, 'rgba(0,60,90,1)');
   }
+  }
   const t = new THREE.CanvasTexture(c); t.minFilter = THREE.LinearMipmapLinearFilter; t.magFilter = THREE.LinearFilter; t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;
-  return { tex: t, data: g.getImageData(0, 0, S, S).data, S, P };
+  return { tex: t, data: g0.getImageData(0, 0, S, S).data, S, P };
 }
 
 // ---------------------------------------------------------------- build
@@ -416,17 +429,18 @@ export async function buildNature(zone, renderer) {
   const names = [...new Set([...byKey.values()].map(v => v.name))];
   await Promise.all(names.map(n => lm(n)));
   const loGeo = new Map(); await Promise.all(names.map(async n => { const g = await loadShadowLod(n, await lm(n)); if (g) loGeo.set(n, g); }));
-  const ditherMat = m => { const k = (m.name || m.uuid) + ':d'; if (!mats.has(k)) { const mm = cloneMat(m); addDither(mm); mats.set(k, mm); } return mats.get(k); };
+  const ditherMat = m => { const k = (m.name || m.uuid) + ':' + (m.map ? m.map.uuid : '') + ':d'; if (!mats.has(k)) { const mm = cloneMat(m); addDither(mm); mats.set(k, mm); } return mats.get(k); };
   for (const { name, items } of byKey.values()) {
     const md = await lm(name), spec = MODELS[name];
-    const im = new THREE.InstancedMesh(md.geo, spec.dither ? md.mats.map(ditherMat) : md.mats, items.length);
+    const mats0 = NV.foliage ? md.mats.map(m => folSwap(m, NV.foliage, aniso)) : md.mats;
+    const im = new THREE.InstancedMesh(md.geo, spec.dither ? mats0.map(ditherMat) : mats0, items.length);
     items.forEach(([q, i], k) => {
       const s = (q.scale || 1) * spec.h * (q.type === 'rock' && q.variant === 'boss' ? 1.25 : 1);
       const g0 = geo.ground(q.pos[0], q.pos[1]);
       qt.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -(q.rot || 0) * DEG);
       im.setMatrixAt(k, m4.compose(T({ x: g0.x, y: g0.y - 0.04 * s * (spec.trunk ? 0.3 : 1), z: g0.z }), qt, sc.set(s, s, s)));
       const v = hash(i * 13 + 5), w = hash(i * 31 + 9);          // gentle per-instance hue / value variation
-      const tn = NV.tint && /^(tree|shrub)/.test(name) && !/violet/.test(name) ? NV.tint : NV.rockTint && name.startsWith('rock') && !/magic/.test(name) ? NV.rockTint : [1, 1, 1], kv = 0.94 + v * 0.1;   // per-model colour correction x gentle per-instance value / hue shift
+      const tn = NV.tint && /^(tree|shrub)/.test(name) && !/violet/.test(name) && !NV.foliage ? NV.tint : NV.rockTint && name.startsWith('rock') && !/magic/.test(name) ? NV.rockTint : [1, 1, 1], kv = 0.94 + v * 0.1;   // per-model colour correction x gentle per-instance value / hue shift
       col.setRGB(tn[0] * kv * (0.97 + w * 0.06), tn[1] * kv, tn[2] * kv * (1.03 - w * 0.06)); im.setColorAt(k, col);
     });
     im.receiveShadow = true; im.castShadow = false;

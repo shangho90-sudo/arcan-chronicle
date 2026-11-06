@@ -331,6 +331,15 @@ def ground_variants(S=1024):
     ground_variant('ruins', S, ('#8a8a3a', '#b0a64a', '#dccb72'), ('#5e5a30', '#7a7038', '#a29450'), ('#a8863e', '#c8a452', '#e8c878'), ('#5a6630', '#76823c', '#9ca452'),
                    ('#8a6448', '#a87c58', '#c89a70'), ('#5e4030', '#74503a'), ('#3a2c26', '#4c3a30'), ('#7a6a5c', '#988674'), flowers=(0.06, 0.02), peb_path=700)
 
+def ground_variants_world(S=1024):
+    # 2026-11-06 world fields: 지라트 회색 황무지 (ash), 붉은숲 (crimson), 발테른 바위산 (stone)
+    ground_variant('ash', S, ('#6e6a62', '#8a857a', '#a8a294'), ('#4a4744', '#5e5a54', '#76716a'), ('#7a6e5a', '#968a72', '#b4a88c'), ('#4e5248', '#62665a', '#7c8070'),
+                   ('#6a625a', '#867c72', '#a49a8e'), ('#4c4640', '#5e5750'), ('#2e2a28', '#3c3734'), ('#76706a', '#948c84'), flowers=(0.0, 0.0), peb_path=800)
+    ground_variant('crimson', S, ('#8a3a2e', '#b0523a', '#d8835a'), ('#5a2228', '#743030', '#94483e'), ('#a0603a', '#c07e4a', '#dca46a'), ('#6a3a2a', '#8a4e34', '#ac6a44'),
+                   ('#8a6450', '#a67c62', '#c49a7c'), ('#5e4034', '#74503e'), ('#3c2622', '#4e322a'), ('#7a6058', '#987a6e'), flowers=(0.08, 0.02))
+    ground_variant('stone', S, ('#5e7a48', '#7e9a58', '#a8bc7a'), ('#3e5440', '#526c4c', '#728c64'), ('#8a8a5a', '#a6a46c', '#c8c48e'), ('#4a6040', '#62784c', '#86986a'),
+                   ('#8c8a84', '#a8a69e', '#c6c4bc'), ('#6a6862', '#82807a'), ('#4a4844', '#5e5c56'), ('#94928a', '#b2b0a8'), flowers=(0.08, 0.03), peb_path=1100)
+
 # ---------------------------------------------------------------------------------------------- mushroom caps / stems (boss forest)
 def cap(name, c0, c1, c2, S=512, seed=71, streaks=True):
     """painted cap: soft value masses + radial-ish brush streaks (box-mapped, so plain strokes in two directions)"""
@@ -355,6 +364,15 @@ def mushroom_set():
     cap('stem', '#d8c6a6', '#efe2c8', '#fff4e0', seed=76)
     cap('spot', '#efe4cc', '#fbf3e2', '#ffffff', seed=77, streaks=False)
 
+def foliage_world():
+    # 2026-11-06 world fields: 붉은숲 (crimson), 푸른숲 (azure), 지라트 마른 잎 (ash), 북방 눈 덮인 잎 (snow)
+    P = lambda *h: dict(zip(('deep', 'dark', 'mid', 'light', 'hi', 'warm'), [hexc(x) for x in h]))
+    for name, pal, seed in [('crimson', P('#3e0e12', '#6a1a1c', '#a42e26', '#d4542e', '#f08a44', '#ffc070'), 21),
+                            ('azure', P('#0e2a4a', '#1a4a78', '#2e74a8', '#4ea2d0', '#86d0ee', '#d0f4ff'), 23),
+                            ('ash', P('#2a2622', '#4a423a', '#6e6254', '#8e8270', '#b0a48e', '#d0c4ac'), 25),
+                            ('snow', P('#24423e', '#36605a', '#5a8a80', '#a8c8c4', '#e4f0f2', '#ffffff'), 27)]:
+        foliage_tile(1024, seed, pal, 'foliage_' + name); leaf_card(512, seed + 1, pal, 'leafcard_' + name)
+
 if __name__ == '__main__':
     foliage_tile(1024, 1, FOL, 'foliage')
     leaf_card(512, 3, FOL, 'leafcard')
@@ -369,7 +387,8 @@ if __name__ == '__main__':
     plants_atlas()
     FOLV = dict(deep=hexc('#2a1f4e'), dark=hexc('#45307a'), mid=hexc('#6c4fae'), light=hexc('#9a7ad6'), hi=hexc('#c6a8f2'), warm=hexc('#e6cff8'))
     foliage_tile(1024, 8, FOLV, 'foliage_violet'); leaf_card(512, 9, FOLV, 'leafcard_violet')
+    foliage_world()
     stone(512, 15, 'stone_violet', '#a49ab4', '#8a86a0', '#5e5672')
     mushroom_set()
-    ground_set(); ground_variants(); magic_floor()
+    ground_set(); ground_variants(); ground_variants_world(); magic_floor()
     print('ok')

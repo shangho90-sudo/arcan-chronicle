@@ -52,6 +52,14 @@
       -10.0
      ],
      "rot": 45.0
+    },
+    {
+     "id": "from_capital_road",
+     "pos": [
+      15.0,
+      -12.2
+     ],
+     "rot": -130.0
     }
    ],
    "buildings": [],
@@ -1096,6 +1104,18 @@
      ],
      "radius": 1.7,
      "targetZone": "forest",
+     "targetSpawn": "from_town",
+     "minLevel": 0
+    },
+    {
+     "id": "to_capital_road",
+     "label": "왕도 가는 길",
+     "pos": [
+      17.5,
+      -14.5
+     ],
+     "radius": 1.7,
+     "targetZone": "capital_road",
      "targetSpawn": "from_town",
      "minLevel": 0
     }
@@ -8164,7 +8184,16 @@
     "sat": 1.2,
     "contrast": 0.3,
     "exposure": 1.02
-   }
+   },
+   "map": [
+    430,
+    420
+   ],
+   "level": [
+    1,
+    50
+   ],
+   "region": "kairion"
   },
   {
    "id": "forest",
@@ -62404,7 +62433,16 @@
      0.58
     ]
    },
-   "scaled": 2
+   "scaled": 2,
+   "map": [
+    395,
+    475
+   ],
+   "level": [
+    1,
+    10
+   ],
+   "region": "kairion"
   },
   {
    "id": "mushroom_grove",
@@ -68849,7 +68887,16 @@
      0.52,
      0.58
     ]
-   }
+   },
+   "map": [
+    360,
+    510
+   ],
+   "level": [
+    10,
+    10
+   ],
+   "region": "kairion"
   },
   {
    "id": "mist_valley",
@@ -68895,6 +68942,14 @@
       61.0
      ],
      "rot": 225.0
+    },
+    {
+     "id": "from_baltern_pass",
+     "pos": [
+      -69.0,
+      -9.2
+     ],
+     "rot": 82.4
     }
    ],
    "buildings": [],
@@ -68979,18 +69034,6 @@
      ],
      "rot": 192.63,
      "scale": 0.89,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "bush",
-     "pos": [
-      -72.44,
-      -11.42
-     ],
-     "rot": 12.45,
-     "scale": 0.76,
      "variant": "",
      "w": 0.0,
      "d": 0.0
@@ -70844,18 +70887,6 @@
      "d": 0.0
     },
     {
-     "type": "pine",
-     "pos": [
-      -77.8,
-      -12.62
-     ],
-     "rot": 329.33,
-     "scale": 1.09,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
      "type": "rock",
      "pos": [
       -82.82,
@@ -70864,18 +70895,6 @@
      "rot": 80.5,
      "scale": 1.44,
      "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -78.12,
-      -6.12
-     ],
-     "rot": 72.56,
-     "scale": 1.49,
-     "variant": "leaves_dark",
      "w": 0.0,
      "d": 0.0
     },
@@ -73340,66 +73359,6 @@
      "d": 0.0
     },
     {
-     "type": "bush",
-     "pos": [
-      -71.25,
-      -9.4
-     ],
-     "rot": 9.9,
-     "scale": 0.77,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "bush",
-     "pos": [
-      -75.37,
-      -10.36
-     ],
-     "rot": 318.4,
-     "scale": 0.67,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "bush",
-     "pos": [
-      -72.85,
-      -13.97
-     ],
-     "rot": 218.7,
-     "scale": 0.78,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "bush",
-     "pos": [
-      -76.97,
-      -11.92
-     ],
-     "rot": 169.2,
-     "scale": 0.75,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "bush",
-     "pos": [
-      -71.05,
-      -14.9
-     ],
-     "rot": 41.1,
-     "scale": 0.65,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
      "type": "rock",
      "pos": [
       -55.97,
@@ -75712,66 +75671,6 @@
      "rot": 290.5,
      "scale": 1.32,
      "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -75.83,
-      -14.22
-     ],
-     "rot": 114.2,
-     "scale": 1.03,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -75.15,
-      -11.95
-     ],
-     "rot": 311.9,
-     "scale": 1.19,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -76.2,
-      -16.83
-     ],
-     "rot": 273.8,
-     "scale": 0.96,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -78.26,
-      -4.15
-     ],
-     "rot": 34.7,
-     "scale": 1.51,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -78.31,
-      -8.07
-     ],
-     "rot": 198.9,
-     "scale": 1.43,
-     "variant": "leaves_dark",
      "w": 0.0,
      "d": 0.0
     },
@@ -81658,30 +81557,6 @@
     {
      "type": "pine",
      "pos": [
-      -68.01,
-      -2.1
-     ],
-     "rot": 17.1,
-     "scale": 1.02,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -72.32,
-      -4.01
-     ],
-     "rot": 197.6,
-     "scale": 1.0,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
       -64.76,
       4.2
      ],
@@ -82422,97 +82297,6 @@
      "rot": 30.5,
      "scale": 1.32,
      "variant": "",
-     "w": 0.0,
-     "d": 0.0,
-     "fill": true
-    },
-    {
-     "type": "bush",
-     "pos": [
-      -71.41,
-      -11.74
-     ],
-     "rot": 345.8,
-     "scale": 0.99,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0,
-     "fill": true
-    },
-    {
-     "type": "bush",
-     "pos": [
-      -71.44,
-      -8.83
-     ],
-     "rot": 258.3,
-     "scale": 0.76,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0,
-     "fill": true
-    },
-    {
-     "type": "bush",
-     "pos": [
-      -71.67,
-      -14.0
-     ],
-     "rot": 39.6,
-     "scale": 1.04,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0,
-     "fill": true
-    },
-    {
-     "type": "bush",
-     "pos": [
-      -68.94,
-      -4.39
-     ],
-     "rot": 26.8,
-     "scale": 1.42,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0,
-     "fill": true
-    },
-    {
-     "type": "bush",
-     "pos": [
-      -69.3,
-      -7.34
-     ],
-     "rot": 292.8,
-     "scale": 0.8,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0,
-     "fill": true
-    },
-    {
-     "type": "pine",
-     "pos": [
-      -66.62,
-      -6.26
-     ],
-     "rot": 282.2,
-     "scale": 1.59,
-     "variant": "leaves_dark",
-     "w": 0.0,
-     "d": 0.0,
-     "fill": true
-    },
-    {
-     "type": "mushroom",
-     "pos": [
-      -69.26,
-      -5.51
-     ],
-     "rot": 5.9,
-     "scale": 1.0,
-     "variant": "orange",
      "w": 0.0,
      "d": 0.0,
      "fill": true
@@ -91136,6 +90920,18 @@
      "targetZone": "frost_highland",
      "targetSpawn": "from_valley",
      "minLevel": 22
+    },
+    {
+     "id": "to_baltern_pass",
+     "label": "바위산 고갯길",
+     "pos": [
+      -74.0,
+      -9.87
+     ],
+     "radius": 1.8,
+     "targetZone": "baltern_pass",
+     "targetSpawn": "from_mist_valley",
+     "minLevel": 0
     }
    ],
    "heights": [],
@@ -91355,6 +91151,20 @@
      ],
      "radius": 4.2,
      "width": 0
+    },
+    {
+     "tex": "dirt",
+     "shape": "path",
+     "pos": [
+      -74.0,
+      -9.87,
+      -69.0,
+      -9.2,
+      -61.07,
+      -8.14
+     ],
+     "radius": 0,
+     "width": 3.6
     }
    ],
    "monsters": [
@@ -91489,7 +91299,16 @@
     "contrast": 0.22,
     "exposure": 1.05
    },
-   "scaled": 2
+   "scaled": 2,
+   "map": [
+    325,
+    430
+   ],
+   "level": [
+    11,
+    22
+   ],
+   "region": "kairion"
   },
   {
    "id": "frost_highland",
@@ -112580,7 +112399,16 @@
     "contrast": 0.22,
     "exposure": 1.04
    },
-   "scaled": 2
+   "scaled": 2,
+   "map": [
+    345,
+    345
+   ],
+   "level": [
+    23,
+    36
+   ],
+   "region": "kairion"
   },
   {
    "id": "dragon_ruins",
@@ -112626,6 +112454,14 @@
       43.5
      ],
      "rot": 90.0
+    },
+    {
+     "id": "from_lumiere_ruins_field",
+     "pos": [
+      9.52,
+      69.0
+     ],
+     "rot": -172.1
     }
    ],
    "buildings": [],
@@ -114139,18 +113975,6 @@
      "rot": 61.36,
      "scale": 1.04,
      "variant": "stone_wall",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      7.4,
-      78.54
-     ],
-     "rot": 253.31,
-     "scale": 0.91,
-     "variant": "leaves_autumn",
      "w": 0.0,
      "d": 0.0
     },
@@ -115991,18 +115815,6 @@
      "d": 0.0
     },
     {
-     "type": "stump",
-     "pos": [
-      11.1,
-      67.26
-     ],
-     "rot": 262.9,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
      "type": "mushroom",
      "pos": [
       -73.4,
@@ -116274,18 +116086,6 @@
      ],
      "rot": 216.73,
      "scale": 1.09,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stump",
-     "pos": [
-      4.4,
-      72.06
-     ],
-     "rot": 220.58,
-     "scale": 1.08,
      "variant": "",
      "w": 0.0,
      "d": 0.0
@@ -117757,48 +117557,12 @@
     {
      "type": "pine",
      "pos": [
-      3.39,
-      76.16
-     ],
-     "rot": 27.9,
-     "scale": 1.06,
-     "variant": "stone_wall",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "pine",
-     "pos": [
       -1.52,
       73.68
      ],
      "rot": 320.3,
      "scale": 1.07,
      "variant": "stone_wall",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      5.81,
-      77.64
-     ],
-     "rot": 328.0,
-     "scale": 0.78,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "pos": [
-      9.7,
-      76.51
-     ],
-     "rot": 196.7,
-     "scale": 0.95,
-     "variant": "leaves_autumn",
      "w": 0.0,
      "d": 0.0
     },
@@ -120649,54 +120413,6 @@
     {
      "type": "stump",
      "pos": [
-      14.35,
-      64.25
-     ],
-     "rot": 256.8,
-     "scale": 0.92,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stump",
-     "pos": [
-      13.51,
-      69.77
-     ],
-     "rot": 51.6,
-     "scale": 1.02,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stump",
-     "pos": [
-      9.03,
-      70.26
-     ],
-     "rot": 141.0,
-     "scale": 0.87,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stump",
-     "pos": [
-      13.72,
-      72.36
-     ],
-     "rot": 140.3,
-     "scale": 1.12,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stump",
-     "pos": [
       10.68,
       60.45
      ],
@@ -121446,42 +121162,6 @@
      ],
      "rot": 46.0,
      "scale": 0.92,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stump",
-     "pos": [
-      3.06,
-      70.07
-     ],
-     "rot": 53.4,
-     "scale": 1.17,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stump",
-     "pos": [
-      6.46,
-      70.23
-     ],
-     "rot": 238.1,
-     "scale": 0.96,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stump",
-     "pos": [
-      9.03,
-      72.78
-     ],
-     "rot": 137.0,
-     "scale": 1.08,
      "variant": "",
      "w": 0.0,
      "d": 0.0
@@ -128089,19 +127769,6 @@
      "fill": true
     },
     {
-     "type": "tree",
-     "pos": [
-      3.07,
-      65.48
-     ],
-     "rot": 32.0,
-     "scale": 1.25,
-     "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0,
-     "fill": true
-    },
-    {
      "type": "rock",
      "pos": [
       1.05,
@@ -128422,32 +128089,6 @@
      "rot": 14.6,
      "scale": 1.39,
      "variant": "bark",
-     "w": 0.0,
-     "d": 0.0,
-     "fill": true
-    },
-    {
-     "type": "pine",
-     "pos": [
-      11.95,
-      74.31
-     ],
-     "rot": 96.0,
-     "scale": 1.55,
-     "variant": "stone_wall",
-     "w": 0.0,
-     "d": 0.0,
-     "fill": true
-    },
-    {
-     "type": "stump",
-     "pos": [
-      12.69,
-      77.55
-     ],
-     "rot": 6.3,
-     "scale": 1.21,
-     "variant": "",
      "w": 0.0,
      "d": 0.0,
      "fill": true
@@ -128884,19 +128525,6 @@
     {
      "type": "rock",
      "pos": [
-      16.2,
-      71.62
-     ],
-     "rot": 29.7,
-     "scale": 1.35,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0,
-     "fill": true
-    },
-    {
-     "type": "rock",
-     "pos": [
       19.99,
       68.48
      ],
@@ -128916,19 +128544,6 @@
      "rot": 212.7,
      "scale": 1.21,
      "variant": "leaves_autumn",
-     "w": 0.0,
-     "d": 0.0,
-     "fill": true
-    },
-    {
-     "type": "tree",
-     "pos": [
-      17.46,
-      74.62
-     ],
-     "rot": 239.6,
-     "scale": 1.31,
-     "variant": "bark",
      "w": 0.0,
      "d": 0.0,
      "fill": true
@@ -132404,6 +132019,18 @@
      "targetZone": "town",
      "targetSpawn": "from_field",
      "minLevel": 0
+    },
+    {
+     "id": "to_lumiere_ruins_field",
+     "label": "불탄 순례지",
+     "pos": [
+      10.21,
+      74.0
+     ],
+     "radius": 1.8,
+     "targetZone": "lumiere_ruins_field",
+     "targetSpawn": "from_dragon_ruins",
+     "minLevel": 0
     }
    ],
    "heights": [
@@ -132634,6 +132261,20 @@
      ],
      "radius": 4.2,
      "width": 0
+    },
+    {
+     "tex": "dirt",
+     "shape": "path",
+     "pos": [
+      10.21,
+      74.0,
+      9.52,
+      69.0,
+      8.42,
+      61.08
+     ],
+     "radius": 0,
+     "width": 3.6
     }
    ],
    "monsters": [
@@ -132772,7 +132413,963 @@
     "contrast": 0.26,
     "exposure": 1.04
    },
-   "scaled": 2
+   "scaled": 2,
+   "map": [
+    420,
+    330
+   ],
+   "level": [
+    38,
+    50
+   ],
+   "region": "kairion"
+  },
+  {
+   "id": "kairion_capital",
+   "name": "카이리온 왕도",
+   "kind": "town",
+   "file": "world/kairion_capital.json",
+   "map": [
+    550,
+    390
+   ],
+   "level": [
+    1,
+    50
+   ],
+   "region": "kairion",
+   "biome": "town"
+  },
+  {
+   "id": "baltern",
+   "name": "발테른 공국",
+   "kind": "town",
+   "file": "world/baltern.json",
+   "map": [
+    170,
+    420
+   ],
+   "level": [
+    6,
+    14
+   ],
+   "region": "baltern",
+   "biome": "town"
+  },
+  {
+   "id": "lumiere",
+   "name": "루미에르 신전",
+   "kind": "town",
+   "file": "world/lumiere.json",
+   "map": [
+    280,
+    120
+   ],
+   "level": [
+    12,
+    20
+   ],
+   "region": "lumiere",
+   "biome": "town"
+  },
+  {
+   "id": "gravel",
+   "name": "그라벨",
+   "kind": "town",
+   "file": "world/gravel.json",
+   "map": [
+    520,
+    620
+   ],
+   "level": [
+    16,
+    26
+   ],
+   "region": "gravel",
+   "biome": "town"
+  },
+  {
+   "id": "silvern",
+   "name": "실베른 영지",
+   "kind": "town",
+   "file": "world/silvern.json",
+   "map": [
+    260,
+    620
+   ],
+   "level": [
+    14,
+    22
+   ],
+   "region": "silvern",
+   "biome": "town"
+  },
+  {
+   "id": "marseon",
+   "name": "마르세온",
+   "kind": "town",
+   "file": "world/marseon.json",
+   "map": [
+    770,
+    380
+   ],
+   "level": [
+    28,
+    36
+   ],
+   "region": "marseon",
+   "biome": "town"
+  },
+  {
+   "id": "baltazar",
+   "name": "발타자르 왕도",
+   "kind": "town",
+   "file": "world/baltazar.json",
+   "map": [
+    900,
+    280
+   ],
+   "level": [
+    33,
+    44
+   ],
+   "region": "baltazar",
+   "biome": "town"
+  },
+  {
+   "id": "kreutz_fort",
+   "name": "크로이츠 국경 요새",
+   "kind": "town",
+   "file": "world/kreutz_fort.json",
+   "map": [
+    700,
+    90
+   ],
+   "level": [
+    36,
+    46
+   ],
+   "region": "kreutz",
+   "biome": "town"
+  },
+  {
+   "id": "capital_road",
+   "name": "왕도 가는 길",
+   "kind": "field",
+   "file": "world/capital_road.json",
+   "map": [
+    490,
+    410
+   ],
+   "level": [
+    2,
+    6
+   ],
+   "region": "kairion",
+   "biome": "meadow"
+  },
+  {
+   "id": "kairion_hunt",
+   "name": "카이리온 사냥터 숲",
+   "kind": "field",
+   "file": "world/kairion_hunt.json",
+   "map": [
+    565,
+    465
+   ],
+   "level": [
+    3,
+    7
+   ],
+   "region": "kairion",
+   "biome": "woods"
+  },
+  {
+   "id": "kairion_hills",
+   "name": "카이리온 구릉지",
+   "kind": "field",
+   "file": "world/kairion_hills.json",
+   "map": [
+    640,
+    420
+   ],
+   "level": [
+    5,
+    9
+   ],
+   "region": "kairion",
+   "biome": "meadow"
+  },
+  {
+   "id": "capital_plain",
+   "name": "수도 앞 평원",
+   "kind": "field",
+   "file": "world/capital_plain.json",
+   "map": [
+    565,
+    315
+   ],
+   "level": [
+    24,
+    30
+   ],
+   "region": "kairion",
+   "biome": "meadow"
+  },
+  {
+   "id": "broken_bridge",
+   "name": "무너진 다리 강변",
+   "kind": "field",
+   "file": "world/broken_bridge.json",
+   "map": [
+    640,
+    325
+   ],
+   "level": [
+    26,
+    31
+   ],
+   "region": "kairion",
+   "biome": "river"
+  },
+  {
+   "id": "baltern_pass",
+   "name": "바위산 고갯길",
+   "kind": "field",
+   "file": "world/baltern_pass.json",
+   "map": [
+    250,
+    440
+   ],
+   "level": [
+    6,
+    9
+   ],
+   "region": "baltern",
+   "biome": "stone"
+  },
+  {
+   "id": "baltern_cliffs",
+   "name": "발테른 절벽길",
+   "kind": "field",
+   "file": "world/baltern_cliffs.json",
+   "map": [
+    130,
+    340
+   ],
+   "level": [
+    8,
+    11
+   ],
+   "region": "baltern",
+   "biome": "stone"
+  },
+  {
+   "id": "baltern_quarry",
+   "name": "옛 채석장",
+   "kind": "field",
+   "file": "world/baltern_quarry.json",
+   "map": [
+    160,
+    510
+   ],
+   "level": [
+    9,
+    12
+   ],
+   "region": "baltern",
+   "biome": "canyon"
+  },
+  {
+   "id": "blue_forest_edge",
+   "name": "푸른숲 어귀",
+   "kind": "field",
+   "file": "world/blue_forest_edge.json",
+   "map": [
+    240,
+    320
+   ],
+   "level": [
+    10,
+    13
+   ],
+   "region": "lumiere",
+   "biome": "blue"
+  },
+  {
+   "id": "blue_forest",
+   "name": "푸른숲 (환영의 숲)",
+   "kind": "field",
+   "file": "world/blue_forest.json",
+   "map": [
+    250,
+    245
+   ],
+   "level": [
+    12,
+    15
+   ],
+   "region": "lumiere",
+   "biome": "blue"
+  },
+  {
+   "id": "blue_forest_heart",
+   "name": "푸른숲 고목지",
+   "kind": "field",
+   "file": "world/blue_forest_heart.json",
+   "map": [
+    300,
+    185
+   ],
+   "level": [
+    14,
+    17
+   ],
+   "region": "lumiere",
+   "biome": "blue"
+  },
+  {
+   "id": "lumiere_hills",
+   "name": "루미에르 순례길",
+   "kind": "field",
+   "file": "world/lumiere_hills.json",
+   "map": [
+    370,
+    135
+   ],
+   "level": [
+    13,
+    16
+   ],
+   "region": "lumiere",
+   "biome": "meadow"
+  },
+  {
+   "id": "lumiere_ruins_field",
+   "name": "불탄 순례지",
+   "kind": "field",
+   "file": "world/lumiere_ruins_field.json",
+   "map": [
+    440,
+    185
+   ],
+   "level": [
+    30,
+    33
+   ],
+   "region": "lumiere",
+   "biome": "ash"
+  },
+  {
+   "id": "gravel_border",
+   "name": "그라벨 국경지대",
+   "kind": "field",
+   "file": "world/gravel_border.json",
+   "map": [
+    545,
+    555
+   ],
+   "level": [
+    16,
+    19
+   ],
+   "region": "gravel",
+   "biome": "highland"
+  },
+  {
+   "id": "lost_villages",
+   "name": "사라진 마을 터",
+   "kind": "field",
+   "file": "world/lost_villages.json",
+   "map": [
+    430,
+    655
+   ],
+   "level": [
+    18,
+    21
+   ],
+   "region": "gravel",
+   "biome": "ash"
+  },
+  {
+   "id": "zirat_outskirts",
+   "name": "지라트 외곽 황무지",
+   "kind": "field",
+   "file": "world/zirat_outskirts.json",
+   "map": [
+    545,
+    700
+   ],
+   "level": [
+    20,
+    23
+   ],
+   "region": "zirat",
+   "biome": "ash"
+  },
+  {
+   "id": "zirat_wastes",
+   "name": "회색 황무지",
+   "kind": "field",
+   "file": "world/zirat_wastes.json",
+   "map": [
+    610,
+    735
+   ],
+   "level": [
+    40,
+    44
+   ],
+   "region": "zirat",
+   "biome": "ash"
+  },
+  {
+   "id": "zirat_abyss_rim",
+   "name": "지라트 심연 가장자리",
+   "kind": "field",
+   "file": "world/zirat_abyss_rim.json",
+   "map": [
+    690,
+    745
+   ],
+   "level": [
+    45,
+    50
+   ],
+   "region": "zirat",
+   "biome": "abyss"
+  },
+  {
+   "id": "abyss_bridge",
+   "name": "심연의 검은 다리",
+   "kind": "field",
+   "file": "world/abyss_bridge.json",
+   "map": [
+    770,
+    735
+   ],
+   "level": [
+    47,
+    50
+   ],
+   "region": "zirat",
+   "biome": "abyss"
+  },
+  {
+   "id": "silvern_fields",
+   "name": "실베른 들판",
+   "kind": "field",
+   "file": "world/silvern_fields.json",
+   "map": [
+    345,
+    600
+   ],
+   "level": [
+    14,
+    17
+   ],
+   "region": "silvern",
+   "biome": "meadow"
+  },
+  {
+   "id": "silvern_woods",
+   "name": "실베른 남쪽 숲",
+   "kind": "field",
+   "file": "world/silvern_woods.json",
+   "map": [
+    200,
+    565
+   ],
+   "level": [
+    15,
+    18
+   ],
+   "region": "silvern",
+   "biome": "woods"
+  },
+  {
+   "id": "silvern_marsh",
+   "name": "실베른 습지",
+   "kind": "field",
+   "file": "world/silvern_marsh.json",
+   "map": [
+    220,
+    700
+   ],
+   "level": [
+    17,
+    20
+   ],
+   "region": "silvern",
+   "biome": "marsh"
+  },
+  {
+   "id": "berg_canyon",
+   "name": "베르그 협곡",
+   "kind": "field",
+   "file": "world/berg_canyon.json",
+   "map": [
+    645,
+    585
+   ],
+   "level": [
+    19,
+    22
+   ],
+   "region": "berg",
+   "biome": "canyon"
+  },
+  {
+   "id": "berg_highland",
+   "name": "베르그 고원",
+   "kind": "field",
+   "file": "world/berg_highland.json",
+   "map": [
+    730,
+    620
+   ],
+   "level": [
+    21,
+    24
+   ],
+   "region": "berg",
+   "biome": "highland"
+  },
+  {
+   "id": "berg_burned",
+   "name": "불탄 베르그 마을 터",
+   "kind": "field",
+   "file": "world/berg_burned.json",
+   "map": [
+    800,
+    560
+   ],
+   "level": [
+    22,
+    25
+   ],
+   "region": "berg",
+   "biome": "ash"
+  },
+  {
+   "id": "trade_road",
+   "name": "동부 교역로",
+   "kind": "field",
+   "file": "world/trade_road.json",
+   "map": [
+    705,
+    400
+   ],
+   "level": [
+    28,
+    31
+   ],
+   "region": "marseon",
+   "biome": "meadow"
+  },
+  {
+   "id": "marseon_outskirts",
+   "name": "마르세온 외곽",
+   "kind": "field",
+   "file": "world/marseon_outskirts.json",
+   "map": [
+    810,
+    455
+   ],
+   "level": [
+    29,
+    32
+   ],
+   "region": "marseon",
+   "biome": "river"
+  },
+  {
+   "id": "crimson_forest",
+   "name": "붉은숲",
+   "kind": "field",
+   "file": "world/crimson_forest.json",
+   "map": [
+    850,
+    515
+   ],
+   "level": [
+    32,
+    35
+   ],
+   "region": "marseon",
+   "biome": "crimson"
+  },
+  {
+   "id": "crimson_heart",
+   "name": "붉은숲 심부",
+   "kind": "field",
+   "file": "world/crimson_heart.json",
+   "map": [
+    890,
+    580
+   ],
+   "level": [
+    34,
+    37
+   ],
+   "region": "marseon",
+   "biome": "crimson"
+  },
+  {
+   "id": "baltazar_mines",
+   "name": "발타자르 광산길",
+   "kind": "field",
+   "file": "world/baltazar_mines.json",
+   "map": [
+    855,
+    335
+   ],
+   "level": [
+    33,
+    36
+   ],
+   "region": "baltazar",
+   "biome": "stone"
+  },
+  {
+   "id": "royal_tomb",
+   "name": "발타자르 왕가 능침",
+   "kind": "field",
+   "file": "world/royal_tomb.json",
+   "map": [
+    950,
+    345
+   ],
+   "level": [
+    40,
+    43
+   ],
+   "region": "baltazar",
+   "biome": "highland"
+  },
+  {
+   "id": "north_canyon",
+   "name": "북쪽 협곡 전선",
+   "kind": "field",
+   "file": "world/north_canyon.json",
+   "map": [
+    870,
+    190
+   ],
+   "level": [
+    36,
+    39
+   ],
+   "region": "baltazar",
+   "biome": "canyon"
+  },
+  {
+   "id": "kreutz_front",
+   "name": "크로이츠 전선",
+   "kind": "field",
+   "file": "world/kreutz_front.json",
+   "map": [
+    790,
+    130
+   ],
+   "level": [
+    37,
+    40
+   ],
+   "region": "kreutz",
+   "biome": "frost"
+  },
+  {
+   "id": "kreutz_snowfield",
+   "name": "크로이츠 설원",
+   "kind": "field",
+   "file": "world/kreutz_snowfield.json",
+   "map": [
+    600,
+    75
+   ],
+   "level": [
+    39,
+    42
+   ],
+   "region": "kreutz",
+   "biome": "frost"
+  },
+  {
+   "id": "frozen_lake",
+   "name": "얼어붙은 호수",
+   "kind": "field",
+   "file": "world/frozen_lake.json",
+   "map": [
+    510,
+    60
+   ],
+   "level": [
+    42,
+    46
+   ],
+   "region": "kreutz",
+   "biome": "frost"
   }
- ]
+ ],
+ "world": {
+  "regions": [
+   {
+    "id": "kreutz",
+    "name": "크로이츠 제국",
+    "x": 650,
+    "y": 28
+   },
+   {
+    "id": "lumiere",
+    "name": "루미에르",
+    "x": 150,
+    "y": 178
+   },
+   {
+    "id": "baltern",
+    "name": "발테른 공국",
+    "x": 88,
+    "y": 472
+   },
+   {
+    "id": "kairion",
+    "name": "카이리온 왕국",
+    "x": 500,
+    "y": 262
+   },
+   {
+    "id": "marseon",
+    "name": "마르세온",
+    "x": 700,
+    "y": 492
+   },
+   {
+    "id": "baltazar",
+    "name": "발타자르 왕국",
+    "x": 995,
+    "y": 425,
+    "anchor": "end"
+   },
+   {
+    "id": "silvern",
+    "name": "실베른 영지",
+    "x": 118,
+    "y": 640
+   },
+   {
+    "id": "gravel",
+    "name": "그라벨 변경령",
+    "x": 440,
+    "y": 560
+   },
+   {
+    "id": "berg",
+    "name": "베르그 고원",
+    "x": 762,
+    "y": 684
+   },
+   {
+    "id": "zirat",
+    "name": "지라트",
+    "x": 470,
+    "y": 748
+   }
+  ],
+  "links": [
+   [
+    "town",
+    "capital_road"
+   ],
+   [
+    "capital_road",
+    "kairion_capital"
+   ],
+   [
+    "kairion_capital",
+    "kairion_hunt"
+   ],
+   [
+    "kairion_capital",
+    "kairion_hills"
+   ],
+   [
+    "kairion_capital",
+    "capital_plain"
+   ],
+   [
+    "capital_plain",
+    "broken_bridge"
+   ],
+   [
+    "capital_plain",
+    "lumiere_ruins_field"
+   ],
+   [
+    "dragon_ruins",
+    "lumiere_ruins_field"
+   ],
+   [
+    "mist_valley",
+    "baltern_pass"
+   ],
+   [
+    "baltern_pass",
+    "baltern"
+   ],
+   [
+    "baltern",
+    "baltern_cliffs"
+   ],
+   [
+    "baltern",
+    "baltern_quarry"
+   ],
+   [
+    "baltern_cliffs",
+    "blue_forest_edge"
+   ],
+   [
+    "blue_forest_edge",
+    "blue_forest"
+   ],
+   [
+    "blue_forest",
+    "blue_forest_heart"
+   ],
+   [
+    "blue_forest_heart",
+    "lumiere"
+   ],
+   [
+    "lumiere",
+    "lumiere_hills"
+   ],
+   [
+    "lumiere_hills",
+    "lumiere_ruins_field"
+   ],
+   [
+    "kairion_hunt",
+    "gravel_border"
+   ],
+   [
+    "gravel_border",
+    "gravel"
+   ],
+   [
+    "gravel",
+    "lost_villages"
+   ],
+   [
+    "gravel",
+    "zirat_outskirts"
+   ],
+   [
+    "zirat_outskirts",
+    "zirat_wastes"
+   ],
+   [
+    "zirat_wastes",
+    "zirat_abyss_rim"
+   ],
+   [
+    "zirat_abyss_rim",
+    "abyss_bridge"
+   ],
+   [
+    "baltern_quarry",
+    "silvern_woods"
+   ],
+   [
+    "silvern_woods",
+    "silvern"
+   ],
+   [
+    "silvern",
+    "silvern_fields"
+   ],
+   [
+    "silvern_fields",
+    "lost_villages"
+   ],
+   [
+    "silvern",
+    "silvern_marsh"
+   ],
+   [
+    "gravel_border",
+    "berg_canyon"
+   ],
+   [
+    "berg_canyon",
+    "berg_highland"
+   ],
+   [
+    "berg_highland",
+    "berg_burned"
+   ],
+   [
+    "berg_burned",
+    "crimson_forest"
+   ],
+   [
+    "kairion_hills",
+    "trade_road"
+   ],
+   [
+    "trade_road",
+    "marseon"
+   ],
+   [
+    "marseon",
+    "marseon_outskirts"
+   ],
+   [
+    "marseon_outskirts",
+    "crimson_forest"
+   ],
+   [
+    "crimson_forest",
+    "crimson_heart"
+   ],
+   [
+    "marseon",
+    "baltazar_mines"
+   ],
+   [
+    "baltazar_mines",
+    "baltazar"
+   ],
+   [
+    "baltazar",
+    "royal_tomb"
+   ],
+   [
+    "baltazar",
+    "north_canyon"
+   ],
+   [
+    "north_canyon",
+    "kreutz_front"
+   ],
+   [
+    "kreutz_front",
+    "kreutz_fort"
+   ],
+   [
+    "kreutz_fort",
+    "kreutz_snowfield"
+   ],
+   [
+    "kreutz_snowfield",
+    "frozen_lake"
+   ]
+  ],
+  "size": [
+   1000,
+   760
+  ]
+ }
 }

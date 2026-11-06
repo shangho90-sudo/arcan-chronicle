@@ -11,6 +11,9 @@ TEXMAP = {
     'M_foliage_violet': dict(tex='foliage_violet.png'), 'M_leaf_violet': dict(tex='leafcard_violet.png', alpha=True), 'M_stone_violet': dict(tex='stone_violet.png'), 'M_moss_violet': dict(tex='foliage_cool.png', scale=1.6),
     'M_cap_purple': dict(tex='cap_purple.png'), 'M_cap_blue': dict(tex='cap_blue.png'), 'M_cap_orange': dict(tex='cap_orange.png'), 'M_stem': dict(tex='stem.png'),
     'M_spot': dict(tex='spot.png'), 'M_glow_purple': dict(tex='glow_purple.png', emissive=True), 'M_glow_blue': dict(tex='glow_blue.png', emissive=True),
+    # foliage swaps per field (js/nature.js zone nature.foliage)
+    **{f'M_foliage_{f}': dict(tex=f'foliage_{f}.png') for f in ('crimson', 'azure', 'ash', 'snow')},
+    **{f'M_leaf_{f}': dict(tex=f'leafcard_{f}.png', alpha=True) for f in ('crimson', 'azure', 'ash', 'snow')},
     'M_plaster': dict(tex='plaster.png'), 'M_glow': dict(tex='lampglow.png', emissive=True), 'M_red': dict(tex='red.png'), 'M_soil': dict(tex='soilpot.png'),
 }
 def tex_path(t): return os.path.join(HERE, 'tex', t)

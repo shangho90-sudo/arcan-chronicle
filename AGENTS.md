@@ -8,7 +8,7 @@
 ## 기본
 - 빌드 없음. `python3 -m http.server 8765` 후 `http://localhost:8765/index.html`.
 - three.js r160을 로컬 import map(`index.html`, `vendor/three-r160/`)으로 불러옵니다. CDN 장애 시 0% 멈춤을 방지하기 위해 동일 버전과 LICENSE를 저장소에 포함합니다. npm 의존성 없음. 새 라이브러리 추가 금지(필요하면 먼저 사용자에게 확인).
-- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs` (현재 346 통과/7 생략, 606 통과).
+- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs` (현재 346 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 606 통과).
 - 테스트하지 않은 것을 "검증됨"이라고 보고하지 말 것.
 
 ## 데이터 우선
@@ -53,6 +53,14 @@
 - 충돌 판정 `ZoneGeometry.blocked`는 4 m 격자 버킷(`GRID_CELL`, 반지름 2 m 이하 질의)으로 찾음 — 소품이 수천 개라 필요.
 - 버섯 보스는 별도 존 `mushroom_grove`(독버섯 군락지, 경계 [-8,1,39,39]): 숲 북동쪽 길 끝 워프 `to_grove` ↔ `to_forest`. 배치는 `tools/forest/layout.py mushroom_grove --write`.
 
+## 용흔 대륙 세계 (2026-11-06, 배경 스토리 『아르칸 연대기 — 흑룡의 계절』)
+- `tools/world/world.py`가 마을 8곳(카이리온 왕도·발테른 공국·루미에르 신전·그라벨·실베른 영지·마르세온·발타자르 왕도·크로이츠 국경 요새)과 새 필드 35곳(기존 5곳 포함 필드 40곳), 연결(`LINKS`), 지도 좌표·권장 레벨·지역, 몬스터 변형, 이야기 NPC를 만듭니다. 결과: `assets/data/world/<id>.json`(존 전체 정의 + 존 메시 `mesh`), `zones.json`에는 스텁(`file`, `map`, `level`, `region`, `biome`)과 `"world"`(지역 이름·연결)만. 게임은 존에 들어갈 때 파일을 받습니다(`game.js` `buildZone`). 직접 고치지 말고 `world.py`를 고친 뒤 `python3 tools/world/world.py --write` → `node tools/forest/check_nav.mjs all`.
+- 필드 생성: 140 m, 출구(이웃 방향)→중심 허브 길, 공터, 연못/강(물은 충돌), 생물군(`BIOMES`: 들판·숲·푸른숲·붉은숲·바위산·설원·황무지·심연·고원·습지·협곡·강변)별 소품 혼합과 밀도, 몬스터는 `spread` 스포너. 존별 잎 색 바꾸기는 `nature.foliage`(crimson/azure/ash/snow, `nature.js` `folSwap`, 텍스처 `paint.py` `foliage_world()`), 바닥 세트 `g_ash_`/`g_crimson_`/`g_stone_`(`ground_variants_world()`).
+- 마을 생성: `town3d` 사양(성벽·탑·성문·궁/신전 `keep`(없어도 됨)·집·광장·장식·가로등)과 충돌 `blockPolys`. 첫 이웃은 남문 밖 워프, 나머지는 성 안 마법진 워프. NPC는 기존 3D 모델을 빌려 씀(npcs.json `model`), 마을마다 상인.
+- 세계 지도: `js/worldmap.js`(M 키 / 메뉴 '지도'), 확대·축소, 장소를 누르면 권장 레벨·이어진 곳. 확인 `tools/browser-tests/worldshots.js`(SIZE=390x844t 휴대폰).
+- 새 몬스터 17종: Tripo 초안(`tools/monsters/tripo_new.py`, 키는 `~/.tripo/key`) → Blender 정리(`tools/monsters/blender_new.py`: 조각 제거, 9천 삼각형으로 줄이기, 바닥 맞춤, 기본색만 1024 px + 손그림 느낌 처리, 무광) → `assets/creatures/w_<name>.glb.json`. 능력치는 `world.py` `SPECIES`(공격 방식별 기존 몬스터 + 레벨 곡선 보간). 화면 확인 `tools/browser-tests/monstershots.js`.
+- 지형 마스크(`nature.js` `paintMask`)는 길을 날카롭게 그린 뒤 한 번만 흐림 — 선분마다 blur 필터를 걸면 소프트웨어 GL에서 몇 분 걸림.
+
 ## 보스 전장 (독버섯 군락지 `mushroom_grove`, 2026-11-06)
 - 바닥: `nature.js` `arenaMaterial`(빌더 `boss_floor` 지형에 적용) — 보라 흙·짙은 보라·갈색·이끼 색 덩어리, 붓 터치, 갈라짐, 낙엽·조약돌·포자, 흔들리는 잎 그늘. 텍스처는 `paint.py` `magic_floor()`(g_magic_*)를 잔결로만 씀.
 - 배치: `tools/forest/layout.py mushroom_grove`의 "mushroom boss grove" 구간(플랫폼 위 가장자리 빽빽, 가운데 비움, 1 큰 + 2~4 중간 + 5~15 작은 묶음, 경계 밖 배경 나무 벽). 원형 바위는 `rock_magic*`. 타입 `mushdecor`(장식, 충돌 없음)·`mushtree`(충돌 `propFootprint`).
@@ -82,6 +90,6 @@
 ## 알려진 미완료
 - 스킬 아이콘은 코드 생성 임시 아이콘.
 - 몬스터: 귀여운 모델(`cute_*`)은 리깅이 없어 모든 동작이 절차 동작. 불씨 비룡 계열(drake)만 예전 모델.
-- 네 필드 모두 `js/nature.js` 렌더(존별 `nature.ground`/`tint`/`rockTint`/`grass`/`lod`). 서리 고원은 색조만 차갑게(눈 덮인 잎 없음).
+- 모든 필드(40곳)가 `js/nature.js` 렌더(존별 `nature.ground`/`tint`/`rockTint`/`grass`/`lod`). 서리 고원은 색조만 차갑게(눈 덮인 잎 없음).
 - 휴대폰 화면은 자동 화면 확인만 함(실기기 미확인). 사람이 처음부터 끝까지 플레이한 검증 없음.
 - 원래 있던 Unity 프로젝트에는 미반영(이 저장소는 웹 버전만).

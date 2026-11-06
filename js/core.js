@@ -39,6 +39,7 @@ export class GameData {
     this.npcs = Object.fromEntries(files.npcs.npcs.map(n => [n.id, n]));
     this.shops = Object.fromEntries(files.npcs.shops.map(s => [s.id, s]));
     this.zones = Object.fromEntries(files.zones.zones.map(z => [z.id, z]));
+    this.world = files.zones.world || null;                 // 세계 지도: regions + links (tools/world/world.py)
     // job skill system v2 (skills2.json): 180 skills, statuses, craft items, recipes
     const s2 = files.skills2 || { skills: [], statuses: [], items: [], recipes: [] };
     this.skill2List = s2.skills; this.skills2 = Object.fromEntries(s2.skills.map(s => [s.id, s]));
@@ -622,6 +623,8 @@ export class ZoneGeometry {
       if (f.r) this.circles.push({ x: p.pos[0], z: p.pos[1], r: f.r, tag: p.type });
       else this.boxes.push({ x: p.pos[0], z: p.pos[1], hw: f.hw, hd: f.hd, yaw: p.rot, tag: p.type });
     }
+    // ponds / lakes / river pools: the shore stays walkable, the water does not
+    for (const p of def.patches || []) if (p.tex === "water" && p.shape === "disc" && p.radius > 1.5) this.circles.push({ x: p.pos[0], z: p.pos[1], r: p.radius - 0.9, tag: "water" });
   }
   addCircle(x, z, r, tag) { this.circles.push({ x, z, r, tag }); this._grid = null; }
   removeTag(tag) { this.circles = this.circles.filter(c => c.tag !== tag); this.boxes = this.boxes.filter(b => b.tag !== tag); this.polys = this.polys.filter(p => p.tag !== tag); this._grid = null; }

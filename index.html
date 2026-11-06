@@ -686,6 +686,29 @@ small { font-size:.8em; }
 .window.narrow .atrow { grid-template-columns:52px 1fr auto; } .window.narrow .atgain { grid-column:2 / 4; } .window.narrow .atbtns { grid-column:1 / 4; justify-content:flex-end; }
 .window.narrow .atgrid { grid-template-columns:repeat(2, 1fr); } .window.narrow .athead { flex-wrap:wrap; }
 </style>
+<style>
+/* ---------- 세계 지도 (js/worldmap.js, 2026-11-06) ---------- */
+.window.worldmap .wbody { display:flex; flex-direction:column; gap:8px; }
+.wmtop { display:flex; align-items:center; gap:16px; flex-wrap:wrap; font-size:15px; }
+.wmhere b { color:#8a4e10; } .wmlegend { display:flex; align-items:center; gap:6px; font-size:13px; opacity:.85; }
+.wmlegend i { display:inline-block; width:12px; height:12px; border-radius:50%; margin-left:8px; border:2px solid #3a2a18; }
+.wmlegend i.lt { background:#e8c45a; border-radius:2px; } .wmlegend i.lf { background:#9cc56a; } .wmlegend i.lh { background:transparent; border-color:#ffe08a; box-shadow:0 0 6px #ffe08a; }
+.wmzoom { margin-left:auto; display:flex; gap:6px; } .wmzoom .btn { min-width:40px; min-height:34px; font-size:18px; padding:0 8px; }
+.wmbox { position:relative; overflow:auto; border:2px solid #b89a5a; border-radius:8px; max-height:68vh; background:#14304a; overscroll-behavior:contain; touch-action:pan-x pan-y; }
+.wminner { width:100%; } .wmsvg { display:block; width:100%; height:auto; user-select:none; }
+.wmregion { font-size:21px; font-weight:800; fill:#5a3e22; fill-opacity:.62; letter-spacing:6px; paint-order:stroke; stroke:#f4e6c0; stroke-width:3px; stroke-opacity:.6; pointer-events:none; }
+.wmroad { stroke:#7a5a34; stroke-width:3.2; stroke-dasharray:8 6; stroke-linecap:round; fill:none; opacity:.85; }
+.wmlabel { font-size:12.5px; font-weight:700; fill:#2e2012; paint-order:stroke; stroke:#fbf1d6; stroke-width:3.4px; stroke-linejoin:round; pointer-events:none; }
+.wmlabel.town { font-size:14.5px; fill:#4a2a08; }
+.wmnode { cursor:pointer; } .wmnode:hover circle, .wmnode.sel circle:not(.wmpulse) { stroke:#fff6c8; stroke-width:3.2; }
+.wmnode.sel .wmlabel { fill:#7a1e10; }
+.wmpulse { fill:none; stroke:#ffe08a; stroke-width:4; animation:wmpulse 1.6s ease-in-out infinite; }
+@keyframes wmpulse { 0%,100% { stroke-opacity:.95; r:18px; } 50% { stroke-opacity:.35; r:26px; } }
+.wminfo { min-height:46px; font-size:15px; line-height:1.5; } .wminfo small { opacity:.8; margin-left:4px; }
+.wmlv { display:inline-block; margin-left:8px; padding:1px 8px; border-radius:10px; background:rgba(200,150,60,.16); border:1px solid #b08a40; font-size:13px; color:#7a4a10; }
+.wmlv.here { background:rgba(255,224,138,.3); }
+@media (max-width: 600px) { .hud .botbar .menubtns .btn { width:36px; } .botbar .menubtns { gap:3px; } }
+</style>
 </head>
 <body>
 <div id="view"></div>

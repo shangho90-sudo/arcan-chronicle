@@ -2919,6 +2919,42 @@
    "emissive": true,
    "file": "glow_blue.jpg"
   },
+  "M_foliage_crimson": {
+   "tex": "foliage_crimson.png",
+   "file": "foliage_crimson.jpg"
+  },
+  "M_foliage_azure": {
+   "tex": "foliage_azure.png",
+   "file": "foliage_azure.jpg"
+  },
+  "M_foliage_ash": {
+   "tex": "foliage_ash.png",
+   "file": "foliage_ash.jpg"
+  },
+  "M_foliage_snow": {
+   "tex": "foliage_snow.png",
+   "file": "foliage_snow.jpg"
+  },
+  "M_leaf_crimson": {
+   "tex": "leafcard_crimson.png",
+   "alpha": true,
+   "file": "leafcard_crimson.png"
+  },
+  "M_leaf_azure": {
+   "tex": "leafcard_azure.png",
+   "alpha": true,
+   "file": "leafcard_azure.png"
+  },
+  "M_leaf_ash": {
+   "tex": "leafcard_ash.png",
+   "alpha": true,
+   "file": "leafcard_ash.png"
+  },
+  "M_leaf_snow": {
+   "tex": "leafcard_snow.png",
+   "alpha": true,
+   "file": "leafcard_snow.png"
+  },
   "M_plaster": {
    "tex": "plaster.png",
    "file": "plaster.jpg"

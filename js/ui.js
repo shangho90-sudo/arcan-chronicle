@@ -1,5 +1,6 @@
 // HTML/CSS user interface (ivory / teal / gold, Galmuri pixel font). Port of the Unity uGUI views.
 import { QS, Shop, isEquipment, slotOf, EQUIP_SLOTS, ATTRS, ATTR_KR, ATTR_BASE, ATTR_FX } from './core.js';
+import { showWorldMap } from './worldmap.js';
 import { THREE, tex, CAM } from './render.js';
 import { ModelBody, loadPlayerModel, loadActions } from './model.js';
 import { renderItemIcons } from './items3d.js';
@@ -72,6 +73,7 @@ const MENU_ICON = (() => {
     skills: W('<path d="M16 3l9 13-9 13-9-13z" fill="#6a4aa0"/><path d="M16 9l5 7-5 7-5-7z" fill="#f6dc94" stroke="none"/>'),
     craft: W('<path d="M7 25L21 11" /><path d="M18 6l8 8-3 3-8-8z" fill="#8a8f9a"/><path d="M25 25L11 11"/><path d="M6 8l5-3 3 3-3 5z" fill="#8a8f9a"/>'),
     quests: W('<path d="M8 5h13l4 4v18H8z" fill="#a0742a"/><path d="M12 12h9M12 17h9M12 22h6"/>'),
+    map: W('<path d="M4 8l7-3 10 3 7-3v19l-7 3-10-3-7 3z"/><path d="M11 5v19M21 8v19"/>'),
     stats: W('<path d="M6 26V16M12 26V10M18 26V13M24 26V6" stroke-width="3.4"/><path d="M4 27h24"/>'),
     pause: W('<path d="M7 9h18M7 16h18M7 23h18"/>'),
   };
@@ -184,7 +186,7 @@ export class UI {
       <div class="bar hp"><i id="hHp"></i><b id="hShield"></b><span id="hHpT"></span></div>
       <div class="bar sp"><i id="hSp"></i><span id="hSpT"></span></div>
       <div class="expbar"><i id="hExp"></i><span id="hExpT"></span></div>
-      <div class="menubtns">${[["inventory", "가방"], ["stats", "능력치"], ["skills", "스킬"], ["craft", "제작"], ["quests", "퀘스트"], ["pause", "메뉴"]].map(([a, t]) => `<button class="btn" data-a="${a}">${MENU_ICON[a]}<span>${t}</span></button>`).join("")}</div></div>`;
+      <div class="menubtns">${[["inventory", "가방"], ["stats", "능력치"], ["skills", "스킬"], ["craft", "제작"], ["quests", "퀘스트"], ["map", "지도"], ["pause", "메뉴"]].map(([a, t]) => `<button class="btn" data-a="${a}">${MENU_ICON[a]}<span>${t}</span></button>`).join("")}</div></div>`;
     for (const b of h.querySelectorAll("[data-a]")) b.onclick = () => { G.audio.sfx("ui"); G.input.press({ skills: "skillWin", craft: "craftWin" }[b.dataset.a] || b.dataset.a); };
     this.h = id => h.querySelector("#" + id);
     this.minimap = new Minimap(h.querySelector("#hMap"));
@@ -352,6 +354,7 @@ export class UI {
     if (down.quests) { if (this.currentName === "quests") this.close(); else if (!this.current || this.currentName === "inventory") this.showQuests(); }
     if (down.questHud && !this.current) this.toggleQuestHud();
     if (down.stats) { if (this.currentName === "stats") this.close(); else if (!this.current || ["inventory", "quests"].includes(this.currentName)) this.showStats(); }
+    if (down.map) { if (this.currentName === "worldmap") this.close(); else if (!this.current || ["inventory", "quests", "stats"].includes(this.currentName)) showWorldMap(this); }
   }
   refresh() { if (this.currentName === "inventory") this.showInventory(); else if (this.currentName === "shop") this.showShop(this.shop); }
   button(parent, label, cls, fn) { const b = $("button", "btn " + (cls || "teal"), parent, label); b.onclick = () => { G.audio.sfx("ui"); fn(); }; return b; }

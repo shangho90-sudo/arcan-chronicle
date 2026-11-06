@@ -371,10 +371,12 @@ class Game {
     if (this.zone) { this.zone.dispose(); this.zone = null; }
     this.fx.clear(); this.ui.clearPlates();
     const def = this.data.zones[id];
-    let json = zoneJsonCache.get(id); if (!json) { json = await fetchJson("assets/zone_" + id + ".json"); zoneJsonCache.set(id, json); }
+    // world zones (tools/world/world.py) keep only a stub in zones.json: the full def (with its zone mesh) is fetched on entry
+    if (def.file && !def.loaded) { Object.assign(def, await fetchJson("assets/data/" + def.file)); def.loaded = true; }
+    let json = def.mesh || zoneJsonCache.get(id); if (!json) { json = await fetchJson("assets/zone_" + id + ".json"); zoneJsonCache.set(id, json); }
     const z = new Zone(def, json); await z.build(); this.zone = z;
     const b = def.bounds; this.camBounds = [b[0] + 4, b[1] + 4, b[2] - 4, b[3] - 4];
-    this.render.scene.background = new THREE.Color(id === "town" ? 0x6d8f5e : 0x3f5a3c);
+    this.render.scene.background = new THREE.Color(def.kind === "town" ? 0x6d8f5e : 0x3f5a3c);
     return z;
   }
   travel(zone, spawn) { if (this.loading) return; this.save(); this.loadZone(zone, spawn, false); }

@@ -277,7 +277,7 @@ function setFade(g, on) {
   for (const m of g.meshes) {
     if (on) {
       if (!m.userData.orig) m.userData.orig = m.material;
-      if (!m.userData.fade) { const f = m.userData.orig.clone(); f.transparent = true; f.opacity = 0.32; f.depthWrite = false; m.userData.fade = f; }
+      if (!m.userData.fade) { const mk = o => { const f = o.clone(); f.transparent = true; f.opacity = 0.32; f.depthWrite = false; return f; }; const o = m.userData.orig; m.userData.fade = Array.isArray(o) ? o.map(mk) : mk(o); }
       m.material = m.userData.fade; m.castShadow = false;
     } else if (m.userData.orig) { m.material = m.userData.orig; m.castShadow = true; }
   }

@@ -651,10 +651,11 @@ export class Boss extends Monster {
 export class Npc {
   constructor(zone, def, pos, yaw) { this.zone = zone; this.def = def; this.pos = pos; this.baseYaw = yaw; this.swap = 0; }
   async attachBody() {
-    if (NPC_MODELS[this.def.id]) {
+    const mk = NPC_MODELS[this.def.id] ? this.def.id : this.def.model;     // world NPCs borrow a town NPC's 3D model ("model")
+    if (NPC_MODELS[mk]) {
       // 3D model (falls back to the sprite sheet if the model file is missing)
       try {
-        const [md, sh] = await Promise.all([loadNpcModel(this.def.id), loadActions()]);
+        const [md, sh] = await Promise.all([loadNpcModel(mk), loadActions()]);
         this.body = new ModelBody(G.render.scene, md, sh, 0.34);
         this.faceYaw(this.baseYaw); this.body.yaw = this.body.targetYaw; this.body.place(this.pos); return;
       } catch (e) { console.warn('npc model', this.def.id, e.message); }

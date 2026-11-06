@@ -116,6 +116,314 @@
     "검이든 방패든, 손에 맞아야 진짜 장비지.",
     "직업에 맞는 무기를 골라 봐."
    ]
+  },
+  {
+   "id": "roderick",
+   "name": "로데릭",
+   "title": "근위대장",
+   "sheet": "npc_guard",
+   "model": "guard",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "왕도의 성문은 폐하의 명 없이는 열리지 않소.",
+    "……그날 밤 일은 묻지 마시오."
+   ],
+   "world": true
+  },
+  {
+   "id": "capital_merchant",
+   "name": "베아",
+   "title": "왕도 상인",
+   "sheet": "npc_merchant",
+   "model": "merchant",
+   "role": "merchant",
+   "shop": "shop_general",
+   "job": "",
+   "lines": [
+    "검은 깃발이 걸린 뒤로 손님이 줄었어요.",
+    "물약은 넉넉히 챙기세요."
+   ],
+   "world": true
+  },
+  {
+   "id": "capital_smith",
+   "name": "하르덴",
+   "title": "왕실 대장장이",
+   "sheet": "npc_master_blacksmith",
+   "model": "master_blacksmith",
+   "role": "merchant",
+   "shop": "shop_smithy",
+   "job": "",
+   "lines": [
+    "왕실 무기고의 칼날도 내 손을 거쳤지.",
+    "무기 손질이 필요하면 말하게."
+   ],
+   "world": true
+  },
+  {
+   "id": "kerin",
+   "name": "케린",
+   "title": "노기사",
+   "sheet": "npc_guard",
+   "model": "guard",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "구하는 일과 베는 일은 같은 검 끝에 있다.",
+    "삼십 년 전 지라트 국경에서 본 것을 아직 잊지 못했다."
+   ],
+   "world": true
+  },
+  {
+   "id": "baltern_merchant",
+   "name": "오린",
+   "title": "바위산 상인",
+   "sheet": "npc_merchant",
+   "model": "merchant",
+   "role": "merchant",
+   "shop": "shop_general",
+   "job": "",
+   "lines": [
+    "고갯길은 미끄러우니 조심하시오.",
+    "여기서는 약초가 귀하다오."
+   ],
+   "world": true
+  },
+  {
+   "id": "justina",
+   "name": "저스티나",
+   "title": "대사제",
+   "sheet": "npc_master_pharmacist",
+   "model": "master_pharmacist",
+   "role": "elder",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "아르칸의 다섯 유물을 모아야 흑룡을 다시 봉인할 수 있습니다.",
+    "오라버니는…… 한때 이 신전의 대사제였지요."
+   ],
+   "world": true
+  },
+  {
+   "id": "lumiere_acolyte",
+   "name": "에피",
+   "title": "견습 사제",
+   "sheet": "npc_master_artist",
+   "model": "master_artist",
+   "role": "merchant",
+   "shop": "shop_pharmacy",
+   "job": "",
+   "lines": [
+    "수정구가 요즘 자꾸 검게 흐려져요.",
+    "순례길에는 환영이 나온대요."
+   ],
+   "world": true
+  },
+  {
+   "id": "chirkai",
+   "name": "치르카이",
+   "title": "그라벨 영주",
+   "sheet": "npc_elder",
+   "model": "elder",
+   "role": "elder",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "석 달 사이 마을 열두 곳이 사라졌소.",
+    "이건 카이리온의 왕위 다툼이 아니군."
+   ],
+   "world": true
+  },
+  {
+   "id": "chirzen",
+   "name": "치르젠",
+   "title": "영주의 아들",
+   "sheet": "npc_master_artist",
+   "model": "master_artist",
+   "role": "elder",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "서고의 오래된 군령서를 정리하고 있습니다.",
+    "숫자를 잊으면 전쟁에서 집니다."
+   ],
+   "world": true
+  },
+  {
+   "id": "yoisen",
+   "name": "요이센",
+   "title": "정찰병",
+   "sheet": "npc_guard",
+   "model": "guard",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "지라트에서는 두 가지만 지키시오. 소리를 내지 말 것. 땅을 믿지 말 것."
+   ],
+   "world": true
+  },
+  {
+   "id": "gravel_merchant",
+   "name": "두란",
+   "title": "국경 상인",
+   "sheet": "npc_merchant",
+   "model": "merchant",
+   "role": "merchant",
+   "shop": "shop_general",
+   "job": "",
+   "lines": [
+    "남쪽으로 가는 길엔 해독제가 필수요."
+   ],
+   "world": true
+  },
+  {
+   "id": "derkai",
+   "name": "데르카이",
+   "title": "실베른 영주",
+   "sheet": "npc_elder",
+   "model": "elder",
+   "role": "elder",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "보복이 두려워 문을 닫는 자도 있지.",
+    "이틀만 생각할 시간을 주게."
+   ],
+   "world": true
+  },
+  {
+   "id": "silvern_merchant",
+   "name": "리아",
+   "title": "들판 상인",
+   "sheet": "npc_merchant",
+   "model": "merchant",
+   "role": "merchant",
+   "shop": "shop_general",
+   "job": "",
+   "lines": [
+    "습지 쪽은 안개가 짙어요."
+   ],
+   "world": true
+  },
+  {
+   "id": "yanber",
+   "name": "얀베르",
+   "title": "발타자르 기사단장",
+   "sheet": "npc_guard",
+   "model": "guard",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "당신이 누구인지는 묻지 않겠습니다.",
+    "발타자르까지 모시겠습니다."
+   ],
+   "world": true
+  },
+  {
+   "id": "marseon_merchant",
+   "name": "카심",
+   "title": "교역 상인",
+   "sheet": "npc_merchant",
+   "model": "merchant",
+   "role": "merchant",
+   "shop": "shop_general",
+   "job": "",
+   "lines": [
+    "검은 깃발 아래서도 장사는 계속되지요."
+   ],
+   "world": true
+  },
+  {
+   "id": "marseon_armorer",
+   "name": "세라",
+   "title": "방어구 상인",
+   "sheet": "npc_armorer",
+   "model": "armorer",
+   "role": "merchant",
+   "shop": "shop_arms",
+   "job": "",
+   "lines": [
+    "동쪽 전선에서 쓰던 방패요. 튼튼하지."
+   ],
+   "world": true
+  },
+  {
+   "id": "erdin",
+   "name": "에르딘",
+   "title": "왕실 대장장이",
+   "sheet": "npc_master_blacksmith",
+   "model": "master_blacksmith",
+   "role": "merchant",
+   "shop": "shop_smithy",
+   "job": "",
+   "lines": [
+    "스승님은 붉은숲으로 사라지셨습니다.",
+    "이 망치로 무언가를 지키는 무기를 만들겠습니다."
+   ],
+   "world": true
+  },
+  {
+   "id": "berion",
+   "name": "베리온",
+   "title": "발타자르 왕자",
+   "sheet": "npc_guard",
+   "model": "guard",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "북쪽 협곡에서 크로이츠군을 막고 있소.",
+    "아버님의 병이 깊어지고 있소."
+   ],
+   "world": true
+  },
+  {
+   "id": "baltazar_merchant",
+   "name": "토마",
+   "title": "왕도 상인",
+   "sheet": "npc_merchant",
+   "model": "merchant",
+   "role": "merchant",
+   "shop": "shop_general",
+   "job": "",
+   "lines": [
+    "대장장이의 나라에 온 걸 환영하오."
+   ],
+   "world": true
+  },
+  {
+   "id": "kreutz_captain",
+   "name": "볼크",
+   "title": "요새 수비대장",
+   "sheet": "npc_guard",
+   "model": "guard",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "제국의 흑기사가 남쪽으로 내려갔다는 소문이 있소.",
+    "호수 쪽 얼음이 밤마다 울린다오."
+   ],
+   "world": true
+  },
+  {
+   "id": "kreutz_merchant",
+   "name": "미샤",
+   "title": "설원 상인",
+   "sheet": "npc_merchant",
+   "model": "merchant",
+   "role": "merchant",
+   "shop": "shop_general",
+   "job": "",
+   "lines": [
+    "털옷 없이 설원에 가면 얼어 죽어요."
+   ],
+   "world": true
   }
  ],
  "shops": [

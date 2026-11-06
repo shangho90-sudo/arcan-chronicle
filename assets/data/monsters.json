@@ -1215,6 +1215,1860 @@
    "hitSfx": "heavy",
    "def": 90,
    "minion": "mon_cinder_lizard"
+  },
+  {
+   "id": "mon_rock_ram",
+   "name": "바위뿔 산양",
+   "level": 8,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 411,
+   "atk": 31,
+   "exp": 45,
+   "goldMin": 16,
+   "goldMax": 31,
+   "moveSpeed": 3.0,
+   "detectRange": 7.5,
+   "leashRange": 14,
+   "attackRange": 1.6,
+   "attackCooldown": 1.7,
+   "windup": 0.5,
+   "radius": 0.65,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 14,
+   "drops": [
+    {
+     "item": "m_frost_horn",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.08,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_sp_potion",
+     "chance": 0.05,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "@jobweapon:2",
+     "chance": 0.02,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 12,
+   "world": true
+  },
+  {
+   "id": "mon_cliff_wolf",
+   "name": "절벽 늑대",
+   "level": 10,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 394,
+   "atk": 45,
+   "exp": 24,
+   "goldMin": 17,
+   "goldMax": 34,
+   "moveSpeed": 3.5,
+   "detectRange": 8,
+   "leashRange": 14,
+   "attackRange": 1.4,
+   "attackCooldown": 1.4,
+   "windup": 0.35,
+   "radius": 0.5,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 12,
+   "drops": [
+    {
+     "item": "m_wolf_fang",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.06,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_sp_potion",
+     "chance": 0.06,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 14,
+   "world": true
+  },
+  {
+   "id": "mon_blue_jelly",
+   "name": "푸른숲 젤리",
+   "level": 11,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 385,
+   "atk": 52,
+   "exp": 14,
+   "goldMin": 18,
+   "goldMax": 35,
+   "moveSpeed": 2.2,
+   "detectRange": 6,
+   "leashRange": 14,
+   "attackRange": 1.0,
+   "attackCooldown": 1.6,
+   "windup": 0.35,
+   "radius": 0.42,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 8,
+   "drops": [
+    {
+     "item": "m_jelly",
+     "chance": 0.8,
+     "min": 1,
+     "max": 2
+    },
+    {
+     "item": "c_potion_s",
+     "chance": 0.12,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 14,
+   "world": true
+  },
+  {
+   "id": "mon_shadow_wolf",
+   "name": "그림자 늑대",
+   "level": 13,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 398,
+   "atk": 65,
+   "exp": 21,
+   "goldMin": 21,
+   "goldMax": 42,
+   "moveSpeed": 3.5,
+   "detectRange": 8,
+   "leashRange": 14,
+   "attackRange": 1.4,
+   "attackCooldown": 1.4,
+   "windup": 0.35,
+   "radius": 0.5,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 12,
+   "drops": [
+    {
+     "item": "m_wolf_fang",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.06,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_sp_potion",
+     "chance": 0.06,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 17,
+   "world": true
+  },
+  {
+   "id": "mon_phantom_fox",
+   "name": "환영 여우",
+   "level": 14,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 405,
+   "atk": 71,
+   "exp": 24,
+   "goldMin": 22,
+   "goldMax": 45,
+   "moveSpeed": 3.3,
+   "detectRange": 7,
+   "leashRange": 14,
+   "attackRange": 1.2,
+   "attackCooldown": 1.3,
+   "windup": 0.35,
+   "radius": 0.4,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 8,
+   "drops": [
+    {
+     "item": "m_fox_fur",
+     "chance": 0.65,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_s",
+     "chance": 0.12,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "m_herb",
+     "chance": 0.12,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 18,
+   "world": true
+  },
+  {
+   "id": "mon_phantom_bear",
+   "name": "숲의 문지기 영령",
+   "level": 17,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 2920,
+   "atk": 156,
+   "exp": 245,
+   "goldMin": 135,
+   "goldMax": 270,
+   "moveSpeed": 1.7,
+   "detectRange": 9,
+   "leashRange": 13,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 90,
+   "drops": [
+    {
+     "item": "m_moss_stone",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.1,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "a_armor_2",
+     "chance": 0.04,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "@jobweapon:2",
+     "chance": 0.06,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 31,
+   "world": true
+  },
+  {
+   "id": "mon_dust_boar",
+   "name": "흙먼지 멧돼지",
+   "level": 18,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 683,
+   "atk": 103,
+   "exp": 54,
+   "goldMin": 29,
+   "goldMax": 57,
+   "moveSpeed": 2.9,
+   "detectRange": 7,
+   "leashRange": 14,
+   "attackRange": 1.5,
+   "attackCooldown": 1.8,
+   "windup": 0.5,
+   "radius": 0.55,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 14,
+   "drops": [
+    {
+     "item": "m_boar_tusk",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.08,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "@jobweapon:2",
+     "chance": 0.03,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 23,
+   "world": true
+  },
+  {
+   "id": "mon_ash_toad",
+   "name": "잿빛 두꺼비",
+   "level": 21,
+   "sheet": "mon_shroom",
+   "ai": "ranged",
+   "hp": 1698,
+   "atk": 126,
+   "exp": 358,
+   "goldMin": 42,
+   "goldMax": 102,
+   "moveSpeed": 2.0,
+   "detectRange": 8,
+   "leashRange": 14,
+   "attackRange": 7,
+   "attackCooldown": 2.2,
+   "windup": 0.5,
+   "radius": 0.5,
+   "attackRadius": 0,
+   "projectileFx": "proj_spore",
+   "projectileSpeed": 7.5,
+   "respawn": 12,
+   "drops": [
+    {
+     "item": "m_toad_gland",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.08,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_sp_potion",
+     "chance": 0.05,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 28,
+   "world": true
+  },
+  {
+   "id": "mon_canyon_ram",
+   "name": "협곡 큰뿔양",
+   "level": 21,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 1698,
+   "atk": 126,
+   "exp": 358,
+   "goldMin": 42,
+   "goldMax": 102,
+   "moveSpeed": 3.0,
+   "detectRange": 7.5,
+   "leashRange": 14,
+   "attackRange": 1.6,
+   "attackCooldown": 1.7,
+   "windup": 0.5,
+   "radius": 0.65,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 14,
+   "drops": [
+    {
+     "item": "m_frost_horn",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.08,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_sp_potion",
+     "chance": 0.05,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "@jobweapon:2",
+     "chance": 0.02,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 28,
+   "world": true
+  },
+  {
+   "id": "mon_berg_bear",
+   "name": "베르그 고원 곰",
+   "level": 24,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 643,
+   "atk": 130,
+   "exp": 115,
+   "goldMin": 39,
+   "goldMax": 77,
+   "moveSpeed": 1.7,
+   "detectRange": 7,
+   "leashRange": 13,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 18,
+   "drops": [
+    {
+     "item": "m_moss_stone",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.1,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "a_armor_2",
+     "chance": 0.04,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "@jobweapon:2",
+     "chance": 0.06,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 31,
+   "world": true
+  },
+  {
+   "id": "mon_blackeye_wolf",
+   "name": "검은 눈 늑대",
+   "level": 28,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 917,
+   "atk": 187,
+   "exp": 215,
+   "goldMin": 45,
+   "goldMax": 90,
+   "moveSpeed": 3.5,
+   "detectRange": 8,
+   "leashRange": 14,
+   "attackRange": 1.4,
+   "attackCooldown": 1.4,
+   "windup": 0.35,
+   "radius": 0.5,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 12,
+   "drops": [
+    {
+     "item": "m_wolf_fang",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.06,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_sp_potion",
+     "chance": 0.06,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 37,
+   "world": true
+  },
+  {
+   "id": "mon_crimson_boar",
+   "name": "붉은숲 멧돼지",
+   "level": 33,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 1205,
+   "atk": 184,
+   "exp": 409,
+   "goldMin": 53,
+   "goldMax": 106,
+   "moveSpeed": 2.9,
+   "detectRange": 7,
+   "leashRange": 14,
+   "attackRange": 1.5,
+   "attackCooldown": 1.8,
+   "windup": 0.5,
+   "radius": 0.55,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 14,
+   "drops": [
+    {
+     "item": "m_boar_tusk",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.08,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "@jobweapon:2",
+     "chance": 0.03,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 43,
+   "world": true
+  },
+  {
+   "id": "mon_mine_golem",
+   "name": "광산 바위정령",
+   "level": 34,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 2108,
+   "atk": 221,
+   "exp": 1225,
+   "goldMin": 64,
+   "goldMax": 147,
+   "moveSpeed": 1.6,
+   "detectRange": 7,
+   "leashRange": 14,
+   "attackRange": 2.4,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.85,
+   "attackRadius": 2.7,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 18,
+   "drops": [
+    {
+     "item": "m_rune_shard",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.12,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "@jobweapon:3",
+     "chance": 0.03,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 44,
+   "world": true
+  },
+  {
+   "id": "mon_crimson_fox",
+   "name": "핏빛 여우",
+   "level": 35,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 3012,
+   "atk": 258,
+   "exp": 2040,
+   "goldMin": 75,
+   "goldMax": 189,
+   "moveSpeed": 3.3,
+   "detectRange": 7,
+   "leashRange": 14,
+   "attackRange": 1.2,
+   "attackCooldown": 1.3,
+   "windup": 0.35,
+   "radius": 0.4,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 8,
+   "drops": [
+    {
+     "item": "m_fox_fur",
+     "chance": 0.65,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_s",
+     "chance": 0.12,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "m_herb",
+     "chance": 0.12,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 46,
+   "world": true
+  },
+  {
+   "id": "mon_crimson_bear",
+   "name": "붉은 수정 곰",
+   "level": 38,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 4060,
+   "atk": 405,
+   "exp": 2400,
+   "goldMin": 305,
+   "goldMax": 610,
+   "moveSpeed": 1.7,
+   "detectRange": 9,
+   "leashRange": 13,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 90,
+   "drops": [
+    {
+     "item": "m_moss_stone",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.1,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "a_armor_2",
+     "chance": 0.04,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "@jobweapon:2",
+     "chance": 0.06,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 69,
+   "world": true
+  },
+  {
+   "id": "mon_kreutz_wolf",
+   "name": "북방 설원 늑대",
+   "level": 39,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 960,
+   "atk": 275,
+   "exp": 521,
+   "goldMin": 63,
+   "goldMax": 125,
+   "moveSpeed": 3.8,
+   "detectRange": 8.5,
+   "leashRange": 14,
+   "attackRange": 1.4,
+   "attackCooldown": 1.3,
+   "windup": 0.35,
+   "radius": 0.55,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 10,
+   "drops": [
+    {
+     "item": "m_frost_fang",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.08,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_sp_potion",
+     "chance": 0.05,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 50,
+   "world": true
+  },
+  {
+   "id": "mon_tomb_golem",
+   "name": "능침 수호석",
+   "level": 42,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 1030,
+   "atk": 314,
+   "exp": 688,
+   "goldMin": 67,
+   "goldMax": 134,
+   "moveSpeed": 1.6,
+   "detectRange": 7,
+   "leashRange": 14,
+   "attackRange": 2.4,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.85,
+   "attackRadius": 2.7,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 18,
+   "drops": [
+    {
+     "item": "m_rune_shard",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.12,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "@jobweapon:3",
+     "chance": 0.03,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 54,
+   "world": true
+  },
+  {
+   "id": "mon_void_toad",
+   "name": "공허 두꺼비",
+   "level": 43,
+   "sheet": "mon_shroom",
+   "ai": "ranged",
+   "hp": 1210,
+   "atk": 344,
+   "exp": 772,
+   "goldMin": 69,
+   "goldMax": 138,
+   "moveSpeed": 2.0,
+   "detectRange": 8,
+   "leashRange": 14,
+   "attackRange": 7,
+   "attackCooldown": 2.2,
+   "windup": 0.5,
+   "radius": 0.5,
+   "attackRadius": 0,
+   "projectileFx": "proj_spore",
+   "projectileSpeed": 7.5,
+   "respawn": 12,
+   "drops": [
+    {
+     "item": "m_toad_gland",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.08,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_sp_potion",
+     "chance": 0.05,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 56,
+   "world": true
+  },
+  {
+   "id": "mon_ash_drake",
+   "name": "잿빛 비룡",
+   "level": 45,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 1427,
+   "atk": 352,
+   "exp": 965,
+   "goldMin": 72,
+   "goldMax": 144,
+   "moveSpeed": 3.3,
+   "detectRange": 8,
+   "leashRange": 14,
+   "attackRange": 1.5,
+   "attackCooldown": 1.5,
+   "windup": 0.45,
+   "radius": 0.6,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 12,
+   "drops": [
+    {
+     "item": "m_drake_scale",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.08,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_sp_potion",
+     "chance": 0.05,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 58,
+   "world": true
+  },
+  {
+   "id": "mon_lake_bear",
+   "name": "호수의 빙곰",
+   "level": 46,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 5853,
+   "atk": 496,
+   "exp": 5362,
+   "goldMin": 367,
+   "goldMax": 735,
+   "moveSpeed": 1.9,
+   "detectRange": 9.5,
+   "leashRange": 14,
+   "attackRange": 2.3,
+   "attackCooldown": 2.8,
+   "windup": 0.95,
+   "radius": 0.8,
+   "attackRadius": 2.5,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 90,
+   "drops": [
+    {
+     "item": "m_snow_pelt",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.12,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "@jobweapon:2",
+     "chance": 0.04,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "@jobweapon:3",
+     "chance": 0.01,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 84,
+   "world": true
+  },
+  {
+   "id": "mon_abyss_drake",
+   "name": "심연 비룡",
+   "level": 49,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 4715,
+   "atk": 467,
+   "exp": 7203,
+   "goldMin": 118,
+   "goldMax": 314,
+   "moveSpeed": 3.3,
+   "detectRange": 8,
+   "leashRange": 14,
+   "attackRange": 1.5,
+   "attackCooldown": 1.5,
+   "windup": 0.45,
+   "radius": 0.6,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 12,
+   "drops": [
+    {
+     "item": "m_drake_scale",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.08,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_sp_potion",
+     "chance": 0.05,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 64,
+   "world": true
+  },
+  {
+   "id": "mon_mole",
+   "name": "흙두더지",
+   "level": 3,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 72,
+   "atk": 10,
+   "exp": 15,
+   "goldMin": 4,
+   "goldMax": 9,
+   "moveSpeed": 2.6,
+   "detectRange": 6,
+   "leashRange": 14,
+   "attackRange": 1.1,
+   "attackCooldown": 1.6,
+   "windup": 0.35,
+   "radius": 0.4,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 8,
+   "drops": [
+    {
+     "item": "m_jelly",
+     "chance": 0.7,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_s",
+     "chance": 0.12,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "m_herb",
+     "chance": 0.1,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 3,
+   "world": true
+  },
+  {
+   "id": "mon_sapling",
+   "name": "걷는 묘목",
+   "level": 5,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 115,
+   "atk": 15,
+   "exp": 28,
+   "goldMin": 7,
+   "goldMax": 14,
+   "moveSpeed": 1.7,
+   "detectRange": 7,
+   "leashRange": 13,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 18,
+   "drops": [
+    {
+     "item": "m_moss_stone",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.1,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "a_armor_2",
+     "chance": 0.04,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "@jobweapon:2",
+     "chance": 0.06,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 4,
+   "world": true
+  },
+  {
+   "id": "mon_beetle",
+   "name": "뿔 딱정벌레",
+   "level": 7,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 420,
+   "atk": 24,
+   "exp": 55,
+   "goldMin": 15,
+   "goldMax": 30,
+   "moveSpeed": 2.9,
+   "detectRange": 7,
+   "leashRange": 14,
+   "attackRange": 1.5,
+   "attackCooldown": 1.8,
+   "windup": 0.5,
+   "radius": 0.55,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 14,
+   "drops": [
+    {
+     "item": "m_boar_tusk",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.08,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "@jobweapon:2",
+     "chance": 0.03,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 12,
+   "world": true
+  },
+  {
+   "id": "mon_hawk",
+   "name": "바위산 매",
+   "level": 9,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 402,
+   "atk": 38,
+   "exp": 34,
+   "goldMin": 16,
+   "goldMax": 32,
+   "moveSpeed": 3.3,
+   "detectRange": 7,
+   "leashRange": 14,
+   "attackRange": 1.2,
+   "attackCooldown": 1.3,
+   "windup": 0.35,
+   "radius": 0.4,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 8,
+   "drops": [
+    {
+     "item": "m_fox_fur",
+     "chance": 0.65,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_s",
+     "chance": 0.12,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "m_herb",
+     "chance": 0.12,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 13,
+   "world": true
+  },
+  {
+   "id": "mon_moth",
+   "name": "환영 나방",
+   "level": 12,
+   "sheet": "mon_shroom",
+   "ai": "ranged",
+   "hp": 392,
+   "atk": 58,
+   "exp": 17,
+   "goldMin": 19,
+   "goldMax": 38,
+   "moveSpeed": 2.0,
+   "detectRange": 8,
+   "leashRange": 14,
+   "attackRange": 7,
+   "attackCooldown": 2.2,
+   "windup": 0.5,
+   "radius": 0.5,
+   "attackRadius": 0,
+   "projectileFx": "proj_spore",
+   "projectileSpeed": 7.5,
+   "respawn": 12,
+   "drops": [
+    {
+     "item": "m_toad_gland",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.08,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_sp_potion",
+     "chance": 0.05,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 15,
+   "world": true
+  },
+  {
+   "id": "mon_owl",
+   "name": "밤 부엉이",
+   "level": 13,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 398,
+   "atk": 65,
+   "exp": 21,
+   "goldMin": 21,
+   "goldMax": 42,
+   "moveSpeed": 3.3,
+   "detectRange": 7,
+   "leashRange": 14,
+   "attackRange": 1.2,
+   "attackCooldown": 1.3,
+   "windup": 0.35,
+   "radius": 0.4,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 8,
+   "drops": [
+    {
+     "item": "m_fox_fur",
+     "chance": 0.65,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_s",
+     "chance": 0.12,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "m_herb",
+     "chance": 0.12,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 17,
+   "world": true
+  },
+  {
+   "id": "mon_spider",
+   "name": "숲거미 영령",
+   "level": 15,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 548,
+   "atk": 84,
+   "exp": 34,
+   "goldMin": 24,
+   "goldMax": 48,
+   "moveSpeed": 3.5,
+   "detectRange": 8,
+   "leashRange": 14,
+   "attackRange": 1.4,
+   "attackCooldown": 1.4,
+   "windup": 0.35,
+   "radius": 0.5,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 12,
+   "drops": [
+    {
+     "item": "m_wolf_fang",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.06,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_sp_potion",
+     "chance": 0.06,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 21,
+   "world": true
+  },
+  {
+   "id": "mon_spider_elite",
+   "name": "디고나의 메아리",
+   "level": 17,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 2920,
+   "atk": 156,
+   "exp": 245,
+   "goldMin": 135,
+   "goldMax": 270,
+   "moveSpeed": 3.5,
+   "detectRange": 10,
+   "leashRange": 14,
+   "attackRange": 1.4,
+   "attackCooldown": 1.4,
+   "windup": 0.35,
+   "radius": 0.5,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 90,
+   "drops": [
+    {
+     "item": "m_wolf_fang",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.06,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_sp_potion",
+     "chance": 0.06,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 31,
+   "world": true
+  },
+  {
+   "id": "mon_wisp",
+   "name": "습지 도깨비불",
+   "level": 18,
+   "sheet": "mon_shroom",
+   "ai": "ranged",
+   "hp": 683,
+   "atk": 103,
+   "exp": 54,
+   "goldMin": 29,
+   "goldMax": 57,
+   "moveSpeed": 2.4,
+   "detectRange": 9,
+   "leashRange": 14,
+   "attackRange": 7.5,
+   "attackCooldown": 2.1,
+   "windup": 0.5,
+   "radius": 0.45,
+   "attackRadius": 0,
+   "projectileFx": "fire",
+   "projectileSpeed": 8,
+   "respawn": 12,
+   "drops": [
+    {
+     "item": "m_cinder_gland",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.08,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_sp_potion",
+     "chance": 0.05,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 23,
+   "world": true
+  },
+  {
+   "id": "mon_wraith",
+   "name": "그림자 망령",
+   "level": 20,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 590,
+   "atk": 101,
+   "exp": 63,
+   "goldMin": 32,
+   "goldMax": 64,
+   "moveSpeed": 3.3,
+   "detectRange": 7,
+   "leashRange": 14,
+   "attackRange": 1.2,
+   "attackCooldown": 1.3,
+   "windup": 0.35,
+   "radius": 0.4,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 8,
+   "drops": [
+    {
+     "item": "m_fox_fur",
+     "chance": 0.65,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_s",
+     "chance": 0.12,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "m_herb",
+     "chance": 0.12,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 26,
+   "world": true
+  },
+  {
+   "id": "mon_scorpion",
+   "name": "모래 전갈",
+   "level": 21,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 1698,
+   "atk": 126,
+   "exp": 358,
+   "goldMin": 42,
+   "goldMax": 102,
+   "moveSpeed": 3.3,
+   "detectRange": 7,
+   "leashRange": 14,
+   "attackRange": 1.2,
+   "attackCooldown": 1.3,
+   "windup": 0.35,
+   "radius": 0.4,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 8,
+   "drops": [
+    {
+     "item": "m_fox_fur",
+     "chance": 0.65,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_s",
+     "chance": 0.12,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "m_herb",
+     "chance": 0.12,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 28,
+   "world": true
+  },
+  {
+   "id": "mon_soldier",
+   "name": "검은 눈의 병사",
+   "level": 27,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 773,
+   "atk": 168,
+   "exp": 184,
+   "goldMin": 43,
+   "goldMax": 86,
+   "moveSpeed": 1.7,
+   "detectRange": 7,
+   "leashRange": 13,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 18,
+   "drops": [
+    {
+     "item": "m_moss_stone",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.1,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "a_armor_2",
+     "chance": 0.04,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "@jobweapon:2",
+     "chance": 0.06,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 35,
+   "world": true
+  },
+  {
+   "id": "mon_crab",
+   "name": "강변 바위게",
+   "level": 29,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 1060,
+   "atk": 205,
+   "exp": 245,
+   "goldMin": 46,
+   "goldMax": 93,
+   "moveSpeed": 3.3,
+   "detectRange": 7,
+   "leashRange": 14,
+   "attackRange": 1.2,
+   "attackCooldown": 1.3,
+   "windup": 0.35,
+   "radius": 0.4,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 8,
+   "drops": [
+    {
+     "item": "m_fox_fur",
+     "chance": 0.65,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_s",
+     "chance": 0.12,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "m_herb",
+     "chance": 0.12,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 38,
+   "world": true
+  },
+  {
+   "id": "mon_salamander",
+   "name": "불꽃 도롱뇽",
+   "level": 34,
+   "sheet": "mon_shroom",
+   "ai": "ranged",
+   "hp": 2108,
+   "atk": 221,
+   "exp": 1225,
+   "goldMin": 64,
+   "goldMax": 147,
+   "moveSpeed": 2.4,
+   "detectRange": 9,
+   "leashRange": 14,
+   "attackRange": 7.5,
+   "attackCooldown": 2.1,
+   "windup": 0.5,
+   "radius": 0.45,
+   "attackRadius": 0,
+   "projectileFx": "fire",
+   "projectileSpeed": 8,
+   "respawn": 12,
+   "drops": [
+    {
+     "item": "m_cinder_gland",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.08,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_sp_potion",
+     "chance": 0.05,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 44,
+   "world": true
+  },
+  {
+   "id": "mon_crystal",
+   "name": "붉은 수정 정령",
+   "level": 36,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 3915,
+   "atk": 295,
+   "exp": 2856,
+   "goldMin": 86,
+   "goldMax": 230,
+   "moveSpeed": 1.7,
+   "detectRange": 7,
+   "leashRange": 13,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 18,
+   "drops": [
+    {
+     "item": "m_moss_stone",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.1,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "a_armor_2",
+     "chance": 0.04,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "@jobweapon:2",
+     "chance": 0.06,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 47,
+   "world": true
+  },
+  {
+   "id": "mon_yeti",
+   "name": "아기 설인",
+   "level": 40,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 905,
+   "atk": 280,
+   "exp": 562,
+   "goldMin": 64,
+   "goldMax": 128,
+   "moveSpeed": 1.7,
+   "detectRange": 7,
+   "leashRange": 13,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 18,
+   "drops": [
+    {
+     "item": "m_moss_stone",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.1,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "a_armor_2",
+     "chance": 0.04,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "@jobweapon:2",
+     "chance": 0.06,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 52,
+   "world": true
+  },
+  {
+   "id": "mon_armor",
+   "name": "능침 수호 갑주",
+   "level": 42,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 1030,
+   "atk": 314,
+   "exp": 688,
+   "goldMin": 67,
+   "goldMax": 134,
+   "moveSpeed": 1.7,
+   "detectRange": 7,
+   "leashRange": 13,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 18,
+   "drops": [
+    {
+     "item": "m_moss_stone",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.1,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "a_armor_2",
+     "chance": 0.04,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "@jobweapon:2",
+     "chance": 0.06,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 54,
+   "world": true
+  },
+  {
+   "id": "mon_bat",
+   "name": "심연 박쥐",
+   "level": 47,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 1500,
+   "atk": 309,
+   "exp": 1180,
+   "goldMin": 75,
+   "goldMax": 150,
+   "moveSpeed": 3.5,
+   "detectRange": 8,
+   "leashRange": 14,
+   "attackRange": 1.4,
+   "attackCooldown": 1.4,
+   "windup": 0.35,
+   "radius": 0.5,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 12,
+   "drops": [
+    {
+     "item": "m_wolf_fang",
+     "chance": 0.6,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_potion_m",
+     "chance": 0.06,
+     "min": 1,
+     "max": 1
+    },
+    {
+     "item": "c_sp_potion",
+     "chance": 0.06,
+     "min": 1,
+     "max": 1
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 61,
+   "world": true
   }
  ]
 }

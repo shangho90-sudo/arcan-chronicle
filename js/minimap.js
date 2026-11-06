@@ -13,12 +13,12 @@ export class Minimap {
   build(zone) {
     const d = zone.def, g = zone.geo, [x0, z0, x1, z1] = d.bounds, W = Math.ceil((x1 - x0) * PPM), H = Math.ceil((z1 - z0) * PPM);
     const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const c = cv.getContext('2d');
-    const [base, path] = THEME[d.id] || ['#7f9a6a', '#b8a080'];
+    const [base, path] = THEME[d.id] || d.theme || (d.kind === 'town' ? THEME.town : ['#7f9a6a', '#b8a080']);
     c.fillStyle = base; c.fillRect(0, 0, W, H);
     // paths / patches
     c.lineCap = 'round'; c.lineJoin = 'round';
     for (const p of d.patches || []) {
-      c.fillStyle = c.strokeStyle = p.tex === 'cobble' || p.tex === 'stone' || p.tex === 'pave' ? '#b9b2a2' : path;
+      c.fillStyle = c.strokeStyle = p.tex === 'water' ? '#5f93c4' : p.tex === 'cobble' || p.tex === 'stone' || p.tex === 'pave' ? '#b9b2a2' : path;
       if (p.shape === 'path' && p.pos && p.pos.length >= 4) {
         c.lineWidth = (p.width || 3) * PPM; c.beginPath();
         for (let i = 0; i < p.pos.length; i += 2) { const X = (p.pos[i] - x0) * PPM, Z = (p.pos[i + 1] - z0) * PPM; i ? c.lineTo(X, Z) : c.moveTo(X, Z); }

@@ -1,0 +1,104 @@
+{
+ "mole": {
+  "task": "a6213590-8b52-47ec-9aa7-b2d064069c00",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/mole.glb"
+ },
+ "sapling": {
+  "task": "0bb0eabf-eef3-4385-8282-bb0b8582d64d",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/sapling.glb"
+ },
+ "beetle": {
+  "task": "a2629e39-f8fe-46e7-aee9-bcbf55b29d8b",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/beetle.glb"
+ },
+ "hawk": {
+  "task": "690ba867-d56d-400f-9a24-1c9fb487c114",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/hawk.glb"
+ },
+ "owl": {
+  "task": "548cca8c-5310-4bdb-bbc1-745ef6aed6fc",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/owl.glb"
+ },
+ "moth": {
+  "task": "4edb9751-ef97-40fd-aa63-1472b71a3700",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/moth.glb"
+ },
+ "spider": {
+  "task": "9be93032-0404-4c47-a7a3-40cc1f50692b",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/spider.glb"
+ },
+ "wisp": {
+  "task": "09d335c4-2be6-465a-ba96-812aa216ec6f",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/wisp.glb"
+ },
+ "wraith": {
+  "task": "8a8c4f6d-dde5-477b-824e-741efdfa22cb",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/wraith.glb"
+ },
+ "scorpion": {
+  "task": "71bffec5-8208-4728-ad87-3e5b5b522072",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/scorpion.glb"
+ },
+ "soldier": {
+  "task": "d39dc14a-34bd-4907-be4c-173ea5a14223",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/soldier.glb"
+ },
+ "crab": {
+  "task": "01ff0272-8044-4d5b-8811-31ef350f91e1",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/crab.glb"
+ },
+ "salamander": {
+  "task": "f349e21d-2089-45af-a5d7-3aeb944b2466",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/salamander.glb"
+ },
+ "crystal": {
+  "task": "24af94fd-37b8-4fc9-a598-31eaddbc5b5d",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/crystal.glb"
+ },
+ "armor": {
+  "task": "50f78033-6f64-467f-8586-95e560be410c",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/armor.glb"
+ },
+ "yeti": {
+  "task": "f184dfe8-eca3-4d90-a4f1-0c5c353cca01",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/yeti.glb"
+ },
+ "bat": {
+  "task": "50076c19-ab09-4b51-bd70-94f94a98f26b",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/bat.glb"
+ }
+}

@@ -588,7 +588,7 @@ export async function buildTown3D(spec, renderer) {
     obj.traverse(o => { if (o.userData.flag) flags.push(o); });
     addFade('gate', obj, [gt.pos[0], 0, gt.pos[1], span / 2 + gt.tr, gt.tr, 0, gt.th + gt.tr * 1.5]);
   }
-  {
+  if (spec.keep) {
     const kp = spec.keep, k = new Kit();
     k.block(kp.w, kp.h, kp.d, 'wallstone'); k.block(kp.w + 0.3, 0.8, kp.d + 0.3, 'basestone');
     const n = Math.floor(kp.w / 1.6); for (let i = 0; i < n; i++) for (const s of [-1, 1]) k.block(0.95, 1.0, 0.5, 'wallstone', { x: -kp.w / 2 + (i + 0.5) * kp.w / n, y: kp.h, z: s * (kp.d / 2 - 0.25) });
@@ -737,7 +737,7 @@ export async function buildTown3D(spec, renderer) {
   }
   let t = 0;
   return {
-    root, fade, smoke, spray: [[0, 3.2, 0]],
+    root, fade, smoke, spray: spec.models.some(m => m.id === 'fountain') ? [[0, 3.2, 0]] : [],
     update(dt) { t += dt; for (const f of flags) f.rotation.y = Math.sin(t * 1.7 + f.position.x) * 0.25; },
   };
 }

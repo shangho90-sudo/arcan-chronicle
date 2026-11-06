@@ -29,7 +29,9 @@ def wait(tid, every=8, limit=1800):
         time.sleep(every)
     return {'timeout': tid}
 def download(url, dst):
-    with urllib.request.urlopen(url, timeout=600) as f, open(dst, 'wb') as o: o.write(f.read())
+    # the data CDN refuses Python's default User-Agent (403)
+    r = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (arcan-chronicle asset tool)'})
+    with urllib.request.urlopen(r, timeout=600) as f, open(dst, 'wb') as o: o.write(f.read())
 
 if __name__ == '__main__':
     cmd = sys.argv[1]
