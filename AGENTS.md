@@ -73,7 +73,7 @@
 
 ## 캐릭터 보행 (`js/model.js`)
 - 걷기·달리기 다리는 절차 보행: `gaitParams`(속도·다리 길이 → 걸음/초, 보폭, 체공), `footAt`(발 궤적), `gaitPose`(3D 다리 IK, 상체), `ModelBody.lockFeet`(디딘 발 월드 고정). `alignLegs`는 키프레임 자세 전용.
-- 보행 진단: `gait_probe.js`(FPS=30 가능) → `gait_report.py`(미끄러짐·걸음) + `gait_ik_report.py`(IK 도달 실패·무릎 각도), 화면은 `gait_views.js`(측면/정면/후면/게임 시점, 관절·접지 표시). 골반 좌우 이동은 `mesh.position.x`(시각 전용)이며 다리 IK 목표에서 빼서 보정합니다.
+- 보행 진단: `gait_probe.js`(FPS=30 가능) → `gait_report.py`(미끄러짐·걸음) + `gait_ik_report.py`(IK 도달 실패·무릎 각도), 화면은 `gait_views.js`(측면/정면/후면/게임 시점, 관절·접지 표시)와 `gait_side.js`(배경 없이 격자 위 캐릭터만, `PITCH=8 YAW=0`이면 옆모습, `MAG=0.35` 걷기). 달리기 흔들림 다리는 뒤꿈치 차올림(`footAt`의 `kick`). 골반 좌우 이동은 `mesh.position.x`(시각 전용)이며 다리 IK 목표에서 빼서 보정합니다.
 - 이동 속도(4.6 m/s)를 낮춰서 보행을 맞추지 말 것. 바꾼 뒤에는 `tools/browser-tests/gait_probe.js` + `gait_report.py`로 디딘 발 미끄러짐·걸음 수를 남녀 모두 비교하고, `gait_film.js`로 화면을 확인하세요.
 
 ## 칼 휘두르기 (`js/model.js`, `tools/anim/swings.py`)

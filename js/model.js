@@ -196,8 +196,8 @@ function gaitParams(v, leg) {
   v = Math.min(v, 5.2);                                                     // dashes are key-framed; the gait only blends out
   const L = Math.min(leg.Left.L1 + leg.Left.L2, leg.Right.L1 + leg.Right.L2) * 0.995;
   const run = sstep(1.9, 3.1, v);
-  let cad = lerp(1.75 + 0.42 * v, 2.6 + 0.26 * v, run) * Math.sqrt(0.72 / L);
-  const crouch = lerp(0.955, 0.88, run) * L;                               // hip-to-ankle height at mid-stance (knee flexed to take the weight)
+  let cad = lerp(1.75 + 0.42 * v, 3.0 + 0.3 * v, run) * Math.sqrt(0.72 / L);
+  const crouch = lerp(0.955, 0.91, run) * L;                               // hip-to-ankle height at mid-stance (knee flexed to take the weight)
   const kr = lerp(0.975, 0.955, run), R = kr * L;                           // longest hip-ankle distance allowed (knee keeps some bend)
   // the leg may swing at most ~28/24 deg (walk) or ~22/19 deg (run) in front of / behind the vertical at that length
   const Rf = R * Math.sin(lerp(28, 22, run) * DEG);                       // landing, in front of the hip
@@ -228,9 +228,13 @@ function footAt(ph, G, toe) {
   }
   const s = (ph - G.duty) / (1 - G.duty), pf0 = lerp(22, 26, run);
   const e = sstep(0.08, 0.9, s);                                           // stays behind briefly (knee folds), passes under the hip mid-swing
-  const lift = Math.max(G.H * Math.sin(Math.PI * Math.min(1, Math.pow(s, 0.72))), toe * Math.sin(pf0 * DEG) * (1 - s) ** 3);
-  const pitch = s < 0.4 ? lerp(-pf0 * 0.8, 0, sstep(0, 0.4, s)) : lerp(0, lerp(8, 3, run), sstep(0.4, 1, s));
-  return { z: -S * back + S * e, lift, pitch, stance: false, s, e, land: S * front };
+  // running: after toe-off the heel kicks up behind (knee folds tight), then the knee drives forward and the foot
+  // reaches down to land - instead of a low shuffle. Walking keeps the low, knee-leading swing.
+  const kick = run * 0.34 * G.L * Math.sin(Math.PI * sstep(0, 0.62, s)) * (1 - sstep(0.55, 0.95, s));
+  const lift = Math.max(G.H * Math.sin(Math.PI * Math.min(1, Math.pow(s, 0.72))), toe * Math.sin(pf0 * DEG) * (1 - s) ** 3) + kick;
+  const back0 = run * 0.06 * G.L * Math.sin(Math.PI * Math.min(1, s / 0.45));
+  const pitch = s < 0.4 ? lerp(-pf0 * (0.8 + 0.25 * run), 0, sstep(0, 0.4, s)) : lerp(0, lerp(8, 3, run), sstep(0.4, 1, s));
+  return { z: -S * back + S * e - back0, lift, pitch, stance: false, s, e, land: S * front };
 }
 
 // ---- 3D two-bone leg IK in the model's own frame (metres, mesh-local: x = model left, y up, z forward)
@@ -341,7 +345,7 @@ function gaitPose(body, ph, v, base, settle = 0) {
   const sw = Math.cos(2 * Math.PI * ph), sl = Math.sin(2 * Math.PI * ph);    // sw +1: left leg forward; sl +: left foot supporting
   const yawA = lerp(7, 9, run) * live, rollA = lerp(4, 2.5, run) * live, swayA = lerp(0.024, 0.009, run) * live;
   const sway = swayA * sl;                                                  // metres towards the model's left (+x) = over the left foot
-  const lean = lerp(4, 11, run) + 2 * live;
+  const lean = lerp(4, 16, run) + 2 * live;
   Q.Hips = mul(ry(-yawA * sw), rz(rollA * sl), rx(lean * 0.3));
   const RH = rotOnly(Q.Hips), RHi = RH.clone().invert();
   for (const side of ['Left', 'Right']) {
@@ -362,11 +366,11 @@ function gaitPose(body, ph, v, base, settle = 0) {
   // head steadier than the trunk: undo most of the shoulder turn and the lean, keep a little life
   Q.Head = mul(ry(-yawA * 0.45 * sw), rz(-rollA * sl * 0.15), rx(-lean * 0.8 + md.cfg.headPitch));
   // ---- arms opposite the legs; elbows bend into a pump when running; the hand holding a weapon / tool swings less
-  const armA = lerp(17, 30, run) * live, armF = lerp(5, 12, run);
+  const armA = lerp(17, 40, run) * live, armF = lerp(5, 14, run);
   for (const [side, nm, sgn] of [[-1, 'Right', 1], [1, 'Left', -1]]) {
     const held = side < 0 ? !!body.weapon : !!body.off, k = held ? 0.55 : 1;
     const f = armF + sgn * armA * k * sw, down = Math.max(0, 90 - (base[side > 0 ? 'armL' : 'armR'][1] || 12)) - 4 * run;
-    const bend = lerp(18, 82, run) + (held ? 10 : 0) + Math.max(0, f) * lerp(0.35, 0.2, run);
+    const bend = lerp(18, 88, run) + (held ? 10 : 0) + Math.max(0, f) * lerp(0.35, 0.2, run);
     Q[nm + '_UpperArm'] = mul(rx(-f), rz(side > 0 ? -down : down));
     Q[nm + '_LowerArm'] = ry(side > 0 ? -bend : bend);
     Q[nm + '_Shoulder'] = ry(sgn * side * -3.5 * sw * live);              // the shoulder girdle follows its arm a little
