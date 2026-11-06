@@ -454,7 +454,7 @@ function towerAt(k, x, z, r, h, o = {}) {
 }
 
 // ---------------------------------------------------------------- ground
-function soft(points, w, alphaEdge = 0.7) {
+function soft(points, w, alphaEdge = 0.14) {
   // strip along a polyline with soft (vertex alpha) edges; returns BufferGeometry in three space (y up)
   const P = [], C = [], U = [], I = [];
   const cols = [[-w / 2, 0], [-w / 2 + alphaEdge, 1], [w / 2 - alphaEdge, 1], [w / 2, 0]];
@@ -470,10 +470,30 @@ function soft(points, w, alphaEdge = 0.7) {
   }
   return mkGeo(P, C, U, I);
 }
-function ringGeo(cx, cz, r0, r1, seg = 72, edge = 0.8) {
-  const P = [], C = [], U = [], I = []; const radii = [[r0 - 0.2, 0], [r0 + 0.3, 1], [r1 - edge, 1], [r1, 0]];
+function ringGeo(cx, cz, r0, r1, seg = 72, edge = 0.14) {
+  const P = [], C = [], U = [], I = []; const radii = [[r0 - edge, 0], [r0, 1], [r1, 1], [r1 + edge, 0]];
   for (let i = 0; i <= seg; i++) { const a = i / seg * Math.PI * 2; for (const [r, al] of radii) { const x = cx + Math.cos(a) * r, z = -cz + Math.sin(a) * r; P.push(x, 0, z); C.push(1, 1, 1, al); U.push(x / TILE.cobble, z / TILE.cobble); } }
   for (let i = 0; i < seg; i++) for (let j = 0; j < 3; j++) { const a = i * 4 + j, b = a + 4; I.push(a, a + 1, b, a + 1, b + 1, b); }
+  return mkGeo(P, C, U, I);
+}
+/** stone kerbs: thin strips along polylines (game x/z), UV along the length; `cut(x, z)` true = no kerb there
+ *  (inside a ring road / across a path mouth) so kerbs never run over another road surface */
+function curbGeo(lines, wid = 0.26, cut = () => false) {
+  const P = [], C = [], U = [], I = []; let base = 0;
+  for (const line of lines) {
+    let run = 0;
+    for (let s = 0; s < line.length - 1; s++) {
+      const [ax, az] = line[s], [bx, bz] = line[s + 1], L = Math.hypot(bx - ax, bz - az); if (L < 1e-3) continue;
+      const n = Math.max(1, Math.ceil(L / 0.6)), dx = (bx - ax) / L, dz = (bz - az) / L, nx = -dz, nz = dx;
+      for (let i = 0; i < n; i++) {
+        const x0 = ax + dx * L * i / n, z0 = az + dz * L * i / n, x1 = ax + dx * L * (i + 1) / n, z1 = az + dz * L * (i + 1) / n;
+        if (cut((x0 + x1) / 2, (z0 + z1) / 2)) { run += L / n; continue; }
+        const v = [[x0 - nx * wid / 2, z0 - nz * wid / 2, 0, run], [x0 + nx * wid / 2, z0 + nz * wid / 2, 1, run], [x1 - nx * wid / 2, z1 - nz * wid / 2, 0, run + L / n], [x1 + nx * wid / 2, z1 + nz * wid / 2, 1, run + L / n]];
+        for (const [x, z, u, r] of v) { P.push(x, 0, -z); C.push(0.78, 0.72, 0.64, 1); U.push(u * 0.2, r / 1.1); }
+        I.push(base, base + 2, base + 1, base + 1, base + 2, base + 3); base += 4; run += L / n;
+      }
+    }
+  }
   return mkGeo(P, C, U, I);
 }
 function patchGeo(poly, edge = 1.2, tile = TILE.grass) {
@@ -542,9 +562,37 @@ export async function buildTown3D(spec, renderer) {
   const gateRoad = new THREE.Mesh(soft([[spec.gate.pos[0], spec.gate.pos[1] - 12], [spec.gate.pos[0], spec.gate.pos[1] - 1]], 5.2, 1.2), decalMat('cobble')); gateRoad.position.y = -0.02; root.add(gateRoad);
   const roadM = decalMat('cobble'), grassM = decalMat('grass');
   gateRoad.material = roadM;
+  // cobble paths that run entirely over the flagstone courtyard are skipped: two stone patterns blended on top of each
+  // other read as tiles overlapping by mistake. Paths outside the courtyard (over grass) and the fountain ring stay.
+  const inCourt = (q) => q[0] > x0 + 0.5 && q[0] < x1 - 0.5 && q[1] > z0 + 0.5 && q[1] < z1 - 0.5;
+  spec = { ...spec, ground: { ...spec.ground, roads: spec.ground.roads.filter(r => r.kind === 'ring' || !r.pts.every(inCourt)) } };
   for (const r of spec.ground.roads) {
-    const g = r.kind === 'ring' ? ringGeo(r.pos[0], r.pos[1], r.r0, r.r1) : soft(r.pts, r.w);
+    const g = r.kind === 'ring' ? ringGeo(r.pos[0], r.pos[1], r.r0, r.r1) : soft(r.pts, r.w, 0.5);   // remaining paths run over grass: softer edge
     const m = new THREE.Mesh(g, roadM); m.position.y = 0.012; m.receiveShadow = true; m.renderOrder = -1; root.add(m);
+  }
+  // kerbs: crisp stone borders where cobbles meet the flagstones (instead of a wide soft blend of two tile patterns)
+  {
+    const rings = spec.ground.roads.filter(r => r.kind === 'ring'), paths = spec.ground.roads.filter(r => r.kind !== 'ring'), lines = [];
+    const inRing = (x, z, pad = 0.05) => rings.some(r => { const d = Math.hypot(x - r.pos[0], z - r.pos[1]); return d > r.r0 - pad && d < r.r1 + pad; });
+    const onPath = (x, z, skip) => paths.some(p => p !== skip && p.pts.some((a, i) => { const b = p.pts[i + 1]; if (!b) return false;
+      const dx = b[0] - a[0], dz = b[1] - a[1], L2 = dx * dx + dz * dz || 1, t = Math.max(-0.15, Math.min(1.15, ((x - a[0]) * dx + (z - a[1]) * dz) / L2));
+      return Math.hypot(x - a[0] - dx * t, z - a[1] - dz * t) < p.w / 2 + 0.05; }));
+    const cuts = [];
+    for (const p of paths) {
+      const L = [], R = [];
+      for (let i = 0; i < p.pts.length; i++) {
+        const a = p.pts[Math.max(0, i - 1)], b = p.pts[Math.min(p.pts.length - 1, i + 1)], dx = b[0] - a[0], dz = b[1] - a[1], m = Math.hypot(dx, dz) || 1;
+        const nx = -dz / m, nz = dx / m, h = p.w / 2 + 0.13; L.push([p.pts[i][0] + nx * h, p.pts[i][1] + nz * h]); R.push([p.pts[i][0] - nx * h, p.pts[i][1] - nz * h]);
+      }
+      cuts.push({ lines: [L, R], p });
+    }
+    for (const c of cuts) for (const l of c.lines) lines.push({ l, cut: (x, z) => inRing(x, z) || onPath(x, z, c.p) });
+    for (const r of rings) for (const rad of [r.r0 - 0.13, r.r1 + 0.13]) {
+      const l = []; for (let i = 0; i <= 96; i++) { const a = i / 96 * Math.PI * 2; l.push([r.pos[0] + Math.cos(a) * rad, r.pos[1] + Math.sin(a) * rad]); }
+      lines.push({ l, cut: (x, z) => onPath(x, z) });
+    }
+    const kerbM = decalMat('basestone');
+    for (const { l, cut } of lines) { const m = new THREE.Mesh(curbGeo([l], 0.26, cut), kerbM); m.position.y = 0.016; m.receiveShadow = true; m.renderOrder = -1; root.add(m); }
   }
   for (const p of spec.ground.grass) { const m = new THREE.Mesh(patchGeo(p.pts), grassM); m.position.y = 0.02; m.receiveShadow = true; m.renderOrder = -1; root.add(m); }
 
