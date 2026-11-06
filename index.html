@@ -80,6 +80,18 @@ small { font-size:.8em; }
 .plate { position:absolute; left:0; top:0; text-align:center; white-space:nowrap; font-size:13px; color:#fff; text-shadow:0 1px 0 #000, 1px 0 0 #000, -1px 0 0 #000, 0 -1px 0 #000; }
 .plate .gold { color:#ffd86b; } .plate .mark { font-size:26px; line-height:1; }
 .m-avail { color:#ffd040; } .m-ready { color:#8fe3a0; } .m-active { color:#c8c0b8; }
+/* quest marks over NPC heads: big outlined glyph with a glow, gently bobbing, clear gap above the name (2026-11-07) */
+.plate .mark:not(:empty) { margin-bottom:14px; }
+.plate .mark b.qmark { display:inline-block; animation:qmbob 1.4s ease-in-out infinite; transform-origin:50% 100%; filter:drop-shadow(0 0 6px rgba(255,200,60,.9)) drop-shadow(0 0 14px rgba(255,160,30,.55)); }
+.plate .mark b.qmark svg { display:block; }
+.plate .mark b.m-active { display:inline-block; font-family:Georgia, "Times New Roman", serif; font-size:54px; font-weight:900; line-height:1; -webkit-text-stroke:2.5px #3a2006; paint-order:stroke fill;
+  text-shadow:0 3px 0 #2a1604, 0 0 14px rgba(255,200,60,.85), 0 0 28px rgba(255,170,40,.55); animation:qmbob 1.4s ease-in-out infinite; transform-origin:50% 100%; }
+.plate .mark b.m-active { font-size:40px; color:#d8d0c8; text-shadow:0 2px 0 #222; animation:none; }
+/* NPC names 3x (13 -> 39 px), thick dark outline so they read over any ground; phones 2x */
+.plate.npc .pname { font-size:39px; font-weight:800; letter-spacing:1px; -webkit-text-stroke:5px #1a1008; paint-order:stroke fill; text-shadow:0 3px 4px rgba(0,0,0,.55); }
+.plate.npc .mark:not(:empty) { margin-bottom:10px; }
+@media (max-width:600px) { .plate.npc .pname { font-size:26px; -webkit-text-stroke:4px #1a1008; } }
+@keyframes qmbob { 0%,100% { transform:translateY(0) scale(1); } 50% { transform:translateY(-7px) scale(1.06); } }
 .phb { width:56px; height:6px; margin:2px auto 0; background:#2a2228; border:1px solid #000; } .phb i { display:block; height:100%; background:#e05a4a; }
 .float { position:absolute; left:0; top:0; font-size:20px; white-space:nowrap; text-shadow:0 2px 0 #000, 2px 0 0 #000, -2px 0 0 #000, 0 -2px 0 #000; will-change:transform; }
 

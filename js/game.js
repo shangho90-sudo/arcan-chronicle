@@ -17,6 +17,18 @@ const zoneJsonCache = new Map();
 async function fetchJson(p) { const r = await fetch(p); if (!r.ok) throw new Error(p + " " + r.status); return r.json(); }
 
 // ======================================================================================= telegraph
+/** quest mark over an NPC: a fat outlined "!" / "?" drawn as SVG (fonts differ per device), gold or green gradient */
+const QMARK = (ch, c0, c1, c2, ink) => {
+  const id = 'qm' + (ch === '!' ? 'a' : 'r');
+  const shape = ch === '!'
+    ? '<path d="M9 6 Q9 2 13 2 L23 2 Q27 2 27 6 L24.5 44 Q24.2 48 21 48 L15 48 Q11.8 48 11.5 44 Z"/><circle cx="18" cy="60" r="7.5"/>'
+    : '<path d="M5 22 Q5 3 19 3 Q33 3 33 18 Q33 27 25 31 Q22.5 33 22.5 37 L22.5 44 L13.5 44 L13.5 35 Q13.5 27 20 23.5 Q24 21 24 17.5 Q24 12 19 12 Q14 12 14 19 Z"/><circle cx="18" cy="58" r="7.5"/>';
+  return `<b class="qmark"><svg viewBox="-4 -4 46 76" width="40" height="66"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c0}"/><stop offset=".45" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs>`
+    + `<g fill="${ink}" stroke="${ink}" stroke-width="6" stroke-linejoin="round" transform="translate(0 2.5)">${shape}</g>`
+    + `<g fill="url(#${id})" stroke="${ink}" stroke-width="2.5" stroke-linejoin="round">${shape}</g>`
+    + `<path d="M13.5 6 L17 6 L15.8 30" stroke="#fff" stroke-opacity=".55" stroke-width="2.4" fill="none" stroke-linecap="round" ${ch === '!' ? '' : 'display="none"'}/></svg></b>`;
+};
+
 class Telegraph {
   constructor(zone, shape, time, color, onFire) {
     this.zone = zone; this.shape = shape; this.time = Math.max(0.05, time); this.t = 0; this.onFire = onFire;
@@ -419,7 +431,7 @@ class Game {
       const st = this.quests.stateOf(q), turnIn = q.turnIn || q.giver;
       if (st === QS.Completable && turnIn === npcId) ready = true; else if (st === QS.Available) avail = true; else if (st === QS.Active && turnIn === npcId) active = true;
     }
-    return ready ? '<b class="m-ready">?</b>' : avail ? '<b class="m-avail">!</b>' : active ? '<b class="m-active">…</b>' : "";
+    return ready ? QMARK('?', '#eafff0', '#7ee09a', '#23884a', '#0c3a1c') : avail ? QMARK('!', '#fff7c4', '#ffd23a', '#d9790c', '#3a2006') : active ? '<b class="m-active">…</b>' : "";
   }
   interact(npc) {
     if (!npc || this.ui.current || !this.player || this.player.dead) return;

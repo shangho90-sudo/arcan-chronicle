@@ -65,6 +65,7 @@
 - 바닥: `nature.js` `arenaMaterial`(빌더 `boss_floor` 지형에 적용) — 보라 흙·짙은 보라·갈색·이끼 색 덩어리, 붓 터치, 갈라짐, 낙엽·조약돌·포자, 흔들리는 잎 그늘. 텍스처는 `paint.py` `magic_floor()`(g_magic_*)를 잔결로만 씀.
 - 배치: `tools/forest/layout.py mushroom_grove`의 "mushroom boss grove" 구간(플랫폼 위 가장자리 빽빽, 가운데 비움, 1 큰 + 2~4 중간 + 5~15 작은 묶음, 경계 밖 배경 나무 벽). 원형 바위는 `rock_magic*`. 타입 `mushdecor`(장식, 충돌 없음)·`mushtree`(충돌 `propFootprint`).
 - 에셋(Blender `assets.py`): `mush_small_purple/blue`, `mush_glow_purple/blue`(약한 발광 + 바닥 빛 원판), `mush_orange`, `mush_cluster`, `mush_tree`, `rock_magic(_low)`, `tree_violet(_round)`. 발광 재질은 `MAT_TEX`의 `ec`/`ei`.
+- NPC 머리 위 퀘스트 표시는 `game.js` `QMARK`(SVG "!"/"?"), 이름표 CSS `.plate.npc`(이름 39 px, 휴대폰 26 px), 위치 `ui.js` `updatePlates`(+1.9 m).
 - 이동 클릭 표시: `render.js` `Fx.clickMark`(청록 마법진 셰이더 `CLICK_FRAG`, 하나만 재사용).
 - 경고 표시: `render.js` `TelegraphView`(셰이더 하나: 바깥 빛 번짐·밝은 테두리·안쪽 그라데이션·룬 점선·전진 파동/맥동·입자, 공격은 산호색, 독 웅덩이는 보라 액체+거품, `seal`=봉인 마법진). 시간은 `TG_TIME`. 판정은 그대로 `HitShape`.
 - 결계: `game.js` `setBarrier` — 봉인 마법진 + 거의 투명한 에너지 벽(위로 오르는 입자).

@@ -286,7 +286,7 @@ export class UI {
   updatePlates(dt) {
     for (const p of this.plates.values()) p._seen = false;
     const z = G.zone, place = (p, pos) => { const s = G.render.toScreen(pos); p.style.transform = `translate(${s.x}px,${s.y}px) translate(-50%,-100%)`; };
-    for (const n of z.npcs) { const p = this.plate(n, false); p.querySelector(".pname").innerHTML = `<span class="gold">${n.def.title}</span> ${n.def.name}`; p.querySelector(".mark").innerHTML = G.questMark(n.def.id); place(p, { x: n.pos.x, y: n.pos.y + 1.75, z: n.pos.z }); }
+    for (const n of z.npcs) { const p = this.plate(n, false); p.classList.add("npc"); p.querySelector(".pname").innerHTML = `<span class="gold">${n.def.title}</span> ${n.def.name}`; const mk = p.querySelector(".mark"), mh = G.questMark(n.def.id); if (mk._h !== mh) { mk._h = mh; mk.innerHTML = mh; } place(p, { x: n.pos.x, y: n.pos.y + 1.9, z: n.pos.z }); }
     for (const pt of z.def.portals) { const p = this.plate(pt, false); p.querySelector(".pname").textContent = "▶ " + pt.label; const g = z.geo.ground(pt.pos[0], pt.pos[1]); place(p, { x: g.x, y: g.y + 1.2, z: g.z }); }
     for (const a of z.actors) {
       if (a.faction !== "monster" || a.dead || a === z.boss || !(a.hitRecently > 0)) continue;
