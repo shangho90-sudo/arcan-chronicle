@@ -343,7 +343,7 @@ export class Player extends Combatant {
     const m = this.zone.pickActor(c.x, c.y); if (m) { this.target = m; this.npcTarget = null; this.setDest(m.pos); return; }
     const n = this.zone.pickNpc(c.x, c.y); if (n) { this.npcTarget = n; this.target = null; this.setDest(n.pos); return; }
     const ray = G.render.screenRay(c.x, c.y), h = this.zone.geo.raycast(ray.o, ray.d);
-    if (h) { this.target = null; this.npcTarget = null; this.setDest(h); G.fx.play("ring", { x: h.x, y: h.y + 0.05, z: h.z }, 0.5, true, [1, 0.95, 0.6]); }
+    if (h) { this.target = null; this.npcTarget = null; this.setDest(h); G.fx.clickMark(h); }
   }
   setDest(p) { this.path = this.zone.nav.findPath(this.pos, p); this.stuck = 0; }
   tryDodge(input) {

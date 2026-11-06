@@ -412,6 +412,43 @@ export function screenToWorldDir(sx, sy) {
   const m = Math.hypot(x, z); return m > 1e-6 ? { x: x / m, z: z / m } : { x: 0, z: 0 };
 }
 
+// ======================================================================================= click marker shader
+const CLICK_SIZE = 1.9, CLICK_LIFE = 1.15;
+const CLICK_FRAG = `
+uniform float uT; varying vec2 vUv;
+float band(float r, float c, float w) { return exp(-pow((r - c) / w, 2.)); }
+float star(vec2 p, float s) { p = abs(p) / s; return smoothstep(1.05, .75, sqrt(p.x) + sqrt(p.y)); }
+float hash(float n) { return fract(sin(n) * 43758.5453); }
+void main() {
+  float r = length(vUv); if (r > 1.) discard;
+  float a = atan(vUv.y, vUv.x), t = uT;
+  float fade = smoothstep(${CLICK_LIFE.toFixed(2)}, .55, t) * smoothstep(0., .06, t);
+  // outer ring: crisp core + soft glow
+  float ring = band(r, .74, .018) * 1.3 + band(r, .74, .07) * .35;
+  // thin inner ring and a turning broken arc between them
+  float inner = band(r, .5, .012) * .7;
+  float arc = band(r, .6, .01) * step(.35, fract(a / 6.2832 * 3. - t * .35)) * .55;
+  // four diamond star points on the outer ring (+ small ones between)
+  float st = 0.;
+  for (int i = 0; i < 4; i++) { float an = float(i) * 1.5708; vec2 c = vec2(cos(an), sin(an)) * .74; st += star(vUv - c, .26); }
+  for (int i = 0; i < 4; i++) { float an = float(i) * 1.5708 + .7854; vec2 c = vec2(cos(an), sin(an)) * .74; st += star(vUv - c, .085) * .7; }
+  // centre: small dot + a ripple running outward at the start
+  float dot = band(r, 0., .07) * .8;
+  float rp = clamp(t / .5, 0., 1.); float ripple = band(r, .2 + .8 * rp, .05) * (1. - rp) * .9;
+  // twinkles sitting on the ring
+  float tw = 0.;
+  for (int i = 0; i < 6; i++) { float fi = float(i); float an = hash(fi * 7.1) * 6.2832; float rr = .62 + .3 * hash(fi * 3.3);
+    vec2 c = vec2(cos(an), sin(an)) * rr; float ph = sin(t * (5. + 3. * hash(fi)) + fi * 2.1) * .5 + .5;
+    tw += star(vUv - c, .07) * ph; }
+  float core = clamp(ring * .9 + st, 0., 1.);
+  float v = ring + inner + arc + st * 1.2 + dot + ripple + tw * .8;
+  // normal blending so the cyan survives on bright paving: deep teal glow, cyan lines, near-white cores
+  float glow = band(r, .74, .16) * .35 + ripple * .4;
+  vec3 col = mix(vec3(.05, .55, .7), vec3(.3, .95, 1.), clamp(v * 1.4, 0., 1.));
+  col = mix(col, vec3(.85, 1., 1.), core * .55) * 1.6;
+  gl_FragColor = vec4(col, clamp(v + glow, 0., 1.) * fade);
+}`;
+
 // ======================================================================================= effects
 export class Fx {
   constructor(scene) {
@@ -464,8 +501,31 @@ export class Fx {
     const u0 = (col * m.cell + 0.01) / m.texW, u1 = ((col + 1) * m.cell - 0.01) / m.texW, v1 = 1 - (row * m.cell + 0.01) / m.texH, v0 = 1 - ((row + 1) * m.cell - 0.01) / m.texH;
     uv.array.set([u0, v1, u1, v1, u0, v0, u1, v0]); uv.needsUpdate = true;
   }
-  clear() { for (const f of this.active.slice()) this.release(f); }
+  clear() { for (const f of this.active.slice()) this.release(f); if (this.cm) this.cm.mesh.visible = false; }
+  /** move-to click marker: a small cyan magic circle (outer ring with four star points, turning inner arcs, a ripple
+   *  and twinkles) drawn by one ground-aligned shader quad; only one exists, a new click restarts it */
+  clickMark(p) {
+    if (!this.cm) {
+      const mat = new THREE.ShaderMaterial({
+        uniforms: { uT: { value: 0 } }, transparent: true, depthWrite: false,
+        polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4,
+        vertexShader: 'varying vec2 vUv; void main(){ vUv = uv * 2. - 1.; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }',
+        fragmentShader: CLICK_FRAG,
+      });
+      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), mat);
+      mesh.rotation.x = -Math.PI / 2; mesh.renderOrder = 6; mesh.frustumCulled = false;
+      this.cm = { mesh, t: 9 };
+    }
+    const c = this.cm; c.t = 0; c.mesh.position.set(p.x, p.y + 0.04, -p.z); c.mesh.visible = true;
+    if (!c.mesh.parent) this.scene.add(c.mesh);
+  }
   update(dt, camera) {
+    if (this.cm && this.cm.mesh.visible) {
+      const c = this.cm; c.t += dt; c.mesh.material.uniforms.uT.value = c.t;
+      const k = Math.min(1, c.t / 0.22), s = CLICK_SIZE * (0.62 + 0.38 * (1 - Math.pow(1 - k, 3)));
+      c.mesh.scale.set(s, s, 1); c.mesh.rotation.z = c.t * 0.9;
+      if (c.t > CLICK_LIFE) c.mesh.visible = false;
+    }
     for (const f of this.active.slice()) {
       f.t += dt;
       if (f.ground) { f.mesh.rotation.set(-Math.PI / 2, 0, -CAM.yaw * DEG); }
