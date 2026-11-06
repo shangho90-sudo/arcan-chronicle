@@ -3,6 +3,7 @@
 // module-level caches, short-lived rigs are pooled per kind, particles live in two instanced buffers (additive + alpha).
 // Public API positions/directions are game (Unity) coords: x east, y up, z north. three-space = (x, y, -z).
 import { THREE, T } from './render.js';
+import { ShatterFx } from './shatterfx.js';
 
 const TAU = Math.PI * 2, DEG = Math.PI / 180;
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -648,9 +649,9 @@ const BURST = {
   explosion_note: { dur: 1.3, col: 0xff6ad5, L: [{ type: 'flash', col: 0xffa0e8, size: 1.4, dur: 0.2 }, { type: 'vring', col: 0xff8ae0, r: 1.5, dur: 0.5, w: 0.06 }, { type: 'shock', col: 0x8ad8ff, r: 1.8, dur: 0.6, w: 0.05, tint: false }, { type: 'vring', col: 0x8ad8ff, r: 1.1, dur: 0.45, w: 0.05, at: 0.12, tint: false }],
     P: [{ n: 8, add: false, tile: TL.note, shape: 'ring', even: true, spd: [1.8, 2.4], up: [0.6, 1.4], drag: 1.6, size: [0.38, 0.48], life: [0.9, 1.2], col: [0xf040b0, 0x30a8f0, 0xf0b020], y: 0.7, fo: 0.6, tint: false, rot0: 0 },
       { n: 4, add: false, tile: TL.note2, shape: 'ring', spd: [1, 1.6], up: [1, 1.6], drag: 1.6, size: [0.45, 0.55], life: [1, 1.2], col: [0xe050c0, 0x40b0f0], y: 0.9, fo: 0.6, rot0: 0 }] },
-  explosion_big: { dur: 2.4, col: 0xff8a2a, shake: [0.6, 0.55], L: [
+  explosion_big: { dur: 2.4, col: 0xff8a2a, shake: [0.6, 0.55], start: (e, fx) => fx.shatter.spawn(e.p, 2.2 * e.sc, { pal: 'fire', power: 0.8 }), L: [
     { type: 'flash', col: 0xffd080, size: 4.2, dur: 0.35, y: 1, a: 0.8 }, { type: 'shock', col: 0xffa040, r: 4.8, dur: 0.7, w: 0.08, trail: 0.3 }, { type: 'shock', col: 0xffffff, r: 3.2, dur: 0.5, w: 0.05, at: 0.1, tint: false },
-    { type: 'vring', col: 0xffd080, r: 3.5, dur: 0.45, w: 0.05, y: 1 }, { type: 'decal', tex: texScorch, col: 0xffffff, r: 2.8, dur: 2.4, add: false, tint: false }, { type: 'decal', tex: texCrack, col: 0xffffff, r: 2.4, dur: 2.4, add: false, tint: false },
+    { type: 'vring', col: 0xffd080, r: 3.5, dur: 0.45, w: 0.05, y: 1 }, { type: 'decal', tex: texScorch, col: 0xffffff, r: 2.8, dur: 2.4, add: false, tint: false }, 
     { type: 'debris', n: 12, dur: 1.8 }],
     P: [{ n: 30, add: false, a: 0.92, tile: TL.smoke, shape: 'sphere', hemi: true, spd: [2, 5], up: [1, 2.5], drag: 3, size: [0.8, 1.3], grow: 2, life: [0.5, 0.9], col: [0xffe8a0, 0xffa030], col2: 0xff3010, y: [0.4, 1.2], spin: 1, fo: 0.35 },
       { n: 12, tile: TL.flame, shape: 'disc', rad: 1.4, up: [3, 5], size: [0.6, 0.9], grow: 1.3, life: [0.4, 0.7], col: 0xffb040, col2: 0xff4010, y: 0.2, rot0: 0 },
@@ -688,29 +689,25 @@ const BURST = {
   mark_pop: { dur: 0.9, col: 0xd060ff, L: [{ type: 'sprite', tile: TL.sigil, col: 0xe0a0ff, size: 1.2, dur: 0.35, y: 1.1, spin: 4 }, { type: 'vring', col: 0xd060ff, r: 1.1, dur: 0.35, w: 0.08, y: 1.1 }, { type: 'flash', col: 0xf0c0ff, size: 1.3, dur: 0.2, y: 1.1 }],
     P: [{ n: 12, add: false, tile: TL.star, shape: 'sphere', spd: [2, 3.5], drag: 2, size: [0.16, 0.26], life: [0.4, 0.7], col: [0xc050f0, 0xe090ff], y: 1.1, spin: 6 }, { n: 4, add: false, tile: TL.rune1, shape: 'sphere', spd: [1.2, 2], drag: 2, size: [0.25, 0.32], life: [0.5, 0.7], y: 1.1 }] },
   // 일격참 finisher: the ground splits and fire bursts out of the cracks
-  fire_crack: { dur: 2.4, col: 0xff8a30, shake: [0.3, 0.32], L: [
-    { type: 'flash', col: 0xffd890, size: 2.4, dur: 0.22, y: 0.3 }, { type: 'shock', col: 0xffa040, r: 2.4, dur: 0.45, w: 0.1, trail: 0.3 },
-    { type: 'decal', tex: texFireCrack, col: 0xffffff, r: 2.0, dur: 2.6, add: false, tint: false, grow: true }, { type: 'decal', tex: texFireCrackGlow, col: 0xffffff, r: 2.0, dur: 2.2, add: true, tint: false, grow: true, y: 0.04 },
-    { type: 'decal', tex: texFireCrackGlow, col: 0xffc060, r: 2.0, dur: 0.9, add: true, tint: false, grow: true, y: 0.05 }, { type: 'debris', n: 10, dur: 1.4 }],
+  fire_crack: { dur: 2.4, col: 0xff8a30, shake: [0.3, 0.32], start: (e, fx) => fx.shatter.spawn(e.p, 2.0 * e.sc, { pal: 'fire' }), L: [
+    { type: 'flash', col: 0xffd890, size: 2.4, dur: 0.22, y: 0.3 },
+        ],
     P: [ext(P.dustRing, { n: 16, spd: [3, 5], size: [0.4, 0.65] }),
       // flame tongues licking up from the cracks, then lingering embers
       { n: 34, tile: TL.flame, shape: 'disc', rad: 1.7, up: [2.6, 5], spd: [0.1, 0.4], size: [0.6, 1.0], grow: 0.7, life: [0.4, 0.75], col: [0xffe070, 0xff5a10], y: 0.05, tint: false },
       { rate: 46, at: 0.15, until: 1.7, tile: TL.flame, shape: 'disc', rad: 1.6, up: [1.6, 3.4], spd: [0.1, 0.3], size: [0.45, 0.8], grow: 0.5, life: [0.3, 0.6], col: [0xffc050, 0xff4a10], y: 0.05, tint: false },
-      { rate: 10, at: 0.3, until: 1.8, add: false, tile: TL.smoke, col: 0x3a2c26, a: 0.45, shape: 'disc', rad: 1.3, up: [1, 1.8], spd: [0.1, 0.3], size: [0.4, 0.6], grow: 2.2, life: [0.8, 1.2], y: 0.4, tint: false },
+      { rate: 10, at: 0.3, until: 1.8, add: false, tile: TL.smoke, col: 0x8a6a52, a: 0.35, shape: 'disc', rad: 1.3, up: [1, 1.8], spd: [0.1, 0.3], size: [0.4, 0.6], grow: 2.2, life: [0.8, 1.2], y: 0.4, tint: false },
       ext(P.embers, { n: 24, spd: [1.5, 3.5], up: [2, 4.5], life: [0.6, 1.2], col: [0xffe0a0, 0xff7020], tint: false }),
-      { n: 8, at: 0.1, add: false, tile: TL.dust, col: 0x4a3a30, a: 0.55, shape: 'disc', rad: 1.2, up: [0.6, 1.2], size: [0.6, 0.9], grow: 2, life: [0.8, 1.3], y: 0.3, tint: false }] },
+      { n: 8, at: 0.1, add: false, tile: TL.dust, col: 0xa88466, a: 0.45, shape: 'disc', rad: 1.2, up: [0.6, 1.2], size: [0.6, 0.9], grow: 2, life: [0.8, 1.3], y: 0.3, tint: false }] },
   // monster claw swipe: three bright parallel scratches
   claw_marks: { dur: 0.45, col: 0xffffff, L: [
     { type: 'sprite', tile: TL.streak, col: 0xffffff, size: 1.5, sx: 1, sy: 0.12, dur: 0.22, y: 1.0, rot: 0.95 }, { type: 'sprite', tile: TL.streak, col: 0xffeedd, size: 1.5, sx: 1, sy: 0.12, dur: 0.22, y: 0.82, rot: 0.95, at: 0.03 },
     { type: 'sprite', tile: TL.streak, col: 0xffe0d0, size: 1.4, sx: 1, sy: 0.12, dur: 0.22, y: 0.64, rot: 0.95, at: 0.06 }, { type: 'flash', col: 0xffffff, size: 0.7, dur: 0.1, y: 0.8 }],
     P: [{ n: 8, tile: TL.ember, mode: 2, shape: 'sphere', spd: [2.5, 4.5], size: [0.05, 0.07], life: [0.15, 0.3], col: 0xffffff, str: 0.05, y: 0.8, tint: false }] },
   // 견습생 '일격참' finisher: the ground splits under the sword (crack decal, rocks thrown up, dust ring, white flash)
-  ground_crack: { dur: 2.2, col: 0xffe6b0, shake: [0.25, 0.3], L: [
-    { type: 'flash', col: 0xfff2d0, size: 2.2, dur: 0.2, y: 0.3 }, { type: 'shock', col: 0xffe0a0, r: 2.4, dur: 0.45, w: 0.09, trail: 0.3 },
-    { type: 'decal', tex: texCrack, col: 0xffffff, r: 2.0, dur: 2.2, add: false, tint: false, grow: true }, { type: 'decal', tex: texCrack, col: 0xffffff, r: 1.3, dur: 2.0, add: false, tint: false, at: 0.05 },
-    { type: 'debris', n: 10, dur: 1.4 }],
-    P: [ext(P.dustRing, { n: 18, spd: [3, 5], size: [0.45, 0.7] }), { n: 10, add: false, tile: TL.dust, col: 0xb09a78, a: 0.8, shape: 'disc', rad: 0.8, up: [0.8, 1.6], size: [0.5, 0.7], grow: 2, life: [0.6, 1.0], y: 0.1, tint: false },
-      ext(P.embers, { n: 10, spd: [2, 4], up: [1, 2], life: [0.2, 0.4], col: [0xfff2c0, 0xffd080], tint: false })] },
+  ground_crack: { dur: 2.2, col: 0xffe6b0, shake: [0.25, 0.3], start: (e, fx) => fx.shatter.spawn(e.p, 2.0 * e.sc), L: [
+    { type: 'flash', col: 0xfff2d0, size: 1.6, dur: 0.14, y: 0.5, a: 0.7 }],
+    P: [ext(P.embers, { n: 6, spd: [2, 4], up: [1, 2], life: [0.2, 0.4], col: [0xfff2c0, 0xffd080], tint: false })] },
   dust: { dur: 1, col: 0xa89270, L: [], P: [ext(P.dustRing, { n: 12, tint: true }), { n: 5, add: false, tile: TL.dust, col: 0xa89270, a: 0.75, shape: 'disc', rad: 0.3, up: [0.4, 0.8], size: [0.4, 0.5], grow: 2, life: [0.6, 0.9], y: 0.1 }] },
 };
 
@@ -938,7 +935,7 @@ const SLASH = {
     tick(e) { const r = e.rig, u = e.lt / 0.28, ext_ = easeOut(clamp01(u / 0.3)), L = e.len * ext_, o = 1 - smooth(0.5, 1, u);
       for (const [m, w] of [[r.st, Math.max(0.3, e.wid)], [r.st2, Math.max(0.3, e.wid) * 0.4]]) { m.rotation.y = -Math.PI / 2; m.position.set(0, SLH, 0.2); m.scale.set(Math.max(0.01, L), 1, w); m.fxu.c.copy(e.col); m.fxu.c2.copy(e.col).multiplyScalar(0.5); m.fxu.o = o; }
       r.tip.position.set(0, SLH, 0.2 + L); r.tip.scale.setScalar(0.7 * (SkillFx.reduceFlash ? 0.6 : 1)); r.tip.fxu.c.copy(e.col); r.tip.fxu.o = o * 0.9; r.tip.fxu.x.x = 1; } },
-  smash: { dur: 1.1, col: 0xc89a5a, shake: [0.3, 0.3], L: [{ type: 'decal', tex: texCrack, col: 0xffffff, r: 1.1, dur: 1.1, tint: false }, { type: 'shock', col: 0xd8b070, r: 1.8, dur: 0.45, w: 0.12, trail: 0.4 }, { type: 'flash', col: 0xffe0a0, size: 1.6, dur: 0.15, y: 0.3 }, { type: 'debris', n: 7, dur: 1.0 }],
+  smash: { dur: 1.1, col: 0xc89a5a, shake: [0.3, 0.3], start: (e, fx) => fx.shatter.spawn(new THREE.Vector3(e.p.x + e.dx * e.R * 0.6, e.p.y, e.p.z + e.dz * e.R * 0.6), 1.4, { power: 0.7 }), L: [{ type: 'flash', col: 0xffe0a0, size: 1.2, dur: 0.12, y: 0.4, a: 0.7 }],
     P: [ext(P.dustRing, { n: 14, spd: [2.5, 3.5] }), ext(P.embers, { n: 8, y: 0.2 })],
     start(e) { e.sc = e.R / 1.6; e.p.x += e.dx * e.R * 0.5; e.p.z += e.dz * e.R * 0.5; e.rig.root.position.copy(e.p); } },
   fan_needles: { dur: 0.45, col: 0xffc830, angle: 60, length: 5,
@@ -1641,6 +1638,7 @@ export class SkillFx {
     this.pa = new Particles(4000, true); this.pn = new Particles(2500, false);
     this.root.add(this.pn.mesh, this.pa.mesh);
     this.live = []; this.pools = new Map(); this.time = 0;
+    this.shatter = new ShatterFx(this.root); this.shatter.load();             // broken-ground meshes load in the background
     /** optional camera-shake hook: (amplitude, duration) => void. Suppressed when SkillFx.reduceFlash. */
     this.onShake = null;
   }
@@ -1681,6 +1679,7 @@ export class SkillFx {
   // ------------------------------------------------------------------------------------ frame
   update(dt) {
     dt = Math.min(Math.max(dt, 0), 0.1); this.time += dt;
+    this.shatter.update(dt);
     const L = this.live;
     for (let i = 0; i < L.length; i++) {
       const e = L[i]; e.t += dt; e.lt = e.t * e.tk;
@@ -1691,7 +1690,7 @@ export class SkillFx {
     }
     this.pa.update(dt); this.pn.update(dt);
   }
-  clear() { for (const e of this.live) if (!e.dead) this._release(e); this.live.length = 0; this.pa.clear(); this.pn.clear(); }
+  clear() { this.shatter.clear(); for (const e of this.live) if (!e.dead) this._release(e); this.live.length = 0; this.pa.clear(); this.pn.clear(); }
   /** remove from scene and free pooled rigs (shared caches stay) */
   dispose() { this.clear(); for (const p of this.pools.values()) for (const r of p) disposeRig(r); this.pools.clear(); this.root.removeFromParent(); this.pa.geo.dispose(); this.pn.geo.dispose(); this.pa.mat.dispose(); this.pn.mat.dispose(); }
 
