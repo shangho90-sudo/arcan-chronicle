@@ -2,7 +2,7 @@
 // The zone background (ground, paths, obstacles) is rasterised once per zone; markers are drawn every few frames.
 const THEME = {
   town: ['#c9b58e', '#e2d4b2'], forest: ['#6d9a46', '#c49a63'], mist_valley: ['#6f8f78', '#b39a74'],
-  frost_highland: ['#c9d6de', '#a9a49a'], dragon_ruins: ['#8e6c58', '#b0a08c'],
+  frost_highland: ['#c9d6de', '#a9a49a'], dragon_ruins: ['#8e6c58', '#b0a08c'], mushroom_grove: ['#6e6488', '#a98f8a'],
 };
 import { CAM } from './render.js';
 const PPM = 3;   // background pixels per metre

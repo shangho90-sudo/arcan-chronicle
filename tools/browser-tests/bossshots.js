@@ -19,7 +19,7 @@ const OUT = process.env.OUT || '/tmp/boss', TAG = process.env.TAG || 'shot'; fs.
     await ev(() => localStorage.clear()); await clickLabel('새 게임'); await clickLabel('모험 시작');
     await pg.waitForFunction(() => window.G && G.inWorld && !G.loading, null, { timeout: 300000 });
     await ev(() => { G.profile.ui = Object.assign(G.profile.ui || {}, { qwin: 'min' }); G.ui.renderQuestHud(true); });
-    await ev(() => G.loadZone('forest', 'from_town', false)); await pg.waitForFunction(() => !G.loading && G.zone.def.id === 'forest', null, { timeout: 600000 });
+    await ev(() => G.loadZone('mushroom_grove', 'from_forest', false)); await pg.waitForFunction(() => !G.loading && G.zone.def.id === 'mushroom_grove', null, { timeout: 600000 });
     const stats = async () => { await ev(() => { const i = G.render.r.info; i.autoReset = false; i.reset(); }); await frames(1);
       return ev(() => { const i = G.render.r.info; const o = { calls: i.render.calls, tris: i.render.triangles }; i.autoReset = true; return o; }); };
     const ONLY = process.env.ONLY ? process.env.ONLY.split(',') : null;

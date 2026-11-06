@@ -303,6 +303,9 @@ function TestSave() {
   Eq(p4.returnZone, "town", "return zone default");
   const ch4 = new CharacterSheet(d, p4);
   Eq(ch4.bag.count("c_potion_s"), 2, "v1 inventory kept");
+  // v3 -> v4: fields were enlarged, so a saved field position is dropped (town positions kept)
+  const pf = migrate({ version: 3, zone: "forest", hasPos: true, posX: 10, posZ: 5 }), pt = migrate({ version: 3, zone: "town", hasPos: true, posX: 1, posZ: 2 });
+  Ok(pf.hasPos === false && pt.hasPos === true, "v4 migration drops field positions only");
   ss.remove();
   Ok(!ss.exists(), "deleted");
 }

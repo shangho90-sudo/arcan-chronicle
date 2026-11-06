@@ -130,7 +130,7 @@ Ok(ch3.book.sk.points >= 0, "negative points repaired");
 // v2 save -> v3: job kept (legacy), no points below 10
 const v2 = { version: 2, name: "옛날", gender: "f", job: "cook", level: 6, exp: 0, gold: 10, inventory: [], learnedSkills: ["ck_chop"], quests: [], flags: [] };
 const p4 = migrate(v2); const ch4 = new CharacterSheet(d, p4);
-Eq(p4.version, 3, "migrated to v3"); Eq(ch4.p.job, "cook", "legacy job kept"); Eq(ch4.book.sk.points, 0, "no points below Lv10"); Ok(p4.legacyJob, "legacy flag");
+Eq(p4.version, 4, "migrated to v4"); Eq(ch4.p.job, "cook", "legacy job kept"); Eq(ch4.book.sk.points, 0, "no points below Lv10"); Ok(p4.legacyJob, "legacy flag");
 
 // ---- 견습생 기본 검술 (novice tree): own point pool from Lv1, kept after job changes
 {

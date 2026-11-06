@@ -9,15 +9,20 @@ Kept as they were: boss-arena rocks, ruins, signposts, mushrooms.
 2026-11-04 (Blender asset set): cluster placement - outer forest dense (big trees), path kept open, mid area = tree +
 rock + shrub groups, roadside = flowers + grass + small stones; models are the Blender ones (tools/blender/assets.py).
 Small decorative stones are type 'stone' (no collision).
-Usage: python3 tools/forest/layout.py [--write]"""
+2026-11-06: fields are twice as wide (tools/zones/scale_fields.py) -> attempt / rock / stump counts scale with the zone
+area; monster spawners with "spread" get no keep-out (monsters roam among the trees); the boss grove section only runs
+for a zone with a boss (the mushroom boss now lives in its own zone 'mushroom_grove').
+Usage: python3 tools/forest/layout.py [forest|mushroom_grove] [--write]"""
 import json, math, os, random, sys
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
 ZPATH = os.path.join(ROOT, 'assets', 'data', 'zones.json')
-SEED = 20261101
+ZID = next((a for a in sys.argv[1:] if not a.startswith('--')), 'forest')
+SEED = 20261101 + (0 if ZID == 'forest' else 3)
 
-zones = json.load(open(ZPATH)); Z = next(z for z in zones['zones'] if z['id'] == 'forest')
+zones = json.load(open(ZPATH)); Z = next(z for z in zones['zones'] if z['id'] == ZID)
 x0, z0, x1, z1 = Z['bounds']
+AREA = (x1 - x0) * (z1 - z0) / (78.5 * 78.5)       # 1.0 = the original 78.5 m forest
 rnd = random.Random(SEED)
 
 paths = [(list(zip(p['pos'][0::2], p['pos'][1::2])), p['width']) for p in Z['patches'] if p['shape'] == 'path']
@@ -36,10 +41,12 @@ def path_clear(x, z):
     return best
 
 keepouts = []
-for m in Z['monsters']: keepouts.append((m['pos'][0], m['pos'][1], m['radius'] + 1.2))
+for m in Z['monsters']:
+    if not m.get('spread'): keepouts.append((m['pos'][0], m['pos'][1], m['radius'] + 1.2))
 for p in Z['portals']: keepouts.append((p['pos'][0], p['pos'][1], 5.0))
 for s in Z['spawns']: keepouts.append((s['pos'][0], s['pos'][1], 4.0))
-B = Z['boss']; keepouts.append((B['gate'][0], B['gate'][1], 4.5)); keepouts.append((B['center'][0], B['center'][1], B['radius'] + 3.5))
+B = Z.get('boss')
+if B: keepouts.append((B['gate'][0], B['gate'][1], 4.5)); keepouts.append((B['center'][0], B['center'][1], B['radius'] + 3.5))
 for d in discs: keepouts.append((d[0], d[1], d[2] - 1.0))
 ramps = [h['rect'] for h in Z['heights'] if h['kind'] == 'ramp']
 plat = [h['rect'] for h in Z['heights'] if h['kind'] == 'platform']
@@ -79,7 +86,7 @@ def density(x, z):
 
 # ---------------------------------------------------------------- trees (Poisson-ish with density acceptance)
 trees = []
-for _ in range(26000):
+for _ in range(int(26000 * AREA)):
     x, z = rnd.uniform(x0 + 1, x1 - 1), rnd.uniform(z0 + 1, z1 - 1)
     if rnd.random() > density(x, z): continue
     if not free(x, z, 3.2): continue
@@ -115,8 +122,8 @@ for pts, w in paths:
 
 # ---------------------------------------------------------------- rocks (collision) and stumps
 rocks = []; stones = []
-for _ in range(9000):
-    if len(rocks) >= 42: break
+for _ in range(int(9000 * AREA)):
+    if len(rocks) >= int(42 * AREA): break
     x, z = rnd.uniform(x0 + 2, x1 - 2), rnd.uniform(z0 + 2, z1 - 2)
     pc = path_clear(x, z)
     if not (1.5 < pc < 9) or not free(x, z, 1.6) or rnd.random() > 0.25 + density(x, z) * 0.5: continue
@@ -143,8 +150,8 @@ for pts, w in paths:
             for k in range(rnd.randint(1, 3)):
                 stones.append({'type': 'stone', 'model': 'rock_small', 'pos': [round(px + nx * off * side + rnd.uniform(-0.5, 0.5), 2), round(pz + nz * off * side + rnd.uniform(-0.5, 0.5), 2)], 'rot': round(rnd.uniform(0, 360), 1), 'scale': round(rnd.uniform(0.6, 1.1), 2), 'variant': '', 'w': 0.0, 'd': 0.0})
 stumps = []
-for _ in range(3000):
-    if len(stumps) >= 6: break
+for _ in range(int(3000 * AREA)):
+    if len(stumps) >= int(6 * AREA): break
     x, z = rnd.uniform(x0 + 2, x1 - 2), rnd.uniform(z0 + 2, z1 - 2)
     if not free(x, z, 1.4) or density(x, z) < 0.3: continue
     if any(math.hypot(x - q['pos'][0], z - q['pos'][1]) < 2.2 for q in trees + rocks + stumps): continue
@@ -182,92 +189,95 @@ for t in trees:                                                      # flowers a
         a = rnd.uniform(0, math.tau); r = rnd.uniform(2.6, 3.6) * t['scale']
         add_flowers(t['pos'][0] + math.cos(a) * r, t['pos'][1] + math.sin(a) * r, rnd.choice(kinds), rnd.uniform(0.8, 1.3))
 
-# ---------------------------------------------------------------- mushroom boss grove (raised platform): dense violet edge, clear centre
-# 2026-11-06: violet trees + mushroom trees + mushroom clusters crowd the platform rim outside the rock ring; the ring
-# rocks become mossy violet stones; the old collision mushrooms inside the arena are removed (centre = combat space);
-# small glowing mushrooms / flowers sit between the ring rocks. Cluster rule: 1 large + 2-4 medium + 5-15 small.
-AR = random.Random(SEED + 7)
-PL = plat[0]; ACX, ACZ = B['center']; AGX, AGZ = B['gate']
-def on_plat(x, z, m=0): return in_rect(x, z, PL, -m)
-def arena_r(x, z): return math.hypot(x - ACX, z - ACZ)
-def corridor(x, z, m=0): return (PL[0] - 1 <= x <= AGX + 2 + m and AGZ - 3.2 - m <= z <= AGZ + 3.6 + m) or math.hypot(x - AGX, z - AGZ) < 3.6 + m
-ring = [p for p in kept if p['type'] == 'rock' and p.get('variant') == 'boss']
-for i, p in enumerate(ring): p['model'] = 'rock_magic_low' if i % 3 == 1 else 'rock_magic'
-kept = [p for p in kept if not (p['type'] == 'mushroom' and on_plat(*p['pos']) and arena_r(*p['pos']) < B['radius'])]
 grove = []
-def gp(t, model, x, z, sc, rot=None, var=''):
-    grove.append({'type': t, 'model': model, 'pos': [round(x, 2), round(z, 2)], 'rot': round(AR.uniform(0, 360) if rot is None else rot, 1), 'scale': round(sc, 2), 'variant': var, 'w': 0.0, 'd': 0.0})
-def solid_clear(x, z, need):
-    """collision props: on the platform, off its wall, outside the ring, off the entry corridor, apart from each other"""
-    if not on_plat(x, z, 1.4) or arena_r(x, z) < B['radius'] + 2.0 or corridor(x, z, need): return False
-    for q in ring + [g for g in grove if g['type'] in ('tree', 'mushtree', 'rock')]:
-        if math.hypot(x - q['pos'][0], z - q['pos'][1]) < need + 1.0: return False
-    return True
-def deco_ok(x, z):
-    return on_plat(x, z, 0.5) and not corridor(x, z) and arena_r(x, z) > B['radius'] - 1.2
-# big pieces first (trees / mushroom trees) on the outer belt, then clusters around each
-for _ in range(4000):
-    x, z = AR.uniform(PL[0], PL[2]), AR.uniform(PL[1], PL[3])
-    if not solid_clear(x, z, 2.2): continue
+if B:
+    # ---------------------------------------------------------------- mushroom boss grove (raised platform): dense violet edge, clear centre
+    # 2026-11-06: violet trees + mushroom trees + mushroom clusters crowd the platform rim outside the rock ring; the ring
+    # rocks become mossy violet stones; the old collision mushrooms inside the arena are removed (centre = combat space);
+    # small glowing mushrooms / flowers sit between the ring rocks. Cluster rule: 1 large + 2-4 medium + 5-15 small.
+    AR = random.Random(SEED + 7)
+    PL = plat[0]; ACX, ACZ = B['center']; AGX, AGZ = B['gate']
+    def on_plat(x, z, m=0): return in_rect(x, z, PL, -m)
+    def arena_r(x, z): return math.hypot(x - ACX, z - ACZ)
+    def corridor(x, z, m=0): return (PL[0] - 1 <= x <= AGX + 2 + m and AGZ - 3.2 - m <= z <= AGZ + 3.6 + m) or math.hypot(x - AGX, z - AGZ) < 3.6 + m
+    ring = [p for p in kept if p['type'] == 'rock' and p.get('variant') == 'boss']
+    for i, p in enumerate(ring): p['model'] = 'rock_magic_low' if i % 3 == 1 else 'rock_magic'
+    kept = [p for p in kept if not (p['type'] == 'mushroom' and on_plat(*p['pos']) and arena_r(*p['pos']) < B['radius'])]
+    grove = []
+    def gp(t, model, x, z, sc, rot=None, var=''):
+        grove.append({'type': t, 'model': model, 'pos': [round(x, 2), round(z, 2)], 'rot': round(AR.uniform(0, 360) if rot is None else rot, 1), 'scale': round(sc, 2), 'variant': var, 'w': 0.0, 'd': 0.0})
+    def solid_clear(x, z, need):
+        """collision props: on the platform, off its wall, outside the ring, off the entry corridor, apart from each other"""
+        if not on_plat(x, z, 1.4) or arena_r(x, z) < B['radius'] + 2.0 or corridor(x, z, need): return False
+        for q in ring + [g for g in grove if g['type'] in ('tree', 'mushtree', 'rock')]:
+            if math.hypot(x - q['pos'][0], z - q['pos'][1]) < need + 1.0: return False
+        return True
+    def deco_ok(x, z):
+        return on_plat(x, z, 0.5) and not corridor(x, z) and arena_r(x, z) > B['radius'] - 1.2
+    # big pieces first (trees / mushroom trees) on the outer belt, then clusters around each
+    for _ in range(4000):
+        x, z = AR.uniform(PL[0], PL[2]), AR.uniform(PL[1], PL[3])
+        if not solid_clear(x, z, 2.2): continue
+        big = [g for g in grove if g['type'] in ('tree', 'mushtree')]
+        if len(big) >= 16: break
+        roll = AR.random()
+        if roll < 0.28 and sum(g['type'] == 'mushtree' for g in grove) < 5: gp('mushtree', 'mush_tree', x, z, AR.uniform(0.85, 1.15))
+        else: gp('tree', 'tree_violet' if roll < 0.68 else 'tree_violet_round', x, z, AR.uniform(0.85, 1.2))
     big = [g for g in grove if g['type'] in ('tree', 'mushtree')]
-    if len(big) >= 16: break
-    roll = AR.random()
-    if roll < 0.28 and sum(g['type'] == 'mushtree' for g in grove) < 5: gp('mushtree', 'mush_tree', x, z, AR.uniform(0.85, 1.15))
-    else: gp('tree', 'tree_violet' if roll < 0.68 else 'tree_violet_round', x, z, AR.uniform(0.85, 1.2))
-big = [g for g in grove if g['type'] in ('tree', 'mushtree')]
-for g in big:                                                       # cluster: 2-4 medium + 5-12 small around each big piece
-    bx, bz = g['pos']
-    for k in range(AR.randint(2, 4)):
-        a = AR.uniform(0, math.tau); r = AR.uniform(1.0, 2.2); x, z = bx + math.cos(a) * r, bz + math.sin(a) * r
-        if not deco_ok(x, z): continue
+    for g in big:                                                       # cluster: 2-4 medium + 5-12 small around each big piece
+        bx, bz = g['pos']
+        for k in range(AR.randint(2, 4)):
+            a = AR.uniform(0, math.tau); r = AR.uniform(1.0, 2.2); x, z = bx + math.cos(a) * r, bz + math.sin(a) * r
+            if not deco_ok(x, z): continue
+            roll = AR.random()
+            if roll < 0.35: gp('mushdecor', 'mush_cluster', x, z, AR.uniform(0.75, 1.0))
+            elif roll < 0.6: gp('mushdecor', 'mush_orange', x, z, AR.uniform(0.7, 1.0))
+            else: gp('shrub', 'shrub_b' if AR.random() < 0.5 else 'shrub_a', x, z, AR.uniform(0.7, 1.05))
+        for k in range(AR.randint(5, 12)):
+            a = AR.uniform(0, math.tau); r = AR.uniform(0.8, 3.0); x, z = bx + math.cos(a) * r, bz + math.sin(a) * r
+            if not deco_ok(x, z): continue
+            roll = AR.random()
+            if roll < 0.3: gp('mushdecor', 'mush_small_purple', x, z, AR.uniform(0.8, 1.3))
+            elif roll < 0.48: gp('mushdecor', 'mush_small_blue', x, z, AR.uniform(0.8, 1.3))
+            elif roll < 0.66: gp('mushdecor', 'mush_glow_purple' if AR.random() < 0.6 else 'mush_glow_blue', x, z, AR.uniform(0.8, 1.3))
+            elif roll < 0.84: gp('flowers', None, x, z, AR.uniform(0.8, 1.3), 0.0, AR.choice(['mixed', 'white', 'mixed']))
+            else: gp('stone', 'rock_small', x, z, AR.uniform(0.7, 1.2))
+    # between the ring rocks: glowing mushrooms, flowers and small stones (walk-through decoration), gate sector left open
+    for p in ring:
+        a0 = math.atan2(p['pos'][1] - ACZ, p['pos'][0] - ACX)
+        for k in range(AR.randint(3, 6)):
+            a = a0 + AR.uniform(-0.2, 0.2); r = B['radius'] + 1 + AR.uniform(-0.9, 1.4); x, z = ACX + math.cos(a) * r, ACZ + math.sin(a) * r
+            if not deco_ok(x, z) or math.hypot(x - p['pos'][0], z - p['pos'][1]) < 0.9: continue
+            roll = AR.random()
+            if roll < 0.4: gp('mushdecor', 'mush_glow_purple' if AR.random() < 0.65 else 'mush_glow_blue', x, z, AR.uniform(0.8, 1.2))
+            elif roll < 0.62: gp('mushdecor', 'mush_small_purple', x, z, AR.uniform(0.7, 1.1))
+            elif roll < 0.85: gp('flowers', None, x, z, AR.uniform(0.7, 1.1), 0.0, AR.choice(['mixed', 'white']))
+            else: gp('stone', 'rock_small', x, z, AR.uniform(0.6, 1.0))
+    # backdrop: the platform runs to the zone edge (N / E), so a dense violet + green tree wall stands just outside the
+    # bounds (unreachable, decoration only) instead of the bare ground plane
+    for _ in range(2500):
+        x, z = AR.uniform(PL[0] - 4, x1 + 9), AR.uniform(PL[1] - 4, z1 + 9)
+        if not (x > x1 + 0.8 or z > z1 + 0.8): continue
+        if any(math.hypot(x - g['pos'][0], z - g['pos'][1]) < 2.6 for g in grove if g['type'] in ('tree', 'pine', 'mushtree')): continue
         roll = AR.random()
-        if roll < 0.35: gp('mushdecor', 'mush_cluster', x, z, AR.uniform(0.75, 1.0))
-        elif roll < 0.6: gp('mushdecor', 'mush_orange', x, z, AR.uniform(0.7, 1.0))
-        else: gp('shrub', 'shrub_b' if AR.random() < 0.5 else 'shrub_a', x, z, AR.uniform(0.7, 1.05))
-    for k in range(AR.randint(5, 12)):
-        a = AR.uniform(0, math.tau); r = AR.uniform(0.8, 3.0); x, z = bx + math.cos(a) * r, bz + math.sin(a) * r
-        if not deco_ok(x, z): continue
-        roll = AR.random()
-        if roll < 0.3: gp('mushdecor', 'mush_small_purple', x, z, AR.uniform(0.8, 1.3))
-        elif roll < 0.48: gp('mushdecor', 'mush_small_blue', x, z, AR.uniform(0.8, 1.3))
-        elif roll < 0.66: gp('mushdecor', 'mush_glow_purple' if AR.random() < 0.6 else 'mush_glow_blue', x, z, AR.uniform(0.8, 1.3))
-        elif roll < 0.84: gp('flowers', None, x, z, AR.uniform(0.8, 1.3), 0.0, AR.choice(['mixed', 'white', 'mixed']))
-        else: gp('stone', 'rock_small', x, z, AR.uniform(0.7, 1.2))
-# between the ring rocks: glowing mushrooms, flowers and small stones (walk-through decoration), gate sector left open
-for p in ring:
-    a0 = math.atan2(p['pos'][1] - ACZ, p['pos'][0] - ACX)
-    for k in range(AR.randint(3, 6)):
-        a = a0 + AR.uniform(-0.2, 0.2); r = B['radius'] + 1 + AR.uniform(-0.9, 1.4); x, z = ACX + math.cos(a) * r, ACZ + math.sin(a) * r
-        if not deco_ok(x, z) or math.hypot(x - p['pos'][0], z - p['pos'][1]) < 0.9: continue
-        roll = AR.random()
-        if roll < 0.4: gp('mushdecor', 'mush_glow_purple' if AR.random() < 0.65 else 'mush_glow_blue', x, z, AR.uniform(0.8, 1.2))
-        elif roll < 0.62: gp('mushdecor', 'mush_small_purple', x, z, AR.uniform(0.7, 1.1))
-        elif roll < 0.85: gp('flowers', None, x, z, AR.uniform(0.7, 1.1), 0.0, AR.choice(['mixed', 'white']))
-        else: gp('stone', 'rock_small', x, z, AR.uniform(0.6, 1.0))
-# backdrop: the platform runs to the zone edge (N / E), so a dense violet + green tree wall stands just outside the
-# bounds (unreachable, decoration only) instead of the bare ground plane
-for _ in range(2500):
-    x, z = AR.uniform(PL[0] - 4, x1 + 9), AR.uniform(PL[1] - 4, z1 + 9)
-    if not (x > x1 + 0.8 or z > z1 + 0.8): continue
-    if any(math.hypot(x - g['pos'][0], z - g['pos'][1]) < 2.6 for g in grove if g['type'] in ('tree', 'pine', 'mushtree')): continue
-    roll = AR.random()
-    if roll < 0.45: gp('tree', 'tree_violet' if roll < 0.3 else 'tree_violet_round', x, z, AR.uniform(0.95, 1.3))
-    elif roll < 0.6: gp('mushtree', 'mush_tree', x, z, AR.uniform(0.9, 1.25))
-    else: gp('pine' if roll < 0.8 else 'tree', 'tree_forest_tall' if roll < 0.8 else 'tree_broad_b', x, z, AR.uniform(0.95, 1.25))
-for g in grove:
-    if g['model'] is None: del g['model']
-# everything the general pass put on the platform is replaced by the grove
-def off_plat(q): return not in_rect(q['pos'][0], q['pos'][1], PL, 0.3)
-trees, shrubs, rocks, stones, stumps, flowers = [list(filter(off_plat, L)) for L in (trees, shrubs, rocks, stones, stumps, flowers)]
-from collections import Counter as _C
-print('arena grove', dict(_C(g.get('model', g['type']) for g in grove)))
+        if roll < 0.45: gp('tree', 'tree_violet' if roll < 0.3 else 'tree_violet_round', x, z, AR.uniform(0.95, 1.3))
+        elif roll < 0.6: gp('mushtree', 'mush_tree', x, z, AR.uniform(0.9, 1.25))
+        else: gp('pine' if roll < 0.8 else 'tree', 'tree_forest_tall' if roll < 0.8 else 'tree_broad_b', x, z, AR.uniform(0.95, 1.25))
+    for g in grove:
+        if g['model'] is None: del g['model']
+    # everything the general pass put on the platform is replaced by the grove
+    def off_plat(q): return not in_rect(q['pos'][0], q['pos'][1], PL, 0.3)
+    trees, shrubs, rocks, stones, stumps, flowers = [list(filter(off_plat, L)) for L in (trees, shrubs, rocks, stones, stumps, flowers)]
+    from collections import Counter as _C
+    print('arena grove', dict(_C(g.get('model', g['type']) for g in grove)))
+
 
 props = kept + trees + shrubs + rocks + stones + stumps + flowers + grove
 from collections import Counter
 print('trees', len(trees), dict(Counter(t['model'] for t in trees)), 'rocks', dict(Counter(r['model'] for r in rocks)), 'stones', len(stones),
       f'shrubs {len(shrubs)}, stumps {len(stumps)}, flower clusters {len(flowers)}, kept {len(kept)}')
 if '--write' in sys.argv:
-    Z['props'] = props; Z['nature'] = {'style': 'storybook_forest', 'seed': SEED}
+    Z['props'] = props; Z['nature'] = {**Z.get('nature', {}), 'style': 'storybook_forest', 'seed': SEED}
     raw = json.dumps(zones, ensure_ascii=False, indent=1)
     open(ZPATH, 'w').write(raw + ('\n' if open(ZPATH).read().endswith('\n') else ''))
     print('wrote', ZPATH)

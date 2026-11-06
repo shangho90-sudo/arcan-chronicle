@@ -82,7 +82,7 @@ export const slotOf = d => !d ? null : (d.type === "weapon" ? "weapon" : d.type 
 export const EQUIP_SLOTS = ["weapon", "armor", "accessory"];
 
 // ======================================================================================= profile / save
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 export function newProfile(data, name, gender) {
   const p = {
     version: SAVE_VERSION, saveTime: "", playTime: 0, name: (name || "모험가").trim() || "모험가", gender: gender === "f" ? "f" : "m",
@@ -110,6 +110,9 @@ export function migrate(p) {
     p.crafted = p.crafted && typeof p.crafted === "object" ? p.crafted : {};
     p.gearMods = p.gearMods && typeof p.gearMods === "object" ? p.gearMods : {};
   }
+  // v4 (2026-11-06): fields became twice as large and the mushroom boss moved to its own zone -> a position saved in a
+  // field no longer means the same place; restart at the zone's entrance instead
+  if ((p.version || 0) < 4 && p.zone && p.zone !== "town") p.hasPos = false;
   p.version = SAVE_VERSION;
   return p;
 }
@@ -604,6 +607,7 @@ function polyContains(poly, x, z, pad) {
 }
 
 export const MAX_STEP = 0.3;
+const GRID_CELL = 4, GRID_PAD = 2;
 export class ZoneGeometry {
   constructor(def) {
     this.def = def; [this.minX, this.minZ, this.maxX, this.maxZ] = def.bounds;
@@ -619,8 +623,22 @@ export class ZoneGeometry {
       else this.boxes.push({ x: p.pos[0], z: p.pos[1], hw: f.hw, hd: f.hd, yaw: p.rot, tag: p.type });
     }
   }
-  addCircle(x, z, r, tag) { this.circles.push({ x, z, r, tag }); }
-  removeTag(tag) { this.circles = this.circles.filter(c => c.tag !== tag); this.boxes = this.boxes.filter(b => b.tag !== tag); this.polys = this.polys.filter(p => p.tag !== tag); }
+  addCircle(x, z, r, tag) { this.circles.push({ x, z, r, tag }); this._grid = null; }
+  removeTag(tag) { this.circles = this.circles.filter(c => c.tag !== tag); this.boxes = this.boxes.filter(b => b.tag !== tag); this.polys = this.polys.filter(p => p.tag !== tag); this._grid = null; }
+  /** uniform bucket grid over every collider (padded by GRID_PAD so one bucket answers queries with r <= GRID_PAD);
+   *  fields have thousands of trees / rocks, and blocked() runs for every nav cell and every movement sub-step */
+  _index() {
+    const S = GRID_CELL, P = GRID_PAD, cells = new Map(), put = (minX, minZ, maxX, maxZ, kind, o) => {
+      for (let i = Math.floor((minX - P) / S); i <= Math.floor((maxX + P) / S); i++) for (let j = Math.floor((minZ - P) / S); j <= Math.floor((maxZ + P) / S); j++) {
+        const k = i * 65536 + j; let b = cells.get(k); if (!b) cells.set(k, b = { c: [], b: [], p: [] }); b[kind].push(o);
+      }
+    };
+    for (const c of this.circles) put(c.x - c.r, c.z - c.r, c.x + c.r, c.z + c.r, 'c', c);
+    for (const b of this.boxes) { const e = Math.hypot(b.hw, b.hd); put(b.x - e, b.z - e, b.x + e, b.z + e, 'b', b); }
+    for (const p of this.polys) { let a = 1e9, c = 1e9, d = -1e9, e = -1e9; for (const q of p.pts) { a = Math.min(a, q.x); c = Math.min(c, q.z); d = Math.max(d, q.x); e = Math.max(e, q.z); } put(a, c, d, e, 'p', p); }
+    this._grid = cells; this._sig = this.circles.length + ':' + this.boxes.length + ':' + this.polys.length;
+    return cells;
+  }
   height(x, z) {
     let h = 0;
     for (const r of this.heights) {
@@ -638,9 +656,15 @@ export class ZoneGeometry {
   ground(x, z) { return { x, y: this.height(x, z), z }; }
   blocked(x, z, r) {
     if (x < this.minX + r || x > this.maxX - r || z < this.minZ + r || z > this.maxZ - r) return true;
-    for (const c of this.circles) { const dx = x - c.x, dz = z - c.z, rr = c.r + r; if (dx * dx + dz * dz < rr * rr) return true; }
-    for (const b of this.boxes) if (boxContains(b, x, z, r)) return true;
-    for (const p of this.polys) if (polyContains(p.pts, x, z, r)) return true;
+    let C = this.circles, Bx = this.boxes, Pp = this.polys;
+    if (r <= GRID_PAD) {
+      if (!this._grid || this._sig !== C.length + ':' + Bx.length + ':' + Pp.length) this._index();
+      const b = this._grid.get(Math.floor(x / GRID_CELL) * 65536 + Math.floor(z / GRID_CELL)); if (!b) return false;
+      C = b.c; Bx = b.b; Pp = b.p;
+    }
+    for (const c of C) { const dx = x - c.x, dz = z - c.z, rr = c.r + r; if (dx * dx + dz * dz < rr * rr) return true; }
+    for (const b of Bx) if (boxContains(b, x, z, r)) return true;
+    for (const p of Pp) if (polyContains(p.pts, x, z, r)) return true;
     return false;
   }
   nearCliff(x, z, r) { const h0 = this.height(x, z); for (let a = 0; a < 8; a++) { const t = a * Math.PI / 4; if (Math.abs(this.height(x + Math.cos(t) * r, z + Math.sin(t) * r) - h0) > MAX_STEP) return true; } return false; }

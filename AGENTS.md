@@ -8,7 +8,7 @@
 ## 기본
 - 빌드 없음. `python3 -m http.server 8765` 후 `http://localhost:8765/index.html`.
 - three.js r160을 로컬 import map(`index.html`, `vendor/three-r160/`)으로 불러옵니다. CDN 장애 시 0% 멈춤을 방지하기 위해 동일 버전과 LICENSE를 저장소에 포함합니다. npm 의존성 없음. 새 라이브러리 추가 금지(필요하면 먼저 사용자에게 확인).
-- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs` (현재 345 통과/6 생략, 606 통과).
+- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs` (현재 346 통과/7 생략, 606 통과).
 - 테스트하지 않은 것을 "검증됨"이라고 보고하지 말 것.
 
 ## 데이터 우선
@@ -17,7 +17,7 @@
 - 스킬 런타임은 `js/skillrt.js`의 op(hit/proj/area/buff/shield/heal/summon/channel/melody/custom…)를 조합합니다. 새 동작은 가능한 기존 op 조합으로, 불가능할 때만 `CUSTOM` 핸들러 추가.
 
 ## 지켜야 할 규칙
-- **저장 호환**: `core.js`의 `SAVE_VERSION`(현재 3)과 `migrate`. 저장 형식을 바꾸면 버전을 올리고 마이그레이션을 추가하세요. 기존 저장 데이터를 깨지 말 것.
+- **저장 호환**: `core.js`의 `SAVE_VERSION`(현재 4 — v4에서 필드 위치 저장값은 버림, 필드 확대 때문)과 `migrate`. 저장 형식을 바꾸면 버전을 올리고 마이그레이션을 추가하세요. 기존 저장 데이터를 깨지 말 것.
 - **레벨 상한(50)·전직 레벨(Lv10/Lv30)** 은 몰래 바꾸지 말고, 바꾼다면 영향(경험치 곡선, 퀘스트, 저장)을 보고하세요.
 - 판정은 발 위치 기준. 텔레그래프와 피격 판정은 같은 `HitShape`를 사용(rect는 시전 위치에서 앞으로 뻗음).
 - 스킬 이펙트 연출 등급: `(차수-1)*3 + 스킬Lv`(궁극기 `+2+Lv`), 최대 10. 물리 스킬은 Lv 2마다 연타 +1, 타당 계수 `coef*base/hits*(1+0.06*추가타)`.
@@ -40,16 +40,22 @@
 - 카메라는 약한 원근(`render.js` `CAM`: 피치 44°(2026-11-06, 48°→44°), 거리 26 m, `ortho` = 초점 거리에서의 화면 반높이). 미리 그린 배경 그림 투영은 `CAM.artPitch`(48°, 바꾸지 말 것). 화면 → 땅 광선은 `Renderer.screenRay`.
 - 화면 비교 캡처: `tools/browser-tests/styleshots.js`(마을 분수·대화, 숲 입구·길·나무·전투, 프레임 시간·draw call·삼각형).
 
-## 필드 그래픽 (`zones.json`의 `"nature"`가 있는 존: 속삭이는 숲·안개 골짜기·서리 고원·용의 유적)
+## 필드 그래픽 (`zones.json`의 `"nature"`가 있는 존: 속삭이는 숲·독버섯 군락지·안개 골짜기·서리 고원·용의 유적)
 - `js/nature.js`가 빌더의 평평한 바닥·원뿔 나무·상자 소품을 숨기고 다시 그립니다: 손그림 지면 셰이더(햇빛 잔디/그늘 잔디/흙/이끼, 반복 완화), 곡선 흙길(마스크는 존의 `patches` 경로에서 생성), Blender 나무·덤불·바위(모델·24 m 청크 단위 인스턴싱), 풀·꽃 덩어리(청크별 한 메시로 합침, 바람), 작은 돌, 플레이어를 가리는 나무 디더링.
 - 배치는 `tools/forest/layout.py --write`(시드 고정)로 `zones.json`의 forest `props`를 다시 씁니다. 나무·바위·그루터기만 충돌(`propFootprint`), `shrub`·`flowers`는 장식. 배치를 바꾸면 `node tools/forest/check_nav.mjs`로 모든 포털·캠프·보스 입구 도달을 확인하세요.
 - 모델 후처리 `tools/forest/process_models.py`, 텍스처 `tools/forest/texgen_forest.py`, 출처는 `assets/forest/README.md`.
 - 그림자는 모델별 저폴리 사본(`*_lo`)만 그립니다(색 패스에서는 0개 인스턴스). 존별 후처리 값은 `zones.json`의 `"post"`.
 - 화면 비교: `tools/browser-tests/forestshots.js` (정지·이동·근접·나무 뒤·전투, `W`/`H`/`TOUCH`로 화면비).
 
-## 보스 전장 (속삭이는 숲 버섯 보스, 2026-11-06)
+## 필드 크기·몬스터 배치 (2026-11-06)
+- 네 필드는 160 m × 160 m(이전 80 m의 가로·세로 2배). 변환은 `tools/zones/scale_fields.py`(한 번만, 존에 `"scaled": 2` 표시): 좌표 2배, 고지대·경사로·보스 전장은 크기 그대로 통째로 이동, 길 폭 1.25배, 원형 패치 1.4배, 존 메시(`assets/zone_<id>.json`, 자연 존에서 보이는 지형·물·보스 바닥만)는 데이터에서 다시 생성. 숲은 `tools/forest/layout.py forest --write`, 나머지 세 필드의 빈 곳은 `tools/zones/fill_fields.py --write`(`"fill": true` 항목만 다시 만듦).
+- 몬스터 스포너의 `"spread"`(m): 무리 대신 넓은 범위(`radius`)에 한 마리씩 최소 간격을 두고 나무 사이에도 생성, 각자 자기 자리 주변(최대 5 m)을 돌아다님. 플레이어 12 m 안에서는 다시 생기지 않음(`Zone.spacedSpot`). 스포너 중심 2.5 m 안에는 나무를 두지 않음.
+- 충돌 판정 `ZoneGeometry.blocked`는 4 m 격자 버킷(`GRID_CELL`, 반지름 2 m 이하 질의)으로 찾음 — 소품이 수천 개라 필요.
+- 버섯 보스는 별도 존 `mushroom_grove`(독버섯 군락지, 경계 [-8,1,39,39]): 숲 북동쪽 길 끝 워프 `to_grove` ↔ `to_forest`. 배치는 `tools/forest/layout.py mushroom_grove --write`.
+
+## 보스 전장 (독버섯 군락지 `mushroom_grove`, 2026-11-06)
 - 바닥: `nature.js` `arenaMaterial`(빌더 `boss_floor` 지형에 적용) — 보라 흙·짙은 보라·갈색·이끼 색 덩어리, 붓 터치, 갈라짐, 낙엽·조약돌·포자, 흔들리는 잎 그늘. 텍스처는 `paint.py` `magic_floor()`(g_magic_*)를 잔결로만 씀.
-- 배치: `tools/forest/layout.py`의 "mushroom boss grove" 구간(플랫폼 위 가장자리 빽빽, 가운데 비움, 1 큰 + 2~4 중간 + 5~15 작은 묶음, 경계 밖 배경 나무 벽). 원형 바위는 `rock_magic*`. 타입 `mushdecor`(장식, 충돌 없음)·`mushtree`(충돌 `propFootprint`).
+- 배치: `tools/forest/layout.py mushroom_grove`의 "mushroom boss grove" 구간(플랫폼 위 가장자리 빽빽, 가운데 비움, 1 큰 + 2~4 중간 + 5~15 작은 묶음, 경계 밖 배경 나무 벽). 원형 바위는 `rock_magic*`. 타입 `mushdecor`(장식, 충돌 없음)·`mushtree`(충돌 `propFootprint`).
 - 에셋(Blender `assets.py`): `mush_small_purple/blue`, `mush_glow_purple/blue`(약한 발광 + 바닥 빛 원판), `mush_orange`, `mush_cluster`, `mush_tree`, `rock_magic(_low)`, `tree_violet(_round)`. 발광 재질은 `MAT_TEX`의 `ec`/`ei`.
 - 경고 표시: `render.js` `TelegraphView`(셰이더 하나: 바깥 빛 번짐·밝은 테두리·안쪽 그라데이션·룬 점선·전진 파동/맥동·입자, 공격은 산호색, 독 웅덩이는 보라 액체+거품, `seal`=봉인 마법진). 시간은 `TG_TIME`. 판정은 그대로 `HitShape`.
 - 결계: `game.js` `setBarrier` — 봉인 마법진 + 거의 투명한 에너지 벽(위로 오르는 입자).

@@ -82,18 +82,25 @@ class Zone {
   }
   async spawnFor(sp) {
     const md = G.data.monsters[sp.def.monster]; if (!md) return;
-    const pos = this.spacedSpot(sp.def.pos[0], sp.def.pos[1], sp.def.radius, md.radius);
-    const m = new Monster(this, md, pos, this.geo.ground(sp.def.pos[0], sp.def.pos[1]), sp.def.radius);
+    // spread spawners (zones.json "spread": min gap in m) scatter one by one over a wide area, trees included, each
+    // monster roaming round its own spot; old camp spawners keep the shared camp centre
+    const P = G.player, away = sp.def.spread && P ? { x: P.pos.x, z: P.pos.z, d: 12 } : null;
+    const pos = this.spacedSpot(sp.def.pos[0], sp.def.pos[1], sp.def.radius, md.radius, sp.def.spread || 0, away);
+    if (!pos) { sp.timers.push(3); return; }
+    const home = sp.def.spread ? this.geo.ground(pos.x, pos.z) : this.geo.ground(sp.def.pos[0], sp.def.pos[1]);
+    const m = new Monster(this, md, pos, home, sp.def.spread ? Math.min(sp.def.radius, 5) : sp.def.radius);
     m.onRemoved = mm => { sp.alive.splice(sp.alive.indexOf(mm), 1); sp.timers.push(md.respawn); };
     sp.alive.push(m); this.actors.push(m); await m.attachBody(); m.body.place(m.pos);
   }
   /** a free spot in the camp circle that keeps its distance from monsters already there (best of several tries) */
-  spacedSpot(cx, cz, R, rad) {
+  spacedSpot(cx, cz, R, rad, spread = 0, away = null) {
     const others = this.actors.filter(a => a.def && !a.dead && a.faction !== "player");
-    const want = 2.2 + rad * 2; let best = null, bestD = -1;
-    for (let i = 0; i < 16; i++) {
-      const grow = i < 8 ? 1 : 1.35, a = Math.random() * Math.PI * 2, r = Math.sqrt(Math.random()) * R * grow;
+    const want = Math.max(spread, 2.2 + rad * 2); let best = null, bestD = -1;
+    for (let i = 0; i < (spread ? 40 : 16); i++) {
+      const grow = spread ? 1 : i < 8 ? 1 : 1.35, a = Math.random() * Math.PI * 2, r = Math.sqrt(Math.random()) * R * grow;
       const q = this.geo.nearestFree(cx + Math.cos(a) * r, cz + Math.sin(a) * r, rad);
+      if (spread && (this.geo.blocked(q.x, q.z, rad) || (this.nav && !this.nav.ok(...this.nav.cellOf(q.x, q.z))) || this.inArena(q, 3))) continue;
+      if (away && Math.hypot(q.x - away.x, q.z - away.z) < away.d) continue;
       let d = 99; for (const o of others) d = Math.min(d, Math.hypot(o.pos.x - q.x, o.pos.z - q.z) - (o.radius || 0.4) - rad);
       if (d >= want) return q;
       if (d > bestD) { bestD = d; best = q; }
@@ -122,7 +129,7 @@ class Zone {
     const p = G.player;
     for (const sp of this.spawners) for (let i = sp.timers.length - 1; i >= 0; i--) {
       sp.timers[i] -= dt; if (sp.timers[i] > 0) continue; sp.timers.splice(i, 1);
-      if (p && Math.hypot(p.pos.x - sp.def.pos[0], p.pos.z - sp.def.pos[1]) < sp.def.radius + 3) { sp.timers.push(3); continue; }
+      if (!sp.def.spread && p && Math.hypot(p.pos.x - sp.def.pos[0], p.pos.z - sp.def.pos[1]) < sp.def.radius + 3) { sp.timers.push(3); continue; }
       this.spawnFor(sp);
     }
     if (!this.boss && this.def.boss && this.def.boss.boss) { this.bossRespawnT -= dt; if (this.bossRespawnT <= 0 && !this.playerInArena(this.def.boss.radius + 4)) this.spawnBoss(); }
