@@ -1,0 +1,492 @@
+[
+  {
+    "zone": "town",
+    "duration": 180.21877083333334,
+    "channels": 2,
+    "rms": 0.19078077437894703,
+    "peak": 0.9949407577514648,
+    "leadingQuiet": 0.09066666666666667,
+    "trailingQuiet": 0.2534375000000182,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "forest",
+    "duration": 180.271,
+    "channels": 2,
+    "rms": 0.19488470674643427,
+    "peak": 0.9754407405853271,
+    "leadingQuiet": 0.08533333333333333,
+    "trailingQuiet": 0.27899999999999636,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "mushroom_grove",
+    "duration": 147.173875,
+    "channels": 2,
+    "rms": 0.1921477210250952,
+    "peak": 0.9768414497375488,
+    "leadingQuiet": 0.08533333333333333,
+    "trailingQuiet": 0.3045416666666654,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "mist_valley",
+    "duration": 174.99427083333333,
+    "channels": 2,
+    "rms": 0.19248851170262873,
+    "peak": 0.9842852354049683,
+    "leadingQuiet": 0.05333333333333334,
+    "trailingQuiet": 0.10627083333332621,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "frost_highland",
+    "duration": 179.04325,
+    "channels": 2,
+    "rms": 0.18902628420628806,
+    "peak": 1.0008177757263184,
+    "leadingQuiet": 0.09333333333333334,
+    "trailingQuiet": 0.11525000000000318,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "dragon_ruins",
+    "duration": 175.43835416666667,
+    "channels": 2,
+    "rms": 0.18847251452161654,
+    "peak": 0.9802707433700562,
+    "leadingQuiet": 0.088,
+    "trailingQuiet": 1.1503541666666592,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "kairion_capital",
+    "duration": 150.04733333333334,
+    "channels": 2,
+    "rms": 0.19410532305587674,
+    "peak": 0.9740482568740845,
+    "leadingQuiet": 0.088,
+    "trailingQuiet": 0.18600000000000705,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "baltern",
+    "duration": 180.55835416666667,
+    "channels": 2,
+    "rms": 0.19371558140952239,
+    "peak": 0.9713222980499268,
+    "leadingQuiet": 0.088,
+    "trailingQuiet": 0.2836875000000134,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "lumiere",
+    "duration": 156.26447916666666,
+    "channels": 2,
+    "rms": 0.195294333554064,
+    "peak": 1.0006211996078491,
+    "leadingQuiet": 0.09333333333333334,
+    "trailingQuiet": 0.39781249999998636,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "gravel",
+    "duration": 175.36,
+    "channels": 2,
+    "rms": 0.19722721086036427,
+    "peak": 0.9794618487358093,
+    "leadingQuiet": 0.05333333333333334,
+    "trailingQuiet": 0.7680000000000007,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "silvern",
+    "duration": 146.07672916666667,
+    "channels": 2,
+    "rms": 0.202206209320105,
+    "peak": 0.9987161159515381,
+    "leadingQuiet": 0.09066666666666667,
+    "trailingQuiet": 0.1913958333333312,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "marseon",
+    "duration": 148.42775,
+    "channels": 2,
+    "rms": 0.19316635155773532,
+    "peak": 0.9844690561294556,
+    "leadingQuiet": 0.09333333333333334,
+    "trailingQuiet": 0.6277499999999918,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "baltazar",
+    "duration": 153.391,
+    "channels": 2,
+    "rms": 0.1888284602474521,
+    "peak": 0.9912469983100891,
+    "leadingQuiet": 0.088,
+    "trailingQuiet": 0.5696666666666488,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "kreutz_fort",
+    "duration": 147.14775,
+    "channels": 2,
+    "rms": 0.18920071968984628,
+    "peak": 0.9739663004875183,
+    "leadingQuiet": 0.088,
+    "trailingQuiet": 0.10241666666667015,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "capital_road",
+    "duration": 160.94039583333333,
+    "channels": 2,
+    "rms": 0.19061283812764987,
+    "peak": 0.9849247932434082,
+    "leadingQuiet": 0.08533333333333333,
+    "trailingQuiet": 0.14039583333331507,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "kairion_hunt",
+    "duration": 180.74120833333333,
+    "channels": 2,
+    "rms": 0.19664322581095636,
+    "peak": 0.9956165552139282,
+    "leadingQuiet": 0.08533333333333333,
+    "trailingQuiet": 0.3172083333333262,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "kairion_hills",
+    "duration": 146.07672916666667,
+    "channels": 2,
+    "rms": 0.19747365499648117,
+    "peak": 0.9843034744262695,
+    "leadingQuiet": 0.10133333333333333,
+    "trailingQuiet": 0.40472916666666947,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "capital_plain",
+    "duration": 163.99672916666665,
+    "channels": 2,
+    "rms": 0.1913198621837876,
+    "peak": 0.9745961427688599,
+    "leadingQuiet": 0.09066666666666667,
+    "trailingQuiet": 0.26339583333333394,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "broken_bridge",
+    "duration": 156.21222916666667,
+    "channels": 2,
+    "rms": 0.1853137378003227,
+    "peak": 0.9870696067810059,
+    "leadingQuiet": 0.09066666666666667,
+    "trailingQuiet": 0.1988958333333528,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "baltern_pass",
+    "duration": 143.151,
+    "channels": 2,
+    "rms": 0.19189054483557993,
+    "peak": 0.9775951504707336,
+    "leadingQuiet": 0.09866666666666667,
+    "trailingQuiet": 0.5296666666666852,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "baltern_cliffs",
+    "duration": 142.88979166666667,
+    "channels": 2,
+    "rms": 0.1932850182261666,
+    "peak": 0.9758133888244629,
+    "leadingQuiet": 0.104,
+    "trailingQuiet": 0.8791249999999877,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "baltern_quarry",
+    "duration": 158.641625,
+    "channels": 2,
+    "rms": 0.19277150541817592,
+    "peak": 0.9687454700469971,
+    "leadingQuiet": 0.09066666666666667,
+    "trailingQuiet": 0.5002916666666692,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "blue_forest_edge",
+    "duration": 155.5069375,
+    "channels": 2,
+    "rms": 0.19173463133893281,
+    "peak": 0.9818546175956726,
+    "leadingQuiet": 0.08266666666666667,
+    "trailingQuiet": 0.43493749999998954,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "blue_forest",
+    "duration": 151.95427083333334,
+    "channels": 2,
+    "rms": 0.1953486429149379,
+    "peak": 0.9625245332717896,
+    "leadingQuiet": 0.088,
+    "trailingQuiet": 0.684937500000018,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "blue_forest_heart",
+    "duration": 115.017125,
+    "channels": 2,
+    "rms": 0.18583296662960266,
+    "peak": 0.8932172656059265,
+    "leadingQuiet": 0.09066666666666667,
+    "trailingQuiet": 0.1717916666666639,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "lumiere_hills",
+    "duration": 144.40489583333334,
+    "channels": 2,
+    "rms": 0.19441076357862233,
+    "peak": 0.99870765209198,
+    "leadingQuiet": 0.09066666666666667,
+    "trailingQuiet": 0.7942291666666677,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "lumiere_ruins_field",
+    "duration": 147.53958333333333,
+    "channels": 2,
+    "rms": 0.19305954789203,
+    "peak": 0.9872560501098633,
+    "leadingQuiet": 0.08,
+    "trailingQuiet": 0.28624999999999545,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "gravel_border",
+    "duration": 149.47264583333333,
+    "channels": 2,
+    "rms": 0.1959496713864327,
+    "peak": 0.9889014959335327,
+    "leadingQuiet": 0.088,
+    "trailingQuiet": 0.1713124999999991,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "lost_villages",
+    "duration": 149.0285625,
+    "channels": 2,
+    "rms": 0.18292967521770592,
+    "peak": 0.9831680059432983,
+    "leadingQuiet": 0.096,
+    "trailingQuiet": 0.02589583333332257,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "zirat_outskirts",
+    "duration": 171.07591666666667,
+    "channels": 2,
+    "rms": 0.1925993683656906,
+    "peak": 0.9794178009033203,
+    "leadingQuiet": 0.05333333333333334,
+    "trailingQuiet": 0.11591666666666356,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "zirat_wastes",
+    "duration": 172.40814583333332,
+    "channels": 2,
+    "rms": 0.19166918751673967,
+    "peak": 0.9949826002120972,
+    "leadingQuiet": 0.09333333333333334,
+    "trailingQuiet": 0.4001458333333119,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "zirat_abyss_rim",
+    "duration": 154.1485625,
+    "channels": 2,
+    "rms": 0.19182578870211928,
+    "peak": 0.9821834564208984,
+    "leadingQuiet": 0.104,
+    "trailingQuiet": 0.36456250000000523,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "abyss_bridge",
+    "duration": 145.841625,
+    "channels": 2,
+    "rms": 0.18897368777144158,
+    "peak": 0.9781535267829895,
+    "leadingQuiet": 0.19733333333333333,
+    "trailingQuiet": 0.1856249999999875,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "silvern_fields",
+    "duration": 147.40897916666665,
+    "channels": 2,
+    "rms": 0.19480672826418916,
+    "peak": 0.9757405519485474,
+    "leadingQuiet": 0.13066666666666665,
+    "trailingQuiet": 0.502312499999988,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "silvern_woods",
+    "duration": 153.15591666666666,
+    "channels": 2,
+    "rms": 0.19724645237929145,
+    "peak": 0.97825688123703,
+    "leadingQuiet": 0.08533333333333333,
+    "trailingQuiet": 0.689249999999987,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "silvern_marsh",
+    "duration": 165.82529166666666,
+    "channels": 2,
+    "rms": 0.19232292519390612,
+    "peak": 0.9772605299949646,
+    "leadingQuiet": 0.09333333333333334,
+    "trailingQuiet": 0.6386249999999905,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "berg_canyon",
+    "duration": 174.99427083333333,
+    "channels": 2,
+    "rms": 0.19515884855735538,
+    "peak": 0.987835705280304,
+    "leadingQuiet": 0.05333333333333334,
+    "trailingQuiet": 0.7596041666666622,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "berg_highland",
+    "duration": 143.41222916666666,
+    "channels": 2,
+    "rms": 0.19437578479371054,
+    "peak": 0.9862409830093384,
+    "leadingQuiet": 0.08533333333333333,
+    "trailingQuiet": 0.29756249999999795,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "berg_burned",
+    "duration": 149.13304166666666,
+    "channels": 2,
+    "rms": 0.18666430472602893,
+    "peak": 0.9866013526916504,
+    "leadingQuiet": 0.09333333333333334,
+    "trailingQuiet": 0.07437500000000341,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "trade_road",
+    "duration": 146.4685625,
+    "channels": 2,
+    "rms": 0.19445516351454203,
+    "peak": 0.9834727048873901,
+    "leadingQuiet": 0.43733333333333335,
+    "trailingQuiet": 0.191229166666659,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "marseon_outskirts",
+    "duration": 152.97304166666666,
+    "channels": 2,
+    "rms": 0.19308182106454494,
+    "peak": 0.982358992099762,
+    "leadingQuiet": 0.09066666666666667,
+    "trailingQuiet": 1.0610416666666538,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "crimson_forest",
+    "duration": 144.30039583333334,
+    "channels": 2,
+    "rms": 0.1900255462036209,
+    "peak": 0.981813907623291,
+    "leadingQuiet": 0.18133333333333335,
+    "trailingQuiet": 0.16972916666668425,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "crimson_heart",
+    "duration": 153.20814583333333,
+    "channels": 2,
+    "rms": 0.19403215184904876,
+    "peak": 0.9871093034744263,
+    "leadingQuiet": 0.08533333333333333,
+    "trailingQuiet": 0.4108124999999916,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "baltazar_mines",
+    "duration": 149.1069375,
+    "channels": 2,
+    "rms": 0.1938066826298302,
+    "peak": 0.9919966459274292,
+    "leadingQuiet": 0.088,
+    "trailingQuiet": 0.2909374999999841,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "royal_tomb",
+    "duration": 167.94120833333332,
+    "channels": 2,
+    "rms": 0.18953757556272138,
+    "peak": 0.9796203374862671,
+    "leadingQuiet": 0.11733333333333333,
+    "trailingQuiet": 0.3732083333333094,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "north_canyon",
+    "duration": 152.293875,
+    "channels": 2,
+    "rms": 0.1914419206462884,
+    "peak": 0.9983898401260376,
+    "leadingQuiet": 0.05333333333333334,
+    "trailingQuiet": 0.18720833333335918,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "kreutz_front",
+    "duration": 157.361625,
+    "channels": 2,
+    "rms": 0.19224029947955887,
+    "peak": 0.9945275187492371,
+    "leadingQuiet": 0.09333333333333334,
+    "trailingQuiet": 0.09762499999999363,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "kreutz_snowfield",
+    "duration": 148.9501875,
+    "channels": 2,
+    "rms": 0.19236541351810124,
+    "peak": 0.9778825044631958,
+    "leadingQuiet": 0.08266666666666667,
+    "trailingQuiet": 0.5821875000000034,
+    "musicBuffers": 1
+  },
+  {
+    "zone": "frozen_lake",
+    "duration": 170.1355,
+    "channels": 2,
+    "rms": 0.1847113531398718,
+    "peak": 0.9772536754608154,
+    "leadingQuiet": 0.08533333333333333,
+    "trailingQuiet": 0.04216666666667379,
+    "musicBuffers": 1
+  }
+]

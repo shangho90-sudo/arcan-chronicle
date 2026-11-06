@@ -52,3 +52,32 @@ a.buf = async () => { now += 301; return {}; };
 await a.sfx('hit');
 assert.equal(starts, before, 'stale downloads not played late');
 console.log('audio: asset headers, skill mapping, caching, normalization, throttling, voice limits, mute and stale playback passed');
+
+// Region switches may complete out of order, fail, or return to the playing zone.
+const music = new sandbox.Audio(), pending = new Map(), played = [];
+music.ctx = { createBufferSource: () => {
+  const s = { connect() {}, disconnect() {}, stop() { s.stopped = true; }, start() { played.push(s); } };
+  return s;
+} };
+music.gMusic = {};
+music.buf = name => { const p = new Promise(resolve => pending.set(name, resolve)); music.buffers.set(name, p); return p; };
+let task = music.playMusic('bgm_a'); pending.get('bgm_a')({}); await task;
+assert.equal(music.curName, 'bgm_a'); assert.equal(music.cur.loop, true);
+const initial = music.cur;
+task = music.playMusic('bgm_b');
+assert.ok(!initial.stopped, 'old track continues during download');
+await music.playMusic('bgm_a');
+pending.get('bgm_b')({}); await task;
+assert.equal(music.cur, initial, 'returning to current region cancels obsolete request');
+const slow = music.playMusic('bgm_slow');
+const fast = music.playMusic('bgm_fast');
+pending.get('bgm_fast')({}); await fast;
+pending.get('bgm_slow')({}); await slow;
+assert.equal(music.curName, 'bgm_fast', 'latest zone wins');
+assert.ok(initial.stopped, 'previous source stopped');
+assert.equal(music.buffers.size, 1, 'old decoded music evicted');
+task = music.playMusic('bgm_retry'); pending.get('bgm_retry')(null); await task;
+assert.equal(music.curName, 'bgm_fast', 'failed download keeps current music');
+task = music.playMusic('bgm_retry'); pending.get('bgm_retry')({}); await task;
+assert.equal(music.curName, 'bgm_retry', 'failed region can retry');
+console.log('music: looping, out-of-order region loads, return travel, failure retry and cache eviction passed');

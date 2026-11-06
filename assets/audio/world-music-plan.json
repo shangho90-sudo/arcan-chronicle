@@ -1,0 +1,314 @@
+{
+  "provider": "Runway",
+  "date": "2026-11-07",
+  "tracks": [
+    {
+      "zone": "kairion_capital",
+      "title": "검은 깃발 아래의 햇살",
+      "file": "bgm_arcan_kairion_capital.mp3",
+      "description": "Regal capital with high stone walls, palace and market under black banners. Warm oboe melody, chamber strings, acoustic guitar, subtle French horn; 94 BPM, D major with wistful B minor bridge, stately 4/4 promenade, welcoming but a shadow of royal intrigue.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Regal capital with high stone walls, palace and market under black banners. Warm oboe melody, chamber strings, acoustic guitar, subtle French horn; 94 BPM, D major with wistful B minor bridge, stately 4/4 promenade, welcoming but a shadow of royal intrigue. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "baltern",
+      "title": "푸른 깃발의 고향",
+      "file": "bgm_arcan_baltern.mp3",
+      "description": "Mountain duchy with blue banners and old knights. Celtic flute, fiddle, bouzouki and brushed frame drum; 106 BPM G major, lilting 6/8 folk dance, sturdy and cozy, distinctive descending fiddle refrain.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Mountain duchy with blue banners and old knights. Celtic flute, fiddle, bouzouki and brushed frame drum; 106 BPM G major, lilting 6/8 folk dance, sturdy and cozy, distinctive descending fiddle refrain. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "lumiere",
+      "title": "수정빛 기도",
+      "file": "bgm_arcan_lumiere.mp3",
+      "description": "Luminous white temple and sanctuary, sacred crystal and gentle mystery. Solo harp, celesta, soft organ and lyrical solo violin; 72 BPM F major, floating 3/4, contemplative tender hymn with a hopeful rising melody, no choir.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Luminous white temple and sanctuary, sacred crystal and gentle mystery. Solo harp, celesta, soft organ and lyrical solo violin; 72 BPM F major, floating 3/4, contemplative tender hymn with a hopeful rising melody, no choir. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "gravel",
+      "title": "국경의 등불",
+      "file": "bgm_arcan_gravel.mp3",
+      "description": "Frontier town sheltered behind red-banner walls, refugees and vigilant scouts. Nylon guitar, clarinet, cello and restrained hand percussion; 88 BPM D dorian, intimate resilient melody, warm homecoming despite unease.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Frontier town sheltered behind red-banner walls, refugees and vigilant scouts. Nylon guitar, clarinet, cello and restrained hand percussion; 88 BPM D dorian, intimate resilient melody, warm homecoming despite unease. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "silvern",
+      "title": "초록 장터의 오후",
+      "file": "bgm_arcan_silvern.mp3",
+      "description": "Peaceful green-banner rural market estate between fields and wetlands. Accordion, recorder, pizzicato strings and fingerpicked guitar; 112 BPM C major, playful light 2/4 country dance with memorable jaunty tune.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Peaceful green-banner rural market estate between fields and wetlands. Accordion, recorder, pizzicato strings and fingerpicked guitar; 112 BPM C major, playful light 2/4 country dance with memorable jaunty tune. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "marseon",
+      "title": "향신료와 검은 비단",
+      "file": "bgm_arcan_marseon.mp3",
+      "description": "Bustling eastern trade town with caravans and black flags. Oud, hammered dulcimer, melodic violin, warm electric bass and light darbuka; 116 BPM A harmonic minor, syncopated 4/4 merchant groove, colorful and charming with intrigue.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Bustling eastern trade town with caravans and black flags. Oud, hammered dulcimer, melodic violin, warm electric bass and light darbuka; 116 BPM A harmonic minor, syncopated 4/4 merchant groove, colorful and charming with intrigue. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "baltazar",
+      "title": "붉은 왕도의 망치",
+      "file": "bgm_arcan_baltazar.mp3",
+      "description": "Proud red-banner royal city of blacksmiths and knights. Bright brass melody, marimba, string ensemble, soft metallic mallet accents and snare brushes; 102 BPM E flat major, confident 4/4 artisan march, noble yet friendly.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Proud red-banner royal city of blacksmiths and knights. Bright brass melody, marimba, string ensemble, soft metallic mallet accents and snare brushes; 102 BPM E flat major, confident 4/4 artisan march, noble yet friendly. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "kreutz_fort",
+      "title": "눈보라 속의 성벽",
+      "file": "bgm_arcan_kreutz_fort.mp3",
+      "description": "Snowy imperial border fortress, tall black-banner walls, shelter amid cold tension. Low French horns, piano, bassoon, muted strings and restrained military snare; 84 BPM C minor, dignified measured 4/4, stoic protective melody.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Snowy imperial border fortress, tall black-banner walls, shelter amid cold tension. Low French horns, piano, bassoon, muted strings and restrained military snare; 84 BPM C minor, dignified measured 4/4, stoic protective melody. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "capital_road",
+      "title": "첫 여행의 발걸음",
+      "file": "bgm_arcan_capital_road.mp3",
+      "description": "Sunlit beginner road leading to a distant royal capital, green meadows and first adventures. Acoustic guitar strumming, pan flute, bright piano and soft pop drums; 118 BPM G major, buoyant 4/4, fresh optimistic catchy melody.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Sunlit beginner road leading to a distant royal capital, green meadows and first adventures. Acoustic guitar strumming, pan flute, bright piano and soft pop drums; 118 BPM G major, buoyant 4/4, fresh optimistic catchy melody. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "kairion_hunt",
+      "title": "나뭇잎 숨바꼭질",
+      "file": "bgm_arcan_kairion_hunt.mp3",
+      "description": "Lively hunting woodland with playful wildlife and dappled sunlight. Clarinet lead, pizzicato strings, marimba and wooden percussion; 124 BPM F major, nimble 6/8, mischievous call-and-response melody.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Lively hunting woodland with playful wildlife and dappled sunlight. Clarinet lead, pizzicato strings, marimba and wooden percussion; 124 BPM F major, nimble 6/8, mischievous call-and-response melody. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "kairion_hills",
+      "title": "바람이 그린 능선",
+      "file": "bgm_arcan_kairion_hills.mp3",
+      "description": "Rolling grassy hills, broad blue skies and distant castle towers. Soprano recorder, nylon guitar, brushed drums and airy strings; 98 BPM A major, breezy 3/4, wide soaring lyrical phrase.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Rolling grassy hills, broad blue skies and distant castle towers. Soprano recorder, nylon guitar, brushed drums and airy strings; 98 BPM A major, breezy 3/4, wide soaring lyrical phrase. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "capital_plain",
+      "title": "왕도 너머의 지평선",
+      "file": "bgm_arcan_capital_plain.mp3",
+      "description": "Wide plain outside the capital where adventure becomes dangerous. Violin melody, acoustic piano, round synth bass and light driving drums; 120 BPM E dorian, spacious 4/4, adventurous hope tinged with urgency.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Wide plain outside the capital where adventure becomes dangerous. Violin melody, acoustic piano, round synth bass and light driving drums; 120 BPM E dorian, spacious 4/4, adventurous hope tinged with urgency. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "broken_bridge",
+      "title": "끊어진 다리의 물결",
+      "file": "bgm_arcan_broken_bridge.mp3",
+      "description": "Ruined bridge beside a flowing river, scattered soldiers and memories. Electric piano, plucked harp, solo cello and restrained trip-hop percussion; 86 BPM B minor, flowing 4/4, wistful broken melodic phrases with quiet determination.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Ruined bridge beside a flowing river, scattered soldiers and memories. Electric piano, plucked harp, solo cello and restrained trip-hop percussion; 86 BPM B minor, flowing 4/4, wistful broken melodic phrases with quiet determination. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "baltern_pass",
+      "title": "구름을 넘는 고갯길",
+      "file": "bgm_arcan_baltern_pass.mp3",
+      "description": "Rocky mountain pass with ram herds and hawks, ascent into open sky. Tin whistle, plucked bouzouki, warm bass and frame drum; 110 BPM D mixolydian, climbing 6/8, adventurous upward melodic sequence.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Rocky mountain pass with ram herds and hawks, ascent into open sky. Tin whistle, plucked bouzouki, warm bass and frame drum; 110 BPM D mixolydian, climbing 6/8, adventurous upward melodic sequence. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "baltern_cliffs",
+      "title": "매의 날개 아래",
+      "file": "bgm_arcan_baltern_cliffs.mp3",
+      "description": "Narrow dramatic cliff paths with soaring hawks and deep valleys. Solo violin, airy flute, plucked zither and soft toms; 100 BPM F sharp minor, swaying 3/4, suspended harmonies and sweeping melody, no loud peaks.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Narrow dramatic cliff paths with soaring hawks and deep valleys. Solo violin, airy flute, plucked zither and soft toms; 100 BPM F sharp minor, swaying 3/4, suspended harmonies and sweeping melody, no loud peaks. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "baltern_quarry",
+      "title": "돌에 새긴 발자국",
+      "file": "bgm_arcan_baltern_quarry.mp3",
+      "description": "Abandoned quarry with stone spirits and old mining tracks. Bass clarinet, wooden marimba, muted guitar and low hand drums; 104 BPM C dorian, earthy syncopated 4/4, curious sturdy motif and gentle cavern resonance.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Abandoned quarry with stone spirits and old mining tracks. Bass clarinet, wooden marimba, muted guitar and low hand drums; 104 BPM C dorian, earthy syncopated 4/4, curious sturdy motif and gentle cavern resonance. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "blue_forest_edge",
+      "title": "푸른 잎의 초대",
+      "file": "bgm_arcan_blue_forest_edge.mp3",
+      "description": "Entrance to an enchanted blue forest, luminous jelly creatures and drifting moths. Music-box celesta, flute, soft Rhodes piano and subtle brushed breakbeat; 96 BPM E major, sparkling 4/4, inviting curious melody.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Entrance to an enchanted blue forest, luminous jelly creatures and drifting moths. Music-box celesta, flute, soft Rhodes piano and subtle brushed breakbeat; 96 BPM E major, sparkling 4/4, inviting curious melody. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "blue_forest",
+      "title": "환영 사이의 춤",
+      "file": "bgm_arcan_blue_forest.mp3",
+      "description": "Illusory blue forest filled with phantom foxes, moonlit foliage and shimmering paths. Glassy synth arpeggios, lyrical oboe, harp and gentle electronic percussion; 108 BPM F sharp dorian, dreamy 6/8, memorable mysterious dancing theme.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Illusory blue forest filled with phantom foxes, moonlit foliage and shimmering paths. Glassy synth arpeggios, lyrical oboe, harp and gentle electronic percussion; 108 BPM F sharp dorian, dreamy 6/8, memorable mysterious dancing theme. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "blue_forest_heart",
+      "title": "고목이 기억하는 노래",
+      "file": "bgm_arcan_blue_forest_heart.mp3",
+      "description": "Ancient sacred trees deep in the blue forest, spirit guardians and ghostly spiders. Low cello, breathy wooden flute, bell-like kalimba and soft evolving pads; 76 BPM B dorian, spacious 5/4, ancient reverent melody, restrained unease.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Ancient sacred trees deep in the blue forest, spirit guardians and ghostly spiders. Low cello, breathy wooden flute, bell-like kalimba and soft evolving pads; 76 BPM B dorian, spacious 5/4, ancient reverent melody, restrained unease. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "lumiere_hills",
+      "title": "순례자의 작은 종",
+      "file": "bgm_arcan_lumiere_hills.mp3",
+      "description": "Sunny hills on a pilgrimage road approaching a luminous temple. Fingerstyle guitar, English horn, soft handbells and light strings; 92 BPM B flat major, gentle 6/8 walking rhythm, pure hopeful memorable tune.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Sunny hills on a pilgrimage road approaching a luminous temple. Fingerstyle guitar, English horn, soft handbells and light strings; 92 BPM B flat major, gentle 6/8 walking rhythm, pure hopeful memorable tune. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "lumiere_ruins_field",
+      "title": "재 속에 남은 기도",
+      "file": "bgm_arcan_lumiere_ruins_field.mp3",
+      "description": "Burned pilgrimage sanctuary, ash and fallen sacred stones. Solo piano, mournful viola, distant soft organ and sparse pulse percussion; 78 BPM F minor, 4/4, elegiac sacred melody with a small bright hopeful bridge.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Burned pilgrimage sanctuary, ash and fallen sacred stones. Solo piano, mournful viola, distant soft organ and sparse pulse percussion; 78 BPM F minor, 4/4, elegiac sacred melody with a small bright hopeful bridge. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "gravel_border",
+      "title": "경계석의 맹세",
+      "file": "bgm_arcan_gravel_border.mp3",
+      "description": "Windswept frontier highlands, scouts watching dangerous borders. Dulcimer, low whistle, acoustic bass and measured frame drum; 114 BPM G dorian, purposeful 4/4 travel rhythm, vigilant but tuneful.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Windswept frontier highlands, scouts watching dangerous borders. Dulcimer, low whistle, acoustic bass and measured frame drum; 114 BPM G dorian, purposeful 4/4 travel rhythm, vigilant but tuneful. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "lost_villages",
+      "title": "돌아오지 않는 저녁",
+      "file": "bgm_arcan_lost_villages.mp3",
+      "description": "Empty village foundations and drifting wraiths, memories of everyday life. Detuned soft music box, intimate upright piano, cello and very sparse brushes; 70 BPM E minor, melancholy 3/4 waltz, haunting simple lullaby without horror stingers.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Empty village foundations and drifting wraiths, memories of everyday life. Detuned soft music box, intimate upright piano, cello and very sparse brushes; 70 BPM E minor, melancholy 3/4 waltz, haunting simple lullaby without horror stingers. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "zirat_outskirts",
+      "title": "먼지 속의 이정표",
+      "file": "bgm_arcan_zirat_outskirts.mp3",
+      "description": "Outer ash wasteland with scorpions and ghostly silhouettes. Low plucked oud, breathy bass flute, warm synth pad and dry hand percussion; 92 BPM D phrygian, sparse 4/4, searching wandering melody and quiet danger.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Outer ash wasteland with scorpions and ghostly silhouettes. Low plucked oud, breathy bass flute, warm synth pad and dry hand percussion; 92 BPM D phrygian, sparse 4/4, searching wandering melody and quiet danger. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "zirat_wastes",
+      "title": "회색 하늘의 행군",
+      "file": "bgm_arcan_zirat_wastes.mp3",
+      "description": "Vast late-game grey wasteland with ash drakes and ancient stone guardians. Muted electric guitar, bassoon, slow string ostinato and low electronic drums; 104 BPM C sharp minor, steady 4/4, desolate melodic resolve, restrained dark adventure.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Vast late-game grey wasteland with ash drakes and ancient stone guardians. Muted electric guitar, bassoon, slow string ostinato and low electronic drums; 104 BPM C sharp minor, steady 4/4, desolate melodic resolve, restrained dark adventure. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "zirat_abyss_rim",
+      "title": "별빛이 닿지 않는 곳",
+      "file": "bgm_arcan_zirat_abyss_rim.mp3",
+      "description": "Rim of a violet abyss, glowing fungal trees and void creatures. Deep rounded synth pulse, glass harmonica texture, solo cello and irregular gentle mallet pattern; 82 BPM G sharp minor, 5/4, uncanny lyrical motif suspended over deep space.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Rim of a violet abyss, glowing fungal trees and void creatures. Deep rounded synth pulse, glass harmonica texture, solo cello and irregular gentle mallet pattern; 82 BPM G sharp minor, 5/4, uncanny lyrical motif suspended over deep space. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "abyss_bridge",
+      "title": "검은 다리의 끝",
+      "file": "bgm_arcan_abyss_bridge.mp3",
+      "description": "Narrow black bridge across a bottomless abyss, final dangerous crossing. Low strings, restrained horns, metallic dulcimer and crisp low tom rhythm; 126 BPM D minor, driving 7/8, tense determined melody, exploration intensity rather than boss climax.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Narrow black bridge across a bottomless abyss, final dangerous crossing. Low strings, restrained horns, metallic dulcimer and crisp low tom rhythm; 126 BPM D minor, driving 7/8, tense determined melody, exploration intensity rather than boss climax. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "silvern_fields",
+      "title": "들꽃의 인사",
+      "file": "bgm_arcan_silvern_fields.mp3",
+      "description": "Golden green rural fields full of flowers and small magical lights. Ocarina, acoustic guitar, playful piano, upright bass and soft shaker; 116 BPM F major, cheerful 4/4 pastoral melody with jazz-pop harmony.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Golden green rural fields full of flowers and small magical lights. Ocarina, acoustic guitar, playful piano, upright bass and soft shaker; 116 BPM F major, cheerful 4/4 pastoral melody with jazz-pop harmony. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "silvern_woods",
+      "title": "남쪽 숲의 낮잠",
+      "file": "bgm_arcan_silvern_woods.mp3",
+      "description": "Quiet southern woodland, owls and shady paths. Bass clarinet, warm vibraphone, fingerpicked guitar and brushed jazz drums; 90 BPM A dorian, relaxed 6/8, mellow curious forest tune.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Quiet southern woodland, owls and shady paths. Bass clarinet, warm vibraphone, fingerpicked guitar and brushed jazz drums; 90 BPM A dorian, relaxed 6/8, mellow curious forest tune. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "silvern_marsh",
+      "title": "도깨비불 왈츠",
+      "file": "bgm_arcan_silvern_marsh.mp3",
+      "description": "Misty wetland with blue will-o-wisps and ponds reflecting dusk. Rhodes piano, hollow marimba, airy flute and soft liquid synth bass; 84 BPM C minor, enchanted 3/4 waltz, playful eerie melodic turns.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Misty wetland with blue will-o-wisps and ponds reflecting dusk. Rhodes piano, hollow marimba, airy flute and soft liquid synth bass; 84 BPM C minor, enchanted 3/4 waltz, playful eerie melodic turns. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "berg_canyon",
+      "title": "붉은 바위의 메아리",
+      "file": "bgm_arcan_berg_canyon.mp3",
+      "description": "Warm rugged canyon with giant rams, scorpions and ochre cliffs. Nylon guitar, panpipes, wooden xylophone and hand drums; 122 BPM E phrygian, lively 6/8, rugged adventurous melody with echoing responses.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Warm rugged canyon with giant rams, scorpions and ochre cliffs. Nylon guitar, panpipes, wooden xylophone and hand drums; 122 BPM E phrygian, lively 6/8, rugged adventurous melody with echoing responses. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "berg_highland",
+      "title": "높은 땅의 자유",
+      "file": "bgm_arcan_berg_highland.mp3",
+      "description": "Open golden highlands, distant ruins and broad mountain skies. French horn, violin, folk guitar and light orchestral percussion; 108 BPM D major, expansive 4/4, uplifting long melodic arcs.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Open golden highlands, distant ruins and broad mountain skies. French horn, violin, folk guitar and light orchestral percussion; 108 BPM D major, expansive 4/4, uplifting long melodic arcs. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "berg_burned",
+      "title": "잿더미의 작은 꽃",
+      "file": "bgm_arcan_berg_burned.mp3",
+      "description": "Burned mountain village with broken homes and wildflowers returning. Solo oboe, felt piano, cello pizzicato and delicate wind chimes as musical accents; 74 BPM G minor, lilting 6/8, intimate grief becoming quiet renewal.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Burned mountain village with broken homes and wildflowers returning. Solo oboe, felt piano, cello pizzicato and delicate wind chimes as musical accents; 74 BPM G minor, lilting 6/8, intimate grief becoming quiet renewal. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "trade_road",
+      "title": "동쪽으로 가는 마차",
+      "file": "bgm_arcan_trade_road.mp3",
+      "description": "Busy eastern caravan route through grasslands with danger nearby. Mandolin, accordion, pizzicato bass, handclaps and gentle drum kit; 128 BPM A major, jaunty syncopated 4/4, catchy traveling tune.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Busy eastern caravan route through grasslands with danger nearby. Mandolin, accordion, pizzicato bass, handclaps and gentle drum kit; 128 BPM A major, jaunty syncopated 4/4, catchy traveling tune. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "marseon_outskirts",
+      "title": "강바람의 흥정",
+      "file": "bgm_arcan_marseon_outskirts.mp3",
+      "description": "Riverside outskirts of a trading city, reeds and distant market silhouettes. Plucked oud, smooth soprano flute, electric piano and light bossa-style percussion; 102 BPM D dorian, relaxed 4/4, flowing urban pastoral melody.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Riverside outskirts of a trading city, reeds and distant market silhouettes. Plucked oud, smooth soprano flute, electric piano and light bossa-style percussion; 102 BPM D dorian, relaxed 4/4, flowing urban pastoral melody. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "crimson_forest",
+      "title": "붉은 잎의 비밀",
+      "file": "bgm_arcan_crimson_forest.mp3",
+      "description": "Crimson autumn forest with fire salamanders and red foxes. Violin, cimbalom, warm synth bass and lightly syncopated drums; 118 BPM A minor, seductive mysterious 6/8, vivid memorable folk melody.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Crimson autumn forest with fire salamanders and red foxes. Violin, cimbalom, warm synth bass and lightly syncopated drums; 118 BPM A minor, seductive mysterious 6/8, vivid memorable folk melody. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "crimson_heart",
+      "title": "핏빛 수정의 심장",
+      "file": "bgm_arcan_crimson_heart.mp3",
+      "description": "Deep red forest with luminous crystals and a great crimson guardian. Resonant glass bells, low cello, harp arpeggios and restrained pulsing percussion; 94 BPM F minor, ritual 5/4, beautiful ominous melody and rich dark harmonies.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Deep red forest with luminous crystals and a great crimson guardian. Resonant glass bells, low cello, harp arpeggios and restrained pulsing percussion; 94 BPM F minor, ritual 5/4, beautiful ominous melody and rich dark harmonies. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "baltazar_mines",
+      "title": "지하를 밝히는 불꽃",
+      "file": "bgm_arcan_baltazar_mines.mp3",
+      "description": "Mountain mining route with stone golems, lava creatures and old forge tunnels. Marimba, muted brass, plucked low strings and small metallic percussion; 112 BPM B minor, mechanical but playful 4/4, working rhythm and adventurous tune.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Mountain mining route with stone golems, lava creatures and old forge tunnels. Marimba, muted brass, plucked low strings and small metallic percussion; 112 BPM B minor, mechanical but playful 4/4, working rhythm and adventurous tune. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "royal_tomb",
+      "title": "잠든 왕들의 정원",
+      "file": "bgm_arcan_royal_tomb.mp3",
+      "description": "Royal burial grounds with weathered statues and enchanted armor. Harpsichord, solo cello, quiet organ and harp; 68 BPM D minor, stately 3/4 baroque elegy, reverent noble melody, no voices.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Royal burial grounds with weathered statues and enchanted armor. Harpsichord, solo cello, quiet organ and harp; 68 BPM D minor, stately 3/4 baroque elegy, reverent noble melody, no voices. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "north_canyon",
+      "title": "북풍의 전령",
+      "file": "bgm_arcan_north_canyon.mp3",
+      "description": "Northern canyon frontline, cold cliffs, yetis and distant war. Low horn melody, urgent viola ostinato, dulcimer and controlled toms; 124 BPM E minor, determined 4/4, heroic but weary exploration music.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Northern canyon frontline, cold cliffs, yetis and distant war. Low horn melody, urgent viola ostinato, dulcimer and controlled toms; 124 BPM E minor, determined 4/4, heroic but weary exploration music. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "kreutz_front",
+      "title": "눈 위의 발자국",
+      "file": "bgm_arcan_kreutz_front.mp3",
+      "description": "Snow-covered imperial frontline with wolves and soldiers. Staccato chamber strings, muted trumpet, warm synth pulse and soft snare; 132 BPM F sharp minor, tight 4/4, alert marching melody, restrained dynamics.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Snow-covered imperial frontline with wolves and soldiers. Staccato chamber strings, muted trumpet, warm synth pulse and soft snare; 132 BPM F sharp minor, tight 4/4, alert marching melody, restrained dynamics. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "kreutz_snowfield",
+      "title": "새하얀 수평선",
+      "file": "bgm_arcan_kreutz_snowfield.mp3",
+      "description": "Wide pristine northern snowfield, icy wind and wandering woolly beasts. Celesta, silver flute, warm French horn and soft piano arpeggios; 88 BPM E flat major, gliding 6/8, lonely wonder with luminous hopeful melody.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Wide pristine northern snowfield, icy wind and wandering woolly beasts. Celesta, silver flute, warm French horn and soft piano arpeggios; 88 BPM E flat major, gliding 6/8, lonely wonder with luminous hopeful melody. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "frozen_lake",
+      "title": "얼음 아래의 별",
+      "file": "bgm_arcan_frozen_lake.mp3",
+      "description": "Frozen lake at night, shimmering ice and a silent ancient guardian. Solo piano, glass bells, bowed vibraphone and gentle ambient strings; 66 BPM B major, spacious 4/4, crystalline serene melody with mysterious depth.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Frozen lake at night, shimmering ice and a silent ancient guardian. Solo piano, glass bells, bowed vibraphone and gentle ambient strings; 66 BPM B major, spacious 4/4, crystalline serene melody with mysterious depth. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    },
+    {
+      "zone": "mushroom_grove",
+      "title": "보랏빛 포자의 장난",
+      "file": "bgm_arcan_mushroom_grove.mp3",
+      "description": "Purple magical mushroom grove with giant glowing caps and a mischievous mushroom guardian. Bassoon, pizzicato strings, celesta, hollow wooden percussion and subtle bouncy synth bass; 106 BPM C dorian, quirky 6/8 fairy-tale tune, mysterious and cute.",
+      "prompt": "Original instrumental background music for an early-2000s Korean fantasy MMORPG, nostalgic melodic game soundtrack blending acoustic chamber instruments, folk color, gentle jazz-pop harmony and tasteful soft synthesis. Warm, whimsical, tuneful and suitable for extended exploration. Purple magical mushroom grove with giant glowing caps and a mischievous mushroom guardian. Bassoon, pizzicato strings, celesta, hollow wooden percussion and subtle bouncy synth bass; 106 BPM C dorian, quirky 6/8 fairy-tale tune, mysterious and cute. Instrumental only: no vocals, no choir, no speech, no environmental sound effects. Compose a distinct original melody, never quote an existing game tune. Full-length cue, develop an A theme, contrasting B section and varied A return, restrained consistent loudness, melody enters promptly, no cinematic trailer booms. Loop-friendly arrangement: return near the opening harmony and texture at the end, no long silence or abrupt ending."
+    }
+  ]
+}

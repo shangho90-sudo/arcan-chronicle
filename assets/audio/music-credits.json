@@ -40,5 +40,401 @@
     "id": "7f57ea1b-8596-43fa-bff6-3dcd61f8fed7",
     "file": "bgm_arcan_dragon_ruins.mp3",
     "duration": 175.438292
+  },
+  {
+    "zone": "kairion_capital",
+    "title": "검은 깃발 아래의 햇살",
+    "provider": "Runway",
+    "id": "35db47c9-a798-4301-8aef-10b951662dfd",
+    "file": "bgm_arcan_kairion_capital.mp3",
+    "duration": 150.047292,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "baltern",
+    "title": "푸른 깃발의 고향",
+    "provider": "Runway",
+    "id": "a177b9c8-1d54-423c-8684-c81a04b48dd0",
+    "file": "bgm_arcan_baltern.mp3",
+    "duration": 180.558292,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "lumiere",
+    "title": "수정빛 기도",
+    "provider": "Runway",
+    "id": "d6d04910-7b27-4aec-9cd8-c42ef17e9f92",
+    "file": "bgm_arcan_lumiere.mp3",
+    "duration": 156.264417,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "gravel",
+    "title": "국경의 등불",
+    "provider": "Runway",
+    "id": "3610843b-5bd4-41a3-9f07-bd120ade99b4",
+    "file": "bgm_arcan_gravel.mp3",
+    "duration": 175.359958,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "silvern",
+    "title": "초록 장터의 오후",
+    "provider": "Runway",
+    "id": "98d33e16-ad2f-4fd5-ac11-e09fd951c4b0",
+    "file": "bgm_arcan_silvern.mp3",
+    "duration": 146.076667,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "marseon",
+    "title": "향신료와 검은 비단",
+    "provider": "Runway",
+    "id": "a7356e9a-547a-438c-ae3a-67c6e4fd876d",
+    "file": "bgm_arcan_marseon.mp3",
+    "duration": 148.427708,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "baltazar",
+    "title": "붉은 왕도의 망치",
+    "provider": "Runway",
+    "id": "bb3f0677-2ef8-4ac6-ae8f-a8ae215de240",
+    "file": "bgm_arcan_baltazar.mp3",
+    "duration": 153.390958,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "kreutz_fort",
+    "title": "눈보라 속의 성벽",
+    "provider": "Runway",
+    "id": "a12662e0-266b-4404-b00d-12ef8e00fe01",
+    "file": "bgm_arcan_kreutz_fort.mp3",
+    "duration": 147.147708,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "capital_road",
+    "title": "첫 여행의 발걸음",
+    "provider": "Runway",
+    "id": "8046ad2b-b6c2-4a63-921f-8c8bbfebeda4",
+    "file": "bgm_arcan_capital_road.mp3",
+    "duration": 160.940333,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "kairion_hunt",
+    "title": "나뭇잎 숨바꼭질",
+    "provider": "Runway",
+    "id": "21b97791-5058-4cce-9cc1-4cc86dbb17dc",
+    "file": "bgm_arcan_kairion_hunt.mp3",
+    "duration": 180.741167,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "kairion_hills",
+    "title": "바람이 그린 능선",
+    "provider": "Runway",
+    "id": "eca1c2e3-c812-4ec1-a6f8-81e3e2d821e5",
+    "file": "bgm_arcan_kairion_hills.mp3",
+    "duration": 146.076667,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "capital_plain",
+    "title": "왕도 너머의 지평선",
+    "provider": "Runway",
+    "id": "94c656e3-b12c-4a83-928c-27ae647d01e1",
+    "file": "bgm_arcan_capital_plain.mp3",
+    "duration": 163.996667,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "broken_bridge",
+    "title": "끊어진 다리의 물결",
+    "provider": "Runway",
+    "id": "60b8b9a4-845d-45a0-aced-3dc6675b1aed",
+    "file": "bgm_arcan_broken_bridge.mp3",
+    "duration": 156.212167,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "baltern_pass",
+    "title": "구름을 넘는 고갯길",
+    "provider": "Runway",
+    "id": "0b5e3a56-e1be-4550-9e8b-86df7215eec7",
+    "file": "bgm_arcan_baltern_pass.mp3",
+    "duration": 143.150958,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "baltern_cliffs",
+    "title": "매의 날개 아래",
+    "provider": "Runway",
+    "id": "b3fd5d5a-ff55-4be2-8405-303f1c1347a5",
+    "file": "bgm_arcan_baltern_cliffs.mp3",
+    "duration": 142.88975,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "baltern_quarry",
+    "title": "돌에 새긴 발자국",
+    "provider": "Runway",
+    "id": "5d6e2097-3c0b-40d6-a857-c726b54c61c9",
+    "file": "bgm_arcan_baltern_quarry.mp3",
+    "duration": 158.641583,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "blue_forest_edge",
+    "title": "푸른 잎의 초대",
+    "provider": "Runway",
+    "id": "57dd1f14-4fa6-414a-8505-71fa382de0d1",
+    "file": "bgm_arcan_blue_forest_edge.mp3",
+    "duration": 155.506875,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "blue_forest",
+    "title": "환영 사이의 춤",
+    "provider": "Runway",
+    "id": "d8cc0eb2-e043-41f1-ada2-c7a58c56b78a",
+    "file": "bgm_arcan_blue_forest.mp3",
+    "duration": 151.954208,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "blue_forest_heart",
+    "title": "고목이 기억하는 노래",
+    "provider": "Runway",
+    "id": "2adcb06f-465d-4821-acc2-75e27d95ea5a",
+    "file": "bgm_arcan_blue_forest_heart.mp3",
+    "duration": 115.017083,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "lumiere_hills",
+    "title": "순례자의 작은 종",
+    "provider": "Runway",
+    "id": "c3ee6386-722f-4ae5-a2d0-c10c9d7c2bfa",
+    "file": "bgm_arcan_lumiere_hills.mp3",
+    "duration": 144.404833,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "lumiere_ruins_field",
+    "title": "재 속에 남은 기도",
+    "provider": "Runway",
+    "id": "1a4ee2a5-e3d1-4a3e-ab4b-f20e19620cd6",
+    "file": "bgm_arcan_lumiere_ruins_field.mp3",
+    "duration": 147.539542,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "gravel_border",
+    "title": "경계석의 맹세",
+    "provider": "Runway",
+    "id": "811a0a59-2aea-43c1-97ca-4d2ce41c914b",
+    "file": "bgm_arcan_gravel_border.mp3",
+    "duration": 149.472583,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "lost_villages",
+    "title": "돌아오지 않는 저녁",
+    "provider": "Runway",
+    "id": "83af5b27-c83e-4dc5-80aa-71f5539433c4",
+    "file": "bgm_arcan_lost_villages.mp3",
+    "duration": 149.0285,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "zirat_outskirts",
+    "title": "먼지 속의 이정표",
+    "provider": "Runway",
+    "id": "4489cb00-1a43-4860-be79-6745d55db47d",
+    "file": "bgm_arcan_zirat_outskirts.mp3",
+    "duration": 171.075875,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "zirat_wastes",
+    "title": "회색 하늘의 행군",
+    "provider": "Runway",
+    "id": "6e680f64-35df-4b26-987e-3c535dbc85d3",
+    "file": "bgm_arcan_zirat_wastes.mp3",
+    "duration": 172.408125,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "zirat_abyss_rim",
+    "title": "별빛이 닿지 않는 곳",
+    "provider": "Runway",
+    "id": "eac15f7f-44fb-4e62-a62d-1b36439addb4",
+    "file": "bgm_arcan_zirat_abyss_rim.mp3",
+    "duration": 154.1485,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "abyss_bridge",
+    "title": "검은 다리의 끝",
+    "provider": "Runway",
+    "id": "fb463b8f-b804-43ce-b04d-ec67d8902165",
+    "file": "bgm_arcan_abyss_bridge.mp3",
+    "duration": 145.841583,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "silvern_fields",
+    "title": "들꽃의 인사",
+    "provider": "Runway",
+    "id": "5e29e334-7c02-452e-8af8-1590861da2df",
+    "file": "bgm_arcan_silvern_fields.mp3",
+    "duration": 147.408917,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "silvern_woods",
+    "title": "남쪽 숲의 낮잠",
+    "provider": "Runway",
+    "id": "0913e63e-2ee0-4544-b402-44ff9e75a191",
+    "file": "bgm_arcan_silvern_woods.mp3",
+    "duration": 153.155875,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "silvern_marsh",
+    "title": "도깨비불 왈츠",
+    "provider": "Runway",
+    "id": "cf7fb6c4-411e-414a-a1b2-fc5bf257d0f4",
+    "file": "bgm_arcan_silvern_marsh.mp3",
+    "duration": 165.82525,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "berg_canyon",
+    "title": "붉은 바위의 메아리",
+    "provider": "Runway",
+    "id": "dea21e41-7531-480c-b02c-f8a5016ac401",
+    "file": "bgm_arcan_berg_canyon.mp3",
+    "duration": 174.994208,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "berg_highland",
+    "title": "높은 땅의 자유",
+    "provider": "Runway",
+    "id": "2c0adb16-31e2-4647-92c3-e27186667937",
+    "file": "bgm_arcan_berg_highland.mp3",
+    "duration": 143.412167,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "berg_burned",
+    "title": "잿더미의 작은 꽃",
+    "provider": "Runway",
+    "id": "2c9a8f70-b3b5-412c-bc91-8e106def4c42",
+    "file": "bgm_arcan_berg_burned.mp3",
+    "duration": 149.133,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "trade_road",
+    "title": "동쪽으로 가는 마차",
+    "provider": "Runway",
+    "id": "8ef4f27b-5a53-4ada-8cc6-7c8f2dacbf8f",
+    "file": "bgm_arcan_trade_road.mp3",
+    "duration": 146.4685,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "marseon_outskirts",
+    "title": "강바람의 흥정",
+    "provider": "Runway",
+    "id": "fe9537d5-d8c4-45f0-ba11-1559213eba6b",
+    "file": "bgm_arcan_marseon_outskirts.mp3",
+    "duration": 152.973,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "crimson_forest",
+    "title": "붉은 잎의 비밀",
+    "provider": "Runway",
+    "id": "0cc617d8-ed39-4d23-aaaf-b39fefaf1e13",
+    "file": "bgm_arcan_crimson_forest.mp3",
+    "duration": 144.300333,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "crimson_heart",
+    "title": "핏빛 수정의 심장",
+    "provider": "Runway",
+    "id": "cd8add61-d05a-46ad-9b09-b1bbb26027df",
+    "file": "bgm_arcan_crimson_heart.mp3",
+    "duration": 153.208125,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "baltazar_mines",
+    "title": "지하를 밝히는 불꽃",
+    "provider": "Runway",
+    "id": "49243632-8e3d-481d-9e5e-a0ce40f5164b",
+    "file": "bgm_arcan_baltazar_mines.mp3",
+    "duration": 149.106875,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "royal_tomb",
+    "title": "잠든 왕들의 정원",
+    "provider": "Runway",
+    "id": "e5da82f0-d969-470b-a349-80df9edcfae7",
+    "file": "bgm_arcan_royal_tomb.mp3",
+    "duration": 167.941167,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "north_canyon",
+    "title": "북풍의 전령",
+    "provider": "Runway",
+    "id": "bc85dbdf-688b-4d2f-8958-9bbb9b89a41f",
+    "file": "bgm_arcan_north_canyon.mp3",
+    "duration": 152.293833,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "kreutz_front",
+    "title": "눈 위의 발자국",
+    "provider": "Runway",
+    "id": "2ec37507-2fef-403a-b1df-76a375da652e",
+    "file": "bgm_arcan_kreutz_front.mp3",
+    "duration": 157.361583,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "kreutz_snowfield",
+    "title": "새하얀 수평선",
+    "provider": "Runway",
+    "id": "08344a14-cbf4-47b0-a39f-1bdfa87eec5e",
+    "file": "bgm_arcan_kreutz_snowfield.mp3",
+    "duration": 148.950167,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "frozen_lake",
+    "title": "얼음 아래의 별",
+    "provider": "Runway",
+    "id": "bc289326-4225-4543-9e72-6640a09c4ff7",
+    "file": "bgm_arcan_frozen_lake.mp3",
+    "duration": 170.135458,
+    "generatedOn": "2026-11-07"
+  },
+  {
+    "zone": "mushroom_grove",
+    "title": "보랏빛 포자의 장난",
+    "provider": "Runway",
+    "id": "7488ea14-f57f-4e51-89e1-f923e556d24e",
+    "file": "bgm_arcan_mushroom_grove.mp3",
+    "duration": 147.173833,
+    "generatedOn": "2026-11-07"
   }
 ]

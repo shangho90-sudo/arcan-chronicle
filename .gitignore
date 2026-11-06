@@ -6,6 +6,7 @@ node_modules/
 .tripo/
 *.key
 .env
+.music-downloads.json
 
 # Blender pipeline outputs (regenerate: tools/blender/paint.py, assets.py)
 tools/blender/out/

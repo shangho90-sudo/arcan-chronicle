@@ -132,10 +132,13 @@ export class Audio {
   }
   async playMusic(name, force) {
     this.wantMusic = name;
-    if (!this.ctx || (!force && name === this.curName)) return;
-    this.curName = name;
-    if (this.cur) { try { this.cur.stop(); } catch (e) { } this.cur = null; }
-    const b = await this.buf(name); if (!b || this.curName !== name) return;
-    const s = this.ctx.createBufferSource(); s.buffer = b; s.loop = true; s.connect(this.gMusic); s.start(); this.cur = s;
+    const request = this.musicRequest = (this.musicRequest || 0) + 1;
+    if (!this.ctx || !name || (!force && name === this.curName && this.cur)) return;
+    // Keep the current track playing while the next region downloads. Failed loads can retry.
+    const b = await this.buf(name); if (!b || this.musicRequest !== request) return;
+    if (this.cur) { try { this.cur.stop(); } catch (e) { } this.cur.disconnect(); }
+    const s = this.ctx.createBufferSource(); s.buffer = b; s.loop = true; s.connect(this.gMusic); s.start(); this.cur = s; this.curName = name;
+    // Forty-nine full-length region scores must not accumulate as decoded PCM in memory.
+    for (const key of this.buffers.keys()) if (key.startsWith('bgm_') && key !== name) this.buffers.delete(key);
   }
 }

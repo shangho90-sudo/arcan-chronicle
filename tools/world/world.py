@@ -10,12 +10,38 @@ Writes
   assets/data/npcs.json         story NPCs (existing sheets, own names / lines; one merchant per town)
   js/creature.js                CREATURES entries for the variants (tinted existing models), between WORLD markers
 Deterministic (seeded per zone id). Re-runnable: replaces everything it generated before.
-Usage: python3 tools/world/world.py [--write]   then  node tools/forest/check_nav.mjs all"""
+Usage: python3 tools/world/world.py [--write]   then  node tools/forest/check_nav.mjs all
+Music only: python3 tools/world/world.py --music-only (preserves all geometry)."""
 import json, math, os, random, re, sys, hashlib, copy
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
 D = lambda *p: os.path.join(ROOT, *p)
 sys.path.insert(0, D('tools', 'zones'))
 from scale_fields import build_mesh, seg_dist   # zone mesh (terrain + water discs) from the data
+
+# Region music is authored separately so regenerating geography preserves each score.
+MUSIC_PLAN = json.load(open(D('assets', 'audio', 'world-music-plan.json'), encoding='utf-8'))
+REGION_MUSIC = {t['zone']: os.path.splitext(t['file'])[0] for t in MUSIC_PLAN['tracks']}
+
+def write_music_only():
+    """Update only bgm fields; preserve generated meshes, props, and formatting."""
+    path = D('assets', 'data', 'zones.json')
+    with open(path, encoding='utf-8') as f: source = f.read()
+    zones = json.loads(source)['zones']
+    for z in zones:
+        if z['id'] not in REGION_MUSIC: continue
+        bgm = REGION_MUSIC[z['id']]
+        if z.get('file'):
+            target = D('assets', 'data', z['file'])
+            with open(target, encoding='utf-8') as f: text = f.read()
+            text, n = re.subn(r'("bgm"\s*:\s*)"[^"]*"', lambda m: m[1] + json.dumps(bgm), text, count=1)
+            assert n == 1, z['id']
+            with open(target, 'w', encoding='utf-8', newline='\n') as f: f.write(text)
+        else:
+            pattern = r'("id"\s*:\s*"' + re.escape(z['id']) + r'".*?"bgm"\s*:\s*)"[^"]*"'
+            source, n = re.subn(pattern, lambda m: m[1] + json.dumps(bgm), source, count=1, flags=re.S)
+            assert n == 1, z['id']
+    with open(path, 'w', encoding='utf-8', newline='\n') as f: f.write(source)
+    print('Updated region music:', len(REGION_MUSIC))
 
 # ======================================================================== the continent (map 0..1000 x 0..760, north up)
 REGIONS = [
@@ -553,6 +579,9 @@ def link_existing(zones, M):
 
 # ======================================================================== main
 if __name__ == '__main__':
+    if '--music-only' in sys.argv:
+        write_music_only()
+        sys.exit(0)
     M = node_map()
     zones = json.load(open(D('assets', 'data', 'zones.json')))
     zones['zones'] = [z for z in zones['zones'] if not z.get('file')]
@@ -568,6 +597,8 @@ if __name__ == '__main__':
         out[f['id']] = gen_field(f, M, None)
     # every link must have a portal on both ends
     allz = {z['id']: z for z in zones['zones']}; allz.update(out)
+    for zid, bgm in REGION_MUSIC.items():
+        if zid in allz: allz[zid]['bgm'] = bgm
     for a, b in LINKS:
         assert any(p['targetZone'] == b for p in allz[a]['portals']), (a, b)
         assert any(p['targetZone'] == a for p in allz[b]['portals']), (b, a)

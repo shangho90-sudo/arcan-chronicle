@@ -62448,7 +62448,7 @@
    "id": "mushroom_grove",
    "name": "독버섯 군락지",
    "kind": "field",
-   "bgm": "bgm_arcan_forest",
+   "bgm": "bgm_arcan_mushroom_grove",
    "bounds": [
     -8.0,
     1.0,
