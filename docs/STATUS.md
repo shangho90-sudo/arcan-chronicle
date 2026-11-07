@@ -420,3 +420,8 @@
 - `model.js` `JOB_MODELS`/`playerModelCfg(gender, job)`: 약사(와 2차 양약사·한약사, jobs.json `sheet: pharmacist`)는 이 모델을 씀. 뼈대가 같아서 걷기·달리기 절차 보행, 칼/무기 휘두르기, 발 고정이 그대로 동작. 불러오기·재접속 때도 직업에 맞는 모델.
 - 변신 연출(`rewardfx.js` `JobChangeFx`, `Player.refreshLook`에서 모델이 바뀔 때만): 투명한 빛기둥 두 겹이 좁아지며 감싸고 → 하얀 빛 고치가 커져 0.95초에 몸을 새 모델로 바꿈(금빛 폭발·치유 빛) → 1.0초 천사 날개(레벨업 날개) 펼침·후광 → 1.05초 양옆에 파란 깃발 달린 금 나팔 두 개가 솟아올라 나팔 입구를 위·바깥으로 들고 1.3~2.9초 떨며 "불고", 입구에서 빛과 음표(♪)가 흘러나옴 → 3.4초쯤 사라짐. 합성 팡파르(`Audio.chime('fanfare')`: 금관 느낌 톱니파 2음 + 저역 필터, 솔-솔-솔-도 · 미-도 · 솔-높은 도, 화음).
 - 확인 도구 `tools/browser-tests/jobchange.js`(GENDER=m|f, Lv10 견습생 → 약사, 시간대별 + 걷기): 남 boy → pharmacist_m, 여 girl → pharmacist_f, 뼈 67개, 오류 없음. core 346 통과(50 생략), skills2 606 통과. 공격 모션·실제 손 플레이는 화면으로 따로 확인 안 함. 다른 직업(요리사 등)은 아직 기존 모델.
+
+### 2026-11-07 — 대장장이 1차 전직 변신 (남·여 대장장이 모델)
+- 사용자가 준 모델 2개(여: `anime_blacksmith_3d_model.glb`, 남: `blacksmith_character_3d_model.glb`, 둘 다 같은 67뼈 휴머노이드)를 `tools/models/glb_to_model.py`로 변환 → `blacksmith_f`(5,559 정점·10,741 삼각형), `blacksmith_m`(5,605·10,298). `model.js` `JOB_MODELS.blacksmith`(2차 기술자도 같은 모습).
+- 변신 연출은 약사와 같음(`JobChangeFx`: 투명 빛기둥·빛 고치·천사 날개·금 나팔·팡파르). 움직임은 기존 뼈대 그대로.
+- `jobchange.js`에 `JOB=` 추가. 확인: JOB=blacksmith 남(boy → blacksmith_m)·여(girl → blacksmith_f), 변신 중·후·걷기 화면, 오류 없음. core 346 통과(50 생략), skills2 606 통과.

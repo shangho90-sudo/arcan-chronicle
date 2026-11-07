@@ -16,26 +16,26 @@ fs.mkdirSync(OUT, { recursive: true });
   await ev(() => localStorage.clear()); await clickLabel('새 게임'); await clickLabel('모험 시작');
   await pg.waitForFunction(() => window.G && G.inWorld && !G.loading && G.skillFx, null, { timeout: 300000 });
   await pg.waitForTimeout(3000);
-  const info = await ev(async (gen) => {
+  const info = await ev(async ([gen, job]) => {
     G.frame = () => {}; document.querySelectorAll('.controls,.toasts,.questhud').forEach(e => e.style.display = 'none');
     const p = G.player; if (G.sheet.p.gender !== gen) { G.sheet.p.gender = gen; await p.attachBody(); }
     p.teleport({ x: -4, z: -14 }); p.setFacing(0.4, -1);
     G.sheet.p.level = 10; G.sheet.book.grantPoints && G.sheet.book.grantPoints(); G.sheet.recalc();
     for (let i = 0; i < 10; i++) G.step(1 / 60, false);
     G.render.setFocus({ x: p.pos.x, y: p.pos.y, z: p.pos.z }, true);
-    const before = p.body.md.cfg.file, e = G.sheet.chooseJob('pharmacist'); G.__t = 0;
+    const before = p.body.md.cfg.file, e = G.sheet.chooseJob(job); G.__t = 0;
     return { before, err: e || null };
-  }, GEN);
+  }, [GEN, process.env.JOB || 'pharmacist']);
   console.log(JSON.stringify(info));
   for (const t of TIMES) {
     await ev(async (t) => { let n = 0; while (G.__t < t - 1e-6 && n++ < 600) { G.step(1 / 60, false); if (G.reward) G.reward.update(1 / 60); if (G.skillFx) G.skillFx.update(1 / 60); G.__t += 1 / 60; if (n % 20 === 0) await new Promise(r => setTimeout(r, 0)); } G.render.render(0); }, t);
     await pg.waitForTimeout(300); await ev(() => G.render.render(0));
-    await pg.screenshot({ path: `${OUT}/job_${GEN}_${t.toFixed(2)}.png`, timeout: 600000 });
+    await pg.screenshot({ path: `${OUT}/job_${process.env.JOB || 'pharmacist'}_${GEN}_${t.toFixed(2)}.png`, timeout: 600000 });
   }
   console.log(await ev(() => JSON.stringify({ after: G.player.body.md.cfg.file, job: G.sheet.p.job, bones: G.player.body.md.bones.length })));
   // walk a little: same gait system
   await ev(async () => { const p = G.player; for (let i = 0; i < 40; i++) { G.input.stick = { x: 1, y: 0 }; G.step(1 / 60, false); } G.render.render(0); });
-  await pg.screenshot({ path: `${OUT}/job_${GEN}_walk.png`, timeout: 600000 });
+  await pg.screenshot({ path: `${OUT}/job_${process.env.JOB || 'pharmacist'}_${GEN}_walk.png`, timeout: 600000 });
   console.log(JSON.stringify(errs.slice(0, 5)));
   await b.close();
 })();
