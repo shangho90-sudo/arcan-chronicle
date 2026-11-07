@@ -430,3 +430,8 @@
 - 사용자가 준 모델 2개(남: `fantasy_character_3d_model.glb`, 여: `fantasy_painter_3d_model.glb`, 같은 67뼈 휴머노이드) → `tools/models/glb_to_model.py` → `artist_m`(5,266 정점·10,108 삼각형), `artist_f`(5,565·10,533). `model.js` `JOB_MODELS.artist`(2차 화가·음악가도 같은 모습).
 - 변신 연출은 약사·대장장이와 같음. 움직임은 기존 뼈대 그대로.
 - 확인: `JOB=artist` 남(boy → artist_m)·여(girl → artist_f) 변신 중·후·걷기 화면, 오류 없음. core 346 통과(50 생략), skills2 606 통과.
+
+### 2026-11-07 — 요리사 1차 전직 변신 (남·여 요리사 모델)
+- 사용자가 준 모델 2개(남: `chef_character_3d_model.glb`, 여: `chef_character_3d_model_1.glb`, 같은 67뼈 휴머노이드) → `tools/models/glb_to_model.py` → `cook_m`(5,345 정점·10,308 삼각형), `cook_f`(5,335·10,413). `model.js` `JOB_MODELS.cook`(2차 셰프도 같은 모습).
+- 변신 연출은 약사·대장장이·예술가와 같음. 움직임은 기존 뼈대 그대로.
+- 확인: `JOB=cook` 남(boy → cook_m)·여(girl → cook_f) 변신 중·후·걷기 화면, 오류 없음. core 346 통과(50 생략), skills2 606 통과.
