@@ -483,14 +483,19 @@ class Game {
   }
 
   // ------------------------------------------------------------------ NPCs / quests
-  questMark(npcId) {
+  /** "ready" (a quest to hand in) / "avail" (a quest to take) / "active" (in progress, turn in here) / "" — head marks + minimap */
+  questState(npcId) {
     if (!this.quests) return "";
     let ready = false, avail = false, active = false;
     for (const q of this.quests.questsFor(npcId)) {
       const st = this.quests.stateOf(q), turnIn = q.turnIn || q.giver;
       if (st === QS.Completable && turnIn === npcId) ready = true; else if (st === QS.Available) avail = true; else if (st === QS.Active && turnIn === npcId) active = true;
     }
-    return ready ? QMARK('?', '#eafff0', '#7ee09a', '#23884a', '#0c3a1c') : avail ? QMARK('!', '#fff7c4', '#ffd23a', '#d9790c', '#3a2006') : active ? '<b class="m-active">…</b>' : "";
+    return ready ? "ready" : avail ? "avail" : active ? "active" : "";
+  }
+  questMark(npcId) {
+    const st = this.questState(npcId);
+    return st === "ready" ? QMARK('?', '#eafff0', '#7ee09a', '#23884a', '#0c3a1c') : st === "avail" ? QMARK('!', '#fff7c4', '#ffd23a', '#d9790c', '#3a2006') : st === "active" ? '<b class="m-active">…</b>' : "";
   }
   interact(npc) {
     if (!npc || this.ui.current || !this.player || this.player.dead) return;

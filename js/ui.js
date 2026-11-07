@@ -190,6 +190,10 @@ export class UI {
     for (const b of h.querySelectorAll("[data-a]")) b.onclick = () => { G.audio.sfx("ui"); G.input.press({ skills: "skillWin", craft: "craftWin" }[b.dataset.a] || b.dataset.a); };
     this.h = id => h.querySelector("#" + id);
     this.minimap = new Minimap(h.querySelector("#hMap"));
+    // the minimap opens the whole-area map (click / tap, or the small zoom button on it)
+    const mm = h.querySelector(".minimap"); mm.insertAdjacentHTML("beforeend", `<button type="button" class="mmzoom" aria-label="지역 지도 크게 보기" title="지역 지도 (전체 보기)"><svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="6.5"/><path d="M15 15l5.5 5.5M7 10h6M10 7v6"/></svg></button>`);
+    const openMap = e => { e.stopPropagation(); if (G.inWorld && (!this.current || this.currentName === "areamap")) { G.audio.sfx("ui"); this.currentName === "areamap" ? this.close() : this.showAreaMap(); } };
+    h.querySelector("#hMap").addEventListener("click", openMap); mm.querySelector(".mmzoom").addEventListener("click", openMap);
     this.buildQuestHud();
   }
   updateHud() {
@@ -563,6 +567,40 @@ export class UI {
     }
     const bb = $("div", "pbtns", b);
     if (back) this.button(bb, "뒤로", "teal", back, "ui_back");
+  }
+  /** whole-area map: the current zone fitted to a big canvas, live markers (me, NPCs with green "?" for quests, warps
+   *  with destination names, monsters, boss). Wheel / pinch / +- buttons zoom (1x = whole area ... 5x), drag pans. */
+  showAreaMap() {
+    const z = G.zone; if (!z) return;
+    const b = this.open("areamap", (z.def.name || "지역") + " 지도", 1180, 900);
+    const wrap = $("div", "amwrap", b), cv = $("canvas", "amcanvas", wrap);
+    const side = $("div", "amside", wrap);
+    const view = this.amView && this.amView.zone === z.def.id ? this.amView : (this.amView = { zone: z.def.id, zoom: 1, x: 0, z: 0 });
+    const lv = z.def.level && z.def.kind !== "town" ? (Array.isArray(z.def.level) ? `권장 Lv ${z.def.level[0]}~${z.def.level[1]}` : `권장 Lv ${z.def.level}`) : "";
+    side.innerHTML = `<div class="amzoom"><button type="button" class="btn ivory" data-z="in" aria-label="확대">＋</button><button type="button" class="btn ivory" data-z="out" aria-label="축소">－</button></div>
+      <button type="button" class="btn teal" data-z="all">전체 보기</button><button type="button" class="btn teal" data-z="me">내 위치</button>
+      <div class="amlegend"><b>표시</b><span><i class="lg me"></i>나</span><span><i class="lg q">?</i>퀘스트 NPC</span><span><i class="lg npc"></i>NPC</span><span><i class="lg warp"></i>이동 장소</span><span><i class="lg mon"></i>몬스터</span>${z.boss ? '<span><i class="lg boss"></i>보스</span>' : ""}</div>
+      ${lv ? `<div class="small muted amlv">${lv}</div>` : ""}<div class="small muted amhelp">휠·두 손가락으로 확대, 끌어서 이동</div>`;
+    let M = null;
+    const clampV = () => { view.zoom = Math.max(1, Math.min(5, view.zoom)); const [x0, z0, x1, z1] = z.def.bounds, hx = (x1 - x0) / 2, hz = (z1 - z0) / 2, f = 1 - 1 / view.zoom; view.x = Math.max(-hx * f, Math.min(hx * f, view.x)); view.z = Math.max(-hz * f, Math.min(hz * f, view.z)); if (view.zoom === 1) view.x = view.z = 0; };
+    // canvas px (CSS) -> world offset from the current centre
+    const toWorld = (px, py) => { if (!M) return { x: 0, z: 0 }; const dx = px * M.dpr / M.k, dy = py * M.dpr / M.k, { ex, ez } = M, det = ex.x * ez.y - ez.x * ex.y || 1; return { x: (dx * ez.y - dy * ez.x) / det, z: (ex.x * dy - ex.y * dx) / det }; };
+    const zoomAt = (f, px = 0, py = 0) => { const a = toWorld(px, py); const z0 = view.zoom; view.zoom *= f; clampV(); const r = 1 - z0 / view.zoom; view.x += a.x * r; view.z += a.z * r; clampV(); };
+    side.onclick = e => { const t = e.target.closest("[data-z]"); if (!t) return; G.audio.sfx("ui"); const k = t.dataset.z;
+      if (k === "in") zoomAt(1.5); else if (k === "out") zoomAt(1 / 1.5); else if (k === "all") { view.zoom = 1; view.x = view.z = 0; }
+      else { const [x0, z0, x1, z1] = z.def.bounds; view.zoom = Math.max(view.zoom, 2.5); view.x = G.player.pos.x - (x0 + x1) / 2; view.z = G.player.pos.z - (z0 + z1) / 2; clampV(); } };
+    const rel = e => { const r = cv.getBoundingClientRect(), sc = cv.clientWidth / r.width || 1; return { x: (e.clientX - r.left) * sc - cv.clientWidth / 2, y: (e.clientY - r.top) * sc - cv.clientHeight / 2 }; };
+    cv.addEventListener("wheel", e => { e.preventDefault(); const q = rel(e); zoomAt(e.deltaY < 0 ? 1.2 : 1 / 1.2, q.x, q.y); }, { passive: false });
+    const pts = new Map(); let pinch = 0;
+    cv.addEventListener("pointerdown", e => { cv.setPointerCapture(e.pointerId); pts.set(e.pointerId, rel(e)); if (pts.size === 2) { const [a, c] = [...pts.values()]; pinch = Math.hypot(a.x - c.x, a.y - c.y); } });
+    cv.addEventListener("pointermove", e => {
+      if (!pts.has(e.pointerId)) return; const q = rel(e), o = pts.get(e.pointerId); pts.set(e.pointerId, q);
+      if (pts.size === 1) { const a = toWorld(q.x - o.x, q.y - o.y); view.x -= a.x; view.z -= a.z; clampV(); }
+      else if (pts.size === 2) { const [a, c] = [...pts.values()], d = Math.hypot(a.x - c.x, a.y - c.y); if (pinch > 0) zoomAt(d / pinch, (a.x + c.x) / 2, (a.y + c.y) / 2); pinch = d; }
+    });
+    const up = e => { pts.delete(e.pointerId); pinch = 0; }; cv.addEventListener("pointerup", up); cv.addEventListener("pointercancel", up);
+    const loop = () => { if (this.current !== b.closest(".window") || !cv.isConnected) return; M = this.minimap.drawFull(G, cv, view); requestAnimationFrame(loop); };
+    requestAnimationFrame(loop);
   }
   confirm(text, yes, no) {
     const pz = G.paused;                                   // a question asked from the pause / save window keeps the game paused

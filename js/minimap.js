@@ -50,40 +50,84 @@ export class Minimap {
     return (this._b = { ex, ez });
   }
 
+  /** small HUD map around the player (redrawn every 3rd frame) */
   draw(G) {
     const z = G.zone, p = G.player; if (!z || !p) return;
     if ((this.n++ % 3) && this.zoneId === z.def.id) return;
     if (this.zoneId !== z.def.id) this.build(z);
     const cv = this.c, dpr = Math.min(2, window.devicePixelRatio || 1), cw = cv.clientWidth || 180, ch = cv.clientHeight || 180;
     if (cv.width !== Math.round(cw * dpr) || cv.height !== Math.round(ch * dpr)) { cv.width = Math.round(cw * dpr); cv.height = Math.round(ch * dpr); }
-    const ctx = this.ctx, k = this.k * (cw / 180) * dpr, W = cv.width, H = cv.height, cx = W / 2, cy = H / 2;
-    const { ex, ez } = this.basis(G, p.pos), P = p.pos;
-    const to = (x, zz) => ({ x: cx + ((x - P.x) * ex.x + (zz - P.z) * ez.x) * k, y: cy + ((x - P.x) * ex.y + (zz - P.z) * ez.y) * k });
+    this.render(G, this.ctx, cv.width, cv.height, p.pos.x, p.pos.z, this.k * (cw / 180) * dpr, dpr, false);
+  }
+
+  /** whole-area map (js/ui.js showAreaMap): the zone fitted to the canvas, then view.zoom (1 = whole map) and
+   *  view.x / view.z (world-metre offset of the centre). Returns the world->canvas mapping for clicks / labels. */
+  drawFull(G, cv, view) {
+    const z = G.zone, p = G.player; if (!z || !p) return;
+    if (this.zoneId !== z.def.id) this.build(z);
+    const dpr = Math.min(2, window.devicePixelRatio || 1), cw = cv.clientWidth || 600, ch = cv.clientHeight || 600;
+    if (cv.width !== Math.round(cw * dpr) || cv.height !== Math.round(ch * dpr)) { cv.width = Math.round(cw * dpr); cv.height = Math.round(ch * dpr); }
+    const W = cv.width, H = cv.height, { ex, ez } = this.basis(G, p.pos), [x0, z0, x1, z1] = this.bounds;
+    // fit the (camera-rotated) zone rectangle into the canvas with a small margin
+    let mnx = 1e9, mxx = -1e9, mny = 1e9, mxy = -1e9;
+    for (const [x, zz] of [[x0, z0], [x1, z0], [x0, z1], [x1, z1]]) { const sx = x * ex.x + zz * ez.x, sy = x * ex.y + zz * ez.y; mnx = Math.min(mnx, sx); mxx = Math.max(mxx, sx); mny = Math.min(mny, sy); mxy = Math.max(mxy, sy); }
+    const fit = Math.min(W / (mxx - mnx), H / (mxy - mny)) * 0.94, k = fit * (view.zoom || 1);
+    const cx0 = (x0 + x1) / 2 + (view.x || 0), cz0 = (z0 + z1) / 2 + (view.z || 0);
+    this.render(G, cv.getContext('2d'), W, H, cx0, cz0, k, dpr, true);
+    return { k, cx: cx0, cz: cz0, ex, ez, dpr };
+  }
+
+  /** draws background + markers with (wx, wz) at the canvas centre and k canvas px per metre */
+  render(G, ctx, W, H, wx, wz, k, dpr, full) {
+    const z = G.zone, p = G.player, cx = W / 2, cy = H / 2;
+    const { ex, ez } = this.basis(G, p.pos);
+    const to = (x, zz) => ({ x: cx + ((x - wx) * ex.x + (zz - wz) * ez.x) * k, y: cy + ((x - wx) * ex.y + (zz - wz) * ez.y) * k });
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = '#16203a'; ctx.fillRect(0, 0, W, H);
     // background image: world (x,z) -> screen through an affine transform
-    const [x0, z0, x1, z1] = this.bounds, o = to(x0, z0);
+    const [x0, z0] = this.bounds, o = to(x0, z0);
     ctx.setTransform(ex.x * k / PPM, ex.y * k / PPM, ez.x * k / PPM, ez.y * k / PPM, o.x, o.y);
     ctx.imageSmoothingEnabled = true; ctx.drawImage(this.bg, 0, 0);
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    const dot = (q, r, fill, stroke) => { ctx.beginPath(); ctx.arc(q.x, q.y, r * dpr, 0, 6.283); ctx.fillStyle = fill; ctx.fill(); if (stroke) { ctx.lineWidth = 1.2 * dpr; ctx.strokeStyle = stroke; ctx.stroke(); } };
+    const u = full ? 1.5 : 1;                                       // marker size on the big map
+    const dot = (q, r, fill, stroke) => { ctx.beginPath(); ctx.arc(q.x, q.y, r * dpr * u, 0, 6.283); ctx.fillStyle = fill; ctx.fill(); if (stroke) { ctx.lineWidth = 1.2 * dpr * u; ctx.strokeStyle = stroke; ctx.stroke(); } };
+    const label = (q, text, dy, col) => {
+      if (!full || !text) return;
+      ctx.font = `${Math.round(15 * dpr)}px Jua, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.lineWidth = 3.5 * dpr; ctx.strokeStyle = 'rgba(10,14,28,.9)'; ctx.strokeText(text, q.x, q.y + dy * dpr); ctx.fillStyle = col; ctx.fillText(text, q.x, q.y + dy * dpr);
+    };
     // portals
     for (const pt of z.def.portals || []) {
-      const q = to(pt.pos[0], pt.pos[1]), r = 5 * dpr;
+      const q = to(pt.pos[0], pt.pos[1]), r = 5 * dpr * u;
       ctx.beginPath(); ctx.moveTo(q.x, q.y - r); ctx.lineTo(q.x + r, q.y); ctx.lineTo(q.x, q.y + r); ctx.lineTo(q.x - r, q.y); ctx.closePath();
       ctx.fillStyle = '#62d8ff'; ctx.fill(); ctx.lineWidth = 1.2 * dpr; ctx.strokeStyle = '#0b3550'; ctx.stroke();
+      label(q, pt.label || (G.data.zones[pt.targetZone] || {}).name, 9, '#bff0ff');
     }
-    // npcs (quest givers with something to say get a gold ring)
-    for (const n of z.npcs || []) dot(to(n.pos.x, n.pos.z), 3.2, '#ffe07a', '#5a3a08');
     // monsters / boss
     for (const a of z.actors) {
       if (a === p || a.dead || !a.def || a.faction === 'player') continue;
       const boss = a === z.boss; dot(to(a.pos.x, a.pos.z), boss ? 5 : 2.6, boss ? '#c06bff' : '#ff5a4a', boss ? '#2a0838' : '#4a0a06');
     }
+    // npcs: plain gold dot, or a green "?" badge when they have a quest to give or to hand in (G.questState)
+    const qn = [];
+    for (const n of z.npcs || []) {
+      const st = G.questState ? G.questState(n.def.id) : '', q = to(n.pos.x, n.pos.z);
+      if (st === 'ready' || st === 'avail') qn.push([q, n, st]); else { dot(q, 3.2, '#ffe07a', '#5a3a08'); label(q, n.def.name, 6, '#ffe9b0'); }
+    }
+    for (const [q, n] of qn) {
+      const r = (full ? 9 : 6.2) * dpr;
+      ctx.beginPath(); ctx.arc(q.x, q.y, r, 0, 6.283);
+      const g = ctx.createRadialGradient(q.x - r * 0.3, q.y - r * 0.35, r * 0.1, q.x, q.y, r); g.addColorStop(0, '#d8ffe0'); g.addColorStop(0.45, '#4fd36a'); g.addColorStop(1, '#16803a');
+      ctx.fillStyle = g; ctx.fill(); ctx.lineWidth = 1.6 * dpr; ctx.strokeStyle = '#0a3a18'; ctx.stroke();
+      ctx.font = `bold ${Math.round(r * 1.45)}px Jua, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.lineWidth = 2.2 * dpr; ctx.strokeStyle = '#0a3a18'; ctx.strokeText('?', q.x, q.y + r * 0.06); ctx.fillStyle = '#ffffff'; ctx.fillText('?', q.x, q.y + r * 0.06);
+      label(q, n.def.name, 11, '#b8ffc8');
+    }
     // player arrow
-    const f = p.facing || { x: 0, z: 1 }, fx = f.x * ex.x + f.z * ez.x, fy = f.x * ex.y + f.z * ez.y, fl = Math.hypot(fx, fy) || 1, ux = fx / fl, uy = fy / fl, s = 7 * dpr;
-    ctx.beginPath(); ctx.moveTo(cx + ux * s, cy + uy * s); ctx.lineTo(cx - ux * s * 0.6 - uy * s * 0.6, cy - uy * s * 0.6 + ux * s * 0.6);
-    ctx.lineTo(cx - ux * s * 0.25, cy - uy * s * 0.25); ctx.lineTo(cx - ux * s * 0.6 + uy * s * 0.6, cy - uy * s * 0.6 - ux * s * 0.6); ctx.closePath();
+    const P = p.pos, c = to(P.x, P.z);
+    const f = p.facing || { x: 0, z: 1 }, fx = f.x * ex.x + f.z * ez.x, fy = f.x * ex.y + f.z * ez.y, fl = Math.hypot(fx, fy) || 1, ux = fx / fl, uy = fy / fl, s = 7 * dpr * u;
+    ctx.beginPath(); ctx.moveTo(c.x + ux * s, c.y + uy * s); ctx.lineTo(c.x - ux * s * 0.6 - uy * s * 0.6, c.y - uy * s * 0.6 + ux * s * 0.6);
+    ctx.lineTo(c.x - ux * s * 0.25, c.y - uy * s * 0.25); ctx.lineTo(c.x - ux * s * 0.6 + uy * s * 0.6, c.y - uy * s * 0.6 - ux * s * 0.6); ctx.closePath();
     ctx.fillStyle = '#ffffff'; ctx.fill(); ctx.lineWidth = 1.5 * dpr; ctx.strokeStyle = '#1a2a4a'; ctx.stroke();
   }
 }

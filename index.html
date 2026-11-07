@@ -279,6 +279,27 @@ small { font-size:.8em; }
 .minimap .gold { font-size:15px; color:#fbf3df; white-space:nowrap; }
 .minimap .gold::before { content:""; display:inline-block; width:15px; height:15px; margin-right:5px; vertical-align:-2px; border-radius:50%; background:radial-gradient(circle at 35% 35%, #fff2b0, #e8b440 45%, #a06a10); }
 .minimap canvas { display:block; width:200px; height:200px; border-radius:8px; border:1.5px solid #c49640; box-shadow:inset 0 0 0 1px rgba(0,0,0,.5); }
+.minimap { pointer-events:auto; } .minimap canvas { cursor:zoom-in; }
+.minimap .mmzoom { position:absolute; right:12px; bottom:12px; width:30px; height:30px; padding:4px; border-radius:50%; border:1.5px solid #c49640; background:rgba(16,22,44,.82); cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,.5); }
+.minimap .mmzoom svg { width:100%; height:100%; fill:none; stroke:#ffe6a8; stroke-width:2.4; stroke-linecap:round; }
+.minimap .mmzoom:hover { background:rgba(40,52,90,.92); }
+/* whole-area map window (ui.js showAreaMap, minimap.js drawFull) */
+.window.areamap .wbody { height:100%; }
+.amwrap { display:flex; gap:16px; height:100%; min-height:0; }
+.amcanvas { flex:1; min-width:0; height:100%; min-height:420px; border-radius:12px; border:2px solid #c49640; box-shadow:inset 0 0 0 1px rgba(0,0,0,.5), 0 3px 10px rgba(60,40,10,.3); background:#16203a; touch-action:none; cursor:grab; }
+.amcanvas:active { cursor:grabbing; }
+.amside { flex:none; width:190px; display:flex; flex-direction:column; gap:10px; }
+.amside .btn { width:100%; padding:8px 10px; font-size:18px; }
+.amzoom { display:flex; gap:8px; } .amzoom .btn { font-size:26px; line-height:1; padding:6px 0; }
+.amlegend { display:flex; flex-direction:column; gap:7px; margin-top:6px; padding:12px; border-radius:10px; background:rgba(255,250,236,.7); box-shadow:inset 0 0 0 1.5px #d8be84; font-size:16px; }
+.amlegend b { color:#8a5a10; } .amlegend span { display:flex; align-items:center; gap:9px; }
+.lg { flex:none; display:inline-grid; place-items:center; width:16px; height:16px; border-radius:50%; font-style:normal; }
+.lg.me { width:0; height:0; border-radius:0; border:8px solid transparent; border-bottom:14px solid #fff; border-top:0; filter:drop-shadow(0 0 1px #1a2a4a) drop-shadow(0 0 1px #1a2a4a); }
+.lg.q { width:20px; height:20px; color:#fff; font-size:14px; font-weight:800; background:radial-gradient(circle at 35% 30%, #d8ffe0, #4fd36a 45%, #16803a); box-shadow:0 0 0 1.5px #0a3a18; }
+.lg.npc { background:#ffe07a; box-shadow:0 0 0 1.5px #5a3a08; } .lg.warp { width:13px; height:13px; border-radius:2px; transform:rotate(45deg); background:#62d8ff; box-shadow:0 0 0 1.5px #0b3550; }
+.lg.mon { width:11px; height:11px; background:#ff5a4a; box-shadow:0 0 0 1.5px #4a0a06; } .lg.boss { background:#c06bff; box-shadow:0 0 0 1.5px #2a0838; }
+.window.phone .amwrap, .window.narrow .amwrap { flex-direction:column; } .window.phone .amside, .window.narrow .amside { width:auto; flex-direction:row; flex-wrap:wrap; }
+.window.phone .amlegend, .window.narrow .amlegend { flex-direction:row; flex-wrap:wrap; width:100%; } .window.phone .amhelp, .window.narrow .amhelp { display:none; }
 .botbar { position:absolute; left:50%; bottom:8px; transform:translateX(-50%); width:min(520px, 44vw); display:flex; flex-direction:column; gap:5px; pointer-events:none; }
 .hud .botbar .bar.hp { position:relative; margin:0; height:24px; } .hud .botbar .bar.hp span { line-height:24px; }
 .hud .botbar .expbar { position:relative; left:auto; right:auto; bottom:auto; transform:none; width:auto; height:18px; }
@@ -441,7 +462,7 @@ small { font-size:.8em; }
 }
 @media (max-width: 600px) {   /* phones held upright: HP/EXP/menu block under the character panel, small minimap top-right */
   .charpanel { width:300px; }
-  .minimap { right:6px; top:6px; transform:none; padding:4px; } .minimap canvas { width:92px; height:92px; } .minimap .mmhead { display:none; }
+  .minimap { right:6px; top:6px; transform:none; padding:4px; } .minimap canvas { width:92px; height:92px; } .minimap .mmhead { display:none; } .minimap .mmzoom { right:6px; bottom:6px; width:22px; height:22px; padding:3px; }
   .botbar { left:12px; top:108px; bottom:auto; width:min(300px, 76vw); transform:none; }
   .botbar .menubtns .btn { width:48px; min-height:46px; font-size:11px; } .botbar .menubtns .btn svg { width:22px; height:22px; }
 }
