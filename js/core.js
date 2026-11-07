@@ -167,6 +167,10 @@ export function migrate(p) {
   return p;
 }
 
+/** save slots: 0 = 자동 저장 (the old single save key, written on warps / page hide / the first save), 1..SAVE_SLOTS = 직접 저장.
+ *  Every slot holds a whole profile in the same format (SAVE_VERSION), so any slot loads with the same migrate(). */
+export const SAVE_SLOTS = 5;
+export function saveSlotKey(i) { return "arcan_save_" + (i | 0); }
 export class SaveStore {
   constructor(key = "arcan_save_0") { this.key = key; this.lastError = null; }
   _ls() { try { return window.localStorage; } catch (e) { return null; } }
@@ -174,7 +178,7 @@ export class SaveStore {
   save(p) {
     const ls = this._ls();
     p.version = SAVE_VERSION;
-    p.saveTime = new Date().toLocaleString("ko-KR");
+    p.saveTime = new Date().toLocaleString("ko-KR"); p.saveAt = Date.now();   // saveAt: sortable time (additive field)
     const json = JSON.stringify(p);
     if (!ls) { this.lastError = "브라우저 저장소를 사용할 수 없습니다"; this.memory = json; return false; }
     try {

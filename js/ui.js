@@ -530,11 +530,42 @@ export class UI {
     $("div", "help small muted", b, "PC: WASD/방향키 이동 · 클릭 이동/공격 · Space 공격 · 1~4 스킬 · R 궁극기 · K 스킬창 · N 제작 · Shift 회피 · Q 물약 · F 대화 · I 가방 · O 퀘스트 · Esc 메뉴");
     const bb = $("div", "pbtns", b);
     this.button(bb, "게임 재개", "gold", () => this.close());
-    this.button(bb, "저장하기", "teal", () => this.toast(G.save() ? "저장했습니다." : "저장 실패: " + G.store.lastError));
+    this.button(bb, "저장하기", "teal", () => this.showSaveSlots("save", null, () => this.showPause()));
     this.button(bb, "타이틀로", "teal", () => { G.save(); this.close(); G.showTitle(); });
   }
+  /** save slot list. mode "save" (in game, from the pause menu): 저장 1..N, click = save (overwrite asks first).
+   *  mode "load" (title 불러오기): 자동 저장 + 저장 1..N, click = continue that save; manual slots can be deleted. */
+  showSaveSlots(mode, onLoad, back) {
+    const save = mode === "save", inGame = save && G.inWorld;
+    const b = this.open("saves", save ? "저장하기" : "불러오기", 1000, 0, inGame, true);
+    if (inGame) G.paused = true;
+    $("p", "small muted slothelp", b, save ? "저장할 칸을 고르세요. 이미 저장된 칸은 덮어씁니다. (이동할 때마다 <b>자동 저장</b> 칸에도 저장됩니다)" : "이어서 할 모험을 고르세요.");
+    const list = $("div", "slotlist", b);
+    const rows = G.slotList().filter(s => !(save && s.i === 0));
+    const newest = rows.filter(s => s.p).reduce((m, s) => (!m || (s.p.saveAt || 0) > (m.p.saveAt || 0) ? s : m), null);
+    for (const s of rows) {
+      const p = s.p, r = $("div", "slotrow" + (p ? "" : " empty") + (s.i === 0 ? " auto" : ""), list);
+      const face = p ? `<i class="slotface" style="background-image:url(assets/ui/portrait_${p.gender === "f" ? "girl" : "boy"}.png);background-position:-72px ${p.gender === "f" ? -63 : -47}px"></i>` : `<i class="slotface none"></i>`;   // same face crop as the HUD badge (scaled 0.64)
+      const j = p && G.data.job(p.job), z = p && G.data.zones[p.zone];
+      r.innerHTML = `${face}<div class="slotinfo"><div class="slotname">${s.label}${s === newest ? ' <em class="slotnew">최근</em>' : ""}</div>` +
+        (p ? `<div class="slotmain"><b>${esc(p.name)}</b> · Lv${p.level} ${j ? j.name : p.job}</div><div class="small muted">${z ? z.name : p.zone} · ${esc(p.saveTime || "")}</div>` : `<div class="muted">비어 있음</div>`) + `</div>`;
+      const btns = $("div", "slotbtns", r);
+      if (save) {
+        this.button(btns, p ? "덮어쓰기" : "저장", p ? "ivory" : "gold", () => {
+          const go = () => { const ok = G.saveToSlot(s.i); this.showSaveSlots("save", null, back); this.toast(ok ? s.label + "에 저장했습니다." : "저장 실패: " + G.slots[s.i].lastError); };
+          if (p) this.confirm(`<b>${s.label}</b>의 기존 저장(${esc(p.name)} · Lv${p.level})을<br>지금 모험으로 덮어쓸까요?`, go, () => this.showSaveSlots("save", null, back)); else go();
+        });
+      } else {
+        const l = this.button(btns, "불러오기", "gold", () => onLoad(s.i)); l.disabled = !p;
+        if (p && s.i > 0) this.button(btns, "삭제", "red", () => this.confirm(`<b>${s.label}</b> (${esc(p.name)} · Lv${p.level})을 지울까요?<br>지운 저장은 되돌릴 수 없습니다.`, () => { G.slots[s.i].remove(); this.showSaveSlots(mode, onLoad, back); }, () => this.showSaveSlots(mode, onLoad, back)));
+      }
+    }
+    const bb = $("div", "pbtns", b);
+    if (back) this.button(bb, "뒤로", "teal", back, "ui_back");
+  }
   confirm(text, yes, no) {
-    const b = this.open("confirm", null, 760, 0, false);
+    const pz = G.paused;                                   // a question asked from the pause / save window keeps the game paused
+    const b = this.open("confirm", null, 760, 0, false); G.paused = pz;
     $("div", "ctext", b, text); const bb = $("div", "pbtns", b);
     this.button(bb, "확인", "teal", () => { this.close(false); yes && yes(); }); this.button(bb, "취소", "ivory", () => { this.close(false); no && no(); });
   }
@@ -546,6 +577,7 @@ export class UI {
     const h = this.button(bb, `제자리 부활 (${cost} G)`, "gold", () => { this.close(false); here(); }); h.disabled = !can;
   }
   showTitle(info, cont, ng) {
+    this.toasts.replaceChildren();                         // in-game notices (e.g. "저장 1에 저장했습니다") don't follow to the title
     const b = this.open("title", null, 1000, 0, false, false);
     this.current.classList.add("titlewin");
     this.current.setAttribute("aria-label", "아르칸 연대기 시작 메뉴");
@@ -553,7 +585,7 @@ export class UI {
     $("img", "title-illustration", stage).src = "assets/ui/title-screen.png";
     stage.firstChild.alt = "아르칸 연대기 — 꽃과 분수가 있는 마을";
     const c = this.button(stage, "", "title-action title-continue", cont);
-    c.setAttribute("aria-label", info ? "이어하기" : "이어하기 (저장 없음)");
+    c.setAttribute("aria-label", info ? "불러오기" : "불러오기 (저장 없음)");
     c.disabled = !info;
     const save = $("div", "title-save", stage);
     save.textContent = info || "저장된 모험이 없습니다. 새 게임으로 시작하세요.";

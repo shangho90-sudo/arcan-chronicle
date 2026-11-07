@@ -110,7 +110,7 @@ const HUD = ['.charpanel', '.feed .feeditem', '.minimap', '.botbar', '.actions .
     await press('.qh-min');
     await ev(() => G.save());
     await pg.goto(URL, { timeout: 300000 });
-    await clickLabel('이어하기');
+    await clickLabel('불러오기'); await clickLabel('불러오기');   // title 불러오기 → first row (자동 저장)
     await pg.waitForFunction(() => window.G && G.inWorld && G.player && !G.loading, null, { timeout: 300000 });
     await wait(300);
     const s7 = await ev(() => ({ qwin: G.profile.ui.qwin, cls: document.querySelector('.qhud').className, banner: [...document.querySelectorAll('.areabanner')].map(e => e.innerText) }));

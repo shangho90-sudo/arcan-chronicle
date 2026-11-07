@@ -8,7 +8,7 @@
 ## 기본
 - 빌드 없음. `python3 -m http.server 8765` 후 `http://localhost:8765/index.html`.
 - three.js r160을 로컬 import map(`index.html`, `vendor/three-r160/`)으로 불러옵니다. CDN 장애 시 0% 멈춤을 방지하기 위해 동일 버전과 LICENSE를 저장소에 포함합니다. npm 의존성 없음. 새 라이브러리 추가 금지(필요하면 먼저 사용자에게 확인).
-- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs` (현재 370 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 606 통과).
+- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs` (현재 377 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 606 통과).
 - 테스트하지 않은 것을 "검증됨"이라고 보고하지 말 것.
 
 ## 데이터 우선
@@ -18,6 +18,7 @@
 
 ## 지켜야 할 규칙
 - **저장 호환**: `core.js`의 `SAVE_VERSION`(현재 4 — v4에서 필드 위치 저장값은 버림, 필드 확대 때문)과 `migrate`. 저장 형식을 바꾸면 버전을 올리고 마이그레이션을 추가하세요. 기존 저장 데이터를 깨지 말 것.
+- **저장 칸**: 0 = 자동 저장(`arcan_save_0`, 예전 키 그대로), 1~5 = 직접 저장(`SAVE_SLOTS`, `saveSlotKey`). 일시정지 "저장하기"와 시작 화면 "불러오기"는 `ui.js` `showSaveSlots`(`G.slotList`/`saveToSlot`/`loadSlot`), 확인 `tools/browser-tests/saveslots.js`. 시작 화면 그림의 버튼 글자는 그림에 들어 있음(`tools/ui/title_relabel.py`).
 - **레벨 상한(50)·전직 레벨(Lv10/Lv30)** 은 몰래 바꾸지 말고, 바꾼다면 영향(경험치 곡선, 퀘스트, 저장)을 보고하세요.
 - 판정은 발 위치 기준. 텔레그래프와 피격 판정은 같은 `HitShape`를 사용(rect는 시전 위치에서 앞으로 뻗음).
 - 스킬 이펙트 연출 등급: `(차수-1)*3 + 스킬Lv`(궁극기 `+2+Lv`), 최대 10. 물리 스킬은 Lv 2마다 연타 +1, 타당 계수 `coef*base/hits*(1+0.06*추가타)`.

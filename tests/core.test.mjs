@@ -581,6 +581,18 @@ function FindSlot(ch, id) {
   return -1;
 }
 
+function TestSaveSlots() {
+  const d = LoadData(); mem.clear();
+  Eq(core.saveSlotKey(0), "arcan_save_0", "slot 0 keeps the old auto-save key");
+  const auto = new SaveStore(), s1 = new SaveStore(core.saveSlotKey(1)), s2 = new SaveStore(core.saveSlotKey(2));
+  const a = newProfile(d, "가나", "m"), b = newProfile(d, "다라", "f"); b.level = 7;
+  Ok(auto.save(a) && s1.save(b), "save into auto + slot 1");
+  Ok(!s2.exists() && s1.exists() && auto.exists(), "slots are separate");
+  Eq(s1.load().name, "다라", "slot 1 loads its own profile"); Eq(auto.load().name, "가나", "auto slot keeps its profile");
+  Ok(typeof s1.load().saveAt === "number" && s1.load().saveAt > 0, "saveAt stored for sorting");
+  s1.remove(); Ok(!s1.exists() && auto.exists(), "deleting a slot leaves the others");
+  mem.clear();
+}
 function TestQuestCategories() {
   const d = LoadData();
   for (const q of d.questList) Ok(q.category === "main" || q.category === "sub", "quest category set: " + q.id);
@@ -619,7 +631,7 @@ const tests = [
   ["Data", TestData], ["Inventory", TestInventory], ["Shop", TestShop], ["Stats & equipment", TestStats],
   ["Leveling", TestLeveling], ["Jobs", TestJobs], ["Quests", TestQuests], ["Save/Load", TestSave],
   ["Hit shapes", TestShapes], ["Combat math", TestCombat], ["Status effects", TestStatus],
-  ["Geometry & nav", TestGeometry], ["Layouts", TestLayouts], ["Balance", TestBalance], ["Full flow", TestFullFlow], ["Attributes", TestAttributes], ["Quest categories", TestQuestCategories],
+  ["Geometry & nav", TestGeometry], ["Layouts", TestLayouts], ["Balance", TestBalance], ["Full flow", TestFullFlow], ["Attributes", TestAttributes], ["Quest categories", TestQuestCategories], ["Save slots", TestSaveSlots],
 ];
 for (const [name, fn] of tests) {
   const p0 = pass, f0 = fail;

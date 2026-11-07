@@ -1,5 +1,5 @@
 // Game orchestrator + zone runtime. Port of Boot/ArcanGame.cs and World/ZoneRuntime.cs.
-import { GameData, SaveStore, CharacterSheet, QuestLog, QS, ZoneGeometry, NavGrid, newProfile, DEG, clamp, HitShape, levelGapExp, monsterAtLevel } from './core.js';
+import { GameData, SaveStore, SAVE_SLOTS, saveSlotKey, CharacterSheet, QuestLog, QS, ZoneGeometry, NavGrid, newProfile, DEG, clamp, HitShape, levelGapExp, monsterAtLevel } from './core.js';
 import { Renderer, Fx, TelegraphView, TG_TIME, loadSheet, preloadTextures, THREE, T } from './render.js';
 import { Player, Monster, Boss, Npc, Loot, bindGame as bindActors } from './actors.js';
 import { Input, Audio } from './io.js';
@@ -308,7 +308,8 @@ class Game {
     }));
     this.data = new GameData(files);
     const errs = this.data.validate(); for (const e of errs) console.error("[Arcan data]", e);
-    this.store = new SaveStore();
+    this.store = new SaveStore();                          // slot 0 = 자동 저장 (same key as before)
+    this.slots = [this.store]; for (let i = 1; i <= SAVE_SLOTS; i++) this.slots.push(new SaveStore(saveSlotKey(i)));
     this.settings = Object.assign({}, DEFAULT_SETTINGS); try { Object.assign(this.settings, JSON.parse(localStorage.getItem("arcan_settings") || "{}")); } catch (e) { }
     this.render = new Renderer(document.getElementById("view"));
     this.fx = new Fx(this.render.scene); this.audio = new Audio(); this.input = new Input(this.render.r.domElement);
@@ -362,15 +363,26 @@ class Game {
     await this.buildZone("town");
     this.render.setFocus({ x: 0, y: 0, z: -2 }, true);
     this.audio.playMusic("bgm_arcan_menu");
-    const p = this.store.load(); let info = null;
-    if (p) { const j = this.data.job(p.job), z = this.data.zones[p.zone]; info = `${p.name} · Lv${p.level} ${j ? j.name : p.job} · ${z ? z.name : p.zone} · 저장 ${p.saveTime}`; }
-    this.ui.showTitle(info, () => this.continueGame(), () => this.newGameFlow());
+    this.showTitleMenu();
   }
+  /** the title buttons only (no zone rebuild): 불러오기 (save slot list) / 새 게임; the line under 불러오기 shows the newest save */
+  showTitleMenu() {
+    const all = this.slotList().filter(s => s.p).sort((a, b) => (b.p.saveAt || 0) - (a.p.saveAt || 0));
+    const info = all.length ? `${all[0].label} · ${this.saveSummary(all[0].p)}` : null;
+    this.ui.showTitle(info, () => this.showLoadMenu(), () => this.newGameFlow());
+  }
+  saveSummary(p) { const j = this.data.job(p.job), z = this.data.zones[p.zone]; return `${p.name} · Lv${p.level} ${j ? j.name : p.job} · ${z ? z.name : p.zone} · 저장 ${p.saveTime}`; }
+  /** [{ i, label, p (migrated profile or null) }] for 자동 저장 + 저장 1..SAVE_SLOTS */
+  slotList() { return this.slots.map((st, i) => ({ i, label: i ? "저장 " + i : "자동 저장", p: st.exists() ? st.load() : null })); }
+  showLoadMenu() { this.ui.showSaveSlots("load", i => this.loadSlot(i), () => this.showTitleMenu()); }
+  loadSlot(i) { const st = this.slots[i], p = st && st.load(); if (!p) return this.ui.toast("저장 파일을 읽을 수 없습니다" + (st && st.lastError ? ": " + st.lastError : "")); this.enterWorld(p, false); }
+  /** manual save into slot i (1..): also refreshes the auto slot so 자동 저장 is never older than the last manual save */
+  saveToSlot(i) { const ok = this.save(this.slots[i]); if (i) this.save(); return ok; }
   newGameFlow() {
-    if (this.store.exists()) this.ui.confirm("기존 저장이 있습니다. 새 게임을 시작하면<br>이어하기 데이터가 덮어써집니다. 계속할까요?", () => this.openCreate(), () => this.showTitle());
+    if (this.store.exists()) this.ui.confirm("새 게임을 시작하면 <b>자동 저장</b> 칸이 새 모험으로 바뀝니다.<br>직접 저장한 칸(저장 1~" + SAVE_SLOTS + ")은 그대로 남습니다. 계속할까요?", () => this.openCreate(), () => this.showTitleMenu());
     else this.openCreate();
   }
-  openCreate() { this.ui.showCreate((name, gender) => this.enterWorld(newProfile(this.data, name, gender), true), () => this.showTitle()); }
+  openCreate() { this.ui.showCreate((name, gender) => this.enterWorld(newProfile(this.data, name, gender), true), () => this.showTitleMenu()); }
   continueGame() { const p = this.store.load(); if (!p) return this.ui.toast("저장 파일을 읽을 수 없습니다: " + this.store.lastError); this.enterWorld(p, false); }
   enterWorld(prof, fresh) {
     this.ui.close(false);
@@ -543,7 +555,7 @@ class Game {
   hitStop(s) { if (s <= 0 || this.hitStopT > 0) return; this.hitStopT = s; }
 
   // ------------------------------------------------------------------ save
-  save() {
+  save(store = this.store) {
     if (!this.profile || !this.inWorld) return false;
     const P = this.profile, p = this.player;
     if (p) {
@@ -551,7 +563,7 @@ class Game {
       if (p.dead) { P.zone = P.returnZone; P.hp = -1; }
     }
     if (this.zone && (!p || !p.dead)) P.zone = this.zone.def.id;
-    return this.store.save(P);
+    return store.save(P);
   }
   autoSave() { if (this.inWorld && !this.loading) this.save(); }
 

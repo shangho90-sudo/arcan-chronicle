@@ -336,7 +336,7 @@ small { font-size:.8em; }
   .title-art { width:100vw; }
   .titlewin .title-action { left:12%; width:76%; height:48px; border:2px solid #f6d58a; border-radius:16px; font-size:22px; font-family:"Malgun Gothic",sans-serif; }
   .titlewin .title-continue { top:57%; background:linear-gradient(#ffdf93,#c48a30); color:#38250c; }
-  .title-continue::after { content:"이어하기"; }
+  .title-continue::after { content:"불러오기"; }
   .titlewin .title-new { top:calc(57% + 104px); background:linear-gradient(#149fdb,#07476f); color:#fff4d8; }
   .title-new::after { content:"새 게임"; }
   .title-save { left:8%; top:calc(57% + 51px); width:84%; height:50px; font-size:11px; padding:4px 12px; border-radius:12px; }
@@ -594,6 +594,21 @@ small { font-size:.8em; }
 .window.fancy .setrow { margin:0 0 10px; padding:10px 16px; border-radius:10px; background:linear-gradient(#fbf6ea, #f0e5cc); box-shadow:inset 0 0 0 1.5px #d4bc88; }
 .window.fancy .setrow input { accent-color:#c9973a; } .window.fancy .setrow b { color:#1d3f7a; } .window.fancy .setrow .btn { padding:6px 18px; font-size:17px; min-width:120px; }
 .window.fancy .help { margin:14px 4px; padding:12px 16px; border-radius:10px; line-height:1.7; color:#5a4630; background:rgba(255,250,236,.6); box-shadow:inset 0 0 0 1.5px #d4bc88; }
+/* save slots (ui.js showSaveSlots: 저장하기 / 불러오기) */
+.window.fancy .slothelp { margin:0 4px 12px; }
+.window.fancy .slotlist { display:flex; flex-direction:column; gap:10px; max-height:560px; overflow:auto; padding:4px; }
+.window.fancy .slotrow { display:flex; align-items:center; gap:16px; padding:10px 16px; border-radius:10px; font-size:18px; color:#2a1a08; background:linear-gradient(#fbf6ea, #f0e5cc); box-shadow:inset 0 0 0 2px #c9973a, inset 0 0 0 5px #fbf5e6, inset 0 0 0 6px #d8be84, 0 2px 5px rgba(80,50,10,.2); }
+.window.fancy .slotrow.auto { box-shadow:inset 0 0 0 2px #3a7ab8, inset 0 0 0 5px #fbf5e6, inset 0 0 0 6px #9cc0e0, 0 2px 5px rgba(80,50,10,.2); }
+.window.fancy .slotrow.empty { opacity:.82; }
+.slotface { display:block; width:64px; height:64px; flex:none; border-radius:50%; background:#e9dcbc no-repeat; background-size:189px auto; box-shadow:0 0 0 3px #c9973a, 0 0 0 5px #5a3a10; }
+.slotface.none { display:block; background:radial-gradient(circle, #efe4c8, #d6c39a); }
+.slotinfo { flex:1; min-width:0; } .slotinfo .slotname { font-size:15px; font-weight:800; color:#8a5a10; letter-spacing:.5px; } .slotrow.auto .slotname { color:#1d4f8a; }
+.slotmain { font-size:21px; } .slotmain b { color:#1d2a4a; }
+.slotnew { font-style:normal; font-size:12px; color:#fff; background:#d06a2a; border-radius:4px; padding:1px 6px; margin-left:4px; vertical-align:2px; }
+.slotbtns { display:flex; gap:8px; flex:none; } .window.fancy .slotbtns .btn { min-width:120px; padding:7px 18px; font-size:18px; }
+.window.saves .pbtns .btn { flex:0 0 auto; width:auto; min-width:200px; }
+.window.fancy .slotbtns .btn:disabled { filter:grayscale(.8) brightness(.95); opacity:.6; cursor:not-allowed; }
+.window.phone .slotrow, .window.narrow .slotrow { flex-wrap:wrap; gap:10px; } .window.phone .slotbtns, .window.narrow .slotbtns { width:100%; justify-content:flex-end; }
 .window.fancy .pbtns { display:flex; gap:14px; justify-content:center; margin-top:16px; } .window.fancy .pbtns .btn { min-width:160px; }
 .window.fancy .ctext { padding:14px 10px 4px; font-size:22px; text-align:center; line-height:1.6; color:#3b2a17; }
 .window.fancy.death .fplaque .fp-t { color:#ffd8cc; }
