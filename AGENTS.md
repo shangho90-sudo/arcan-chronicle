@@ -82,7 +82,7 @@
 - 이동 속도(4.6 m/s)를 낮춰서 보행을 맞추지 말 것. 바꾼 뒤에는 `tools/browser-tests/gait_probe.js` + `gait_report.py`로 디딘 발 미끄러짐·걸음 수를 남녀 모두 비교하고, `gait_film.js`로 화면을 확인하세요.
 
 ## 직업 모델 (2026-11-07)
-- 전직하면 모습이 바뀌는 직업은 `model.js` `JOB_MODELS`(지금은 약사 `pharmacist_m`/`_f`, 대장장이 `blacksmith_m`/`_f`, 예술가 `artist_m`/`_f`, 요리사 `cook_m`/`_f` — 미용사만 아직 기본 모습). 모델은 반드시 같은 67뼈 휴머노이드 뼈대 GLB를 `python3 tools/models/glb_to_model.py <in.glb> <이름>`로 변환. 변신 연출은 `rewardfx.js` `JobChangeFx`(빛기둥·고치·날개·나팔·`Audio.chime('fanfare')`), 확인 `tools/browser-tests/jobchange.js`(`JOB=`·`GENDER=`).
+- 전직하면 모습이 바뀌는 직업은 `model.js` `JOB_MODELS`(지금은 약사 `pharmacist_m`/`_f`, 대장장이 `blacksmith_m`/`_f`, 예술가 `artist_m`/`_f`, 요리사 `cook_m`/`_f`, 미용사 `hairdresser_m`/`_f` — 1차 직업 5개 모두). 모델은 반드시 같은 67뼈 휴머노이드 뼈대 GLB를 `python3 tools/models/glb_to_model.py <in.glb> <이름>`로 변환. 변신 연출은 `rewardfx.js` `JobChangeFx`(빛기둥·고치·날개·나팔·`Audio.chime('fanfare')`), 확인 `tools/browser-tests/jobchange.js`(`JOB=`·`GENDER=`).
 
 ## 칼 휘두르기 (`js/model.js`, `tools/anim/swings.py`)
 - 공격 동작은 시간 키(`keys`, 초) + 구간 이징(`e`) + 칼 팔 IK(`hand`/`blade`/`elbow`) + 발 고정(`step`, `plant`)으로 정의합니다. actions.json의 `attack`/`attack2`는 `python3 tools/anim/swings.py`로 생성하세요(직접 편집 금지).

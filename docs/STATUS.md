@@ -442,3 +442,8 @@
 - NPC 30명 각각 고유 한국어 인사와 남녀 음성 프리셋. 별도 `npc-voices.json`으로 관리하여 월드 재생성 시 보존. 클릭/상호작용으로 대화가 열릴 때 인사 문구와 음성을 함께 표시·재생. 대화 선택·닫기·이동·타이틀 복귀 시 중지, 늦은 다운로드 취소, 한 번에 한 목소리만 재생. 효과음 음량/음소거 설정 공통 적용.
 - Runway 생성 오디오 34개는 앞쪽 무음 정리, 음량 정규화, MP3 128 kbps. 자원 출처·작업 ID·음성 성별은 `interaction-credits.json`.
 - 검증: core 346 통과/50 생략, skills2 606 통과. 기존 음향 테스트 및 NPC 음성 전환·닫기·비동기 취소·음소거·첫 로딩·연타 제한 회귀 테스트. Chromium에서 34개 모두 실제 Web Audio 디코딩, 게임 대화 인사/선택, 레벨업, 전직 성공, travel 진입의 효과음 호출 확인(런타임 오류 0). 워프는 travel 경계에서 다음 존 로딩을 대체해 확인했고, 실기기 청음/손 플레이는 미실시.
+
+### 2026-11-07 — 미용사 1차 전직 변신 (남·여 미용사 모델) — 1차 직업 5개 모두 전용 모습
+- 사용자가 준 모델 2개(여: `chibi_mechanic_character_3d_model.glb`, 남: `anime_craftsman_3d_model.glb`, 같은 67뼈 휴머노이드) → `tools/models/glb_to_model.py` → `hairdresser_f`(5,339 정점·10,315 삼각형), `hairdresser_m`(5,292·10,212). `model.js` `JOB_MODELS.hairdresser`(2차 디자이너도 같은 모습).
+- 변신 연출은 다른 직업과 같음. 움직임은 기존 뼈대 그대로.
+- 확인: `JOB=hairdresser` 남(boy → hairdresser_m)·여(girl → hairdresser_f) 변신 중·후·걷기 화면, 오류 없음. core 346 통과(50 생략), skills2 606 통과.

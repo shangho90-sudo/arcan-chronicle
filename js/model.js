@@ -16,6 +16,7 @@ export const JOB_MODELS = {
   pharmacist: { m: { file: 'pharmacist_m', height: 1.65, headPitch: -10 }, f: { file: 'pharmacist_f', height: 1.6, headPitch: -14 } },
   blacksmith: { m: { file: 'blacksmith_m', height: 1.65, headPitch: -10 }, f: { file: 'blacksmith_f', height: 1.6, headPitch: -14 } },
   cook: { m: { file: 'cook_m', height: 1.65, headPitch: -10 }, f: { file: 'cook_f', height: 1.6, headPitch: -14 } },
+  hairdresser: { m: { file: 'hairdresser_m', height: 1.65, headPitch: -10 }, f: { file: 'hairdresser_f', height: 1.6, headPitch: -14 } },
   artist: { m: { file: 'artist_m', height: 1.65, headPitch: -10 }, f: { file: 'artist_f', height: 1.6, headPitch: -14 } },
 };
 export function playerModelCfg(gender, jobSheet) { const j = JOB_MODELS[jobSheet]; return (j && j[gender]) || PLAYER_MODELS[gender] || PLAYER_MODELS.m; }
