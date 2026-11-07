@@ -382,7 +382,12 @@ class Game {
     if (this.store.exists()) this.ui.confirm("새 게임을 시작하면 <b>자동 저장</b> 칸이 새 모험으로 바뀝니다.<br>직접 저장한 칸(저장 1~" + SAVE_SLOTS + ")은 그대로 남습니다. 계속할까요?", () => this.openCreate(), () => this.showTitleMenu());
     else this.openCreate();
   }
-  openCreate() { this.ui.showCreate((name, gender) => this.enterWorld(newProfile(this.data, name, gender), true), () => this.showTitleMenu()); }
+  openCreate() { this.ui.showCreate((name, gender) => this.playPrologue(() => this.enterWorld(newProfile(this.data, name, gender), true)), () => this.showTitleMenu()); }
+  /** 서장 (js/prologue.js): illustrated story before a new character appears in the town; also from the pause menu */
+  playPrologue(done) {
+    this.ui.close(false);
+    import('./prologue.js').then(m => new m.Prologue(this).play(done)).catch(e => { console.warn('prologue', e); done(); });
+  }
   continueGame() { const p = this.store.load(); if (!p) return this.ui.toast("저장 파일을 읽을 수 없습니다: " + this.store.lastError); this.enterWorld(p, false); }
   enterWorld(prof, fresh) {
     this.ui.close(false);
@@ -571,6 +576,7 @@ class Game {
   frame(now) {
     requestAnimationFrame(t => this.frame(t));
     const rdt = Math.min(0.05, Math.max(0, (now - this.last) / 1000)); this.last = now;
+    if (this.prologueCover) return;      // an opaque prologue panel hides the scene: don't render / tick behind it
     // ?sim=N (automated tests only): run N logic steps per rendered frame so slow software-GL runs reach real game speed
     try { for (let i = 1; i < this.simSteps; i++) this.step(rdt, false); this.step(rdt, true); } catch (e) { console.error(e); if (!this._errShown) { this._errShown = true; this.ui.toast("오류: " + e.message); } }
   }

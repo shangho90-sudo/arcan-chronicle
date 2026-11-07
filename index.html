@@ -316,6 +316,57 @@ small { font-size:.8em; }
 .controls:not(.mobile) .actions { transform:scale(.95); }
 .resbar { border:1.5px solid #d6ac54; background:rgba(15,22,42,.9); }
 .target, .prompt { font-weight:700; }
+
+/* prologue (js/prologue.js, assets/data/prologue.json): illustrated 서장 before a new character enters the town */
+.prologue { position:fixed; inset:0; z-index:200; background:#000; overflow:hidden; opacity:0; transition:opacity .8s, background 2.4s; cursor:pointer; user-select:none; -webkit-user-select:none; font-family:Jua, sans-serif; }
+.prologue.on { opacity:1; }
+.prologue.ending { background:rgba(8,4,2,.38); }
+.prologue.out { opacity:0; transition:opacity 1.3s; }
+.pl-stage, .pl-layer { position:absolute; inset:0; }
+.pl-layer { opacity:0; transition:opacity .9s ease; overflow:hidden; } .pl-layer.in { opacity:1; }
+.prologue.ending .pl-stage { opacity:0; transition:opacity 2.2s; }
+.pl-pan { position:absolute; inset:0; background:center/cover no-repeat; transform-origin:var(--x0) var(--y0); animation:plPan linear forwards; }
+@keyframes plPan { from { transform:scale(var(--z0)); transform-origin:var(--x0) var(--y0); } to { transform:scale(var(--z1)); transform-origin:var(--x1) var(--y1); } }
+.pl-blur { display:none; }
+/* portrait phones: the whole picture (fitted to the width, a little above the middle) over a blurred, darkened copy of itself */
+@media (orientation: portrait) {
+  .pl-blur { display:block; position:absolute; inset:-30px; background:center/cover no-repeat; filter:blur(22px) brightness(.45) saturate(1.2); }
+  .pl-pan { inset:auto 0; top:30%; height:calc(100vw * 9 / 16); transform:translateY(-50%); animation-name:plPanP; }
+  @keyframes plPanP { from { transform:translateY(-50%) scale(calc(var(--z0) * 1.18)); transform-origin:var(--x0) var(--y0); } to { transform:translateY(-50%) scale(calc(var(--z1) * 1.18)); transform-origin:var(--x1) var(--y1); } }
+}
+.pl-shade { position:absolute; inset:0; pointer-events:none; background:linear-gradient(rgba(0,0,0,.25), rgba(0,0,0,0) 22%, rgba(0,0,0,0) 58%, rgba(0,0,0,.7)); transition:opacity 1.5s; }
+.prologue.ending .pl-shade { opacity:0; }
+.pl-fx { position:absolute; width:calc(var(--r) * 2); height:calc(var(--r) * 2); margin:calc(var(--r) * -1) 0 0 calc(var(--r) * -1); border-radius:50%; pointer-events:none; mix-blend-mode:screen;
+  background:radial-gradient(circle, rgba(var(--c),.7), rgba(var(--c),.18) 35%, rgba(var(--c),0) 70%); animation:plPulse 2.6s ease-in-out infinite; }
+.pl-fx.slow { animation-duration:4.2s; }
+.pl-fx.flash { animation:plFlash 1.7s ease-in-out infinite; }
+.pl-fx.heart { animation:plHeart 3.2s ease-in-out infinite; background:radial-gradient(circle, rgba(var(--c),.85), rgba(var(--c),.25) 30%, rgba(var(--c),0) 68%); }
+@keyframes plPulse { 0%, 100% { opacity:.35; transform:scale(.85); } 50% { opacity:1; transform:scale(1.08); } }
+@keyframes plFlash { 0%, 100% { opacity:.25; transform:scale(.8); } 8% { opacity:1; transform:scale(1.15); } 20% { opacity:.4; } 30% { opacity:.9; } }
+@keyframes plHeart { 0%, 60%, 100% { opacity:.15; transform:scale(.9); } 10% { opacity:.95; transform:scale(1.06); } 22% { opacity:.4; } 32% { opacity:.8; transform:scale(1.03); } }
+.pl-tw { position:absolute; width:4px; height:4px; margin:-2px; border-radius:50%; background:#fff; box-shadow:0 0 6px 2px rgba(255,236,190,.8); animation:plTw 3.4s ease-in-out infinite; opacity:0; }
+@keyframes plTw { 0%, 100% { opacity:0; } 50% { opacity:.9; } }
+.pl-box { position:absolute; left:50%; bottom:5.5vh; width:min(1100px, 92vw); transform:translate(-50%, 14px); opacity:0; transition:opacity .45s, transform .45s; pointer-events:none;
+  padding:22px 34px 26px; border-radius:16px; color:#f6ecd6; font-size:clamp(17px, 1.75vw, 25px); line-height:1.7; letter-spacing:.3px; text-shadow:0 2px 3px rgba(0,0,0,.6);
+  background:linear-gradient(rgba(20,14,30,.78), rgba(10,8,18,.88)); border:1.5px solid rgba(214,172,84,.75); box-shadow:0 0 0 4px rgba(10,8,18,.5), inset 0 0 0 1px rgba(255,230,170,.18), 0 10px 40px rgba(0,0,0,.6); }
+.pl-box::before, .pl-box::after { content:"✦"; position:absolute; top:-13px; color:#e8c060; font-size:20px; text-shadow:0 0 8px rgba(240,190,80,.8); }
+.pl-box::before { left:24px; } .pl-box::after { right:24px; }
+.pl-box.show { opacity:1; transform:translate(-50%, 0); }
+.pl-who { display:none; position:absolute; top:-22px; left:44px; padding:3px 18px; border-radius:9px; font-size:.82em; color:#2a1a08; background:linear-gradient(#fff0c0, #d8a848); box-shadow:0 0 0 2px #5a3a10, 0 3px 8px rgba(0,0,0,.5); text-shadow:none; }
+.pl-box.speak .pl-who { display:block; } .pl-box.speak .pl-text { color:#fff8e6; }
+.pl-text { min-height:3.4em; } .pl-text b { font-weight:400; color:#ffd88a; } .pl-text b.pl-w { color:#fff4d8; text-shadow:0 0 10px rgba(255,220,150,.8); } .pl-text b.pl-b { color:#d6a8ff; text-shadow:0 0 10px rgba(160,60,255,.7); } .pl-text b.pl-r { color:#ff8a70; text-shadow:0 0 10px rgba(255,40,20,.6); }
+.pl-next { position:absolute; right:22px; bottom:10px; font-style:normal; font-size:.7em; color:#e8c060; animation:plNext 1s ease-in-out infinite; }
+@keyframes plNext { 0%, 100% { transform:translateY(0); opacity:.5; } 50% { transform:translateY(4px); opacity:1; } }
+.pl-skip { position:absolute; top:18px; right:20px; z-index:2; padding:8px 18px; border-radius:20px; border:1px solid rgba(214,172,84,.7); background:rgba(10,8,18,.55); color:#f0e0b8; font:inherit; font-size:17px; cursor:pointer; }
+.pl-skip:hover { background:rgba(40,30,20,.7); } .pl-skip b { font-weight:400; color:#e8c060; margin-left:4px; letter-spacing:-2px; }
+.prologue.ending .pl-skip { opacity:0; pointer-events:none; transition:opacity .4s; }
+.pl-end { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; opacity:0; transition:opacity 1.6s .6s; }
+.prologue.ending .pl-end { opacity:1; }
+.pl-end p { margin:0; color:#fff4dc; text-shadow:0 0 18px rgba(255,170,80,.7), 0 3px 6px rgba(0,0,0,.8); letter-spacing:4px; }
+.pl-e1 { font-size:clamp(30px, 4.2vw, 64px); } .pl-e2 { margin-top:10px !important; font-size:clamp(18px, 2.2vw, 32px); color:#ffd9a0 !important; }
+.pl-leaves i { position:absolute; top:-6vh; width:22px; height:14px; border-radius:2px 14px 2px 14px; background:hsl(var(--h), 85%, 52%); opacity:.85; transform:scale(var(--s)); animation:plLeaf linear infinite; box-shadow:inset -3px -2px 0 rgba(0,0,0,.18); }
+@keyframes plLeaf { from { transform:translate(0, 0) rotate(0) scale(var(--s)); } to { transform:translate(var(--dx), 112vh) rotate(540deg) scale(var(--s)); } }
+@media (max-width: 700px) { .pl-box { padding:18px 20px 22px; bottom:3vh; } .pl-skip { top:10px; right:10px; font-size:14px; padding:6px 12px; } }
 </style>
 <style>
 /* Full-screen illustrated title; native buttons align with the painted artwork. */

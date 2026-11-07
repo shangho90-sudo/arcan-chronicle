@@ -531,6 +531,7 @@ export class UI {
     const bb = $("div", "pbtns", b);
     this.button(bb, "게임 재개", "gold", () => this.close());
     this.button(bb, "저장하기", "teal", () => this.showSaveSlots("save", null, () => this.showPause()));
+    this.button(bb, "프롤로그 보기", "ivory", () => { G.paused = true; G.playPrologue(() => { G.paused = false; G.input.block = false; }); });
     this.button(bb, "타이틀로", "teal", () => { G.save(); this.close(); G.showTitle(); });
   }
   /** save slot list. mode "save" (in game, from the pause menu): 저장 1..N, click = save (overwrite asks first).
