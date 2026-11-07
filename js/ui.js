@@ -288,11 +288,18 @@ export class UI {
     const z = G.zone, place = (p, pos) => { const s = G.render.toScreen(pos); p.style.transform = `translate(${s.x}px,${s.y}px) translate(-50%,-100%)`; };
     for (const n of z.npcs) { const p = this.plate(n, false); p.classList.add("npc"); p.querySelector(".pname").innerHTML = `<span class="gold">${n.def.title}</span> ${n.def.name}`; const mk = p.querySelector(".mark"), mh = G.questMark(n.def.id); if (mk._h !== mh) { mk._h = mh; mk.innerHTML = mh; } place(p, { x: n.pos.x, y: n.pos.y + 1.9, z: n.pos.z }); }
     for (const pt of z.def.portals) { const p = this.plate(pt, false); p.querySelector(".pname").textContent = "▶ " + pt.label; const g = z.geo.ground(pt.pos[0], pt.pos[1]); place(p, { x: g.x, y: g.y + 1.2, z: g.z }); }
+    // monsters: name + HP bar always shown above the head (with a gap); name white = your level or lower, red = stronger
+    const pl = G.player, pL = pl ? pl.level : 1;
     for (const a of z.actors) {
-      if (a.faction !== "monster" || a.dead || a === z.boss || !(a.hitRecently > 0)) continue;
-      a.hitRecently -= dt;
-      const p = this.plate(a, true); p.querySelector(".pname").textContent = "Lv" + a.level + " " + a.name; p.querySelector(".phb i").style.width = (100 * a.hp / a.maxHp) + "%";
-      place(p, { x: a.pos.x, y: a.pos.y + a.def.radius * 1.6 + 0.9, z: a.pos.z });
+      if (a.faction !== "monster" || a.dead || a === z.boss) continue;
+      if (pl && Math.hypot(a.pos.x - pl.pos.x, a.pos.z - pl.pos.z) > 32) continue;
+      if (a.hitRecently > 0) a.hitRecently -= dt;
+      const p = this.plate(a, true); p.classList.add("mon");
+      const strong = a.level > pL, nm = p.querySelector(".pname"), txt = "Lv" + a.level + " " + a.name + (a.def.elite ? " ★" : "");
+      if (nm._t !== txt) { nm._t = txt; nm.textContent = txt; } nm.classList.toggle("strong", strong);
+      p.querySelector(".phb i").style.width = (100 * a.hp / a.maxHp) + "%";
+      if (!(a._plateH > 0) && a.body && a.body.root) { const bb = new THREE.Box3().setFromObject(a.body.root); const h = bb.max.y - bb.min.y; if (isFinite(h) && h > 0.1) a._plateH = h; }
+      place(p, { x: a.pos.x, y: a.pos.y + (a._plateH || a.def.radius * 2 + 0.4) + 0.45, z: a.pos.z });
     }
     for (const [k, p] of this.plates) if (!p._seen) { p.remove(); this.plates.delete(k); }
   }

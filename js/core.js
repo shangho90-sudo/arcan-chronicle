@@ -18,6 +18,40 @@ export function missChance(src, tgt) {
   if (tgt.faction === "player") return clamp(tgt.stat ? tgt.stat("eva") : 0, 0, EVA_CAP);
   return 0;
 }
+/** level-gap combat (similar levels fight fairly; much stronger monsters are near-untouchable and hit very hard,
+ *  much weaker ones barely hurt): damage multiplier for an attack from `att` on `def` (factions differ) */
+export function levelGapDamage(att, def) {
+  const a = att && att.level, b = def && def.level; if (!(a > 0) || !(b > 0)) return 1;
+  if (att.faction === "player") { const g = b - a; return g > 0 ? Math.max(0.12, 1 - 0.13 * g) : 1 + Math.min(0.3, -0.04 * g); }
+  const g = a - b; return g > 0 ? 1 + Math.min(1.5, 0.15 * g) : Math.max(0.35, 1 + 0.08 * g);   // monster on player
+}
+/** EXP for a kill by a player of level pl: full within 3 levels below, falling to 10 % for much weaker monsters, a small
+ *  bonus for stronger ones */
+export function levelGapExp(exp, pl, ml) { const g = ml - pl; const k = g >= 0 ? 1 + 0.08 * Math.min(g, 5) : g >= -3 ? 1 : Math.max(0.1, 1 + 0.18 * (g + 3)); return Math.max(1, Math.round(exp * k)); }
+
+/** monster stats from their level (one curve for every field, so a monster of level L is a fair fight for a player of
+ *  level L with the gear of that level): hp / atk / def / exp from the reference player, times a role factor
+ *  (ai heavy / ranged, elite = a monster whose data hp is >= 2x its level neighbours). Bosses keep their data values. */
+export function balanceMonsters(mons, levels) {
+  const refAtk = L => 14 + 2.6 * (L - 1) + (L >= 8 ? 35 : L >= 5 ? 17 : 6);
+  const refHp = L => 120 + 18 * (L - 1) + (L >= 10 ? 200 : 0) + (L >= 8 ? 160 : L >= 5 ? 50 : 20);
+  const refDef = L => 5 + 2 * (L - 1) + (L >= 8 ? 24 : L >= 5 ? 13 : 4);
+  const exp2 = levels && levels.expToNext || [];
+  const list = Object.values(mons), normal = list.filter(m => !(m.id.startsWith("boss_") || m.ai === "boss"));
+  for (const m of normal) {
+    const L = Math.max(1, m.level | 0), near = normal.filter(o => Math.abs((o.level | 0) - L) <= 3).map(o => o.hp).sort((x, y) => x - y);
+    const med = near[near.length >> 1] || m.hp, elite = m.hp >= med * 2 && near.length >= 3;
+    const role = { hp: 1, atk: 1, exp: 1 };
+    if (m.ai === "heavy") { role.hp *= 1.6; role.atk *= 1.2; role.exp *= 1.5; } else if (m.ai === "ranged") role.hp *= 0.8;
+    if (elite) { role.hp *= 5; role.atk *= 1.5; role.exp *= 5; }
+    const mdef = Math.round(2 + 1.5 * L), hits = 3.5 + 0.12 * L;
+    const hit = (0.06 + 0.0008 * L) * refHp(L), kills = 6 + 0.9 * L, need = exp2[Math.min(exp2.length - 1, L - 1)] || 30 * L;
+    m._orig = m._orig || { hp: m.hp, atk: m.atk, def: m.def, exp: m.exp }; m.elite = elite;
+    m.hp = Math.round(hits * refAtk(L) * 100 / (100 + mdef) * role.hp);
+    m.atk = Math.round(hit * (100 + refDef(L)) / 100 * role.atk);
+    m.def = mdef; m.exp = Math.max(1, Math.round(need / kills * role.exp));
+  }
+}
 export const clamp = (v, a, b) => v < a ? a : (v > b ? b : v);
 export const clamp01 = v => clamp(v, 0, 1);
 export const lerp = (a, b, t) => a + (b - a) * clamp01(t);
@@ -35,6 +69,7 @@ export class GameData {
     this.statuses = Object.fromEntries(files.skills.statuses.map(s => [s.id, s]));
     this.itemList = files.items.items; this.items = Object.fromEntries(this.itemList.map(i => [i.id, i]));
     this.monsters = Object.fromEntries(files.monsters.monsters.map(m => [m.id, m]));
+    if (!(files.config && files.config.balanceMonsters === false)) balanceMonsters(this.monsters, files.levels);
     this.questList = files.quests.quests; this.quests = Object.fromEntries(this.questList.map(q => [q.id, q]));
     this.npcs = Object.fromEntries(files.npcs.npcs.map(n => [n.id, n]));
     this.shops = Object.fromEntries(files.npcs.shops.map(s => [s.id, s]));
@@ -546,7 +581,7 @@ export function propFootprint(p) {
     case "bench": return b(0.9 * s, 0.3 * s); case "flowerbed": return b((p.w > 0 ? p.w : 2) / 2, (p.d > 0 ? p.d : 0.8) / 2);
     case "fence": return b((p.w > 0 ? p.w : 2) / 2, 0.1); case "wall": return b((p.w > 0 ? p.w : 2) / 2, (p.d > 0 ? p.d : 0.6) / 2);
     case "ruin": return b(0.5 * s, 0.5 * s); case "stall": return b((p.w > 0 ? p.w : 3) / 2, (p.d > 0 ? p.d : 1.2) / 2);
-    case "signpost": return c(0.15); case "forge": return b(0.8, 0.7); case "easel": return c(0.35); case "cauldron": return c(0.5);
+    case "signpost": return c(p.text ? 0.3 : 0.15); case "landmark": return c((p.r > 0 ? p.r : 2.4) * s); case "forge": return b(0.8, 0.7); case "easel": return c(0.35); case "cauldron": return c(0.5);
   }
   return null;
 }

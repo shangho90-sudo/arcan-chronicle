@@ -1,6 +1,6 @@
 // Actors: combatant base, player, monsters, boss, NPCs, projectiles, poison zones, loot, skill runner.
 // Port of Assets/Arcan/Scripts/Runtime/{Actors,Combat} (C#).
-import { CombatMath, HitShape, StatusSet, clamp, clamp01, DEG, missChance } from './core.js';
+import { CombatMath, HitShape, StatusSet, clamp, clamp01, DEG, missChance, levelGapDamage } from './core.js';
 import { SpriteBody, dirFromWorld, hitTime, duration, lockTime, action, TelegraphView, T, THREE } from './render.js';
 import { lootModel, hasItemModel } from './items3d.js';
 import { SkillEngine, applyStatus, clearMarks } from './skillrt.js';
@@ -38,6 +38,7 @@ export class Combatant {
       d.missed = true; return;
     }
     let amount = d.amount;
+    if (d.source && d.source !== this && d.source.faction !== this.faction) amount = Math.max(1, Math.round(amount * levelGapDamage(d.source, this)));   // level gap
     if (this.faction === "player" && this.skills2) {
       if (!d.dot) this._hits = (this._hits || 0) + 1;
       const fg = this.status.flag("frontguard"); if (fg && d.source && d.source.pos) { const dx = d.source.pos.x - this.pos.x, dz = d.source.pos.z - this.pos.z, m = Math.hypot(dx, dz) || 1; if ((dx * this.facing.x + dz * this.facing.z) / m > 0.3) amount *= 1 - fg; }

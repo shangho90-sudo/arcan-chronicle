@@ -24,6 +24,7 @@
 - 쿨타임은 슬롯 교체·재접속 후에도 유지. 스킬 초기화는 마을에서만.
 - 능력치(힘·지능·민첩·생명력·행운, `core.js` `ATTRS`/`ATTR_FX`): 레벨당 3포인트(`P.apoints`), 투자분만 효과(기본 5는 직업 기본값에 포함). 명중·회피는 `missChance`(`Actor.takeDamage`에서 판정), 제작 성공은 `skillsys.js` `craftSuccessRate`(1단계 항상 성공). 수치를 바꾸면 `tests/core.test.mjs` TestAttributes도 함께.
 - 기본 검술(`job: novice`, `nv_*` 5종)은 모든 직업의 계보 맨 앞에 붙어 전직 후에도 유지되며, 직업 포인트(`sk.points`)와 별개인 `sk.npoints`를 씁니다(Lv1부터 레벨당 1).
+- 몬스터 능력치는 레벨 곡선으로 다시 계산(`core.js` `balanceMonsters`, monsters.json의 hp/atk/def/exp는 역할 판단용 원본), 레벨 차이 보정 `levelGapDamage`/`levelGapExp`. 필드 몬스터는 들어갈 때 고르게 다시 배치(`game.js` `Zone.evenSpawners`). 몬스터 이름표는 항상 표시(흰색 = 내 레벨 이하, 빨강 = 높음).
 - 몬스터 공격 방식은 `js/creature.js` `CREATURES[id].atk`(동작)와 `js/actors.js` `Monster.resolve`(판정·이펙트)에서 함께 정합니다.
 - UI 문구는 한국어.
 

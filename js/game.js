@@ -1,5 +1,5 @@
 // Game orchestrator + zone runtime. Port of Boot/ArcanGame.cs and World/ZoneRuntime.cs.
-import { GameData, SaveStore, CharacterSheet, QuestLog, QS, ZoneGeometry, NavGrid, newProfile, DEG, clamp, HitShape } from './core.js';
+import { GameData, SaveStore, CharacterSheet, QuestLog, QS, ZoneGeometry, NavGrid, newProfile, DEG, clamp, HitShape, levelGapExp } from './core.js';
 import { Renderer, Fx, TelegraphView, TG_TIME, loadSheet, preloadTextures, THREE, T } from './render.js';
 import { Player, Monster, Boss, Npc, Loot, bindGame as bindActors } from './actors.js';
 import { Input, Audio } from './io.js';
@@ -88,7 +88,7 @@ class Zone {
       const nd = G.data.npcs[n.npc]; if (!nd) continue;
       const npc = new Npc(this, nd, this.geo.ground(n.pos[0], n.pos[1]), n.rot); this.npcs.push(npc); jobs.push(npc.attachBody());
     }
-    for (const ms of this.def.monsters || []) { const sp = { def: ms, alive: [], timers: [] }; this.spawners.push(sp); for (let i = 0; i < ms.count; i++) jobs.push(this.spawnFor(sp)); }
+    for (const ms of this.evenSpawners(this.def.monsters || [])) { const sp = { def: ms, alive: [], timers: [] }; this.spawners.push(sp); for (let i = 0; i < ms.count; i++) jobs.push(this.spawnFor(sp)); }
     if (this.def.boss && this.def.boss.boss) jobs.push(this.spawnBoss());
     await Promise.all(jobs);
   }
@@ -103,6 +103,34 @@ class Zone {
     const m = new Monster(this, md, pos, home, sp.def.spread ? Math.min(sp.def.radius, 5) : sp.def.radius);
     m.onRemoved = mm => { sp.alive.splice(sp.alive.indexOf(mm), 1); sp.timers.push(md.respawn); };
     sp.alive.push(m); this.actors.push(m); await m.attachBody(); m.body.place(m.pos);
+  }
+  /** spread a field's monsters evenly: the data lists a few camps (species, area, count); here the walkable field is cut
+   *  into a grid of ~24 m cells and every usable cell gets a small camp of the species of the nearest data camp (so
+   *  each area keeps its monsters and level), the total count is kept (at least one monster per ~520 m2). Cells near
+   *  portals / player spawns / the boss arena or mostly blocked (trees, water) are skipped. Single elites stay where
+   *  the data puts them. Towns and fields without "spread" camps are left alone. */
+  evenSpawners(list) {
+    const camps = list.filter(m => m.spread && m.count > 1), keep = list.filter(m => !(m.spread && m.count > 1));
+    if (camps.length < 1 || this.def.kind === "town" || this.def.evenMonsters === false) return list;
+    const [x0, z0, x1, z1] = this.def.bounds, W = x1 - x0, H = z1 - z0, cell = 24, avoid = [];
+    for (const p of this.def.portals || []) avoid.push([p.pos[0], p.pos[1], 14]);
+    for (const p of this.def.spawns || []) avoid.push([p.pos[0], p.pos[1], 14]);
+    const cells = [];
+    for (let cz = z0 + cell / 2; cz < z1 - 4; cz += cell) for (let cx = x0 + cell / 2; cx < x1 - 4; cx += cell) {
+      if (avoid.some(([ax, az, r]) => Math.hypot(cx - ax, cz - az) < r) || this.inArena({ x: cx, z: cz }, 8)) continue;
+      let free = 0; for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) { const x = cx + i * 7, z = cz + j * 7; if (x > x0 + 2 && x < x1 - 2 && z > z0 + 2 && z < z1 - 2 && !this.geo.blocked(x, z, 0.5)) free++; }
+      if (free >= 4) cells.push([cx, cz]);
+    }
+    if (!cells.length) return list;
+    const total = Math.max(camps.reduce((a, m) => a + m.count, 0), Math.round(W * H / 520));
+    const base = Math.floor(total / cells.length);
+    const out = cells.map(([cx, cz]) => {
+      let near = camps[0], bd = 1e9; for (const m of camps) { const d = Math.hypot(m.pos[0] - cx, m.pos[1] - cz); if (d < bd) { bd = d; near = m; } }
+      return { monster: near.monster, pos: [cx, cz], radius: cell * 0.48, count: base, spread: near.spread };
+    });
+    let sum = out.reduce((a, m) => a + m.count, 0);                              // hand out what rounding left over
+    for (let i = 0; sum < total && i < out.length * 3; i++) { out[(i * 7) % out.length].count++; sum++; }
+    return out.filter(m => m.count > 0).concat(keep);
   }
   /** a free spot in the camp circle that keeps its distance from monsters already there (best of several tries) */
   spacedSpot(cx, cz, R, rad, spread = 0, away = null) {
@@ -469,10 +497,10 @@ class Game {
   onMonsterDamaged(m) { this.ui.setTarget(m); m.hitRecently = 4; }
   onMonsterKilled(m) {
     if (!this.player) return;
-    const d = m.def, gold = d.goldMin + Math.floor(Math.random() * (d.goldMax - d.goldMin + 1));
-    this.sheet.addGold(gold); this.sheet.addExp(d.exp);
-    if (this.reward) this.reward.kill(m.pos, d.exp, gold);                     // light shafts, rune, stars, EXP / gold stack
-    else { this.ui.floatText(m.pos, "+" + d.exp + " EXP", "#b8e0ff", 0.9, 1.6); if (gold > 0) this.ui.floatText(m.pos, "+" + gold + " G", "#ffd86b", 0.85, 1.1); }
+    const d = m.def, gold = d.goldMin + Math.floor(Math.random() * (d.goldMax - d.goldMin + 1)), exp = levelGapExp(d.exp, this.player.level, m.level);
+    this.sheet.addGold(gold); this.sheet.addExp(exp);
+    if (this.reward) this.reward.kill(m.pos, exp, gold);                     // light shafts, rune, stars, EXP / gold stack
+    else { this.ui.floatText(m.pos, "+" + exp + " EXP", "#b8e0ff", 0.9, 1.6); if (gold > 0) this.ui.floatText(m.pos, "+" + gold + " G", "#ffd86b", 0.85, 1.1); }
     // coin sound after the gold number appears; several kills at once share one
     if (gold > 0) { const now = performance.now(); if (now - (this._coinT || 0) > 160) { this._coinT = now; this.timers.push({ t: 0.3, f: () => this.audio.sfx("coin") }); } }
     for (const dr of d.drops || []) {
