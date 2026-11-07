@@ -11,3 +11,5 @@ node_modules/
 # Blender pipeline outputs (regenerate: tools/blender/paint.py, assets.py)
 tools/blender/out/
 tools/blender/tex/
+tools/prologue/legacy-output/
+docs/prologue-review/

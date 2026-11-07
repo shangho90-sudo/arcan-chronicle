@@ -1,4 +1,5 @@
-"""Prologue illustrations (서장 '별을 잇는 자') painted in code -> assets/ui/prologue/p<N>.jpg (1600x900).
+"""Legacy prologue illustrations -> tools/prologue/legacy-output/p<N>.jpg (1600x900).
+The game uses the new illustrated assets; see assets/ui/prologue/README.md.
 
 Style: a told legend — dark painted skies (fbm noise), light-and-ink silhouettes, strong glows, grain + vignette.
 Panels (story: docs / 『아르칸 연대기 — 흑룡의 계절』 서장):
@@ -16,7 +17,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
 ROOT = os.path.join(os.path.dirname(__file__), '..', '..')
-OUT = os.path.join(ROOT, 'assets', 'ui', 'prologue')
+OUT = os.path.join(ROOT, 'tools', 'prologue', 'legacy-output')
 W, H = 1600, 900
 SS = 2                                   # silhouettes are drawn at 2x and reduced (smooth edges)
 rng = np.random.default_rng(7)

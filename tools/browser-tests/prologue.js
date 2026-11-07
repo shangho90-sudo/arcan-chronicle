@@ -1,23 +1,54 @@
 // 새 게임 → 캐릭터 만들기 → 프롤로그(그림 + 대화창) → 마을. Screenshots of every panel and the ending card.
 // Usage: SIZES=1280x720,390x844t node tools/browser-tests/prologue.js -> OUT/pro_<size>_*.png
 const { chromium } = require('playwright'); const fs = require('fs');
+const path = require('path');
 const OUT = process.env.OUT || '/tmp/pro'; fs.mkdirSync(OUT, { recursive: true });
 const fails = []; const ok = (c, m) => { console.log((c ? '  ok   ' : '  FAIL ') + m); if (!c) fails.push(m); };
 (async () => {
-  const b = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+  const b = await chromium.launch({ ...(process.env.BROWSER_PATH ? { executablePath: process.env.BROWSER_PATH } : {}), args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
   for (const sz of (process.env.SIZES || '1280x720').split(',')) {
     console.log('== ' + sz);
     const touch = sz.endsWith('t'), [W, H] = sz.replace('t', '').split('x').map(Number);
     const ctx = await b.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1, hasTouch: touch, isMobile: touch });
     const pg = await ctx.newPage(); const errs = []; pg.on('pageerror', e => errs.push(e.message));
+    // Optional in-process serving for hosts whose browser cannot reach a loopback server.
+    if (process.env.LOCAL_FILES === '1') {
+      const root = path.resolve(__dirname, '../..');
+      const mime = { '.html':'text/html', '.js':'text/javascript', '.json':'application/json', '.jpg':'image/jpeg', '.png':'image/png', '.mp3':'audio/mpeg', '.ogg':'audio/ogg', '.woff':'font/woff', '.woff2':'font/woff2', '.svg':'image/svg+xml' };
+      await ctx.route('http://127.0.0.1:8765/**', async route => {
+        const file = path.resolve(root, '.' + decodeURIComponent(new URL(route.request().url()).pathname));
+        if (!file.startsWith(root + path.sep)) return route.fulfill({ status:403, body:'' });
+        if (process.env.SLOW_PROLOGUE === '1' && /(?:prologue\.js|prologue\.json|p1\.jpg)$/.test(file)) await new Promise(r => setTimeout(r, 900));
+        try { await route.fulfill({ status:200, contentType:mime[path.extname(file)] || 'application/octet-stream', body:await fs.promises.readFile(file) }); }
+        catch { await route.fulfill({ status:404, body:'' }); }
+      });
+    }
     const ev = (f, a) => pg.evaluate(f, a), shot = n => pg.screenshot({ path: `${OUT}/pro_${sz}_${n}.png`, timeout: 300000 });
     const S = 'button,[role=button],[aria-label]';
     const click = async t => { await pg.waitForFunction(([S, t]) => [...document.querySelectorAll(S)].some(b => (b.getAttribute('aria-label') || b.textContent || '').trim() === t), [S, t], { timeout: 300000 });
       await ev(([S, t]) => [...document.querySelectorAll(S)].find(b => (b.getAttribute('aria-label') || b.textContent || '').trim() === t).click(), [S, t]); await pg.waitForTimeout(400); };
-    await pg.goto('http://localhost:8765/index.html', { timeout: 300000 });
+    await pg.goto(process.env.GAME_URL || 'http://127.0.0.1:8765/index.html', { timeout: 300000 });
     await ev(() => localStorage.clear()); await pg.reload({ timeout: 300000 });
-    await click('새 게임'); await click('모험 시작');
+    await click('새 게임');
+    await ev(() => {
+      window.prologueTransition = { frames:0, gaps:0, done:false };
+      const begin = document.querySelector('.create-start');
+      begin.addEventListener('click', () => {
+        const sample = () => {
+          const s = window.prologueTransition; s.frames++;
+          const covers = [...document.querySelectorAll('.pl-loading, .prologue')];
+          if (!covers.some(el => { const c = getComputedStyle(el), r = el.getBoundingClientRect(); return +c.opacity === 1 && c.backgroundColor === 'rgb(8, 12, 22)' && r.width >= innerWidth && r.height >= innerHeight; })) s.gaps++;
+          const layer = document.querySelector('.pl-layer.in');
+          if (layer && +getComputedStyle(layer).opacity >= .99) s.done = true;
+          else requestAnimationFrame(sample);
+        };
+        requestAnimationFrame(sample);
+      }, { once:true });
+    });
+    await click('모험 시작');
     await pg.waitForSelector('.prologue.on', { timeout: 60000 }); await pg.waitForTimeout(2500);
+    await pg.waitForFunction(() => window.prologueTransition.done, null, { timeout:60000 });
+    ok(await ev(() => prologueTransition.frames > 0 && prologueTransition.gaps === 0), 'no town frame between character selection and the first illustration');
     ok(await ev(() => !G.inWorld), 'prologue plays before the character enters the world');
     const tap = () => pg.mouse.click(W / 2, H / 3);
     let n = 0, guard = 0, last = '';

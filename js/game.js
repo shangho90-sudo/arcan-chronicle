@@ -385,8 +385,19 @@ class Game {
   openCreate() { this.ui.showCreate((name, gender) => this.playPrologue(() => this.enterWorld(newProfile(this.data, name, gender), true)), () => this.showTitleMenu()); }
   /** 서장 (js/prologue.js): illustrated story before a new character appears in the town; also from the pause menu */
   playPrologue(done) {
+    if (this.prologueActive) return;
+    this.prologueActive = true;
+    // Cover the town synchronously, before closing character selection or awaiting any files.
+    const cover = document.createElement('div'); cover.className = 'pl-loading';
+    cover.setAttribute('role', 'status'); cover.innerHTML = '<small>서장</small><p>별을 잇는 자</p>';
+    document.body.appendChild(cover);
     this.ui.close(false);
-    import('./prologue.js').then(m => new m.Prologue(this).play(done)).catch(e => { console.warn('prologue', e); done(); });
+    this.input.block = true; this.prologueCover = true;
+    const finish = () => {
+      if (!this.prologueActive) return;
+      this.prologueActive = false; this.prologueCover = false; cover.remove(); done();
+    };
+    import('./prologue.js').then(m => new m.Prologue(this).play(finish)).then(() => cover.remove()).catch(e => { console.warn('prologue', e); finish(); });
   }
   continueGame() { const p = this.store.load(); if (!p) return this.ui.toast("저장 파일을 읽을 수 없습니다: " + this.store.lastError); this.enterWorld(p, false); }
   enterWorld(prof, fresh) {
