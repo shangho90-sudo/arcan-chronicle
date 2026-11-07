@@ -15,6 +15,7 @@ export const PLAYER_MODELS = {
 export const JOB_MODELS = {
   pharmacist: { m: { file: 'pharmacist_m', height: 1.65, headPitch: -10 }, f: { file: 'pharmacist_f', height: 1.6, headPitch: -14 } },
   blacksmith: { m: { file: 'blacksmith_m', height: 1.65, headPitch: -10 }, f: { file: 'blacksmith_f', height: 1.6, headPitch: -14 } },
+  artist: { m: { file: 'artist_m', height: 1.65, headPitch: -10 }, f: { file: 'artist_f', height: 1.6, headPitch: -14 } },
 };
 export function playerModelCfg(gender, jobSheet) { const j = JOB_MODELS[jobSheet]; return (j && j[gender]) || PLAYER_MODELS[gender] || PLAYER_MODELS.m; }
 /** town NPCs made from the user's character sheet (Tripo image->3D + auto rig), keyed by npc id; hold their own items */

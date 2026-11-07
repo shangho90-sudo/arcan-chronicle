@@ -425,3 +425,8 @@
 - 사용자가 준 모델 2개(여: `anime_blacksmith_3d_model.glb`, 남: `blacksmith_character_3d_model.glb`, 둘 다 같은 67뼈 휴머노이드)를 `tools/models/glb_to_model.py`로 변환 → `blacksmith_f`(5,559 정점·10,741 삼각형), `blacksmith_m`(5,605·10,298). `model.js` `JOB_MODELS.blacksmith`(2차 기술자도 같은 모습).
 - 변신 연출은 약사와 같음(`JobChangeFx`: 투명 빛기둥·빛 고치·천사 날개·금 나팔·팡파르). 움직임은 기존 뼈대 그대로.
 - `jobchange.js`에 `JOB=` 추가. 확인: JOB=blacksmith 남(boy → blacksmith_m)·여(girl → blacksmith_f), 변신 중·후·걷기 화면, 오류 없음. core 346 통과(50 생략), skills2 606 통과.
+
+### 2026-11-07 — 예술가 1차 전직 변신 (남·여 예술가 모델)
+- 사용자가 준 모델 2개(남: `fantasy_character_3d_model.glb`, 여: `fantasy_painter_3d_model.glb`, 같은 67뼈 휴머노이드) → `tools/models/glb_to_model.py` → `artist_m`(5,266 정점·10,108 삼각형), `artist_f`(5,565·10,533). `model.js` `JOB_MODELS.artist`(2차 화가·음악가도 같은 모습).
+- 변신 연출은 약사·대장장이와 같음. 움직임은 기존 뼈대 그대로.
+- 확인: `JOB=artist` 남(boy → artist_m)·여(girl → artist_f) 변신 중·후·걷기 화면, 오류 없음. core 346 통과(50 생략), skills2 606 통과.
