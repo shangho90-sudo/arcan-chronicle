@@ -8,7 +8,7 @@
 ## 기본
 - 빌드 없음. `python3 -m http.server 8765` 후 `http://localhost:8765/index.html`.
 - three.js r160을 로컬 import map(`index.html`, `vendor/three-r160/`)으로 불러옵니다. CDN 장애 시 0% 멈춤을 방지하기 위해 동일 버전과 LICENSE를 저장소에 포함합니다. npm 의존성 없음. 새 라이브러리 추가 금지(필요하면 먼저 사용자에게 확인).
-- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs` (현재 346 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 606 통과).
+- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs` (현재 370 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 606 통과).
 - 테스트하지 않은 것을 "검증됨"이라고 보고하지 말 것.
 
 ## 데이터 우선
@@ -31,7 +31,7 @@
 ## 화면 연출 (그래픽 효과)
 - `js/post.js`: HDR 렌더 → 블룸, 따뜻한 색보정(필믹 커브·채도·대비), 비네트. 화면 위아래 흐림(tilt)은 사용자 요청으로 0(꺼짐) — 다시 켜지 말 것. 값은 `Post.params`(옅은 보라 대기 `haze`·`hazeCol` 포함, 존별 `zones.json` "post"). 설정의 "그래픽 효과"로 끌 수 있음(`settings.graphicsFx`).
 - 마을 바닥 텍스처는 `tools/town/texgen2.py`로 생성(`pave`, `cobble`). 장미 문양 바닥·꽃잎·나뭇잎 그림자(보이지 않는 나무 그늘 캐스터)·장식 가로등은 `js/town3d.js`.
-- HUD는 `index.html`의 "ornate gold HUD" CSS 블록과 `js/ui.js`의 `MENU_ICON`/`HUD_ICON`(SVG 아이콘). 배치: 왼쪽 위 초상화·이름, 오른쪽 위 미니맵(`js/minimap.js`)·퀘스트, 가운데 아래 체력·기력·경험치·메뉴 버튼(`.botbar`). 처치 보상 연출(바닥 마법진·금빛 광주·별빛·EXP/골드 묶음 `.rwstack`, `RewardFx.kill`, 확인 `rewardshots.js`)·레벨업 날개는 `js/rewardfx.js`, 합성 효과음은 `Audio.chime`. 화면 확인은 `tools/browser-tests/hudshots.js`. 퀘스트 창(미니맵 아래 고정 HUD, 접기·닫기·`L` 키, 상태는 `profile.ui`)과 지역 이름 배너·첫 시작 환영 문구는 `js/questhud.js` — 퀘스트 진행을 화면 가운데 토스트로 다시 띄우지 말 것, 확인 `questhud.js`(브라우저 테스트). 휴대폰 배치는 `index.html` 끝의 "phone compact layout" 블록(세로: 체력 막대를 초상화 패널 안에, 가운데 비우기), 휴대폰 게임 창은 `ui.fit`이 폭에 맞춰 재배치(`.window.phone`/`.narrow`, 최소 0.64배, 안에서 스크롤) — 확인 `mobileshots.js`. NPC 이름표·대화창 글꼴은 주아체(`assets/fonts/Jua.woff2`, OFL, 부분 집합 — `tools/fonts/jua_subset.py`로 다시 만듦). 모든 게임 창은 장식 창(`ui.js`의 `PLAIN`/`BANNER`, CSS `.window.fancy`, 확인 `windowshots.js`). 대화·타이틀·캐릭터 만들기만 예외.
+- HUD는 `index.html`의 "ornate gold HUD" CSS 블록과 `js/ui.js`의 `MENU_ICON`/`HUD_ICON`(SVG 아이콘). 배치: 왼쪽 위 초상화·이름, 오른쪽 위 미니맵(`js/minimap.js`)·퀘스트, 가운데 아래 체력·기력·경험치·메뉴 버튼(`.botbar`). 처치 보상 연출(바닥 마법진·금빛 광주·별빛·EXP/골드 묶음 `.rwstack`, `RewardFx.kill`, 확인 `rewardshots.js`)·레벨업 날개는 `js/rewardfx.js`, 합성 효과음은 `Audio.chime`. 화면 확인은 `tools/browser-tests/hudshots.js`. 퀘스트 창(미니맵 아래 고정 HUD, 접기·닫기·`L` 키, 상태는 `profile.ui`)과 지역 이름 배너·첫 시작 환영 문구는 `js/questhud.js` — 퀘스트 진행을 화면 가운데 토스트로 다시 띄우지 말 것, 확인 `questhud.js`(브라우저 테스트). 퀘스트는 메인(이야기)/서브(사냥·채집)로 나뉨: `quests.json` `"category"`(새 퀘스트에 꼭 넣기), `core.js` `questCategory`, 목록 창(`ui.js` `showQuests`) 탭·HUD 표시, 확인 `questcats.js`. 휴대폰 배치는 `index.html` 끝의 "phone compact layout" 블록(세로: 체력 막대를 초상화 패널 안에, 가운데 비우기), 휴대폰 게임 창은 `ui.fit`이 폭에 맞춰 재배치(`.window.phone`/`.narrow`, 최소 0.64배, 안에서 스크롤) — 확인 `mobileshots.js`. NPC 이름표·대화창 글꼴은 주아체(`assets/fonts/Jua.woff2`, OFL, 부분 집합 — `tools/fonts/jua_subset.py`로 다시 만듦). 모든 게임 창은 장식 창(`ui.js`의 `PLAIN`/`BANNER`, CSS `.window.fancy`, 확인 `windowshots.js`). 대화·타이틀·캐릭터 만들기만 예외.
 
 ## Blender 자산 (2026-11-04, `tools/blender/`, 자세한 내용 `tools/blender/README.md`)
 - 나무·바위·덤불·풀/꽃·마을 소품은 Blender(bpy)로 절차 제작합니다: `paint.py`(손그림 텍스처) → `assets.py`(모델, LOD `_l0`/게임용/`_l2`/`_lo`) → `wrap.py`(→ `assets/forest/bl/`) → `validate_assets.py`. 직접 GLB를 고치지 말고 스크립트를 고친 뒤 다시 만드세요.

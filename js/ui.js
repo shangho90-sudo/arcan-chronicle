@@ -1,5 +1,5 @@
 // HTML/CSS user interface (ivory / teal / gold, Galmuri pixel font). Port of the Unity uGUI views.
-import { QS, Shop, isEquipment, slotOf, EQUIP_SLOTS, ATTRS, ATTR_KR, ATTR_BASE, ATTR_FX } from './core.js';
+import { QS, QUEST_CAT, questCategory, Shop, isEquipment, slotOf, EQUIP_SLOTS, ATTRS, ATTR_KR, ATTR_BASE, ATTR_FX } from './core.js';
 import { showWorldMap } from './worldmap.js';
 import { THREE, tex, CAM } from './render.js';
 import { ModelBody, loadPlayerModel, loadActions } from './model.js';
@@ -465,20 +465,36 @@ export class UI {
     ].map(([a, v]) => `<span><em>${a}</em><b>${v}</b></span>`).join("") + `</div><p class="small muted">레벨이 오를 때마다 능력치 포인트 3을 얻습니다. 몬스터는 레벨이 높을수록 공격을 조금 더 잘 피하고, 명중 보너스가 그만큼을 줄여 줍니다. 회피율은 최대 40%입니다. 제작은 1단계 결과물은 항상 성공하고, 단계가 오를 때마다 성공 확률이 6%씩 낮아지며 행운이 그만큼을 채워 줍니다.</p>`);
   }
 
-  showQuests() {
+  showQuests(tab) {
     const p = G.player, ql = p.quests, b = this.open("quests", "퀘스트", 1240, 800);
-    let html = "";
-    const act = ql.active();
-    if (!act.length) html += "<p class='muted'>진행 중인 퀘스트가 없습니다. 머리 위에 <b>!</b> 가 있는 주민에게 말을 걸어 보세요.</p>";
-    for (const q of act) {
-      const st = ql.stateOf(q), n = G.data.npcs[q.turnIn || q.giver];
-      html += `<div class="qitem"><b>${q.name}</b>${st === QS.Completable ? ` <span class="good">[완료 보고: ${n.title} ${n.name}]</span>` : ""}<div class="small muted">${q.summary}</div>` +
-        q.objectives.map((o, i) => `<div class="small">· ${ql.objectiveText(q, i)}</div>`).join("") + `<div class="small goldtxt">보상: ${rewardText(q)}</div></div>`;
+    // two tabs: 메인 퀘스트 (story chain) / 서브 퀘스트 (side hunting & gathering), see core.js questCategory
+    const all = G.data.questList, act = ql.active(), of = c => q => questCategory(q) === c;
+    // opens on the last tab used; the first time on 메인 (or 서브 when only side quests are running)
+    if (!tab) tab = this.qtab || (!act.some(of("main")) && act.some(of("sub")) ? "sub" : "main");
+    this.qtab = tab;
+    const tabs = $("div", "qtabs", b);
+    for (const c of ["main", "sub"]) {
+      const n = act.filter(of(c)).length, ready = act.filter(of(c)).some(q => ql.stateOf(q) === QS.Completable);
+      const bt = $("button", "qtab " + c + (c === tab ? " on" : ""), tabs, `<i class="qcat ${c}">${c === "main" ? "★" : "◆"}</i>${QUEST_CAT[c]}<span class="qtab-n">${n}</span>${ready ? '<em class="qtab-dot"></em>' : ""}`);
+      bt.type = "button"; bt.onclick = () => { if (this.qtab === c) return; G.audio.sfx("ui"); this.qtab = c; render(); for (const t of tabs.children) t.classList.toggle("on", t === bt); };
     }
-    const avail = G.data.questList.filter(q => ql.stateOf(q) === QS.Available).map(q => { const n = G.data.npcs[q.giver]; return `${q.name} (${n.title} ${n.name})`; });
-    if (avail.length) html += `<b>받을 수 있는 퀘스트</b><div class="small">${avail.join("<br>")}</div>`;
-    html += `<p class="small muted">완료한 퀘스트 ${G.data.questList.filter(q => ql.isCompleted(q.id)).length} / ${G.data.questList.length}</p>`;
-    $("div", "qbody", b, html);
+    const body = $("div", "qbody", b);
+    const render = () => {
+      const c = this.qtab, mine = act.filter(of(c));
+      let html = `<p class="qcat-desc small muted">${c === "main" ? "아르칸 대륙의 이야기를 따라가는 퀘스트입니다. 끝내면 다음 이야기가 열립니다." : "주민들의 부탁 — 몬스터 사냥, 재료 모으기 같은 따로 하는 퀘스트입니다."}</p>`;
+      if (!mine.length) html += `<p class='muted'>진행 중인 ${QUEST_CAT[c]}가 없습니다. 머리 위에 <b>!</b> 가 있는 주민에게 말을 걸어 보세요.</p>`;
+      for (const q of mine) {
+        const st = ql.stateOf(q), n = G.data.npcs[q.turnIn || q.giver];
+        html += `<div class="qitem ${c}"><b>${q.name}</b>${st === QS.Completable ? ` <span class="good">[완료 보고: ${n.title} ${n.name}]</span>` : ""}<div class="small muted">${q.summary}</div>` +
+          q.objectives.map((o, i) => `<div class="small">· ${ql.objectiveText(q, i)}</div>`).join("") + `<div class="small goldtxt">보상: ${rewardText(q)}</div></div>`;
+      }
+      const avail = all.filter(of(c)).filter(q => ql.stateOf(q) === QS.Available).map(q => { const n = G.data.npcs[q.giver]; return `${q.name} (${n.title} ${n.name})`; });
+      if (avail.length) html += `<b>받을 수 있는 퀘스트</b><div class="small">${avail.join("<br>")}</div>`;
+      const cat = all.filter(of(c));
+      html += `<p class="small muted">완료한 ${QUEST_CAT[c]} ${cat.filter(q => ql.isCompleted(q.id)).length} / ${cat.length}</p>`;
+      body.innerHTML = html; body.scrollTop = 0;
+    };
+    render();
   }
 
   showJobs(hl) {

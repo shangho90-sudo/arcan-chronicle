@@ -7,7 +7,7 @@
 // - Content comes from the quest data (QuestLog). Before the first quest is taken, the tutorial goal "talk to the elder"
 //   is shown; it counts as done once the elder's first quest has been accepted (an existing, saved quest state), so it
 //   never comes back after a reload or a zone change.
-import { QS } from './core.js';
+import { QS, questCategory } from './core.js';
 
 let G = null; export function bindQuestHud(g) { G = g; }
 /** mixes the quest window methods into the UI class (called once from ui.js) */
@@ -16,6 +16,7 @@ const $ = (tag, cls, parent, html) => { const e = document.createElement(tag); i
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const SCROLL = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h10a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V6" fill="#e9dcbc" stroke="#6a4a1a" stroke-width="1.4"/><path d="M5 6a2 2 0 1 1 4 0v12" fill="none" stroke="#6a4a1a" stroke-width="1.4"/><path d="M10 9h6M10 12h6M10 15h4" stroke="#8a6a2a" stroke-width="1.3" stroke-linecap="round"/></svg>';
 const CHECK = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const CAT = c => `<em class="qh-cat ${c === 'sub' ? 'sub' : 'main'}">${c === 'sub' ? '서브' : '메인'}</em>`;
 const npcName = id => { const n = G.data.npcs[id]; return n ? `${n.title} ${n.name}` : id; };
 
 /** the goals to show, most relevant first: [{ key, title, rows:[{text, done, prog}], hint, ready }] */
@@ -25,7 +26,7 @@ function questGoals() {
   // tutorial: before the elder's first quest is taken (not a quest in the data: it is how the first quest is obtained)
   const first = G.data.quests.q1_start;
   if (first && ql.stateOf(first) === QS.Available) {
-    out.push({ key: 'tut_elder', title: '시작 안내', rows: [{ text: '분수 옆 촌장과 대화하기', done: false, prog: '대화 완료 0/1' }], hint: talkHint(first.giver) });
+    out.push({ key: 'tut_elder', cat: 'main', title: '시작 안내', rows: [{ text: '분수 옆 촌장과 대화하기', done: false, prog: '대화 완료 0/1' }], hint: talkHint(first.giver) });
   }
   for (const q of ql.active()) {
     const st = ql.stateOf(q), rows = q.objectives.map((o, i) => {
@@ -37,9 +38,10 @@ function questGoals() {
     if (st === QS.Completable) hint = `보고하기: ${talkHint(q.turnIn || q.giver)}`;
     else { const o = q.objectives.find((o, i) => ql.current(q, i) < o.count);
       if (o) hint = o.type === 'talk' ? talkHint(o.target) : o.type === 'kill' ? (mobile ? '공격 버튼으로 공격' : '몬스터를 클릭하거나 Space 키로 공격') : o.type === 'collect' ? '몬스터를 처치하면 재료를 얻습니다' : o.type === 'level' ? '몬스터를 처치해 경험치를 모으세요' : o.type === 'job' ? '직업 마스터에게 말을 걸어 전직' : o.type === 'equip' ? `가방(${mobile ? '가방 버튼' : 'I 키'})에서 장비 장착` : ''; }
-    out.push({ key: q.id, title: q.name, rows, hint, ready: st === QS.Completable });
+    out.push({ key: q.id, cat: questCategory(q), title: q.name, rows, hint, ready: st === QS.Completable });
   }
-  return out;
+  // story (메인) goals first, then side (서브) goals; order inside each group is kept
+  return out.filter(g => g.cat === 'main').concat(out.filter(g => g.cat !== 'main'));
 }
 
 const QUEST_HUD = {
@@ -93,9 +95,9 @@ const QUEST_HUD = {
     const main = list[0], next = main.rows.find(r => !r.done) || main.rows[main.rows.length - 1];
     if (st === 'min') { body.innerHTML = `<div class="qh-line${main.flash ? ' flash' : ''}">${main.flash || next.done ? `<i class="qh-ck">${CHECK}</i>` : '<i class="qh-dot"></i>'}<span>${esc(main.ready ? '보고하기 · ' + main.title : next.text)}</span></div>`; return; }
     const row = (g, r, i) => `<li class="${r.done ? 'done' : ''}${justDone.has(g.key + ':' + i) ? ' flash' : ''}">${r.done ? `<i class="qh-ck">${CHECK}</i>` : '<i class="qh-dot"></i>'}<span class="qh-obj">${esc(r.text)}</span><span class="qh-prog">${esc(r.prog)}</span></li>`;
-    let html = `<article class="qh-main${main.flash ? ' flash' : ''}"><h3>${esc(main.title)}${main.flash ? ' <em class="qh-tag">완료</em>' : main.ready ? ' <em class="qh-tag">보고 가능</em>' : ''}</h3><ul>${main.rows.map((r, i) => row(main, r, i)).join('')}</ul>${main.hint && !main.flash ? `<p class="qh-hint">${esc(main.hint)}</p>` : ''}</article>`;
+    let html = `<article class="qh-main${main.flash ? ' flash' : ''}"><h3>${CAT(main.cat)}${esc(main.title)}${main.flash ? ' <em class="qh-tag">완료</em>' : main.ready ? ' <em class="qh-tag">보고 가능</em>' : ''}</h3><ul>${main.rows.map((r, i) => row(main, r, i)).join('')}</ul>${main.hint && !main.flash ? `<p class="qh-hint">${esc(main.hint)}</p>` : ''}</article>`;
     const rest = list.slice(1);
-    if (rest.length) html += `<div class="qh-others">${rest.map(g => { const n = g.rows.find(r => !r.done); return `<button type="button" class="qh-other" data-q="${esc(g.key)}"><b>${esc(g.title)}</b><span>${esc(g.ready ? '보고 가능' : n ? n.text + ' · ' + n.prog : '')}</span></button>`; }).join('')}</div>`;
+    if (rest.length) html += `<div class="qh-others">${rest.map(g => { const n = g.rows.find(r => !r.done); return `<button type="button" class="qh-other" data-q="${esc(g.key)}"><b>${CAT(g.cat)}${esc(g.title)}</b><span>${esc(g.ready ? '보고 가능' : n ? n.text + ' · ' + n.prog : '')}</span></button>`; }).join('')}</div>`;
     body.innerHTML = html;
   },
 

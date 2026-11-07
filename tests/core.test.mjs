@@ -581,6 +581,14 @@ function FindSlot(ch, id) {
   return -1;
 }
 
+function TestQuestCategories() {
+  const d = LoadData();
+  for (const q of d.questList) Ok(q.category === "main" || q.category === "sub", "quest category set: " + q.id);
+  for (const id of ["q1_start", "q2_merchant", "q_job1", "q7_boss"]) Eq(core.questCategory(d.quests[id]), "main", "story quest is main: " + id);
+  for (const id of ["q3_slime", "q4_spore", "q6_golem"]) Eq(core.questCategory(d.quests[id]), "sub", "hunt/gather quest is sub: " + id);
+  Eq(core.questCategory({ objectives: [{ type: "kill" }, { type: "collect" }] }), "sub", "no category: kill/collect -> sub");
+  Eq(core.questCategory({ objectives: [{ type: "talk" }] }), "main", "no category: talk -> main");
+}
 function TestAttributes() {
   const d = LoadData(); const ch = NewChar(d);
   Eq(ch.p.apoints, 0, "new character: no attribute points at Lv1");
@@ -611,7 +619,7 @@ const tests = [
   ["Data", TestData], ["Inventory", TestInventory], ["Shop", TestShop], ["Stats & equipment", TestStats],
   ["Leveling", TestLeveling], ["Jobs", TestJobs], ["Quests", TestQuests], ["Save/Load", TestSave],
   ["Hit shapes", TestShapes], ["Combat math", TestCombat], ["Status effects", TestStatus],
-  ["Geometry & nav", TestGeometry], ["Layouts", TestLayouts], ["Balance", TestBalance], ["Full flow", TestFullFlow], ["Attributes", TestAttributes],
+  ["Geometry & nav", TestGeometry], ["Layouts", TestLayouts], ["Balance", TestBalance], ["Full flow", TestFullFlow], ["Attributes", TestAttributes], ["Quest categories", TestQuestCategories],
 ];
 for (const [name, fn] of tests) {
   const p0 = pass, f0 = fail;

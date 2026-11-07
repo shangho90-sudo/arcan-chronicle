@@ -3,6 +3,7 @@
   {
    "id": "q1_start",
    "name": "새로운 시작",
+   "category": "main",
    "giver": "elder",
    "turnIn": "elder",
    "summary": "대장장이 철산에게 마을의 생활 직업 이야기를 듣자.",
@@ -34,6 +35,7 @@
   {
    "id": "q2_merchant",
    "name": "마을 상인 모아",
+   "category": "main",
    "giver": "elder",
    "turnIn": "merchant",
    "summary": "광장 남서쪽 노점의 상인 모아에게 인사하자.",
@@ -82,6 +84,7 @@
     ]
    },
    "name": "첫 전직",
+   "category": "main",
    "giver": "elder",
    "turnIn": "elder",
    "summary": "레벨 10이 되면 직업 마스터를 찾아가 1차 전직을 하자.",
@@ -100,6 +103,7 @@
   {
    "id": "q3_slime",
    "name": "숲 토끼 소동",
+   "category": "sub",
    "giver": "guard",
    "turnIn": "guard",
    "summary": "속삭이는 숲 입구의 숲 토끼 6마리를 쫓아내자.",
@@ -133,6 +137,7 @@
   {
    "id": "q4_spore",
    "name": "도토리 채집",
+   "category": "sub",
    "giver": "master_pharmacist",
    "turnIn": "master_pharmacist",
    "summary": "도토리 다람쥐에게서 단단한 도토리 5개를 모아 약사 소연에게 가져가자.",
@@ -166,6 +171,7 @@
   {
    "id": "q5_gear",
    "name": "새 장비 마련",
+   "category": "sub",
    "giver": "master_blacksmith",
    "turnIn": "master_blacksmith",
    "summary": "2단계 이상의 무기를 장착하고 대장장이 철산에게 보여주자.",
@@ -194,6 +200,7 @@
   {
    "id": "q6_golem",
    "name": "꽃잎 곰 토벌",
+   "category": "sub",
    "giver": "guard",
    "turnIn": "guard",
    "summary": "숲 동쪽 유적의 꽃잎 곰 3마리를 쓰러뜨리자.",
@@ -227,6 +234,7 @@
   {
    "id": "q7_boss",
    "name": "거대 독버섯",
+   "category": "main",
    "giver": "elder",
    "turnIn": "elder",
    "summary": "숲 북동쪽 워프로 독버섯 군락지에 가서 거대 독버섯을 쓰러뜨리자.",
@@ -270,6 +278,7 @@
     "items": []
    },
    "name": "양약사 전직 시험",
+   "category": "main",
    "giver": "master_pharmacist",
    "turnIn": "master_pharmacist",
    "summary": "양약사의 자격을 증명하자.",
@@ -311,6 +320,7 @@
     "items": []
    },
    "name": "한약사 전직 시험",
+   "category": "main",
    "giver": "master_pharmacist",
    "turnIn": "master_pharmacist",
    "summary": "한약사의 자격을 증명하자.",
@@ -352,6 +362,7 @@
     "items": []
    },
    "name": "쉐프 전직 시험",
+   "category": "main",
    "giver": "master_cook",
    "turnIn": "master_cook",
    "summary": "쉐프의 자격을 증명하자.",
@@ -393,6 +404,7 @@
     "items": []
    },
    "name": "엔지니어 전직 시험",
+   "category": "main",
    "giver": "master_blacksmith",
    "turnIn": "master_blacksmith",
    "summary": "엔지니어의 자격을 증명하자.",
@@ -434,6 +446,7 @@
     "items": []
    },
    "name": "디자이너 전직 시험",
+   "category": "main",
    "giver": "master_hairdresser",
    "turnIn": "master_hairdresser",
    "summary": "디자이너의 자격을 증명하자.",
@@ -475,6 +488,7 @@
     "items": []
    },
    "name": "화가 전직 시험",
+   "category": "main",
    "giver": "master_artist",
    "turnIn": "master_artist",
    "summary": "화가의 자격을 증명하자.",
@@ -516,6 +530,7 @@
     "items": []
    },
    "name": "음악가 전직 시험",
+   "category": "main",
    "giver": "master_artist",
    "turnIn": "master_artist",
    "summary": "음악가의 자격을 증명하자.",

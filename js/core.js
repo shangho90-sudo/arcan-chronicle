@@ -397,6 +397,13 @@ export class CharacterSheet {
 
 // ======================================================================================= quests
 export const QS = { Locked: 0, Available: 1, Active: 2, Completable: 3, Completed: 4 };
+/** quest category: "main" = story chain, "sub" = side hunting / gathering. quests.json "category"; without it, quests
+ *  whose goals are only kill / collect / equip count as side quests. */
+export const QUEST_CAT = { main: "메인 퀘스트", sub: "서브 퀘스트" };
+export function questCategory(q) {
+  if (q && (q.category === "main" || q.category === "sub")) return q.category;
+  return q && q.objectives && q.objectives.length && q.objectives.every(o => ["kill", "collect", "equip"].includes(o.type)) ? "sub" : "main";
+}
 export class QuestLog {
   constructor(data, ch) {
     this.data = data; this.ch = ch; this.events = { accepted: [], updated: [], completed: [], ready: [] };
