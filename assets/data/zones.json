@@ -56,10 +56,10 @@
     {
      "id": "from_capital_road",
      "pos": [
-      15.0,
-      -12.2
+      -20.6,
+      -4.4
      ],
-     "rot": -130.0
+     "rot": 135.0
     }
    ],
    "buildings": [],
@@ -1111,8 +1111,8 @@
      "id": "to_capital_road",
      "label": "왕도 가는 길",
      "pos": [
-      17.5,
-      -14.5
+      -22.0,
+      -1.0
      ],
      "radius": 1.7,
      "targetZone": "capital_road",
@@ -7594,38 +7594,11 @@
      {
       "model": "flower_white",
       "pos": [
-       -24.65,
-       0.12
-      ],
-      "rot": 155.9,
-      "scale": 0.69
-     },
-     {
-      "model": "flower_white",
-      "pos": [
        -26.03,
        -1.99
       ],
       "rot": 357.1,
       "scale": 0.74
-     },
-     {
-      "model": "flower_white",
-      "pos": [
-       -23.78,
-       -0.08
-      ],
-      "rot": 219.6,
-      "scale": 0.77
-     },
-     {
-      "model": "grass_short",
-      "pos": [
-       -24.94,
-       0.66
-      ],
-      "rot": 126.3,
-      "scale": 0.84
      },
      {
       "model": "shrub_a",

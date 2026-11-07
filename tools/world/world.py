@@ -478,9 +478,22 @@ def gen_town(t, M):
             spawns.append(dict(id='from_' + n, pos=[gx, -Dd + 3.0], rot=0.0))
         else:
             dx, dz = direction(t['id'], n, M)
-            sp = max(spots, key=lambda s: s[0] * dx + s[1] * dz); spots.remove(sp)
-            for i, d in enumerate(decor):
-                if math.hypot(d['pos'][0] - sp[0], d['pos'][1] - sp[1]) < 4.5: d['pos'] = [d['pos'][0] * 0.6, d['pos'][1] * 0.6]
+            # a clear spot toward that neighbour: outside the plaza ring, >= 2.8 m from every house / keep footprint,
+            # off the gate road, apart from NPCs and other warps
+            def clear(x, z):
+                if math.hypot(x, z) < 10.5 or abs(x - gx) < 5 and z < -Dd + 11: return False
+                if not (-W + 4.5 < x < W - 4.5 and -Dd + 4.5 < z < Dd - 4.5): return False
+                for h in houses:
+                    if abs(x - h['pos'][0]) < h['w'] / 2 + 2.8 and abs(z - h['pos'][1]) < h['d'] / 2 + 2.8: return False
+                if any(math.hypot(x - q['pos'][0], z - q['pos'][1]) < 3.2 for q in npcs): return False
+                if any(math.hypot(x - lx, z - lz) < 5.0 for lx, lz in lanterns): return False
+                if any(math.hypot(x - q['pos'][0], z - q['pos'][1]) < 7 for q in portals): return False
+                return True
+            cand = [(x * 0.5, z * 0.5) for x in range(int(-2 * W), int(2 * W) + 1) for z in range(int(-2 * Dd), int(2 * Dd) + 1) if clear(x * 0.5, z * 0.5)]
+            sp = max(cand, key=lambda s: (s[0] * dx + s[1] * dz) / (math.hypot(*s) or 1) * 3 - math.hypot(*s) * 0.12) if cand else max(spots, key=lambda s: s[0] * dx + s[1] * dz)
+            if sp in spots: spots.remove(sp)
+            decor[:] = [d for d in decor if d['type'] == 'planter' or math.hypot(d['pos'][0] - sp[0], d['pos'][1] - sp[1]) >= 3.6]   # nothing on the circle
+            blocks[:] = [b for b in blocks if not b['id'].startswith('decor') or min(math.hypot(px - sp[0], pz - sp[1]) for px, pz in b['pts']) >= 2.4]
             portals.append(dict(id='to_' + n, label=name_of(n), pos=[round(sp[0], 2), round(sp[1], 2)], radius=1.7, targetZone=n, targetSpawn='from_' + t['id'], minLevel=0))
             spawns.append(dict(id='from_' + n, pos=[round(sp[0] * 0.78, 2), round(sp[1] * 0.78 - 1.5, 2)], rot=yaw_to(-sp[0], -sp[1])))
     roads = [dict(kind='ring', pos=[0, 0], r0=5.2, r1=8.8), dict(kind='path', pts=[[gx, -Dd - 2.2], [gx, -Dd + 4], [gx * 0.5, -8.6]], w=4.4)]
@@ -561,9 +574,9 @@ def link_existing(zones, M):
             if any(p['targetZone'] == n for p in Z['portals']): continue
             Z['portals'] = [p for p in Z['portals'] if p['id'] != 'to_' + n]; Z['spawns'] = [s for s in Z['spawns'] if s['id'] != 'from_' + n]
             if zid == 'town':
-                # warp circle inside the castle courtyard (east side, by the dummies' lawn)
-                Z['portals'].append(dict(id='to_' + n, label=name_of(n), pos=[17.5, -14.5], radius=1.7, targetZone=n, targetSpawn='from_town', minLevel=0))
-                Z['spawns'].append(dict(id='from_' + n, pos=[15.0, -12.2], rot=-130.0))
+                # warp circle inside the castle courtyard: west lawn between the well and the cart, clear of every building
+                Z['portals'].append(dict(id='to_' + n, label=name_of(n), pos=[-22.0, -1.0], radius=1.7, targetZone=n, targetSpawn='from_town', minLevel=0))
+                Z['spawns'].append(dict(id='from_' + n, pos=[-20.6, -4.4], rot=135.0))
                 continue
             x0, z0, x1, z1 = Z['bounds']; dx, dz = direction(zid, n, M)
             cx, cz = (x0 + x1) / 2, (z0 + z1) / 2; hx, hz = (x1 - x0) / 2, (z1 - z0) / 2
