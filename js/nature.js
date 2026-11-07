@@ -474,12 +474,42 @@ export async function buildNature(zone, renderer) {
 
   // signposts (simple carved wood; the builder's version is hidden with the other props)
   const wood = new THREE.MeshStandardMaterial({ color: 0x8a6038, roughness: 1 }), woodD = new THREE.MeshStandardMaterial({ color: 0x5e3e22, roughness: 1 });
-  for (const q of props) if (q.type === 'signpost') {
+  for (const q of props) if (q.type === 'signpost' && !q.text) {
     const g = new THREE.Group(), g0 = geo.ground(q.pos[0], q.pos[1]);
     const post = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 1.7, 7), woodD); post.position.y = 0.85; g.add(post);
     for (const [y, r] of [[1.45, 0.2], [1.12, -0.25]]) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.24, 0.06), wood); b.position.set(0.32, y, 0); b.rotation.y = r; g.add(b); }
     g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
     g.position.copy(T(g0)); g.rotation.y = -(q.rot || 0) * DEG; root.add(g);
+  }
+
+  // carved notice boards (signpost with "text"): two posts, a wide plank with the words burnt in (Jua), a little roof
+  for (const q of props) if (q.type === 'signpost' && q.text) {
+    try { await document.fonts.load('48px Jua'); } catch (e) { }
+    const cv = document.createElement('canvas'); cv.width = 512; cv.height = 160; const cx = cv.getContext('2d');
+    const gr = cx.createLinearGradient(0, 0, 0, 160); gr.addColorStop(0, '#c08a52'); gr.addColorStop(1, '#94643a'); cx.fillStyle = gr; cx.fillRect(0, 0, 512, 160);
+    cx.strokeStyle = 'rgba(70,40,18,.35)'; cx.lineWidth = 2; for (let i = 0; i < 9; i++) { cx.beginPath(); const y = 12 + i * 17 + Math.sin(i * 3) * 3; cx.moveTo(0, y); cx.bezierCurveTo(170, y + 5, 340, y - 5, 512, y + 2); cx.stroke(); }
+    cx.strokeStyle = '#5a3418'; cx.lineWidth = 10; cx.strokeRect(5, 5, 502, 150);
+    const lines = String(q.text).split('\n'); cx.textAlign = 'center'; cx.textBaseline = 'middle';
+    let fs = lines.length > 1 ? 50 : 64; cx.font = `${fs}px Jua, sans-serif`; while (Math.max(...lines.map(l => cx.measureText(l).width)) > 430 && fs > 24) { fs -= 2; cx.font = `${fs}px Jua, sans-serif`; }
+    lines.forEach((l, i) => { const y = 80 + (i - (lines.length - 1) / 2) * fs * 1.1; cx.fillStyle = 'rgba(255,230,190,.35)'; cx.fillText(l, 256, y + 2); cx.fillStyle = '#3a1c08'; cx.fillText(l, 256, y); });
+    const tx = new THREE.CanvasTexture(cv); tx.colorSpace = THREE.SRGBColorSpace; tx.anisotropy = aniso;
+    const g = new THREE.Group(), g0 = geo.ground(q.pos[0], q.pos[1]), W = 2.0, H = 0.62;
+    for (const sx of [-1, 1]) { const post = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 1.9, 7), woodD); post.position.set(sx * (W / 2 - 0.12), 0.95, 0); g.add(post); }
+    const face = new THREE.MeshStandardMaterial({ map: tx, roughness: 1 });
+    const board = new THREE.Mesh(new THREE.BoxGeometry(W, H, 0.08), [wood, wood, wood, wood, face, wood]); board.position.y = 1.45; g.add(board);
+    const roof = new THREE.Mesh(new THREE.BoxGeometry(W + 0.3, 0.07, 0.34), woodD); roof.position.set(0, 1.83, 0); roof.rotation.x = 0.12; g.add(roof);
+    g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+    g.position.copy(T(g0)); g.rotation.y = -(q.rot || 0) * DEG; g.name = 'nature:notice'; root.add(g);
+  }
+
+  // landmark models (type 'landmark', model = assets/props/<model>.glb.json, Tripo -> Blender, e.g. the mushroom house)
+  for (const q of props) if (q.type === 'landmark' && q.model) {
+    try {
+      const gltf = await parseWrapped('assets/props/' + q.model + '.glb.json'), m = gltf.scene, g0 = geo.ground(q.pos[0], q.pos[1]);
+      const bb = new THREE.Box3().setFromObject(m), k = (q.h > 0 ? q.h : 6) / Math.max(0.01, bb.max.y - bb.min.y);
+      m.scale.setScalar(k); m.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; const mm = o.material; if (mm && mm.isMeshStandardMaterial) { mm.roughness = 0.95; mm.metalness = 0; } } });
+      m.position.copy(T(g0)); m.position.y += (q.y || 0) - bb.min.y * k; m.rotation.y = -(q.rot || 0) * DEG; m.name = 'nature:landmark'; root.add(m);
+    } catch (e) { console.warn('landmark', q.model, e); }
   }
 
   // ruined walls (type 'wall', footprint w x d): weathered stone blocks with a broken top, painted-light vertex colours

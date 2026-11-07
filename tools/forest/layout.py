@@ -50,7 +50,9 @@ if B: keepouts.append((B['gate'][0], B['gate'][1], 4.5)); keepouts.append((B['ce
 for d in discs: keepouts.append((d[0], d[1], d[2] - 1.0))
 ramps = [h['rect'] for h in Z['heights'] if h['kind'] == 'ramp']
 plat = [h['rect'] for h in Z['heights'] if h['kind'] == 'platform']
-kept = [p for p in Z['props'] if (p['type'] == 'rock' and p.get('variant') == 'boss') or p['type'] in ('ruin', 'signpost', 'mushroom')]
+kept = [p for p in Z['props'] if (p['type'] == 'rock' and p.get('variant') == 'boss') or p['type'] in ('ruin', 'signpost', 'mushroom', 'landmark')]
+for p in kept:   # landmark buildings (mushroom house) keep their surroundings open
+    if p['type'] == 'landmark': keepouts.append((p['pos'][0], p['pos'][1], (p.get('r') or 2.4) + 3.0))
 
 def in_rect(x, z, r, m=0): return r[0] - m <= x <= r[2] + m and r[1] - m <= z <= r[3] + m
 

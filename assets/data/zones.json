@@ -14059,19 +14059,6 @@
      "d": 0.0
     },
     {
-     "type": "pine",
-     "model": "tree_forest_tall",
-     "pos": [
-      11.07,
-      46.9
-     ],
-     "rot": 136.9,
-     "scale": 0.98,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
      "type": "tree",
      "model": "tree_forest_round",
      "pos": [
@@ -14938,19 +14925,6 @@
      ],
      "rot": 340.9,
      "scale": 1.21,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "model": "tree_forest_round",
-     "pos": [
-      16.59,
-      46.46
-     ],
-     "rot": 159.0,
-     "scale": 1.07,
      "variant": "",
      "w": 0.0,
      "d": 0.0
@@ -17876,19 +17850,6 @@
      ],
      "rot": 34.0,
      "scale": 1.09,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "model": "tree_broad_a",
-     "pos": [
-      13.52,
-      48.31
-     ],
-     "rot": 222.5,
-     "scale": 0.94,
      "variant": "",
      "w": 0.0,
      "d": 0.0
@@ -21672,19 +21633,6 @@
      ],
      "rot": 256.5,
      "scale": 0.98,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "tree",
-     "model": "tree_forest_round",
-     "pos": [
-      14.06,
-      51.74
-     ],
-     "rot": 80.4,
-     "scale": 1.25,
      "variant": "",
      "w": 0.0,
      "d": 0.0
@@ -28165,19 +28113,6 @@
     },
     {
      "type": "shrub",
-     "model": "shrub_a",
-     "pos": [
-      9.48,
-      34.63
-     ],
-     "rot": 113.4,
-     "scale": 0.84,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "shrub",
      "model": "shrub_b",
      "pos": [
       -23.99,
@@ -34301,19 +34236,6 @@
     },
     {
      "type": "shrub",
-     "model": "shrub_a",
-     "pos": [
-      11.11,
-      45.17
-     ],
-     "rot": 125.4,
-     "scale": 0.93,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "shrub",
      "model": "shrub_b",
      "pos": [
       30.02,
@@ -35978,32 +35900,6 @@
     },
     {
      "type": "shrub",
-     "model": "shrub_b",
-     "pos": [
-      18.69,
-      47.77
-     ],
-     "rot": 62.5,
-     "scale": 1.08,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "shrub",
-     "model": "shrub_a",
-     "pos": [
-      14.92,
-      46.99
-     ],
-     "rot": 241.4,
-     "scale": 1.07,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "shrub",
      "model": "shrub_a",
      "pos": [
       22.49,
@@ -36726,19 +36622,6 @@
      ],
      "rot": 225.7,
      "scale": 0.72,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "shrub",
-     "model": "shrub_a",
-     "pos": [
-      11.05,
-      52.28
-     ],
-     "rot": 85.3,
-     "scale": 0.99,
      "variant": "",
      "w": 0.0,
      "d": 0.0
@@ -38476,19 +38359,6 @@
      "type": "shrub",
      "model": "shrub_b",
      "pos": [
-      8.22,
-      46.63
-     ],
-     "rot": 280.0,
-     "scale": 1.01,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "shrub",
-     "model": "shrub_b",
-     "pos": [
       12.58,
       64.46
      ],
@@ -40177,19 +40047,6 @@
     },
     {
      "type": "shrub",
-     "model": "shrub_b",
-     "pos": [
-      8.3,
-      34.01
-     ],
-     "rot": 141.2,
-     "scale": 0.72,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "shrub",
      "model": "shrub_a",
      "pos": [
       -34.5,
@@ -41635,32 +41492,6 @@
      "type": "shrub",
      "model": "shrub_a",
      "pos": [
-      15.8,
-      48.77
-     ],
-     "rot": 159.2,
-     "scale": 1.12,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "shrub",
-     "model": "shrub_b",
-     "pos": [
-      13.37,
-      46.27
-     ],
-     "rot": 104.9,
-     "scale": 1.08,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "shrub",
-     "model": "shrub_a",
-     "pos": [
       10.07,
       -68.65
      ],
@@ -41848,19 +41679,6 @@
      ],
      "rot": 180.1,
      "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "shrub",
-     "model": "shrub_a",
-     "pos": [
-      8.25,
-      49.97
-     ],
-     "rot": 93.5,
-     "scale": 1.13,
      "variant": "",
      "w": 0.0,
      "d": 0.0
@@ -47652,19 +47470,6 @@
     },
     {
      "type": "shrub",
-     "model": "shrub_b",
-     "pos": [
-      12.43,
-      52.5
-     ],
-     "rot": 233.0,
-     "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "shrub",
      "model": "shrub_a",
      "pos": [
       62.36,
@@ -48978,19 +48783,6 @@
     },
     {
      "type": "rock",
-     "model": "rock_medium",
-     "pos": [
-      17.95,
-      44.25
-     ],
-     "rot": 8.2,
-     "scale": 0.9,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "rock",
      "model": "rock_roadside",
      "pos": [
       -68.25,
@@ -49318,19 +49110,6 @@
      "type": "rock",
      "model": "rock_moss",
      "pos": [
-      16.95,
-      34.24
-     ],
-     "rot": 115.6,
-     "scale": 0.94,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "rock",
-     "model": "rock_moss",
-     "pos": [
       -17.63,
       -14.06
      ],
@@ -49537,19 +49316,6 @@
     },
     {
      "type": "rock",
-     "model": "rock_roadside",
-     "pos": [
-      14.81,
-      44.59
-     ],
-     "rot": 235.8,
-     "scale": 0.96,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "rock",
      "model": "rock_moss",
      "pos": [
       15.02,
@@ -49609,19 +49375,6 @@
      ],
      "rot": 294.1,
      "scale": 1.0,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "rock",
-     "model": "rock_moss",
-     "pos": [
-      9.41,
-      43.34
-     ],
-     "rot": 198.0,
-     "scale": 0.96,
      "variant": "",
      "w": 0.0,
      "d": 0.0
@@ -50449,19 +50202,6 @@
      "type": "stone",
      "model": "rock_small",
      "pos": [
-      17.11,
-      44.52
-     ],
-     "rot": 42.3,
-     "scale": 1.15,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stone",
-     "model": "rock_small",
-     "pos": [
       -67.84,
       -48.06
      ],
@@ -51112,19 +50852,6 @@
      "type": "stone",
      "model": "rock_small",
      "pos": [
-      16.01,
-      34.28
-     ],
-     "rot": 256.6,
-     "scale": 0.85,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stone",
-     "model": "rock_small",
-     "pos": [
       -19.48,
       -13.68
      ],
@@ -51580,32 +51307,6 @@
      "type": "stone",
      "model": "rock_small",
      "pos": [
-      16.3,
-      44.24
-     ],
-     "rot": 190.1,
-     "scale": 1.09,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stone",
-     "model": "rock_small",
-     "pos": [
-      14.6,
-      45.55
-     ],
-     "rot": 37.1,
-     "scale": 1.17,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stone",
-     "model": "rock_small",
-     "pos": [
       15.32,
       8.27
      ],
@@ -51728,32 +51429,6 @@
      ],
      "rot": 213.6,
      "scale": 1.29,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stone",
-     "model": "rock_small",
-     "pos": [
-      10.57,
-      42.35
-     ],
-     "rot": 259.5,
-     "scale": 1.06,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stone",
-     "model": "rock_small",
-     "pos": [
-      8.44,
-      43.4
-     ],
-     "rot": 169.9,
-     "scale": 1.01,
      "variant": "",
      "w": 0.0,
      "d": 0.0
@@ -52911,58 +52586,6 @@
      ],
      "rot": 329.9,
      "scale": 0.79,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stone",
-     "model": "rock_small",
-     "pos": [
-      15.38,
-      37.47
-     ],
-     "rot": 115.7,
-     "scale": 1.04,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stone",
-     "model": "rock_small",
-     "pos": [
-      15.98,
-      37.43
-     ],
-     "rot": 66.0,
-     "scale": 0.92,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stone",
-     "model": "rock_small",
-     "pos": [
-      16.19,
-      37.17
-     ],
-     "rot": 233.5,
-     "scale": 0.61,
-     "variant": "",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "stone",
-     "model": "rock_small",
-     "pos": [
-      9.96,
-      35.68
-     ],
-     "rot": 9.1,
-     "scale": 0.74,
      "variant": "",
      "w": 0.0,
      "d": 0.0
@@ -54476,30 +54099,6 @@
     {
      "type": "flowers",
      "pos": [
-      15.64,
-      34.71
-     ],
-     "rot": 0.0,
-     "scale": 1.23,
-     "variant": "yellow",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      16.55,
-      35.67
-     ],
-     "rot": 0.0,
-     "scale": 1.53,
-     "variant": "white",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
       9.74,
       37.46
      ],
@@ -55364,42 +54963,6 @@
     {
      "type": "flowers",
      "pos": [
-      18.48,
-      43.42
-     ],
-     "rot": 0.0,
-     "scale": 0.88,
-     "variant": "white",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      18.54,
-      44.84
-     ],
-     "rot": 0.0,
-     "scale": 0.76,
-     "variant": "yellow",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      18.72,
-      45.24
-     ],
-     "rot": 0.0,
-     "scale": 0.75,
-     "variant": "yellow",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
       -68.81,
       -48.51
      ],
@@ -56168,18 +55731,6 @@
     {
      "type": "flowers",
      "pos": [
-      15.7,
-      34.35
-     ],
-     "rot": 0.0,
-     "scale": 0.95,
-     "variant": "yellow",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
       17.53,
       33.48
      ],
@@ -56648,42 +56199,6 @@
     {
      "type": "flowers",
      "pos": [
-      13.77,
-      44.56
-     ],
-     "rot": 0.0,
-     "scale": 0.84,
-     "variant": "yellow",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      15.92,
-      44.18
-     ],
-     "rot": 0.0,
-     "scale": 1.01,
-     "variant": "yellow",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      15.04,
-      43.55
-     ],
-     "rot": 0.0,
-     "scale": 1.03,
-     "variant": "white",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
       14.86,
       9.94
      ],
@@ -56833,30 +56348,6 @@
      ],
      "rot": 0.0,
      "scale": 0.9,
-     "variant": "white",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      9.64,
-      42.11
-     ],
-     "rot": 0.0,
-     "scale": 1.0,
-     "variant": "white",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      10.47,
-      42.53
-     ],
-     "rot": 0.0,
-     "scale": 1.08,
      "variant": "white",
      "w": 0.0,
      "d": 0.0
@@ -59516,18 +59007,6 @@
     {
      "type": "flowers",
      "pos": [
-      13.79,
-      48.03
-     ],
-     "rot": 0.0,
-     "scale": 1.03,
-     "variant": "white",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
       29.19,
       9.32
      ],
@@ -60710,18 +60189,6 @@
      "rot": 0.0,
      "scale": 0.83,
      "variant": "yellow",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
-      9.64,
-      47.56
-     ],
-     "rot": 0.0,
-     "scale": 1.1,
-     "variant": "white",
      "w": 0.0,
      "d": 0.0
     },
@@ -62048,18 +61515,6 @@
     {
      "type": "flowers",
      "pos": [
-      13.01,
-      48.62
-     ],
-     "rot": 0.0,
-     "scale": 0.84,
-     "variant": "white",
-     "w": 0.0,
-     "d": 0.0
-    },
-    {
-     "type": "flowers",
-     "pos": [
       65.67,
       3.55
      ],
@@ -62234,6 +61689,34 @@
      "rot": 0.0,
      "scale": 0.8,
      "variant": "white",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "landmark",
+     "model": "mushhouse",
+     "pos": [
+      13.4,
+      46.8
+     ],
+     "rot": 180,
+     "scale": 1,
+     "h": 7.5,
+     "r": 2.7,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0
+    },
+    {
+     "type": "signpost",
+     "pos": [
+      15.8,
+      35.6
+     ],
+     "rot": 45,
+     "scale": 1,
+     "variant": "boss",
+     "text": "버섯대왕이 사는 곳",
      "w": 0.0,
      "d": 0.0
     }
