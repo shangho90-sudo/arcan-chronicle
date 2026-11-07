@@ -148,6 +148,54 @@ SPECIES = [
     ('mon_crystal', 'crystal', '붉은 수정 정령', 36, 'slam', 1.25, False, None), ('mon_yeti', 'yeti', '아기 설인', 40, 'slam', 1.25, False, None),
     ('mon_armor', 'armor', '능침 수호 갑주', 42, 'slam', 1.35, False, None), ('mon_bat', 'bat', '심연 박쥐', 47, 'bite', 1.05, False, None),
 ]
+# batch 2 (2026-11-07, tools/monsters/tripo_more.py): body plans the game did not have yet; only species whose model
+# exists (assets/creatures/w_<file>.glb.json) are used
+MONS_KNOWN = None
+SPECIES2 = [
+    ('mon_hedgehog', 'hedgehog', '가시 고슴도치', 3, 'tackle', 0.8), ('mon_snail', 'snail', '이끼 달팽이', 4, 'tackle', 0.95),
+    ('mon_hornet', 'hornet', '왕벌', 5, 'spit', 0.85), ('mon_mandrake', 'mandrake', '비명 맨드레이크', 6, 'tackle', 0.8),
+    ('mon_turtle', 'turtle', '이끼 거북', 7, 'tackle', 0.95), ('mon_stumpling', 'stumpling', '걷는 그루터기', 8, 'slam', 1.05),
+    ('mon_armadillo', 'armadillo', '바위 아르마딜로', 9, 'charge', 0.95), ('mon_goblin_miner', 'goblin_miner', '고블린 광부', 10, 'claw', 0.95),
+    ('mon_gargoyle', 'gargoyle', '아기 가고일', 12, 'claw', 1.0), ('mon_pixie', 'pixie', '장난꾸러기 요정', 13, 'spit', 0.85),
+    ('mon_spirit_deer', 'spirit_deer', '별빛 사슴', 15, 'charge', 1.35), ('mon_lantern_ghost', 'lantern_ghost', '등불 유령', 16, 'fire', 1.0),
+    ('mon_frog_shaman', 'frog_shaman', '개구리 주술사', 16, 'spit', 1.0), ('mon_treant', 'treant', '어린 나무거인', 17, 'slam', 1.7),
+    ('mon_pitcher_plant', 'pitcher_plant', '식인 낭상초', 17, 'spit', 1.1), ('mon_swamp_serpent', 'swamp_serpent', '늪 뱀', 18, 'bite', 1.1),
+    ('mon_snapping_turtle', 'snapping_turtle', '늪 악어거북', 19, 'bite', 1.15), ('mon_cactus', 'cactus', '성난 선인장', 20, 'claw', 1.0),
+    ('mon_vulture', 'vulture', '황무지 독수리', 21, 'claw', 1.05), ('mon_sandworm', 'sandworm', '모래 벌레', 22, 'bite', 1.35),
+    ('mon_mummy', 'mummy', '꼬마 미라', 23, 'claw', 1.0), ('mon_griffin_chick', 'griffin_chick', '아기 그리핀', 24, 'claw', 1.25),
+    ('mon_goblin_bandit', 'goblin_bandit', '고블린 산적', 27, 'claw', 1.0), ('mon_orc', 'orc', '오크 전사', 30, 'slam', 1.4),
+    ('mon_flame_imp', 'flame_imp', '불꽃 임프', 33, 'fire', 0.95), ('mon_lava_turtle', 'lava_turtle', '용암 거북', 35, 'slam', 1.35),
+    ('mon_mimic', 'mimic', '미믹 상자', 38, 'bite', 1.0), ('mon_penguin_knight', 'penguin_knight', '펭귄 기사', 38, 'claw', 0.95),
+    ('mon_skeleton_knight', 'skeleton_knight', '해골 기사', 41, 'claw', 1.15), ('mon_ice_golem', 'ice_golem', '얼음 골렘', 44, 'slam', 1.55),
+    ('mon_shadow_eye', 'shadow_eye', '그림자 눈', 46, 'spit', 1.1), ('mon_demon_knight', 'demon_knight', '마족 기사', 49, 'slam', 1.45),
+]
+SPECIES += [(i, f, n, lv, atk, size, False, None) for i, f, n, lv, atk, size in SPECIES2 if os.path.exists(D('assets', 'creatures', 'w_%s.glb.json' % f))]
+# where the new species live: field -> [(id, count)] (camp levels follow the field's place in the story, see gen_field)
+NEW_MONS = {
+    'capital_road': [('mon_hedgehog', 5), ('mon_snail', 5)], 'kairion_hunt': [('mon_mandrake', 5), ('mon_hornet', 5), ('mon_stumpling', 4)],
+    'kairion_hills': [('mon_turtle', 5), ('mon_hornet', 4), ('mon_hedgehog', 4)], 'baltern_pass': [('mon_armadillo', 5), ('mon_goblin_miner', 5)],
+    'baltern_cliffs': [('mon_gargoyle', 6)], 'baltern_quarry': [('mon_goblin_miner', 6), ('mon_armadillo', 4)],
+    'blue_forest_edge': [('mon_pixie', 6)], 'blue_forest': [('mon_spirit_deer', 5), ('mon_pixie', 5)], 'blue_forest_heart': [('mon_treant', 4), ('mon_lantern_ghost', 5)],
+    'lumiere_hills': [('mon_spirit_deer', 5)], 'silvern_fields': [('mon_pitcher_plant', 6)], 'silvern_woods': [('mon_treant', 4), ('mon_frog_shaman', 5)],
+    'silvern_marsh': [('mon_snapping_turtle', 5), ('mon_swamp_serpent', 6), ('mon_frog_shaman', 4)], 'gravel_border': [('mon_vulture', 5), ('mon_cactus', 5)],
+    'lost_villages': [('mon_lantern_ghost', 5), ('mon_mummy', 5)], 'zirat_outskirts': [('mon_sandworm', 4), ('mon_mummy', 5), ('mon_cactus', 4)],
+    'berg_canyon': [('mon_vulture', 5), ('mon_sandworm', 4)], 'berg_highland': [('mon_griffin_chick', 5)], 'berg_burned': [('mon_mummy', 5), ('mon_griffin_chick', 4)],
+    'capital_plain': [('mon_goblin_bandit', 6), ('mon_orc', 4)], 'broken_bridge': [('mon_goblin_bandit', 5), ('mon_snapping_turtle', 4)],
+    'trade_road': [('mon_goblin_bandit', 5), ('mon_orc', 4)], 'marseon_outskirts': [('mon_orc', 5)], 'lumiere_ruins_field': [('mon_orc', 4), ('mon_lantern_ghost', 5)],
+    'crimson_forest': [('mon_flame_imp', 6)], 'crimson_heart': [('mon_flame_imp', 5), ('mon_lava_turtle', 4)],
+    'baltazar_mines': [('mon_lava_turtle', 4), ('mon_goblin_miner', 5), ('mon_mimic', 3)], 'royal_tomb': [('mon_skeleton_knight', 6), ('mon_mimic', 3)],
+    'north_canyon': [('mon_penguin_knight', 6)], 'kreutz_front': [('mon_penguin_knight', 5), ('mon_skeleton_knight', 4)],
+    'kreutz_snowfield': [('mon_ice_golem', 4), ('mon_penguin_knight', 5)], 'frozen_lake': [('mon_ice_golem', 5)],
+    'zirat_wastes': [('mon_shadow_eye', 5), ('mon_skeleton_knight', 4)], 'zirat_abyss_rim': [('mon_shadow_eye', 5), ('mon_demon_knight', 4)],
+    'abyss_bridge': [('mon_demon_knight', 5), ('mon_shadow_eye', 4)],
+}
+# the original hand-made fields get some of them too (their camps keep their own spots; a new camp gets "level")
+NEW_MONS_EXISTING = {
+    'forest': [('mon_hedgehog', 5, (-60.0, 30.0)), ('mon_mandrake', 4, (30.0, 10.0))],
+    'mist_valley': [('mon_frog_shaman', 5, (40.0, 60.0)), ('mon_swamp_serpent', 5, (-60.0, -50.0))],
+    'frost_highland': [('mon_penguin_knight', 5, (0.0, 0.0)), ('mon_ice_golem', 3, (50.0, -50.0))],
+    'dragon_ruins': [('mon_flame_imp', 5, (-30.0, 20.0)), ('mon_demon_knight', 3, (40.0, 40.0))],
+}
 ATK_BASE = {'tackle': 'mon_slime', 'slam': 'mon_golem', 'charge': 'mon_boar', 'claw': 'mon_fox', 'spit': 'mon_fog_toad', 'bite': 'mon_wolf', 'fire': 'mon_cinder_lizard', 'ice': 'mon_ice_fox'}
 # fields: id, name, region, biome, map (x, y), level, monsters [(id, count)], respawn town
 F = lambda i, n, r, b, xy, lv, mons, town: dict(id=i, name=n, region=r, biome=b, map=xy, level=lv, mons=mons, town=town)
@@ -322,7 +370,12 @@ def gen_field(f, M, mon_levels):
     monsters = []
     spots = [c for c in clear] + [(p[0], p[1], 0) for pts, w in paths for p in pts[::4]]
     rnd.shuffle(spots)
-    for mid, cnt in f['mons']:
+    have = {m['id'] for m in MONS_KNOWN} if MONS_KNOWN else None
+    mons_list = list(f['mons']) + [(i, c) for i, c in NEW_MONS.get(f['id'], []) if have is None or i in have]
+    lo, hi = f['level']; natives = {m['id']: m['level'] for m in MONS_KNOWN} if MONS_KNOWN else {}
+    normal = sorted({mid for mid, c in mons_list if c > 1}, key=lambda i: natives.get(i, 0))
+    camp_lv = {mid: (round(lo + (hi - lo) * k / max(1, len(normal) - 1)) if len(normal) > 1 else (lo + hi) // 2) for k, mid in enumerate(normal)}
+    for mid, cnt in mons_list:
         elite = cnt == 1
         for _ in range(200):
             x, z, _r = spots[rnd.randrange(len(spots))]
@@ -331,7 +384,7 @@ def gen_field(f, M, mon_levels):
             if any(math.hypot(x - e[0], z - e[1]) < 20 for e in exits): continue
             if any(math.hypot(x - m['pos'][0], z - m['pos'][1]) < 22 for m in monsters): continue
             if any(math.hypot(x - a, z - b) < c + 2 for a, b, c in ponds): continue
-            monsters.append(dict(monster=mid, pos=[round(x, 2), round(z, 2)], radius=9.0 if elite else round(rnd.uniform(15, 19), 1), count=cnt, spread=6.0)); break
+            monsters.append(dict(monster=mid, pos=[round(x, 2), round(z, 2)], radius=9.0 if elite else round(rnd.uniform(15, 19), 1), count=cnt, spread=6.0, level=min(50, hi + 1) if elite else camp_lv[mid])); break
     # props
     mix = B['mix']; types = list(mix); weights = [mix[t] for t in types]
     SOL = {'tree', 'pine', 'rock', 'stump', 'mushroom', 'mushtree', 'ruin'}
@@ -603,6 +656,13 @@ if __name__ == '__main__':
     mons['monsters'] = [m for m in mons['monsters'] if not m.get('world')]
     mons['monsters'] += make_variants(mons['monsters'])
     known = {m['id'] for m in mons['monsters']}
+    MONS_KNOWN = mons['monsters']
+    for zid, adds in NEW_MONS_EXISTING.items():   # hand-made fields: new camps at their story level
+        Z = next(z for z in zones['zones'] if z['id'] == zid); lo, hi = Z.get('level', [1, 50])
+        Z['monsters'] = [m for m in Z['monsters'] if not m.get('added')]
+        nat = {m['id']: m['level'] for m in mons['monsters']}
+        for mid, cnt, pos in adds:
+            if mid in known: Z['monsters'].append(dict(monster=mid, pos=list(pos), radius=14.0, count=cnt, spread=6.0, level=max(lo, min(hi, nat[mid])), added=True))
     out = {}
     for t in TOWNS: out[t['id']] = gen_town(t, M)
     for f in FIELDS:

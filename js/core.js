@@ -33,24 +33,38 @@ export function levelGapExp(exp, pl, ml) { const g = ml - pl; const k = g >= 0 ?
  *  level L with the gear of that level): hp / atk / def / exp from the reference player, times a role factor
  *  (ai heavy / ranged, elite = a monster whose data hp is >= 2x its level neighbours). Bosses keep their data values. */
 export function balanceMonsters(mons, levels) {
+  const list = Object.values(mons), normal = list.filter(m => !(m.id.startsWith("boss_") || m.ai === "boss"));
+  for (const m of normal) {
+    const L = Math.max(1, m.level | 0), near = normal.filter(o => Math.abs((o.level | 0) - L) <= 3).map(o => (o._orig || o).hp).sort((x, y) => x - y);
+    const med = near[near.length >> 1] || m.hp;
+    m._orig = m._orig || { hp: m.hp, atk: m.atk, def: m.def, exp: m.exp };
+    m.elite = !!(m.elite || (m._orig.hp >= med * 2 && near.length >= 3));
+    Object.assign(m, monsterStats(m, L, levels));
+  }
+}
+/** hp / atk / def / exp of monster `m` (its ai role and elite flag) at level L - the curve balanceMonsters uses */
+export function monsterStats(m, L, levels) {
+  L = Math.max(1, L | 0);
   const refAtk = L => 14 + 2.6 * (L - 1) + (L >= 8 ? 35 : L >= 5 ? 17 : 6);
   const refHp = L => 120 + 18 * (L - 1) + (L >= 10 ? 200 : 0) + (L >= 8 ? 160 : L >= 5 ? 50 : 20);
   const refDef = L => 5 + 2 * (L - 1) + (L >= 8 ? 24 : L >= 5 ? 13 : 4);
   const exp2 = levels && levels.expToNext || [];
-  const list = Object.values(mons), normal = list.filter(m => !(m.id.startsWith("boss_") || m.ai === "boss"));
-  for (const m of normal) {
-    const L = Math.max(1, m.level | 0), near = normal.filter(o => Math.abs((o.level | 0) - L) <= 3).map(o => o.hp).sort((x, y) => x - y);
-    const med = near[near.length >> 1] || m.hp, elite = m.hp >= med * 2 && near.length >= 3;
-    const role = { hp: 1, atk: 1, exp: 1 };
-    if (m.ai === "heavy") { role.hp *= 1.6; role.atk *= 1.2; role.exp *= 1.5; } else if (m.ai === "ranged") role.hp *= 0.8;
-    if (elite) { role.hp *= 5; role.atk *= 1.5; role.exp *= 5; }
-    const mdef = Math.round(2 + 1.5 * L), hits = 3.5 + 0.12 * L;
-    const hit = (0.06 + 0.0008 * L) * refHp(L), kills = 6 + 0.9 * L, need = exp2[Math.min(exp2.length - 1, L - 1)] || 30 * L;
-    m._orig = m._orig || { hp: m.hp, atk: m.atk, def: m.def, exp: m.exp }; m.elite = elite;
-    m.hp = Math.round(hits * refAtk(L) * 100 / (100 + mdef) * role.hp);
-    m.atk = Math.round(hit * (100 + refDef(L)) / 100 * role.atk);
-    m.def = mdef; m.exp = Math.max(1, Math.round(need / kills * role.exp));
-  }
+  const role = { hp: 1, atk: 1, exp: 1 };
+  if (m.ai === "heavy") { role.hp *= 1.6; role.atk *= 1.2; role.exp *= 1.5; } else if (m.ai === "ranged") role.hp *= 0.8;
+  if (m.elite) { role.hp *= 5; role.atk *= 1.5; role.exp *= 5; }
+  const mdef = Math.round(2 + 1.5 * L), hits = 3.5 + 0.12 * L;
+  const hit = (0.06 + 0.0008 * L) * refHp(L), kills = 6 + 0.9 * L, need = exp2[Math.min(exp2.length - 1, L - 1)] || 30 * L;
+  return { hp: Math.round(hits * refAtk(L) * 100 / (100 + mdef) * role.hp), atk: Math.round(hit * (100 + refDef(L)) / 100 * role.atk), def: mdef, exp: Math.max(1, Math.round(need / kills * role.exp)) };
+}
+/** the same monster at another level (a field's camp can set "level" so one species fits every field of the story);
+ *  cached per id + level; gold scales with the level too */
+const _lvCache = new Map();
+export function monsterAtLevel(def, L, levels) {
+  if (!(L > 0) || L === def.level || def.id.startsWith("boss_") || def.ai === "boss") return def;
+  const k = def.id + "@" + L; if (_lvCache.has(k)) return _lvCache.get(k);
+  const g = L / Math.max(1, def.level);
+  const d = Object.assign({}, def, monsterStats(def, L, levels), { level: L, goldMin: Math.max(1, Math.round(def.goldMin * g)), goldMax: Math.max(1, Math.round(def.goldMax * g)) });
+  _lvCache.set(k, d); return d;
 }
 export const clamp = (v, a, b) => v < a ? a : (v > b ? b : v);
 export const clamp01 = v => clamp(v, 0, 1);

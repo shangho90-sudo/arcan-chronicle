@@ -1,5 +1,5 @@
 // Game orchestrator + zone runtime. Port of Boot/ArcanGame.cs and World/ZoneRuntime.cs.
-import { GameData, SaveStore, CharacterSheet, QuestLog, QS, ZoneGeometry, NavGrid, newProfile, DEG, clamp, HitShape, levelGapExp } from './core.js';
+import { GameData, SaveStore, CharacterSheet, QuestLog, QS, ZoneGeometry, NavGrid, newProfile, DEG, clamp, HitShape, levelGapExp, monsterAtLevel } from './core.js';
 import { Renderer, Fx, TelegraphView, TG_TIME, loadSheet, preloadTextures, THREE, T } from './render.js';
 import { Player, Monster, Boss, Npc, Loot, bindGame as bindActors } from './actors.js';
 import { Input, Audio } from './io.js';
@@ -93,7 +93,8 @@ class Zone {
     await Promise.all(jobs);
   }
   async spawnFor(sp) {
-    const md = G.data.monsters[sp.def.monster]; if (!md) return;
+    const md0 = G.data.monsters[sp.def.monster]; if (!md0) return;
+    const md = sp.def.level ? monsterAtLevel(md0, sp.def.level, G.data.levels) : md0;   // camp level (field's place in the story)
     // spread spawners (zones.json "spread": min gap in m) scatter one by one over a wide area, trees included, each
     // monster roaming round its own spot; old camp spawners keep the shared camp centre
     const P = G.player, away = sp.def.spread && P ? { x: P.pos.x, z: P.pos.z, d: 12 } : null;
@@ -126,7 +127,7 @@ class Zone {
     const base = Math.floor(total / cells.length);
     const out = cells.map(([cx, cz]) => {
       let near = camps[0], bd = 1e9; for (const m of camps) { const d = Math.hypot(m.pos[0] - cx, m.pos[1] - cz); if (d < bd) { bd = d; near = m; } }
-      return { monster: near.monster, pos: [cx, cz], radius: cell * 0.48, count: base, spread: near.spread };
+      return { monster: near.monster, level: near.level, pos: [cx, cz], radius: cell * 0.48, count: base, spread: near.spread };
     });
     let sum = out.reduce((a, m) => a + m.count, 0);                              // hand out what rounding left over
     for (let i = 0; sum < total && i < out.length * 3; i++) { out[(i * 7) % out.length].count++; sum++; }

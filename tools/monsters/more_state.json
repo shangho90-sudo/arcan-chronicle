@@ -1,0 +1,94 @@
+{
+ "hedgehog": {
+  "task": "0dc6f9ba-1bcd-4429-9457-ba04ac534094",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/hedgehog.glb"
+ },
+ "snail": {
+  "task": "44b3c6cc-b9ec-4676-94c0-9b38923864e7",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/snail.glb"
+ },
+ "hornet": {
+  "task": "5174b60d-e71b-4be7-a24a-8aaa7b13b18d",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/hornet.glb"
+ },
+ "mandrake": {
+  "task": "b8d45208-7e31-4f41-916a-72312e33cd26",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/mandrake.glb"
+ },
+ "turtle": {
+  "task": "d061db04-70e2-4d77-9104-9c6a05f0f867",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/turtle.glb"
+ },
+ "stumpling": {
+  "task": "66c90bd5-e03c-44f8-8deb-698b15abe70c",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/stumpling.glb"
+ },
+ "armadillo": {
+  "task": "49be4d58-d6bd-47cb-bf58-ccea7aa90a98",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/armadillo.glb"
+ },
+ "goblin_miner": {
+  "task": "66cebb0b-455d-4c21-a099-8edc765d4855",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/goblin_miner.glb"
+ },
+ "gargoyle": {
+  "task": "7d2fca4f-a852-4376-a1e2-8a9d670e2df5",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/gargoyle.glb"
+ },
+ "pixie": {
+  "task": "cc86a5e3-7144-4b23-9d0e-66d04cfc570f",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/pixie.glb"
+ },
+ "spirit_deer": {
+  "task": "c05bd3c8-43fd-4241-a964-053ba46f9a08",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/spirit_deer.glb"
+ },
+ "lantern_ghost": {
+  "task": "c4aeb7de-7fd5-4326-ad2f-efc535da2b42",
+  "status": "success",
+  "progress": 100,
+  "file": "/home/claude/new3d/lantern_ghost.glb"
+ },
+ "treant": {},
+ "frog_shaman": {},
+ "snapping_turtle": {},
+ "swamp_serpent": {},
+ "pitcher_plant": {},
+ "cactus": {},
+ "sandworm": {},
+ "vulture": {},
+ "mummy": {},
+ "griffin_chick": {},
+ "goblin_bandit": {},
+ "orc": {},
+ "flame_imp": {},
+ "lava_turtle": {},
+ "skeleton_knight": {},
+ "mimic": {},
+ "penguin_knight": {},
+ "ice_golem": {},
+ "shadow_eye": {},
+ "demon_knight": {}
+}

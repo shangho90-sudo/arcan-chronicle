@@ -447,3 +447,10 @@
 - 사용자가 준 모델 2개(여: `chibi_mechanic_character_3d_model.glb`, 남: `anime_craftsman_3d_model.glb`, 같은 67뼈 휴머노이드) → `tools/models/glb_to_model.py` → `hairdresser_f`(5,339 정점·10,315 삼각형), `hairdresser_m`(5,292·10,212). `model.js` `JOB_MODELS.hairdresser`(2차 디자이너도 같은 모습).
 - 변신 연출은 다른 직업과 같음. 움직임은 기존 뼈대 그대로.
 - 확인: `JOB=hairdresser` 남(boy → hairdresser_m)·여(girl → hairdresser_f) 변신 중·후·걷기 화면, 오류 없음. core 346 통과(50 생략), skills2 606 통과.
+
+### 2026-11-07 — 새 몬스터 12종 + 필드별 몬스터 레벨을 스토리 순서에 맞춤
+- 새 종 32개를 Tripo에 맡겼으나 12개를 만든 뒤 Tripo 크레딧이 떨어짐("You don't have enough credit"). 만든 12종(모두 기존에 없던 몸 모양): 가시 고슴도치·이끼 달팽이·왕벌·비명 맨드레이크·이끼 거북·걷는 그루터기·바위 아르마딜로·고블린 광부·아기 가고일·장난꾸러기 요정·별빛 사슴·등불 유령. Tripo 초안(`tools/monsters/tripo_more.py`, 상태 `more_state.json`) → Blender 정리(`blender_new.py`, 각 9천 삼각형) → `assets/creatures/w_<이름>.glb.json`.
+- 나머지 20종(늪 뱀·악어거북·주술사 개구리·나무거인·식인 낭상초·선인장·모래 벌레·독수리·미라·아기 그리핀·고블린 산적·오크·불꽃 임프·용암 거북·미믹·펭귄 기사·해골 기사·얼음 골렘·그림자 눈·마족 기사)은 프롬프트·이름·레벨·배치 필드까지 `tools/world/world.py`(`SPECIES2`, `NEW_MONS`)에 들어 있고 모델 파일이 없으면 건너뜀 → 크레딧을 채운 뒤 `python3 tools/monsters/tripo_more.py submit`(여러 번)·`download` → `python3 tools/monsters/blender_new.py <이름들>` → `python3 tools/world/world.py --write` 하면 자동으로 들어감.
+- 배치: 왕도 가는 길(고슴도치·달팽이), 카이리온 사냥터(맨드레이크·왕벌·그루터기), 카이리온 구릉(거북·왕벌·고슴도치), 바위산 고갯길·옛 채석장(아르마딜로·고블린 광부), 발테른 절벽(가고일), 푸른숲 어귀·환영의 숲(요정·사슴), 푸른숲 고목지·사라진 마을 터·불탄 순례지(등불 유령), 루미에르 순례길(사슴), 발타자르 광산길(고블린 광부), 속삭이는 숲(고슴도치·맨드레이크).
+- 스토리 레벨: 생성 필드의 몬스터 무리마다 `level`을 붙여 그 필드의 권장 레벨 범위 안에 고르게 둠(약한 종 → 범위 아래쪽, 정예 혼자 → 범위 위 +1). 같은 종도 필드에 따라 레벨이 달라지고, 능력치는 그 레벨로 다시 계산(`core.js` `monsterStats`/`monsterAtLevel`, `game.js` `spawnFor`). 예: 수도 앞 평원의 흙먼지 멧돼지 18 → 24, 오래된 필드 4곳에 추가한 무리도 그 필드 범위 안. `Zone.evenSpawners`가 다시 나눌 때도 레벨 유지.
+- 확인: `check_nav.mjs all` 실패 0, core 346 통과(50 생략), skills2 606 통과, `monstershots.js`로 12종이 게임 안에서 보이고 이름표(레벨·이름)가 나오는 것 확인.

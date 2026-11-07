@@ -61,6 +61,7 @@
 - 마을 생성: `town3d` 사양(성벽·탑·성문·궁/신전 `keep`(없어도 됨)·집·광장·장식·가로등)과 충돌 `blockPolys`. 첫 이웃은 남문 밖 워프, 나머지는 성 안 마법진 워프. NPC는 기존 3D 모델을 빌려 씀(npcs.json `model`), 마을마다 상인.
 - 세계 지도: `js/worldmap.js`(M 키 / 메뉴 '지도'), 확대·축소, 장소를 누르면 권장 레벨·이어진 곳. 남색+금색 창(로고·나침반·범례·아래 정보 막대, CSS는 `index.html` "세계 지도 (js/worldmap.js, navy + gold chart)" 블록, 휴대폰은 로고 숨김). 배경 그림 `assets/ui/worldmap_bg.jpg`와 글꼴 `assets/fonts/ArcanSerif.woff`(Noto Serif CJK KR Bold 부분 집합, OFL)는 `python3 tools/world/paint_map.py`로 생성 — 세계 데이터(`world.py --write`)를 바꾸면 다시 실행. `paint_map.py`의 `OX, OY`와 `worldmap.js`의 `PAD`는 같아야 함. 글자 배치는 `layoutLabels`(화면 크기 고정·겹치면 자리 옮김/숨김, 확대할 때마다 다시). 확인 `tools/browser-tests/worldshots.js`(SIZE=390x844t 휴대폰).
 - 새 몬스터 17종: Tripo 초안(`tools/monsters/tripo_new.py`, 키는 `~/.tripo/key`) → Blender 정리(`tools/monsters/blender_new.py`: 조각 제거, 9천 삼각형으로 줄이기, 바닥 맞춤, 기본색만 1024 px + 손그림 느낌 처리, 무광) → `assets/creatures/w_<name>.glb.json`. 능력치는 `world.py` `SPECIES`(공격 방식별 기존 몬스터 + 레벨 곡선 보간). 화면 확인 `tools/browser-tests/monstershots.js`.
+- 몬스터 2차 묶음(`world.py` `SPECIES2`/`NEW_MONS`, Tripo `tools/monsters/tripo_more.py`): 모델이 있는 종만 들어감. 생성 필드의 무리는 필드 레벨 범위에 맞춘 `level`을 가짐(`core.js` `monsterAtLevel`).
 - 지형 마스크(`nature.js` `paintMask`)는 길을 날카롭게 그린 뒤 한 번만 흐림 — 선분마다 blur 필터를 걸면 소프트웨어 GL에서 몇 분 걸림.
 
 ## 보스 전장 (독버섯 군락지 `mushroom_grove`, 2026-11-06)

@@ -74,6 +74,18 @@ export const CREATURES = {
   mon_yeti: { file: 'w_yeti', size: 1.25, height: true, rigless: true, yaw: -90, atk: 'slam' },
   mon_armor: { file: 'w_armor', size: 1.35, height: true, rigless: true, yaw: -90, atk: 'slam' },
   mon_bat: { file: 'w_bat', size: 1.05, height: true, rigless: true, yaw: -90, atk: 'bite' },
+  mon_hedgehog: { file: 'w_hedgehog', size: 0.80, height: true, rigless: true, yaw: -90, atk: 'tackle' },
+  mon_snail: { file: 'w_snail', size: 0.95, height: true, rigless: true, yaw: -90, atk: 'tackle' },
+  mon_hornet: { file: 'w_hornet', size: 0.85, height: true, rigless: true, yaw: -90, atk: 'spit' },
+  mon_mandrake: { file: 'w_mandrake', size: 0.80, height: true, rigless: true, yaw: -90, atk: 'tackle' },
+  mon_turtle: { file: 'w_turtle', size: 0.95, height: true, rigless: true, yaw: -90, atk: 'tackle' },
+  mon_stumpling: { file: 'w_stumpling', size: 1.05, height: true, rigless: true, yaw: -90, atk: 'slam' },
+  mon_armadillo: { file: 'w_armadillo', size: 0.95, height: true, rigless: true, yaw: -90, atk: 'charge' },
+  mon_goblin_miner: { file: 'w_goblin_miner', size: 0.95, height: true, rigless: true, yaw: -90, atk: 'claw' },
+  mon_gargoyle: { file: 'w_gargoyle', size: 1.00, height: true, rigless: true, yaw: -90, atk: 'claw' },
+  mon_pixie: { file: 'w_pixie', size: 0.85, height: true, rigless: true, yaw: -90, atk: 'spit' },
+  mon_spirit_deer: { file: 'w_spirit_deer', size: 1.35, height: true, rigless: true, yaw: -90, atk: 'charge' },
+  mon_lantern_ghost: { file: 'w_lantern_ghost', size: 1.00, height: true, rigless: true, yaw: -90, atk: 'fire' },
   // /WORLD
 };
 const cache = new Map();
