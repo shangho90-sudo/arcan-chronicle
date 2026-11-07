@@ -412,6 +412,27 @@ export function screenToWorldDir(sx, sy) {
   const m = Math.hypot(x, z); return m > 1e-6 ? { x: x / m, z: z / m } : { x: 0, z: 0 };
 }
 
+// ======================================================================================= lock-on marker shader
+const LOCK_FRAG = `
+uniform float uT; varying vec2 vUv;
+float band(float r, float c, float w) { return exp(-pow((r - c) / w, 2.)); }
+void main() {
+  float r = length(vUv); if (r > 1.) discard;
+  float a = atan(vUv.y, vUv.x), t = uT;
+  float pop = 1. + .35 * exp(-t * 9.);                                     // snaps in from a bit larger
+  float R = .78 * pop;
+  float seg = fract((a + t * .9) / 1.5708);                                  // four turning brackets
+  float br = band(r, R, .045) * smoothstep(.04, .1, seg) * smoothstep(.66, .6, seg);
+  float ring = band(r, R - .1, .012) * (.45 + .25 * sin(t * 5.));
+  float chev = 0.;
+  for (int i = 0; i < 4; i++) { float an = float(i) * 1.5708 + .7854 - t * .4; vec2 d = vec2(cos(an), sin(an));
+    vec2 q = vec2(dot(vUv, d), dot(vUv, vec2(-d.y, d.x))); float k = q.x - (R + .1) + abs(q.y) * 1.1;
+    chev += smoothstep(.03, .0, abs(k)) * step(abs(q.y), .1); }
+  float v = br * 1.8 + ring * 1.3 + chev * 1.2 + band(r, R, .12) * .35;
+  vec3 col = mix(vec3(.95, .18, .06), vec3(1., .78, .35), clamp(br * .8 + chev * .5, 0., 1.));
+  gl_FragColor = vec4(col * 1.25, clamp(v, 0., 1.));
+}`;
+
 // ======================================================================================= click marker shader
 const CLICK_SIZE = 1.9, CLICK_LIFE = 1.15;
 const CLICK_FRAG = `
@@ -501,9 +522,27 @@ export class Fx {
     const u0 = (col * m.cell + 0.01) / m.texW, u1 = ((col + 1) * m.cell - 0.01) / m.texW, v1 = 1 - (row * m.cell + 0.01) / m.texH, v0 = 1 - ((row + 1) * m.cell - 0.01) / m.texH;
     uv.array.set([u0, v1, u1, v1, u0, v0, u1, v0]); uv.needsUpdate = true;
   }
-  clear() { for (const f of this.active.slice()) this.release(f); if (this.cm) this.cm.mesh.visible = false; }
+  clear() { if (this.lm) this.lm.mesh.visible = false; for (const f of this.active.slice()) this.release(f); if (this.cm) this.cm.mesh.visible = false; }
   /** move-to click marker: a small cyan magic circle (outer ring with four star points, turning inner arcs, a ripple
    *  and twinkles) drawn by one ground-aligned shader quad; only one exists, a new click restarts it */
+  /** lock-on ring under the locked monster (called every player update; null hides it): four turning bracket arcs,
+   *  a thin pulsing ring and small inward chevrons, warm red-orange so it reads against grass, dirt and paving */
+  lockMark(a) {
+    if (!a) { if (this.lm) this.lm.mesh.visible = false; return; }
+    if (!this.lm) {
+      const mat = new THREE.ShaderMaterial({
+        uniforms: { uT: { value: 0 } }, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4,
+        vertexShader: 'varying vec2 vUv; void main(){ vUv = uv * 2. - 1.; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }',
+        fragmentShader: LOCK_FRAG,
+      });
+      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), mat); mesh.rotation.x = -Math.PI / 2; mesh.renderOrder = 6; mesh.frustumCulled = false;
+      this.lm = { mesh, a: null, t0: 0 }; this.scene.add(mesh);
+    }
+    const L = this.lm; if (L.a !== a) { L.a = a; L.t0 = performance.now(); }
+    const s = Math.max(1.3, a.radius * 2.6 + 0.5);
+    L.mesh.visible = true; L.mesh.position.set(a.pos.x, a.pos.y + 0.05, -a.pos.z); L.mesh.scale.set(s, s, 1);
+    L.mesh.material.uniforms.uT.value = (performance.now() - L.t0) / 1000;
+  }
   clickMark(p) {
     if (!this.cm) {
       const mat = new THREE.ShaderMaterial({

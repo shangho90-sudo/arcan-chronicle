@@ -349,7 +349,7 @@ export class UI {
   }
   handleKeys(down) {
     if (!G.inWorld) return;
-    if (down.pause) { if (this.current) { if (this.closable) this.close(); } else this.showPause(); return; }
+    if (down.pause) { if (this.current) { if (this.closable) this.close(); } else if (G.player && G.player.lockOn) { G.player.lockOn = null; G.player.target = null; } else this.showPause(); return; }   // Esc: first drops a lock-on
     if (down.inventory) { if (this.currentName === "inventory") this.close(); else if (!this.current || this.currentName === "quests") this.showInventory(); }
     if (down.quests) { if (this.currentName === "quests") this.close(); else if (!this.current || this.currentName === "inventory") this.showQuests(); }
     if (down.questHud && !this.current) this.toggleQuestHud();

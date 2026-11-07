@@ -409,7 +409,7 @@ class Game {
       if (z.inArena(pos, 2)) ({ pos, yaw } = z.spawnPoint("plateau"));
     } else ({ pos, yaw } = z.spawnPoint(spawnId));
     if (!this.player) { this.player = new Player(z, pos, this.sheet, this.quests, cfg); await this.player.attachBody(); }
-    const p = this.player; p.zone = z; p.teleport(pos); p.setFacing(Math.sin(yaw * DEG), Math.cos(yaw * DEG)); p.path = []; p.target = null; p.npcTarget = null;
+    const p = this.player; p.zone = z; p.teleport(pos); p.setFacing(Math.sin(yaw * DEG), Math.cos(yaw * DEG)); p.path = []; p.target = null; p.npcTarget = null; p.lockOn = null;
     p.body.setTint(z.tint[0], z.tint[1], z.tint[2]); p.body.place(p.pos);
     if (!z.actors.includes(p)) z.actors.push(p);
     this.render.setFocus(p.pos, true);

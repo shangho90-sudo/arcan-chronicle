@@ -8198,6 +8198,7 @@
   {
    "id": "forest",
    "name": "속삭이는 숲",
+   "passiveMonsters": true,
    "kind": "field",
    "bgm": "bgm_arcan_forest",
    "bounds": [

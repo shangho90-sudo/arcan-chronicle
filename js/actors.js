@@ -222,7 +222,7 @@ export class Player extends Combatant {
     this.hp = clamp(sheet.p.hp < 0 ? sheet.final.maxHp : sheet.p.hp, 1, sheet.final.maxHp);
     this.sp = clamp(sheet.p.sp < 0 ? sheet.final.maxSp : sheet.p.sp, 0, sheet.final.maxSp);
     this.lastMove = { x: 0, z: 0 }; this.vel = { x: 0, z: 0 }; this.path = []; this.stuck = 0;
-    this.dodgeCd = 0; this.potionCd = 0; this.dashT = 0; this.target = null; this.npcTarget = null;
+    this.dodgeCd = 0; this.potionCd = 0; this.dashT = 0; this.target = null; this.npcTarget = null; this.lockOn = null;
     sheet.events.job.push(() => { this.refreshLook(); this.skills.reset(); this.skills2.clearTemp(); });
     sheet.events.stats.push(() => { this.hp = Math.min(this.hp, this.maxHp); this.sp = Math.min(this.sp, this.maxSp); });
   }
@@ -271,7 +271,7 @@ export class Player extends Combatant {
     }
     if (this.dashT > 0) return this.updateDash(dt);
     if (this.stunned) { this.vel = { x: 0, z: 0 }; if (!this.skills.busy) this.body.play("hit", 0.5); return; }
-    if (input.block) { this.vel = { x: 0, z: 0 }; this.idle(); return; }
+    if (input.block) { this.vel = { x: 0, z: 0 }; this.idle(); G.fx.lockMark && G.fx.lockMark(null); return; }
     this.actions(input);
     if (this.skills.busy) { this.vel = { x: 0, z: 0 }; return; }
     this.movement(input, dt);
@@ -289,12 +289,17 @@ export class Player extends Combatant {
       const e = this.skills2.cast(id, this.aimFor({ targeting: d.target === "ground" ? "ground" : d.target === "self" ? "self" : "dir", range: d.range }, input));
       if (e) G.ui.toast(e);
     }
-    if (input.down.attack || input.held.attack) { this.target = null; this.basic(input); }
+    this.updateLock(input);
+    if (input.down.attack || input.held.attack) {
+      // locked on: the attack key goes after the locked monster (walks up to it when out of reach); otherwise swing here
+      const L = this.lockOn;
+      if (L && !input.move && this.dist(L) > this.basicReach(L)) this.target = L;
+      else { this.target = null; this.basic(input); }
+    }
     if (this.target) {
       if (this.target.dead || this.target.zone !== this.zone) this.target = null;
       else {
-        const b = G.data.skill(this.sheet.job.basicAttack), reach = (b ? b.range : 1.5) + this.target.radius * 0.6;
-        if (this.dist(this.target) <= reach) { this.path = []; this.basic(input); }
+        if (this.dist(this.target) <= this.basicReach(this.target)) { this.path = []; this.basic(input); }
         else if ((!this.path.length || this.stuck > 0.4) && !(this.repathT > 0)) { this.setDest(this.target.pos); this.repathT = 0.25; }
       }
     }
@@ -302,13 +307,29 @@ export class Player extends Combatant {
       const n = this.npcTarget; this.npcTarget = null; this.path = []; G.interact(n);
     }
   }
+  basicReach(m) { const b = G.data.skill(this.sheet.job.basicAttack); return (b ? b.range : 1.5) + m.radius * 0.6; }
+  /** lock-on: PC = the monster you clicked; phone = the nearest monster that comes close or attacks you (re-picks when
+   *  the locked one dies). Skills and basic attacks aim at the locked monster; the ring under it shows the lock. */
+  updateLock(input) {
+    let L = this.lockOn;
+    if (L && (L.dead || L.zone !== this.zone || this.dist(L) > 24)) L = this.lockOn = null;
+    if (input.mobile && !L) {
+      let best = null, bd = 6.5;
+      for (const c of this.zone.actors) { if (c.dead || c.faction === "player" || Math.abs(c.pos.y - this.pos.y) > 1.4) continue;
+        const d = this.dist(c) - c.radius, near = (c.state === "chase" || c.state === "windup") ? d < 9 : d < 4.5;
+        if (near && d < bd + (c.state === "chase" ? 3 : 0)) { bd = d; best = c; } }
+      if (best) this.lockOn = best;
+    }
+    if (G.fx.lockMark) G.fx.lockMark(this.lockOn);
+  }
   basic(input) { if (this.skills.busy) return; const s = G.data.skill(this.sheet.job.basicAttack); if (s) this.skills.tryCast(s, this.aimFor(s, input)); }
   aimFor(s, input) {
     if (s.targeting === "ground" && input && !input.mobile && input.pointer) {
       const ray = G.render.screenRay(input.pointer.x, input.pointer.y); const h = this.zone.geo.raycast(ray.o, ray.d); if (h) return h;
     }
     if (s.targeting === "self") return { x: this.pos.x + this.facing.x, z: this.pos.z + this.facing.z };
-    const t = this.target && !this.target.dead ? this.target : this.zone.nearestEnemy(this, Math.max(2.2, s.range + 1.2));
+    const L = this.lockOn && !this.lockOn.dead && this.dist(this.lockOn) <= Math.max(6, s.range + 4) ? this.lockOn : null;
+    const t = this.target && !this.target.dead ? this.target : L || this.zone.nearestEnemy(this, Math.max(2.2, s.range + 1.2));
     if (t) { if (s.targeting === "ground") return t.pos; const dx = t.pos.x - this.pos.x, dz = t.pos.z - this.pos.z, m = Math.hypot(dx, dz) || 1; return { x: this.pos.x + dx / m, z: this.pos.z + dz / m }; }
     const moving = Math.hypot(this.vel.x, this.vel.z) > 0.1, f = moving ? this.lastMove : this.facing;
     const d = s.targeting === "ground" ? Math.min(4, s.range) : 1;
@@ -340,7 +361,7 @@ export class Player extends Combatant {
   }
   idle() { if (!this.body || this.skills.busy) return; if (this.body.action === "hit" && !this.body.finished) return; this.body.play("idle", 1); }
   onClick(c) {
-    const m = this.zone.pickActor(c.x, c.y); if (m) { this.target = m; this.npcTarget = null; this.setDest(m.pos); return; }
+    const m = this.zone.pickActor(c.x, c.y); if (m) { this.target = m; this.lockOn = m; this.npcTarget = null; this.setDest(m.pos); return; }
     const n = this.zone.pickNpc(c.x, c.y); if (n) { this.npcTarget = n; this.target = null; this.setDest(n.pos); return; }
     const ray = G.render.screenRay(c.x, c.y), h = this.zone.geo.raycast(ray.o, ray.d);
     if (h) { this.target = null; this.npcTarget = null; this.setDest(h); G.fx.clickMark(h); }
@@ -450,7 +471,7 @@ export class Monster extends Combatant {
     const p = this.player, d = p ? this.dist(p) : 999, fromHome = Math.hypot(this.pos.x - this.home.x, this.pos.z - this.home.z), D = this.def;
     switch (this.state) {
       case "idle":
-        if (p && (d < D.detectRange || this.aggro) && Math.abs(p.pos.y - this.pos.y) < 1.2) { this.state = "chase"; this.aggro = true; break; }
+        if (p && (this.aggro || (d < D.detectRange && !(this.zone && this.zone.def.passiveMonsters))) && Math.abs(p.pos.y - this.pos.y) < 1.2) { this.state = "chase"; this.aggro = true; break; }
         this.doWander(dt); break;
       case "chase":
         if (!p || fromHome > D.leashRange || d > D.detectRange * 2.2) { this.state = "return"; this.aggro = false; break; }
