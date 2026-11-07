@@ -1,0 +1,182 @@
+{
+  "elder": {
+    "gender": "m",
+    "line": "어서 오게, 모험가여. 자네의 앞날을 응원하겠네.",
+    "voice": "Elias",
+    "file": "voice_elder"
+  },
+  "merchant": {
+    "gender": "f",
+    "line": "어서 오세요! 모험에 필요한 물건, 여기 다 있어요.",
+    "voice": "Niki",
+    "file": "voice_merchant"
+  },
+  "guard": {
+    "gender": "m",
+    "line": "숲으로 가시오? 장비를 챙기고 조심히 다녀오시오.",
+    "voice": "Bernard",
+    "file": "voice_guard"
+  },
+  "master_pharmacist": {
+    "gender": "f",
+    "line": "몸은 괜찮으세요? 당신의 모험에 힘이 되는 약을 준비했어요.",
+    "voice": "Serene",
+    "file": "voice_master_pharmacist"
+  },
+  "master_cook": {
+    "gender": "m",
+    "line": "잘 왔어! 뜨끈한 한 끼로 힘부터 채우자고!",
+    "voice": "Billy",
+    "file": "voice_master_cook"
+  },
+  "master_blacksmith": {
+    "gender": "m",
+    "line": "어서 오게. 자네를 지켜 줄 튼튼한 장비를 만들어 주지.",
+    "voice": "Clint",
+    "file": "voice_master_blacksmith"
+  },
+  "master_hairdresser": {
+    "gender": "f",
+    "line": "어서 와요! 오늘은 어떤 멋진 모습으로 떠나볼까요?",
+    "voice": "Lara",
+    "file": "voice_master_hairdresser"
+  },
+  "master_artist": {
+    "gender": "m",
+    "line": "반갑네. 자네의 모험을 새로운 색으로 그려 보게.",
+    "voice": "Noah",
+    "file": "voice_master_artist"
+  },
+  "armorer": {
+    "gender": "m",
+    "line": "무기를 찾나? 손에 딱 맞는 녀석으로 골라 보게.",
+    "voice": "Martin",
+    "file": "voice_armorer"
+  },
+  "roderick": {
+    "gender": "m",
+    "line": "멈추시오. 왕도의 안전은 내가 지키고 있소.",
+    "voice": "Tom",
+    "file": "voice_roderick"
+  },
+  "capital_merchant": {
+    "gender": "f",
+    "line": "어서 오세요. 힘든 때일수록 물약은 넉넉히 챙기세요.",
+    "voice": "Wanda",
+    "file": "voice_capital_merchant"
+  },
+  "capital_smith": {
+    "gender": "m",
+    "line": "왕실의 기술로 벼린 무기다. 한번 살펴보게.",
+    "voice": "Ragnar",
+    "file": "voice_capital_smith"
+  },
+  "kerin": {
+    "gender": "m",
+    "line": "젊은이, 검을 들기 전에 지킬 사람부터 떠올리게.",
+    "voice": "Elias",
+    "file": "voice_kerin"
+  },
+  "baltern_merchant": {
+    "gender": "m",
+    "line": "고갯길을 넘을 참이오? 필요한 물품부터 챙기시오.",
+    "voice": "James",
+    "file": "voice_baltern_merchant"
+  },
+  "justina": {
+    "gender": "f",
+    "line": "빛의 가호가 당신의 길을 밝혀 주기를.",
+    "voice": "Miriam",
+    "file": "voice_justina"
+  },
+  "lumiere_acolyte": {
+    "gender": "f",
+    "line": "어서 오세요! 순례길에 쓸 약을 준비해 뒀어요.",
+    "voice": "Pip",
+    "file": "voice_lumiere_acolyte"
+  },
+  "chirkai": {
+    "gender": "m",
+    "line": "그라벨에 온 것을 환영하오. 우리 백성을 도와주시오.",
+    "voice": "Vincent",
+    "file": "voice_chirkai"
+  },
+  "chirzen": {
+    "gender": "m",
+    "line": "찾아오셨군요. 오래된 기록에 분명 단서가 있을 겁니다.",
+    "voice": "Brodie",
+    "file": "voice_chirzen"
+  },
+  "yoisen": {
+    "gender": "m",
+    "line": "조용히 오시오. 저 너머의 움직임이 심상치 않소.",
+    "voice": "Frank",
+    "file": "voice_yoisen"
+  },
+  "gravel_merchant": {
+    "gender": "m",
+    "line": "국경을 넘는 길인가? 해독제는 꼭 챙겨 가게.",
+    "voice": "Malachi",
+    "file": "voice_gravel_merchant"
+  },
+  "derkai": {
+    "gender": "m",
+    "line": "실베른에 잘 왔네. 잠시 쉬며 앞으로의 길을 살펴보게.",
+    "voice": "Elias",
+    "file": "voice_derkai"
+  },
+  "silvern_merchant": {
+    "gender": "f",
+    "line": "어서 오세요! 안개 속에서도 무사히 돌아오셔야 해요.",
+    "voice": "Maggie",
+    "file": "voice_silvern_merchant"
+  },
+  "yanber": {
+    "gender": "m",
+    "line": "안심하십시오. 발타자르까지 제가 호위하겠습니다.",
+    "voice": "Bernard",
+    "file": "voice_yanber"
+  },
+  "marseon_merchant": {
+    "gender": "m",
+    "line": "먼 길 오셨군요! 여행에 쓸 좋은 물건을 가져왔습니다.",
+    "voice": "James",
+    "file": "voice_marseon_merchant"
+  },
+  "marseon_armorer": {
+    "gender": "f",
+    "line": "어서 와요. 어떤 공격도 버텨 낼 방어구를 골라봐요.",
+    "voice": "Sandra",
+    "file": "voice_marseon_armorer"
+  },
+  "erdin": {
+    "gender": "m",
+    "line": "잘 오셨습니다. 소중한 것을 지킬 무기를 벼려 드리죠.",
+    "voice": "Chad",
+    "file": "voice_erdin"
+  },
+  "berion": {
+    "gender": "m",
+    "line": "함께 싸워 주겠소? 이 땅의 내일을 지켜야 하오.",
+    "voice": "Benjamin",
+    "file": "voice_berion"
+  },
+  "baltazar_merchant": {
+    "gender": "m",
+    "line": "대장장이의 나라에 온 걸 환영하오! 편히 둘러보시오.",
+    "voice": "Mark",
+    "file": "voice_baltazar_merchant"
+  },
+  "kreutz_captain": {
+    "gender": "m",
+    "line": "경계를 늦추지 마시오. 이 요새는 반드시 지켜 낼 것이오.",
+    "voice": "Kirk",
+    "file": "voice_kreutz_captain"
+  },
+  "kreutz_merchant": {
+    "gender": "f",
+    "line": "많이 춥죠? 설원에 나가기 전에 따뜻하게 챙겨 입으세요.",
+    "voice": "Katie",
+    "file": "voice_kreutz_merchant"
+  }
+}

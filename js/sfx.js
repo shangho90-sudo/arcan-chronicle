@@ -18,7 +18,8 @@ export function skillSound(d, op = null) {
   return 'magic';
 }
 
-export const SFX_NAMES = ['hit', 'heavy', 'swing', 'magic', 'fire', 'ice', 'splash',
+export const SFX_EVENTS = new Set(['levelup', 'jobchange', 'dialog', 'warp']);
+export const SFX_NAMES = ['levelup', 'jobchange', 'dialog', 'warp', 'hit', 'heavy', 'swing', 'magic', 'fire', 'ice', 'splash',
   'heal', 'shield', 'dodge', 'throw', 'boss_slam', 'monster_attack', 'monster_die',
-  'hurt', 'die', 'levelup', 'quest', 'coin', 'pickup', 'crit', 'ui', 'ui_back', 'warn'];
-export const SFX_REWARDS = new Set(['levelup', 'quest', 'coin', 'pickup', 'die']);
+  'hurt', 'die', 'quest', 'coin', 'pickup', 'crit', 'ui', 'ui_back', 'warn'];
+export const SFX_REWARDS = new Set(['levelup', 'jobchange', 'quest', 'coin', 'pickup', 'die']);

@@ -322,7 +322,7 @@ class Game {
     const sheetNames = new Set();
     for (const m of Object.values(this.data.monsters)) sheetNames.add(m.sheet);
     for (const n of Object.values(this.data.npcs)) sheetNames.add(n.sheet);
-    const resources = [this.fx.load(), this.ui.load(), loadPlayerModel("m"), loadPlayerModel("f"), loadActions(), document.fonts && document.fonts.load("16px Galmuri11").catch(() => { }), ...[...sheetNames].map(n => loadSheet(n))];
+    const resources = [this.audio.loadNpcVoices(), this.fx.load(), this.ui.load(), loadPlayerModel("m"), loadPlayerModel("f"), loadActions(), document.fonts && document.fonts.load("16px Galmuri11").catch(() => { }), ...[...sheetNames].map(n => loadSheet(n))];
     let resourceDone = 0;
     await Promise.all(resources.map(async task => {
       await task;
@@ -354,6 +354,7 @@ class Game {
 
   // ------------------------------------------------------------------ title / create / continue
   async showTitle() {
+    this.audio.stopNpcVoice();
     this.session++; this.inWorld = false; this.loading = false; this.timeScale = 1; this.paused = false; this.timers = [];
     this.ui.setFade(0); this.ui.showGameplay(false); this.input.block = true;
     if (this.player) { if (this.zone) this.zone.removeActor(this.player); this.player.body.dispose(); this.player = null; }
@@ -395,7 +396,7 @@ class Game {
       const d = this.data.skill(s); if (d) ui.toast("새 스킬 습득: " + d.name);
     });
     S.bag.onChange.push(() => { Q.refreshPassive(); ui.refresh(); });
-    S.events.job.push(() => Q.refreshPassive());
+    S.events.job.push(() => { Q.refreshPassive(); this.audio.sfx('jobchange'); });
     // quest progress is shown inside the quest window (check mark + highlight), not as centre notices
     Q.events.accepted.push(() => { this.audio.sfx("quest"); ui.updateTracker(); });
     Q.events.ready.push(q => {
@@ -419,9 +420,10 @@ class Game {
     this.render.scene.background = new THREE.Color(def.kind === "town" ? 0x6d8f5e : 0x3f5a3c);
     return z;
   }
-  travel(zone, spawn) { if (this.loading) return; this.save(); this.loadZone(zone, spawn, false); }
+  travel(zone, spawn) { if (this.loading) return; this.save(); this.audio.sfx('warp'); this.loadZone(zone, spawn, false); }
   async fadeTo(a, dur) { const from = parseFloat(this.ui.fade.style.opacity || 0), t0 = performance.now(); while (true) { const k = Math.min(1, (performance.now() - t0) / 1000 / dur); this.ui.setFade(from + (a - from) * k); if (k >= 1) break; await new Promise(r => requestAnimationFrame(r)); } }
   async loadZone(zoneId, spawnId, usePos) {
+    this.audio.stopNpcVoice();
     if (this.reward) this.reward.clear(); if (this.swingFx) this.swingFx.clear();
     this.loading = true; this.input.block = true; const session = this.session;
     await this.fadeTo(1, 0.25);
@@ -463,9 +465,9 @@ class Game {
   }
   interact(npc) {
     if (!npc || this.ui.current || !this.player || this.player.dead) return;
-    this.quests.notify("talk", npc.def.id, 1); this.audio.sfx("ui"); this.openNpcMenu(npc.def);
+    this.quests.notify("talk", npc.def.id, 1); this.audio.sfx("ui"); this.openNpcMenu(npc.def, true); this.audio.npcGreeting(npc.def.id);
   }
-  openNpcMenu(npc) {
+  openNpcMenu(npc, greeting = false) {
     const Q = this.quests, opts = [];
     for (const q of Q.questsFor(npc.id)) {
       const st = Q.stateOf(q), turnIn = q.turnIn || q.giver;
@@ -478,6 +480,7 @@ class Game {
     opts.push(["대화 종료", () => this.ui.close()]);
     while (opts.length > 4) opts.splice(opts.length - 2, 1);
     let line = npc.lines && npc.lines.length ? npc.lines[Math.floor(Math.random() * npc.lines.length)] : "...";
+    if (greeting && this.audio.npcVoices[npc.id]) line = this.audio.npcVoices[npc.id].line;
     if (npc.role === "jobmaster" && this.profile.job === "novice") line += `<br><span class="tealtxt">'직업 상담'에서 ${this.data.job(npc.job).name}(이)가 될 수 있어요.</span>`;
     this.ui.showDialog(npc, line, opts);
   }

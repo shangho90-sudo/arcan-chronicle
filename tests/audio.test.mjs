@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
-import { skillSound, SFX_NAMES, SFX_REWARDS } from '../js/sfx.js';
+import { skillSound, SFX_NAMES, SFX_REWARDS, SFX_EVENTS } from '../js/sfx.js';
 
 for (const name of SFX_NAMES) {
   const b = readFileSync(new URL(`../assets/audio/sfx_${name}.mp3`, import.meta.url));
@@ -21,7 +21,7 @@ for (const skill of skills.filter(s => s.type !== 'passive')) assert.ok(SFX_NAME
 // Exercise the actual audio class without importing the renderer or requiring a device.
 const source = readFileSync(new URL('../js/io.js', import.meta.url), 'utf8').split('export class Audio ')[1];
 let now = 0, starts = 0, requests = 0;
-const sandbox = { SFX_NAMES, SFX_REWARDS, performance: { now: () => now },
+const sandbox = { SFX_NAMES, SFX_REWARDS, SFX_EVENTS, performance: { now: () => now },
   fetch: async () => { requests++; return { ok: true, arrayBuffer: async () => new ArrayBuffer(8) }; } };
 vm.createContext(sandbox);
 vm.runInContext('this.Audio = class Audio ' + source, sandbox);

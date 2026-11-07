@@ -213,7 +213,7 @@ Object.assign(UI.prototype, {
         cats.map((n, i) => `<div class="jskill"><b>${'ABC'[i]}.</b> ${n}<div class="small muted">${sk.filter(s => s.cat === i).map(s => s.name).join(' · ')}</div></div>`).join(''));
       const btn = this.button(c, err ? '조건 미충족' : '이 직업으로 전직', err ? 'ivory' : 'gold', () => {
         const e = p.sheet.chooseJob(j.id); if (e) return this.toast(e);
-        G.audio.sfx('levelup'); G.fx.play('levelup', { x: p.pos.x, y: p.pos.y + 0.8, z: p.pos.z }, 1.4);
+        G.fx.play('levelup', { x: p.pos.x, y: p.pos.y + 0.8, z: p.pos.z }, 1.4);
         this.toast(j.name + '(으)로 전직했습니다! 스킬창(K)에서 스킬을 배우세요.'); G.autoSave(); this.close();
       });
       if (err) { btn.title = err; $('div', 'small bad', c, err); }

@@ -1,6 +1,6 @@
 // Input (keyboard / mouse / multi-touch) and audio.
 import { screenToWorldDir } from './render.js';
-import { SFX_NAMES, SFX_REWARDS } from './sfx.js';
+import { SFX_NAMES, SFX_REWARDS, SFX_EVENTS } from './sfx.js';
 
 const KEYS = {
   attack: ["Space", "KeyJ"], skill1: ["Digit1", "Numpad1"], skill2: ["Digit2", "Numpad2"], skill3: ["Digit3", "Numpad3"], skill4: ["Digit4", "Numpad4"], ult: ["KeyR", "Digit5"], skillWin: ["KeyK"], craftWin: ["KeyN"],
@@ -67,6 +67,7 @@ export class Audio {
   constructor() {
     this.music = 0.6; this.sfxVol = 0.8; this.buffers = new Map(); this.last = new Map(); this.ctx = null; this.cur = null; this.curName = null;
     this.voices = new Set();
+    this.npcVoices = {}; this.npcRequest = 0; this.npcSource = null;
   }
   /** browsers only allow sound after a user gesture; `tryEarly` creates the context right away (it starts suspended
    *  unless the browser already allows autoplay for this site) so the queued music starts the moment it is allowed */
@@ -75,13 +76,33 @@ export class Audio {
     if (this.ctx) { if (this.ctx.state === "suspended") this.ctx.resume().then(() => this.onState && this.onState()).catch(() => { }); return; }
     try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); this.gMusic = this.ctx.createGain(); this.gMusic.connect(this.ctx.destination); this.gSfx = this.ctx.createGain(); this.gSfx.connect(this.ctx.destination); this.apply(); this.ctx.onstatechange = () => this.onState && this.onState(); if (this.ctx.state === "suspended") this.ctx.resume().catch(() => { }); if (this.wantMusic) this.playMusic(this.wantMusic, true); this.preloadSfx(); } catch (e) { this.ctx = null; }
   }
-  apply() { if (this.ctx) { this.gMusic.gain.value = this.music * 0.5; this.gSfx.gain.value = this.sfxVol; } }
+  apply() { if (this.ctx) { this.gMusic.gain.value = this.music * 0.5; this.gSfx.gain.value = this.sfxVol; if (this.sfxVol <= 0) this.stopNpcVoice(); } }
+  async loadNpcVoices() {
+    try { const r = await fetch('assets/data/npc-voices.json'); if (!r.ok) throw new Error(r.status); this.npcVoices = await r.json(); }
+    catch (e) { console.warn('NPC 인사 음성을 불러오지 못했습니다.', e); }
+  }
+  stopNpcVoice() {
+    this.npcRequest++;
+    if (this.npcSource) { try { this.npcSource.stop(); } catch (e) { } this.npcSource = null; }
+  }
+  async npcGreeting(id) {
+    this.stopNpcVoice();
+    const def = this.npcVoices[id], request = this.npcRequest, now = performance.now();
+    if (!def || !this.audible || this.sfxVol <= 0) return;
+    const b = await this.buf(def.file);
+    // Closing the dialogue, switching NPCs or travelling cancels even a pending download.
+    if (!b || request !== this.npcRequest || !this.audible || this.sfxVol <= 0 || performance.now() - now > 5000) return;
+    const s = this.ctx.createBufferSource(), g = this.ctx.createGain();
+    s.buffer = b; g.gain.value = 0.9; s.connect(g); g.connect(this.gSfx); this.npcSource = s;
+    s.onended = () => { if (this.npcSource === s) this.npcSource = null; s.disconnect(); g.disconnect(); };
+    s.start();
+  }
   async buf(name) {
     if (!this.ctx) return null;
     if (this.buffers.has(name)) return this.buffers.get(name);
     const p = fetch("assets/audio/" + name + ".mp3").then(r => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); }).then(a => this.ctx.decodeAudioData(a)).then(b => {
       // Keep generated samples at a consistent peak without changing music.
-      if (name.startsWith('sfx_')) {
+      if (name.startsWith('sfx_') || name.startsWith('voice_')) {
         let peak = 0;
         for (let c = 0; c < b.numberOfChannels; c++) for (const v of b.getChannelData(c)) peak = Math.max(peak, Math.abs(v));
         if (peak > 0) for (let c = 0; c < b.numberOfChannels; c++) { const a = b.getChannelData(c), gain = Math.min(3, 0.65 / peak); for (let i = 0; i < a.length; i++) a[i] *= gain; }
@@ -92,16 +113,16 @@ export class Audio {
   }
   async sfx(name) {
     if (!this.audible || !name || this.sfxVol <= 0) return;
-    const reward = SFX_REWARDS.has(name), now = performance.now();
-    const gap = reward ? (name === 'levelup' ? 1200 : 120) : 65;
+    const reward = SFX_REWARDS.has(name), event = SFX_EVENTS.has(name), now = performance.now();
+    const gap = name === 'jobchange' ? 1500 : reward ? (name === 'levelup' ? 1200 : 120) : name === 'dialog' ? 90 : name === 'warp' ? 600 : 65;
     if (now - (this.last.get(name) ?? -Infinity) < gap) return; this.last.set(name, now);
     const b = await this.buf("sfx_" + name);
-    if (!b || !this.audible || this.sfxVol <= 0 || performance.now() - now > 300) return;
+    if (!b || !this.audible || this.sfxVol <= 0 || performance.now() - now > (event ? 2000 : 300)) return;
     // Reserve separate voices for rewards, so a large battle cannot hide a level-up.
     if ([...this.voices].filter(v => v.reward === reward).length >= (reward ? 4 : 12)) return;
     const s = this.ctx.createBufferSource(), g = this.ctx.createGain();
-    s.buffer = b; s.playbackRate.value = reward ? 1 : 0.96 + Math.random() * 0.08;
-    g.gain.value = reward ? 0.65 : 0.38; s.connect(g); g.connect(this.gSfx);
+    s.buffer = b; s.playbackRate.value = reward || event ? 1 : 0.96 + Math.random() * 0.08;
+    g.gain.value = name === 'dialog' ? 0.24 : name === 'warp' ? 0.58 : reward ? 0.65 : 0.38; s.connect(g); g.connect(this.gSfx);
     const voice = { s, reward }; this.voices.add(voice);
     s.onended = () => { this.voices.delete(voice); s.disconnect(); g.disconnect(); }; s.start();
   }
@@ -109,6 +130,8 @@ export class Audio {
     // Four concurrent fetch/decode workers; never block game startup on sound.
     const queue = [...SFX_NAMES];
     await Promise.all(Array.from({ length: 4 }, async () => { while (queue.length) await this.buf('sfx_' + queue.shift()); }));
+    const greetings = Object.values(this.npcVoices).map(v => v.file);
+    await Promise.all(Array.from({ length: 3 }, async () => { while (greetings.length) await this.buf(greetings.shift()); }));
   }
   /** small synthesized sounds (no audio file): 'exp' = bright bell whose pitch climbs with each orb, 'levelup' = rising shimmer chord */
   chime(kind, n = 1) {

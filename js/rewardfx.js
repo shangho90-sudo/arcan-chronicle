@@ -454,7 +454,7 @@ export class RewardFx {
   jobChange(onSwap) {
     const G = this.G, p = G.player; if (!p) { onSwap && onSwap(); return; }
     this.items.push(new JobChangeFx(this.scene, p, onSwap));
-    G.audio && G.audio.chime && G.audio.chime('fanfare');
+    // Recorded trumpet fanfare is played once by the CharacterSheet job event.
   }
   levelUp() {
     const G = this.G, p = G.player; if (!p) return;

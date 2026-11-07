@@ -1,0 +1,267 @@
+{
+  "provider": "Runway",
+  "generatedOn": "2026-11-07",
+  "assets": [
+    {
+      "file": "sfx_levelup.mp3",
+      "taskId": "a738c4b7-7a47-4d51-bf60-c85b221c7c58",
+      "prompt": "아르칸 레벨업 축하"
+    },
+    {
+      "file": "sfx_jobchange.mp3",
+      "taskId": "ca9324bc-7c0d-4136-acec-7b8ba1481766",
+      "prompt": "아르칸 전직 트럼펫 팡파르"
+    },
+    {
+      "file": "sfx_dialog.mp3",
+      "taskId": "5e3b76d3-f9e5-4316-8938-2bdd240a7b9c",
+      "prompt": "아르칸 대화 넘기기"
+    },
+    {
+      "file": "sfx_warp.mp3",
+      "taskId": "1930ab40-a0bf-4320-889a-fb695114086c",
+      "prompt": "아르칸 워프 이동"
+    },
+    {
+      "file": "voice_elder.mp3",
+      "taskId": "91df12fc-b479-4310-998a-780bb5ff838b",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC elder 인사",
+      "voice": "Elias",
+      "gender": "m"
+    },
+    {
+      "file": "voice_merchant.mp3",
+      "taskId": "a50c35d2-6e42-4251-8a40-9a968679bd79",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC merchant 인사",
+      "voice": "Niki",
+      "gender": "f"
+    },
+    {
+      "file": "voice_guard.mp3",
+      "taskId": "bef663b2-178e-4dbb-b329-2f105cdeb827",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC guard 인사",
+      "voice": "Bernard",
+      "gender": "m"
+    },
+    {
+      "file": "voice_master_pharmacist.mp3",
+      "taskId": "5b07a05a-99b0-4261-8522-af4f675e5d6a",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC master_pharmacist 인사",
+      "voice": "Serene",
+      "gender": "f"
+    },
+    {
+      "file": "voice_master_cook.mp3",
+      "taskId": "a6abdd7c-a2c0-4700-bace-b0180e68b384",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC master_cook 인사",
+      "voice": "Billy",
+      "gender": "m"
+    },
+    {
+      "file": "voice_master_blacksmith.mp3",
+      "taskId": "dc95da4f-87a6-4028-913e-a9b0bb8b35f7",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC master_blacksmith 인사",
+      "voice": "Clint",
+      "gender": "m"
+    },
+    {
+      "file": "voice_master_hairdresser.mp3",
+      "taskId": "277b4150-402b-4b12-98b1-981c3e876531",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC master_hairdresser 인사",
+      "voice": "Lara",
+      "gender": "f"
+    },
+    {
+      "file": "voice_master_artist.mp3",
+      "taskId": "79cc4467-a2e2-483f-a04b-a3af570848de",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC master_artist 인사",
+      "voice": "Noah",
+      "gender": "m"
+    },
+    {
+      "file": "voice_armorer.mp3",
+      "taskId": "70441ca5-2b0b-4c8e-bc8e-5e0b39d1f3c3",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC armorer 인사",
+      "voice": "Martin",
+      "gender": "m"
+    },
+    {
+      "file": "voice_roderick.mp3",
+      "taskId": "cd727600-0cdc-45be-b125-3c4cc923aa97",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC roderick 인사",
+      "voice": "Tom",
+      "gender": "m"
+    },
+    {
+      "file": "voice_capital_merchant.mp3",
+      "taskId": "deee5c61-f06a-495c-874d-1ee987f24757",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC capital_merchant 인사",
+      "voice": "Wanda",
+      "gender": "f"
+    },
+    {
+      "file": "voice_capital_smith.mp3",
+      "taskId": "15df2172-bf72-4cd7-87f6-a21c9e9017ec",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC capital_smith 인사",
+      "voice": "Ragnar",
+      "gender": "m"
+    },
+    {
+      "file": "voice_kerin.mp3",
+      "taskId": "d3bcda5a-fa87-4067-bbc3-3bc17ff536ec",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC kerin 인사",
+      "voice": "Elias",
+      "gender": "m"
+    },
+    {
+      "file": "voice_baltern_merchant.mp3",
+      "taskId": "c1912a1d-a6ca-434a-bc61-f082bf5e8250",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC baltern_merchant 인사",
+      "voice": "James",
+      "gender": "m"
+    },
+    {
+      "file": "voice_justina.mp3",
+      "taskId": "c97a9705-ef07-414d-89c1-5164c101db84",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC justina 인사",
+      "voice": "Miriam",
+      "gender": "f"
+    },
+    {
+      "file": "voice_lumiere_acolyte.mp3",
+      "taskId": "0b3c55fc-876d-485d-a2e5-046d737ab216",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC lumiere_acolyte 인사",
+      "voice": "Pip",
+      "gender": "f"
+    },
+    {
+      "file": "voice_chirkai.mp3",
+      "taskId": "c000bd61-cc4c-4310-8425-f8928bedcefd",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC chirkai 인사",
+      "voice": "Vincent",
+      "gender": "m"
+    },
+    {
+      "file": "voice_chirzen.mp3",
+      "taskId": "dc4a7360-d6a5-43b5-8a5b-50759e9828c0",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC chirzen 인사",
+      "voice": "Brodie",
+      "gender": "m"
+    },
+    {
+      "file": "voice_yoisen.mp3",
+      "taskId": "d654e094-5bb1-4bbf-ab77-813b4e77ca40",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC yoisen 인사",
+      "voice": "Frank",
+      "gender": "m"
+    },
+    {
+      "file": "voice_gravel_merchant.mp3",
+      "taskId": "1c46d118-2170-4285-ad2f-e3a684b84fbb",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC gravel_merchant 인사",
+      "voice": "Malachi",
+      "gender": "m"
+    },
+    {
+      "file": "voice_derkai.mp3",
+      "taskId": "1f1c5cae-5355-4106-8624-dba9ec6f3afc",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC derkai 인사",
+      "voice": "Elias",
+      "gender": "m"
+    },
+    {
+      "file": "voice_silvern_merchant.mp3",
+      "taskId": "e246495e-b125-4bf5-9970-ccbeee1b2452",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC silvern_merchant 인사",
+      "voice": "Maggie",
+      "gender": "f"
+    },
+    {
+      "file": "voice_yanber.mp3",
+      "taskId": "cceff96e-5a02-4320-8e52-e5209321eece",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC yanber 인사",
+      "voice": "Bernard",
+      "gender": "m"
+    },
+    {
+      "file": "voice_marseon_merchant.mp3",
+      "taskId": "f9d1fb2b-1f09-40d2-a159-58f4a559e9fc",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC marseon_merchant 인사",
+      "voice": "James",
+      "gender": "m"
+    },
+    {
+      "file": "voice_marseon_armorer.mp3",
+      "taskId": "60c34866-7c3d-4f7d-8d06-3915bf526361",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC marseon_armorer 인사",
+      "voice": "Sandra",
+      "gender": "f"
+    },
+    {
+      "file": "voice_erdin.mp3",
+      "taskId": "6f3500f2-7fae-4213-b7d3-f8d2826c75cf",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC erdin 인사",
+      "voice": "Chad",
+      "gender": "m"
+    },
+    {
+      "file": "voice_berion.mp3",
+      "taskId": "e8aa9275-c124-49d2-b0b7-8065a6b316f4",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC berion 인사",
+      "voice": "Benjamin",
+      "gender": "m"
+    },
+    {
+      "file": "voice_baltazar_merchant.mp3",
+      "taskId": "c35b3c80-252e-40b8-b6dd-e76b1b5ae6b1",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC baltazar_merchant 인사",
+      "voice": "Mark",
+      "gender": "m"
+    },
+    {
+      "file": "voice_kreutz_captain.mp3",
+      "taskId": "cf315894-99fc-4612-bdd7-541d714ef0a0",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC kreutz_captain 인사",
+      "voice": "Kirk",
+      "gender": "m"
+    },
+    {
+      "file": "voice_kreutz_merchant.mp3",
+      "taskId": "02a648dd-90f2-4ee7-a506-62034299d461",
+      "model": "workflow_text_to_speech",
+      "prompt": "아르칸 NPC kreutz_merchant 인사",
+      "voice": "Katie",
+      "gender": "f"
+    }
+  ],
+  "processing": "Leading silence trimmed at -48 dB, loudnorm I=-18 TP=-2 LRA=9, 44.1 kHz MP3 128 kbps"
+}

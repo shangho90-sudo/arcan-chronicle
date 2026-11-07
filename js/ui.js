@@ -349,6 +349,7 @@ export class UI {
   }
   close(notify = true) {
     const was = !!this.current;
+    if (this.currentName === 'dialog') G.audio.stopNpcVoice();
     if (this.current) this.current.remove(); if (this.dim) this.dim.remove();
     this.current = null; this.currentName = null; this.dim = null; this.root.classList.remove("winopen");
     G.input.block = !G.inWorld; if (G.paused) G.paused = false;
@@ -364,14 +365,14 @@ export class UI {
     if (down.map) { if (this.currentName === "worldmap") this.close(); else if (!this.current || ["inventory", "quests", "stats"].includes(this.currentName)) showWorldMap(this); }
   }
   refresh() { if (this.currentName === "inventory") this.showInventory(); else if (this.currentName === "shop") this.showShop(this.shop); }
-  button(parent, label, cls, fn) { const b = $("button", "btn " + (cls || "teal"), parent, label); b.onclick = () => { G.audio.sfx("ui"); fn(); }; return b; }
+  button(parent, label, cls, fn, sound = 'ui') { const b = $("button", "btn " + (cls || "teal"), parent, label); b.onclick = () => { G.audio.sfx(sound); fn(); }; return b; }
 
   showDialog(npc, text, options) {
     const b = this.open("dialog", null, 1180, 0, true, false);
     $("div", "dname", b, npc ? `${npc.title} ${npc.name}` : "");
     $("div", "dtext", b, text);
     const opts = $("div", "dopts", b);
-    options.forEach(([label, fn], i) => this.button(opts, label, i === options.length - 1 ? "ivory" : "teal", fn));
+    options.forEach(([label, fn], i) => this.button(opts, label, i === options.length - 1 ? "ivory" : "teal", fn, 'dialog'));
     this.current.style.transform = ""; // dialog is anchored to the bottom
   }
 
@@ -489,7 +490,7 @@ export class UI {
         j.skills.map(id => G.data.skill(id)).map(s => `<div class="jskill">${this.icon(s.icon, 32)}<div><b>${s.name}</b> <small class="muted">${s.kind === "passive" ? "패시브" : "Lv" + s.unlockLevel}</small><div class="small">${s.desc}</div></div></div>`).join(""));
       const btn = this.button(c, cur ? "선택됨" : "이 직업으로", cur ? "ivory" : "gold", () => {
         const e = p.sheet.chooseJob(j.id); if (e) return this.toast(e);
-        G.audio.sfx("levelup"); G.fx.play("levelup", { x: p.pos.x, y: p.pos.y + 0.8, z: p.pos.z }, 1.4);
+        G.fx.play("levelup", { x: p.pos.x, y: p.pos.y + 0.8, z: p.pos.z }, 1.4);
         this.toast(j.name + "(으)로 전직했습니다! 1번 키 / 스킬 버튼으로 스킬을 써 보세요."); G.autoSave(); this.close();
       });
       btn.disabled = cur;
