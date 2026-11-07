@@ -440,7 +440,12 @@ export class Player extends Combatant {
 }
 
 // ======================================================================================= monsters
+/** monsters at or below this level never attack first (same species behaves the same in every field) */
+export const PASSIVE_MAX_LEVEL = 10;
 export class Monster extends Combatant {
+  /** non-aggressive: Lv10 and below (bosses excluded), or every monster of a zone with "passiveMonsters": true.
+   *  A passive monster still fights back once hit (onDamaged sets aggro) and its pack-mates are unaffected. */
+  get passive() { return !this.isBoss && ((this.level || 1) <= PASSIVE_MAX_LEVEL || !!(this.zone && this.zone.def.passiveMonsters)); }
   constructor(zone, def, pos, home, homeRadius) {
     super(zone, pos, def.radius, "monster");
     this.def = def; this.home = home; this.homeR = homeRadius; this.name = def.name; this.level = def.level; this.hp = def.hp;
@@ -478,7 +483,7 @@ export class Monster extends Combatant {
     const p = this.player, d = p ? this.dist(p) : 999, fromHome = Math.hypot(this.pos.x - this.home.x, this.pos.z - this.home.z), D = this.def;
     switch (this.state) {
       case "idle":
-        if (p && (this.aggro || (d < D.detectRange && !(this.zone && this.zone.def.passiveMonsters))) && Math.abs(p.pos.y - this.pos.y) < 1.2) { this.state = "chase"; this.aggro = true; break; }
+        if (p && (this.aggro || (d < D.detectRange && !this.passive)) && Math.abs(p.pos.y - this.pos.y) < 1.2) { this.state = "chase"; this.aggro = true; break; }
         this.doWander(dt); break;
       case "chase":
         if (!p || fromHome > D.leashRange || d > D.detectRange * 2.2) { this.state = "return"; this.aggro = false; break; }
@@ -567,7 +572,7 @@ export class Monster extends Combatant {
   cancelAttack() { if (this.state === "windup") this.state = "chase"; if (this.tele) { this.tele.cancel(); this.tele = null; } }
   onDamaged(d) {
     this.aggro = true; if (this.state === "idle" || this.state === "return") this.state = "chase";
-    if (!d.dot && this.state !== "windup" && this.def.ai !== "boss" && this.def.ai !== "heavy") { this.hitReact = 0.18; this.body.play("hit", 1, true); }
+    if (!d.dot && this.state !== "windup" && this.def.ai !== "boss" && this.def.ai !== "heavy") { this.hitReact = 0.18; if (this.body) this.body.play("hit", 1, true); }   // the model may still be loading
     G.onMonsterDamaged(this);
   }
   onDeath() { this.cancelAttack(); this.state = "dead"; this.deadT = 0; G.audio.sfx("monster_die"); G.onMonsterKilled(this); }

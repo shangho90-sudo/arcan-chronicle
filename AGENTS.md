@@ -74,7 +74,7 @@
 - 에셋(Blender `assets.py`): `mush_small_purple/blue`, `mush_glow_purple/blue`(약한 발광 + 바닥 빛 원판), `mush_orange`, `mush_cluster`, `mush_tree`, `rock_magic(_low)`, `tree_violet(_round)`. 발광 재질은 `MAT_TEX`의 `ec`/`ei`.
 - NPC 머리 위 퀘스트 표시는 `game.js` `QMARK`(SVG "!"/"?"), 이름표 CSS `.plate.npc`(이름 20 px, 휴대폰 14 px, 주아체), 위치 `ui.js` `updatePlates`(+1.9 m).
 - 지면 파쇄: `js/shatterfx.js`(`SkillFx.shatter.spawn(pos, R, {pal})`, BURST 정의의 `start`에서 호출), 메시는 `python3 tools/blender/fx_shatter.py` → `assets/fx/`. 화면 확인 `tools/browser-tests/shattershots.js`(KIND=ground_crack|fire_crack|explosion_big).
-- 록온: `actors.js` `Player.lockOn`/`updateLock`(PC 클릭, 휴대폰 자동), 표시 `render.js` `Fx.lockMark`, 확인 `tools/browser-tests/lockon.js`. 선공 없는 필드는 존 데이터 `"passiveMonsters": true`(지금은 속삭이는 숲만).
+- 록온: `actors.js` `Player.lockOn`/`updateLock`(PC 클릭, 휴대폰 자동), 표시 `render.js` `Fx.lockMark`, 확인 `tools/browser-tests/lockon.js`. 선공 없는 필드는 존 데이터 `"passiveMonsters": true`(지금은 속삭이는 숲만). 그와 별개로 Lv10 이하 몬스터는 어디서나 선공 없음(`actors.js` `PASSIVE_MAX_LEVEL`, `Monster.passive`, 보스 제외).
 - 이동 클릭 표시: `render.js` `Fx.clickMark`(청록 마법진 셰이더 `CLICK_FRAG`, 하나만 재사용).
 - 경고 표시: `render.js` `TelegraphView`(셰이더 하나: 바깥 빛 번짐·밝은 테두리·안쪽 그라데이션·룬 점선·전진 파동/맥동·입자, 공격은 산호색, 독 웅덩이는 보라 액체+거품, `seal`=봉인 마법진). 시간은 `TG_TIME`. 판정은 그대로 `HitShape`.
 - 결계: `game.js` `setBarrier` — 봉인 마법진 + 거의 투명한 에너지 벽(위로 오르는 입자).
