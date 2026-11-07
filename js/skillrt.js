@@ -155,8 +155,15 @@ export class SkillEngine {
     if (d.tags) { if (d.tags.includes('music') || d.tags.includes('paint')) this.lastFamily = d.tags.includes('music') ? 'music' : 'paint'; }
     if (d.job === 'musician' && d.type === 'attack') this.lastFamily = 'music';
     // animation
-    const anim = d.anim || 'cast', sh = pc.body.sh, act = sh.actions[anim] ? anim : 'attack';
-    let aspd = 1; const hop = d.ops.find(o => o.hitsPerLv); if (hop && sh.actions[act]) { const hits = (hop.hits || 1) + Math.floor(hop.hitsPerLv * (Lv - 1)), a = sh.actions[act]; aspd = Math.max(0.6, (a.frames / a.fps) / Math.max(0.3, hits * (hop.gap || 0.13) + 0.25)); }
+    const anim = d.anim || 'cast', sh = pc.body.sh; let act = sh.actions[anim] ? anim : 'attack';
+    let aspd = 1; const hop = d.ops.find(o => o.hitsPerLv);
+    if (hop) {
+      const hits = (hop.hits || 1) + Math.floor(hop.hitsPerLv * (Lv - 1)), cv = sh.actions[anim + '_' + hits];
+      // sword flurry authored for exactly this many strikes (tools/anim/swings.py): its impacts drive the hit timing
+      if (cv && cv.hitTimes && cv.hitTimes.length === hits) { act = anim + '_' + hits; ctx.combo = cv; }
+      else if (sh.actions[act]) { const a = sh.actions[act]; aspd = Math.max(0.6, (a.frames / a.fps) / Math.max(0.3, hits * (hop.gap || 0.13) + 0.25)); }
+    }
+    ctx.act = act;
     pc.body.play(act, aspd, true);
     const castT = d.cast || 0;
     if (castT > 0) { this.casting = { ctx, t: castT, cost }; G.ui.floatText(pc.pos, d.name, '#ffe08a', 1.0, 2.1); }
@@ -167,12 +174,14 @@ export class SkillEngine {
   }
   /** cast time finished (or instant): schedule every op */
   release(ctx) {
-    const pc = this.pc, sh = pc.body.sh, d = ctx.d, anim = d.anim || 'cast';
+    const pc = this.pc, sh = pc.body.sh, d = ctx.d, anim = ctx.act || d.anim || 'cast', cb = ctx.combo;
     G.audio.sfx(skillSound(d));
     const ht = d.cast ? 0 : Math.min(0.35, (sh.actions[anim] ? sh.actions[anim].hitFrame / sh.actions[anim].fps : 0.2) || 0.2);
-    let span = 0; for (const op of d.ops) { if (op.op === 'lunge') continue; const n = (op.hits || 1) + (op.hitsPerLv ? Math.floor(op.hitsPerLv * (ctx.L - 1)) : 0); span = Math.max(span, (op.at || 0) + (n - 1) * (op.gap || 0.13)); }
-    pc.skills.lock = Math.max(pc.skills.lock, ht + span + (d.recover || 0.3));
-    for (const op of d.ops) this.pending.push({ time: this.clock + Math.max(0, ht + (op.at || 0)), op, ctx });
+    let span = 0; for (const op of d.ops) { if (op.op === 'lunge') continue; const n = (op.hits || 1) + (op.hitsPerLv ? Math.floor(op.hitsPerLv * (ctx.L - 1)) : 0); span = Math.max(span, (op.at || 0) + (cb && op.hitsPerLv ? cb.hitTimes[n - 1] - cb.hitTimes[0] : (n - 1) * (op.gap || 0.13))); }
+    pc.skills.lock = Math.max(pc.skills.lock, ht + span + Math.max(d.recover || 0.3, cb && cb.recover || 0));
+    for (const op of d.ops) { if (cb && cb.lunges && op.op === 'lunge') continue; this.pending.push({ time: this.clock + Math.max(0, ht + (op.at || 0)), op, ctx }); }
+    // the flurry's own steps (action time = time since the cast started, the cast is instant for these skills)
+    if (cb && cb.lunges) for (const [t, dist, dur] of cb.lunges) this.pending.push({ time: this.clock + t, op: { op: 'lunge', dist, dur }, ctx });
     if (d.type === 'ultimate') { G.render.addShake && !G.reduceFlash && G.render.addShake(0.12, 0.25); }
   }
   interruptCast(reason) {
@@ -347,7 +356,16 @@ export class SkillEngine {
         // fx
         const fxp = op.atAim ? ctx.aim : op.atTarget && ctx.tgt ? ctx.tgt.pos : { x: pc.pos.x + f.x * (op.fwd || 1.0), y: pc.pos.y, z: pc.pos.z + f.z * (op.fwd || 1.0) };
         if (op.fx) {
-          if (op.fx.slash) {
+          const cf = ctx.combo && op.hitsPerLv && ctx.combo.hitFx ? ctx.combo.hitFx[h] : null;
+          if (op.fx.slash && cf) {
+            // authored flurry: each strike's arc follows the real swing (direction, tilt, size); the finisher adds a burst,
+            // a camera kick and a short hit-stop
+            const sp = op.shape === 'single' && ts[0] ? ts[0].pos : pc.pos;
+            FX.slash(cf.slash || op.fx.slash, sp, f, { color: cf.gold ? 0xffd27a : col, radius: (op.r || 2) * (cf.r || 1), angle: cf.ang || op.ang || 100, mirror: !!cf.mirror, tilt: cf.tilt || 0 });
+            if (cf.burst) FX.burst(cf.burst, { x: pc.pos.x + f.x * (cf.burstFwd || 1), y: pc.pos.y, z: pc.pos.z + f.z * (cf.burstFwd || 1) }, { color: col, radius: cf.burstR || 1 });
+            if (cf.shake && G.render.addShake && !G.reduceFlash) G.render.addShake(cf.shake[0], cf.shake[1]);
+            if (cf.stop && ts.length) G.hitStop(cf.stop);
+          } else if (op.fx.slash) {
             // sweep / alt: swing direction (alt alternates every strike and tilts the arc a little so a flurry reads as many swings)
             const mir = op.alt ? h % 2 === 1 : op.sweep > 0, tilt = op.alt ? ((h * 37) % 5 - 2) * 0.12 : 0, ca = Math.cos(tilt), sa = Math.sin(tilt);
             const fd = { x: f.x * ca - f.z * sa, z: f.x * sa + f.z * ca };
@@ -376,7 +394,8 @@ export class SkillEngine {
         if (op.link && ts.length > 1) for (let i = 1; i < ts.length; i++) FX.beam('thread_link', ts[i - 1].pos, ts[i].pos, { duration: 2 });
         if (ts.length) G.audio.sfx(skillSound(d, op));
       };
-      if (h === 0) run(); else this.pending.push({ time: this.clock + h * (op.gap || 0.15), op: { op: '_run', run }, ctx });
+      const ht_ = ctx.combo && op.hitsPerLv && ctx.combo.hitTimes ? ctx.combo.hitTimes[h] - ctx.combo.hitTimes[0] : h * (op.gap || 0.15);
+      if (h === 0) run(); else this.pending.push({ time: this.clock + ht_, op: { op: '_run', run }, ctx });
     }
     if (op.op === 'hit') this.echo(op, ctx);
   }

@@ -417,7 +417,7 @@ function blendBones(A, B, w) {
 // ---------------------------------------------------------------- swing trail: a short, soft crescent behind the real blade
 /** Samples the actual blade (base + tip) every frame while the action's `trail` window is open and draws a fading
  *  ribbon through them (Catmull-Rom smoothed), so the afterimage always matches the sword - in every facing. */
-const TRAIL_LIFE = 0.11, TRAIL_SUB = 4, TRAIL_MAX = 24;
+const TRAIL_LIFE = 0.11, TRAIL_SUB = 4, TRAIL_MAX = 40;
 class SwingTrail {
   constructor(scene) {
     this.scene = scene; this.s = []; this.mesh = null;
@@ -430,9 +430,10 @@ class SwingTrail {
     const m = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, toneMapped: false });
     this.mesh = new THREE.Mesh(g, m); this.mesh.frustumCulled = false; this.mesh.renderOrder = 8; this.scene.add(this.mesh);
   }
-  update(dt, pts, color) {
+  /** life / base: per action (skills leave a longer, wider afterimage: action.trailLife, action.trailBase) */
+  update(dt, pts, color, life = TRAIL_LIFE, base = 0.35) {
     for (const q of this.s) q.age += dt;
-    while (this.s.length && this.s[0].age > TRAIL_LIFE) this.s.shift();
+    while (this.s.length && this.s[0].age > life) this.s.shift();
     if (pts) { this.s.push({ a: pts[0], b: pts[1], age: 0 }); if (this.s.length > TRAIL_MAX) this.s.shift(); }
     if (!this.s.length) { if (this.mesh) this.mesh.visible = false; return; }
     if (!this.mesh) this.build();
@@ -444,9 +445,9 @@ class SwingTrail {
       const sub = i < S.length - 1 ? TRAIL_SUB : 1;
       for (let j = 0; j < sub; j++) {
         const t = j / sub, A = cr(s0.a, s1.a, s2.a, s3.a, t), B = cr(s0.b, s1.b, s2.b, s3.b, t), age = s1.age + (s2.age - s1.age) * t;
-        const k = Math.max(0, 1 - age / TRAIL_LIFE), al = k * k * 0.85;
+        const k = Math.max(0, 1 - age / life), al = k * k * 0.85;
         // base end of the strip faint, tip end bright: reads as a thin crescent along the edge, not a filled fan
-        const Am = A.clone().lerp(B, 0.35);
+        const Am = A.clone().lerp(B, base);
         P.setXYZ(v, Am.x, Am.y, Am.z); C.setXYZ(v, c[0], c[1], c[2]); C.setW(v, 0); v++;
         P.setXYZ(v, B.x, B.y, B.z); C.setXYZ(v, c[0], c[1], c[2]); C.setW(v, al); v++;
       }
@@ -601,9 +602,10 @@ export class ModelBody {
     else if (this.gaitW <= 0.01) this.gaitPh = 0.15;                       // next start: mid-stance, not mid-stride
     this.apply();
     // swing afterimage from the real blade while the action's trail window [start, end] (seconds) is open
-    const a = this.sh.actions[this.action], tw = a && a.trail;
-    const on = tw && this.t >= tw[0] && this.t <= tw[1] && this.swingW > 0.5;
-    if (on || (this.trail && this.trail.s.length)) { if (!this.trail) this.trail = new SwingTrail(this.scene); this.trail.update(dt, on ? this.bladePoints() : null, a && a.trailColor); }
+    // (trail = one [start, end] window, or a list of them: skill flurries only trail the cutting part of each strike)
+    const a = this.sh.actions[this.action], tw = a && a.trail, wins = tw ? (typeof tw[0] === 'number' ? [tw] : tw) : [];
+    const on = this.swingW > 0.5 && wins.some(w => this.t >= w[0] && this.t <= w[1]);
+    if (on || (this.trail && this.trail.s.length)) { if (!this.trail) this.trail = new SwingTrail(this.scene); this.trail.update(dt, on ? this.bladePoints() : null, a && a.trailColor, a && a.trailLife, a && a.trailBase); }
   }
   poseOf(name) {
     const a = this.sh.actions[name]; if (!a) return this.currentPose();
@@ -662,7 +664,11 @@ export class ModelBody {
     }
     // body bob / sink (metres) and facing
     this.mesh.position.y = bodyY; this.mesh.position.x = swayX;   // visual weight shift only: collision / camera follow the root
-    this.root.rotation.y = this.yaw;
+    // whole-body turns of a skill (action.spins = [start, end, deg]): eased root yaw on top of the facing; it is computed
+    // from the action time (not interpolated between keys), so a full circle never unwinds when the action ends
+    let spin = 0; const ca = this.sh.actions[this.action];
+    if (ca && ca.spins) for (const [s0, s1, deg] of ca.spins) if (this.t > s0 && this.t < s1) spin += deg * EASE.io((this.t - s0) / (s1 - s0));
+    this.root.rotation.y = this.yaw + spin * DEG;
     const wid = !p.held && this.weaponId ? this.weaponId() : null;
     this.updateProp('R', p.held || (wid && isWeaponModel(wid) ? 'item:' + wid : this.weapon), (p.wOff - 90) * (1 - (this.swingW || 0)));
     this.updateProp('L', p.held ? null : this.off, p.offOff - 90);
