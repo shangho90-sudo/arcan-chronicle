@@ -10,6 +10,12 @@ export const PLAYER_MODELS = {
   m: { file: 'boy', height: 1.65, headPitch: -10 },
   f: { file: 'girl', height: 1.6, headPitch: -14 },
 };
+/** 1st-job outfits: the player turns into this model on 전직 (same 67-bone skeleton as boy / girl, so every pose, gait
+ *  and swing works unchanged); 2nd jobs of the same line (jobs.json "sheet") keep it */
+export const JOB_MODELS = {
+  pharmacist: { m: { file: 'pharmacist_m', height: 1.65, headPitch: -10 }, f: { file: 'pharmacist_f', height: 1.6, headPitch: -14 } },
+};
+export function playerModelCfg(gender, jobSheet) { const j = JOB_MODELS[jobSheet]; return (j && j[gender]) || PLAYER_MODELS[gender] || PLAYER_MODELS.m; }
 /** town NPCs made from the user's character sheet (Tripo image->3D + auto rig), keyed by npc id; hold their own items */
 export const NPC_MODELS = {
   armorer:            { file: 'npc_armorer', height: 1.62, headPitch: -6, npc: true },
@@ -38,7 +44,7 @@ export async function loadActions() {
 }
 
 export function loadNpcModel(id) { return NPC_MODELS[id] ? loadModelCfg(NPC_MODELS[id]) : null; }
-export async function loadPlayerModel(gender) { return loadModelCfg(PLAYER_MODELS[gender] || PLAYER_MODELS.m); }
+export async function loadPlayerModel(gender, jobSheet) { return loadModelCfg(playerModelCfg(gender, jobSheet)); }
 async function loadModelCfg(cfg) {
   if (modelCache.has(cfg.file)) return modelCache.get(cfg.file);
   const p = (async () => {

@@ -5,7 +5,7 @@ import { SpriteBody, dirFromWorld, hitTime, duration, lockTime, action, Telegrap
 import { lootModel, hasItemModel } from './items3d.js';
 import { SkillEngine, applyStatus, clearMarks } from './skillrt.js';
 import { CreatureBody, loadCreature, CREATURES } from './creature.js';
-import { ModelBody, loadPlayerModel, loadNpcModel, loadActions, PLAYER_MODELS, NPC_MODELS } from './model.js';
+import { ModelBody, loadPlayerModel, loadNpcModel, loadActions, PLAYER_MODELS, NPC_MODELS, playerModelCfg } from './model.js';
 
 let G = null; // game context (set by game.js)
 export function bindGame(g) { G = g; }
@@ -238,7 +238,7 @@ export class Player extends Combatant {
     const g = this.sheet.p.gender;
     if (PLAYER_MODELS[g]) {
       // real-time 3D character (sharp at any resolution, smooth turning)
-      const [md, sh] = await Promise.all([loadPlayerModel(g), loadActions()]);
+      const [md, sh] = await Promise.all([loadPlayerModel(g, this.jobKey()), loadActions()]);
       this.body = new ModelBody(G.render.scene, md, sh, this.radius, this.jobKey());
       this.body.weaponId = () => this.sheet.p.weapon;
       if (this.sheet.p.sk && this.sheet.p.sk.dye && this.sheet.p.sk.dye.outfit) this.body.setDye(this.sheet.p.sk.dye.outfit);
@@ -250,6 +250,12 @@ export class Player extends Combatant {
     this.body.setDir(dirFromWorld(this.facing.x, this.facing.z));
   }
   refreshLook() {
+    // a job with its own outfit model (약사): transform - light, angel wings and trumpets, the body swaps inside the light
+    if (this.body && this.body.md && PLAYER_MODELS[this.sheet.p.gender] && playerModelCfg(this.sheet.p.gender, this.jobKey()).file !== this.body.md.cfg.file) {
+      const swap = () => this.attachBody().then(() => { if (this.body) { this.body.place && this.body.place(this.pos); this.body.play("idle", 1, true); } });
+      if (G.reward && G.reward.jobChange) G.reward.jobChange(swap); else swap();
+      return;
+    }
     if (this.body && this.body.setJob) { this.body.setJob(this.jobKey()); this.body.play("idle", 1, true); return; }
     G.loadSheet(this.sheetKey()).then(sh => { if (this.body) { this.body.setSheet(sh); this.body.play("idle", 1, true); } });
   }

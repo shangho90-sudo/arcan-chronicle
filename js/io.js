@@ -124,6 +124,19 @@ export class Audio {
       const now = performance.now(); if (now - (this._expT || 0) < 45) return; this._expT = now;
       const scale = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21], f = 1046.5 * Math.pow(2, scale[Math.min(scale.length - 1, n - 1)] / 12);
       bell(f, 0, 0.35, 0.09);
+    } else if (kind === 'fanfare') {
+      // heralds' fanfare: two brassy voices (sawtooth through a low-pass), G-G-G-C . E-C . G-high C, then a held chord
+      const brass = (f, at, dur, vol) => {
+        const o = C.createOscillator(), o2 = C.createOscillator(), lp = C.createBiquadFilter(), g = C.createGain();
+        o.type = 'sawtooth'; o2.type = 'sawtooth'; o.frequency.value = f; o2.frequency.value = f * 1.004; lp.type = 'lowpass'; lp.Q.value = 2;
+        lp.frequency.setValueAtTime(f * 1.5, t0 + at); lp.frequency.linearRampToValueAtTime(f * 6, t0 + at + 0.06); lp.frequency.linearRampToValueAtTime(f * 3.5, t0 + at + dur);
+        g.gain.setValueAtTime(0.0001, t0 + at); g.gain.exponentialRampToValueAtTime(vol, t0 + at + 0.04); g.gain.setValueAtTime(vol, t0 + at + dur * 0.8); g.gain.exponentialRampToValueAtTime(0.0001, t0 + at + dur + 0.12);
+        o.connect(lp); o2.connect(lp); lp.connect(g); g.connect(this.gSfx); o.start(t0 + at); o2.start(t0 + at); o.stop(t0 + at + dur + 0.2); o2.stop(t0 + at + dur + 0.2);
+      };
+      const s0 = 1.05, G4 = 392, C5 = 523.25, E5 = 659.25, G5 = 783.99, C6 = 1046.5;
+      [[G4, 0, .12], [G4, .14, .12], [G4, .28, .12], [C5, .42, .42], [E5, .9, .16], [C5, 1.08, .16], [G5, 1.26, .2], [C6, 1.5, 1.1]].forEach(([f, a, d]) => { brass(f, s0 + a, d, 0.05); brass(f / 2, s0 + a, d, 0.025); });
+      [C5, E5, G5].forEach(f => brass(f, s0 + 1.5, 1.1, 0.025));
+      [1046.5, 1318.5, 1568, 2093].forEach((f, i) => bell(f, 0.05 + i * 0.05, 1.6, 0.03));      // shimmer as the light closes
     } else if (kind === 'levelup') {
       const notes = [523.25, 659.25, 783.99, 1046.5, 1318.5, 1568];
       notes.forEach((f, i) => bell(f, i * 0.07, 1.4 - i * 0.1, 0.07, 'triangle'));

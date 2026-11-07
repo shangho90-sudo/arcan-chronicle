@@ -81,6 +81,9 @@
 - 보행 진단: `gait_probe.js`(FPS=30 가능) → `gait_report.py`(미끄러짐·걸음) + `gait_ik_report.py`(IK 도달 실패·무릎 각도), 화면은 `gait_views.js`(측면/정면/후면/게임 시점, 관절·접지 표시)와 `gait_side.js`(배경 없이 격자 위 캐릭터만, `PITCH=8 YAW=0`이면 옆모습, `MAG=0.35` 걷기). 달리기 흔들림 다리는 뒤꿈치 차올림(`footAt`의 `kick`). 골반 좌우 이동은 `mesh.position.x`(시각 전용)이며 다리 IK 목표에서 빼서 보정합니다.
 - 이동 속도(4.6 m/s)를 낮춰서 보행을 맞추지 말 것. 바꾼 뒤에는 `tools/browser-tests/gait_probe.js` + `gait_report.py`로 디딘 발 미끄러짐·걸음 수를 남녀 모두 비교하고, `gait_film.js`로 화면을 확인하세요.
 
+## 직업 모델 (2026-11-07)
+- 전직하면 모습이 바뀌는 직업은 `model.js` `JOB_MODELS`(지금은 약사: `pharmacist_m`/`pharmacist_f`). 모델은 반드시 같은 67뼈 휴머노이드 뼈대 GLB를 `python3 tools/models/glb_to_model.py <in.glb> <이름>`로 변환. 변신 연출은 `rewardfx.js` `JobChangeFx`(빛기둥·고치·날개·나팔·`Audio.chime('fanfare')`), 확인 `tools/browser-tests/jobchange.js`.
+
 ## 칼 휘두르기 (`js/model.js`, `tools/anim/swings.py`)
 - 공격 동작은 시간 키(`keys`, 초) + 구간 이징(`e`) + 칼 팔 IK(`hand`/`blade`/`elbow`) + 발 고정(`step`, `plant`)으로 정의합니다. actions.json의 `attack`/`attack2`는 `python3 tools/anim/swings.py`로 생성하세요(직접 편집 금지).
 - 칼 잔상은 실제 칼날 위치에서 그립니다(`SwingTrail`, 동작의 `trail` 구간). 바꾼 뒤에는 `swing_film.js` → `tools/anim/strip.py`, `swing_report.py`(발 이동·그립·칼끝 속도)와 `attack_dirs.js`(실제 입력 8방향)로 확인하세요.

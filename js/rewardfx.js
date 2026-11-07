@@ -149,6 +149,100 @@ class LevelUpWings {
   }
 }
 
+// ===================================================================================== job change (전직 변신)
+// A see-through column of light closes round the player, a soft white cocoon swells (the body swaps to the new
+// outfit model inside it, ~0.95 s), the angel wings (LevelUpWings) unfold behind, two golden heralds' trumpets with
+// hanging banners rise either side and "blow" (shake, glow at the bell, notes streaming out) to a synthesized fanfare,
+// sparkles and feathers rain down. ~3.4 s.
+let _trumpetTex, _noteTex;
+const trumpetTex = () => _trumpetTex || (_trumpetTex = canvasTex(512, 256, (g, w, h) => {
+  const gold = (y0, y1) => { const gr = g.createLinearGradient(0, y0, 0, y1); gr.addColorStop(0, '#fff6c0'); gr.addColorStop(0.35, '#ffd24a'); gr.addColorStop(0.7, '#c98a14'); gr.addColorStop(1, '#7a4a08'); return gr; };
+  // banner hanging under the tube (blue cloth, gold fringe, a white star)
+  g.fillStyle = '#2a4aa8'; g.beginPath(); g.moveTo(150, 92); g.lineTo(330, 92); g.lineTo(330, 196); g.lineTo(240, 172); g.lineTo(150, 196); g.closePath(); g.fill();
+  g.strokeStyle = '#ffd24a'; g.lineWidth = 6; g.stroke();
+  g.fillStyle = '#fff4d0'; g.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 11 : 26; g.lineTo(240 + Math.cos(a) * r, 132 + Math.sin(a) * r); } g.closePath(); g.fill();
+  g.fillStyle = '#ffd24a'; for (let x = 156; x < 326; x += 14) { g.beginPath(); g.arc(x, 92, 4, 0, TAU); g.fill(); }
+  // tube: mouthpiece -> long straight pipe -> flaring bell (right)
+  g.fillStyle = gold(70, 100); g.fillRect(40, 74, 330, 20);
+  g.fillStyle = gold(60, 110); g.beginPath(); g.ellipse(36, 84, 12, 16, 0, 0, TAU); g.fill();
+  g.fillStyle = gold(56, 114); g.fillRect(120, 66, 14, 36); g.fillRect(250, 66, 14, 36);       // valves / rings
+  g.fillStyle = gold(10, 160); g.beginPath(); g.moveTo(360, 74); g.quadraticCurveTo(440, 70, 500, 14); g.lineTo(500, 154); g.quadraticCurveTo(440, 98, 360, 94); g.closePath(); g.fill();
+  g.strokeStyle = '#6a3e06'; g.lineWidth = 3; g.stroke();
+  g.fillStyle = '#fff8dc'; g.beginPath(); g.ellipse(500, 84, 10, 70, 0, 0, TAU); g.fill();     // bell rim
+  g.strokeStyle = 'rgba(255,255,240,.85)'; g.lineWidth = 4; g.beginPath(); g.moveTo(48, 78); g.lineTo(360, 78); g.stroke();   // highlight
+}));
+const noteTex = () => _noteTex || (_noteTex = canvasTex(128, 128, (g) => {
+  g.font = 'bold 96px serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.shadowColor = 'rgba(255,220,120,1)'; g.shadowBlur = 14;
+  g.fillStyle = '#fff6d0'; g.fillText('♪', 64, 70);
+}));
+
+class JobChangeFx {
+  constructor(scene, player, onSwap) {
+    this.scene = scene; this.p = player; this.onSwap = onSwap; this.t = 0; this.dur = 3.6; this.dead = false; this.swapped = false; this.wings = null;
+    this.root = new THREE.Group(); scene.add(this.root);
+    const add = (m) => { this.root.add(m); return m; };
+    // see-through light column (two nested cylinders, slowly turning streaks)
+    this.colMat = new THREE.MeshBasicMaterial({ map: pillarTex(), color: new THREE.Color(1.6, 1.7, 1.9), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, toneMapped: false, opacity: 0 });
+    this.col = add(new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.25, 9, 32, 1, true), this.colMat)); this.col.position.y = 4.5;
+    this.col2 = add(new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.7, 9, 24, 1, true), this.colMat)); this.col2.position.y = 4.5;
+    // white cocoon hiding the swap
+    this.cocMat = new THREE.SpriteMaterial({ map: glowTex(), color: new THREE.Color(2.4, 2.4, 2.2), transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending, toneMapped: false, opacity: 0 });
+    this.coc = add(new THREE.Sprite(this.cocMat)); this.coc.position.y = 0.95; this.coc.renderOrder = 30;
+    // two trumpets (sprites; the left one mirrored) + notes
+    this.trMat = new THREE.SpriteMaterial({ map: trumpetTex(), transparent: true, depthWrite: false, toneMapped: false, opacity: 0 });
+    this.trGlowMat = new THREE.SpriteMaterial({ map: glowTex(), color: new THREE.Color(2.2, 1.8, 0.9), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false, opacity: 0 });
+    // sprites ignore negative scale, so the left trumpet gets a mirrored copy of the texture (bell = texture right end, outward)
+    this.trTexL = trumpetTex().clone(); this.trTexL.wrapS = THREE.RepeatWrapping; this.trTexL.repeat.x = -1; this.trTexL.offset.x = 1; this.trTexL.needsUpdate = true;
+    this.tr = [-1, 1].map(side => { const m = this.trMat.clone(); if (side < 0) m.map = this.trTexL; const s = add(new THREE.Sprite(m)); s.renderOrder = 25; const gl = add(new THREE.Sprite(this.trGlowMat)); gl.renderOrder = 26; return { s, gl, side }; });
+    this.notes = []; this.noteT = 0;
+    this.place();
+  }
+  place() { const p = this.p.pos; this.root.position.set(p.x, p.y || 0, -p.z); }
+  update(dt) {
+    const t = (this.t += dt); this.place();
+    // column: closes in, glows, then thins out and fades
+    const ci = smooth(0, 0.35, t) * (1 - smooth(2.4, 3.4, t));
+    this.colMat.opacity = 0.75 * ci; const sq = 1 - 0.35 * smooth(0, 0.9, t) + 0.15 * smooth(1.2, 2.6, t);
+    this.col.scale.set(sq, 1, sq); this.col.rotation.y = t * 0.8; this.col2.rotation.y = -t * 1.3; this.col2.scale.set(sq, 1, sq);
+    // cocoon peaks at the swap, then opens
+    const ck = t < 0.95 ? smooth(0.15, 0.95, t) : 1 - smooth(1.0, 1.7, t);
+    this.cocMat.opacity = ck; this.coc.scale.setScalar(1.2 + 1.6 * ck + 0.08 * Math.sin(t * 20));
+    if (!this.swapped && t >= 0.95) { this.swapped = true; try { this.onSwap && this.onSwap(); } catch (e) { console.warn(e); } G.render.addShake && G.render.addShake(0.05, 0.2);
+      if (G.skillFx) { const q = { x: this.p.pos.x, y: this.p.pos.y, z: this.p.pos.z }; G.skillFx.burst('explosion_gold', q, { radius: 1.3 }); G.skillFx.burst('heal', q, { radius: 1.4, color: 0xfff0c0 }); } }
+    if (!this.wings && t >= 1.0) { this.wings = new LevelUpWings(this.scene, this.p); this.wings.dur = 2.6; }
+    if (this.wings && !this.wings.dead) this.wings.update(dt);
+    // trumpets: rise from the shoulders 1.05 s, tilt the bells up and outward, shake while they blow (1.3 - 2.9 s)
+    const yaw = CAM.yaw * DEG, rx = Math.cos(yaw), rz = Math.sin(yaw);       // camera right (three space)
+    const up = easeOutBack(clamp01((t - 1.05) / 0.5)), blow = t > 1.3 && t < 2.9, fade = clamp01((t - 1.05) / 0.25) * (1 - smooth(2.9, 3.4, t));
+    this.trGlowMat.opacity = blow ? 0.7 + 0.3 * Math.sin(t * 30) : 0.25 * fade;
+    for (const T of this.tr) {
+      const d = 0.95 + 0.25 * up, h = 1.15 + 0.85 * up + (blow ? Math.sin(t * 26 + T.side) * 0.025 : 0);
+      T.s.position.set(rx * T.side * d, h, rz * T.side * d); T.s.scale.set(1.9, 0.95, 1);
+      T.rot = T.side * (0.42 + 0.1 * up + (blow ? 0.03 * Math.sin(t * 22) : 0));        // bells tilt up and outward
+      const bx = rx * T.side * (d + 0.82), bz = rz * T.side * (d + 0.82), by = h + 0.42;
+      T.gl.position.set(bx, by, bz); T.gl.scale.setScalar(blow ? 0.9 + 0.25 * Math.sin(t * 18) : 0.5); T.bell = new THREE.Vector3(bx, by, bz);
+    }
+    for (const T of this.tr) { T.s.material.opacity = fade; T.s.material.rotation = T.rot; }
+    if (blow) { this.noteT -= dt; if (this.noteT <= 0) { this.noteT = 0.09; for (const T of this.tr) this.spawnNote(T); } }
+    for (const n of this.notes) { n.t += dt; n.s.position.addScaledVector(n.v, dt); n.v.y += 0.6 * dt; n.s.material.opacity = clamp01(1 - n.t / n.life) * fade; n.s.material.rotation = Math.sin(n.t * 6 + n.ph) * 0.4; }
+    this.notes = this.notes.filter(n => { if (n.t < n.life) return true; this.root.remove(n.s); n.s.material.dispose(); return false; });
+    if (t > this.dur && (!this.wings || this.wings.dead)) this.dispose();
+  }
+  spawnNote(T) {
+    if (!T.bell) return;
+    const m = new THREE.SpriteMaterial({ map: noteTex(), color: new THREE.Color(1.6, 1.4, 0.9), transparent: true, depthWrite: false, toneMapped: false });
+    const s = new THREE.Sprite(m); s.position.copy(T.bell); s.scale.setScalar(0.42 + Math.random() * 0.18); s.renderOrder = 27; this.root.add(s);
+    const yaw = CAM.yaw * DEG, rx = Math.cos(yaw) * T.side, rz = Math.sin(yaw) * T.side;
+    this.notes.push({ s, t: 0, life: 0.9 + Math.random() * 0.4, ph: Math.random() * 6, v: new THREE.Vector3(rx * (0.8 + Math.random() * 0.6), 0.9 + Math.random() * 0.7, rz * (0.8 + Math.random() * 0.6)) });
+  }
+  dispose() {
+    if (this.dead) return; this.dead = true; this.scene.remove(this.root);
+    this.col.geometry.dispose(); this.col2.geometry.dispose(); this.colMat.dispose(); this.cocMat.dispose(); this.trGlowMat.dispose(); this.trMat.dispose(); this.trTexL.dispose();
+    for (const T of this.tr) T.s.material.dispose(); for (const n of this.notes) n.s.material.dispose();
+    if (this.wings) this.wings.dispose();
+  }
+}
+
 // ===================================================================================== monster-kill reward
 // One sequence per kill (all pooled, no per-kill geometry / material):
 //   0.00 kill  · 0.05 small white-gold flash · 0.10 thin gold ground rune (0.7 -> 1.05 -> 1.0) · 0.15 golden light shafts
@@ -355,6 +449,12 @@ export class RewardFx {
     const s0 = G.render.toScreen(st.pos);
     for (let tries = 0; tries < 4; tries++) { const hit = this.stacks.find(o => o.t < 1.3 && Math.abs(o.sx - (s0.x + st.dx)) < 150 && Math.abs(o.sy - (s0.y + st.dy)) < 104); if (!hit) break; st.dy = hit.sy - s0.y - 106; st.dx += (Math.random() - 0.5) * 60; }
     st.sx = s0.x + st.dx; st.sy = s0.y + st.dy; this.stacks.push(st);
+  }
+  /** 전직 변신: light, swap (onSwap at ~0.95 s, inside the white cocoon), angel wings, trumpets + fanfare */
+  jobChange(onSwap) {
+    const G = this.G, p = G.player; if (!p) { onSwap && onSwap(); return; }
+    this.items.push(new JobChangeFx(this.scene, p, onSwap));
+    G.audio && G.audio.chime && G.audio.chime('fanfare');
   }
   levelUp() {
     const G = this.G, p = G.player; if (!p) return;
