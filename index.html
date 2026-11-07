@@ -88,9 +88,10 @@ small { font-size:.8em; }
   text-shadow:0 3px 0 #2a1604, 0 0 14px rgba(255,200,60,.85), 0 0 28px rgba(255,170,40,.55); animation:qmbob 1.4s ease-in-out infinite; transform-origin:50% 100%; }
 .plate .mark b.m-active { font-size:40px; color:#d8d0c8; text-shadow:0 2px 0 #222; animation:none; }
 /* NPC names 3x (13 -> 39 px), thick dark outline so they read over any ground; phones 2x */
-.plate.npc .pname { font-size:39px; font-weight:800; letter-spacing:1px; -webkit-text-stroke:5px #1a1008; paint-order:stroke fill; text-shadow:0 3px 4px rgba(0,0,0,.55); }
+@font-face { font-family:Jua; src:url(assets/fonts/Jua.woff2) format('woff2'); font-display:swap; }   /* 주아체, OFL (assets/fonts/Jua-OFL.txt) */
+.plate.npc .pname { font-family:Jua, sans-serif; font-size:20px; font-weight:400; letter-spacing:.5px; -webkit-text-stroke:3px #1a1008; paint-order:stroke fill; text-shadow:0 3px 4px rgba(0,0,0,.55); }
 .plate.npc .mark:not(:empty) { margin-bottom:10px; }
-@media (max-width:600px) { .plate.npc .pname { font-size:26px; -webkit-text-stroke:4px #1a1008; } }
+@media (max-width:600px) { .plate.npc .pname { font-size:14px; -webkit-text-stroke:2.5px #1a1008; } }
 @keyframes qmbob { 0%,100% { transform:translateY(0) scale(1); } 50% { transform:translateY(-7px) scale(1.06); } }
 .phb { width:56px; height:6px; margin:2px auto 0; background:#2a2228; border:1px solid #000; } .phb i { display:block; height:100%; background:#e05a4a; }
 /* monster-kill reward stack (js/rewardfx.js RewardStack): EXP (white-blue, navy shadow, gold ornaments) above gold (gold-orange) */
@@ -123,6 +124,7 @@ small { font-size:.8em; }
 .wtitle { font-size:28px; color:var(--teal-d); text-align:center; padding:4px 50px 10px; border-bottom:2px solid var(--gold); margin-bottom:12px; }
 .wclose { position:absolute; right:4px; top:2px; min-height:44px; padding:2px 12px; font-size:18px; }
 .wbody { flex:1; min-height:0; position:relative; }
+.window.dialog, .window.dialog * { font-family:Jua, sans-serif; }
 .window.dialog { top:auto; bottom:22px; transform:translateX(-50%); width:min(1180px,96vw) !important; font-size:clamp(15px, 1.6vw, 20px); }
 .dname { color:var(--gold-d); font-size:1.15em; margin-bottom:6px; }
 .dtext { line-height:1.65; min-height:3.2em; } .reward { color:var(--gold-d); font-size:.85em; margin-top:8px; }
