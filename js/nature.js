@@ -9,7 +9,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { T, CAM, TG_TIME } from './render.js';
+import { T, CAM, TG_TIME, paintMat } from './render.js';
 
 const BASE = 'assets/forest/';
 const BL = 'assets/forest/bl/';
@@ -507,8 +507,10 @@ export async function buildNature(zone, renderer) {
     try {
       const gltf = await parseWrapped('assets/props/' + q.model + '.glb.json'), m = gltf.scene, g0 = geo.ground(q.pos[0], q.pos[1]);
       const bb = new THREE.Box3().setFromObject(m), k = (q.h > 0 ? q.h : 6) / Math.max(0.01, bb.max.y - bb.min.y);
-      m.scale.setScalar(k); m.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; const mm = o.material; if (mm && mm.isMeshStandardMaterial) { mm.roughness = 0.95; mm.metalness = 0; } } });
+      m.scale.setScalar(k);
       m.position.copy(T(g0)); m.position.y += (q.y || 0) - bb.min.y * k; m.rotation.y = -(q.rot || 0) * DEG; m.name = 'nature:landmark'; root.add(m);
+      const baseY = T(g0).y, gc = new THREE.Color(...(q.groundCol || [0.30, 0.47, 0.16]));
+      m.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; const mm = o.material; if (mm && mm.isMeshStandardMaterial) landmarkMat(mm, baseY, gc); } });
     } catch (e) { console.warn('landmark', q.model, e); }
   }
 
@@ -653,4 +655,24 @@ export async function placeBlProps(list, aniso = 4, groundY = () => 0) {
     else im.castShadow = !/^(grass|flower|clover|fern)/.test(name);
   }));
   return root;
+}
+
+/** a Tripo-made landmark painted to sit in the field: the game's toon shading (paintMat: banded light, violet shade,
+ *  warm occlusion, rim), slightly calmer colours, and a soft grass-coloured blend over the lowest ~0.7 m so the walls
+ *  grow out of the painted ground instead of standing on it */
+function landmarkMat(m, baseY, grass) {
+  m.roughness = 1; m.metalness = 0; m.envMapIntensity = 0.4;
+  if (m.map) { m.map.anisotropy = 8; m.map.needsUpdate = true; }
+  m.onBeforeCompile = sh => {
+    sh.uniforms.uBaseY = { value: baseY }; sh.uniforms.uGrass = { value: grass };
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying float vWY;')
+      .replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvWY = (modelMatrix * vec4(transformed, 1.)).y;');
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying float vWY; uniform float uBaseY; uniform vec3 uGrass;')
+      .replace('#include <opaque_fragment>', `{ float gb = 1. - smoothstep(0.0, 0.7, vWY - uBaseY);
+  float l = dot(outgoingLight, vec3(.299, .587, .114));
+  outgoingLight = mix(outgoingLight, uGrass * (0.55 + 0.9 * l), gb * 0.55); }
+#include <opaque_fragment>`);
+  };
+  m.customProgramCacheKey = () => 'landmark';
+  paintMat(m, { sat: 0.9, rimK: 0.16 });
 }

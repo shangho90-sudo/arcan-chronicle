@@ -61672,7 +61672,7 @@
       13.4,
       46.8
      ],
-     "rot": 180,
+     "rot": 90,
      "scale": 1,
      "h": 7.5,
      "r": 2.7,
@@ -61692,6 +61692,221 @@
      "text": "버섯대왕이 사는 곳",
      "w": 0.0,
      "d": 0.0
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      12.57,
+      50.92
+     ],
+     "rot": 0.0,
+     "scale": 0.9,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0,
+     "skirt": true
+    },
+    {
+     "type": "shrub",
+     "model": "shrub_a",
+     "pos": [
+      16.78,
+      46.09
+     ],
+     "rot": 9.3,
+     "scale": 0.71,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0,
+     "skirt": true
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      12.5,
+      50.1
+     ],
+     "rot": 0.0,
+     "scale": 0.84,
+     "variant": "mixed",
+     "w": 0.0,
+     "d": 0.0,
+     "skirt": true
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      15.95,
+      44.81
+     ],
+     "rot": 0.0,
+     "scale": 1.2,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0,
+     "skirt": true
+    },
+    {
+     "type": "shrub",
+     "model": "shrub_b",
+     "pos": [
+      10.03,
+      46.38
+     ],
+     "rot": 213.5,
+     "scale": 0.71,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0,
+     "skirt": true
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      15.71,
+      49.36
+     ],
+     "rot": 0.0,
+     "scale": 0.96,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0,
+     "skirt": true
+    },
+    {
+     "type": "shrub",
+     "model": "shrub_b",
+     "pos": [
+      11.07,
+      49.49
+     ],
+     "rot": 287.9,
+     "scale": 0.74,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0,
+     "skirt": true
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      16.44,
+      47.85
+     ],
+     "rot": 0.0,
+     "scale": 1.1,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0,
+     "skirt": true
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      9.33,
+      45.58
+     ],
+     "rot": 0.0,
+     "scale": 0.85,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0,
+     "skirt": true
+    },
+    {
+     "type": "shrub",
+     "model": "shrub_b",
+     "pos": [
+      10.94,
+      48.95
+     ],
+     "rot": 205.7,
+     "scale": 0.57,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0,
+     "skirt": true
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      10.93,
+      44.47
+     ],
+     "rot": 0.0,
+     "scale": 0.96,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0,
+     "skirt": true
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      11.12,
+      49.15
+     ],
+     "rot": 0.0,
+     "scale": 0.95,
+     "variant": "white",
+     "w": 0.0,
+     "d": 0.0,
+     "skirt": true
+    },
+    {
+     "type": "shrub",
+     "model": "shrub_b",
+     "pos": [
+      9.58,
+      46.68
+     ],
+     "rot": 176.8,
+     "scale": 0.73,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0,
+     "skirt": true
+    },
+    {
+     "type": "shrub",
+     "model": "shrub_a",
+     "pos": [
+      16.43,
+      45.14
+     ],
+     "rot": 134.7,
+     "scale": 0.8,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0,
+     "skirt": true
+    },
+    {
+     "type": "flowers",
+     "pos": [
+      16.57,
+      49.22
+     ],
+     "rot": 0.0,
+     "scale": 1.12,
+     "variant": "yellow",
+     "w": 0.0,
+     "d": 0.0,
+     "skirt": true
+    },
+    {
+     "type": "shrub",
+     "model": "shrub_a",
+     "pos": [
+      11.3,
+      49.83
+     ],
+     "rot": 140.6,
+     "scale": 0.8,
+     "variant": "",
+     "w": 0.0,
+     "d": 0.0,
+     "skirt": true
     }
    ],
    "npcs": [],

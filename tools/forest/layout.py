@@ -274,7 +274,23 @@ if B:
     print('arena grove', dict(_C(g.get('model', g['type']) for g in grove)))
 
 
-props = kept + trees + shrubs + rocks + stones + stumps + flowers + grove
+def landmark_skirt(L):
+    """flowers + small shrubs around a landmark's base so it grows out of the field (the door side stays open:
+    door = model +X; rot 90 = door toward -z)"""
+    import random as _r
+    rr = _r.Random(int(L['pos'][0] * 100 + L['pos'][1] * 7)); cx, cz, R = L['pos'][0], L['pos'][1], (L.get('r') or 2.4)
+    th = math.radians(L.get('rot') or 0); door = math.atan2(-math.sin(th), math.cos(th))      # door (x, z) = (cos rot, -sin rot): checked in game
+    out = []
+    for i in range(22):
+        a = rr.uniform(0, 2 * math.pi)
+        if abs((a - door + math.pi) % (2 * math.pi) - math.pi) < math.radians(42): continue
+        d = R + rr.uniform(0.3, 1.6); x, z = cx + math.cos(a) * d, cz + math.sin(a) * d
+        if i % 3 == 0: out.append({'type': 'shrub', 'model': rr.choice(['shrub_a', 'shrub_b']), 'pos': [round(x, 2), round(z, 2)], 'rot': round(rr.uniform(0, 360), 1), 'scale': round(rr.uniform(0.55, 0.8), 2), 'variant': '', 'w': 0.0, 'd': 0.0, 'skirt': True})
+        else: out.append({'type': 'flowers', 'pos': [round(x, 2), round(z, 2)], 'rot': 0.0, 'scale': round(rr.uniform(0.8, 1.2), 2), 'variant': rr.choice(['white', 'white', 'yellow', 'mixed']), 'w': 0.0, 'd': 0.0, 'skirt': True})
+    return out
+skirts = [q for L in kept if L['type'] == 'landmark' for q in landmark_skirt(L)]
+
+props = kept + trees + shrubs + rocks + stones + stumps + flowers + grove + skirts
 from collections import Counter
 print('trees', len(trees), dict(Counter(t['model'] for t in trees)), 'rocks', dict(Counter(r['model'] for r in rocks)), 'stones', len(stones),
       f'shrubs {len(shrubs)}, stumps {len(stumps)}, flower clusters {len(flowers)}, kept {len(kept)}')
