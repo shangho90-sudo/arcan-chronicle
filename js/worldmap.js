@@ -47,6 +47,48 @@ export function worldMapSvg(data, here) {
   return s + `</svg>`;
 }
 
+/** label layout for the current zoom: labels keep a constant on-screen size (towns 14 px, fields 12 px, regions
+ *  18-30 px), each tries 8 spots round its marker and takes the first that hits no marker / other label (region names
+ *  are a soft obstacle); field labels that fit nowhere are hidden until you zoom in (or select / hover them). */
+function layoutLabels(svg, selId) {
+  const ctm = svg.getScreenCTM(); if (!ctm) return; const k = ctm.a || 1;              // screen px per map unit
+  const boxes = [], hit = (a, b) => a.x0 < b.x1 && a.x1 > b.x0 && a.y0 < b.y1 && a.y1 > b.y0;
+  const nodes = [...svg.querySelectorAll('.wmnode')].map(g => { const t = g.transform.baseVal.consolidate().matrix; return { g, x: t.e, y: t.f, town: g.classList.contains('town'), cur: g.classList.contains('here'), id: g.dataset.z }; });
+  for (const n of nodes) { const r = (n.town ? 21 : 11) + 1 / k; boxes.push({ x0: n.x - r, x1: n.x + r, y0: n.y - r - (n.town ? 6 : 0), y1: n.y + r, hard: true }); }
+  const regs = [...svg.querySelectorAll('.wmregion')], rpx = Math.max(16, Math.min(28, 31 * k));
+  for (const t of regs) { t.style.fontSize = (rpx / k) + 'px'; t.style.letterSpacing = (3 / k) + 'px'; t.style.strokeWidth = (4 / k) + 'px'; }
+  const order = nodes.slice().sort((a, b) => (b.cur - a.cur) || ((b.id === selId) - (a.id === selId)) || (b.town - a.town));
+  for (const n of order) {
+    const t = n.g.querySelector('.wmlabel'), px = n.cur ? 15 : n.town ? 14 : 12, fs = px / k, len = [...t.textContent].length;
+    t.style.fontSize = fs + 'px'; t.style.strokeWidth = (3.2 / k) + 'px';
+    const w = len * fs * 0.95, h = fs * 1.15, r = (n.town ? 22 : 12) + 2 / k;
+    const C = [[0, r + fs * 0.95, 'middle'], [0, -r - fs * 0.3 - (n.cur ? 12 : 0), 'middle'], [r + 3 / k, fs * 0.35, 'start'], [-r - 3 / k, fs * 0.35, 'end'],
+      [r * 0.7, r + fs * 0.9, 'start'], [-r * 0.7, r + fs * 0.9, 'end'], [r * 0.7, -r - fs * 0.2, 'start'], [-r * 0.7, -r - fs * 0.2, 'end']];
+    let best = null, bestCost = 1e9;
+    for (const [dx, dy, an] of C) {
+      const x0 = an === 'middle' ? n.x + dx - w / 2 : an === 'start' ? n.x + dx : n.x + dx - w, b = { x0, x1: x0 + w, y0: n.y + dy - fs * 0.85, y1: n.y + dy - fs * 0.85 + h };
+      let cost = 0; for (const o of boxes) if (o.g !== n.g && hit(b, o)) cost += o.soft ? 1 : 100;
+      if (cost < bestCost) { bestCost = cost; best = { dx, dy, an, b }; if (!cost) break; }
+    }
+    const show = bestCost < 100 || n.town || n.cur || n.id === selId;
+    t.style.display = show ? '' : 'none'; n.g.classList.toggle('lblhid', !show);
+    if (show) { t.setAttribute('x', best.dx); t.setAttribute('y', best.dy); t.setAttribute('text-anchor', best.an); boxes.push(Object.assign(best.b, { hard: true, g: n.g })); }
+  }
+  // region names go last: each slides (up to ~2 letters' height / width) to the spot that covers the fewest places
+  for (const t of regs) {
+    const x0 = +(t.dataset.x ??= t.getAttribute('x')), y0 = +(t.dataset.y ??= t.getAttribute('y'));
+    t.setAttribute('x', x0); t.setAttribute('y', y0); const bb = t.getBBox(), step = rpx / k * 0.55;
+    let best = [0, 0], bc = 1e9;
+    for (const dy of [0, -1, 1, -2, 2, -3, 3, -4, 4, -5, 5]) for (const dx of [0, -1.5, 1.5, -3, 3, -4.5, 4.5]) {
+      const b = { x0: bb.x + dx * step, x1: bb.x + bb.width + dx * step, y0: bb.y + dy * step, y1: bb.y + bb.height + dy * step };
+      let c = Math.abs(dx) * 0.2 + Math.abs(dy) * 0.25; for (const o of boxes) if (hit(b, o)) c += 10;
+      if (c < bc) { bc = c; best = [dx * step, dy * step]; }
+    }
+    t.setAttribute('x', x0 + best[0]); t.setAttribute('y', y0 + best[1]); t.style.opacity = bc >= 10 ? '.42' : '';   // still crowded: fade it under the places
+    const b2 = t.getBBox(); boxes.push({ x0: b2.x, x1: b2.x + b2.width, y0: b2.y, y1: b2.y + b2.height, hard: true });
+  }
+}
+
 const LOGO_WING = `<svg viewBox="0 0 120 50" class="wmwing"><path d="M118 30 C96 26 86 12 64 6 C70 14 66 18 58 16 C62 22 56 26 48 23 C52 30 44 33 36 29 C38 36 30 38 22 33 C22 40 12 40 2 36 C22 48 60 46 84 40 C98 37 108 34 118 30 Z" fill="url(#lg)" stroke="#3a2208" stroke-width="1.6"/><defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6dc8a"/><stop offset="1" stop-color="#8a5a14"/></linearGradient></defs></svg>`;
 const COMPASS = `<svg viewBox="-40 -40 80 80" class="wmcompass"><circle r="30" fill="none" stroke="#c9a24a" stroke-width="1.5"/><circle r="24" fill="none" stroke="#c9a24a" stroke-width=".8"/>
 ${[0, 90, 180, 270].map(a => `<path d="M0,-36 L5,0 L0,5 L-5,0 Z" transform="rotate(${a})" fill="#e8c46a" stroke="#6a4a14" stroke-width=".8"/>`).join('')}
@@ -74,8 +116,9 @@ export function showWorldMap(ui) {
   let zoom = 1;
   // the chart fills the frame: the box is as wide as the window, its height follows the screen, the SVG keeps its aspect
   // ("meet") and the open sea around it is the box's own painted-sea background
+  let selId = here; const relayout = () => requestAnimationFrame(() => layoutLabels(inner.querySelector('svg'), selId));
   const setZoom = (z, focus) => {
-    zoom = Math.max(1, Math.min(3, z)); inner.style.width = (zoom * 100) + '%'; inner.style.height = (zoom * 100) + '%';
+    zoom = Math.max(1, Math.min(3.5, z)); inner.style.width = (zoom * 100) + '%'; inner.style.height = (zoom * 100) + '%'; relayout();
     if (focus) requestAnimationFrame(() => { const r = inner.getBoundingClientRect(), Wv = SZ[0] + 2 * PAD[0], Hv = SZ[1] + 2 * PAD[1];
       const k = Math.min(r.width / Wv, r.height / Hv), ox = (r.width - Wv * k) / 2, oy = (r.height - Hv * k) / 2, sc = box.getBoundingClientRect().width / (box.offsetWidth || 1) || 1;
       box.scrollLeft = (ox + (focus[0] + PAD[0]) * k) / sc - box.clientWidth / 2; box.scrollTop = (oy + (focus[1] + PAD[1]) * k) / sc - box.clientHeight / 2; });
@@ -91,7 +134,12 @@ export function showWorldMap(ui) {
     txt.innerHTML = `<div class="wmname"><b>${esc(z.name)}</b> <small>${esc(kind)}${reg ? ' · ' + esc(reg.name) : ''}</small> ${lv}${id === here ? ' <span class="wmlv here">현재 위치</span>' : ''}</div>` +
       `<div class="wmlinks"><span>이어진 곳 :</span> ${links.map(l => `<b>${esc(l.name)}</b>`).join(', ') || '없음'}</div>`;
     for (const n of inner.querySelectorAll('.wmnode')) n.classList.toggle('sel', n.dataset.z === id);
+    if (selId !== id) { selId = id; relayout(); }
   };
+  // mouse wheel zooms around the pointer's place on the map
+  box.addEventListener('wheel', e => { e.preventDefault(); const r = box.getBoundingClientRect(), fx = (box.scrollLeft + e.clientX - r.left) / inner.offsetWidth, fy = (box.scrollTop + e.clientY - r.top) / inner.offsetHeight;
+    setZoom(zoom * (e.deltaY < 0 ? 1.2 : 1 / 1.2)); requestAnimationFrame(() => { box.scrollLeft = fx * inner.offsetWidth - (e.clientX - r.left); box.scrollTop = fy * inner.offsetHeight - (e.clientY - r.top); }); }, { passive: false });
+  if (window.ResizeObserver) { const ro = new ResizeObserver(() => { if (!box.isConnected) return ro.disconnect(); relayout(); }); ro.observe(box); }
   for (const n of inner.querySelectorAll('.wmnode')) n.addEventListener('click', () => { G.audio.sfx('ui'); show(n.dataset.z); });
   show(here);
   setZoom(G.input && G.input.mobile ? 1.7 : 1, cur && cur.map);

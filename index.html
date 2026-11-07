@@ -755,6 +755,8 @@ small { font-size:.8em; }
 .wmlabel.town { font-size:17.5px; fill:#3a1c04; } .wmlabel.cur { fill:#b01e10; font-size:18px; }
 .wmnode { cursor:pointer; } .wmnode:hover circle:nth-child(2), .wmnode.sel circle:nth-of-type(2) { stroke:#ffe48a; stroke-width:3; }
 .wmnode.sel .wmlabel { fill:#7a1e10; }
+.wmnode.lblhid:hover .wmlabel { display:inline !important; }   /* hidden (crowded) field names appear on hover */
+.wmregion { opacity:.82; }
 .wmpulse { fill:none; stroke:#ffe08a; stroke-width:3; animation:wmpulse 1.6s ease-in-out infinite; }
 @keyframes wmpulse { 0%,100% { stroke-opacity:.95; r:17px; } 50% { stroke-opacity:.2; r:27px; } }
 .wminfo { position:relative; display:flex; align-items:center; min-height:70px; padding:10px 18px; border:2px solid #c9a24a; border-radius:8px;
