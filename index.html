@@ -432,13 +432,24 @@ small { font-size:.8em; }
 .titlewin .title-action:disabled { opacity:1; background:#17273599; cursor:not-allowed; filter:none; }
 .title-save { position:absolute; left:24.5%; top:66%; width:51%; height:5%; display:flex; align-items:center; justify-content:center; padding:0 3%; border:1px solid #d9bc72; border-radius:999px; background:linear-gradient(#253447,#101d2c); color:#fff6de; font-family:"Malgun Gothic",sans-serif; font-size:clamp(9px,min(1.45vw,1.93vh),21px); text-align:center; line-height:1.25; overflow:hidden; }
 @media (max-aspect-ratio:3/4) {
-  .title-art { width:100vw; }
-  .titlewin .title-action { left:12%; width:76%; height:48px; border:2px solid #f6d58a; border-radius:16px; font-size:22px; font-family:"Malgun Gothic",sans-serif; }
-  .titlewin .title-continue { top:57%; background:linear-gradient(#ffdf93,#c48a30); color:#38250c; }
+  /* portrait phones: the picture's top part (town + logo, above its painted buttons) as a full-width banner over a blurred
+     copy of itself, then real buttons in a column — no painted button text shows through */
+  .titlewin .wbody { place-items:stretch; }
+  .titlewin .wbody::before { background:url(assets/ui/title-screen.png) center 30%/cover no-repeat; filter:blur(16px) brightness(.42) saturate(1.1); inset:-30px; }
+  .title-art { width:100vw; height:100%; aspect-ratio:auto; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:max(16px, env(safe-area-inset-top)) 0 max(20px, env(safe-area-inset-bottom)); box-sizing:border-box; }
+  /* banner = the picture's top 57.5 % at --bh tall (sides cropped on narrow screens; the logo stays centred) */
+  .title-art { --bh:min(40vh, 70vw); }
+  .title-illustration { width:auto; max-width:none; height:calc(var(--bh) / .575); flex:none; margin-bottom:calc(var(--bh) / .575 * -.425 + 6px);
+    clip-path:inset(0 0 42.5% 0); -webkit-mask-image:linear-gradient(#000 0, #000 51%, transparent 57.5%); mask-image:linear-gradient(#000 0, #000 51%, transparent 57.5%); }
+  .titlewin .title-action, .title-save { position:relative; left:auto; top:auto; flex:none; width:min(84vw, 380px); box-sizing:border-box; }
+  .titlewin .title-action { height:56px; border:2px solid #f6d58a; border-radius:16px; font:700 21px Jua, "Malgun Gothic", sans-serif; letter-spacing:1px; box-shadow:0 4px 12px rgba(0,0,0,.4); }
+  .titlewin .title-continue { background:linear-gradient(#ffe4a0,#c48a30); color:#38250c; }
+  .titlewin .title-continue:disabled { background:linear-gradient(#5b6470,#39424e); color:#c8ccd4; border-color:#8a8f98; }
   .title-continue::after { content:"불러오기"; }
-  .titlewin .title-new { top:calc(57% + 104px); background:linear-gradient(#149fdb,#07476f); color:#fff4d8; }
+  .titlewin .title-new { background:linear-gradient(#149fdb,#07476f); color:#fff4d8; }
   .title-new::after { content:"새 게임"; }
-  .title-save { left:8%; top:calc(57% + 51px); width:84%; height:50px; font-size:11px; padding:4px 12px; border-radius:12px; }
+  .title-save { height:auto; min-height:40px; font-size:12px; padding:8px 14px; border-radius:12px; white-space:normal; }
+  .title-sound { top:max(12px, env(safe-area-inset-top)); right:12px; font-size:13px; padding:5px 10px; z-index:2; }
 }
 @media (prefers-reduced-motion:reduce) { .titlewin .title-action { transition:none; } }
 </style>
@@ -462,15 +473,23 @@ small { font-size:.8em; }
 .create-art .create-back { left:15.7%; top:80.3%; width:32%; height:8.8%; }
 .create-art .create-start { left:49.3%; top:80.3%; width:34.8%; height:8.8%; }
 @media (max-width:600px) and (orientation:portrait) {
-  .create-art { width:100vw; margin-bottom:210px; }
-  .create-art::after { content:""; position:absolute; left:3%; right:3%; top:64%; height:calc(36% + 210px); border:1px solid #d9b76f; border-radius:12px; background:linear-gradient(#faf1dc,#e7d5b1); }
-  .create-form { left:8%; top:70%; width:67%; height:48px; z-index:1; }
+  /* portrait phones: only the picture's top 64% (title + both characters + their cards), then a real form panel below it;
+     everything centred as one block over a blurred copy of the picture */
+  .window.create-art-window { background:transparent; }
+  .create-art-window .wbody::before { content:""; position:fixed; inset:-30px; z-index:-1; background:url(assets/ui/character-select.png) center/cover no-repeat; filter:blur(16px) brightness(.4); }
+  .create-art { width:100vw; aspect-ratio:3 / 1.28; margin-bottom:226px; }
+  .create-art-window .wbody { isolation:isolate; }
+  .create-illustration { position:absolute; left:0; top:0; width:100%; height:auto; clip-path:inset(0 0 36% 0); }
+  .create-choice { top:47%; height:49%; }
+  .create-choice.sel::after { bottom:-12px; font-size:11px; padding:2px 10px; }
+  .create-art::after { content:""; position:absolute; left:3%; right:3%; top:calc(100% + 6px); height:212px; border:1.5px solid #d9b76f; border-radius:14px; background:linear-gradient(#faf1dc,#e7d5b1); box-shadow:0 6px 18px rgba(0,0,0,.4); }
+  .create-form { left:8%; top:calc(100% + 26px); width:67%; height:50px; z-index:1; }
   .create-form input { font-size:18px; }
-  .create-art .create-random { left:78%; top:70%; width:14%; height:48px; z-index:1; background:#0d5984; border:2px solid #e4be66; }
+  .create-art .create-random { left:78%; top:calc(100% + 26px); width:14%; height:50px; z-index:1; background:#0d5984; border:2px solid #e4be66; }
   .create-random::after { content:"⚄"; color:white; font-size:28px; }
-  .create-art .create-back, .create-art .create-start { left:8%; width:84%; height:48px; z-index:1; border:2px solid #b28a44; font:20px "Malgun Gothic",sans-serif; }
-  .create-art .create-back { top:calc(70% + 122px); background:#fff4d8; color:#493421; }
-  .create-art .create-start { top:calc(70% + 62px); background:linear-gradient(#167fb5,#104068); color:#fff4d8; }
+  .create-art .create-back, .create-art .create-start { left:8%; width:84%; height:50px; z-index:1; border:2px solid #b28a44; font:700 19px Jua, "Malgun Gothic",sans-serif; }
+  .create-art .create-start { top:calc(100% + 88px); background:linear-gradient(#167fb5,#104068); color:#fff4d8; }
+  .create-art .create-back { top:calc(100% + 150px); background:#fff4d8; color:#493421; }
   .create-back::after { content:"← 뒤로"; } .create-start::after { content:"모험 시작 →"; }
 }
 @media (max-width: 600px) {   /* phones held upright: HP/EXP/menu block under the character panel, small minimap top-right */
@@ -709,6 +728,7 @@ small { font-size:.8em; }
 .window.fancy .slotbtns .btn:disabled { filter:grayscale(.8) brightness(.95); opacity:.6; cursor:not-allowed; }
 .window.phone .slotrow, .window.narrow .slotrow { flex-wrap:wrap; gap:10px; } .window.phone .slotbtns, .window.narrow .slotbtns { width:100%; justify-content:flex-end; }
 .window.fancy .pbtns { display:flex; gap:14px; justify-content:center; margin-top:16px; } .window.fancy .pbtns .btn { min-width:160px; }
+.window.phone .pbtns, .window.narrow .pbtns { flex-wrap:wrap; gap:10px; } .window.phone .pbtns .btn, .window.narrow .pbtns .btn { flex:1 1 40%; min-width:0; }   /* phones: button rows wrap instead of running off the side */
 .window.fancy .ctext { padding:14px 10px 4px; font-size:22px; text-align:center; line-height:1.6; color:#3b2a17; }
 .window.fancy.death .fplaque .fp-t { color:#ffd8cc; }
 .window.fancy .fplaque { white-space:nowrap; } .window.fancy.pause .fplaque, .window.fancy.death .fplaque { font-size:36px; padding-left:44px; padding-right:44px; }

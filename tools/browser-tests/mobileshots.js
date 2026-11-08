@@ -15,6 +15,7 @@ const OUT = process.env.OUT || '/tmp/mob'; fs.mkdirSync(OUT, { recursive: true }
     const clickLabel = async t => { await pg.waitForFunction(t => [...document.querySelectorAll('button,[aria-label]')].some(b => (b.getAttribute('aria-label') || b.textContent || '').includes(t)), t, { timeout: 300000 });
       await ev(t => [...document.querySelectorAll('button,[aria-label]')].find(b => (b.getAttribute('aria-label') || b.textContent || '').includes(t)).click(), t); };
     await ev(() => localStorage.clear()); await clickLabel('새 게임'); await clickLabel('모험 시작');
+    await pg.waitForSelector('.prologue.on', { timeout: 120000 }).then(() => clickLabel('건너뛰기')).catch(() => {});
     await pg.waitForFunction(() => window.G && G.inWorld && !G.loading, null, { timeout: 300000 });
     const report = name => ev(() => {
       const out = {}; for (const s of ['.charpanel', '.minimap', '.botbar', '.qhud', '.qh-reopen', '.target', '.prompt', '.feed', '.actions', '.stickbase', '.window', '.toasts']) {
@@ -28,11 +29,12 @@ const OUT = process.env.OUT || '/tmp/mob'; fs.mkdirSync(OUT, { recursive: true }
     await shot('prompt');
     await ev(() => G.interact(G.zone.npcs.find(n => n.def.id === 'elder'))); await shot('dialog');
     await ev(() => { G.ui.close(); const S = G.sheet; S.p.level = 12; S.p.job = 'cook'; S.book.grantPoints(); S.recalc(); for (const [id, n] of [['m_jelly', 9], ['m_spore', 4]]) S.bag.add(id, n); });
-    for (const k of ['inventory', 'skills', 'quests', 'shop', 'craft', 'pause']) {
+    for (const k of ['inventory', 'skills', 'quests', 'shop', 'craft', 'pause', 'saves', 'areamap', 'stats', 'worldmap']) {
       await ev(k => { const U = G.ui; U.close();
         if (k === 'inventory') U.showInventory(); if (k === 'skills') U.showSkills(); if (k === 'quests') U.showQuests(); if (k === 'pause') U.showPause();
         if (k === 'shop') { const id = Object.keys(G.data.shops)[0]; U.showShop(G.data.shops[id]); }
-        if (k === 'craft') U.showCraft(); }, k);
+        if (k === 'craft') U.showCraft(); if (k === 'saves') U.showSaveSlots('save', null, () => U.showPause()); if (k === 'areamap') U.showAreaMap();
+        if (k === 'stats' && U.showStats) U.showStats(); if (k === 'worldmap') U.handleKeys({ map: true }); }, k);
       await shot('win_' + k);
     }
     await ev(() => G.ui.close());

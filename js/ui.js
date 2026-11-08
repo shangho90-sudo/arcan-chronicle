@@ -370,7 +370,7 @@ export class UI {
       const PHONE_S = 0.64, dw = Math.min(+w.dataset.w || w.offsetWidth, Math.floor((innerWidth - 12) / PHONE_S));
       if (w.style.width !== dw + "px") w.style.width = dw + "px";
       w.style.height = ""; w.classList.toggle("narrow", dw < 900);
-      const s = Math.min(1, (innerWidth - 12) / w.offsetWidth), mh = Math.floor((innerHeight - 14) / s) + "px";
+      const s = Math.min(1, (innerWidth - 12) / w.offsetWidth), mh = Math.floor((innerHeight - 30) / s) + "px";   // room for the frame / banner so nothing runs off the screen
       if (w.style.maxHeight !== mh) w.style.maxHeight = mh;
       w.style.transform = `translate(-50%,-50%) scale(${s})`; return;
     }
