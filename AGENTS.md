@@ -49,6 +49,7 @@
 - `js/nature.js`가 빌더의 평평한 바닥·원뿔 나무·상자 소품을 숨기고 다시 그립니다: 손그림 지면 셰이더(햇빛 잔디/그늘 잔디/흙/이끼, 반복 완화), 곡선 흙길(마스크는 존의 `patches` 경로에서 생성), Blender 나무·덤불·바위(모델·24 m 청크 단위 인스턴싱), 풀·꽃 덩어리(청크별 한 메시로 합침, 바람), 작은 돌, 플레이어를 가리는 나무 디더링.
 - 배치는 `tools/forest/layout.py --write`(시드 고정)로 `zones.json`의 forest `props`를 다시 씁니다. 나무·바위·그루터기만 충돌(`propFootprint`), `shrub`·`flowers`는 장식. 배치를 바꾸면 `node tools/forest/check_nav.mjs`로 모든 포털·캠프·보스 입구 도달을 확인하세요.
 - 모델 후처리 `tools/forest/process_models.py`, 텍스처 `tools/forest/texgen_forest.py`, 출처는 `assets/forest/README.md`.
+- 호수·연못(존 `patches`의 `tex: water` 원판)은 `nature.js` `buildWater`가 셰이더 물(`WATER_FS`: 물가 마스크·깊이 색·물결·하늘 반사·반짝임·물가 물결선·젖은 띠)과 연잎으로 그림, 물가에는 갈대 카드. 빌더 물 메시는 `game.js`에서 숨김. 충돌은 그대로 원판(`r - 0.9`). 확인 `tools/browser-tests/watershots.js`.
 - 그림자는 모델별 저폴리 사본(`*_lo`)만 그립니다(색 패스에서는 0개 인스턴스). 존별 후처리 값은 `zones.json`의 `"post"`.
 - 화면 비교: `tools/browser-tests/forestshots.js` (정지·이동·근접·나무 뒤·전투, `W`/`H`/`TOUCH`로 화면비).
 

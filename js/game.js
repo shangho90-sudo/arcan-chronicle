@@ -74,6 +74,7 @@ class Zone {
       this.nature = await buildNature(this, G.render.r);
       for (const g of G.render.groups) if (g.name === 'terrain') for (const m of g.meshes) if (/boss_floor$/.test(m.userData.tex || '')) { m.material = this.nature.magicFloor; m.receiveShadow = true; }
       G.render.zoneRoot.add(this.nature.root);
+      if (this.nature.water) for (const g of G.render.groups) for (const m of g.meshes) if (m.userData.water) m.visible = false;   // nature draws the ponds
     }
     // the old builder's flat flower clusters (untextured little cubes on the ground) look like stray debris: hide them
     for (const g of G.render.groups) if (g.name === 'props') for (const m of g.meshes) {

@@ -535,13 +535,17 @@ export async function buildNature(zone, renderer) {
   const maskAt = (x, z) => { const [u, v] = mask.P(x, z); const i = (Math.min(mask.S - 1, Math.max(0, v | 0)) * mask.S + Math.min(mask.S - 1, Math.max(0, u | 0))) * 4; return [mask.data[i] / 255, mask.data[i + 1] / 255, mask.data[i + 2] / 255]; };
   const onPlat = (x, z) => (def.heights || []).some(h => x > h.rect[0] - 0.3 && x < h.rect[2] + 0.3 && z > h.rect[1] - 0.3 && z < h.rect[3] + 0.3);
   const camps = (def.monsters || []).map(m => [m.pos[0], m.pos[1], m.radius]);
+  // ponds / lakes / river pools (zone patches tex 'water', shape 'disc'): drawn by buildWater below
+  const ponds = (def.patches || []).filter(p => p.tex === 'water' && p.shape === 'disc').map(p => [p.pos[0], p.pos[1], p.radius]);
+  let waterU = null;
+  const inWater = (x, z, m = 0.15) => ponds.some(([px, pz, r]) => Math.hypot(x - px, z - pz) < r + m);
   // flower clusters from the layout (white / yellow first, mixed as accents)
   const FCELL = { white: [4, 7], yellow: [5], mixed: [6, 10] };
   for (const q of props) if (q.type === 'flowers') {
     const cells = FCELL[q.variant] || FCELL.white, n = 5 + Math.floor(rnd() * 6), r = 0.9 * (q.scale || 1);
     for (let k = 0; k < n; k++) {
       const a = rnd() * Math.PI * 2, d = Math.sqrt(rnd()) * r, x = q.pos[0] + Math.cos(a) * d, z = q.pos[1] + Math.sin(a) * d;
-      if (maskAt(x, z)[0] > 0.55) continue;
+      if (maskAt(x, z)[0] > 0.55 || inWater(x, z)) continue;
       const s = 0.5 + rnd() * 0.3; cards.push([x, z, s * 1.1, s, k % 3 === 2 ? Math.floor(rnd() * 3) : cells[Math.floor(rnd() * cells.length)]]);
     }
   }
@@ -549,7 +553,7 @@ export async function buildNature(zone, renderer) {
   const area = (x1 - x0) * (z1 - z0);
   for (let k = 0; k < area * 2.6 * (NV.grass ?? 1); k++) {
     const x = x0 + rnd() * (x1 - x0), z = z0 + rnd() * (z1 - z0);
-    if (onPlat(x, z)) continue;
+    if (onPlat(x, z) || inWater(x, z)) continue;
     const [r, g, b] = maskAt(x, z);
     if (r > 0.42) continue;                                       // never on the walkable dirt
     let dens = 0.16 + g * 0.55 + b * 0.25;                        // under / near trees
@@ -559,6 +563,20 @@ export async function buildNature(zone, renderer) {
     const s = 0.38 + rnd() * 0.32 + g * 0.15;
     cards.push([x, z, s * 1.25, s, rnd() < 0.82 ? Math.floor(rnd() * 3) : 3]);
     if (rnd() < 0.09 && g < 0.4) cards.push([x + 0.2, z + 0.1, 0.42, 0.36, rnd() < 0.65 ? 4 : rnd() < 0.8 ? 5 : 7]);   // stray daisies / buttercups
+  }
+  // reeds and tall grass along the shores (gaps where a path meets the water), then the water itself
+  if (ponds.length) {
+    const wr = mulberry(517);
+    for (const [px, pz, r] of ponds) {
+      const n = Math.round(r * 14);
+      for (let k = 0; k < n; k++) {
+        const a = wr() * Math.PI * 2, d = r * (0.96 + wr() * 0.14) + wr() * 0.5, x = px + Math.cos(a) * d, z = pz + Math.sin(a) * d;
+        if (ponds.some(([qx, qz, qr]) => Math.hypot(x - qx, z - qz) < qr - 0.35) || maskAt(x, z)[0] > 0.3 || onPlat(x, z)) continue;
+        if (Math.sin(a * 3 + px) > 0.55 && wr() < 0.75) continue;                  // open stretches of shore between the reed beds
+        const s = 0.6 + wr() * 0.45; cards.push([x, z, s * 1.2, s, wr() < 0.75 ? 3 : Math.floor(wr() * 3)]);
+      }
+    }
+    const W = buildWater(def, ponds, NV, geo); root.add(W.mesh); if (W.pads) root.add(W.pads); waterU = W.U;
   }
   {
     const pg = new THREE.IcosahedronGeometry(1, 0); pg.scale(1, 0.55, 0.8); pg.translate(0, 0.25, 0);
@@ -619,10 +637,11 @@ transformed.xz += vec2(sw, sw * .4) * aRoot.z * aRoot.z;`);
 
   const v3 = new THREE.Vector3(); let t = 0;
   return {
-    root, stats: { instances, cards: cards.length }, dither: DITHER, magicFloor,
+    root, stats: { instances, cards: cards.length }, dither: DITHER, magicFloor, water: !!waterU,
     update(dt) {
       t += dt; fm.userData.U.uTime.value = t;
       const p = G.player, R = G.render; if (!p || !R) return;
+      if (waterU) { waterU.uTime.value = t; waterU.uSun.value.copy(R.sun.position).sub(R.sun.target.position).normalize(); waterU.uSunCol.value.copy(R.sun.color).multiplyScalar(Math.min(1.6, R.sun.intensity / 2.3)); }
       // player position on screen (drawing-buffer pixels, origin bottom-left) and view depth, for see-through dithering
       v3.copy(T({ x: p.pos.x, y: p.pos.y + 0.9, z: p.pos.z })); v3.project(R.cam);
       const sz = R.r.getDrawingBufferSize(new THREE.Vector2());
@@ -675,4 +694,115 @@ function landmarkMat(m, baseY, grass) {
   };
   m.customProgramCacheKey = () => 'landmark';
   paintMat(m, { sat: 0.9, rimK: 0.16 });
+}
+
+// ------------------------------------------------------------------------------------------------ water (ponds / lakes)
+// One quad per group of touching ponds over a painted mask (R = shoreline, G = depth): opaque water with a muddy-sand
+// shallow band fading into a deep blue-green middle, animated ripple normals (three scrolling noise layers), sky
+// reflection by Fresnel, sun glints, a foam / lapping line at the shore and a dark wet ring on the ground around it.
+// Lily pads float in the shallows. Replaces the builder's flat textured water discs (hidden in game.js).
+const WATER_FS = `
+varying vec3 vP; varying vec2 vG;
+uniform sampler2D tMask; uniform vec4 uB; uniform float uTime; uniform vec3 uSun, uSunCol, uShal, uDeep, uSky, uMud;
+float h21(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
+float vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f);
+  return mix(mix(h21(i), h21(i+vec2(1,0)), f.x), mix(h21(i+vec2(0,1)), h21(i+vec2(1,1)), f.x), f.y); }
+float wav(vec2 q){ float t = uTime;
+  return vn(q * .55 + vec2(t * .22, t * .15)) * .55 + vn(mat2(.8,-.6,.6,.8) * q * 1.35 - vec2(t * .31, -t * .18)) * .3 + vn(q * 3.4 + vec2(-t * .5, t * .42)) * .15; }
+void main(){
+  vec4 M = texture2D(tMask, vec2((vG.x - uB.x) / uB.z, (vG.y - uB.y) / uB.w));   // canvas texture is flipped: v = (z - z0) / depth
+  float e = M.r, dep = smoothstep(.5, .95, M.g);
+  if (e < .08) discard;
+  // ripple normal from the height field (finite differences)
+  vec2 q = vG; float h0 = wav(q), hx = wav(q + vec2(.12, 0.)), hz = wav(q + vec2(0., .12));
+  vec3 N = normalize(vec3(-(hx - h0) * 3.6, 1., (hz - h0) * 3.6));
+  vec3 V = normalize(cameraPosition - vP);
+  // colour: muddy sand shallows (bed shows through, mottled) -> clear teal -> deep blue-green
+  float mott = vn(vG * 1.7) * .6 + vn(vG * 5.3) * .4;
+  vec3 shallow = mix(uMud * (.85 + .3 * mott), uShal, smoothstep(.5, .72, e));
+  vec3 base = mix(shallow, uDeep, dep);
+  float fres = .02 + .98 * pow(1. - max(dot(N, V), 0.), 5.);
+  // reflected sky: zenith blue -> pale horizon, soft drifting clouds seen in the reflection direction
+  vec3 Rf = reflect(-V, N);
+  vec3 sky = mix(uSky * 1.15, uSky * .55, clamp(Rf.y, 0., 1.));
+  float cl = smoothstep(.45, .85, vn(Rf.xz / max(Rf.y, .2) * 2.2 + uTime * .03) * .7 + vn(Rf.xz * 6. + 3.) * .3);
+  sky = mix(sky, vec3(.92, .94, .96), cl * .5);
+  vec3 col = mix(base, sky, clamp(fres * 1.25, 0., .42) * smoothstep(.5, .65, e));
+  // sun: broad sheen + sharp glints, a little sparkle on wave crests
+  vec3 H = normalize(uSun + V);
+  float sp = pow(max(dot(N, H), 0.), 120.) * 2.2 + pow(max(dot(N, H), 0.), 18.) * .12;
+  float glit = step(.985, vn(vG * 9. + uTime * 1.3)) * step(.6, h0);
+  col += uSunCol * (sp + glit * .8) * smoothstep(.5, .6, e);
+  // foam / lapping line at the shore, breaking up and moving
+  float line = 1. - abs(e - .525) / .028; line = clamp(line, 0., 1.);
+  float foam = line * smoothstep(.35, .75, vn(vG * 2.6 + vec2(uTime * .4, -uTime * .3)) + .25 * sin(uTime * 1.6 + e * 40.));
+  col = mix(col, vec3(.9, .94, .92), foam * .45);
+  // outside the water: a wet, darker ring on the ground (transparent)
+  float water = smoothstep(.47, .53, e);
+  float wet = smoothstep(.08, .45, e) * (1. - water);
+  vec4 o = mix(vec4(uMud * .55, .45 * wet), vec4(col, 1.), water);
+  gl_FragColor = o;
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
+}`;
+function buildWater(def, ponds, NV, geo) {
+  const [x0, z0, x1, z1] = def.bounds, Wd = x1 - x0, Hd = z1 - z0, S = 1024, px = S / Wd;
+  const c = document.createElement('canvas'); c.width = c.height = S; const g = c.getContext('2d');
+  const P = (x, z) => [(x - x0) / Wd * S, (z1 - z) / Hd * S];
+  const disc = (ctx, k) => { for (const [x, z, r] of ponds) { const [cx, cy] = P(x, z); ctx.beginPath(); ctx.arc(cx, cy, r * px * k, 0, Math.PI * 2); ctx.fill(); } };
+  // R: shoreline (edge = 0.5 at the disc radius, soft over ~1.2 m); G: depth (much wider blur, shrunk discs)
+  const L = document.createElement('canvas'); L.width = L.height = S; const l = L.getContext('2d');
+  g.fillStyle = '#000'; g.fillRect(0, 0, S, S); g.globalCompositeOperation = 'lighter';
+  l.fillStyle = '#f00'; disc(l, 1); g.filter = `blur(${(1.2 * px).toFixed(1)}px)`; g.drawImage(L, 0, 0);
+  l.clearRect(0, 0, S, S); l.fillStyle = '#0f0'; disc(l, 0.8); g.filter = `blur(${(3.2 * px).toFixed(1)}px)`; g.drawImage(L, 0, 0); g.filter = 'none';
+  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.NoColorSpace; tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+  const frost = NV.ground === 'frost', marsh = NV.ground === 'mist';
+  const U = { tMask: { value: tex }, uB: { value: new THREE.Vector4(x0, z0, Wd, Hd) }, uTime: { value: 0 },
+    uSun: { value: new THREE.Vector3(0.4, 0.8, 0.3).normalize() }, uSunCol: { value: new THREE.Color(1, 0.95, 0.85) },
+    uShal: { value: new THREE.Color(...(frost ? [0.3, 0.52, 0.6] : marsh ? [0.16, 0.32, 0.26] : [0.14, 0.38, 0.36])) },
+    uDeep: { value: new THREE.Color(...(frost ? [0.05, 0.14, 0.22] : marsh ? [0.03, 0.09, 0.08] : [0.02, 0.1, 0.14])) },
+    uSky: { value: new THREE.Color(...(frost ? [0.6, 0.72, 0.84] : [0.42, 0.58, 0.74])) }, uMud: { value: new THREE.Color(...(frost ? [0.42, 0.44, 0.45] : [0.36, 0.3, 0.2])) } };
+  const mat = new THREE.ShaderMaterial({ uniforms: U, transparent: true, depthWrite: true,
+    vertexShader: 'varying vec3 vP; varying vec2 vG; void main(){ vec4 w = modelMatrix * vec4(position, 1.); vP = w.xyz; vG = vec2(w.x, -w.z); gl_Position = projectionMatrix * viewMatrix * w; }',
+    fragmentShader: WATER_FS });
+  // one quad per group of touching ponds
+  const grp = ponds.map((_, i) => i), find = i => grp[i] === i ? i : (grp[i] = find(grp[i]));
+  ponds.forEach((a, i) => ponds.forEach((b, j) => { if (j > i && Math.hypot(a[0] - b[0], a[1] - b[1]) < a[2] + b[2] + 3) grp[find(i)] = find(j); }));
+  const rects = new Map();
+  ponds.forEach(([x, z, r], i) => { const k = find(i), m = r + 2.2, R = rects.get(k) || [1e9, 1e9, -1e9, -1e9];
+    rects.set(k, [Math.min(R[0], x - m), Math.min(R[1], z - m), Math.max(R[2], x + m), Math.max(R[3], z + m)]); });
+  const parts = [];
+  for (const [a, b, cc, d] of rects.values()) {
+    const q = new THREE.PlaneGeometry(cc - a, d - b).rotateX(-Math.PI / 2);
+    const y = geo.ground((a + cc) / 2, (b + d) / 2).y + 0.02; q.translate((a + cc) / 2, y, -(b + d) / 2); parts.push(q);
+  }
+  const mesh = new THREE.Mesh(mergeGeometries(parts), mat); mesh.name = 'nature:water'; mesh.renderOrder = 1; mesh.receiveShadow = false;
+  // lily pads in the shallows (a notched disc, two greens, a few pink / white flowers)
+  const pr = mulberry(733), pads = [];
+  for (const [x, z, r] of ponds) {
+    const n = Math.round(r * 1.6);
+    for (let k = 0; k < n; k++) {
+      const a = pr() * Math.PI * 2, d = r * (0.55 + pr() * 0.3), px2 = x + Math.cos(a) * d, pz = z + Math.sin(a) * d;
+      for (let j = 0; j < 1 + Math.floor(pr() * 3); j++) pads.push([px2 + (pr() - 0.5) * 0.9, pz + (pr() - 0.5) * 0.9, 0.22 + pr() * 0.2, pr() * 6.28, pr()]);
+    }
+  }
+  let padMesh = null;
+  if (pads.length) {
+    const pg = new THREE.CircleGeometry(1, 18, 0.35, Math.PI * 2 - 0.5).rotateX(-Math.PI / 2);
+    const pm = new THREE.MeshLambertMaterial({ color: 0xffffff });
+    padMesh = new THREE.InstancedMesh(pg, pm, pads.length); const m4 = new THREE.Matrix4(), qt = new THREE.Quaternion(), col = new THREE.Color();
+    pads.forEach(([x, z, s, a, v], k) => { qt.setFromAxisAngle(new THREE.Vector3(0, 1, 0), a);
+      m4.compose(T({ x, y: geo.ground(x, z).y + 0.035, z }), qt, new THREE.Vector3(s, 1, s)); padMesh.setMatrixAt(k, m4);
+      padMesh.setColorAt(k, col.setRGB(0.2 + v * 0.12, 0.42 + v * 0.12, 0.14 + v * 0.06)); });
+    padMesh.name = 'nature:lilypads'; padMesh.receiveShadow = true; padMesh.renderOrder = 2; padMesh.computeBoundingSphere();
+    const flowers = pads.filter(p => p[4] > 0.82);
+    if (flowers.length) {
+      const fg = new THREE.ConeGeometry(0.09, 0.08, 6).translate(0, 0.04, 0);
+      const fm = new THREE.InstancedMesh(fg, new THREE.MeshLambertMaterial({ color: 0xffffff }), flowers.length);
+      flowers.forEach(([x, z, s, a, v], k) => { m4.compose(T({ x, y: geo.ground(x, z).y + 0.05, z }), qt.identity(), new THREE.Vector3(1, 1, 1)); fm.setMatrixAt(k, m4);
+        fm.setColorAt(k, col.setRGB(1, v > 0.92 ? 0.95 : 0.62, v > 0.92 ? 0.95 : 0.78)); });
+      fm.name = 'nature:lilyflowers'; padMesh.add(fm); fm.matrixAutoUpdate = false;
+    }
+  }
+  return { mesh, pads: padMesh, U };
 }
