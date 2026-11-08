@@ -316,16 +316,22 @@ export class Player extends Combatant {
   }
   basicReach(m) { const b = G.data.skill(this.sheet.job.basicAttack); return (b ? b.range : 1.5) + m.radius * 0.6; }
   /** lock-on: PC = the monster you clicked; phone = the nearest monster that comes close or attacks you (re-picks when
-   *  the locked one dies). Skills and basic attacks aim at the locked monster; the ring under it shows the lock. */
+   *  the locked one dies, lets go when you walk away from it, and switches to a clearly closer one). Skills and basic attacks aim at the locked monster; the ring under it shows the lock. */
   updateLock(input) {
     let L = this.lockOn;
-    if (L && (L.dead || L.zone !== this.zone || this.dist(L) > 24)) L = this.lockOn = null;
-    if (input.mobile && !L) {
+    // phone: walking away from the locked monster (> LOCK_RELEASE m from its edge) lets go of it; PC keeps a clicked lock to 24 m
+    const far = L && (input.mobile ? this.dist(L) - L.radius > LOCK_RELEASE : this.dist(L) > 24);
+    if (L && (L.dead || L.zone !== this.zone || far)) { if (this.target === L) this.target = null; L = this.lockOn = null; }
+    if (input.mobile) {
+      // nearest monster that comes close (or chases / winds up at you); while locked, a clearly closer one takes over
       let best = null, bd = 6.5;
       for (const c of this.zone.actors) { if (c.dead || c.faction === "player" || Math.abs(c.pos.y - this.pos.y) > 1.4) continue;
         const d = this.dist(c) - c.radius, near = (c.state === "chase" || c.state === "windup") ? d < 9 : d < 4.5;
         if (near && d < bd + (c.state === "chase" ? 3 : 0)) { bd = d; best = c; } }
-      if (best) this.lockOn = best;
+      if (best && best !== L) {
+        const dl = L ? this.dist(L) - L.radius : Infinity;
+        if (!L || (dl > 3 && bd < dl - 1.5 && !this.skills.busy)) { if (this.target === L) this.target = null; this.lockOn = best; }
+      }
     }
     if (G.fx.lockMark) G.fx.lockMark(this.lockOn);
   }
@@ -440,6 +446,8 @@ export class Player extends Combatant {
 }
 
 // ======================================================================================= monsters
+/** phone lock-on lets go when the locked monster is this far (m, from its edge) */
+export const LOCK_RELEASE = 9;
 /** monsters at or below this level never attack first (same species behaves the same in every field) */
 export const PASSIVE_MAX_LEVEL = 10;
 export class Monster extends Combatant {
