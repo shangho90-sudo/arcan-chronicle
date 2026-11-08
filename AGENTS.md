@@ -41,7 +41,7 @@
 - 나무·바위·덤불·풀/꽃·마을 소품은 Blender(bpy)로 절차 제작합니다: `paint.py`(손그림 텍스처) → `assets.py`(모델, LOD `_l0`/게임용/`_l2`/`_lo`) → `wrap.py`(→ `assets/forest/bl/`) → `validate_assets.py`. 직접 GLB를 고치지 말고 스크립트를 고친 뒤 다시 만드세요.
 - GLB에는 이미지를 넣지 않습니다. 재질 이름이 공유 텍스처를 고릅니다(`tools/blender/texmap.py` ↔ `js/nature.js` `MAT_TEX`). 칠한 빛(AO·그라데이션)은 정점 색입니다.
 - 잎 카드(`M_leaf*`)는 4정점이 한 점에 모인 카메라 빌보드(두 번째 UV = 크기·회전)입니다. 잘라낸 재질(`M_leaf*`, `M_plants`)은 뒷면 노멀을 뒤집지 않습니다.
-- 마을 장식 배치는 `python3 tools/town/props_layout.py --write`(`town3d.blprops` + 충돌용 `props`의 `bl: true` 항목). 숲 배치는 `tools/forest/layout.py --write`. 둘 다 바꾼 뒤 `node tools/forest/check_nav.mjs forest|town`(마을은 boss_gate 실패가 원래 상태).
+- 마을 장식 배치는 `python3 tools/town/props_layout.py --write`(`town3d.blprops` + 충돌용 `props`의 `bl: true` 항목). 주의: 지금 저장된 배치는 스크립트 결과와 조금 다름(2026-11-08 모아 가게 앞 통·상자를 손으로 지움, 스크립트에는 `CLEAR`로 반영) — 다시 돌리면 다른 장식 위치도 바뀌니 결과를 화면으로 확인할 것. 숲 배치는 `tools/forest/layout.py --write`. 둘 다 바꾼 뒤 `node tools/forest/check_nav.mjs forest|town`(마을은 boss_gate 실패가 원래 상태).
 - 카메라는 약한 원근(`render.js` `CAM`: 피치 44°(2026-11-06, 48°→44°), 거리 26 m, `ortho` = 초점 거리에서의 화면 반높이). 미리 그린 배경 그림 투영은 `CAM.artPitch`(48°, 바꾸지 말 것). 화면 → 땅 광선은 `Renderer.screenRay`.
 - 화면 비교 캡처: `tools/browser-tests/styleshots.js`(마을 분수·대화, 숲 입구·길·나무·전투, 프레임 시간·draw call·삼각형).
 

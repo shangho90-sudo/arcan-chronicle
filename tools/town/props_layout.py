@@ -200,6 +200,16 @@ for r in T3['ground']['roads']:
 for d in T3['decor']:
     if d['type'] == 'planter': put('town_planter', d['pos'][0], d['pos'][1], rnd.uniform(0, 360), d.get('r', 1.0) / 0.8, d.get('r', 1.0)); flower_patch(d['pos'][0], d['pos'][1], 5, d.get('r', 1.0) + 1.0)
 
+# kept clear on purpose (user request 2026-11-08): the barrel and the wooden flower box left of the plaza planter stood
+# in the way to Moa's shop. Filtered after placement so the seeded layout of everything else does not move.
+# (zones.json was trimmed by hand the same way: this script no longer reproduces the saved layout exactly — rerun with care)
+CLEAR = [(('town_barrel', 'town_crate', 'town_flowerbox'), 8.01, 11.38, 0.6), (('town_barrel', 'town_crate', 'town_flowerbox'), 6.88, 12.13, 0.6)]
+def _cleared(models, x, z):
+    return any(m in ms and math.hypot(x - cx, z - cz) < r for ms, cx, cz, r in CLEAR for m in models)
+out[:] = [o for o in out if not _cleared((o['model'],), o['pos'][0], o['pos'][1])]
+_SOLID = {'barrel': 'town_barrel', 'crate': 'town_crate', 'flowerbed': 'town_flowerbox'}
+coll[:] = [c for c in coll if not (c['type'] in _SOLID and _cleared((_SOLID[c['type']],), c['pos'][0], c['pos'][1]))]
+
 from collections import Counter
 print(len(out), dict(Counter(o['model'] for o in out)), 'solid', len(coll))
 if '--write' in sys.argv:
