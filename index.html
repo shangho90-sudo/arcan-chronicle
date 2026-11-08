@@ -2,14 +2,20 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>아르칸 연대기</title>
+<meta name="theme-color" content="#1c2a26">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="아르칸 연대기">
+<link rel="manifest" href="./manifest.webmanifest">
 <link rel="preload" as="image" href="assets/ui/loading-screen.png" fetchpriority="high">
 <style>
 @font-face { font-family: Galmuri11; src: url(assets/fonts/Galmuri11.woff) format("woff"); font-display: block; }
 :root { --ivory:#faf4e4; --ivory2:#ece2cc; --teal:#287f80; --teal-d:#18565c; --gold:#d6ac54; --gold-d:#a06a10; --ink:#3a2f25; --muted:#8a7a66; --red:#c04a3c; --good:#2f9a52; }
 * { box-sizing: border-box; }
-html, body { margin:0; height:100%; overflow:hidden; background:#1c2a26; font-family: Galmuri11, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color:var(--ink); -webkit-user-select:none; user-select:none; touch-action:none; -webkit-tap-highlight-color:transparent; }
+html, body { margin:0; height:100%; height:100dvh; overflow:hidden; background:#1c2a26; font-family: Galmuri11, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color:var(--ink); -webkit-user-select:none; user-select:none; touch-action:none; -webkit-tap-highlight-color:transparent; }
 #view, #ui { position:fixed; inset:0; }
 #view canvas { display:block; width:100%; height:100%; touch-action:none; }
 #ui { pointer-events:none; }
