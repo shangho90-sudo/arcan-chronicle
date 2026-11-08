@@ -24,6 +24,12 @@ export class Input {
       if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)) e.preventDefault();
     });
     addEventListener("keyup", e => this.keys.delete(e.code));
+    // phones play upright: on the first touch ask the browser to keep portrait (works where the API exists, e.g. Android
+    // Chrome / installed app; iOS ignores it and the CSS .rotate-hint covers a sideways phone instead)
+    addEventListener("pointerdown", e => {
+      if (e.pointerType !== "touch" || this._oriTried) return; this._oriTried = true;
+      try { const o = screen.orientation; if (o && o.lock) o.lock("portrait").catch(() => {}); } catch (_) {}
+    }, { capture: true, passive: true });
     addEventListener("blur", () => { this.keys.clear(); this.mouseDown = false; });
     canvas.addEventListener("pointerdown", e => {
       if (e.pointerType === "touch") { this.mobile = true; this.pendingClick = { x: e.clientX, y: e.clientY }; return; }

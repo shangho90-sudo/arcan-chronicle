@@ -67,7 +67,7 @@ export class Combatant {
   onDamaged() { }
   heal(n, show = true) {
     if (this.dead || n <= 0) return; const b = this.hp; this.hp = Math.min(this.maxHp, this.hp + n);
-    if (show && this.hp - b >= 1) G.ui.floatText(this.pos, "+" + Math.round(this.hp - b), "#73ff8c", 1);
+    if (show && this.hp - b >= 1) G.ui.damageText(this.pos, "+" + Math.round(this.hp - b), "heal");   // big, clear green number (ui.js / CSS .dmg-heal)
   }
   addShield(n, d) { this.shield = Math.max(this.shield, n); this.shieldT = d; }
   die(killer) {
