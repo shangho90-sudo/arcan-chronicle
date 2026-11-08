@@ -42,11 +42,10 @@ def custom(fn, **k): return dict(op='custom', fn=fn, **k)
 # ======================================================================= 견습생 (novice) 기본 검술 — tier 0, every job keeps it
 # separate point pool (1 per character level, see js/skillsys.js), unlock Lv 1 / 5 / 10 / 3 / 7, no extra-hit rule (noExtra)
 J, C = 'novice', 0xcfe6ff
-S(J, 0, 0, '기본 검술', 1, 'nv_a1', '일격참', 'attack', '왼쪽·오른쪽으로 한 번씩 벤 뒤 뛰어올라 칼로 내려찍는다. 내려찍은 자리의 땅이 갈라진다.', range=2.4, mp=8, cd=5, anim='nv_ilgyeok', recover=0.25,
-  ops=[dict(op='lunge', dist=0.7, dur=0.16, at=-0.08), hit('cone', 0.75, r=2.3, ang=120, noExtra=True, at=0.0, fx=dict(slash='blade', burst='hit_slash'), sweep=-1),
-       dict(op='lunge', dist=0.6, dur=0.14, at=0.16), hit('cone', 0.75, r=2.3, ang=120, noExtra=True, at=0.24, fx=dict(slash='blade', burst='hit_slash'), sweep=1),
-       dict(op='lunge', dist=1.7, dur=0.24, at=0.34),
-       hit('circle', 1.9, r=2.2, noExtra=True, at=0.58, fwd=0.8, knock=1.2, st=[st('stagger', 0.5)], fx=dict(burst='fire_crack', burstR=1.15), shake=[0.22, 0.3])], fx=dict(color=C))
+S(J, 0, 0, '기본 검술', 1, 'nv_a1', '일격참', 'attack', '칼을 허리춤으로 끌어당겼다가 앞으로 뛰어들며 한 번에 깊게 찌른다. 찌른 자리 앞의 땅이 갈라진다.', range=3.2, mp=8, cd=5, anim='nv_ilgyeok', recover=0.3,
+  ops=[dict(op='lunge', dist=1.4, dur=0.14, at=-0.12),
+       hit('line', 3.2, w=1.5, len=3.4, noExtra=True, at=0.0, knock=1.4, st=[st('stagger', 0.6)], fx=dict(slash='thrust'), shake=[0.24, 0.3]),
+       dict(op='fx', burst='fire_crack', r=1.2, fwd=2.0, at=0.02)], fx=dict(color=C))
 S(J, 0, 0, '기본 검술', 2, 'nv_a2', '연', 'attack', '칼을 이리저리 휘둘러 연속으로 벤다. 처음엔 2연타, 스킬 레벨이 오를 때마다 1타씩 늘어 최대 6연타.', range=2.2, mp=10, cd=6, anim='nv_yeon', recover=0.2,
   ops=[dict(op='lunge', dist=1.0, dur=0.2, at=-0.1), dict(op='lunge', dist=0.8, dur=0.3, at=0.2),
        hit('cone', 0.62, r=2.2, ang=110, hits=2, hitsPerLv=1, gap=0.13, noExtra=True, alt=True, fx=dict(slash='blade', burst='hit_slash'))], fx=dict(color=0xffe6a0))

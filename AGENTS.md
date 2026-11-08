@@ -94,7 +94,7 @@
 
 ## 칼 휘두르기 (`js/model.js`, `tools/anim/swings.py`)
 - 공격 동작은 시간 키(`keys`, 초) + 구간 이징(`e`) + 칼 팔 IK(`hand`/`blade`/`elbow`) + 발 고정(`step`, `plant`)으로 정의합니다. actions.json의 `attack`/`attack2`는 `python3 tools/anim/swings.py`로 생성하세요(직접 편집 금지).
-- 기본 검술 스킬 동작(`nv_yeon_<타수>`, `nv_ilgyeok`, `nv_biyeon`)도 `swings.py`의 `combo()`(타격 묶음 `ST` + `spin`/`ov`)로 생성. 여러 번 때리는 스킬은 `<anim>_<타수>` 동작이 있으면 그 동작의 `hitTimes`(타격 시각)·`hitFx`(타별 베기 효과)·`lunges`(전진)·`recover`를 씀(`skillrt.js` `cast`/`release`/`opHit`). 몸 회전은 `spins`(`model.js` `apply`). 확인 `tools/browser-tests/skill_film.js`(`SKILL= LV= ZOOM=`).
+- 기본 검술 스킬 동작(`nv_yeon_<타수>`, `nv_biyeon`)도 `swings.py`의 `combo()`(타격 묶음 `ST` + `spin`/`ov`)로 생성. 일격참 `nv_ilgyeok`은 연타가 아닌 한 번의 찌르기(`IL_KEYS`, 2026-11-09) + 앞쪽 `fire_crack`(스킬 `fx` op의 `fwd`). 여러 번 때리는 스킬은 `<anim>_<타수>` 동작이 있으면 그 동작의 `hitTimes`(타격 시각)·`hitFx`(타별 베기 효과)·`lunges`(전진)·`recover`를 씀(`skillrt.js` `cast`/`release`/`opHit`). 몸 회전은 `spins`(`model.js` `apply`). 확인 `tools/browser-tests/skill_film.js`(`SKILL= LV= ZOOM=`).
 - 칼 잔상은 실제 칼날 위치에서 그립니다(`SwingTrail`, 동작의 `trail` 구간). 바꾼 뒤에는 `swing_film.js` → `tools/anim/strip.py`, `swing_report.py`(발 이동·그립·칼끝 속도)와 `attack_dirs.js`(실제 입력 8방향)로 확인하세요.
 
 ## 3D 자산

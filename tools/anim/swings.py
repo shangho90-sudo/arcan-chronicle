@@ -146,7 +146,23 @@ YEON = {2: ['fd', 'br'], 3: ['fd', 'br', 'ov'], 4: ['fd', 'br', 'hz', 'ov'], 5: 
 COMBOS = [combo('nv_yeon_%d' % n, seq) for n, seq in YEON.items()]
 # 일격참 (nv_a1): left cut, right cut, jump slam. Impacts must match the skill data (hit ops at +0, +0.24, +0.58) and
 # its own lunges move the body, so no lunges / hitFx here (the data keeps its blade + fire crack effects)
-IL = combo('nv_ilgyeok', ['fd', 'br', 'ov'], gaps=[0.24, 0.34], lunge=False); del IL['hitFx']
+# 일격참 (nv_a1, 2026-11-09): one big forward thrust instead of the old 3-hit flurry. Sword pulled back to the right hip
+# (shoulders turned away, weight sunk), a short hold, then an explosive lunge with the arm and blade driven straight
+# forward; the stance stays deep while the ground cracks in front (skill data: lunge at -0.12, one line hit + crack at +0)
+IL_T = 0.30
+IL_KEYS = [
+    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
+    key(0.15, 'o', twist=-42, lean=-4, sink=0.16, hand=[-78, -22, 0.52], blade=[-8, -2], elbow=[-0.5, -0.2, -1], armL=[40, 46], step=[0.18, -0.14]),
+    key(0.23, 's', twist=-46, lean=-2, sink=0.20, hand=[-82, -24, 0.48], blade=[-6, -2], elbow=[-0.5, -0.2, -1], armL=[44, 48], step=[0.18, -0.14], squint=True),
+    key(IL_T - 0.03, 'i', twist=-16, lean=10, sink=0.22, hand=[-36, -10, 0.82], blade=[-2, -4], elbow=[-0.6, -0.5, -0.6], armL=[24, 40], step=[0.30, -0.22], squint=True),
+    key(IL_T, None, twist=16, lean=22, sink=0.28, hand=[-6, -4, 1.02], blade=[0, -6], elbow=[-0.5, -0.8, -0.2], armL=[8, 52], step=[0.40, -0.28], squint=True),
+    key(IL_T + 0.08, 'o', twist=20, lean=25, sink=0.31, hand=[-4, -6, 1.04], blade=[0, -8], elbow=[-0.5, -0.8, -0.2], armL=[6, 56], step=[0.40, -0.28], squint=True),
+    key(IL_T + 0.36, 's', twist=16, lean=20, sink=0.27, hand=[-8, -10, 0.96], blade=[0, -12], elbow=[-0.5, -0.9, -0.2], armL=[8, 50], step=[0.40, -0.28]),
+    key(IL_T + 0.56, 's', twist=6, lean=6, sink=0.06, hand=[10, -40, 0.78], blade=[30, -12], elbow=[-0.5, -1, -0.1]),
+    key(IL_T + 0.72, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
+]
+IL = action('nv_ilgyeok', IL_KEYS, IL_T, IL_T + 0.50, [[IL_T - 0.06, IL_T + 0.06]], fadeIn=0.07, fadeOut=0.16)
+IL.update(hitTimes=[IL_T], trailLife=0.22, trailBase=0.12, trailColor=[1.7, 1.45, 0.95])
 # 비연참 (nv_a3): one huge horizontal sweep that throws the sword wave
 BI = combo('nv_biyeon', ['hz'], t0=0.22, lunge=False); del BI['hitFx']
 # 구르기 (회피, Shift): crouch -> tucked ball rolling forward 360 deg about a point 0.5 m up (action.flips, js/model.js)

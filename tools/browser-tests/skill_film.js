@@ -18,6 +18,7 @@ const CW = +(process.env.CW || 460), CH = +(process.env.CH || 380);
   await clickLabel('새 게임');
   if (process.env.GENDER === 'f') await ev(() => { const c = document.querySelector('.choice-f'); if (c) c.click(); });
   await clickLabel('모험 시작');
+  await pg.waitForSelector('.prologue.on', { timeout: 60000 }).then(() => clickLabel('건너뛰기')).catch(() => {});   // 새 캐릭터 서장 건너뛰기
   await pg.waitForFunction(() => window.G && G.inWorld && G.player && !G.loading && G.player.body && G.player.body.md, null, { timeout: 300000 });
   await pg.waitForTimeout(1500);
   await ev(([nd, z]) => { window.__nd = nd; window.__zoom = z; }, [+(process.env.DUMMIES ?? 3), +(process.env.ZOOM || 1)]);

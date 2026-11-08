@@ -325,7 +325,7 @@ export class SkillEngine {
         const c = op.atAim ? ctx.aim : pc.pos;
         FX.telegraph(c, op.r || op.w || 2, op.dur, { color: 0xffb040, shape: op.shape, dir: ctx.facing, length: op.len, width: op.w }); return;
       }
-      case 'fx': if (op.slash) FX.slash(op.slash, pc.pos, ctx.facing, { radius: op.r || 1.6, angle: op.ang || 120, color: col, tilt: op.tilt || 0, mirror: !!op.mirror }); if (op.burst) FX.burst(op.burst, pc.pos, { radius: op.r || 2, color: col }); return;
+      case 'fx': if (op.slash) FX.slash(op.slash, pc.pos, ctx.facing, { radius: op.r || 1.6, angle: op.ang || 120, color: col, tilt: op.tilt || 0, mirror: !!op.mirror }); if (op.burst) FX.burst(op.burst, op.fwd ? { x: pc.pos.x + ctx.facing.x * op.fwd, y: pc.pos.y, z: pc.pos.z + ctx.facing.z * op.fwd } : pc.pos, { radius: op.r || 2, color: col }); return;   // fwd: m in front (일격참 땅 갈라짐)
       case 'repair': {
         for (const s of this.summons) if (s.machine && !s.dead) { const miss = 1 - s.hp / s.maxHp; s.hp = Math.min(s.maxHp, s.hp + s.maxHp * op.pct * ctx.mult * (1 + op.missingBonus * miss)); FX.burst('sparks', s.pos, { radius: 0.8 }); }
         return;

@@ -10,90 +10,56 @@
 "idx": 1,
 "name": "일격참",
 "type": "attack",
-"desc": "왼쪽·오른쪽으로 한 번씩 벤 뒤 뛰어올라 칼로 내려찍는다. 내려찍은 자리의 땅이 갈라진다.",
+"desc": "칼을 허리춤으로 끌어당겼다가 앞으로 뛰어들며 한 번에 깊게 찌른다. 찌른 자리 앞의 땅이 갈라진다.",
 "maxLv": 5,
 "unlock": 1,
 "prereq": [],
 "weapon": null,
 "target": "dir",
-"range": 2.4,
+"range": 3.2,
 "mp": 8,
 "cd": 5,
 "cast": 0.0,
-"recover": 0.25,
+"recover": 0.3,
 "anim": "nv_ilgyeok",
 "ops": [
 {
 "op": "lunge",
-"dist": 0.7,
-"dur": 0.16,
-"at": -0.08
+"dist": 1.4,
+"dur": 0.14,
+"at": -0.12
 },
 {
 "op": "hit",
-"shape": "cone",
-"coef": 0.75,
-"r": 2.3,
-"ang": 120,
+"shape": "line",
+"coef": 3.2,
+"w": 1.5,
+"len": 3.4,
 "noExtra": true,
 "at": 0.0,
-"fx": {
-"slash": "blade",
-"burst": "hit_slash"
-},
-"sweep": -1
-},
-{
-"op": "lunge",
-"dist": 0.6,
-"dur": 0.14,
-"at": 0.16
-},
-{
-"op": "hit",
-"shape": "cone",
-"coef": 0.75,
-"r": 2.3,
-"ang": 120,
-"noExtra": true,
-"at": 0.24,
-"fx": {
-"slash": "blade",
-"burst": "hit_slash"
-},
-"sweep": 1
-},
-{
-"op": "lunge",
-"dist": 1.7,
-"dur": 0.24,
-"at": 0.34
-},
-{
-"op": "hit",
-"shape": "circle",
-"coef": 1.9,
-"r": 2.2,
-"noExtra": true,
-"at": 0.58,
-"fwd": 0.8,
-"knock": 1.2,
+"knock": 1.4,
 "st": [
 {
 "id": "stagger",
-"dur": 0.5,
+"dur": 0.6,
 "val": 0,
 "ch": 1.0
 }
 ],
 "fx": {
-"burst": "fire_crack",
-"burstR": 1.15
+"slash": "thrust"
 },
 "shake": [
-0.22,
+0.24,
 0.3
 ]
+},
+{
+"op": "fx",
+"burst": "fire_crack",
+"r": 1.2,
+"fwd": 2.0,
+"at": 0.02
 }
 ],
 "mods": [],
