@@ -1,0 +1,19 @@
+{
+  "name": "아르칸 연대기",
+  "short_name": "아르칸",
+  "description": "아르칸 연대기 모바일 RPG",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#1c2a26",
+  "theme_color": "#1c2a26",
+  "icons": [
+    {
+      "src": "assets/ui/loading-screen.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
