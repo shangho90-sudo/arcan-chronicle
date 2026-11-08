@@ -218,7 +218,7 @@ export class UI {
     if (bossOn) { h("hBName").innerHTML = `Lv.${boss.level} ${boss.name} <small>${boss.phase}단계</small>`; h("hBHp").style.width = (100 * boss.hp / boss.maxHp) + "%"; h("hBHpT").textContent = Math.ceil(boss.hp) + " / " + boss.maxHp; }
     if (p.target && !p.target.dead) { this.target = p.target; this.targetT = 6; }
     this.targetT = (this.targetT || 0) - 1 / 60;
-    const t = this.target, tOn = !bossOn && t && !t.dead && this.targetT > 0;
+    const t = this.target, tOn = !bossOn && t && !t.dead && this.targetT > 0 && !(G.input && G.input.mobile);   // touch play: no target window (CSS hides it too)
     h("hTarget").style.display = tOn ? "" : "none";
     if (tOn) { h("hTName").textContent = `Lv.${t.level} ${t.name}`; h("hTHp").style.width = (100 * t.hp / t.maxHp) + "%"; h("hTHpT").textContent = Math.ceil(t.hp) + " / " + t.maxHp; }
     const npc = G.zone.nearestNpc(p.pos, G.data.config.interactRange), pr = h("hPrompt");
