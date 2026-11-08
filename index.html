@@ -75,9 +75,13 @@ small { font-size:.8em; }
 .controls:not(.mobile) .abtn.big { width:84px; height:84px; } .controls:not(.mobile) .abtn.sk { width:64px; height:64px; } .controls:not(.mobile) .abtn.sm { width:52px; height:52px; }
 .controls:not(.mobile) .actions { transform:scale(.82); transform-origin:right bottom; }
 .stickarea { position:absolute; left:0; bottom:0; width:42%; height:62%; pointer-events:auto; touch-action:none; }
-.stickbase { position:absolute; left:130px; top:auto; bottom:110px; width:150px; height:150px; margin:-75px 0 0 -75px; border-radius:50%; background:url(assets/ui/ring.png) center/100% 100%; opacity:.55; image-rendering:pixelated; }
-.stickbase.on { opacity:.9; bottom:auto; }
-.knob { position:absolute; left:45px; top:45px; width:60px; height:60px; border-radius:50%; background:url(assets/ui/soft_circle.png) center/100% 100%; }
+/* movement pad (ui.js PAD_BASE / PAD_KNOB): glass orb + gold rim + four gold star points, glass knob with a star */
+.stickbase { position:absolute; left:130px; top:auto; bottom:110px; width:170px; height:170px; margin:-85px 0 0 -85px; border-radius:50%; opacity:.82; transition:opacity .15s;
+  -webkit-backdrop-filter:blur(1.5px) saturate(1.15); backdrop-filter:blur(1.5px) saturate(1.15); box-shadow:0 4px 14px rgba(10,20,30,.28), inset 0 0 18px rgba(255,255,255,.18); }
+.stickbase.on { opacity:1; bottom:auto; }
+.stickbase .padbase { position:absolute; left:-12%; top:-12%; width:124%; height:124%; overflow:visible; pointer-events:none; filter:drop-shadow(0 1px 1px rgba(40,24,6,.45)); }
+.knob { position:absolute; left:50%; top:50%; width:72px; height:72px; margin:-36px 0 0 -36px; border-radius:50%; -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px); box-shadow:0 3px 8px rgba(10,20,30,.35); }
+.knob svg { display:block; width:100%; height:100%; filter:drop-shadow(0 1px 1px rgba(40,24,6,.4)); }
 
 /* ---------- world labels / floating text ---------- */
 .plate { position:absolute; left:0; top:0; text-align:center; white-space:nowrap; font-size:13px; color:#fff; text-shadow:0 1px 0 #000, 1px 0 0 #000, -1px 0 0 #000, 0 -1px 0 #000; }
@@ -767,7 +771,7 @@ small { font-size:.8em; }
   .qh-reopen { left:12px; right:auto; top:102px; width:38px; height:38px; }
   .target { left:auto; right:160px; transform:none; width:min(300px, calc(64vw - 200px)); } .target.boss { width:min(360px, calc(64vw - 200px)); }   /* monster bar between the quest window and the minimap */
   .feed { left:calc(min(300px, 36vw) + 26px); top:146px; transform:scale(.8); }   /* loot feed right of the quest window */
-  .stickbase { bottom:16px; }   /* default pad ring sits lower so it stays clear of the quest window (touch area unchanged) */
+  .stickbase { bottom:14px; width:140px; height:140px; margin:-70px 0 0 -70px; } .knob { width:60px; height:60px; margin:-30px 0 0 -30px; }   /* default pad ring sits lower so it stays clear of the quest window (touch area unchanged) */
   .qh-head { padding:4px 4px 4px 12px; } .qh-body { padding:7px 12px 9px; } .qh-title { font-size:14px; } .qh-main h3 { font-size:14px; } .qh-hint { font-size:12px; }
   .qh-btn { width:34px; height:30px; line-height:30px; }
   .areabanner { top:64px; font-size:20px; }
@@ -796,7 +800,7 @@ small { font-size:.8em; }
   .target, .target.boss { top:auto; bottom:300px; left:8px; right:auto; transform:none; width:min(300px, calc(100vw - 16px)); }
   .prompt { left:50%; top:auto; bottom:356px; transform:translateX(-50%); max-width:calc(100vw - 24px); white-space:nowrap; text-align:center; }
   .toasts { top:auto; bottom:400px; } .toast { font-size:13px; }
-  .stickbase { left:76px; bottom:60px; }
+  .stickbase { left:84px; bottom:70px; width:136px; height:136px; margin:-68px 0 0 -68px; } .knob { width:58px; height:58px; margin:-29px 0 0 -29px; }
 }
 @media (max-height: 520px) and (min-width: 601px) {
   .charpanel { transform:scale(.7); }

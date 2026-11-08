@@ -78,6 +78,32 @@ const MENU_ICON = (() => {
     pause: W('<path d="M7 9h18M7 16h18M7 23h18"/>'),
   };
 })();
+// ---------------------------------------------------------------- movement pad (mobile): glass orb with a gold rim,
+// four gold star points (N/E/S/W) and a glass knob with a small star in the middle
+const PAD_STAR = (x, y, r, k = 0.28) => `M${x} ${y - r}Q${x + r * k} ${y - r * k} ${x + r} ${y}Q${x + r * k} ${y + r * k} ${x} ${y + r}Q${x - r * k} ${y + r * k} ${x - r} ${y}Q${x - r * k} ${y - r * k} ${x} ${y - r}Z`;
+const PAD_DEFS = `<radialGradient id="padGlass" cx="45%" cy="38%" r="70%"><stop offset="0" stop-color="#f4fffd" stop-opacity=".26"/><stop offset=".62" stop-color="#bfe6e6" stop-opacity=".2"/><stop offset=".9" stop-color="#d8f4f2" stop-opacity=".36"/><stop offset="1" stop-color="#ffffff" stop-opacity=".55"/></radialGradient>
+  <linearGradient id="padGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff6cf"/><stop offset=".45" stop-color="#e9c46a"/><stop offset="1" stop-color="#a87a22"/></linearGradient>
+  <linearGradient id="padShine" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>`;
+const PAD_BASE = `<svg class="padbase" viewBox="-14 -14 228 228" aria-hidden="true"><defs>${PAD_DEFS}</defs>
+  <circle cx="100" cy="100" r="92" fill="url(#padGlass)"/>
+  <circle cx="100" cy="100" r="86" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="1.5"/>
+  <circle cx="100" cy="100" r="56" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="1.2"/>
+  <path d="M38 64A70 70 0 0 1 120 30A80 80 0 0 0 46 78Z" fill="url(#padShine)" opacity=".7"/>
+  <circle cx="100" cy="100" r="92" fill="none" stroke="#5a3a10" stroke-opacity=".55" stroke-width="5"/>
+  <circle cx="100" cy="100" r="92" fill="none" stroke="url(#padGold)" stroke-width="3"/>
+  ${[[100, 8], [192, 100], [100, 192], [8, 100]].map(([x, y]) => `<path d="${PAD_STAR(x, y, 15)}" fill="url(#padGold)" stroke="#5a3a10" stroke-opacity=".6" stroke-width="1"/><path d="${PAD_STAR(x, y, 6, .3)}" fill="#fffbe6"/>`).join("")}
+  ${[45, 135, 225, 315].map(a => { const r = a * Math.PI / 180, x = 100 + Math.cos(r) * 92, y = 100 + Math.sin(r) * 92; return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.6" fill="#fff4c8" opacity=".9"/>`; }).join("")}
+</svg>`;
+const PAD_KNOB = `<svg viewBox="0 0 100 100" aria-hidden="true">
+  <circle cx="50" cy="50" r="45" fill="#0c2a30" fill-opacity=".22"/>
+  <circle cx="50" cy="50" r="45" fill="url(#padGlass)"/>
+  <circle cx="50" cy="50" r="38" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="1.4"/>
+  <path d="M20 38A33 33 0 0 1 64 17A38 38 0 0 0 24 46Z" fill="url(#padShine)" opacity=".75"/>
+  <circle cx="50" cy="50" r="45" fill="none" stroke="#5a3a10" stroke-opacity=".55" stroke-width="5"/>
+  <circle cx="50" cy="50" r="45" fill="none" stroke="url(#padGold)" stroke-width="3.2"/>
+  <path d="${PAD_STAR(50, 50, 11)}" fill="url(#padGold)" stroke="#5a3a10" stroke-opacity=".5" stroke-width=".8"/><path d="${PAD_STAR(50, 50, 4, .3)}" fill="#fffbe6"/>
+</svg>`;
+
 export class UI {
   constructor(root) {
     this.root = root;
@@ -240,7 +266,7 @@ export class UI {
   // ------------------------------------------------------------------ action buttons + stick
   buildControls() {
     const c = this.controls;
-    c.innerHTML = `<div class="stickarea" id="cStick"><div class="stickbase"><div class="knob"></div></div></div><div class="actions" id="cActions"></div>`;
+    c.innerHTML = `<div class="stickarea" id="cStick"><div class="stickbase">${PAD_BASE}<div class="knob">${PAD_KNOB}</div></div></div><div class="actions" id="cActions"></div>`;
     const acts = this.controls.querySelector("#cActions");
     const defs = [["attack", "Space", "big"], ["skill1", "1", "sk"], ["skill2", "2", "sk"], ["skill3", "3", "sk"], ["dodge", "Shift", "sm"], ["potion", "Q", "sm"], ["interact", "F", "sm"]];
     this.btn = {};
@@ -252,7 +278,7 @@ export class UI {
       this.btn[a] = b;
     }
     const area = c.querySelector("#cStick"), base = area.querySelector(".stickbase"), knob = area.querySelector(".knob");
-    let id = null, cx = 0, cy = 0; const R = 70;
+    let id = null, cx = 0, cy = 0; const R = 72;
     area.addEventListener("pointerdown", e => { if (id !== null) return; id = e.pointerId; area.setPointerCapture(id); const r = area.getBoundingClientRect(); cx = e.clientX; cy = e.clientY; base.style.left = (cx - r.left) + "px"; base.style.top = (cy - r.top) + "px"; base.classList.add("on"); G.audio.unlock(); });
     area.addEventListener("pointermove", e => { if (e.pointerId !== id) return; let dx = e.clientX - cx, dy = e.clientY - cy; const m = Math.hypot(dx, dy); if (m > R) { dx = dx / m * R; dy = dy / m * R; } knob.style.transform = `translate(${dx}px,${dy}px)`; const n = Math.hypot(dx, dy) / R; G.input.stick = n < 0.12 ? { x: 0, y: 0 } : { x: dx / R, y: -dy / R }; });
     const end = e => { if (e.pointerId !== id) return; id = null; knob.style.transform = ""; base.classList.remove("on"); base.style.left = ""; base.style.top = ""; G.input.stick = { x: 0, y: 0 }; };

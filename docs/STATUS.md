@@ -126,6 +126,7 @@
 6. Tripo API 키 교체 권장 (대화에 노출됨, 잔여 크레딧 약 2865)
 
 ## 변경 기록
+- 2026-11-08: 휴대폰 이동 패드를 보내준 그림처럼 바꿈 — 반투명 유리 원판(뒤를 살짝 흐림) + 금테 + 위·아래·좌·우 금색 별 장식 + 안쪽 동심원, 손잡이도 유리 원판 + 금테 + 가운데 작은 별(`ui.js` `PAD_BASE`/`PAD_KNOB` SVG, CSS `.stickbase`/`.knob`). 예전 픽셀 그림(`ring.png`/`soft_circle.png`)은 안 씀. 크기는 기본 170 px, 세로 휴대폰 136 px, 가로 휴대폰 140 px(퀘스트 창·버튼과 안 겹치게). 조작 방식(누른 곳에 패드가 생기는 방식, 최대 72 px)은 그대로. 확인 `tools/browser-tests/padshots.js`(390x844t·844x390t, 끄는 동안 이동 입력 확인).
 - 2026-11-08: 휴대폰(터치·좁은 화면)에서는 화면 가운데 몬스터 정보 창(`#hTarget`)을 띄우지 않음 — 몬스터 머리 위 이름표·체력 막대로 충분. CSS `(pointer: coarse), (max-width: 600px), (max-height: 500px)` + `ui.js`(터치 입력이면 표시 안 함). 보스 체력 막대와 PC 화면은 그대로. 브라우저 확인: 390x844 터치 숨김, 1280x720 표시.
 - 2026-11-08: 속삭이는 숲 버섯 집을 필드와 어울리게 손봄. 모델의 납작한 이끼 받침판(필드 바닥과 색·모양이 달라 붕 떠 보이던 부분)을 지우고 감소 때 생긴 갓의 흰 틈을 메움(`tools/props/mushhouse_trim.py`, Blender). 게임 안 재질은 캐릭터와 같은 손그림 음영(`paintMat`) + 채도 약간 낮춤 + 아래 0.7 m를 풀색으로 자연스럽게 섞음(`nature.js` `landmarkMat`). 둘레에 꽃·작은 덤불(문 쪽은 비움, `layout.py` `landmark_skirt`, 표시 `"skirt": true`). 문 방향을 워프·길 쪽으로 돌림(`rot` 180 → 90, 게임 화면에서 각도별로 확인). 확인 `tools/browser-tests/mushhouse.js`(`ZOOM`·`ROT`·`TAG`), 숲 길 찾기 검사 통과.
 - 2026-11-08: 미니맵에서 퀘스트를 주거나 받을 수 있는 NPC는 초록 "?" 표시(`game.js` `questState`, `minimap.js` `render`). 미니맵(또는 오른쪽 아래 돋보기 버튼)을 누르면 **지역 전체 지도** 창(`ui.js` `showAreaMap`, `minimap.js` `drawFull`): 지역 전체가 한눈에, NPC·이동 장소 이름, 몬스터·보스, 내 위치가 실시간으로 표시. 휠·두 손가락·＋/－로 1~5배 확대, 끌어서 이동, "전체 보기"·"내 위치". 확인 `tools/browser-tests/areamap.js`(1280x720 통과).
