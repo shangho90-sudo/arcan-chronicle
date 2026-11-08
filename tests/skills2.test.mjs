@@ -67,7 +67,7 @@ ch.book.equip("wp_a5", 0, false); ch.book.equip("wp_b5", 0, false);
 Eq(ch.book.sk.ult, "wp_b5", "only one ultimate equipped");
 // slots
 ch.book.learn("wp_a1"); ch.book.learn("wp_a2"); ch.book.learn("wp_a3"); ch.book.learn("wp_a4"); ch.book.learn("wp_b3");
-Ok(ch.book.sk.slots.filter(Boolean).length <= 4, "4 normal slots");
+Ok(ch.book.sk.slots.filter(Boolean).length <= 3, "3 normal slots");
 Ok(ch.book.equip("wp_b3", 0, true) != null, "no slot change in combat");
 Ok(ch.book.equip("wp_b4", 0, false) != null, "passive cannot be slotted");
 Ok(ch.book.equip("wp_b3", 2, false) == null && ch.book.sk.slots[2] === "wp_b3", "equip into slot 3");
@@ -125,7 +125,7 @@ Ok(p2.sk.cds.ck1_a1 > Date.now(), "long cooldown saved");
 const p3 = migrate(JSON.parse(JSON.stringify(p2))); p3.sk.learned = { ck1_a1: 99, nope: 3, ck1_a2: -1 }; p3.sk.slots = ["nope", "ck1_a1", "ck1_a1", 7, "x"]; p3.sk.ult = "ck1_a1"; p3.sk.points = -5;
 const ch3 = new CharacterSheet(d, p3);
 Eq(ch3.book.level("ck1_a1"), 5, "over-max level clamped"); Ok(!("nope" in ch3.book.sk.learned), "unknown id dropped");
-Eq(ch3.book.sk.slots.length, 4, "slot array repaired"); Eq(ch3.book.sk.slots.filter(x => x === "ck1_a1").length, 1, "duplicate slot removed"); Eq(ch3.book.sk.ult, "", "invalid ult cleared");
+Eq(ch3.book.sk.slots.length, 3, "slot array repaired"); Eq(ch3.book.sk.slots.filter(x => x === "ck1_a1").length, 1, "duplicate slot removed"); Eq(ch3.book.sk.ult, "", "invalid ult cleared");
 Ok(ch3.book.sk.points >= 0, "negative points repaired");
 // v2 save -> v3: job kept (legacy), no points below 10
 const v2 = { version: 2, name: "옛날", gender: "f", job: "cook", level: 6, exp: 0, gold: 10, inventory: [], learnedSkills: ["ck_chop"], quests: [], flags: [] };

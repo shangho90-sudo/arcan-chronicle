@@ -2,7 +2,7 @@
 // Save data lives in profile.sk (see ensureSk). Combat execution is in skillrt.js.
 
 export const ADV1_LEVEL = 10, ADV2_LEVEL = 30, ULT_MIN_LEVEL = 45;
-export const NORMAL_SLOTS = 4;
+export const NORMAL_SLOTS = 3;
 export const UNLOCK1 = [10, 12, 15, 18, 20], UNLOCK2 = [30, 33, 36, 40, 45];
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 

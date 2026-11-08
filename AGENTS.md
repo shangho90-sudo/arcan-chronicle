@@ -23,6 +23,8 @@
 - 판정은 발 위치 기준. 텔레그래프와 피격 판정은 같은 `HitShape`를 사용(rect는 시전 위치에서 앞으로 뻗음).
 - 스킬 이펙트 연출 등급: `(차수-1)*3 + 스킬Lv`(궁극기 `+2+Lv`), 최대 10. 물리 스킬은 Lv 2마다 연타 +1, 타당 계수 `coef*base/hits*(1+0.06*추가타)`.
 - 쿨타임은 슬롯 교체·재접속 후에도 유지. 스킬 초기화는 마을에서만.
+- 스킬 슬롯은 일반 3개(1~3, `skillsys.js` `NORMAL_SLOTS`) + 궁극기 R. 휴대폰 버튼은 공격 버튼 둘레 부채꼴(1·2·3·R), 왼쪽 대시·포션, 맨 위 대화(`index.html` `.abtn.*`, 확인 `tools/browser-tests/keypad.js`).
+- 회피(Shift)는 앞구르기 동작 `roll`(`swings.py`에서 생성, 몸 전체 회전은 동작 필드 `flips`, `model.js` `apply`). 스킬 돌진은 `dash`.
 - 능력치(힘·지능·민첩·생명력·행운, `core.js` `ATTRS`/`ATTR_FX`): 레벨당 3포인트(`P.apoints`), 투자분만 효과(기본 5는 직업 기본값에 포함). 명중·회피는 `missChance`(`Actor.takeDamage`에서 판정), 제작 성공은 `skillsys.js` `craftSuccessRate`(1단계 항상 성공). 수치를 바꾸면 `tests/core.test.mjs` TestAttributes도 함께.
 - 기본 검술(`job: novice`, `nv_*` 5종)은 모든 직업의 계보 맨 앞에 붙어 전직 후에도 유지되며, 직업 포인트(`sk.points`)와 별개인 `sk.npoints`를 씁니다(Lv1부터 레벨당 1).
 - 몬스터 능력치는 레벨 곡선으로 다시 계산(`core.js` `balanceMonsters`, monsters.json의 hp/atk/def/exp는 역할 판단용 원본), 레벨 차이 보정 `levelGapDamage`/`levelGapExp`. 필드 몬스터는 들어갈 때 고르게 다시 배치(`game.js` `Zone.evenSpawners`). 몬스터 이름표는 항상 표시(흰색 = 내 레벨 이하, 빨강 = 높음).

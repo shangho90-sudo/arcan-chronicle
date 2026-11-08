@@ -113,7 +113,7 @@ function poseToBones(p, headPitch) {
   for (const [nm, a0] of [['Left', p.legL || 0], ['Right', p.legR || 0]]) {
     const a = a0 * 0.62;
     Q[nm + '_UpperLeg'] = rx(-a + fall * 0.65);
-    Q[nm + '_LowerLeg'] = rx(Math.max(0, -a) * 1.1 + Math.max(0, a) * 0.5 + 4);
+    Q[nm + '_LowerLeg'] = rx(Math.max(0, -a) * 1.1 + Math.max(0, a) * 0.5 + 4 + (p.tuck || 0));
     Q[nm + '_Foot'] = rx(-Math.max(0, -a) * 0.3);
   }
   return Q;
@@ -126,7 +126,7 @@ function npcIdle(t, look) {
     Head: mul(ry(Math.max(-35, Math.min(35, look)) + sw * 3), rx(Math.sin(t * 0.9) * 2)),
   };
 }
-const NUM = ['bob', 'lean', 'twist', 'legL', 'legR', 'wOff', 'offOff', 'fall', 'sink'];
+const NUM = ['bob', 'lean', 'twist', 'legL', 'legR', 'wOff', 'offOff', 'fall', 'sink', 'tuck'];
 // weapon-swing keys (see SWING below): hand = [azimuth, elevation, reach] of the sword hand around the right shoulder,
 // blade = [azimuth, elevation] of the blade, elbow = pole the elbow points at, step = [left, right] foot offsets (m)
 const VEC = ['hand', 'blade', 'elbow', 'step'];
@@ -664,6 +664,13 @@ export class ModelBody {
     }
     // body bob / sink (metres) and facing
     this.mesh.position.y = bodyY; this.mesh.position.x = swayX;   // visual weight shift only: collision / camera follow the root
+    // whole-body somersault (action.flips = [start, end, deg, pivotHeight]): the mesh pitches about a point pivotHeight m
+    // above the feet (a forward roll on the ground); computed from the action time like spins, a full 360 ends upright
+    const fa = this.sh.actions[this.action]; let flip = 0, fh = 0.5;
+    if (fa && fa.flips) for (const [s0, s1, deg, h] of fa.flips) if (this.t > s0) { flip += deg * (this.t < s1 ? EASE.io((this.t - s0) / (s1 - s0)) : 1); if (h) fh = h; }
+    flip = flip % 360;
+    if (flip) { const a = flip * DEG, y = bodyY - fh; this.mesh.rotation.x = a; this.mesh.position.y = fh + y * Math.cos(a); this.mesh.position.z = y * Math.sin(a); }
+    else if (this.mesh.rotation.x || this.mesh.position.z) { this.mesh.rotation.x = 0; this.mesh.position.z = 0; }
     // whole-body turns of a skill (action.spins = [start, end, deg]): eased root yaw on top of the facing; it is computed
     // from the action time (not interpolated between keys), so a full circle never unwinds when the action ends
     let spin = 0; const ca = this.sh.actions[this.action];

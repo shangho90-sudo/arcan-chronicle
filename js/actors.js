@@ -280,6 +280,7 @@ export class Player extends Combatant {
     if (this.stunned) { this.vel = { x: 0, z: 0 }; if (!this.skills.busy) this.body.play("hit", 0.5); return; }
     if (input.block) { this.vel = { x: 0, z: 0 }; this.idle(); G.fx.lockMark && G.fx.lockMark(null); return; }
     this.actions(input);
+    if (this.dashT > 0) return;   // 이번 프레임에 회피(구르기)를 시작했으면 이동/대기 동작으로 덮어쓰지 않음
     if (this.skills.busy) { this.vel = { x: 0, z: 0 }; return; }
     this.movement(input, dt);
   }
@@ -288,10 +289,11 @@ export class Player extends Combatant {
     if (input.down.potion) this.usePotion();
     if (input.down.interact) { const n = this.zone.nearestNpc(this.pos, this.cfg.interactRange); if (n) G.interact(n); }
     const sk = this.sheet.book.sk;
-    for (let i = 0; i < 5; i++) {
-      const key = i < 4 ? "skill" + (i + 1) : "ult"; if (!input.down[key]) continue;
-      const id = i < 4 ? sk.slots[i] : sk.ult;
-      if (!id) { G.ui.toast(i < 4 ? "빈 슬롯입니다 (스킬창 K)" : "궁극기가 장착되지 않았습니다"); continue; }
+    const NS = sk.slots.length;
+    for (let i = 0; i <= NS; i++) {
+      const key = i < NS ? "skill" + (i + 1) : "ult"; if (!input.down[key]) continue;
+      const id = i < NS ? sk.slots[i] : sk.ult;
+      if (!id) { G.ui.toast(i < NS ? "빈 슬롯입니다 (스킬창 K)" : "궁극기가 장착되지 않았습니다"); continue; }
       const d = G.data.skill2(id);
       const e = this.skills2.cast(id, this.aimFor({ targeting: d.target === "ground" ? "ground" : d.target === "self" ? "self" : "dir", range: d.range }, input));
       if (e) G.ui.toast(e);
@@ -384,14 +386,14 @@ export class Player extends Combatant {
     if (this.dodgeCd > 0 || (this.skills.busy && this.skills.lock > 0.15)) return;
     const d = input.move ? input.move : (Math.hypot(this.vel.x, this.vel.z) > 0.1 ? this.lastMove : this.facing);
     this.skills.cancel(); this.dodgeCd = this.cfg.dodgeCooldown;
-    this.startDash(d, this.cfg.dodgeDistance, this.cfg.dodgeDistance / this.cfg.dodgeDuration, true);
+    this.startDash(d, this.cfg.dodgeDistance, this.cfg.dodgeDistance / this.cfg.dodgeDuration, true, "roll");   // 회피 = 앞구르기 (actions.json roll)
     G.audio.sfx("dodge"); G.fx.play("smoke", { x: this.pos.x, y: this.pos.y + 0.3, z: this.pos.z }, 0.8);
   }
   startLunge(d, dist, dur) { const m = Math.hypot(d.x, d.z) || 1; this.lunge = { dir: { x: d.x / m, z: d.z / m }, dist, dur: Math.max(0.05, dur) }; this.lungeT = this.lunge.dur; }
-  startDash(d, dist, speed, inv) {
+  startDash(d, dist, speed, inv, anim = "dash") {
     const m = Math.hypot(d.x, d.z) || 1; this.dashDir = { x: d.x / m, z: d.z / m }; this.dashSpeed = Math.max(1, speed); this.dashT = dist / this.dashSpeed;
     if (inv) this.invuln = Math.max(this.invuln, this.dashT + 0.1);
-    this.setFacing(this.dashDir.x, this.dashDir.z); this.path = []; this.body.play("dash", 1, true);
+    this.setFacing(this.dashDir.x, this.dashDir.z); this.path = []; this.body.play(anim, 1, true);
   }
   updateDash(dt) {
     const s = Math.min(this.dashT, dt); const mv = this.moveBy(this.dashDir.x * this.dashSpeed * s, this.dashDir.z * this.dashSpeed * s);

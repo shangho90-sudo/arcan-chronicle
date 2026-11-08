@@ -8311,5 +8311,186 @@
   "trailLife": 0.2,
   "trailBase": 0.12,
   "recover": 0.12
+ },
+ {
+  "name": "roll",
+  "frames": 5,
+  "fps": 9.2593,
+  "loop": false,
+  "hitFrame": 0.0,
+  "keys": [
+   0.0,
+   0.08,
+   0.3,
+   0.41,
+   0.54
+  ],
+  "poses": [
+   {
+    "bob": 0.0,
+    "lean": 18,
+    "twist": 0.0,
+    "legL": 25,
+    "legR": -10,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.12,
+    "squint": false,
+    "armR": [
+     40,
+     18
+    ],
+    "armL": [
+     40,
+     18
+    ],
+    "held": null,
+    "step": [
+     0.0,
+     0.0
+    ],
+    "ik": 0,
+    "plant": 0
+   },
+   {
+    "bob": 0.0,
+    "lean": 58,
+    "twist": 0.0,
+    "legL": 150,
+    "legR": 140,
+    "wOff": 40.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.4,
+    "squint": false,
+    "armR": [
+     72,
+     6
+    ],
+    "armL": [
+     72,
+     6
+    ],
+    "held": null,
+    "step": [
+     0.0,
+     0.0
+    ],
+    "ik": 0,
+    "plant": 0,
+    "tuck": 55,
+    "e": "o"
+   },
+   {
+    "bob": 0.0,
+    "lean": 62,
+    "twist": 0.0,
+    "legL": 145,
+    "legR": 150,
+    "wOff": 40.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.4,
+    "squint": false,
+    "armR": [
+     72,
+     6
+    ],
+    "armL": [
+     72,
+     6
+    ],
+    "held": null,
+    "step": [
+     0.0,
+     0.0
+    ],
+    "ik": 0,
+    "plant": 0,
+    "tuck": 55,
+    "e": "s"
+   },
+   {
+    "bob": 0.0,
+    "lean": 22,
+    "twist": 0.0,
+    "legL": 35,
+    "legR": -12,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.16,
+    "squint": false,
+    "armR": [
+     30,
+     22
+    ],
+    "armL": [
+     30,
+     22
+    ],
+    "held": null,
+    "step": [
+     0.0,
+     0.0
+    ],
+    "ik": 0,
+    "plant": 0,
+    "e": "o"
+   },
+   {
+    "bob": 0.0,
+    "lean": 0.0,
+    "twist": 0.0,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.0,
+    "squint": false,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     8,
+     14
+    ],
+    "held": null,
+    "step": [
+     0.0,
+     0.0
+    ],
+    "ik": 0,
+    "plant": 0,
+    "e": "s"
+   }
+  ],
+  "dur": 0.54,
+  "hitT": 0.0,
+  "lock": 0.4,
+  "trail": null,
+  "fadeIn": 0.04,
+  "fadeOut": 0.12,
+  "trailColor": [
+   1.25,
+   1.45,
+   1.9
+  ],
+  "flips": [
+   [
+    0.05,
+    0.4,
+    360,
+    0.5
+   ]
+  ]
  }
 ]

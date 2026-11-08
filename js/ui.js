@@ -557,7 +557,7 @@ export class UI {
     tog("섬광 효과 줄이기", () => s.reduceFlash ? "켜짐" : "꺼짐", () => { s.reduceFlash = !s.reduceFlash; G.reduceFlash = s.reduceFlash; if (G.skillFx) G.skillFx.constructor.reduceFlash = s.reduceFlash; });
     tog("그래픽 효과 (빛 번짐·색감)", () => s.graphicsFx !== false ? "켜짐" : "꺼짐", () => s.graphicsFx = s.graphicsFx === false);
     tog("모바일 조작 버튼", () => ["자동", "항상 표시", "숨김"][s.mobileControls], () => s.mobileControls = (s.mobileControls + 1) % 3);
-    $("div", "help small muted", b, "PC: WASD/방향키 이동 · 클릭 이동/공격 · Space 공격 · 1~4 스킬 · R 궁극기 · K 스킬창 · N 제작 · Shift 회피 · Q 물약 · F 대화 · I 가방 · O 퀘스트 · Esc 메뉴");
+    $("div", "help small muted", b, "PC: WASD/방향키 이동 · 클릭 이동/공격 · Space 공격 · 1~3 스킬 · R 궁극기 · K 스킬창 · N 제작 · Shift 회피 · Q 물약 · F 대화 · I 가방 · O 퀘스트 · Esc 메뉴");
     const bb = $("div", "pbtns", b);
     this.button(bb, "게임 재개", "gold", () => this.close());
     this.button(bb, "저장하기", "teal", () => this.showSaveSlots("save", null, () => this.showPause()));

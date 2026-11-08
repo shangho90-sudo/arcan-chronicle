@@ -8,7 +8,7 @@
  "lookAhead": 0.6,
  "playerRadius": 0.32,
  "dodgeDistance": 3.2,
- "dodgeDuration": 0.28,
+ "dodgeDuration": 0.42,
  "dodgeCooldown": 1.2,
  "dodgeCost": 0,
  "interactRange": 2.2,

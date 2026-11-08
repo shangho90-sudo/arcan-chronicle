@@ -18,6 +18,7 @@ const STEP = +process.env.STEP || 0.035, CW = 130, CH = 150;
   if (process.env.GENDER === 'f') await ev(() => { const c = document.querySelector('.choice-f'); if (c) c.click(); });
   if (await pg.locator('button', { hasText: '확인' }).count()) await pg.locator('button', { hasText: '확인' }).first().click();
   await clickLabel('모험 시작');
+  await pg.waitForSelector('.prologue.on', { timeout: 60000 }).then(() => clickLabel('건너뛰기')).catch(() => {});   // 새 캐릭터 서장 건너뛰기
   await pg.waitForFunction(() => window.G && G.inWorld && G.player && !G.loading && G.player.body && G.player.body.md, null, { timeout: 300000 });
   await wait(1500);
   await ev(() => { G.frame = () => {}; document.querySelectorAll('.hud,.controls,.toasts,.layer').forEach(e => e.style.visibility = 'hidden');

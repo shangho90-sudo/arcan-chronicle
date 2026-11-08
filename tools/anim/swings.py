@@ -149,7 +149,18 @@ COMBOS = [combo('nv_yeon_%d' % n, seq) for n, seq in YEON.items()]
 IL = combo('nv_ilgyeok', ['fd', 'br', 'ov'], gaps=[0.24, 0.34], lunge=False); del IL['hitFx']
 # 비연참 (nv_a3): one huge horizontal sweep that throws the sword wave
 BI = combo('nv_biyeon', ['hz'], t0=0.22, lunge=False); del BI['hitFx']
-SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
+# 구르기 (회피, Shift): crouch -> tucked ball rolling forward 360 deg about a point 0.5 m up (action.flips, js/model.js)
+# -> open up and stand. Matches config.json dodgeDuration 0.42 s (the flip ends just before the dash does)
+TUCK = dict(lean=58, sink=0.40, legL=150, legR=140, tuck=55, armR=[72, 6], armL=[72, 6], wOff=40.0, ik=0, plant=0)
+ROLL = action('roll', [
+    key(0.00, None, ik=0, plant=0, lean=18, sink=0.12, legL=25, legR=-10, armR=[40, 18], armL=[40, 18]),
+    key(0.08, 'o', **TUCK),
+    key(0.30, 's', **dict(TUCK, lean=62, legL=145, legR=150)),
+    key(0.41, 'o', ik=0, plant=0, lean=22, sink=0.16, legL=35, legR=-12, armR=[30, 22], armL=[30, 22]),
+    key(0.54, 's', ik=0, plant=0),
+], 0.0, 0.40, None, fadeIn=0.04, fadeOut=0.12)
+ROLL['flips'] = [[0.05, 0.40, 360, 0.5]]
+SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
 
 acts = json.load(open(P))
 names = {'attack', 'attack2'} | {x['name'] for x in SKILL_ACTS}

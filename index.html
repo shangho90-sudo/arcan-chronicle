@@ -74,11 +74,14 @@ small { font-size:.8em; }
 .abtn .cdt { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#fff; font-size:18px; text-shadow:0 2px 0 #000; pointer-events:none; }
 .abtn .key { position:absolute; left:-2px; top:-4px; background:rgba(20,40,44,.9); color:var(--gold); font-size:11px; padding:1px 4px; border-radius:3px; pointer-events:none; }
 .abtn .sub { position:absolute; bottom:-4px; right:-2px; color:#9fd4ff; font-size:12px; text-shadow:0 1px 0 #000; pointer-events:none; }
-.abtn.big { width:110px; height:110px; right:0; bottom:0; background-image:url(assets/ui/circle_attack.png); }
-.abtn.sk { width:78px; height:78px; } .abtn.sm { width:62px; height:62px; background-image:url(assets/ui/circle_small.png); }
-.abtn.skill1 { right:122px; bottom:0; } .abtn.skill2 { right:112px; bottom:88px; } .abtn.skill3 { right:36px; bottom:126px; }
-.abtn.dodge { right:208px; bottom:6px; } .abtn.potion { right:206px; bottom:96px; } .abtn.interact { right:130px; bottom:184px; }
-.controls:not(.mobile) .abtn.big { width:84px; height:84px; } .controls:not(.mobile) .abtn.sk { width:64px; height:64px; } .controls:not(.mobile) .abtn.sm { width:52px; height:52px; }
+.abtn.big { width:104px; height:104px; right:0; bottom:0; background-image:url(assets/ui/circle_attack.png); }
+.abtn.sk { width:66px; height:66px; } .abtn.sm { width:62px; height:62px; background-image:url(assets/ui/circle_small.png); }
+/* 부채꼴 배치: 공격 버튼 중심에서 반지름 130px, -5°~95°에 1·2·3·R, 왼쪽에 대시·포션, 맨 위에 대화 */
+.abtn.skill1 { right:149px; bottom:8px; } .abtn.skill2 { right:133px; bottom:81px; } .abtn.skill3 { right:81px; bottom:133px; } .abtn.ult { right:8px; bottom:149px; }
+.abtn.dodge { right:228px; bottom:8px; } .abtn.potion { right:222px; bottom:84px; } .abtn.interact { right:52px; bottom:226px; }
+.controls:not(.mobile) .abtn.skill1 { right:119px; bottom:6px; } .controls:not(.mobile) .abtn.skill2 { right:107px; bottom:64px; } .controls:not(.mobile) .abtn.skill3 { right:64px; bottom:107px; } .controls:not(.mobile) .abtn.ult { right:6px; bottom:119px; }
+.controls:not(.mobile) .abtn.dodge { right:184px; bottom:6px; } .controls:not(.mobile) .abtn.potion { right:178px; bottom:66px; } .controls:not(.mobile) .abtn.interact { right:42px; bottom:180px; }
+.controls:not(.mobile) .abtn.big { width:84px; height:84px; } .controls:not(.mobile) .abtn.sk { width:54px; height:54px; } .controls:not(.mobile) .abtn.sm { width:52px; height:52px; }
 .controls:not(.mobile) .actions { transform:scale(.82); transform-origin:right bottom; }
 .stickarea { position:absolute; left:0; bottom:0; width:42%; height:62%; pointer-events:auto; touch-action:none; }
 /* movement pad (ui.js PAD_BASE / PAD_KNOB): glass orb + gold rim + four gold star points, glass knob with a star */
@@ -235,8 +238,7 @@ small { font-size:.8em; }
 }
 
 /* ---------- skills / craft ---------- */
-.abtn.skill4 { right:28px; bottom:214px; } .abtn.ult { right:206px; bottom:186px; background-image:url(assets/ui/circle_attack.png); }
-.controls:not(.mobile) .abtn.skill4 { right:20px; bottom:180px; } .controls:not(.mobile) .abtn.ult { right:178px; bottom:160px; }
+.abtn.ult { background-image:url(assets/ui/circle_attack.png); }
 .abtn.nores .ic { filter:grayscale(.7); }
 .resbar { position:absolute; right:16px; bottom:300px; background:rgba(20,40,44,.82); color:#e8f4f0; padding:4px 10px; border-radius:6px; font-size:15px; pointer-events:none; }
 .skhead { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:8px; font-size:20px; }
@@ -842,7 +844,11 @@ small { font-size:.8em; }
   .target, .target.boss { top:auto; bottom:300px; left:8px; right:auto; transform:none; width:min(300px, calc(100vw - 16px)); }
   .prompt { left:50%; top:auto; bottom:356px; transform:translateX(-50%); max-width:calc(100vw - 24px); white-space:nowrap; text-align:center; }
   .toasts { top:auto; bottom:400px; } .toast { font-size:13px; }
-  .stickbase { left:84px; bottom:70px; width:136px; height:136px; margin:-68px 0 0 -68px; } .knob { width:58px; height:58px; margin:-29px 0 0 -29px; }
+  .stickbase { left:72px; bottom:70px; width:124px; height:124px; margin:-62px 0 0 -62px; } .knob { width:54px; height:54px; margin:-27px 0 0 -27px; }
+}
+@media (max-aspect-ratio: 3/4) and (max-width: 380px) {   /* 좁은 휴대폰: 부채꼴 키패드를 조금 줄여 이동 패드와 겹치지 않게 */
+  .controls.mobile .actions { transform:scale(.72); }
+  .stickbase { left:66px; width:116px; height:116px; margin:-58px 0 0 -58px; }
 }
 @media (max-height: 520px) and (min-width: 601px) {
   .charpanel { transform:scale(.7); }

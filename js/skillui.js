@@ -233,7 +233,7 @@ const origBuild = UI.prototype.buildControls;
 UI.prototype.buildControls = function () {
   origBuild.call(this);
   const acts = this.controls.querySelector('#cActions');
-  for (const [a, key] of [['skill4', '4'], ['ult', 'R']]) {
+  for (const [a, key] of [['ult', 'R']]) {
     const b = $('div', 'abtn sk ' + a, acts, `<div class="ic"></div><div class="cd"></div><div class="cdt"></div><div class="key">${key}</div><div class="sub"></div>`);
     b.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); b.setPointerCapture(e.pointerId); b.classList.add('on'); G.input.press(a); G.audio.unlock(); });
     const up = () => b.classList.remove('on'); b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up);
@@ -258,7 +258,7 @@ UI.prototype.updateControls = function () {
     ic.style.opacity = !d ? 0.35 : noRes ? 0.45 : 1;
     b.classList.toggle('nores', !!noRes);
   };
-  for (let i = 0; i < 4; i++) set(this.btn['skill' + (i + 1)], G.data.skill2(sk.slots[i]), i);
+  for (let i = 0; i < NORMAL_SLOTS; i++) set(this.btn['skill' + (i + 1)], G.data.skill2(sk.slots[i]), i);
   set(this.btn.ult, G.data.skill2(sk.ult), 4);
   // job resources only for the jobs that use them
   const job = p.sheet.p.job; let html = '';
