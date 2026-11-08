@@ -10,6 +10,7 @@
  "dodgeDistance": 3.2,
  "dodgeDuration": 0.42,
  "dodgeCooldown": 1.2,
+ "fieldMonsterMul": 1.3,
  "dodgeCost": 0,
  "interactRange": 2.2,
  "potionCooldown": 1.0,

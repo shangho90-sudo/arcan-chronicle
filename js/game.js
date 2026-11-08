@@ -123,8 +123,10 @@ class Zone {
       let free = 0; for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) { const x = cx + i * 7, z = cz + j * 7; if (x > x0 + 2 && x < x1 - 2 && z > z0 + 2 && z < z1 - 2 && !this.geo.blocked(x, z, 0.5)) free++; }
       if (free >= 4) cells.push([cx, cz]);
     }
-    if (!cells.length) return list;
-    const total = Math.max(camps.reduce((a, m) => a + m.count, 0), Math.round(W * H / 520));
+    // 필드 몬스터 수 배율(config.json fieldMonsterMul, 2026-11-09 1.3 = 30% 증가) — 혼자 있는 정예(count 1)는 그대로
+    const mul = (G.data.config && G.data.config.fieldMonsterMul) || 1;
+    if (!cells.length) return list.map(m => camps.includes(m) ? { ...m, count: Math.round(m.count * mul) } : m);
+    const total = Math.round(Math.max(camps.reduce((a, m) => a + m.count, 0), Math.round(W * H / 520)) * mul);
     const base = Math.floor(total / cells.length);
     const out = cells.map(([cx, cz]) => {
       let near = camps[0], bd = 1e9; for (const m of camps) { const d = Math.hypot(m.pos[0] - cx, m.pos[1] - cz); if (d < bd) { bd = d; near = m; } }
