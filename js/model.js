@@ -31,6 +31,13 @@ export const NPC_MODELS = {
   master_artist:      { file: 'npc_artist', height: 1.5, headPitch: -6, npc: true },
   elder:              { file: 'npc_elder', height: 1.5, headPitch: -6, npc: true },
   guard:              { file: 'npc_guard', height: 1.62, headPitch: -6, npc: true },
+  // 이야기 NPC (tools/quests/story.py): 아스텔 = Tripo + Blender 정적 모델(tools/npcs/static_npc.py),
+  // 나머지는 기존 NPC 메시에 옷 색만 바꾼 텍스처(tex, tools/npcs/recolor.py)
+  astel:              { file: 'npc_astel', height: 1.66, headPitch: -6, npc: true },
+  castilla:           { file: 'npc_artist', tex: 'npc_castilla', height: 1.56, headPitch: -6, npc: true },
+  kylus:              { file: 'npc_guard', tex: 'npc_kylus', height: 1.74, headPitch: -6, npc: true },
+  daisen:             { file: 'npc_blacksmith', tex: 'npc_daisen', height: 1.95, headPitch: -6, npc: true },
+  boldran:            { file: 'npc_blacksmith', tex: 'npc_boldran', height: 1.62, headPitch: -6, npc: true },
 };
 const WEAPON = { novice: 'sword', pharmacist: 'pestle', cook: 'knife', blacksmith: 'hammer', hairdresser: 'scissors', artist: 'brush' };
 const OFF = { cook: 'pan', hairdresser: 'dryer', artist: 'palette' };
@@ -50,7 +57,8 @@ export async function loadActions() {
 export function loadNpcModel(id) { return NPC_MODELS[id] ? loadModelCfg(NPC_MODELS[id]) : null; }
 export async function loadPlayerModel(gender, jobSheet) { return loadModelCfg(playerModelCfg(gender, jobSheet)); }
 async function loadModelCfg(cfg) {
-  if (modelCache.has(cfg.file)) return modelCache.get(cfg.file);
+  const key = cfg.file + '|' + (cfg.tex || '') + '|' + cfg.height;
+  if (modelCache.has(key)) return modelCache.get(key);
   const p = (async () => {
     const base = 'assets/models/' + cfg.file;
     const r = await fetch(base + '.json'); if (!r.ok) throw new Error(base + ' ' + r.status);
@@ -81,7 +89,7 @@ async function loadModelCfg(cfg) {
     g.setAttribute('skinIndex', new THREE.BufferAttribute(SI, 4));
     g.setAttribute('skinWeight', new THREE.BufferAttribute(SW, 4));
     g.computeBoundingSphere();
-    const texture = new THREE.TextureLoader().load(base + '.jpg');
+    const texture = new THREE.TextureLoader().load(cfg.tex ? 'assets/models/' + cfg.tex + '.jpg' : base + '.jpg');
     texture.colorSpace = THREE.SRGBColorSpace; texture.anisotropy = 4;
     const bones = meta.bones.map(b => ({ name: b.name, parent: b.parent, bind: new THREE.Matrix4().fromArray(b.bind) }));
     for (const b of bones) { b.inv = b.bind.clone().invert(); b.t = new THREE.Vector3().setFromMatrixPosition(b.bind); }
@@ -89,7 +97,7 @@ async function loadModelCfg(cfg) {
     const scale = cfg.height / (meta.max[1] - meta.min[1]);
     return { cfg, geometry: g, texture, bones, byName, scale, leg: byName.Left_UpperLeg !== undefined ? legGeometry(bones, byName, scale, meta.min[1]) : null };
   })();
-  modelCache.set(cfg.file, p);
+  modelCache.set(key, p);
   return p;
 }
 

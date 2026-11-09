@@ -52,6 +52,7 @@ export function monsterStats(m, L, levels) {
   const role = { hp: 1, atk: 1, exp: 1 };
   if (m.ai === "heavy") { role.hp *= 1.6; role.atk *= 1.2; role.exp *= 1.5; } else if (m.ai === "ranged") role.hp *= 0.8;
   if (m.elite) { role.hp *= 5; role.atk *= 1.5; role.exp *= 5; }
+  if (m.hpMul) role.hp *= m.hpMul; if (m.atkMul) role.atk *= m.atkMul; if (m.expMul) role.exp *= m.expMul;   // story bosses (tools/quests/story.py)
   const mdef = Math.round(2 + 1.5 * L), hits = 3.5 + 0.12 * L;
   const hit = (0.06 + 0.0008 * L) * refHp(L), kills = 6 + 0.9 * L, need = exp2[Math.min(exp2.length - 1, L - 1)] || 30 * L;
   return { hp: Math.round(hits * refAtk(L) * 100 / (100 + mdef) * role.hp), atk: Math.round(hit * (100 + refDef(L)) / 100 * role.atk), def: mdef, exp: Math.max(1, Math.round(need / kills * role.exp)) };
@@ -84,7 +85,7 @@ export class GameData {
     this.itemList = files.items.items; this.items = Object.fromEntries(this.itemList.map(i => [i.id, i]));
     this.monsters = Object.fromEntries(files.monsters.monsters.map(m => [m.id, m]));
     if (!(files.config && files.config.balanceMonsters === false)) balanceMonsters(this.monsters, files.levels);
-    this.questList = files.quests.quests; this.quests = Object.fromEntries(this.questList.map(q => [q.id, q]));
+    this.questList = files.quests.quests; this.quests = Object.fromEntries(this.questList.map(q => [q.id, q])); this.storyNpcs = files.quests.storyNpcs || [];
     this.npcs = Object.fromEntries(files.npcs.npcs.map(n => [n.id, n]));
     this.shops = Object.fromEntries(files.npcs.shops.map(s => [s.id, s]));
     this.zones = Object.fromEntries(files.zones.zones.map(z => [z.id, z]));
@@ -436,7 +437,7 @@ export class QuestLog {
       case "collect": return Math.min(o.count, this.ch.bag.count(o.target));
       case "level": return P.level >= o.count ? o.count : P.level;
       case "equip": { const [slot, t] = o.target.split(":"); const it = this.data.item(P[slot]); return it && it.tier >= (+t || 1) ? 1 : 0; }
-      case "job": return o.target === "any" ? (P.job !== "novice" ? 1 : 0) : (P.job === o.target ? 1 : 0);
+      case "job": return o.target === "any" ? (P.job !== "novice" ? 1 : 0) : o.target === "tier2" ? ((this.data.job(P.job) || {}).tier >= 2 ? 1 : 0) : (P.job === o.target ? 1 : 0);
     }
     return pr ? pr.counts[i] | 0 : 0;
   }

@@ -424,6 +424,334 @@
     "털옷 없이 설원에 가면 얼어 죽어요."
    ],
    "world": true
+  },
+  {
+   "id": "astel",
+   "name": "아스텔",
+   "title": "망명 왕자",
+   "sheet": "npc_guard",
+   "model": "astel",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "…동생을 구하고 싶다. 그게 베는 일이 되더라도.",
+    "오른손의 문양이 또 뜨거워진다."
+   ],
+   "story": true
+  },
+  {
+   "id": "castilla",
+   "name": "카스티야",
+   "title": "왕실 궁수",
+   "sheet": "npc_master_artist",
+   "model": "master_artist",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "오늘은 내가 먼저 발견했어.",
+    "바람이 어느 쪽에서 부는지만 알면 돼."
+   ],
+   "story": true
+  },
+  {
+   "id": "kylus",
+   "name": "카일러스",
+   "title": "호위기사",
+   "sheet": "npc_guard",
+   "model": "guard",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "전하의 왼쪽 어깨는 늘 반 박자 늦습니다.",
+    "누군가는 남아야 합니다. 그게 호위기사의 일이니까요."
+   ],
+   "story": true
+  },
+  {
+   "id": "daisen",
+   "name": "다이센",
+   "title": "베르그 전사",
+   "sheet": "npc_master_blacksmith",
+   "model": "master_blacksmith",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "용서한 건 아니다.",
+    "이 철퇴는 할아버지의 할아버지 때부터 무거웠다."
+   ],
+   "story": true
+  },
+  {
+   "id": "boldran",
+   "name": "볼드란",
+   "title": "전설의 대장장이",
+   "sheet": "npc_master_blacksmith",
+   "model": "master_blacksmith",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "내가 만든 무기가 너무 많은 사람을 죽였네.",
+    "이번엔 무언가를 지키는 데 쓰이게 하고 싶군."
+   ],
+   "story": true
+  },
+  {
+   "id": "capital_cook",
+   "name": "곤",
+   "title": "왕도 요리사",
+   "sheet": "npc_master_cook",
+   "model": "master_cook",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "수확제 요리는 재료가 반이지!"
+   ],
+   "story": true
+  },
+  {
+   "id": "baltern_herbalist",
+   "name": "미르",
+   "title": "발테른 약초상",
+   "sheet": "npc_master_pharmacist",
+   "model": "master_pharmacist",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "바위산 약초는 쓰지만 잘 듣지요."
+   ],
+   "story": true
+  },
+  {
+   "id": "baltern_captain",
+   "name": "가론",
+   "title": "발테른 경비대장",
+   "sheet": "npc_guard",
+   "model": "guard",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "고갯길 상인들이 또 당했어."
+   ],
+   "story": true
+  },
+  {
+   "id": "lumiere_pilgrim",
+   "name": "티아",
+   "title": "순례자",
+   "sheet": "npc_master_artist",
+   "model": "master_artist",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "안개 속에서 등불이 꺼지면 길을 잃어요."
+   ],
+   "story": true
+  },
+  {
+   "id": "lumiere_monk",
+   "name": "세오",
+   "title": "루미에르 수도사",
+   "sheet": "npc_master_pharmacist",
+   "model": "master_pharmacist",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "기록은 사람보다 오래 남습니다."
+   ],
+   "story": true
+  },
+  {
+   "id": "lumiere_priest",
+   "name": "베른",
+   "title": "경비 사제",
+   "sheet": "npc_guard",
+   "model": "guard",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "순례길은 늘 지켜져야 합니다."
+   ],
+   "story": true
+  },
+  {
+   "id": "shepherd_wife",
+   "name": "네아",
+   "title": "양치기의 아내",
+   "sheet": "npc_merchant",
+   "model": "merchant",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "양들이 밤마다 사라져요…",
+    "그이가 돌아오지 않아요."
+   ],
+   "story": true
+  },
+  {
+   "id": "shepherd",
+   "name": "토빈",
+   "title": "실베른 양치기",
+   "sheet": "npc_elder",
+   "model": "elder",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "피리 소리만 들리면 양들은 돌아와."
+   ],
+   "story": true
+  },
+  {
+   "id": "silvern_hunter",
+   "name": "라엘",
+   "title": "실베른 사냥꾼",
+   "sheet": "npc_guard",
+   "model": "guard",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "늑대 굴은 남쪽 숲 깊은 곳에 있지."
+   ],
+   "story": true
+  },
+  {
+   "id": "gravel_pharmacist",
+   "name": "오나",
+   "title": "그라벨 약사",
+   "sheet": "npc_master_pharmacist",
+   "model": "master_pharmacist",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "전갈 독은 해독제의 재료이기도 해요."
+   ],
+   "story": true
+  },
+  {
+   "id": "gravel_refugee",
+   "name": "한스",
+   "title": "피난민",
+   "sheet": "npc_elder",
+   "model": "elder",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "우리 마을은… 지도에서 지워졌습니다."
+   ],
+   "story": true
+  },
+  {
+   "id": "supply_officer",
+   "name": "브람",
+   "title": "연합군 보급관",
+   "sheet": "npc_guard",
+   "model": "guard",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "사만 명이 먹는다. 하루에도 산 하나가 사라지지."
+   ],
+   "story": true
+  },
+  {
+   "id": "highland_hunter",
+   "name": "카야",
+   "title": "고원 사냥꾼",
+   "sheet": "npc_guard",
+   "model": "guard",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "고원의 겨울은 빨리 온다."
+   ],
+   "story": true
+  },
+  {
+   "id": "tanner",
+   "name": "도르",
+   "title": "마르세온 무두장이",
+   "sheet": "npc_armorer",
+   "model": "armorer",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "좋은 가죽은 좋은 갑옷이 되지."
+   ],
+   "story": true
+  },
+  {
+   "id": "miner_chief",
+   "name": "바르크",
+   "title": "광부 조합장",
+   "sheet": "npc_master_blacksmith",
+   "model": "master_blacksmith",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "광산길이 막히면 왕국의 화로도 식는다."
+   ],
+   "story": true
+  },
+  {
+   "id": "cavalry_captain",
+   "name": "레아",
+   "title": "발타자르 기병대장",
+   "sheet": "npc_guard",
+   "model": "guard",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "설인 때문에 말들이 놀라서 큰일이야."
+   ],
+   "story": true
+  },
+  {
+   "id": "fort_watch",
+   "name": "일렉",
+   "title": "요새 파수병",
+   "sheet": "npc_guard",
+   "model": "guard",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "밤마다 호수 밑에서 소리가 울려."
+   ],
+   "story": true
+  },
+  {
+   "id": "ruin_monk",
+   "name": "유디트",
+   "title": "살아남은 수도사",
+   "sheet": "npc_master_pharmacist",
+   "model": "master_pharmacist",
+   "role": "guard",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "대사제님은… 끝까지 기록을 지키셨어요."
+   ],
+   "story": true
   }
  ],
  "shops": [

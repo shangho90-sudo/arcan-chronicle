@@ -11,6 +11,7 @@ import { Warp } from './warp.js';
 import { bindSkillRt } from './skillrt.js';
 import { bindSkillUi } from './skillui.js';
 import { installDev } from './devtools.js';
+import { QuestWorld } from './questworld.js';
 
 const rnd = (a, b) => a + Math.random() * (b - a);
 const zoneJsonCache = new Map();
@@ -430,13 +431,14 @@ class Game {
     S.bag.onChange.push(() => { Q.refreshPassive(); ui.refresh(); });
     S.events.job.push(() => { Q.refreshPassive(); this.audio.sfx('jobchange'); });
     // quest progress is shown inside the quest window (check mark + highlight), not as centre notices
-    Q.events.accepted.push(() => { this.audio.sfx("quest"); ui.updateTracker(); });
+    this.qworld = new QuestWorld(this);
+    Q.events.accepted.push(() => { this.audio.sfx("quest"); ui.updateTracker(); if (this.zone) Q.notify("visit", this.zone.def.id, 1); this.qworld.sync(); });
     Q.events.ready.push(q => {
       const pr = Q.find(q.id); if (pr) { if (pr._toasted) return; pr._toasted = true; pr._readyNotified = true; }
       this.audio.sfx("quest"); ui.updateTracker();
     });
     Q.events.updated.push(() => ui.updateTracker());
-    Q.events.completed.push(() => { this.audio.sfx("quest"); ui.updateTracker(); this.autoSave(); });
+    Q.events.completed.push(() => { this.audio.sfx("quest"); ui.updateTracker(); this.autoSave(); this.qworld.sync(); });
   }
 
   // ------------------------------------------------------------------ zones
@@ -477,6 +479,7 @@ class Game {
     this.render.setFocus(p.pos, true);
     this.audio.playMusic(def.bgm);
     this.quests.notify("visit", zoneId, 1); this.quests.refreshPassive(); this.ui.updateTracker();
+    if (this.qworld) await this.qworld.sync();
     await this.fadeTo(0, 0.3);
     const welcome = this.pendingWelcome; this.pendingWelcome = false;
     if (welcome) P.ui.welcomed = true;
@@ -549,12 +552,20 @@ class Game {
       if (!item) continue; m.zone.dropLoot(item, dr.min + Math.floor(Math.random() * (dr.max - dr.min + 1)), m.pos);
     }
     this.quests.notify("kill", d.id, 1); this.player.onKilledMonster && this.player.onKilledMonster(m);
+    if (this.qworld) this.qworld.onKill(m);
     // 손질 숙련: extra ingredient drops
     const ing = this.sheet.book.passive("ingredientDrop"); if (ing && Math.random() < ing) m.zone.dropLoot(["m_meat", "m_veg", "m_flour"][Math.floor(Math.random() * 3)], 1, m.pos);
     if (m instanceof Boss) {
       if (!this.profile.flags.includes("boss_" + d.id + "_defeated")) this.profile.flags.push("boss_" + d.id + "_defeated");
       this.endBossFight(true); this.ui.toast(m.def.name + "을(를) 쓰러뜨렸습니다!"); this.audio.sfx("levelup"); this.render.addShake(0.3, 0.6); this.autoSave();
     }
+  }
+  /** a scripted story boss gave up (yieldAt) or the hold-out ended (surviveSec): counts as beating it */
+  onMonsterYield(m) {
+    if (!this.player) return;
+    const d = m.def, exp = levelGapExp(d.exp, this.player.level, m.level); this.sheet.addExp(exp);
+    if (this.reward) this.reward.kill(m.pos, exp, 0); else this.ui.floatText(m.pos, "+" + exp + " EXP", "#b8e0ff", 0.9, 1.6);
+    this.quests.notify("kill", d.id, 1); this.audio.sfx("levelup"); this.autoSave();
   }
   startBossFight(boss) {
     if (!boss || boss.fight || boss.dead || !this.player || this.player.dead) return;

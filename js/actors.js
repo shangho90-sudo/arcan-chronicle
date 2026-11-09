@@ -4,7 +4,7 @@ import { CombatMath, HitShape, StatusSet, clamp, clamp01, DEG, missChance, level
 import { SpriteBody, dirFromWorld, hitTime, duration, lockTime, action, TelegraphView, T, THREE } from './render.js';
 import { lootModel, hasItemModel } from './items3d.js';
 import { SkillEngine, applyStatus, clearMarks } from './skillrt.js';
-import { CreatureBody, loadCreature, CREATURES } from './creature.js';
+import { CreatureBody, loadCreature, loadCreatureLook, CREATURES } from './creature.js';
 import { ModelBody, loadPlayerModel, loadNpcModel, loadActions, PLAYER_MODELS, NPC_MODELS, playerModelCfg } from './model.js';
 
 let G = null; // game context (set by game.js)
@@ -47,7 +47,7 @@ export class Combatant {
       if (this.hp - (amount - sh) <= 0 && this.skills2.cheatDeath()) return;
     }
     if (this.shield > 0) { const a = Math.min(this.shield, amount); this.shield -= a; amount -= a; }
-    this.hp = Math.max(0, this.hp - amount);
+    this.hp = Math.max(this.minHp || 0, this.hp - amount);   // minHp: scripted quest bosses (yieldAt / surviveSec) give up instead of dying
     if (!d.silent) {
       if (amount < 1) G.ui.floatText(this.pos, "흡수", "#8ce6ff", 0.9);
       else G.ui.damageText(this.pos, Math.round(amount), d.dot ? "dot" : this.faction === "player" ? "taken" : d.crit ? "crit" : "hit");
@@ -62,6 +62,7 @@ export class Combatant {
     if (!d.dot && this.body) this.body.flash(0.1);
     if (d.knockback > 0 && d.kdir) { const m = Math.hypot(d.kdir.x, d.kdir.z) || 1; this.knock = { x: d.kdir.x / m * d.knockback * 6, z: d.kdir.z / m * d.knockback * 6 }; }
     this.onDamaged(d, amount);
+    if (this.yieldOnHp && this.hp <= this.minHp) this.onYield();
     if (this.hp <= 0) this.die(d.source);
   }
   onDamaged() { }
@@ -455,17 +456,28 @@ export const PASSIVE_MAX_LEVEL = 10;
 export class Monster extends Combatant {
   /** non-aggressive: Lv10 and below (bosses excluded), or every monster of a zone with "passiveMonsters": true.
    *  A passive monster still fights back once hit (onDamaged sets aggro) and its pack-mates are unaffected. */
-  get passive() { return !this.isBoss && ((this.level || 1) <= PASSIVE_MAX_LEVEL || !!(this.zone && this.zone.def.passiveMonsters)); }
+  get passive() { return !this.isBoss && !this.def.questBoss && ((this.level || 1) <= PASSIVE_MAX_LEVEL || !!(this.zone && this.zone.def.passiveMonsters)); }
   constructor(zone, def, pos, home, homeRadius) {
     super(zone, pos, def.radius, "monster");
     this.def = def; this.home = home; this.homeR = homeRadius; this.name = def.name; this.level = def.level; this.hp = def.hp;
     this.state = "idle"; this.timer = 0; this.atkCd = rnd(0.3, 1); this.think = rnd(0.5, 2.5); this.wander = { ...home }; this.aggro = false; this.deadT = 0;
     this.onRemoved = null;
+    // story bosses (monsters.json, tools/quests/story.py): yieldAt = gives up at this HP fraction (패배 이벤트 / 대련),
+    // surviveSec = can't be beaten, the fight ends after holding out this long (버티기); both count as a quest kill
+    if (def.yieldAt) { this.minHp = Math.max(1, Math.round(def.hp * def.yieldAt)); this.yieldOnHp = true; }
+    if (def.surviveSec) { this.minHp = Math.round(def.hp * 0.85); this.surviveT = 0; }
+  }
+  onYield() {
+    if (this.yielded || this.dead) return; this.yielded = true;
+    if (this.def.yieldLine) G.ui.notice(this.def.yieldLine);
+    this.dead = true; this.cancelAttack(); this.status.clear(); this.state = "dead"; this.deadT = 0;
+    if (this.body) this.body.play("hit", 1, true);
+    G.onMonsterYield(this);
   }
   async attachBody() {
     const sh = await G.loadSheet(this.def.sheet);
-    if (CREATURES[this.def.id]) {
-      try { this.body = new CreatureBody(G.render.scene, await loadCreature(this.def.id), sh, this.radius); }
+    if (CREATURES[this.def.id] || (this.def.look && CREATURES[this.def.look.base])) {
+      try { this.body = new CreatureBody(G.render.scene, CREATURES[this.def.id] ? await loadCreature(this.def.id) : await loadCreatureLook(this.def.look), sh, this.radius); }
       catch (e) { console.warn('creature', this.def.id, e.message); }
     }
     if (!this.body) this.body = new SpriteBody(G.render.scene, sh, this.radius);
@@ -485,6 +497,11 @@ export class Monster extends Combatant {
     if (this.atkCd > 0) this.atkCd -= dt;
     if (this.state === "dead") return this.updateDead(dt);
     if (!this.body) return;
+    if (this.surviveT != null && this.aggro && !this.yielded) {
+      this.surviveT += dt; const left = Math.ceil(this.def.surviveSec - this.surviveT);
+      if (left !== this._survShown) { this._survShown = left; if (left > 0 && (left % 10 === 0 || left <= 5)) G.ui.toast(`버티기: ${left}초`); }
+      if (this.surviveT >= this.def.surviveSec) return this.onYield();
+    }
     if (this.stunned) { this.cancelAttack(); this.body.play("hit", 0.6); return; }
     if (this.hitReact > 0 && this.state !== "windup") return;
     this.thinkStep(dt);

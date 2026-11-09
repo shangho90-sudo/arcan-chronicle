@@ -3627,6 +3627,1858 @@
    "hitSfx": "hit",
    "def": 24,
    "world": true
+  },
+  {
+   "id": "qb_boar_lord",
+   "name": "길목의 엄니 멧돼지",
+   "level": 4,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 175,
+   "atk": 19,
+   "exp": 38,
+   "goldMin": 32,
+   "goldMax": 56,
+   "moveSpeed": 2.9,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 1.5,
+   "attackCooldown": 1.8,
+   "windup": 0.5,
+   "radius": 0.55,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 7,
+   "look": {
+    "base": "mon_boar",
+    "size": 1.9,
+    "tint": [
+     0.75,
+     0.55,
+     0.4
+    ],
+    "recolor": 0.4
+   },
+   "questBoss": true,
+   "story": true,
+   "hpMul": 3
+  },
+  {
+   "id": "qb_shadow_scout",
+   "name": "그림자 정찰대",
+   "level": 5,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 590,
+   "atk": 101,
+   "exp": 63,
+   "goldMin": 40,
+   "goldMax": 70,
+   "moveSpeed": 3.3,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 1.2,
+   "attackCooldown": 1.3,
+   "windup": 0.35,
+   "radius": 0.4,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 26,
+   "world": true,
+   "look": {
+    "base": "mon_wraith",
+    "size": 1.3,
+    "tint": [
+     0.3,
+     0.28,
+     0.42
+    ],
+    "recolor": 0.7
+   },
+   "questBoss": true,
+   "story": true,
+   "hpMul": 3
+  },
+  {
+   "id": "qb_roderick",
+   "name": "근위대장 로데릭",
+   "level": 6,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 773,
+   "atk": 168,
+   "exp": 184,
+   "goldMin": 48,
+   "goldMax": 84,
+   "moveSpeed": 1.7,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 35,
+   "world": true,
+   "look": {
+    "base": "mon_soldier",
+    "size": 1.35,
+    "tint": [
+     0.95,
+     0.45,
+     0.4
+    ],
+    "recolor": 0.55
+   },
+   "questBoss": true,
+   "story": true,
+   "hpMul": 2.5,
+   "yieldAt": 0.5,
+   "yieldLine": "로데릭: 물러서라! …성문을 닫아라! 반역자들이 달아난다!"
+  },
+  {
+   "id": "qb_chaser_captain",
+   "name": "추격 기마대장",
+   "level": 7,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 773,
+   "atk": 168,
+   "exp": 184,
+   "goldMin": 56,
+   "goldMax": 98,
+   "moveSpeed": 1.7,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 35,
+   "world": true,
+   "look": {
+    "base": "mon_soldier",
+    "size": 1.3,
+    "tint": [
+     0.55,
+     0.6,
+     0.85
+    ],
+    "recolor": 0.5
+   },
+   "questBoss": true,
+   "story": true,
+   "hpMul": 2.5
+  },
+  {
+   "id": "qb_black_feather",
+   "name": "검은 깃 두목",
+   "level": 9,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 394,
+   "atk": 45,
+   "exp": 24,
+   "goldMin": 72,
+   "goldMax": 126,
+   "moveSpeed": 3.3,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 1.2,
+   "attackCooldown": 1.3,
+   "windup": 0.35,
+   "radius": 0.4,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 14,
+   "world": true,
+   "look": {
+    "base": "mon_goblin_miner",
+    "size": 1.5,
+    "tint": [
+     0.25,
+     0.22,
+     0.3
+    ],
+    "recolor": 0.75
+   },
+   "questBoss": true,
+   "story": true,
+   "hpMul": 3
+  },
+  {
+   "id": "qb_kerin_spar",
+   "name": "노기사 케린 (대련)",
+   "level": 10,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 773,
+   "atk": 168,
+   "exp": 184,
+   "goldMin": 80,
+   "goldMax": 140,
+   "moveSpeed": 1.7,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 35,
+   "world": true,
+   "look": {
+    "base": "mon_soldier",
+    "size": 1.3,
+    "tint": [
+     0.85,
+     0.88,
+     0.95
+    ],
+    "recolor": 0.5
+   },
+   "questBoss": true,
+   "story": true,
+   "hpMul": 5,
+   "yieldAt": 0.3,
+   "yieldLine": "케린: 됐다. 검이 아직 무디지만, 등을 맡길 만은 하구나."
+  },
+  {
+   "id": "qb_quarry_golem",
+   "name": "그림자 깃든 석상",
+   "level": 11,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 2108,
+   "atk": 221,
+   "exp": 1225,
+   "goldMin": 88,
+   "goldMax": 154,
+   "moveSpeed": 1.6,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 2.4,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.85,
+   "attackRadius": 2.7,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 44,
+   "world": true,
+   "look": {
+    "base": "mon_mine_golem",
+    "size": 1.9,
+    "tint": [
+     0.45,
+     0.4,
+     0.6
+    ],
+    "recolor": 0.6
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true
+  },
+  {
+   "id": "qb_fog_alpha",
+   "name": "안개 늑대 우두머리",
+   "level": 13,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 398,
+   "atk": 65,
+   "exp": 21,
+   "goldMin": 104,
+   "goldMax": 182,
+   "moveSpeed": 3.5,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 1.4,
+   "attackCooldown": 1.4,
+   "windup": 0.35,
+   "radius": 0.5,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 17,
+   "world": true,
+   "look": {
+    "base": "mon_shadow_wolf",
+    "size": 1.8,
+    "tint": [
+     0.7,
+     0.75,
+     0.9
+    ],
+    "recolor": 0.5
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true
+  },
+  {
+   "id": "qb_phantom_king",
+   "name": "환영의 아버지",
+   "level": 15,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 590,
+   "atk": 101,
+   "exp": 63,
+   "goldMin": 120,
+   "goldMax": 210,
+   "moveSpeed": 3.3,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 1.2,
+   "attackCooldown": 1.3,
+   "windup": 0.35,
+   "radius": 0.4,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 26,
+   "world": true,
+   "look": {
+    "base": "mon_wraith",
+    "size": 1.7,
+    "tint": [
+     1.0,
+     0.85,
+     0.45
+    ],
+    "recolor": 0.6
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true
+  },
+  {
+   "id": "qb_digona",
+   "name": "디고나",
+   "level": 16,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 2920,
+   "atk": 156,
+   "exp": 245,
+   "goldMin": 128,
+   "goldMax": 224,
+   "moveSpeed": 3.5,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 1.4,
+   "attackCooldown": 1.4,
+   "windup": 0.35,
+   "radius": 0.5,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 31,
+   "world": true,
+   "look": {
+    "base": "mon_spider",
+    "size": 3.2,
+    "tint": [
+     0.9,
+     0.35,
+     0.45
+    ],
+    "recolor": 0.55
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true,
+   "hpMul": 1.4
+  },
+  {
+   "id": "qb_cult_spy",
+   "name": "교단 첩보 사제",
+   "level": 17,
+   "sheet": "mon_slime",
+   "ai": "ranged",
+   "hp": 590,
+   "atk": 101,
+   "exp": 63,
+   "goldMin": 136,
+   "goldMax": 238,
+   "moveSpeed": 3.3,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 1.2,
+   "attackCooldown": 1.3,
+   "windup": 0.35,
+   "radius": 0.4,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 26,
+   "world": true,
+   "look": {
+    "base": "mon_wraith",
+    "size": 1.3,
+    "tint": [
+     0.6,
+     0.35,
+     0.8
+    ],
+    "recolor": 0.6
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true
+  },
+  {
+   "id": "qb_blackeye_chief",
+   "name": "검은 눈의 촌장",
+   "level": 19,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 590,
+   "atk": 101,
+   "exp": 63,
+   "goldMin": 152,
+   "goldMax": 266,
+   "moveSpeed": 3.3,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 1.2,
+   "attackCooldown": 1.3,
+   "windup": 0.35,
+   "radius": 0.4,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 26,
+   "world": true,
+   "look": {
+    "base": "mon_wraith",
+    "size": 1.6,
+    "tint": [
+     0.35,
+     0.3,
+     0.35
+    ],
+    "recolor": 0.7
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true
+  },
+  {
+   "id": "qb_abyss_shade",
+   "name": "심연의 눈",
+   "level": 21,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 590,
+   "atk": 101,
+   "exp": 63,
+   "goldMin": 168,
+   "goldMax": 294,
+   "moveSpeed": 3.3,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 1.2,
+   "attackCooldown": 1.3,
+   "windup": 0.35,
+   "radius": 0.4,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 26,
+   "world": true,
+   "look": {
+    "base": "mon_wraith",
+    "size": 2.8,
+    "tint": [
+     0.15,
+     0.12,
+     0.22
+    ],
+    "recolor": 0.8
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true,
+   "surviveSec": 40,
+   "yieldLine": "거대한 눈이 감겼다. 요이센: 지금이야, 달려!"
+  },
+  {
+   "id": "qb_daisen",
+   "name": "베르그 전사 다이센",
+   "level": 21,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 643,
+   "atk": 130,
+   "exp": 115,
+   "goldMin": 168,
+   "goldMax": 294,
+   "moveSpeed": 1.7,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 31,
+   "world": true,
+   "look": {
+    "base": "mon_soldier",
+    "size": 1.55,
+    "tint": [
+     0.7,
+     0.5,
+     0.35
+    ],
+    "recolor": 0.55
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true,
+   "yieldAt": 0.35,
+   "yieldLine": "다이센: …칼끝이 망설이지 않는군. 좋다, 증거를 가져와라."
+  },
+  {
+   "id": "qb_ash_wraith",
+   "name": "재의 망령",
+   "level": 23,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 590,
+   "atk": 101,
+   "exp": 63,
+   "goldMin": 184,
+   "goldMax": 322,
+   "moveSpeed": 3.3,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 1.2,
+   "attackCooldown": 1.3,
+   "windup": 0.35,
+   "radius": 0.4,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 26,
+   "world": true,
+   "look": {
+    "base": "mon_wraith",
+    "size": 2.0,
+    "tint": [
+     0.55,
+     0.5,
+     0.45
+    ],
+    "recolor": 0.7
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true
+  },
+  {
+   "id": "qb_assassin_lord",
+   "name": "검은 깃의 수장",
+   "level": 24,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 773,
+   "atk": 168,
+   "exp": 184,
+   "goldMin": 192,
+   "goldMax": 336,
+   "moveSpeed": 1.7,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 35,
+   "world": true,
+   "look": {
+    "base": "mon_soldier",
+    "size": 1.4,
+    "tint": [
+     0.2,
+     0.2,
+     0.26
+    ],
+    "recolor": 0.75
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true
+  },
+  {
+   "id": "qb_fort_warden",
+   "name": "검은 사슬의 수문장",
+   "level": 25,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 1030,
+   "atk": 314,
+   "exp": 688,
+   "goldMin": 200,
+   "goldMax": 350,
+   "moveSpeed": 1.7,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 54,
+   "world": true,
+   "look": {
+    "base": "mon_armor",
+    "size": 1.45,
+    "tint": [
+     0.35,
+     0.3,
+     0.4
+    ],
+    "recolor": 0.6
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true
+  },
+  {
+   "id": "qb_grace_1",
+   "name": "찬탈왕 그레이스",
+   "level": 28,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 590,
+   "atk": 101,
+   "exp": 63,
+   "goldMin": 224,
+   "goldMax": 392,
+   "moveSpeed": 3.3,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 1.2,
+   "attackCooldown": 1.3,
+   "windup": 0.35,
+   "radius": 0.4,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 26,
+   "world": true,
+   "look": {
+    "base": "mon_wraith",
+    "size": 1.6,
+    "tint": [
+     0.25,
+     0.3,
+     0.55
+    ],
+    "recolor": 0.6
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true,
+   "hpMul": 2,
+   "surviveSec": 30,
+   "yieldLine": "그레이스: 돌아갈 곳이…… 없어요, 형."
+  },
+  {
+   "id": "qb_shadow_general",
+   "name": "그림자 추격 장군",
+   "level": 29,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 1030,
+   "atk": 314,
+   "exp": 688,
+   "goldMin": 232,
+   "goldMax": 406,
+   "moveSpeed": 1.7,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 54,
+   "world": true,
+   "look": {
+    "base": "mon_armor",
+    "size": 1.6,
+    "tint": [
+     0.25,
+     0.22,
+     0.35
+    ],
+    "recolor": 0.7
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true
+  },
+  {
+   "id": "qb_bridge_chaser",
+   "name": "추격군 대장",
+   "level": 30,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 773,
+   "atk": 168,
+   "exp": 184,
+   "goldMin": 240,
+   "goldMax": 420,
+   "moveSpeed": 1.7,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 35,
+   "world": true,
+   "look": {
+    "base": "mon_soldier",
+    "size": 1.45,
+    "tint": [
+     0.4,
+     0.35,
+     0.45
+    ],
+    "recolor": 0.6
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true
+  },
+  {
+   "id": "qb_fallen_paladin",
+   "name": "타락한 순례 기사단장",
+   "level": 32,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 1030,
+   "atk": 314,
+   "exp": 688,
+   "goldMin": 256,
+   "goldMax": 448,
+   "moveSpeed": 1.7,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 54,
+   "world": true,
+   "look": {
+    "base": "mon_armor",
+    "size": 1.5,
+    "tint": [
+     0.85,
+     0.75,
+     0.55
+    ],
+    "recolor": 0.5
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true
+  },
+  {
+   "id": "qb_justina",
+   "name": "타락한 저스티나",
+   "level": 33,
+   "sheet": "mon_shroom",
+   "ai": "ranged",
+   "hp": 690,
+   "atk": 96,
+   "exp": 44,
+   "goldMin": 264,
+   "goldMax": 462,
+   "moveSpeed": 2.4,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 7.5,
+   "attackCooldown": 2.1,
+   "windup": 0.5,
+   "radius": 0.45,
+   "attackRadius": 0,
+   "projectileFx": "fire",
+   "projectileSpeed": 8,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 24,
+   "world": true,
+   "look": {
+    "base": "mon_wraith",
+    "size": 1.6,
+    "tint": [
+     0.55,
+     0.3,
+     0.6
+    ],
+    "recolor": 0.6
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true,
+   "hpMul": 1.4
+  },
+  {
+   "id": "qb_checkpoint",
+   "name": "검문소 그림자 집행관",
+   "level": 33,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 773,
+   "atk": 168,
+   "exp": 184,
+   "goldMin": 264,
+   "goldMax": 462,
+   "moveSpeed": 1.7,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 35,
+   "world": true,
+   "look": {
+    "base": "mon_soldier",
+    "size": 1.4,
+    "tint": [
+     0.3,
+     0.3,
+     0.4
+    ],
+    "recolor": 0.65
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true
+  },
+  {
+   "id": "qb_marseon_guard",
+   "name": "마르세온 총독 근위대장",
+   "level": 34,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 1030,
+   "atk": 314,
+   "exp": 688,
+   "goldMin": 272,
+   "goldMax": 476,
+   "moveSpeed": 1.7,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 54,
+   "world": true,
+   "look": {
+    "base": "mon_armor",
+    "size": 1.45,
+    "tint": [
+     0.6,
+     0.3,
+     0.3
+    ],
+    "recolor": 0.55
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true
+  },
+  {
+   "id": "qb_crystal_golem",
+   "name": "붉은 수정 골렘",
+   "level": 35,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 3915,
+   "atk": 295,
+   "exp": 2856,
+   "goldMin": 280,
+   "goldMax": 490,
+   "moveSpeed": 1.7,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 47,
+   "world": true,
+   "look": {
+    "base": "mon_crystal",
+    "size": 2.3
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true
+  },
+  {
+   "id": "qb_boldran",
+   "name": "폭주한 볼드란",
+   "level": 37,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 773,
+   "atk": 168,
+   "exp": 184,
+   "goldMin": 296,
+   "goldMax": 518,
+   "moveSpeed": 1.7,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 35,
+   "world": true,
+   "look": {
+    "base": "mon_soldier",
+    "size": 1.5,
+    "tint": [
+     0.95,
+     0.35,
+     0.3
+    ],
+    "recolor": 0.55
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true,
+   "yieldAt": 0.25,
+   "yieldLine": "볼드란: 내가… 무슨 짓을. 수정이… 부서졌군."
+  },
+  {
+   "id": "qb_dig_golem",
+   "name": "크로이츠 굴착 골렘",
+   "level": 38,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 2108,
+   "atk": 221,
+   "exp": 1225,
+   "goldMin": 304,
+   "goldMax": 532,
+   "moveSpeed": 1.6,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 2.4,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.85,
+   "attackRadius": 2.7,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 44,
+   "world": true,
+   "look": {
+    "base": "mon_mine_golem",
+    "size": 2.1,
+    "tint": [
+     0.6,
+     0.65,
+     0.8
+    ],
+    "recolor": 0.5
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true
+  },
+  {
+   "id": "qb_black_knight",
+   "name": "검은 창의 기사",
+   "level": 40,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 1030,
+   "atk": 314,
+   "exp": 688,
+   "goldMin": 320,
+   "goldMax": 560,
+   "moveSpeed": 1.7,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 54,
+   "world": true,
+   "look": {
+    "base": "mon_armor",
+    "size": 1.5,
+    "tint": [
+     0.12,
+     0.12,
+     0.16
+    ],
+    "recolor": 0.85
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true,
+   "hpMul": 1.3,
+   "yieldAt": 0.4,
+   "yieldLine": "흑기사: 제 왕자는 강에서 죽었습니다. 당신은 그분의 흉내를 내는 자일 뿐이오."
+  },
+  {
+   "id": "qb_tainted_queen",
+   "name": "물든 왕비",
+   "level": 41,
+   "sheet": "mon_shroom",
+   "ai": "ranged",
+   "hp": 690,
+   "atk": 96,
+   "exp": 44,
+   "goldMin": 328,
+   "goldMax": 574,
+   "moveSpeed": 2.4,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 7.5,
+   "attackCooldown": 2.1,
+   "windup": 0.5,
+   "radius": 0.45,
+   "attackRadius": 0,
+   "projectileFx": "fire",
+   "projectileSpeed": 8,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 24,
+   "world": true,
+   "look": {
+    "base": "mon_lantern_ghost",
+    "size": 1.6,
+    "tint": [
+     0.6,
+     0.35,
+     0.7
+    ],
+    "recolor": 0.6
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true,
+   "surviveSec": 35,
+   "yieldLine": "왕비: 가거라. 내가 다시 물들기 전에."
+  },
+  {
+   "id": "qb_tomb_guardian",
+   "name": "능침의 고대 수호자",
+   "level": 42,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 1030,
+   "atk": 314,
+   "exp": 688,
+   "goldMin": 336,
+   "goldMax": 588,
+   "moveSpeed": 1.6,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 2.4,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.85,
+   "attackRadius": 2.7,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 54,
+   "world": true,
+   "look": {
+    "base": "mon_tomb_golem",
+    "size": 2.4
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true,
+   "hpMul": 1.3
+  },
+  {
+   "id": "qb_yanber",
+   "name": "배신자 얀베르",
+   "level": 43,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 773,
+   "atk": 168,
+   "exp": 184,
+   "goldMin": 344,
+   "goldMax": 602,
+   "moveSpeed": 1.7,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 35,
+   "world": true,
+   "look": {
+    "base": "mon_soldier",
+    "size": 1.4,
+    "tint": [
+     0.35,
+     0.45,
+     0.35
+    ],
+    "recolor": 0.6
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true,
+   "hpMul": 1.4
+  },
+  {
+   "id": "qb_frost_giant",
+   "name": "설원의 서리 거인",
+   "level": 44,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 905,
+   "atk": 280,
+   "exp": 562,
+   "goldMin": 352,
+   "goldMax": 616,
+   "moveSpeed": 1.7,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 52,
+   "world": true,
+   "look": {
+    "base": "mon_yeti",
+    "size": 2.6,
+    "tint": [
+     0.75,
+     0.85,
+     1.0
+    ],
+    "recolor": 0.5
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true,
+   "hpMul": 1.3
+  },
+  {
+   "id": "qb_siege_beast",
+   "name": "그림자 공성 거수",
+   "level": 45,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 643,
+   "atk": 130,
+   "exp": 115,
+   "goldMin": 360,
+   "goldMax": 630,
+   "moveSpeed": 1.7,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 31,
+   "world": true,
+   "look": {
+    "base": "mon_berg_bear",
+    "size": 2.8,
+    "tint": [
+     0.2,
+     0.18,
+     0.28
+    ],
+    "recolor": 0.8
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true,
+   "hpMul": 1.4
+  },
+  {
+   "id": "qb_palace_captain",
+   "name": "왕궁 그림자 근위대장",
+   "level": 46,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 1030,
+   "atk": 314,
+   "exp": 688,
+   "goldMin": 368,
+   "goldMax": 644,
+   "moveSpeed": 1.7,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 54,
+   "world": true,
+   "look": {
+    "base": "mon_armor",
+    "size": 1.55,
+    "tint": [
+     0.2,
+     0.25,
+     0.5
+    ],
+    "recolor": 0.7
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true,
+   "hpMul": 1.3
+  },
+  {
+   "id": "qb_executioner",
+   "name": "사브낙 교단 집행자",
+   "level": 46,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 590,
+   "atk": 101,
+   "exp": 63,
+   "goldMin": 368,
+   "goldMax": 644,
+   "moveSpeed": 3.3,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 1.2,
+   "attackCooldown": 1.3,
+   "windup": 0.35,
+   "radius": 0.4,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 26,
+   "world": true,
+   "look": {
+    "base": "mon_wraith",
+    "size": 1.8,
+    "tint": [
+     0.45,
+     0.15,
+     0.25
+    ],
+    "recolor": 0.7
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true,
+   "hpMul": 1.3
+  },
+  {
+   "id": "qb_sabnak_eye",
+   "name": "사브낙의 눈",
+   "level": 48,
+   "sheet": "mon_slime",
+   "ai": "ranged",
+   "hp": 590,
+   "atk": 101,
+   "exp": 63,
+   "goldMin": 384,
+   "goldMax": 672,
+   "moveSpeed": 3.3,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 1.2,
+   "attackCooldown": 1.3,
+   "windup": 0.35,
+   "radius": 0.4,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 26,
+   "world": true,
+   "look": {
+    "base": "mon_wraith",
+    "size": 3.2,
+    "tint": [
+     0.1,
+     0.08,
+     0.15
+    ],
+    "recolor": 0.85
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true,
+   "hpMul": 1.6
+  },
+  {
+   "id": "qb_kylus",
+   "name": "흑기사 카일러스",
+   "level": 49,
+   "sheet": "mon_golem",
+   "ai": "heavy",
+   "hp": 1030,
+   "atk": 314,
+   "exp": 688,
+   "goldMin": 392,
+   "goldMax": 686,
+   "moveSpeed": 1.7,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 2.2,
+   "attackCooldown": 3.0,
+   "windup": 1.0,
+   "radius": 0.75,
+   "attackRadius": 2.4,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "heavy",
+   "def": 54,
+   "world": true,
+   "look": {
+    "base": "mon_armor",
+    "size": 1.5,
+    "tint": [
+     0.14,
+     0.14,
+     0.2
+    ],
+    "recolor": 0.85
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true,
+   "hpMul": 1.5,
+   "yieldAt": 0.2,
+   "yieldLine": "카일러스: ……어깨를 고치시라고, 몇 번을 말씀드렸습니까."
+  },
+  {
+   "id": "qb_malachion",
+   "name": "말라키온",
+   "level": 50,
+   "sheet": "mon_slime",
+   "ai": "ranged",
+   "hp": 590,
+   "atk": 101,
+   "exp": 63,
+   "goldMin": 400,
+   "goldMax": 700,
+   "moveSpeed": 3.3,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 1.2,
+   "attackCooldown": 1.3,
+   "windup": 0.35,
+   "radius": 0.4,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 26,
+   "world": true,
+   "look": {
+    "base": "mon_wraith",
+    "size": 1.9,
+    "tint": [
+     0.35,
+     0.25,
+     0.45
+    ],
+    "recolor": 0.7
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true,
+   "hpMul": 2
+  },
+  {
+   "id": "qb_sabnak_grace",
+   "name": "사브낙-그레이스",
+   "level": 50,
+   "sheet": "mon_slime",
+   "ai": "melee",
+   "hp": 4715,
+   "atk": 467,
+   "exp": 7203,
+   "goldMin": 400,
+   "goldMax": 700,
+   "moveSpeed": 3.3,
+   "detectRange": 11,
+   "leashRange": 40,
+   "attackRange": 1.5,
+   "attackCooldown": 1.5,
+   "windup": 0.45,
+   "radius": 0.6,
+   "attackRadius": 0,
+   "projectileFx": "",
+   "projectileSpeed": 0,
+   "respawn": 99999,
+   "drops": [
+    {
+     "item": "c_potion_m",
+     "chance": 1.0,
+     "min": 2,
+     "max": 3
+    }
+   ],
+   "hitSfx": "hit",
+   "def": 64,
+   "world": true,
+   "look": {
+    "base": "mon_abyss_drake",
+    "size": 3.4,
+    "tint": [
+     0.12,
+     0.1,
+     0.2
+    ],
+    "recolor": 0.85
+   },
+   "questBoss": true,
+   "story": true,
+   "elite": true,
+   "hpMul": 3
   }
  ]
 }

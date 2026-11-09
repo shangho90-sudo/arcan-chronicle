@@ -107,6 +107,8 @@ function load(file) {
   cache.set(file, p); return p;
 }
 export async function loadCreature(id) { const c = CREATURES[id]; return c ? { cfg: c, data: await load(c.file) } : null; }
+/** a monster that borrows another species' model (monsters.json "look": {base, size, tint, recolor} — quest bosses) */
+export async function loadCreatureLook(look) { const b = CREATURES[look.base]; if (!b) return null; const c = { ...b, ...look }; delete c.base; return { cfg: c, data: await load(c.file) }; }
 
 let shadowMat = null; const shadowGeo = new THREE.PlaneGeometry(1, 0.85);
 export class CreatureBody {
