@@ -16,7 +16,7 @@ const d = load();
 const make = (lv, job) => { const p = newProfile(d, "테스터", "m"); const ch = new CharacterSheet(d, p); new QuestLog(d, ch); ch.p.level = lv; ch.book.grantPoints(); ch.recalc(); if (job) ch.p.job = job, ch.book.grantPoints(), ch.recalc(); return ch; };
 
 // ---- data
-Eq(d.skill2List.length, 185, "180 job skills + 5 novice skills");
+Eq(d.skill2List.length, 186, "180 job skills + 6 novice skills");
 const jobs = ["pharmacist", "western_pharmacist", "herbalist", "cook", "chef", "blacksmith", "engineer", "hairdresser", "designer", "artist", "painter", "musician"];
 for (const j of jobs) {
   const s = d.skillsOf(j); Eq(s.length, 15, j + " has 15");
@@ -24,11 +24,11 @@ for (const j of jobs) {
   Ok(s.some(x => x.type === "attack" && x.ops.some(o => o.op === "hit" && o.shape === "single" || o.op === "proj" || o.op === "custom")) || s.some(x => x.type === "summon"), j + " has a single-target damage option");
   Ok(s.some(x => ["support", "passive"].includes(x.type) && x.ops.concat([]).some(o => ["shield", "heal", "buff", "cleanse", "melody", "area"].includes(o.op)) || x.mods?.some(m => ["maxHp", "def"].includes(m.stat))), j + " has a survival tool");
 }
-const ids = new Set(d.skill2List.map(s => s.id)); Eq(ids.size, 185, "unique ids");
+const ids = new Set(d.skill2List.map(s => s.id)); Eq(ids.size, 186, "unique ids");
 for (const s of d.skill2List) {
   if (s.type === "ultimate") { Eq(s.maxLv, 3, s.id + " ult max 3"); Ok(s.unlock >= 45, s.id + " ult >= Lv45"); }
   else Eq(s.maxLv, 5, s.id + " max 5");
-  const t = d.job(s.job).tier, exp = t === 0 ? [1, 5, 10, 3, 7] : t === 1 ? [10, 12, 15, 18, 20] : [30, 33, 36, 40, 45];
+  const t = d.job(s.job).tier, exp = t === 0 ? [1, 5, 10, 3, 7, 7] : t === 1 ? [10, 12, 15, 18, 20] : [30, 33, 36, 40, 45];
   if (s.type !== "ultimate") Eq(s.unlock, exp[s.idx - 1], s.id + " unlock by position");
   if (s.type === "craft") Ok((s.recipes || []).length > 0, s.id + " has recipes");
   for (const r of s.recipes || []) if (r !== "salvage") { const rc = d.recipes.find(x => x.id === r); Ok(rc && d.item(rc.output.item) && rc.inputs.every(x => d.item(x.item)), r + " recipe items exist"); }
@@ -134,7 +134,7 @@ Eq(p4.version, 4, "migrated to v4"); Eq(ch4.p.job, "cook", "legacy job kept"); E
 
 // ---- 견습생 기본 검술 (novice tree): own point pool from Lv1, kept after job changes
 {
-  Eq(d.skillsOf("novice").length, 5, "novice has 5 skills");
+  Eq(d.skillsOf("novice").length, 6, "novice has 6 skills");
   let c = make(1); Eq(c.book.sk.npoints, 1, "Lv1 grants 1 novice point"); Eq(c.book.sk.points, 0, "no job points at Lv1");
   Ok(c.book.learn("nv_a1") === null, "novice learns 일격참 at Lv1"); Eq(c.book.sk.slots[0], "nv_a1", "auto-equipped in slot 1");
   Ok(c.book.learnBlock("nv_a2") !== null, "연 locked before Lv5");

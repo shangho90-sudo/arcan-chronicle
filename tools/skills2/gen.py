@@ -9,7 +9,7 @@ Skill fields: id (stable), job, tier, cat (0..2), catName, idx (1..5), name, des
 import json, os
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 OUT = os.path.join(ROOT, 'assets', 'data', 'skills2.json')
-UNLOCK = {0: [1, 5, 10, 3, 7], 1: [10, 12, 15, 18, 20], 2: [30, 33, 36, 40, 45]}
+UNLOCK = {0: [1, 5, 10, 3, 7, 7], 1: [10, 12, 15, 18, 20], 2: [30, 33, 36, 40, 45]}
 SK = []
 
 def S(job, tier, cat, catName, idx, sid, name, typ, desc, **kw):
@@ -40,18 +40,22 @@ def custom(fn, **k): return dict(op='custom', fn=fn, **k)
 
 
 # ======================================================================= 견습생 (novice) 기본 검술 — tier 0, every job keeps it
-# separate point pool (1 per character level, see js/skillsys.js), unlock Lv 1 / 5 / 10 / 3 / 7, no extra-hit rule (noExtra)
+# separate point pool (1 per character level, see js/skillsys.js), unlock Lv 1 / 5 / 10 / 3 / 7 / 7(배쉬), no extra-hit rule (noExtra)
+# 2026-11-09: 견습생 공격 스킬은 모두 단일 대상(target='enemy', shape 'single', 비연참은 관통 없음)
 J, C = 'novice', 0xcfe6ff
-S(J, 0, 0, '기본 검술', 1, 'nv_a1', '일격참', 'attack', '칼을 허리춤으로 끌어당겼다가 앞으로 뛰어들며 한 번에 깊게 찌른다. 칼끝에서 뻗은 섬광이 닿은 적에게 별 모양 빛살이 터진다.', range=3.2, mp=8, cd=5, anim='nv_ilgyeok', recover=0.3,
+S(J, 0, 0, '기본 검술', 1, 'nv_a1', '일격참', 'attack', '칼을 허리춤으로 끌어당겼다가 적 하나에게 뛰어들며 한 번에 깊게 찌른다. 칼끝에서 뻗은 섬광이 닿은 적에게 별 모양 빛살이 터진다.', target='enemy', range=3.2, mp=8, cd=5, anim='nv_ilgyeok', recover=0.3,
   ops=[dict(op='lunge', dist=1.4, dur=0.14, at=-0.12),
        dict(op='fx', sal='cast', len=2.85, at=-0.10),   # '살' effect (js/salfx.js): tip gather 0.05 s, beam reaches ~3.4 m from the body at the hit
-       hit('line', 3.2, w=1.5, len=3.4, noExtra=True, at=0.0, knock=1.4, st=[st('stagger', 0.6)], fx=dict(sal=True), shake=[0.24, 0.3])], fx=dict(color=C))
-S(J, 0, 0, '기본 검술', 2, 'nv_a2', '연', 'attack', '칼을 이리저리 휘둘러 연속으로 벤다. 처음엔 2연타, 스킬 레벨이 오를 때마다 1타씩 늘어 최대 6연타.', range=2.2, mp=10, cd=6, anim='nv_yeon', recover=0.2,
+       hit('single', 3.2, len=3.4, noExtra=True, at=0.0, knock=1.4, st=[st('stagger', 0.6)], fx=dict(sal=True), shake=[0.24, 0.3])], fx=dict(color=C))
+S(J, 0, 0, '기본 검술', 2, 'nv_a2', '연', 'attack', '적 하나를 칼로 이리저리 연속으로 벤다. 처음엔 2연타, 스킬 레벨이 오를 때마다 1타씩 늘어 최대 6연타.', target='enemy', range=2.2, mp=10, cd=6, anim='nv_yeon', recover=0.2,
   ops=[dict(op='lunge', dist=1.0, dur=0.2, at=-0.1), dict(op='lunge', dist=0.8, dur=0.3, at=0.2),
-       hit('cone', 0.62, r=2.2, ang=110, hits=2, hitsPerLv=1, gap=0.13, noExtra=True, alt=True, fx=dict(slash='blade', burst='hit_slash'))], fx=dict(color=0xffe6a0))
-S(J, 0, 0, '기본 검술', 3, 'nv_a3', '비연참', 'attack', '칼을 크게 휘둘러 초승달 모양의 검풍을 멀리 날린다. 지나가는 길의 적을 모두 벤다.', range=9, mp=14, cd=7, anim='nv_biyeon', recover=0.3,
-  ops=[dict(op='lunge', dist=0.9, dur=0.18, at=-0.12), proj('normal', 2.0, speed=13, range=10, pierce=True, w=1.3, fx='sword_wave', burst='hit_slash'),
+       hit('single', 0.62, r=2.2, ang=110, hits=2, hitsPerLv=1, gap=0.13, noExtra=True, alt=True, fx=dict(slash='blade', burst='hit_slash'))], fx=dict(color=0xffe6a0))
+S(J, 0, 0, '기본 검술', 3, 'nv_a3', '비연참', 'attack', '칼을 크게 휘둘러 초승달 모양의 검풍을 날린다. 처음 닿은 적 하나를 벤다.', target='enemy', range=9, mp=14, cd=7, anim='nv_biyeon', recover=0.3,
+  ops=[dict(op='lunge', dist=0.9, dur=0.18, at=-0.12), proj('normal', 2.0, speed=13, range=10, w=1.3, fx='sword_wave', burst='hit_slash'),
        dict(op='fx', slash='blade', r=1.7, ang=150, tilt=-0.35)], fx=dict(color=0xbfe8ff))
+S(J, 0, 0, '기본 검술', 6, 'nv_a4', '배쉬', 'attack', '칼자루와 어깨로 적 하나를 세게 들이받아 약 2.6 m 뒤로 밀쳐 내며 피해를 준다. 무거운 몬스터도 밀려나고 잠깐 비틀거린다(보스 제외).', target='enemy', range=2.2, mp=9, cd=6, anim='attack2', recover=0.25,
+  ops=[dict(op='lunge', dist=0.6, dur=0.12, at=-0.08),
+       hit('single', 1.9, noExtra=True, push=2.6, st=[st('stagger', 0.7)], fx=dict(slash='thrust', burst='hit_blunt'), shake=[0.12, 0.2])], fx=dict(color=0xffd9a0))
 S(J, 0, 1, '기본 검술', 4, 'nv_p1', '회복력 증가', 'passive', '움직이지 않고 3초 동안 쉬면 3초마다 최대 체력의 일정 비율을 회복한다.',
   flags=dict(restRegen=[0.02, 0.01]))
 S(J, 0, 1, '기본 검술', 5, 'nv_p2', '검수련', 'passive', '칼을 다루는 솜씨가 늘어 공격력이 조금씩 오른다.',
@@ -536,8 +540,8 @@ for d in SK:
     if d['type'] == 'craft': d['recipes'] = [r['id'] for r in RECIPES if r['skill'] == d['id']] + (['salvage'] if d['id'] == 'bs1_c4' else [])
 by_job = {}
 for d in SK: by_job.setdefault(d['job'], []).append(d)
-assert len(SK) == 185, len(SK)
-for j, lst in by_job.items(): assert len(lst) == (5 if j == 'novice' else 15), (j, len(lst))
-assert len({d['id'] for d in SK}) == 185
+assert len(SK) == 186, len(SK)
+for j, lst in by_job.items(): assert len(lst) == (6 if j == 'novice' else 15), (j, len(lst))
+assert len({d['id'] for d in SK}) == 186
 json.dump(dict(version=1, skills=SK, statuses=STATUSES, items=ITEMS, recipes=RECIPES, salvage=SALVAGE, shopAdd=SHOP_ADD), open(OUT, 'w'), ensure_ascii=False, indent=0)
 print('wrote', OUT, len(SK), 'skills', {j: len(v) for j, v in by_job.items()})

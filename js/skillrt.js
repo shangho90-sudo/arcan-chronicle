@@ -243,6 +243,7 @@ export class SkillEngine {
     const kdir = { x: t.pos.x - pc.pos.x, z: t.pos.z - pc.pos.z };
     const knock = op.knock && !(t.isBoss) && !(t.def && t.def.ai === 'heavy') ? op.knock * 0.4 : 0;
     t.takeDamage({ source: pc, amount: r.amount, crit: r.crit, kdir, knockback: knock });
+    if (op.push && !t.isBoss && !t.dead) { const m = Math.hypot(kdir.x, kdir.z) || 1; t.knock = { x: kdir.x / m * op.push * 10, z: kdir.z / m * op.push * 10 }; t.hitReact = Math.max(t.hitReact || 0, 0.4); }   // push = m 밀어냄(배쉬, 무거운 몬스터 포함·보스 제외)
     if (op.pull && !t.isBoss && !t.dead) { const p = op.pullTo || ctx.aim; const ddx = p.x - t.pos.x, ddz = p.z - t.pos.z, m = Math.hypot(ddx, ddz); if (m > 0.3) t.knock = { x: ddx / m * op.pull * 3, z: ddz / m * op.pull * 3 }; }
     if (op.launch && !t.isBoss && !(t.def && t.def.ai === 'heavy')) applyStatus(t, { id: 'stagger', dur: op.launch, val: 1, ch: 1 }, pc);
     this.combatT = 5;
