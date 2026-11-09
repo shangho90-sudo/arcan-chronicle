@@ -70,6 +70,7 @@ const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a
 const rnd = (a, b) => a + Math.random() * (b - a);
 const lite = () => { const G = window.G; return !!(G && ((G.input && G.input.mobile) || (G.settings && G.settings.graphicsFx === false))); };
 const flashK = () => { const G = window.G; return G && G.reduceFlash ? 0.6 : 1; };
+const rawK = () => { const G = window.G; return G && G.settings && G.settings.graphicsFx === false ? 0.5 : 1; };   // no post (tonemap) -> the additive white flash would clip into a flat blob
 
 async function loadWrapped(url, owner) {
   const j = await (await fetch(url)).json(); if (owner) owner.cells = j.cells || null; const raw = atob(j.b64), u8 = new Uint8Array(raw.length);
@@ -228,10 +229,10 @@ export class SalFx {
       // flash: in 0 -> 0.025, holds the peak to 0.07 (the damage frame), white collapses 0.07 -> 0.17, pink rim lingers to 0.22
       const fIn = expoOut(t / 0.025), fOut = 1 - smooth(0.07, 0.2, t), fw = 1 - smooth(0.07, 0.17, t);
       const FL = 3.2 * sz * (0.75 + 0.25 * fIn) * (1 + 0.12 * smooth(0.03, 0.2, t)) * (0.6 + 0.4 * fsc), FW = 1.9 * sz * (0.7 + 0.3 * fIn) * (0.55 + 0.45 * fw);
-      s.flash.scale.set(FL, FW, 1); U(s.flash).uA.value = fIn * fOut; U(s.flash).uI.value = 2.6 * k; U(s.flash).uR.value = 0.3 + 0.9 * fw; U(s.flash).uHue.value = 0.15 + 0.6 * smooth(0.08, 0.2, t);
+      s.flash.scale.set(FL, FW, 1); U(s.flash).uA.value = fIn * fOut; U(s.flash).uI.value = 2.6 * k * rawK(); U(s.flash).uR.value = 0.3 + 0.9 * fw; U(s.flash).uHue.value = 0.15 + 0.6 * smooth(0.08, 0.2, t);
       // burst: lines shoot out 0 -> 0.035, peak 0.035 -> 0.08, then thin out / dim to purple, gone by 0.24
       const bIn = expoOut(t / 0.035), bOut = 1 - smooth(0.08, 0.24, t);
-      s.burst.scale.setScalar(3.0 * sz * (0.45 + 0.55 * bIn) * (1 + 0.15 * smooth(0.04, 0.24, t)) + 0.001); U(s.burst).uA.value = bIn * bOut; U(s.burst).uI.value = 2.4 * k; U(s.burst).uHue.value = 0.08 + 0.7 * smooth(0.08, 0.22, t);
+      s.burst.scale.setScalar(3.0 * sz * (0.45 + 0.55 * bIn) * (1 + 0.15 * smooth(0.04, 0.24, t)) + 0.001); U(s.burst).uA.value = bIn * bOut; U(s.burst).uI.value = 2.4 * k * (0.5 + 0.5 * rawK()); U(s.burst).uHue.value = 0.08 + 0.7 * smooth(0.08, 0.22, t);
       s.flash.visible = s.burst.visible = fOut > 0.002 || bOut > 0.002;
     }
     // pink rays: shoot out 0.00 -> 0.03, brightest 0.03 -> 0.06, then get thinner + dimmer 0.06 -> 0.20 (UV-thinned around the

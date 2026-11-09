@@ -60,7 +60,7 @@ const MARKS = [-0.10, -0.05, 0, 0.03, 0.06, 0.10, 0.16, 0.22, 0.30];
       const e = p.skills2.cast('nv_a1', at(2)); if (e) return 'cast error: ' + e;
       // 허공: the only target vanishes right after the cast (the skill keeps its single-target rule -> nothing to hit)
       if (scene === 'whiff') for (const m of ds) { m.dead = true; m.remove(); }
-      if (scene === 'kill') for (const m of ds) { Object.defineProperty(m, 'maxHp', { get: () => 10 }); m.hp = 1; }
+      if (scene === 'kill') for (const m of ds) m.hp = 1;   // the hit kills it (maxHp is a fixed getter on dummies)
       window.__move = scene === 'moving' ? { x: f.z, z: -f.x, v: 2.5 } : null;
       return { ds: ds.length };
     }, [SCENE, FPS]);
