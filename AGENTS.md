@@ -76,6 +76,7 @@
 - 배치: `tools/forest/layout.py mushroom_grove`의 "mushroom boss grove" 구간(플랫폼 위 가장자리 빽빽, 가운데 비움, 1 큰 + 2~4 중간 + 5~15 작은 묶음, 경계 밖 배경 나무 벽). 원형 바위는 `rock_magic*`. 타입 `mushdecor`(장식, 충돌 없음)·`mushtree`(충돌 `propFootprint`).
 - 에셋(Blender `assets.py`): `mush_small_purple/blue`, `mush_glow_purple/blue`(약한 발광 + 바닥 빛 원판), `mush_orange`, `mush_cluster`, `mush_tree`, `rock_magic(_low)`, `tree_violet(_round)`. 발광 재질은 `MAT_TEX`의 `ec`/`ei`.
 - NPC 머리 위 퀘스트 표시는 `game.js` `QMARK`(SVG "!"/"?"), 이름표 CSS `.plate.npc`(이름 20 px, 휴대폰 14 px, 주아체), 위치 `ui.js` `updatePlates`(+1.9 m).
+- 일격참 '살' 찌르기 이펙트: `js/salfx.js`(`SkillFx.sal.cast(pos, dir, {follow, length})` / `.hit(pos, dir)`, 조절값 `SAL`: 색·intensity·length·width·hitSize·speed), 메시·아틀라스는 `python3 tools/blender/fx_sal.py` → `assets/fx/fx_sal.*`(맨 위 상수로 길이·굵기·광선 수), 원본 `tools/blender/sal/`, 안내 `tools/blender/fx_sal_README.md`. 스킬 데이터는 `fx` op `sal: 'cast'` + hit op `fx.sal`. 확인 `tools/browser-tests/sal_film.js`(`DIRS= ZONE=`).
 - 지면 파쇄: `js/shatterfx.js`(`SkillFx.shatter.spawn(pos, R, {pal})`, BURST 정의의 `start`에서 호출), 메시는 `python3 tools/blender/fx_shatter.py` → `assets/fx/`. 화면 확인 `tools/browser-tests/shattershots.js`(KIND=ground_crack|fire_crack|explosion_big).
 - 록온: `actors.js` `Player.lockOn`/`updateLock`(PC 클릭, 휴대폰 자동 — 멀어지면 `LOCK_RELEASE` 9 m에서 풀리고 가까운 몬스터로 다시/바꿔 록온), 표시 `render.js` `Fx.lockMark`, 확인 `tools/browser-tests/lockon.js`·`lockmobile.js`. 선공 없는 필드는 존 데이터 `"passiveMonsters": true`(지금은 속삭이는 숲만). 그와 별개로 Lv10 이하 몬스터는 어디서나 선공 없음(`actors.js` `PASSIVE_MAX_LEVEL`, `Monster.passive`, 보스 제외).
 - 이동 클릭 표시: `render.js` `Fx.clickMark`(청록 마법진 셰이더 `CLICK_FRAG`, 하나만 재사용).
@@ -94,7 +95,7 @@
 
 ## 칼 휘두르기 (`js/model.js`, `tools/anim/swings.py`)
 - 공격 동작은 시간 키(`keys`, 초) + 구간 이징(`e`) + 칼 팔 IK(`hand`/`blade`/`elbow`) + 발 고정(`step`, `plant`)으로 정의합니다. actions.json의 `attack`/`attack2`는 `python3 tools/anim/swings.py`로 생성하세요(직접 편집 금지).
-- 기본 검술 스킬 동작(`nv_yeon_<타수>`, `nv_biyeon`)도 `swings.py`의 `combo()`(타격 묶음 `ST` + `spin`/`ov`)로 생성. 일격참 `nv_ilgyeok`은 연타가 아닌 한 번의 찌르기(`IL_KEYS`, 2026-11-09) + 앞쪽 `fire_crack`(스킬 `fx` op의 `fwd`). 여러 번 때리는 스킬은 `<anim>_<타수>` 동작이 있으면 그 동작의 `hitTimes`(타격 시각)·`hitFx`(타별 베기 효과)·`lunges`(전진)·`recover`를 씀(`skillrt.js` `cast`/`release`/`opHit`). 몸 회전은 `spins`(`model.js` `apply`). 확인 `tools/browser-tests/skill_film.js`(`SKILL= LV= ZOOM=`).
+- 기본 검술 스킬 동작(`nv_yeon_<타수>`, `nv_biyeon`)도 `swings.py`의 `combo()`(타격 묶음 `ST` + `spin`/`ov`)로 생성. 일격참 `nv_ilgyeok`은 연타가 아닌 한 번의 찌르기(`IL_KEYS`, 2026-11-09) + '살' 섬광(`js/salfx.js`). 여러 번 때리는 스킬은 `<anim>_<타수>` 동작이 있으면 그 동작의 `hitTimes`(타격 시각)·`hitFx`(타별 베기 효과)·`lunges`(전진)·`recover`를 씀(`skillrt.js` `cast`/`release`/`opHit`). 몸 회전은 `spins`(`model.js` `apply`). 확인 `tools/browser-tests/skill_film.js`(`SKILL= LV= ZOOM=`).
 - 칼 잔상은 실제 칼날 위치에서 그립니다(`SwingTrail`, 동작의 `trail` 구간). 바꾼 뒤에는 `swing_film.js` → `tools/anim/strip.py`, `swing_report.py`(발 이동·그립·칼끝 속도)와 `attack_dirs.js`(실제 입력 8방향)로 확인하세요.
 
 ## 3D 자산

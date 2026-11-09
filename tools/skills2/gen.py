@@ -42,10 +42,10 @@ def custom(fn, **k): return dict(op='custom', fn=fn, **k)
 # ======================================================================= 견습생 (novice) 기본 검술 — tier 0, every job keeps it
 # separate point pool (1 per character level, see js/skillsys.js), unlock Lv 1 / 5 / 10 / 3 / 7, no extra-hit rule (noExtra)
 J, C = 'novice', 0xcfe6ff
-S(J, 0, 0, '기본 검술', 1, 'nv_a1', '일격참', 'attack', '칼을 허리춤으로 끌어당겼다가 앞으로 뛰어들며 한 번에 깊게 찌른다. 찌른 자리 앞의 땅이 갈라진다.', range=3.2, mp=8, cd=5, anim='nv_ilgyeok', recover=0.3,
+S(J, 0, 0, '기본 검술', 1, 'nv_a1', '일격참', 'attack', '칼을 허리춤으로 끌어당겼다가 앞으로 뛰어들며 한 번에 깊게 찌른다. 칼끝에서 뻗은 섬광이 닿은 적에게 별 모양 빛살이 터진다.', range=3.2, mp=8, cd=5, anim='nv_ilgyeok', recover=0.3,
   ops=[dict(op='lunge', dist=1.4, dur=0.14, at=-0.12),
-       hit('line', 3.2, w=1.5, len=3.4, noExtra=True, at=0.0, knock=1.4, st=[st('stagger', 0.6)], fx=dict(slash='thrust'), shake=[0.24, 0.3]),
-       dict(op='fx', burst='fire_crack', r=1.2, fwd=2.0, at=0.02)], fx=dict(color=C))
+       dict(op='fx', sal='cast', len=2.85, at=-0.10),   # '살' effect (js/salfx.js): tip gather 0.05 s, beam reaches ~3.4 m from the body at the hit
+       hit('line', 3.2, w=1.5, len=3.4, noExtra=True, at=0.0, knock=1.4, st=[st('stagger', 0.6)], fx=dict(sal=True), shake=[0.24, 0.3])], fx=dict(color=C))
 S(J, 0, 0, '기본 검술', 2, 'nv_a2', '연', 'attack', '칼을 이리저리 휘둘러 연속으로 벤다. 처음엔 2연타, 스킬 레벨이 오를 때마다 1타씩 늘어 최대 6연타.', range=2.2, mp=10, cd=6, anim='nv_yeon', recover=0.2,
   ops=[dict(op='lunge', dist=1.0, dur=0.2, at=-0.1), dict(op='lunge', dist=0.8, dur=0.3, at=0.2),
        hit('cone', 0.62, r=2.2, ang=110, hits=2, hitsPerLv=1, gap=0.13, noExtra=True, alt=True, fx=dict(slash='blade', burst='hit_slash'))], fx=dict(color=0xffe6a0))

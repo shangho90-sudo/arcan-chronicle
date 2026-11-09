@@ -4,6 +4,7 @@
 // Public API positions/directions are game (Unity) coords: x east, y up, z north. three-space = (x, y, -z).
 import { THREE, T } from './render.js';
 import { ShatterFx } from './shatterfx.js';
+import { SalFx } from './salfx.js';
 
 const TAU = Math.PI * 2, DEG = Math.PI / 180;
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -1639,6 +1640,7 @@ export class SkillFx {
     this.root.add(this.pn.mesh, this.pa.mesh);
     this.live = []; this.pools = new Map(); this.time = 0;
     this.shatter = new ShatterFx(this.root); this.shatter.load();             // broken-ground meshes load in the background
+    this.sal = new SalFx(this.root); this.sal.load();                         // 일격참 '살' thrust meshes (js/salfx.js)
     /** optional camera-shake hook: (amplitude, duration) => void. Suppressed when SkillFx.reduceFlash. */
     this.onShake = null;
   }
@@ -1679,7 +1681,7 @@ export class SkillFx {
   // ------------------------------------------------------------------------------------ frame
   update(dt) {
     dt = Math.min(Math.max(dt, 0), 0.1); this.time += dt;
-    this.shatter.update(dt);
+    this.shatter.update(dt); this.sal.update(dt);
     const L = this.live;
     for (let i = 0; i < L.length; i++) {
       const e = L[i]; e.t += dt; e.lt = e.t * e.tk;
@@ -1690,7 +1692,7 @@ export class SkillFx {
     }
     this.pa.update(dt); this.pn.update(dt);
   }
-  clear() { this.shatter.clear(); for (const e of this.live) if (!e.dead) this._release(e); this.live.length = 0; this.pa.clear(); this.pn.clear(); }
+  clear() { this.shatter.clear(); this.sal.clear(); for (const e of this.live) if (!e.dead) this._release(e); this.live.length = 0; this.pa.clear(); this.pn.clear(); }
   /** remove from scene and free pooled rigs (shared caches stay) */
   dispose() { this.clear(); for (const p of this.pools.values()) for (const r of p) disposeRig(r); this.pools.clear(); this.root.removeFromParent(); this.pa.geo.dispose(); this.pn.geo.dispose(); this.pa.mat.dispose(); this.pn.mat.dispose(); }
 

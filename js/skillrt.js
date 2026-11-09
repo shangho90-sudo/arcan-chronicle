@@ -18,6 +18,7 @@ export const FX = {
   get on() { return !!(G && G.skillFx); },
   burst(kind, pos, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.burst(kind, pos, o); G.fx.play('hit', { x: pos.x, y: (pos.y || 0) + 0.5, z: pos.z }, o.radius || 1, false, hexToArr(o.color)); } catch (e) { console.warn('fx', kind, e); } },
   slash(kind, pos, dir, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.slash(kind, pos, dir, o); G.fx.play('slash', { x: pos.x, y: (pos.y || 0) + 0.7, z: pos.z }, 1); } catch (e) { console.warn('fx', kind, e); } },
+  sal(kind, pos, dir, o = {}) { try { if (G.skillFx && G.skillFx.sal) return G.skillFx.sal[kind](pos, dir, o); } catch (e) { console.warn('fx sal', e); } },   // 일격참 '살' (js/salfx.js)
   beam(kind, a, b, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.beam(kind, a, b, o); } catch (e) { console.warn('fx', kind, e); } },
   projectile(kind, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.projectile(kind, o) || NOOP; } catch (e) { console.warn('fx', kind, e); } return NOOP; },
   area(kind, pos, r, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.area(kind, pos, r, o) || NOOP; } catch (e) { console.warn('fx', kind, e); } return NOOP; },
@@ -325,7 +326,8 @@ export class SkillEngine {
         const c = op.atAim ? ctx.aim : pc.pos;
         FX.telegraph(c, op.r || op.w || 2, op.dur, { color: 0xffb040, shape: op.shape, dir: ctx.facing, length: op.len, width: op.w }); return;
       }
-      case 'fx': if (op.slash) FX.slash(op.slash, pc.pos, ctx.facing, { radius: op.r || 1.6, angle: op.ang || 120, color: col, tilt: op.tilt || 0, mirror: !!op.mirror }); if (op.burst) FX.burst(op.burst, op.fwd ? { x: pc.pos.x + ctx.facing.x * op.fwd, y: pc.pos.y, z: pc.pos.z + ctx.facing.z * op.fwd } : pc.pos, { radius: op.r || 2, color: col }); return;   // fwd: m in front (일격참 땅 갈라짐)
+      case 'fx': if (op.sal === 'cast') FX.sal('cast', pc.pos, ctx.facing, { follow: pc, length: op.len || 2.6, width: op.w || 1 });
+        if (op.slash) FX.slash(op.slash, pc.pos, ctx.facing, { radius: op.r || 1.6, angle: op.ang || 120, color: col, tilt: op.tilt || 0, mirror: !!op.mirror }); if (op.burst) FX.burst(op.burst, op.fwd ? { x: pc.pos.x + ctx.facing.x * op.fwd, y: pc.pos.y, z: pc.pos.z + ctx.facing.z * op.fwd } : pc.pos, { radius: op.r || 2, color: col }); return;   // fwd: m in front (일격참 땅 갈라짐)
       case 'repair': {
         for (const s of this.summons) if (s.machine && !s.dead) { const miss = 1 - s.hp / s.maxHp; s.hp = Math.min(s.maxHp, s.hp + s.maxHp * op.pct * ctx.mult * (1 + op.missingBonus * miss)); FX.burst('sparks', s.pos, { radius: 0.8 }); }
         return;
@@ -370,6 +372,11 @@ export class SkillEngine {
             const mir = op.alt ? h % 2 === 1 : op.sweep > 0, tilt = op.alt ? ((h * 37) % 5 - 2) * 0.12 : 0, ca = Math.cos(tilt), sa = Math.sin(tilt);
             const fd = { x: f.x * ca - f.z * sa, z: f.x * sa + f.z * ca };
             FX.slash(op.fx.slash, op.shape === 'single' && ts[0] ? ts[0].pos : (op.atAim ? ctx.aim : pc.pos), fd, { color: op.alt && h % 3 === 2 ? 0xffd27a : col, radius: op.r || 2, angle: op.ang || 100, length: op.len, width: op.w, mirror: mir, tilt: op.alt ? [0.22, -0.3, 0.45][h % 3] : (op.sweep || 0) * 0.2 });
+          }
+          if (op.fx.sal) {   // '살' star flash on every target hit (at its body, on the attacker's side), or at the end of the line
+            const hs = ts.length ? ts.map(t => ({ x: t.pos.x - f.x * (t.radius || 0.5) * 0.6, y: (t.pos.y || 0) + Math.min(1.35, 0.6 + (t.radius || 0.5) * 0.55), z: t.pos.z - f.z * (t.radius || 0.5) * 0.6 }))
+              : [{ x: pc.pos.x + f.x * (op.len || 3), y: (pc.pos.y || 0) + 1.0, z: pc.pos.z + f.z * (op.len || 3) }];
+            hs.forEach((p, i) => FX.sal('hit', p, f, { delay: i * 0.012, size: ts.length ? 1 : 0.75 }));
           }
           if (op.fx.beam) FX.beam(op.fx.beam, pc.pos, { x: pc.pos.x + f.x * (op.len || 6), y: pc.pos.y, z: pc.pos.z + f.z * (op.len || 6) }, { color: col, width: op.w || 0.6 });
           if (op.fx.burst) { if (op.shape === 'circle') FX.burst(op.fx.burst, op.fwd ? fxp : pc.pos, { color: col, radius: op.fx.burstR || op.r }); else for (const t of ts.length ? ts : [{ pos: fxp }]) FX.burst(op.fx.burst, t.pos, { color: col, radius: 0.8 }); }
