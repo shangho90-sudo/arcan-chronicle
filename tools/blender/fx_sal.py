@@ -38,12 +38,12 @@ import blib
 # ------------------------------------------------------------------------------------------------ parameters
 ATLAS = 512                 # texture size (2 x 2 cells)
 SEG = 6                     # segments along every needle / sheet
-CORE_W = 0.30               # centre beam width (unit length 1)
-SHEET_W = 0.90              # membrane max width
-SHEET_PLANES = 3
-SIDE = [(-0.22, 0.06, 0.22, 0.62, 0.13), (0.2, 0.12, 0.30, 0.78, 0.11), (0.02, -0.17, 0.38, 0.55, 0.10)]   # x, y, z0, length, width
-HIT_RAYS = 8                # pink main rays
-HIT_THIN = 6                # thin purple rays
+CORE_W = 0.15               # centre beam width (unit length 1) — thin white needle (2026-11-09 #2: 0.30 -> 0.13)
+SHEET_W = 0.38              # membrane max width (0.90 -> 0.38: wraps the core, no longer a wide film)
+SHEET_PLANES = 2
+SIDE = [(-0.16, 0.05, 0.24, 0.62, 0.05), (0.14, 0.10, 0.32, 0.74, 0.045), (0.02, -0.13, 0.40, 0.50, 0.04)]   # x, y, z0, length, width
+HIT_RAYS = 9                # pink main rays (2 long ones along the thrust, the rest irregular)
+HIT_THIN = 8                # thin purple rays in the gaps
 SEED = 7
 
 ROOT = os.path.join(HERE, '..', '..'); OUT = os.path.join(ROOT, 'assets', 'fx'); SRC = os.path.join(HERE, 'sal'); TMP = os.path.join(HERE, 'out')
@@ -73,7 +73,7 @@ def atlas():
     lines = np.repeat(rng.random((n, 1)), n, 1)                       # per-row random -> lines along u
     tail = np.clip(U / 0.32, 0, 1) ** 1.4; sm = np.clip((U - 0.12) / 0.26, 0, 1); sm = sm * sm * (3 - 2 * sm)
     tail_k = (0.3 + 0.7 * lines) * (1 - sm) + sm
-    tip = np.clip((1 - U) / 0.06, 0, 1)
+    tip = np.clip((1 - U) / 0.10, 0, 1) ** 1.5
     put(0, np.exp(-(d / 0.22) ** 2) * tail * tip * 1.0,
            np.exp(-(d / 0.55) ** 2) * (1 - d) ** 0.5 * tail * tail_k * (0.75 + 0.25 * tip),
            np.exp(-(d / 0.9) ** 2) * (1 - d) * np.clip(U / 0.5, 0, 1) * tail_k * 0.55)
@@ -106,7 +106,7 @@ def needle(bm, uvl, base, axis, up, length, width, cell, planes=2, z0=0.0, profi
         for i in range(SEG + 1):
             t = i / SEG
             if profile == 'kite': w = width * (0.25 + 0.75 * min(1, t / 0.6)) * (1 if t < 0.6 else max(0.0, (1 - t) / 0.4))
-            else: w = width * min(1, t / 0.18) ** 0.6 * (1 - t) ** 0.85 + width * 0.06
+            else: w = width * (min(1, t / 0.14) ** 0.6 * (1 - t) ** 1.1 + 0.08 * (1 - t))     # ends in a real point (w = 0 at t = 1)
             c = np.array(base, float) + ax * (z0 + t * length)
             rows.append([bm.verts.new(V(*(c - side * w / 2))), bm.verts.new(V(*(c + side * w / 2))), t])
         for i in range(SEG):
@@ -131,18 +131,20 @@ def build():
         for x, y, z0, L, w in SIDE: needle(bm, uv, (x, y, 0), (x * 0.08, y * 0.08, 1), (0, 1, 0), L, w, 0, 2, z0=z0)
     obs.append(make('sal_thrust_side', side, cols['SAL_cast']))
     # hit star: ray 0 = forward (+Z, longest), the rest spread to the sides / up / down with a forward lean
-    def rays(n, lmin, lmax, wmin, wmax, phase, longest):
+    def rays(n, lmin, lmax, wmin, wmax, phase, longest, planes=2):
         def f(bm, uv):
             for i in range(n):
-                if longest and i == 0: d, L, w = (0, 0.05, 1), 1.0, wmax * 1.1
+                if longest and i == 0: d, L, w = (0, 0.04, 1), 1.0, wmax * 1.15                  # main ray along the thrust
+                elif longest and i == 1: d, L, w = (0.10, 0.16, 1), 0.78, wmax * 0.8              # second long ray, slightly up / aside
+                elif longest and i == 2: d, L, w = (-0.12, -0.05, -1), 0.55, wmax * 0.75          # back ray (towards the attacker)
                 else:
-                    a = 2 * math.pi * (i + phase) / n + rng.uniform(-0.25, 0.25)
-                    d = (math.cos(a), math.sin(a) * 0.85, rng.uniform(-0.25, 0.55)); L, w = rng.uniform(lmin, lmax), rng.uniform(wmin, wmax)
+                    a = 2 * math.pi * (i + phase) / n + rng.uniform(-0.3, 0.3)
+                    d = (math.cos(a), math.sin(a) * 0.9, rng.uniform(-0.2, 0.5)); L, w = rng.uniform(lmin, lmax), rng.uniform(wmin, wmax)
                 up = (0, 0, 1) if abs(d[1]) > 0.7 else (0, 1, 0)
-                needle(bm, uv, (0, 0, 0), d, up, L, w, 0, 2, z0=0.03)
+                needle(bm, uv, (0, 0, 0), d, up, L, w, 0, planes, z0=0.02)
         return f
-    obs.append(make('sal_hit_rays', rays(HIT_RAYS, 0.4, 0.8, 0.26, 0.38, 0.0, True), cols['SAL_hit']))
-    obs.append(make('sal_hit_thin', rays(HIT_THIN, 0.45, 0.92, 0.06, 0.09, 0.5, False), cols['SAL_hit']))
+    obs.append(make('sal_hit_rays', rays(HIT_RAYS, 0.3, 0.68, 0.08, 0.15, 0.0, True, 3), cols['SAL_hit']))
+    obs.append(make('sal_hit_thin', rays(HIT_THIN, 0.35, 0.85, 0.025, 0.045, 0.5, False), cols['SAL_hit']))
     obs.append(make('sal_shard', lambda bm, uv: needle(bm, uv, (0, 0, -0.5), (0, 0, 1), (0, 1, 0), 1.0, 0.36, 3, 2, profile='kite'), cols['SAL_shared']))
     def quad(bm, uv):
         vs = [bm.verts.new(V(x, y, 0)) for x, y in ((-0.5, -0.5), (0.5, -0.5), (0.5, 0.5), (-0.5, 0.5))]
@@ -187,7 +189,14 @@ def main():
     glb = os.path.join(TMP, 'fx_sal.glb')
     bpy.ops.export_scene.gltf(filepath=glb, use_selection=True, export_format='GLB', export_yup=True, export_apply=True,
                               export_materials='NONE', export_normals=False, export_animations=False)
-    raw = open(glb, 'rb').read(); json.dump({'b64': base64.b64encode(raw).decode()}, open(os.path.join(OUT, 'fx_sal.glb.json'), 'w'))
+    raw = open(glb, 'rb').read()
+    # atlas cells as the GAME sees them (glTF export flips v: v_gltf = 1 - v_blender): [u0, u1, v0, v1] — js/salfx.js shrinks
+    # the rays across v around the CENTRE OF THIS CELL (the old hard-coded 0.25 missed the real 0.75 and discarded the rays)
+    cells = {}
+    for name, c in (('ray', 0), ('sheet', 1), ('glow', 2), ('shard', 3)):
+        u0, v0 = cell_uv(c, 0, 0); u1, v1 = cell_uv(c, 1, 1)
+        cells[name] = [round(u0, 6), round(u1, 6), round(1 - v1, 6), round(1 - v0, 6)]
+    json.dump({'b64': base64.b64encode(raw).decode(), 'cells': cells}, open(os.path.join(OUT, 'fx_sal.glb.json'), 'w'))
     try:
         bpy.ops.export_scene.fbx(filepath=os.path.join(SRC, 'fx_sal.fbx'), use_selection=True, axis_forward='-Z', axis_up='Y',
                                  bake_space_transform=True, mesh_smooth_type='FACE', add_leaf_bones=False)

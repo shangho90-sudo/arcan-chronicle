@@ -327,7 +327,7 @@ export class SkillEngine {
         const c = op.atAim ? ctx.aim : pc.pos;
         FX.telegraph(c, op.r || op.w || 2, op.dur, { color: 0xffb040, shape: op.shape, dir: ctx.facing, length: op.len, width: op.w }); return;
       }
-      case 'fx': if (op.sal === 'cast') FX.sal('cast', pc.pos, ctx.facing, { follow: pc, length: op.len || 2.6, width: op.w || 1 });
+      case 'fx': if (op.sal === 'cast') FX.sal('cast', pc.pos, ctx.facing, { follow: pc, length: op.len || 3.4, width: op.w || 1, target: ctx.tgt || null });   // beam: sword tip -> target hit point (max op.len m)
         if (op.slash) FX.slash(op.slash, pc.pos, ctx.facing, { radius: op.r || 1.6, angle: op.ang || 120, color: col, tilt: op.tilt || 0, mirror: !!op.mirror }); if (op.burst) FX.burst(op.burst, op.fwd ? { x: pc.pos.x + ctx.facing.x * op.fwd, y: pc.pos.y, z: pc.pos.z + ctx.facing.z * op.fwd } : pc.pos, { radius: op.r || 2, color: col }); return;   // fwd: m in front (일격참 땅 갈라짐)
       case 'repair': {
         for (const s of this.summons) if (s.machine && !s.dead) { const miss = 1 - s.hp / s.maxHp; s.hp = Math.min(s.maxHp, s.hp + s.maxHp * op.pct * ctx.mult * (1 + op.missingBonus * miss)); FX.burst('sparks', s.pos, { radius: 0.8 }); }
@@ -354,7 +354,7 @@ export class SkillEngine {
       const run = () => {
         if (pc.dead) return;
         let ts;
-        if (op.shape === 'single') { const t = ctx.tgt && !ctx.tgt.dead ? ctx.tgt : this.targetFor(d); ts = t && pc.dist(t) <= this.range(d) + t.radius + 1 ? [t] : []; }
+        if (op.shape === 'single') { const t = ctx.tgt && !ctx.tgt.dead && !ctx.tgt.removed ? ctx.tgt : this.targetFor(d); ts = t && pc.dist(t) <= this.range(d) + t.radius + 1 ? [t] : []; }
         else ts = this.targets(this.shapeOf(op, ctx));
         // fx
         const fxp = op.atAim ? ctx.aim : op.atTarget && ctx.tgt ? ctx.tgt.pos : { x: pc.pos.x + f.x * (op.fwd || 1.0), y: pc.pos.y, z: pc.pos.z + f.z * (op.fwd || 1.0) };
@@ -374,10 +374,11 @@ export class SkillEngine {
             const fd = { x: f.x * ca - f.z * sa, z: f.x * sa + f.z * ca };
             FX.slash(op.fx.slash, op.shape === 'single' && ts[0] ? ts[0].pos : (op.atAim ? ctx.aim : pc.pos), fd, { color: op.alt && h % 3 === 2 ? 0xffd27a : col, radius: op.r || 2, angle: op.ang || 100, length: op.len, width: op.w, mirror: mir, tilt: op.alt ? [0.22, -0.3, 0.45][h % 3] : (op.sweep || 0) * 0.2 });
           }
-          if (op.fx.sal) {   // '살' star flash on every target hit (at its body, on the attacker's side), or at the end of the line
-            const hs = ts.length ? ts.map(t => ({ x: t.pos.x - f.x * (t.radius || 0.5) * 0.6, y: (t.pos.y || 0) + Math.min(1.35, 0.6 + (t.radius || 0.5) * 0.55), z: t.pos.z - f.z * (t.radius || 0.5) * 0.6 }))
-              : [{ x: pc.pos.x + f.x * (op.len || 3), y: (pc.pos.y || 0) + 1.0, z: pc.pos.z + f.z * (op.len || 3) }];
-            hs.forEach((p, i) => FX.sal('hit', p, f, { delay: i * 0.012, size: ts.length ? 1 : 0.75 }));
+          if (op.fx.sal) {   // '살' star flash: the full flash on the main target (closest), smaller ones on any extra target, a faint glint on a whiff
+            const near = [...ts].sort((a, b) => pc.dist(a) - pc.dist(b));
+            const at = t => ({ x: t.pos.x - f.x * (t.radius || 0.5), y: (t.pos.y || 0) + Math.min(1.35, 0.6 + (t.radius || 0.5) * 0.55), z: t.pos.z - f.z * (t.radius || 0.5) });   // front surface of the body (not inside it)
+            if (near.length) near.forEach((t, i) => FX.sal('hit', at(t), f, i === 0 ? { primary: true } : { secondary: true, delay: i * 0.015 }));
+            else FX.sal('hit', { x: pc.pos.x + f.x * (op.len || 3), y: (pc.pos.y || 0) + 1.0, z: pc.pos.z + f.z * (op.len || 3) }, f, { whiff: true });
           }
           if (op.fx.beam) FX.beam(op.fx.beam, pc.pos, { x: pc.pos.x + f.x * (op.len || 6), y: pc.pos.y, z: pc.pos.z + f.z * (op.len || 6) }, { color: col, width: op.w || 0.6 });
           if (op.fx.burst) { if (op.shape === 'circle') FX.burst(op.fx.burst, op.fwd ? fxp : pc.pos, { color: col, radius: op.fx.burstR || op.r }); else for (const t of ts.length ? ts : [{ pos: fxp }]) FX.burst(op.fx.burst, t.pos, { color: col, radius: 0.8 }); }

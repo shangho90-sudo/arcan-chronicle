@@ -161,8 +161,10 @@ IL_KEYS = [
     key(IL_T + 0.56, 's', twist=6, lean=6, sink=0.06, hand=[10, -40, 0.78], blade=[30, -12], elbow=[-0.5, -1, -0.1]),
     key(IL_T + 0.72, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
 ]
-IL = action('nv_ilgyeok', IL_KEYS, IL_T, IL_T + 0.50, [[IL_T - 0.06, IL_T + 0.06]], fadeIn=0.07, fadeOut=0.16)
-IL.update(hitTimes=[IL_T], trailLife=0.22, trailBase=0.12, trailColor=[1.7, 1.45, 0.95])
+# trail: only the last 0.04 s of the thrust, short-lived, white / light pink, from the outer half of the blade -> it
+# leads into the '살' beam instead of competing with it (other sword skills keep their gold trails)
+IL = action('nv_ilgyeok', IL_KEYS, IL_T, IL_T + 0.50, [[IL_T - 0.045, IL_T + 0.02]], fadeIn=0.07, fadeOut=0.16)
+IL.update(hitTimes=[IL_T], trailLife=0.11, trailBase=0.45, trailColor=[1.55, 1.3, 1.5])
 # 비연참 (nv_a3): one huge horizontal sweep that throws the sword wave
 BI = combo('nv_biyeon', ['hz'], t0=0.22, lunge=False); del BI['hitFx']
 # 구르기 (회피, Shift): crouch -> tucked ball rolling forward 360 deg about a point 0.5 m up (action.flips, js/model.js)
