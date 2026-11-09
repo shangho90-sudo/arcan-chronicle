@@ -8,10 +8,16 @@
 //   cast  (follows the caster while the beam extends, then stays in the world)
 //     tip glow (camera quad at the real sword tip) + 6 converging sparks       0.00 - 0.08
 //     core needle (white) + 3 crossed membranes (pink->purple) + 3 side rays    extend 0.05 - 0.12, thin + fade to 0.34
-//   hit   (spawned at the target's hit point, never follows anyone)
-//     white core quad, 8 pink rays (longest along the thrust), 6 thin purple rays, purple afterglow quad, 14 shards
-//     peak 0.00 - 0.06 after the hit, rays thin 0.06 - 0.20, purple afterglow + shards gone by ~0.35
-// Low spec (phone or "그래픽 효과" off): no side rays / thin rays, fewer shards and sparks. "섬광 효과 줄이기": dimmer peaks.
+//   hit   (spawned at the impact point = the beam's end, never follows anyone)
+//     (2026-11-10) WIDE white flash (camera quad, long along the screen-space thrust, jagged lobes, pink rim) +
+//     dense pink radial burst (camera quad, ~56 lines of varied length / width / angle) — both pure additive —
+//     + 3D pink rays (depth), thin purple rays, white core, purple afterglow quad, 14 shards
+//     0.00 - 0.03 flash + burst in, 0.03 - 0.07 peak (= the damage frame), 0.07 - 0.18 white collapses, pink -> purple to ~0.35
+//   impact point: one point shared by the beam end and the flash centre — the front surface of the target at chest height
+//   (salImpact). The cast slot keeps the last valid point if the target dies / is removed (the beam never jumps to full
+//   reach); hit(..., {cast}) locks the beam end onto the exact impact point of the damage event.
+// Low spec (phone or "그래픽 효과" off): keeps the wide flash + burst + core rays; drops side rays / thin rays, fewer shards
+// and sparks. "섬광 효과 줄이기": dimmer peaks.
 // Tuning: SAL (colours, intensity, length / width multipliers, speed) - window.SAL_FX at runtime for quick tests.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -23,6 +29,13 @@ const CAST_LIFE = 0.42, HIT_LIFE = 0.37, DEPTH_BIAS = 1.3;   // m towards the ca
 // used a hard-coded centre 0.25 while the ray cell really spans v 0.506..0.994 -> as soon as uThin < 1 every pixel fell
 // outside the "cell" and the whole ray was discarded at once instead of thinning.)
 const CELLS_DEFAULT = { ray: [0.005859, 0.494141, 0.505859, 0.994141] };
+const FLASH_BIAS = 2.0;   // the wide flash / burst may overlap more of the target's body than the beam
+/** impact point (GAME coords) for a thrust along f = {x, z} (unit) into actor t: front surface of the body at chest height.
+ *  skillrt.js uses the same function for the hit flash, the cast uses it for the beam end. */
+export function salImpact(t, f) {
+  const r = t.radius || 0.5;
+  return { x: t.pos.x - f.x * r, y: (t.pos.y || 0) + Math.min(1.35, 0.6 + r * 0.55), z: t.pos.z - f.z * r };
+}
 
 const VS = `
 attribute float aFade; attribute float aHue; uniform float uBias;
@@ -78,15 +91,15 @@ export class SalFx {
     })().catch(e => { console.warn('salfx load', e); });
     return this.loading;
   }
-  _mat(hue = 0) {
+  _mat(hue = 0, add = false) {
     return new THREE.ShaderMaterial({
       uniforms: { uMap: { value: this.tex }, uW: { value: new THREE.Color(SAL.white) }, uP: { value: new THREE.Color(SAL.pink) }, uM: { value: new THREE.Color(SAL.magenta) },
         uU: { value: new THREE.Color(SAL.purple) }, uI: { value: 1 }, uA: { value: 0 }, uHue: { value: hue }, uThin: { value: 1 }, uR: { value: 1 }, uCell: { value: this.rayCell }, uBias: { value: DEPTH_BIAS } },
       vertexShader: VS, fragmentShader: FS, transparent: true, depthWrite: false, depthTest: true, side: THREE.DoubleSide,
-      blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor, blendEquation: THREE.AddEquation,
+      blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: add ? THREE.OneFactor : THREE.OneMinusSrcAlphaFactor, blendEquation: THREE.AddEquation,
     });
   }
-  _mesh(name, hue, order) { const m = new THREE.Mesh(this.geo[name], this._mat(hue)); m.frustumCulled = false; m.renderOrder = order; return m; }
+  _mesh(name, hue, order, add = false) { const m = new THREE.Mesh(this.geo[name], this._mat(hue, add)); m.frustumCulled = false; m.renderOrder = order; return m; }
   _inst(n, order) {
     const geo = this.geo.sal_shard.clone(); geo.setAttribute('aFade', new THREE.InstancedBufferAttribute(new Float32Array(n), 1)); geo.setAttribute('aHue', new THREE.InstancedBufferAttribute(new Float32Array(n), 1));
     const m = new THREE.InstancedMesh(geo, this._mat(0), n); m.frustumCulled = false; m.renderOrder = order; m.count = 0; m.material.uniforms.uA.value = 1; return m;
@@ -104,8 +117,10 @@ export class SalFx {
     let s = this.free.hit.pop(); if (s) return s;
     s = { kind: 'hit', g: new THREE.Group(), star: new THREE.Group() };
     s.rays = this._mesh('sal_hit_rays', 0, 9); s.rays.material.uniforms.uR.value = 0.3; s.thin = this._mesh('sal_hit_thin', 0.85, 8); s.thin.material.uniforms.uR.value = 0.2; s.star.add(s.thin, s.rays);
-    s.core = this._mesh('sal_quad', 0, 11); s.after = this._mesh('sal_quad', 1, 7); s.shards = this._inst(14, 10);
-    s.g.add(s.star, s.after, s.core); s.sh = [];
+    s.core = this._mesh('sal_quad', 0, 13, true); s.after = this._mesh('sal_quad', 1, 7); s.shards = this._inst(14, 10);
+    s.flash = this._mesh(this.geo.sal_flash ? 'sal_flash' : 'sal_quad', 0, 12, true); s.burst = this._mesh(this.geo.sal_burst ? 'sal_burst' : 'sal_quad', 0.05, 11, true);
+    s.flash.material.uniforms.uBias.value = FLASH_BIAS; s.burst.material.uniforms.uBias.value = FLASH_BIAS;
+    s.g.add(s.star, s.after, s.burst, s.flash, s.core); s.sh = [];
     return s;
   }
   /** cast: the sword-tip gather + the forward beam. pos/dir in GAME coords ({x, y, z}, dir {x, z}); o.follow = actor whose
@@ -116,6 +131,7 @@ export class SalFx {
     const s = this._castSlot(), lo = lite(), m = Math.hypot(dir.x, dir.z) || 1;
     s.t = 0; s.dx = dir.x / m; s.dz = -dir.z / m; s.follow = o.follow || null; s.target = o.target || null; s.reach = (o.length ?? 3.4) * SAL.length; s.W = (o.width ?? 1) * SAL.width;
     s.o3 = new THREE.Vector3(pos.x, (pos.y || 0) + 1.0, -pos.z); s.tipP = s.o3.clone(); s.end = s.o3.clone(); s.L = 0.001; s.lite = lo; s.k = flashK();
+    s.lock = null; s.lastImp = null;
     s.side.visible = !lo; s.sp.length = 0;
     const n = lo ? 4 : 6;
     for (let i = 0; i < n; i++) { const a = rnd(0, Math.PI * 2), e = rnd(-0.6, 0.9), r = rnd(0.3, 0.5);
@@ -124,15 +140,18 @@ export class SalFx {
   }
   /** hit: star flash at a target's hit point (GAME coords, y = height of the flash), dir = thrust direction {x, z}.
    *  o.primary (default) = the full flash; o.secondary = extra targets: smaller, fewer rays, no thin rays / few shards;
-   *  o.whiff = nothing was hit: only a faint fading glint at the end of the beam. */
+   *  o.whiff = nothing was hit: only a faint fading glint at the end of the beam (no flash / burst).
+   *  o.cast = the slot returned by cast(): its beam end is locked onto this exact point (primary hit only). */
   hit(pos, dir, o = {}) {
     if (!this.ready) { this.load(); return; }
+    if (o.cast && o.cast.kind === 'cast' && this.live.includes(o.cast) && !o.secondary && !o.whiff) { o.cast.lock = new THREE.Vector3(pos.x, pos.y || 0, -pos.z); this._place(o.cast); }
     const s = this._hitSlot(), lo = lite(), m = Math.hypot(dir.x, dir.z) || 1, dx = dir.x / m, dz = -dir.z / m;
     s.mode = o.whiff ? 'whiff' : o.secondary ? 'sec' : 'main';
     s.t = -(o.delay || 0); s.k = flashK(); s.size = (o.size ?? (s.mode === 'sec' ? 0.62 : s.mode === 'whiff' ? 0.5 : 1)) * SAL.hitSize;
     s.g.position.set(pos.x, pos.y || 0, -pos.z);
     s.star.rotation.set(0, Math.atan2(dx, dz), 0); s.star.rotateZ(rnd(-0.35, 0.35));            // longest ray along the thrust, small random roll
     s.rays.visible = s.mode !== 'whiff'; s.thin.visible = !lo && s.mode === 'main'; s.sh.length = 0;
+    s.flash.visible = s.burst.visible = s.mode !== 'whiff'; s.roll = rnd(-0.12, 0.12); s.dir3 = new THREE.Vector3(dx, 0, dz);
     const n = s.mode === 'whiff' ? 0 : s.mode === 'sec' ? (lo ? 2 : 5) : (lo ? 6 : 14);
     for (let i = 0; i < n; i++) {
       const fw = Math.random() < 0.6, a = fw ? rnd(-0.6, 0.6) : rnd(-Math.PI, Math.PI), up = rnd(-0.35, 0.8), sp = rnd(3, 7.5) * (fw ? 1.2 : 0.8);
@@ -152,18 +171,20 @@ export class SalFx {
       let tip = null; try { const b = a.body && a.body.bladePoints && a.body.bladePoints(); if (b) tip = b[1].clone(); } catch (e) { tip = null; }
       const px = a.pos.x, pz = -a.pos.z, py = a.pos.y || 0;
       if (tip) s.tipP.copy(tip); else s.tipP.set(px + s.dx * 0.8, py + 1.05, pz + s.dz * 0.8);
-      const t = s.target && !s.target.dead ? s.target : null;
-      let reach = s.reach, hy = py + 1.0;
-      if (t) { const r = t.radius || 0.5, d = Math.hypot(t.pos.x - a.pos.x, t.pos.z - a.pos.z) - r; reach = Math.min(s.reach + 0.4, Math.max(1.9, d + 0.9)); hy = (t.pos.y || 0) + Math.min(1.35, 0.6 + r * 0.55); }   // runs into the hit point and a little through the target so a close target never hides it
-      s.end.set(px + s.dx * reach, hy, pz + s.dz * reach);
+      const t = s.target && !s.target.dead && !s.target.removed ? s.target : null;
+      if (s.lock) s.end.copy(s.lock);                                                   // exact impact of the damage event
+      else if (t && Math.hypot(t.pos.x - a.pos.x, t.pos.z - a.pos.z) - (t.radius || 0.5) <= s.reach + 0.5) {
+        const ip = salImpact(t, { x: s.dx, z: -s.dz }); s.end.set(ip.x, ip.y, -ip.z); s.lastImp = s.end.clone();   // same point as the hit flash
+      } else if (s.lastImp) s.end.copy(s.lastImp);                                      // target died / was removed: keep the last valid point
+      else s.end.set(px + s.dx * s.reach, py + 1.0, pz + s.dz * s.reach);               // no target: full reach on the attack axis
       s.o3.copy(s.tipP);
-    }
+    } else if (s.lock) s.end.copy(s.lock);
     const d = new THREE.Vector3().subVectors(s.end, s.o3); s.L = Math.max(0.05, d.length());
     s.beam.position.copy(s.o3); s.beam.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), d.normalize());
   }
   _castTick(s, dt) {
     const t = s.t, k = s.k * SAL.intensity, U = (m) => m.material.uniforms;
-    if (t < 0.13 && s.follow) this._place(s);                     // ride the lunge while extending, then stay in the world
+    if ((t < 0.13 || s.lock) && s.follow && t < 0.2) this._place(s);   // ride the lunge while extending (and onto the locked impact), then stay in the world
     // A. tip gather 0 -> 0.05 (sparks converge onto the tip), then the glow slides into the beam and is gone by 0.10
     const cam = window.G && window.G.render && window.G.render.cam;
     s.tip.position.copy(s.tipP); if (cam) s.tip.quaternion.copy(cam.quaternion);
@@ -198,6 +219,21 @@ export class SalFx {
     // C. small white core: in by 0.03, holds through the ray peak, collapses 0.06 -> 0.16
     const cIn = expoOut(t / 0.03), cOut = 1 - smooth(0.06, 0.16, t);
     s.core.scale.setScalar((W ? 0.35 : 0.62) * sz * cIn * (0.4 + 0.6 * cOut) + 0.001); U(s.core).uA.value = cOut * (W ? 0.45 : 1); U(s.core).uI.value = (W ? 1.2 : 2.4) * k;
+    // E. (2026-11-10) wide white flash + dense pink burst, camera quads turned so +u runs along the thrust ON SCREEN.
+    if (!W && cam) {
+      const qi = cam.quaternion.clone().invert(), v = s.dir3.clone().applyQuaternion(qi), ang = Math.atan2(v.y, v.x) + s.roll;
+      const qz = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), ang);
+      s.flash.quaternion.copy(cam.quaternion).multiply(qz); s.burst.quaternion.copy(s.flash.quaternion);
+      const fsc = Math.min(1.2, Math.max(0.55, Math.hypot(v.x, v.y)));             // thrust nearly along the view -> shorter on screen
+      // flash: in 0 -> 0.025, holds the peak to 0.07 (the damage frame), white collapses 0.07 -> 0.17, pink rim lingers to 0.22
+      const fIn = expoOut(t / 0.025), fOut = 1 - smooth(0.07, 0.2, t), fw = 1 - smooth(0.07, 0.17, t);
+      const FL = 3.2 * sz * (0.75 + 0.25 * fIn) * (1 + 0.12 * smooth(0.03, 0.2, t)) * (0.6 + 0.4 * fsc), FW = 1.9 * sz * (0.7 + 0.3 * fIn) * (0.55 + 0.45 * fw);
+      s.flash.scale.set(FL, FW, 1); U(s.flash).uA.value = fIn * fOut; U(s.flash).uI.value = 2.6 * k; U(s.flash).uR.value = 0.3 + 0.9 * fw; U(s.flash).uHue.value = 0.15 + 0.6 * smooth(0.08, 0.2, t);
+      // burst: lines shoot out 0 -> 0.035, peak 0.035 -> 0.08, then thin out / dim to purple, gone by 0.24
+      const bIn = expoOut(t / 0.035), bOut = 1 - smooth(0.08, 0.24, t);
+      s.burst.scale.setScalar(3.0 * sz * (0.45 + 0.55 * bIn) * (1 + 0.15 * smooth(0.04, 0.24, t)) + 0.001); U(s.burst).uA.value = bIn * bOut; U(s.burst).uI.value = 2.4 * k; U(s.burst).uHue.value = 0.08 + 0.7 * smooth(0.08, 0.22, t);
+      s.flash.visible = s.burst.visible = fOut > 0.002 || bOut > 0.002;
+    }
     // pink rays: shoot out 0.00 -> 0.03, brightest 0.03 -> 0.06, then get thinner + dimmer 0.06 -> 0.20 (UV-thinned around the
     // real cell centre: the rays narrow smoothly instead of vanishing), gone by 0.22
     const rIn = expoOut(t / 0.03), rThin = 1 - 0.8 * smooth(0.06, 0.2, t), rFade = Math.min(1, 1.15 - smooth(0.06, 0.22, t) * 1.15);

@@ -1,6 +1,6 @@
 // 일격참 nv_a1 을 실제 스킬 경로(cast → 칼 동작·돌진 → 타격 → '살' 이펙트)로 시전하고, 타격 시각 기준 같은 시점의 프레임을 저장.
 // 정상 배속으로 G.step(1/FPS) 한 프레임씩 진행(캐릭터·판정·이펙트가 같은 시간축). Math.random 고정 → 수정 전후 같은 장면.
-// Usage: SCENE=single|line|whiff DIRS=90,225 ZOOM=1 SIZE=1100x760|390x844t FX=1|0 TAG=after URL=... node tools/browser-tests/sal_skill.js
+// Usage: SCENE=single|line|whiff|close|kill|moving (2026-11-10: close = 1.4 m, kill = the hit kills the dummy, moving = target walks sideways 2.5 m/s) DIRS=90,225 ZOOM=1 SIZE=1100x760|390x844t FX=1|0 TAG=after URL=... node tools/browser-tests/sal_skill.js
 //   -> OUT/<TAG>_<scene>_<dir>_<size>_fx<FX>.png (가로 띠: 타격 -0.10/-0.05/0/+0.03/+0.06/+0.10/+0.16/+0.22/+0.30 s) + 개별 프레임 폴더
 const { chromium } = require('playwright'); const fs = require('fs'); const { execSync } = require('child_process');
 const SCENE = process.env.SCENE || 'single', DIRS = (process.env.DIRS || '90').split(',').map(Number), FPS = +(process.env.FPS || 60);
@@ -45,7 +45,7 @@ const MARKS = [-0.10, -0.05, 0, 0.03, 0.06, 0.10, 0.16, 0.22, 0.30];
       p.skills2.cd = {}; G.dev.full();
       const at = d => ({ x: p.pos.x + f.x * d, z: p.pos.z + f.z * d });
       window.__ds = []; window.__f = f; window.__at = at;
-      for (const d of scene === 'line' ? [2.6, 3.6, 4.6] : [2.8]) { const m = G.dev.dummies('mon_boar', 1, 0.01, at(d))[0]; m.teleport(at(d)); m.thinkStep = () => {}; window.__ds.push(m); }
+      for (const d of scene === 'line' ? [2.6, 3.6, 4.6] : scene === 'close' ? [1.4] : [2.8]) { const m = G.dev.dummies('mon_boar', 1, 0.01, at(d))[0]; m.teleport(at(d)); m.thinkStep = () => {}; window.__ds.push(m); }
     }, [dir, SCENE, FPS]);
     await pg.waitForFunction(() => window.__ds.every(m => m.body), null, { timeout: 120000 });
     const info = await ev(([scene, fps]) => {
@@ -55,24 +55,26 @@ const MARKS = [-0.10, -0.05, 0, 0.03, 0.06, 0.10, 0.16, 0.22, 0.30];
       for (let i = 0; i < 12; i++) G.step(1 / fps, false);
       p.teleport(window.__spot); p.setFacing(f.x, f.z); for (const m of ds) m.knock = { x: 0, z: 0 };
       G.render.setFocus({ x: p.pos.x + f.x * 1.6, y: 0, z: p.pos.z + f.z * 1.6 }, true);
-      window.__hits = []; const S = G.skillFx.sal, oh = S.hit.bind(S); if (!S.__wrapped) { S.__wrapped = true; S.hit = (pos, d, o) => { window.__hits.push({ t: window.__t, pos: { ...pos }, o: { ...o } }); return oh(pos, d, o); }; }
+      window.__hits = []; const S = G.skillFx.sal, oh = S.hit.bind(S); if (!S.__wrapped) { S.__wrapped = true; S.hit = (pos, d, o) => { const r = oh(pos, d, o); const c = S.live.find(x => x.kind === 'cast'); window.__hits.push({ t: window.__t, pos: { ...pos }, o: { primary: o.primary, whiff: o.whiff, size: o.size }, gap: c ? +Math.hypot(c.end.x - pos.x, c.end.y - pos.y, c.end.z + pos.z).toFixed(3) : null }); return r; }; }
       window.__t = 0; p.target = ds[0];
       const e = p.skills2.cast('nv_a1', at(2)); if (e) return 'cast error: ' + e;
       // 허공: the only target vanishes right after the cast (the skill keeps its single-target rule -> nothing to hit)
       if (scene === 'whiff') for (const m of ds) { m.dead = true; m.remove(); }
+      if (scene === 'kill') for (const m of ds) { Object.defineProperty(m, 'maxHp', { get: () => 10 }); m.hp = 1; }
+      window.__move = scene === 'moving' ? { x: f.z, z: -f.x, v: 2.5 } : null;
       return { ds: ds.length };
     }, [SCENE, FPS]);
     if (typeof info === 'string') { console.log(info); continue; }
     // step at normal speed, one frame at a time; keep every frame, find the hit frame, then pick the marked times
     const frames = []; const total = Math.round(0.95 * FPS);
     for (let i = 0; i < total; i++) {
-      const c = await ev(([i, fps]) => { window.__t = i / fps; G.step(1 / fps, true); const p = G.player, f = window.__f; const s = G.render.toScreen({ x: p.pos.x + f.x * 1.6, y: p.pos.y + 0.9, z: p.pos.z + f.z * 1.6 }); return [s.x, s.y, window.__hits.length]; }, [i, FPS]);
+      const c = await ev(([i, fps]) => { window.__t = i / fps; const mv = window.__move; if (mv) for (const m of window.__ds) if (!m.dead) m.teleport({ x: m.pos.x + mv.x * mv.v / fps, z: m.pos.z + mv.z * mv.v / fps }); G.step(1 / fps, true); const p = G.player, f = window.__f; const s = G.render.toScreen({ x: p.pos.x + f.x * 1.6, y: p.pos.y + 0.9, z: p.pos.z + f.z * 1.6 }); return [s.x, s.y, window.__hits.length]; }, [i, FPS]);
       const fn = `${dirOut}/${String(i).padStart(3, '0')}.png`;
       if (process.env.MARKONLY && !MARKS.some(m => Math.abs(i - (Math.round(0.30 * FPS) + 1 + Math.round(m * FPS))) < 0.5)) { frames.push(null); continue; }
       await pg.screenshot({ path: fn, clip: { x: Math.max(0, Math.min(VW - CW, Math.round(c[0] - CW / 2))), y: Math.max(0, Math.min(VH - CH, Math.round(c[1] - CH / 2))), width: CW, height: CH }, timeout: 300000 });
       frames.push(fn);
     }
-    const hits = await ev(() => window.__hits.map(h => ({ t: +h.t.toFixed(3), size: h.o.size, primary: h.o.primary, whiff: h.o.whiff })));
+    const hits = await ev(() => window.__hits.map(h => ({ t: +h.t.toFixed(3), size: h.o.size, primary: h.o.primary, whiff: h.o.whiff, gap: h.gap, dead: window.__ds.map(m => !!m.dead) })));
     const ht = hits.length ? hits[0].t : null, hitFrame = ht == null ? null : Math.round(ht * FPS) + 1;   // the frame drawn right after the hit step
     const pick = MARKS.map(m => hitFrame == null ? null : Math.max(0, Math.min(frames.length - 1, hitFrame + Math.round(m * FPS)))).map(i => i != null && frames[i] ? i : null);
     fs.writeFileSync('/tmp/_salstrip.py', `from PIL import Image, ImageDraw\nfr=${JSON.stringify(pick.map(i => i == null ? '' : frames[i]))}\nlab=${JSON.stringify(MARKS)}\nims=[Image.open(f) if f else None for f in fr]\nw,h=next(i for i in ims if i).size\nims=[i or Image.new('RGB',(w,h),(0,0,0)) for i in ims]\nw,h=ims[0].size\nsh=Image.new('RGB',(w*len(ims),h+22),(20,20,28))\nd=ImageDraw.Draw(sh)\nfor i,(im,l) in enumerate(zip(ims,lab)):\n  sh.paste(im,(i*w,22)); d.text((i*w+6,4),('hit %+.2fs'%l),fill=(255,255,255))\nsh.save('${OUT}/${name}.png')`);

@@ -47,7 +47,7 @@ void main(){
   c += (b1 * 0.6 + b2 * 0.9) * bloom;
   // warm grade: lift warm highlights, keep shadows slightly cool-violet, a touch more saturation
   c = filmic(c);
-  c = mix(c, c * c * (3.0 - 2.0 * c), contrast);
+  vec3 cc = min(c, vec3(1.0)); c = mix(c, cc * cc * (3.0 - 2.0 * cc) + max(c - 1.0, 0.0), contrast);   // S-curve on 0..1 only: above 1.5 the cubic went negative, very bright pink (R, B high) turned GREEN (2026-11-10)
   float l = dot(c, vec3(0.299, 0.587, 0.114));
   c = mix(vec3(l), c, sat);
   c *= mix(vec3(0.97, 0.96, 1.03), vec3(1.05, 1.0, 0.9), smoothstep(0.05, 0.8, l) * warmth + (1.0 - warmth) * 0.5);

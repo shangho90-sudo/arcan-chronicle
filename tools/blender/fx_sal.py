@@ -14,12 +14,15 @@ Parts (separate objects / collections, all in metres, game axes: +Z = attack dir
     sal_shard         elongated diamond (2 crossed quads, length 1 along +Z) -> instanced fragments / gathering sparks
     sal_quad          unit quad facing +Z                                    -> camera-facing glow (tip gather, hit core)
 
-Texture: fx_sal.png (ATLAS px, RGBA, 4 cells). The channels are MASKS, not colours, so the game can recolour freely:
+Texture: fx_sal.png (ATLAS px, RGBA, 6 cells, layout in CELLS). The channels are MASKS, not colours, so the game can recolour:
   R = hot core (-> white #FFF7FF), G = body (-> pink #FF4FD8 / magenta #D83CFF), B = halo (-> purple #7B4DFF), A = coverage
   cell 0 (left-bottom)  ray     u = along the ray (0 base .. 1 tip), v = across; tail breaks into streaks
   cell 1 (right-bottom) sheet   thin membrane: soft transparent edges, faint speed streaks along u
   cell 2 (left-top)     glow    radial core + 4-point flare
   cell 3 (right-top)    shard   diamond with a bright centre line
+  cell 4 flash   (2026-11-10) wide irregular white flash, long along u (the thrust), jagged sharp lobes, pink rim, soft halo
+  cell 5 burst   (2026-11-10) ~56 thin radial lines of varied length / width / angle, densest and longest along +u
+  sal_flash / sal_burst = unit quads on cells 4 / 5 (camera-facing in the game, u turned to the screen-space thrust)
 The patterns are procedural (numpy, the node-free equivalent of a procedural bake) and written as a plain PNG.
 
 Outputs:
@@ -36,10 +39,12 @@ HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
 import blib
 
 # ------------------------------------------------------------------------------------------------ parameters
-ATLAS = 512                 # texture size (2 x 2 cells)
+ATLAS = 1024                # texture size; cells below (2026-11-10: 512 -> 1024 for the flash / burst cells)
 SEG = 6                     # segments along every needle / sheet
-CORE_W = 0.15               # centre beam width (unit length 1) — thin white needle (2026-11-09 #2: 0.30 -> 0.13)
-SHEET_W = 0.38              # membrane max width (0.90 -> 0.38: wraps the core, no longer a wide film)
+CORE_W = 0.20               # centre beam width (unit length 1) — white needle (11-09: 0.30 -> 0.15, 11-10: 0.20, the wide white
+SHEET_W = 0.46              #   area now comes from the flash quad) / membrane max width (0.90 -> 0.38 -> 0.46)
+BURST_RAYS = 56             # lines in the burst texture (cell 5)
+FLASH_LOBES = 22            # jagged lobes around the flash (cell 4)
 SHEET_PLANES = 2
 SIDE = [(-0.16, 0.05, 0.24, 0.62, 0.05), (0.14, 0.10, 0.32, 0.74, 0.045), (0.02, -0.13, 0.40, 0.50, 0.04)]   # x, y, z0, length, width
 HIT_RAYS = 9                # pink main rays (2 long ones along the thrust, the rest irregular)
@@ -53,20 +58,28 @@ def V(x, y, z):
     """game axes (x right, y up, z forward) -> Blender (glTF export turns Blender -Y into +Z, Z into +Y)"""
     return (x, -z, y)
 
-CELLS = [(0.0, 0.0), (0.5, 0.0), (0.0, 0.5), (0.5, 0.5)]
+# cells (x0, y0, w, h) in atlas fractions, y from the bottom (Blender UV): 0 ray, 1 sheet, 2 glow, 3 shard, 4 flash, 5 burst
+CELLS = [(0.0, 0.0, 0.5, 0.5), (0.5, 0.0, 0.5, 0.25), (0.75, 0.25, 0.25, 0.25), (0.5, 0.25, 0.25, 0.25), (0.0, 0.5, 0.5, 0.5), (0.5, 0.5, 0.5, 0.5)]
 PAD = 3 / ATLAS
 def cell_uv(c, u, v):
-    ox, oy = CELLS[c]; return (ox + PAD + u * (0.5 - 2 * PAD), oy + PAD + v * (0.5 - 2 * PAD))
+    ox, oy, w, h = CELLS[c]; return (ox + PAD + u * (w - 2 * PAD), oy + PAD + v * (h - 2 * PAD))
 
 # ------------------------------------------------------------------------------------------------ texture
 def atlas():
-    n = ATLAS // 2; rng = np.random.default_rng(SEED)
-    u = (np.arange(n) + 0.5) / n; U, Vv = np.meshgrid(u, u)        # U across x (along the ray), Vv along y (across)
+    rng = np.random.default_rng(SEED)
     img = np.zeros((ATLAS, ATLAS, 4), np.float32)
+    def grid(c):
+        nx, ny = int(CELLS[c][2] * ATLAS), int(CELLS[c][3] * ATLAS)
+        return np.meshgrid((np.arange(nx) + 0.5) / nx, (np.arange(ny) + 0.5) / ny)   # U along x (along the ray), Vv along y
     def put(c, R, Gc, B):
         A = np.clip(np.maximum(np.maximum(R, Gc * 0.95), B * 0.8), 0, 1)
-        ox, oy = int(CELLS[c][0] * ATLAS), int(CELLS[c][1] * ATLAS)
-        img[oy:oy + n, ox:ox + n] = np.stack([np.clip(R, 0, 1), np.clip(Gc, 0, 1), np.clip(B, 0, 1), A], -1)
+        ox, oy, w, h = (int(q * ATLAS) for q in CELLS[c])
+        e = np.ones_like(R)                                          # fade the last 2 % to 0 so nothing is cut at a cell border
+        bx = np.clip(np.minimum(U_[c], 1 - U_[c]) / 0.02, 0, 1); by = np.clip(np.minimum(V_[c], 1 - V_[c]) / 0.02, 0, 1); e = bx * by
+        img[oy:oy + h, ox:ox + w] = np.stack([np.clip(R * e, 0, 1), np.clip(Gc * e, 0, 1), np.clip(B * e, 0, 1), A * e], -1)
+    U_, V_ = {}, {}
+    for c in range(len(CELLS)): U_[c], V_[c] = grid(c)
+    U, Vv = U_[0], V_[0]; n = U.shape[0]
     d = np.abs(Vv - 0.5) * 2                                          # 0 centre .. 1 edge
     # ray: bright thin core, pink body, purple halo; the tail (u < 0.3) breaks into streaks, the tip stays sharp
     streak = 0.55 + 0.45 * np.interp(Vv * 23 % 1, [0, .5, 1], [0, 1, 0]) * (rng.random((n, 1)) * 0 + 1)
@@ -78,18 +91,49 @@ def atlas():
            np.exp(-(d / 0.55) ** 2) * (1 - d) ** 0.5 * tail * tail_k * (0.75 + 0.25 * tip),
            np.exp(-(d / 0.9) ** 2) * (1 - d) * np.clip(U / 0.5, 0, 1) * tail_k * 0.55)
     # sheet: transparent edges, brighter towards the leading edge, speed streaks along u
-    sp = 0.6 + 0.4 * np.repeat(rng.random((n, 1)), n, 1) ** 2
+    U, Vv = U_[1], V_[1]; d = np.abs(Vv - 0.5) * 2
+    sp = 0.6 + 0.4 * np.repeat(rng.random((U.shape[0], 1)), U.shape[1], 1) ** 2
     lead = np.clip(U / 0.25, 0, 1) * (0.55 + 0.45 * U)
     put(1, np.exp(-(d / 0.08) ** 2) * lead * 0.5,
            np.exp(-(d / 0.62) ** 2) * (1 - d) ** 0.5 * lead * sp,
            np.exp(-(d / 0.9) ** 2) * (1 - d) * lead * 0.85)
     # glow: radial core + 4-point flare
-    X, Y = (U - 0.5) * 2, (Vv - 0.5) * 2; r = np.hypot(X, Y)
+    U, Vv = U_[2], V_[2]; X, Y = (U - 0.5) * 2, (Vv - 0.5) * 2; r = np.hypot(X, Y)
     flare = np.exp(-(np.abs(X) / 0.035) ** 2) * np.exp(-(np.abs(Y) / 0.9) ** 2) + np.exp(-(np.abs(Y) / 0.035) ** 2) * np.exp(-(np.abs(X) / 0.9) ** 2)
     put(2, np.exp(-(r / 0.16) ** 2) + flare * 0.5, np.exp(-(r / 0.36) ** 2) * 0.9 + flare * 0.6, np.clip(np.exp(-(r / 0.62) ** 2) * (1 - r), 0, 1))
     # shard: diamond, bright centre line along u
+    U, Vv = U_[3], V_[3]; X, Y = (U - 0.5) * 2, (Vv - 0.5) * 2
     dm = np.abs(X) * 0.9 + np.abs(Y) * 1.9
     put(3, np.exp(-(np.abs(Y) / 0.08) ** 2) * np.clip(1 - dm, 0, 1) * 1.4, np.clip(1 - dm, 0, 1) ** 0.7, np.clip(1.25 - dm, 0, 1) * 0.6)
+    # flash (2026-11-10): a WIDE irregular white area, long along u (the thrust), with sharp jagged lobes; pink rim, soft halo.
+    # Radius in the stretched frame R(theta) = base + many thin random spikes (sharp, unequal), longest near +-u.
+    U, Vv = U_[4], V_[4]; X, Y = (U - 0.5) * 2, (Vv - 0.5) * 2
+    th = np.arctan2(Y / 0.62, X); re = np.hypot(X, Y / 0.62)                 # elongated: 1 along u, 0.62 across
+    Rr = np.full_like(re, 0.40)
+    for k in range(FLASH_LOBES):
+        a = rng.uniform(-np.pi, np.pi) if k > 3 else [0.0, np.pi, 0.18, -0.2][k]
+        amp = rng.uniform(0.12, 0.42) * (1.5 if abs(np.cos(a)) > 0.9 else 1.0); w = rng.uniform(0.03, 0.09)
+        dth = np.angle(np.exp(1j * (th - a))); Rr = Rr + amp * np.exp(-(np.abs(dth) / w) ** 1.3)
+    m = re / Rr                                                               # 0 centre .. 1 boundary of the white lobes
+    ss = lambda a, b, x: (lambda t: t * t * (3 - 2 * t))(np.clip((x - a) / (b - a), 0, 1))
+    hot = 1 - ss(0.55, 1.05, m)                                                # big white area with jagged edge
+    rim = (1 - ss(0.8, 1.6, m)) * 0.95                                         # pink just outside the white
+    halo = np.exp(-(re / 0.95) ** 2) * 0.7 * np.clip(1 - re, 0, 1)
+    put(4, hot, np.maximum(rim * (1 - hot), hot * 0.22), halo * (1 - hot))     # the white stays white (little pink under it)
+    # burst (2026-11-10): many thin radial lines (pink with white hearts), lengths 0.25..0.98, longest + densest along +-u
+    U, Vv = U_[5], V_[5]; X, Y = (U - 0.5) * 2, (Vv - 0.5) * 2; r = np.hypot(X, Y); th = np.arctan2(Y, X)
+    Rg = np.zeros_like(r); Gg = np.zeros_like(r)
+    for k in range(BURST_RAYS):
+        if k < 6: a = [0.0, 0.07, -0.09, np.pi, 0.16, -0.18][k] + rng.uniform(-0.02, 0.02)
+        else: a = rng.uniform(-np.pi, np.pi) if rng.random() < 0.6 else rng.normal(0, 0.45) + (np.pi if rng.random() < 0.25 else 0)
+        al = abs(np.cos(a)); L = (0.98 if k == 0 else 0.86 if k < 3 else 0.6 if k < 6 else rng.uniform(0.22, 0.55 + 0.4 * al ** 3))
+        w = (0.020 if k < 3 else rng.uniform(0.006, 0.017)) * (1.15 if k < 6 else 1)
+        dth = np.angle(np.exp(1j * (th - a))); along = r * np.cos(dth); perp = np.abs(r * np.sin(dth))
+        t = np.clip(along / L, 0, 1); ww = w * (1 - t) ** 0.9 + 1e-4                  # tapers to a real point
+        line = np.exp(-(perp / ww) ** 2) * (along > 0) * (along < L) * (0.35 + 0.65 * (1 - t) ** 0.6)
+        Gg = np.maximum(Gg, line); Rg = np.maximum(Rg, np.exp(-(perp / (ww * 0.45)) ** 2) * (along > 0) * (along < L) * (1 - t) ** 1.5)
+    core = np.exp(-(r / 0.12) ** 2)
+    put(5, np.clip(Rg * 0.9 + core, 0, 1), np.clip(Gg + core * 0.8, 0, 1), np.exp(-(r / 0.5) ** 2) * 0.35)
     a = (np.clip(img, 0, 1) * 255 + 0.5).astype(np.uint8)
     im = Image.fromarray(a[::-1], 'RGBA')                              # row 0 = top in PNG, v = 0 at the bottom in UV
     for p in (os.path.join(OUT, 'fx_sal.png'), os.path.join(SRC, 'fx_sal.png')): im.save(p, optimize=True)
@@ -151,6 +195,14 @@ def build():
         f = bm.faces.new(vs)
         for l, (uu, vv) in zip(f.loops, ((0, 0), (1, 0), (1, 1), (0, 1))): l[uv].uv = cell_uv(2, uu, vv)
     obs.append(make('sal_quad', quad, cols['SAL_shared']))
+    def cquad(c):
+        def f(bm, uv):
+            vs = [bm.verts.new(V(x, y, 0)) for x, y in ((-0.5, -0.5), (0.5, -0.5), (0.5, 0.5), (-0.5, 0.5))]
+            f_ = bm.faces.new(vs)
+            for l, (uu, vv) in zip(f_.loops, ((0, 0), (1, 0), (1, 1), (0, 1))): l[uv].uv = cell_uv(c, uu, vv)
+        return f
+    obs.append(make('sal_flash', cquad(4), cols['SAL_hit']))
+    obs.append(make('sal_burst', cquad(5), cols['SAL_hit']))
     return obs
 
 def preview_material(png):
@@ -193,7 +245,7 @@ def main():
     # atlas cells as the GAME sees them (glTF export flips v: v_gltf = 1 - v_blender): [u0, u1, v0, v1] — js/salfx.js shrinks
     # the rays across v around the CENTRE OF THIS CELL (the old hard-coded 0.25 missed the real 0.75 and discarded the rays)
     cells = {}
-    for name, c in (('ray', 0), ('sheet', 1), ('glow', 2), ('shard', 3)):
+    for name, c in (('ray', 0), ('sheet', 1), ('glow', 2), ('shard', 3), ('flash', 4), ('burst', 5)):
         u0, v0 = cell_uv(c, 0, 0); u1, v1 = cell_uv(c, 1, 1)
         cells[name] = [round(u0, 6), round(u1, 6), round(1 - v1, 6), round(1 - v0, 6)]
     json.dump({'b64': base64.b64encode(raw).decode(), 'cells': cells}, open(os.path.join(OUT, 'fx_sal.glb.json'), 'w'))
@@ -202,7 +254,7 @@ def main():
                                  bake_space_transform=True, mesh_smooth_type='FACE', add_leaf_bones=False)
     except Exception as e: print('fbx export failed:', e)
     # spread the parts out in the .blend so they can be inspected, then save
-    for o, x in zip(obs, (0, 0, 0, 3, 3, 6, 6)): o.location.x = x
+    for o, x in zip(obs, (0, 0, 0, 3, 3, 6, 6, 9, 11)): o.location.x = x
     bpy.ops.wm.save_as_mainfile(filepath=os.path.join(SRC, 'fx_sal.blend'), compress=True)
     print('tris', tris, 'total', sum(tris.values()), 'glb bytes', len(raw))
 
