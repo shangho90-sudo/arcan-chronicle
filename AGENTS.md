@@ -8,7 +8,7 @@
 ## 기본
 - 빌드 없음. `python3 -m http.server 8765` 후 `http://localhost:8765/index.html`.
 - three.js r160을 로컬 import map(`index.html`, `vendor/three-r160/`)으로 불러옵니다. CDN 장애 시 0% 멈춤을 방지하기 위해 동일 버전과 LICENSE를 저장소에 포함합니다. npm 의존성 없음. 새 라이브러리 추가 금지(필요하면 먼저 사용자에게 확인).
-- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs` (현재 504 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 609 통과).
+- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs` (현재 504 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 617 통과).
 - 테스트하지 않은 것을 "검증됨"이라고 보고하지 말 것.
 
 ## 데이터 우선
@@ -26,7 +26,7 @@
 - 스킬 슬롯은 일반 3개(1~3, `skillsys.js` `NORMAL_SLOTS`) + 궁극기 R. 휴대폰 버튼은 공격 버튼 둘레 부채꼴(1·2·3·R), 왼쪽 대시·포션, 맨 위 대화(`index.html` `.abtn.*`, 확인 `tools/browser-tests/keypad.js`).
 - 회피(Shift)는 앞구르기 동작 `roll`(`swings.py`에서 생성, 몸 전체 회전은 동작 필드 `flips`, `model.js` `apply`). 스킬 돌진은 `dash`.
 - 능력치(힘·지능·민첩·생명력·행운, `core.js` `ATTRS`/`ATTR_FX`): 레벨당 3포인트(`P.apoints`), 투자분만 효과(기본 5는 직업 기본값에 포함). 명중·회피는 `missChance`(`Actor.takeDamage`에서 판정), 제작 성공은 `skillsys.js` `craftSuccessRate`(1단계 항상 성공). 수치를 바꾸면 `tests/core.test.mjs` TestAttributes도 함께.
-- 기본 검술(`job: novice`, `nv_*` 6종 — 일격참·연·비연참·배쉬(Lv7, `push` 밀치기)·회복력 증가·검수련, 공격 스킬은 모두 단일 대상 `target: 'enemy'`/`single`, 확인 `tools/browser-tests/novice_single.js`)은 모든 직업의 계보 맨 앞에 붙어 전직 후에도 유지되며, 직업 포인트(`sk.points`)와 별개인 `sk.npoints`를 씁니다(Lv1부터 레벨당 1).
+- 기본 검술(`job: novice`, `nv_*` 8종 — 일격참·연·비연참·배쉬(Lv7, `push` 밀치기)·회복력 증가·검수련·회피율 증가(Lv5, `eva`)·급소치기(Lv9, `crit`), 공격 스킬은 모두 단일 대상 `target: 'enemy'`/`single`, 확인 `tools/browser-tests/novice_single.js`)은 모든 직업의 계보 맨 앞에 붙어 전직 후에도 유지되며, 직업 포인트(`sk.points`)와 별개인 `sk.npoints`를 씁니다(Lv1부터 레벨당 1).
 - 몬스터 능력치는 레벨 곡선으로 다시 계산(`core.js` `balanceMonsters`, monsters.json의 hp/atk/def/exp는 역할 판단용 원본), 레벨 차이 보정 `levelGapDamage`/`levelGapExp`. 필드 몬스터는 들어갈 때 고르게 다시 배치(`game.js` `Zone.evenSpawners`), 전체 수는 `config.json` `fieldMonsterMul`(지금 1.3배, 정예 1마리 무리 제외) — 확인 `tools/browser-tests/moncount.js`. 몬스터 이름표는 항상 표시(흰색 = 내 레벨 이하, 빨강 = 높음).
 - 몬스터 공격 방식은 `js/creature.js` `CREATURES[id].atk`(동작)와 `js/actors.js` `Monster.resolve`(판정·이펙트)에서 함께 정합니다.
 - UI 문구는 한국어.

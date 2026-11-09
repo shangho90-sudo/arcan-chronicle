@@ -9,7 +9,7 @@ Skill fields: id (stable), job, tier, cat (0..2), catName, idx (1..5), name, des
 import json, os
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 OUT = os.path.join(ROOT, 'assets', 'data', 'skills2.json')
-UNLOCK = {0: [1, 5, 10, 3, 7, 7], 1: [10, 12, 15, 18, 20], 2: [30, 33, 36, 40, 45]}
+UNLOCK = {0: [1, 5, 10, 3, 7, 7, 5, 9], 1: [10, 12, 15, 18, 20], 2: [30, 33, 36, 40, 45]}
 SK = []
 
 def S(job, tier, cat, catName, idx, sid, name, typ, desc, **kw):
@@ -40,7 +40,7 @@ def custom(fn, **k): return dict(op='custom', fn=fn, **k)
 
 
 # ======================================================================= 견습생 (novice) 기본 검술 — tier 0, every job keeps it
-# separate point pool (1 per character level, see js/skillsys.js), unlock Lv 1 / 5 / 10 / 3 / 7 / 7(배쉬), no extra-hit rule (noExtra)
+# separate point pool (1 per character level, see js/skillsys.js), unlock Lv 1 / 5 / 10 / 3 / 7 / 7(배쉬) / 5(회피율 증가) / 9(급소치기), no extra-hit rule (noExtra)
 # 2026-11-09: 견습생 공격 스킬은 모두 단일 대상(target='enemy', shape 'single', 비연참은 관통 없음)
 J, C = 'novice', 0xcfe6ff
 S(J, 0, 0, '기본 검술', 1, 'nv_a1', '일격참', 'attack', '칼을 허리춤으로 끌어당겼다가 적 하나에게 뛰어들며 한 번에 깊게 찌른다. 칼끝에서 뻗은 섬광이 닿은 적에게 별 모양 빛살이 터진다.', target='enemy', range=3.2, mp=8, cd=5, anim='nv_ilgyeok', recover=0.3,
@@ -60,6 +60,10 @@ S(J, 0, 1, '기본 검술', 4, 'nv_p1', '회복력 증가', 'passive', '움직�
   flags=dict(restRegen=[0.02, 0.01]))
 S(J, 0, 1, '기본 검술', 5, 'nv_p2', '검수련', 'passive', '칼을 다루는 솜씨가 늘어 공격력이 조금씩 오른다.',
   mods=[dict(stat='atk', add=2, addLv=2, mul=0.02, mulLv=0.02)])
+S(J, 0, 1, '기본 검술', 7, 'nv_p3', '회피율 증가', 'passive', '몸놀림이 가벼워져 몬스터의 공격을 피할 확률이 오른다. 회피율 +2%(레벨마다 +1%, 최대 +6%).',
+  mods=[dict(stat='eva', add=0.02, addLv=0.01)])
+S(J, 0, 1, '기본 검술', 8, 'nv_p4', '급소치기', 'passive', '적의 급소를 노려 치명타 확률이 오른다. 치명타 확률 +2%(레벨마다 +1.5%, 최대 +8%).',
+  mods=[dict(stat='crit', add=0.02, addLv=0.015)])
 
 # ======================================================================= 약사 (pharmacist) — tier 1
 J, C = 'pharmacist', 0x48b080
@@ -540,8 +544,8 @@ for d in SK:
     if d['type'] == 'craft': d['recipes'] = [r['id'] for r in RECIPES if r['skill'] == d['id']] + (['salvage'] if d['id'] == 'bs1_c4' else [])
 by_job = {}
 for d in SK: by_job.setdefault(d['job'], []).append(d)
-assert len(SK) == 186, len(SK)
-for j, lst in by_job.items(): assert len(lst) == (6 if j == 'novice' else 15), (j, len(lst))
-assert len({d['id'] for d in SK}) == 186
+assert len(SK) == 188, len(SK)
+for j, lst in by_job.items(): assert len(lst) == (8 if j == 'novice' else 15), (j, len(lst))
+assert len({d['id'] for d in SK}) == 188
 json.dump(dict(version=1, skills=SK, statuses=STATUSES, items=ITEMS, recipes=RECIPES, salvage=SALVAGE, shopAdd=SHOP_ADD), open(OUT, 'w'), ensure_ascii=False, indent=0)
 print('wrote', OUT, len(SK), 'skills', {j: len(v) for j, v in by_job.items()})

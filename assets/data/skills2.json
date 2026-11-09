@@ -347,6 +347,86 @@
 "implemented": true
 },
 {
+"id": "nv_p3",
+"job": "novice",
+"tier": 0,
+"cat": 1,
+"catName": "기본 검술",
+"idx": 7,
+"name": "회피율 증가",
+"type": "passive",
+"desc": "몸놀림이 가벼워져 몬스터의 공격을 피할 확률이 오른다. 회피율 +2%(레벨마다 +1%, 최대 +6%).",
+"maxLv": 5,
+"unlock": 5,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [
+{
+"stat": "eva",
+"add": 0.02,
+"addLv": 0.01
+}
+],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "nv_p4",
+"job": "novice",
+"tier": 0,
+"cat": 1,
+"catName": "기본 검술",
+"idx": 8,
+"name": "급소치기",
+"type": "passive",
+"desc": "적의 급소를 노려 치명타 확률이 오른다. 치명타 확률 +2%(레벨마다 +1.5%, 최대 +8%).",
+"maxLv": 5,
+"unlock": 9,
+"prereq": [],
+"weapon": null,
+"target": "self",
+"range": 2.0,
+"mp": 0,
+"cd": 0,
+"cast": 0.0,
+"recover": 0.35,
+"anim": null,
+"ops": [],
+"mods": [
+{
+"stat": "crit",
+"add": 0.02,
+"addLv": 0.015
+}
+],
+"flags": {},
+"fx": {},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
 "id": "ph1_a1",
 "job": "pharmacist",
 "tier": 1,
