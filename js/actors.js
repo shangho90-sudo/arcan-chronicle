@@ -54,7 +54,7 @@ export class Combatant {
       // critical hit on a monster: a beat of hit-stop, a camera kick and a star burst at the target
       if (d.crit && !d.dot && this.faction !== "player") {
         G.audio.sfx("crit");
-        G.hitStop(0.05); G.render.addShake(0.06, 0.12);
+        if (!d.localStop) G.hitStop(0.05); G.render.addShake(0.06, 0.12);   // localStop: 배쉬 freezes only itself + the target
         if (G.swingFx && G.swingFx.ready) G.swingFx.hit(this.pos, { crit: true });
         else if (G.skillFx) try { G.skillFx.burst('explosion_gold', { x: this.pos.x, y: this.pos.y + 0.6, z: this.pos.z }, { radius: 0.55 }); } catch (e) { }
       }
@@ -89,7 +89,8 @@ export class Combatant {
       this._ticking = false;
       if (this._clearAfter) { this._clearAfter = false; this.status.clear(); }
     }
-    if (Math.hypot(this.knock.x, this.knock.z) > 0.1) {
+    if (this.freezeT > 0) { /* local hit-stop (배쉬): the push starts after the freeze */ }
+    else if (Math.hypot(this.knock.x, this.knock.z) > 0.1) {
       this.pos = this.zone.geo.move(this.pos, this.knock.x * dt, this.knock.z * dt, this.radius);
       const k = 1 - Math.exp(-10 * dt); this.knock.x *= 1 - k; this.knock.z *= 1 - k;
     } else this.knock = { x: 0, z: 0 };

@@ -55,7 +55,8 @@ S(J, 0, 0, '기본 검술', 3, 'nv_a3', '비연참', 'attack', '칼을 크게 �
        dict(op='fx', biyeon='cast', at=-0.22)], fx=dict(color=0xbfe8ff))   # 비연파 js/biyeonfx.js: fx op at the cast (wind-up, sweep, side blades = decoration); the proj = centre blade + hit
 S(J, 0, 0, '기본 검술', 6, 'nv_a4', '배쉬', 'attack', '칼자루와 어깨로 적 하나를 세게 들이받아 약 2.6 m 뒤로 밀쳐 내며 피해를 준다. 무거운 몬스터도 밀려나고 잠깐 비틀거린다(보스 제외).', target='enemy', range=2.2, mp=9, cd=6, anim='attack2', recover=0.25,
   ops=[dict(op='lunge', dist=0.6, dur=0.12, at=-0.08),
-       hit('single', 1.9, noExtra=True, push=2.6, st=[st('stagger', 0.7)], fx=dict(slash='thrust', burst='hit_blunt'), shake=[0.12, 0.2])], fx=dict(color=0xffd9a0))
+       dict(op='fx', bash='cast', at=-0.24),   # 2026-11-10 배쉬 이펙트 (js/bashfx.js): tip gather + crescent on the real sword arc from the cast start
+       hit('single', 1.9, noExtra=True, push=2.6, st=[st('stagger', 0.7)], fx=dict(bash=True), shake=[0.12, 0.2])], fx=dict(color=0xffd9a0))
 S(J, 0, 1, '기본 검술', 4, 'nv_p1', '회복력 증가', 'passive', '움직이지 않고 3초 동안 쉬면 3초마다 최대 체력의 일정 비율을 회복한다.',
   flags=dict(restRegen=[0.02, 0.01]))
 S(J, 0, 1, '기본 검술', 5, 'nv_p2', '검수련', 'passive', '칼을 다루는 솜씨가 늘어 공격력이 조금씩 오른다.',

@@ -7,6 +7,7 @@ import { skillSound } from './sfx.js';
 import { salImpact } from './salfx.js';
 import { yeonImpact, LEAD as YEON_LEAD } from './yeonfx.js';
 import { biyeonImpact } from './biyeonfx.js';
+import { bashImpact, BASH } from './bashfx.js';
 
 let G = null; export function bindSkillRt(g) { G = g; }
 const DEG = Math.PI / 180;
@@ -24,6 +25,7 @@ export const FX = {
   yeon(kind, a, b) { try { if (G.skillFx && G.skillFx.yeon) return kind === 'strike' ? G.skillFx.yeon.strike(a) : G.skillFx.yeon.hit(a, b); } catch (e) { console.warn('fx yeon', e); } },   // 견습생 '연' (js/yeonfx.js)
   sal(kind, pos, dir, o = {}) { try { if (G.skillFx && G.skillFx.sal) return G.skillFx.sal[kind](pos, dir, o); } catch (e) { console.warn('fx sal', e); } },   // 일격참 '살' (js/salfx.js)
   biyeon(kind, pos, dir, o = {}) { try { if (G.skillFx && G.skillFx.biyeon) return G.skillFx.biyeon[kind](pos, dir, o); } catch (e) { console.warn('fx biyeon', e); } return null; },   // 비연참 '비연파' (js/biyeonfx.js)
+  bash(kind, pos, dir, o = {}) { try { if (G.skillFx && G.skillFx.bash) return G.skillFx.bash[kind](pos, dir, o); } catch (e) { console.warn('fx bash', e); } },   // 배쉬 (js/bashfx.js)
   beam(kind, a, b, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.beam(kind, a, b, o); } catch (e) { console.warn('fx', kind, e); } },
   projectile(kind, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.projectile(kind, o) || NOOP; } catch (e) { console.warn('fx', kind, e); } return NOOP; },
   area(kind, pos, r, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.area(kind, pos, r, o) || NOOP; } catch (e) { console.warn('fx', kind, e); } return NOOP; },
@@ -252,12 +254,12 @@ export class SkillEngine {
     const r = CombatMath.compute(this.power(ctx), c, def, pc.stat('crit'), critDmg, t.stat('dmgReduce'));
     const kdir = { x: t.pos.x - pc.pos.x, z: t.pos.z - pc.pos.z };
     const knock = op.knock && !(t.isBoss) && !(t.def && t.def.ai === 'heavy') ? op.knock * 0.4 : 0;
-    t.takeDamage({ source: pc, amount: r.amount, crit: r.crit, kdir, knockback: knock });
+    t.takeDamage({ source: pc, amount: r.amount, crit: r.crit, kdir, knockback: knock, localStop: !!(op.fx && op.fx.bash) });
     if (op.push && !t.isBoss && !t.dead) { const m = Math.hypot(kdir.x, kdir.z) || 1; t.knock = { x: kdir.x / m * op.push * 10, z: kdir.z / m * op.push * 10 }; t.hitReact = Math.max(t.hitReact || 0, 0.4); }   // push = m 밀어냄(배쉬, 무거운 몬스터 포함·보스 제외)
     if (op.pull && !t.isBoss && !t.dead) { const p = op.pullTo || ctx.aim; const ddx = p.x - t.pos.x, ddz = p.z - t.pos.z, m = Math.hypot(ddx, ddz); if (m > 0.3) t.knock = { x: ddx / m * op.pull * 3, z: ddz / m * op.pull * 3 }; }
     if (op.launch && !t.isBoss && !(t.def && t.def.ai === 'heavy')) applyStatus(t, { id: 'stagger', dur: op.launch, val: 1, ch: 1 }, pc);
     this.combatT = 5;
-    pc.onHitLanded && pc.onHitLanded(c >= 2);
+    pc.onHitLanded && pc.onHitLanded(c >= 2 && !(op.fx && op.fx.bash));   // 배쉬: no global hit-stop, its own local freeze (opHit, BASH.stop)
     return r.amount;
   }
   /** shared on-hit extras: statuses, marks, temperature, gains */
@@ -338,6 +340,7 @@ export class SkillEngine {
         FX.telegraph(c, op.r || op.w || 2, op.dur, { color: 0xffb040, shape: op.shape, dir: ctx.facing, length: op.len, width: op.w }); return;
       }
       case 'fx': if (op.biyeon === 'cast') { const a = pc.body && pc.body.sh && pc.body.sh.actions[ctx.act]; ctx.biyeonCast = FX.biyeon('cast', pc.pos, ctx.facing, { follow: pc, swing: a && a.fps ? a.hitFrame / a.fps : 0.22 }); }   // wind-up + sweep + side blades (decoration); the centre blade rides the proj op
+        if (op.bash === 'cast') ctx.bashCast = FX.bash('cast', pc.pos, ctx.facing, { follow: pc });   // crescent on the real sword arc (js/bashfx.js)
         if (op.sal === 'cast') { const tg = ctx.tgt && !ctx.tgt.dead ? ctx.tgt : this.targetFor(ctx.d); ctx.salCast = FX.sal('cast', pc.pos, ctx.facing, { follow: pc, length: op.len || 3.4, width: op.w || 1, target: tg || null }); }   // beam: sword tip -> impact point (salImpact, max op.len m); the hit locks it
         if (op.slash) FX.slash(op.slash, pc.pos, ctx.facing, { radius: op.r || 1.6, angle: op.ang || 120, color: col, tilt: op.tilt || 0, mirror: !!op.mirror }); if (op.burst) FX.burst(op.burst, op.fwd ? { x: pc.pos.x + ctx.facing.x * op.fwd, y: pc.pos.y, z: pc.pos.z + ctx.facing.z * op.fwd } : pc.pos, { radius: op.r || 2, color: col }); return;   // fwd: m in front (일격참 땅 갈라짐)
       case 'repair': {
@@ -398,6 +401,14 @@ export class SkillEngine {
             const near = [...ts].sort((a, b) => pc.dist(a) - pc.dist(b));
             if (near.length) near.forEach((t, i) => FX.sal('hit', salImpact(t, f), f, i === 0 ? { primary: true, cast: ctx.salCast } : { secondary: true, delay: i * 0.015 }));   // same impact point as the beam end
             else FX.sal('hit', { x: pc.pos.x + f.x * (op.len || 3), y: (pc.pos.y || 0) + 1.0, z: pc.pos.z + f.z * (op.len || 3) }, f, { whiff: true });
+          }
+          if (op.fx.bash) {   // 배쉬: star flash / sphere / rays on the target's front surface at the blade's height, rings + dust from its feet
+            const t = [...ts].sort((a, b) => pc.dist(a) - pc.dist(b))[0];
+            let tipY = null; try { const b = pc.body.bladePoints(); if (b) tipY = b[1].y; } catch (e) { tipY = null; }
+            if (t) {
+              FX.bash('hit', bashImpact(t, f, tipY), f, { cast: ctx.bashCast, ground: { x: t.pos.x, y: t.pos.y || 0, z: t.pos.z } });
+              pc.freezeT = Math.max(pc.freezeT || 0, BASH.stop); t.freezeT = Math.max(t.freezeT || 0, BASH.stop);   // local hit-stop: only these two (game.js Zone.update, actors.js knock)
+            } else FX.bash('hit', { x: pc.pos.x + f.x * 1.6, y: (pc.pos.y || 0) + 0.6, z: pc.pos.z + f.z * 1.6 }, f, { whiff: true, ground: { x: pc.pos.x + f.x * 1.6, y: pc.pos.y || 0, z: pc.pos.z + f.z * 1.6 } });
           }
           if (op.fx.beam) FX.beam(op.fx.beam, pc.pos, { x: pc.pos.x + f.x * (op.len || 6), y: pc.pos.y, z: pc.pos.z + f.z * (op.len || 6) }, { color: col, width: op.w || 0.6 });
           if (op.fx.burst) { if (op.shape === 'circle') FX.burst(op.fx.burst, op.fwd ? fxp : pc.pos, { color: col, radius: op.fx.burstR || op.r }); else for (const t of ts.length ? ts : [{ pos: fxp }]) FX.burst(op.fx.burst, t.pos, { color: col, radius: 0.8 }); }

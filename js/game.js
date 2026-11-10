@@ -183,7 +183,8 @@ class Zone {
     for (const t of this.things.slice()) { t.update(dt); }
     this.things = this.things.filter(t => !t.dead);
     this.separate(dt);
-    for (const a of this.actors) if (a.body) { a.body.place(a.pos); a.body.update(dt); }
+    // freezeT: local hit-stop (배쉬) - only this actor's animation nearly stops, the rest of the game keeps running
+    for (const a of this.actors) if (a.body) { a.body.place(a.pos); let bd = dt; if (a.freezeT > 0) { a.freezeT -= dt; bd = dt * 0.05; } a.body.update(bd); }
     this.updatePortals(); this.updateArena();
     if (this.town3d) this.town3d.update(dt);
     if (this.nature) this.nature.update(dt);

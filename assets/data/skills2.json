@@ -226,6 +226,11 @@
 "at": -0.08
 },
 {
+"op": "fx",
+"bash": "cast",
+"at": -0.24
+},
+{
 "op": "hit",
 "shape": "single",
 "coef": 1.9,
@@ -240,8 +245,7 @@
 }
 ],
 "fx": {
-"slash": "thrust",
-"burst": "hit_blunt"
+"bash": true
 },
 "shake": [
 0.12,
