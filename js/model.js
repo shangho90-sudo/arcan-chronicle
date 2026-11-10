@@ -41,7 +41,7 @@ export const NPC_MODELS = {
 };
 /** back holder (backMount): grip at x = this fraction of the right shoulder's x, up / out (m) above the shoulder joint and
  *  behind the back surface; dir = blade direction in bind space (+x = the character's left, +y up, +z forward) */
-const BACK_MOUNT = { x: 0.62, up: 0.06, out: 0.055, dir: [0.62, -1, -0.1] };
+const BACK_MOUNT = { x: 0.62, up: 0.1, out: 0.05, dir: [0.72, -1, -0.03] };   // 확인: python3 tools/anim/back_clip.py
 const XFER = 0.1;   // s the weapon glides between the back holder and the hand at the grab / release
 const WEAPON = { novice: 'sword', pharmacist: 'pestle', cook: 'knife', blacksmith: 'hammer', hairdresser: 'scissors', artist: 'brush' };
 const OFF = { cook: 'pan', hairdresser: 'dryer', artist: 'palette' };
