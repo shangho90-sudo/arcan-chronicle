@@ -5,6 +5,7 @@
 import { THREE, T } from './render.js';
 import { ShatterFx } from './shatterfx.js';
 import { SalFx } from './salfx.js';
+import { YeonFx } from './yeonfx.js';
 
 const TAU = Math.PI * 2, DEG = Math.PI / 180;
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -1641,6 +1642,7 @@ export class SkillFx {
     this.live = []; this.pools = new Map(); this.time = 0;
     this.shatter = new ShatterFx(this.root); this.shatter.load();             // broken-ground meshes load in the background
     this.sal = new SalFx(this.root); this.sal.load();                         // 일격참 '살' thrust meshes (js/salfx.js)
+    this.yeon = new YeonFx(this.root); this.yeon.load();                      // 견습생 '연' crescents (js/yeonfx.js)
     /** optional camera-shake hook: (amplitude, duration) => void. Suppressed when SkillFx.reduceFlash. */
     this.onShake = null;
   }
@@ -1681,7 +1683,7 @@ export class SkillFx {
   // ------------------------------------------------------------------------------------ frame
   update(dt) {
     dt = Math.min(Math.max(dt, 0), 0.1); this.time += dt;
-    this.shatter.update(dt); this.sal.update(dt);
+    this.shatter.update(dt); this.sal.update(dt); this.yeon.update(dt);
     const L = this.live;
     for (let i = 0; i < L.length; i++) {
       const e = L[i]; e.t += dt; e.lt = e.t * e.tk;
@@ -1692,7 +1694,7 @@ export class SkillFx {
     }
     this.pa.update(dt); this.pn.update(dt);
   }
-  clear() { this.shatter.clear(); this.sal.clear(); for (const e of this.live) if (!e.dead) this._release(e); this.live.length = 0; this.pa.clear(); this.pn.clear(); }
+  clear() { this.shatter.clear(); this.sal.clear(); this.yeon.clear(); for (const e of this.live) if (!e.dead) this._release(e); this.live.length = 0; this.pa.clear(); this.pn.clear(); }
   /** remove from scene and free pooled rigs (shared caches stay) */
   dispose() { this.clear(); for (const p of this.pools.values()) for (const r of p) disposeRig(r); this.pools.clear(); this.root.removeFromParent(); this.pa.geo.dispose(); this.pn.geo.dispose(); this.pa.mat.dispose(); this.pn.mat.dispose(); }
 

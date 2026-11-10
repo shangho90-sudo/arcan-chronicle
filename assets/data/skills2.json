@@ -120,15 +120,14 @@
 "noExtra": true,
 "alt": true,
 "fx": {
-"slash": "blade",
-"burst": "hit_slash"
+"yeon": true
 }
 }
 ],
 "mods": [],
 "flags": {},
 "fx": {
-"color": 16770720
+"color": 7921663
 },
 "status": {
 "data": true,

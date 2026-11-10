@@ -143,7 +143,30 @@ def combo(name, seq, t0=0.20, gap=0.125, gaps=None, trailColor=(1.55, 1.38, 0.95
 
 # 연 (nv_a2): 2 hits at skill Lv1, +1 per level up to 6 -> one action per hit count, each a bigger flurry
 YEON = {2: ['fd', 'br'], 3: ['fd', 'br', 'ov'], 4: ['fd', 'br', 'hz', 'ov'], 5: ['fd', 'br', 'hz', 'hb', 'ov'], 6: ['fd', 'br', 'hz', 'hb', 'spin', 'ov']}
-COMBOS = [combo('nv_yeon_%d' % n, seq) for n, seq in YEON.items()]
+# (2026-11-10) '연(連)' effect (js/yeonfx.js): every strike gets hitFx[i].yeon = the crescent pattern drawn along that swing.
+#   p     pattern: rl = right -> left (forehand), lr = left -> right (the cross stroke), up = rising, down = heavy downward,
+#         ring = the spin; the LAST strike is always the finisher (fin: big double crescent + cross cut + burst)
+#   roll  rotation of the crescent plane about the attack axis (rad, + = the start end high), mirror = swing from the other side
+#   size  crescent radius multiplier, var = mesh variant (a = thickest late, b = thickest early) -> no two strikes look stamped
+#   col   [body, halo] from the palette sky #78DFFF / blue-violet #8A65FF / pink #FF8BD8 (white core in the texture)
+SKY, VIOLET, PINK, PALE = 0x78DFFF, 0x8A65FF, 0xFF8BD8, 0xB4ECFF
+YPAT = {'fd': dict(p='rl', roll=0.50, mirror=False), 'br': dict(p='up', roll=-0.62, mirror=True), 'hz': dict(p='rl', roll=0.10, mirror=False),
+        'hb': dict(p='lr', roll=-0.16, mirror=True), 'spin': dict(p='ring', roll=0.04, mirror=False), 'ov': dict(p='down', roll=1.30, mirror=False)}
+YCOL = [[SKY, VIOLET], [VIOLET, PINK], [SKY, PINK], [PINK, VIOLET], [SKY, VIOLET]]
+YSIZE = [1.0, 0.93, 1.08, 0.97, 1.12]
+# rhythm (2026-11-10): 0.12 s between the quick strikes, a longer beat before the finisher (0.15, or 0.26 for the jump slam):
+# 5 hits land at 0.20 / 0.32 / 0.44 / 0.56 / 0.82 s (the visible slashes run ~0.16 -> ~1.1 s). Damage follows hitTimes.
+def yeon_combo(n, seq):
+    gaps = [0.12] * (len(seq) - 2) + [0.26 if seq[-1] == 'ov' else 0.15]
+    a = combo('nv_yeon_%d' % n, seq, gaps=gaps, trailColor=(0.85, 1.45, 1.75))
+    a['trailLife'] = 0.14
+    for i, (sid, fx) in enumerate(zip(seq, a['hitFx'])):
+        fin = i == len(seq) - 1
+        y = dict(YPAT[sid], var='ab'[i % 2], size=1.45 if fin else YSIZE[i % 5], col=[PALE, PINK] if fin else YCOL[i % 5])
+        if fin: y['fin'] = True
+        fx['yeon'] = y
+    return a
+COMBOS = [yeon_combo(n, seq) for n, seq in YEON.items()]
 # 일격참 (nv_a1): left cut, right cut, jump slam. Impacts must match the skill data (hit ops at +0, +0.24, +0.58) and
 # its own lunges move the body, so no lunges / hitFx here (the data keeps its blade + fire crack effects)
 # 일격참 (nv_a1, 2026-11-09): one big forward thrust instead of the old 3-hit flurry. Sword pulled back to the right hip

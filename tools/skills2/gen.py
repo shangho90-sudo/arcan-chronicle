@@ -49,7 +49,7 @@ S(J, 0, 0, '기본 검술', 1, 'nv_a1', '일격참', 'attack', '칼을 허리춤
        hit('single', 3.2, len=3.4, noExtra=True, at=0.0, knock=1.4, st=[st('stagger', 0.6)], fx=dict(sal=True), shake=[0.24, 0.3])], fx=dict(color=C))
 S(J, 0, 0, '기본 검술', 2, 'nv_a2', '연', 'attack', '적 하나를 칼로 이리저리 연속으로 벤다. 처음엔 2연타, 스킬 레벨이 오를 때마다 1타씩 늘어 최대 6연타.', target='enemy', range=2.2, mp=10, cd=6, anim='nv_yeon', recover=0.2,
   ops=[dict(op='lunge', dist=1.0, dur=0.2, at=-0.1), dict(op='lunge', dist=0.8, dur=0.3, at=0.2),
-       hit('single', 0.62, r=2.2, ang=110, hits=2, hitsPerLv=1, gap=0.13, noExtra=True, alt=True, fx=dict(slash='blade', burst='hit_slash'))], fx=dict(color=0xffe6a0))
+       hit('single', 0.62, r=2.2, ang=110, hits=2, hitsPerLv=1, gap=0.13, noExtra=True, alt=True, fx=dict(yeon=True))], fx=dict(color=0x78dfff))   # '연' crescents: js/yeonfx.js
 S(J, 0, 0, '기본 검술', 3, 'nv_a3', '비연참', 'attack', '칼을 크게 휘둘러 초승달 모양의 검풍을 날린다. 처음 닿은 적 하나를 벤다.', target='enemy', range=9, mp=14, cd=7, anim='nv_biyeon', recover=0.3,
   ops=[dict(op='lunge', dist=0.9, dur=0.18, at=-0.12), proj('normal', 2.0, speed=13, range=10, w=1.3, fx='sword_wave', burst='hit_slash'),
        dict(op='fx', slash='blade', r=1.7, ang=150, tilt=-0.35)], fx=dict(color=0xbfe8ff))

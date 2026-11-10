@@ -5,6 +5,7 @@ import { THREE, T } from './render.js';
 import { HitShape, CombatMath, clamp, clamp01 } from './core.js';
 import { skillSound } from './sfx.js';
 import { salImpact } from './salfx.js';
+import { yeonImpact, LEAD as YEON_LEAD } from './yeonfx.js';
 
 let G = null; export function bindSkillRt(g) { G = g; }
 const DEG = Math.PI / 180;
@@ -19,6 +20,7 @@ export const FX = {
   get on() { return !!(G && G.skillFx); },
   burst(kind, pos, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.burst(kind, pos, o); G.fx.play('hit', { x: pos.x, y: (pos.y || 0) + 0.5, z: pos.z }, o.radius || 1, false, hexToArr(o.color)); } catch (e) { console.warn('fx', kind, e); } },
   slash(kind, pos, dir, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.slash(kind, pos, dir, o); G.fx.play('slash', { x: pos.x, y: (pos.y || 0) + 0.7, z: pos.z }, 1); } catch (e) { console.warn('fx', kind, e); } },
+  yeon(kind, a, b) { try { if (G.skillFx && G.skillFx.yeon) return kind === 'strike' ? G.skillFx.yeon.strike(a) : G.skillFx.yeon.hit(a, b); } catch (e) { console.warn('fx yeon', e); } },   // 견습생 '연' (js/yeonfx.js)
   sal(kind, pos, dir, o = {}) { try { if (G.skillFx && G.skillFx.sal) return G.skillFx.sal[kind](pos, dir, o); } catch (e) { console.warn('fx sal', e); } },   // 일격참 '살' (js/salfx.js)
   beam(kind, a, b, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.beam(kind, a, b, o); } catch (e) { console.warn('fx', kind, e); } },
   projectile(kind, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.projectile(kind, o) || NOOP; } catch (e) { console.warn('fx', kind, e); } return NOOP; },
@@ -184,6 +186,11 @@ export class SkillEngine {
     for (const op of d.ops) { if (cb && cb.lunges && op.op === 'lunge') continue; this.pending.push({ time: this.clock + Math.max(0, ht + (op.at || 0)), op, ctx }); }
     // the flurry's own steps (action time = time since the cast started, the cast is instant for these skills)
     if (cb && cb.lunges) for (const [t, dist, dur] of cb.lunges) this.pending.push({ time: this.clock + t, op: { op: 'lunge', dist, dur }, ctx });
+    // '연' crescents: each strike starts drawing YEON_LEAD s before its impact (the damage itself stays on hitTimes)
+    if (cb && cb.hitFx && d.ops.some(o => o.fx && o.fx.yeon && o.hitsPerLv)) {
+      ctx.yeonPre = true;
+      cb.hitTimes.forEach((t, i) => this.pending.push({ time: this.clock + Math.max(0, t - YEON_LEAD), op: { op: '_run', run: () => { if (!pc.dead) FX.yeon('strike', { follow: pc, y: cb.hitFx[i] && cb.hitFx[i].yeon, lead: Math.min(YEON_LEAD, t) }); } }, ctx }));
+    }
     if (d.type === 'ultimate') { G.render.addShake && !G.reduceFlash && G.render.addShake(0.12, 0.25); }
   }
   interruptCast(reason) {
@@ -374,6 +381,15 @@ export class SkillEngine {
             const mir = op.alt ? h % 2 === 1 : op.sweep > 0, tilt = op.alt ? ((h * 37) % 5 - 2) * 0.12 : 0, ca = Math.cos(tilt), sa = Math.sin(tilt);
             const fd = { x: f.x * ca - f.z * sa, z: f.x * sa + f.z * ca };
             FX.slash(op.fx.slash, op.shape === 'single' && ts[0] ? ts[0].pos : (op.atAim ? ctx.aim : pc.pos), fd, { color: op.alt && h % 3 === 2 ? 0xffd27a : col, radius: op.r || 2, angle: op.ang || 100, length: op.len, width: op.w, mirror: mir, tilt: op.alt ? [0.22, -0.3, 0.45][h % 3] : (op.sweep || 0) * 0.2 });
+          }
+          if (op.fx.yeon) {  // '연': per-strike crescent (scheduled ahead in release, else now) + flash / cut / shards on the target
+            const y = (cf && cf.yeon) || { p: h % 2 ? 'lr' : 'rl', roll: h % 2 ? -0.3 : 0.4, mirror: h % 2 === 1, var: 'ab'[h % 2], fin: h === hits - 1, size: h === hits - 1 ? 1.45 : 1 };
+            if (!ctx.yeonPre) FX.yeon('strike', { follow: pc, y, lead: 0 });
+            const t0 = ts[0];
+            if (t0) FX.yeon('hit', yeonImpact(t0, f), { y, dir: pc.facing || f });
+            else FX.yeon('hit', { x: pc.pos.x + f.x * 1.5, y: (pc.pos.y || 0) + 1.05, z: pc.pos.z + f.z * 1.5 }, { y, dir: f, whiff: true });
+            if (cf && cf.shake && G.render.addShake && !G.reduceFlash) G.render.addShake(cf.shake[0], cf.shake[1]);
+            if (cf && cf.stop && ts.length) G.hitStop(cf.stop);
           }
           if (op.fx.sal) {   // '살' star flash: the full flash on the main target (closest), smaller ones on any extra target, a faint glint on a whiff
             const near = [...ts].sort((a, b) => pc.dist(a) - pc.dist(b));
