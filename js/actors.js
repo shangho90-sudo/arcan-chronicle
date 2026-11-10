@@ -128,16 +128,24 @@ export class SkillRunner {
     if (this.cdLeft(s.id) > 0) return "재사용 대기 중"; if (pc.sp < s.cost) return "기력이 부족합니다";
     const basic = s.kind === "basic", atkSpd = Math.max(0.3, pc.stat("atkSpeed"));
     const animSpeed = Math.max(0.2, s.animSpeed) * (basic ? atkSpd : 1);
-    const cd = basic ? s.cooldown / atkSpd : CombatMath.cooldown(s.cooldown, pc.stat("cdr"));
+    let cd = basic ? s.cooldown / atkSpd : CombatMath.cooldown(s.cooldown, pc.stat("cdr"));
+    // 기본공격 5단 콤보 (actions combo_1..5, tools/anim/swings.py): the next strike if this press comes before the previous
+    // strike's chainClose, else strike 1 again. Each strike blocks for its own lock (its timing replaces the cooldown).
+    let cmb = null; const sh0 = pc.body && pc.body.sh;
+    if (basic && (s.anim || "attack") === "attack" && sh0 && sh0.actions.combo_1) {
+      const prev = this.comboN ? sh0.actions["combo_" + this.comboN] : null, since = (this.clock - (this.comboAt ?? -99)) * animSpeed;
+      this.comboN = prev && since <= prev.chainClose ? this.comboN % 5 + 1 : 1; this.comboAt = this.clock;
+      cmb = sh0.actions["combo_" + this.comboN]; cd = cmb.lock / animSpeed;
+    }
     pc.sp -= s.cost; this.cdEnd[s.id] = this.clock + cd; this.cdLen[s.id] = cd;
     const o = { ...pc.pos };
     let dx = aim.x - o.x, dz = aim.z - o.z;
     if (s.targeting === "ground") { const m = Math.hypot(dx, dz); if (m > s.range) { aim = { x: o.x + dx / m * s.range, z: o.z + dz / m * s.range }; } aim = pc.zone.geo.ground(aim.x, aim.z); }
     if (dx * dx + dz * dz > 0.01) pc.setFacing(dx, dz);
     const facing = { ...pc.facing };
-    let anim = s.anim || "attack"; const sh = pc.body.sh;
+    let anim = cmb ? "combo_" + this.comboN : s.anim || "attack"; const sh = pc.body.sh;
     // basic attacks alternate forehand / backhand while the button is held (the 2nd swing starts where the 1st ended)
-    if (basic && anim === "attack" && sh.actions.attack2) { this.combo = this.clock - (this.lastBasic ?? -9) < 0.9 ? ((this.combo || 0) + 1) % 2 : 0; this.lastBasic = this.clock; if (this.combo) anim = "attack2"; }
+    if (!cmb && basic && anim === "attack" && sh.actions.attack2) { this.combo = this.clock - (this.lastBasic ?? -9) < 0.9 ? ((this.combo || 0) + 1) % 2 : 0; this.lastBasic = this.clock; if (this.combo) anim = "attack2"; }
     const ht = hitTime(sh, anim) / animSpeed, du = duration(sh, anim) / animSpeed;
     pc.body.play(anim, animSpeed, true);
     this.lock = anim === "dash" ? 0 : lockTime(sh, anim) / animSpeed;   // the recovery of a swing can blend into moving / the next swing
@@ -145,7 +153,7 @@ export class SkillRunner {
     let extra = 0;
     for (const a of s.actions) {
       if (a.type === "projectile") { this.pending.push({ time: this.clock + ht + a.delay, a, s, aim, facing, origin: o }); extra += Math.hypot(aim.x - o.x, aim.z - o.z) / Math.max(1, a.speed); continue; }
-      for (let h = 0; h < Math.max(1, a.hits); h++) this.pending.push({ time: this.clock + ht + a.delay + extra + h * a.interval, a, s, aim, facing, origin: o });
+      for (let h = 0; h < Math.max(1, a.hits); h++) this.pending.push({ time: this.clock + ht + a.delay + extra + h * a.interval, a, s, aim, facing, origin: o, cm: cmb && cmb.atk, cn: cmb && cmb.combo });
     }
     pc.path = [];
     return null;
@@ -164,7 +172,9 @@ export class SkillRunner {
     return HitShape.circle(c.x, c.z, a.radius);
   }
   exec(p) {
-    const a = p.a, pc = this.pc, st = pc.sheet.final;
+    const a0 = p.a, pc = this.pc, st = pc.sheet.final, cm = p.cm;
+    // combo strike: per-strike damage / reach / arc (3 wide, 4 thrust = long and narrow, 5 heavy)
+    const a = cm && a0.type === "damage" ? { ...a0, coef: a0.coef * cm.coef, radius: a0.radius * cm.r, length: a0.length * cm.r, angle: Math.min(200, a0.angle * cm.ang) } : a0;
     switch (a.type) {
       case "damage": {
         const sh = this.shape(a, p); const ts = Resolver.targets(pc, sh);
@@ -182,11 +192,11 @@ export class SkillRunner {
         const fp = a.atTarget ? { x: p.aim.x, y: p.aim.y + 0.3, z: p.aim.z } : { x: pc.pos.x + p.facing.x * reach, y: pc.pos.y + 0.7, z: pc.pos.z + p.facing.z * reach };
         const trail = pc.body && pc.body.md && pc.body.sh.actions[pc.body.action] && pc.body.sh.actions[pc.body.action].trail;
         // melee swing: Tripo crescent sweeping the same way as the swing (forehand / backhand)
-        if (SF && !a.atTarget && (a.shape === "cone" || a.shape === "rect")) SF.slash(pc.pos, p.facing, pc.body && pc.body.action === "attack2" ? -1 : 1, { radius: Math.max(1.0, (a.radius || a.length || 1.5) * 0.85) });
+        if (SF && !cm && !a.atTarget && (a.shape === "cone" || a.shape === "rect")) SF.slash(pc.pos, p.facing, pc.body && pc.body.action === "attack2" ? -1 : 1, { radius: Math.max(1.0, (a.radius || a.length || 1.5) * 0.85) });
         if (fx3 && !trail) { this.swing = ((this.swing || 0) + 1) % 3;
           G.skillFx.slash("blade", pc.pos, p.facing, { radius: a.radius * 1.05, angle: Math.max(110, a.angle + 20), mirror: this.swing === 1, tilt: [0.18, -0.22, 0.42][this.swing], grade: 3 }); }
         else if (["slash", "wind", "paint_burst", "potion_splash", "ring"].includes(a.fx)) G.fx.play(a.fx, fp, a.fxScale, a.fx === "ring");
-        if (ts.length) { G.audio.sfx(a.sfx || "hit"); pc.onHitLanded(a.coef >= 1.5); }
+        if (ts.length) { G.audio.sfx(a.sfx || "hit"); pc.onHitLanded(a0.coef >= 1.5); }
         else if (a.atTarget && a.sfx) G.audio.sfx(a.sfx);
         break;
       }
@@ -266,8 +276,8 @@ export class Player extends Combatant {
 
   update(dt, input) {
     this.baseUpdate(dt);
-    if (this.dodgeCd > 0) this.dodgeCd -= dt; if (this.potionCd > 0) this.potionCd -= dt; if (this.repathT > 0) this.repathT -= dt;
-    this.skills.tick(dt); this.skills2.tick(dt);
+    if (this.dodgeCd > 0) this.dodgeCd -= dt; if (this.potionCd > 0) this.potionCd -= dt; if (this.repathT > 0) this.repathT -= dt; if (this.atkBuf > 0) this.atkBuf -= dt;
+    this.skills.tick(dt); this.skills2.tick(dt); this.comboRoot();
     if (this.dead) { this.vel = { x: 0, z: 0 }; return; }
     this.sp = Math.min(this.maxSp, this.sp + this.stat("spRegen") * dt);
     this.sheet.p.playTime += dt;
@@ -319,6 +329,7 @@ export class Player extends Combatant {
       if (e) G.ui.toast(e);
     }
     this.updateLock(input);
+    if (this.atkBuf > 0 && !this.skills.busy) this.basic(input);
     if (input.down.attack || input.held.attack) {
       // locked on: the attack key goes after the locked monster (walks up to it when out of reach); otherwise swing here
       const L = this.lockOn;
@@ -357,7 +368,20 @@ export class Player extends Combatant {
     }
     if (G.fx.lockMark) G.fx.lockMark(this.lockOn);
   }
-  basic(input) { if (this.skills.busy) return; const s = G.data.skill(this.sheet.job.basicAttack); if (s) this.skills.tryCast(s, this.aimFor(s, input)); }
+  basic(input) {
+    // a press during a combo strike is remembered (Chain_Open .. the strike's lock end) and fires as soon as it ends
+    if (this.skills.busy) { const A = this.body && this.body.sh && this.body.sh.actions[this.body.action]; if (A && A.combo && this.body.t >= A.chainOpen * 0.999) this.atkBuf = 0.4; return; }
+    this.atkBuf = 0; const s = G.data.skill(this.sheet.job.basicAttack); if (s) this.skills.tryCast(s, this.aimFor(s, input));
+  }
+  /** combo strike root motion: the actor follows the action's adv (m forward of where the strike started), so the
+   *  planted feet (step - adv in model.js) stay on the ground; blocked moves just stop there */
+  comboRoot() {
+    const B = this.body, A = B && B.sh && B.sh.actions[B.action], a = A && A.combo && B.rawPose ? B.rawPose.adv || 0 : null;
+    if (a === null) { this.advPrev = null; return; }
+    if (this.advPrev === null || this.advPrev === undefined || B.action !== this.advAct || B.t < this.advT) this.advPrev = 0;
+    const d = a - this.advPrev; this.advPrev = a; this.advAct = B.action; this.advT = B.t;
+    if (Math.abs(d) > 1e-5 && !this.dead) this.moveBy(this.facing.x * d, this.facing.z * d);
+  }
   aimFor(s, input) {
     if (s.targeting === "ground" && input && !input.mobile && input.pointer) {
       const ray = G.render.screenRay(input.pointer.x, input.pointer.y); const h = this.zone.geo.raycast(ray.o, ray.d); if (h) return h;

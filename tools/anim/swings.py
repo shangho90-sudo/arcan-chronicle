@@ -202,7 +202,120 @@ ROLL = action('roll', [
     key(0.54, 's', ik=0, plant=0),
 ], 0.0, 0.40, None, fadeIn=0.04, fadeOut=0.12)
 ROLL['flips'] = [[0.05, 0.40, 360, 0.5]]
-SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
+
+# ------------------------------------------------------------------------------------------------ basic attack: 5-hit combo
+# (2026-11-10) 기본공격 5단 콤보 (one-handed sword, right hand; the left arm balances). Authored as ONE timeline at 60 fps
+# (150 frames = 2.5 s), the same one the Blender export uses (tools/blender/combo5.py):
+#   1  f1-22   hit f12   diagonal cut, right shoulder -> left hip, right foot steps in
+#   2  f23-44  hit f34   rising cut from where 1 ended (low left -> high right): the two make an X
+#   3  f45-70  hit f58   wide horizontal cut right -> left at waist / chest height, pivot on the feet (no full turn)
+#   4  f71-94  hit f83   sword pulled to the right hip, front foot steps, short straight thrust (pelvis + chest go forward)
+#   5  f95-130 hit f116  sword raised over the right shoulder (longer wind-up), heavy diagonal cut down, weight on the
+#                        front foot; f131-150 absorb the weight and return to the guard
+# Legs: step = [left, right] foot position (m forward of the idle footprint) in the ACTION-START space, adv = how far the
+# root has travelled forward in that space (root motion: js/actors.js moves the actor by d(adv), model.js plants the feet
+# at step - adv relative to the body, so a planted foot never slides); lift = [left, right] ankle lift (m) - a foot only
+# moves while it is in the air. combo_1..combo_5 = the five strikes cut out of the timeline (entry pose = where the
+# previous strike ended, times and positions re-based), each followed by its own recovery to the guard so it can also be
+# played alone. Extra fields: hitT (impact, s), lock (= Chain_Open: input before this is buffered), chainClose (s; later
+# than this the next press starts again from strike 1), atk = per-strike {coef, r, ang} multipliers of the job's basic
+# attack (1-4 lighter, 5 heavier; ~same damage per second as the old 2-swing alternation), mark = the frame markers.
+CF = 60.0
+def F(n): return round(n / CF, 4)
+GUARD = dict(hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18])
+def ck(t, e, adv, step, lift=(0, 0), **kw):
+    return key(t, e, adv=adv, step=[round(step[0], 3), round(step[1], 3)], lift=[lift[0], lift[1]], **kw)
+FD, BR, HZ = ST['fd'], ST['br'], ST['hz']
+def PZ(d, **kw): o = dict(d); o.update(kw); return o
+C5 = [  # (t, ease, adv, step [L, R], lift [L, R], pose)
+    (0.0,     None, 0.00, [0.00, 0.00], [0, 0],    PZ(GUARD, sink=0.05)),
+    # 1 diagonal down: right foot lifts and plants 0.18 forward while the shoulders coil back
+    (F(5),    'o',  0.02, [0.00, 0.07], [0, 0.07], PZ(FD['cock'], sink=0.07)),
+    (F(10),   'i',  0.07, [0.00, 0.18], [0, 0.0],  PZ(FD['mid'])),
+    (F(12),   None, 0.08, [0.00, 0.18], [0, 0],    PZ(FD['hit'])),
+    (F(15),   'o',  0.09, [0.00, 0.18], [0, 0],    PZ(FD['fol'])),
+    (F(22),   's',  0.09, [0.00, 0.18], [0, 0],    dict(twist=30, lean=10, sink=0.10, hand=[70, -30, 0.80], blade=[115, -32], elbow=[0.0, -1, 0.4], armL=[10, 40])),
+    # 2 rising: no rewind - the blade leaves from the low left; the legs push up into the cut
+    (F(29),   'o',  0.09, [0.00, 0.18], [0, 0],    PZ(BR['cock'], sink=0.12)),
+    (F(32.5), 'i',  0.10, [0.00, 0.18], [0, 0],    PZ(BR['mid'], sink=0.09)),
+    (F(34),   None, 0.10, [0.00, 0.18], [0, 0],    PZ(BR['hit'], sink=0.05)),
+    (F(37),   'o',  0.10, [0.00, 0.18], [0, 0],    PZ(BR['fol'], sink=0.05)),
+    (F(44),   's',  0.10, [0.00, 0.18], [0, 0],    dict(twist=-38, lean=2, sink=0.09, hand=[-104, 18, 0.84], blade=[-140, 14], elbow=[-0.5, -0.6, -0.8], armL=[32, 30])),
+    # 3 wide horizontal: chest-height sweep, pivoting on both planted feet (twist -46 -> +44, never the back to the enemy)
+    (F(52),   'o',  0.10, [0.00, 0.18], [0, 0],    PZ(HZ['cock'])),
+    (F(56),   'i',  0.11, [0.00, 0.18], [0, 0],    PZ(HZ['mid'])),
+    (F(58),   None, 0.11, [0.00, 0.18], [0, 0],    PZ(HZ['hit'])),
+    (F(62),   'o',  0.11, [0.00, 0.18], [0, 0],    PZ(HZ['fol'])),
+    (F(70),   's',  0.11, [0.00, 0.18], [0, 0],    dict(twist=24, lean=4, sink=0.12, hand=[20, -24, 0.66], blade=[40, -6], elbow=[-0.2, -1, -0.2], armL=[18, 34])),
+    # 4 thrust: elbow folds, sword to the right hip with the point forward; the back leg drives, the front (left) foot
+    # steps 0.22 and the pelvis follows (adv), arm and blade go straight out, then hold
+    (F(76),   's',  0.11, [0.00, 0.18], [0, 0],    dict(twist=-40, lean=-2, sink=0.16, hand=[-78, -22, 0.52], blade=[-8, -2], elbow=[-0.5, -0.2, -1], armL=[40, 46])),
+    (F(80),   's',  0.13, [0.08, 0.18], [0.06, 0], dict(twist=-44, lean=0, sink=0.18, hand=[-82, -24, 0.48], blade=[-6, -2], elbow=[-0.5, -0.2, -1], armL=[44, 48], squint=True)),
+    (F(82),   'i',  0.18, [0.20, 0.18], [0.02, 0], dict(twist=-14, lean=10, sink=0.20, hand=[-36, -10, 0.84], blade=[-2, -4], elbow=[-0.6, -0.5, -0.6], armL=[24, 40], squint=True)),
+    (F(83),   None, 0.20, [0.22, 0.18], [0, 0],    dict(twist=14, lean=20, sink=0.22, hand=[-6, -4, 1.02], blade=[0, -6], elbow=[-0.5, -0.8, -0.2], armL=[8, 52], squint=True)),
+    (F(88),   'o',  0.21, [0.22, 0.18], [0, 0],    dict(twist=16, lean=22, sink=0.23, hand=[-4, -6, 1.03], blade=[0, -8], elbow=[-0.5, -0.8, -0.2], armL=[6, 54])),
+    (F(94),   's',  0.21, [0.22, 0.18], [0, 0],    dict(twist=4, lean=12, sink=0.18, hand=[-40, 10, 0.80], blade=[-50, 30], elbow=[-0.6, -0.6, -0.6], armL=[20, 40])),
+    # 5 heavy diagonal: pull the point back and lift the sword over the right shoulder, hold the coil, then cut down
+    # hard with the weight sinking onto the front foot (blade stops short of the ground)
+    (F(103),  'o',  0.21, [0.22, 0.18], [0, 0],    dict(twist=-40, lean=-8, sink=0.08, hand=[-100, 62, 0.80], blade=[-150, 78], elbow=[-0.4, -0.2, -1], armL=[40, 36])),
+    (F(111),  's',  0.21, [0.22, 0.18], [0, 0],    dict(twist=-46, lean=-10, sink=0.10, hand=[-108, 66, 0.80], blade=[-158, 80], elbow=[-0.4, -0.2, -1], armL=[44, 38])),
+    (F(114),  'i',  0.23, [0.22, 0.18], [0, 0],    dict(twist=-14, lean=8, sink=0.16, hand=[-50, 30, 0.97], blade=[-70, 20], elbow=[-0.6, -0.8, -0.6], armL=[30, 30], squint=True)),
+    (F(116),  None, 0.24, [0.22, 0.18], [0, 0],    dict(twist=20, lean=22, sink=0.24, hand=[8, -18, 1.0], blade=[20, -36], elbow=[-0.5, -1, -0.1], armL=[14, 44], squint=True)),
+    (F(121),  'o',  0.24, [0.22, 0.18], [0, 0],    dict(twist=30, lean=26, sink=0.28, hand=[46, -38, 0.88], blade=[68, -56], elbow=[-0.1, -1, 0.2], armL=[10, 48])),
+    (F(130),  's',  0.24, [0.22, 0.18], [0, 0],    dict(twist=26, lean=20, sink=0.24, hand=[40, -38, 0.86], blade=[62, -52], elbow=[-0.1, -1, 0.2], armL=[12, 42])),
+    # recovery: the back foot gathers in, the front foot settles, guard
+    (F(138),  's',  0.24, [0.22, 0.24], [0, 0.05], dict(twist=10, lean=8, sink=0.10, hand=[10, -40, 0.78], blade=[30, -12], elbow=[-0.5, -1, -0.1], armL=[12, 26])),
+    (F(144),  's',  0.24, [0.24, 0.24], [0.03, 0], PZ(GUARD, sink=0.05)),
+    (F(150),  's',  0.24, [0.24, 0.24], [0, 0],    PZ(GUARD)),
+]
+C5_HIT = [F(12), F(34), F(58), F(83), F(116)]
+C5_CUT = [0.0, F(22), F(44), F(70), F(94), F(130)]          # strike sections (start of each strike, end of the 5th)
+C5_ATK = [dict(coef=0.8, r=1.0, ang=1.0), dict(coef=0.8, r=1.0, ang=1.0), dict(coef=0.95, r=1.0, ang=1.35),
+          dict(coef=0.9, r=1.2, ang=0.55), dict(coef=1.3, r=1.1, ang=1.1)]
+TRAIL_C = [1.45, 1.75, 2.15]; TRAIL_C5 = [1.9, 2.15, 2.6]   # white core / pale blue edge (HDR, the bloom whitens the middle)
+
+def c5_keys(t0, t1):
+    return [x for x in C5 if t0 - 1e-6 <= x[0] <= t1 + 1e-6]
+
+def c5_mk(x, dt, da):
+    t, e, adv, step, lift, pose = x
+    return ck(round(t - dt, 4), e, round(adv - da, 3), [step[0] - da, step[1] - da], lift, **pose)
+
+def c5_strike(i):
+    """combo_<i+1>: the section of strike i, re-based to start at 0 with the root at 0, plus its own recovery"""
+    t0, t1 = C5_CUT[i], C5_CUT[i + 1]; a0 = next(x for x in C5 if abs(x[0] - t0) < 1e-6)[2]
+    ks = [c5_mk(x, t0, a0) for x in c5_keys(t0, t1)]
+    if i == 4: ks += [c5_mk(x, t0, a0) for x in C5 if x[0] > t1 + 1e-6]          # the real finish (f131-150)
+    else:
+        end = ks[-1][1]; ad = end['adv']; T = ks[-1][0]
+        L, R = end['step']
+        # recovery to the guard: each foot that is off the idle footprint lifts and steps back under the body (one at a
+        # time, highest lift in the middle of its move); feet within 2 cm just stay
+        mvR, mvL = abs(R - ad) > 0.02, abs(L - ad) > 0.02
+        R1, L1 = (ad if mvR else R), (ad if mvL else L)
+        mid = dict(twist=8, lean=5, sink=0.06, hand=[10, -40, 0.78], blade=[30, -12], elbow=[-0.5, -1, -0.1], armL=[12, 24])
+        ks += [ck(round(T + 0.09, 4), 's', ad, [L, (R + R1) / 2], [0, 0.05 if mvR else 0], **mid),
+               ck(round(T + 0.17, 4), 's', ad, [(L + L1) / 2, R1], [0.04 if mvL else 0, 0], **PZ(GUARD, sink=0.04)),
+               ck(round(T + 0.25, 4), 's', ad, [L1, R1], [0, 0], **PZ(GUARD, sink=0.02)),
+               ck(round(T + 0.32, 4), 's', ad, [L1, R1], [0, 0], **PZ(GUARD))]
+    h = C5_HIT[i] - t0
+    trail = [[round(h - 0.035, 3), round(h + 0.012, 3)]] if i == 3 else [[round(h - (0.06 if i == 4 else 0.05), 3), round(h + (0.05 if i == 4 else 0.04), 3)]]
+    lock = round(t1 - t0 + (0.12 if i == 4 else 0.0), 3)               # 5: a longer recovery before the next round
+    a = action('combo_%d' % (i + 1), ks, round(h, 4), lock, trail, fadeIn=0.05, fadeOut=0.14)
+    a.update(hitTimes=[round(h, 4)], chainOpen=round(h + 0.05, 3), chainClose=round(t1 - t0 + 0.30, 3), atk=C5_ATK[i],
+             trailColor=TRAIL_C5 if i == 4 else TRAIL_C, trailLife=0.16 if i == 4 else 0.12, trailBase=0.2 if i == 4 else 0.38,
+             adv=round(ks[-1][1]['adv'], 3), combo=i + 1,
+             mark=dict(Hit=round(h * CF), Chain_Open=round((h + 0.05) * CF), Chain_Close=round((t1 - t0 + 0.30) * CF)))
+    assert all(x < y for x, y in zip(a['keys'], a['keys'][1:])), a['keys']
+    return a
+
+C5_ACTS = [c5_strike(i) for i in range(5)]
+# the whole 150-frame chain in one action (previews, Blender export, tools/browser-tests/combo_film.js)
+C5_FULL = action('combo_full', [ck(*x[:5], **x[5]) for x in C5], C5_HIT[0], F(150), [[round(h - 0.05, 3), round(h + 0.045, 3)] for h in C5_HIT], fadeIn=0.05, fadeOut=0.14)
+C5_FULL.update(hitTimes=C5_HIT, trailColor=TRAIL_C, trailLife=0.12, trailBase=0.38, adv=0.24,
+               mark=dict(Hit=[round(h * CF) for h in C5_HIT], Strike=[round(t * CF) + 1 for t in C5_CUT[:5]]))
+
+SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
 
 acts = json.load(open(P))
 names = {'attack', 'attack2'} | {x['name'] for x in SKILL_ACTS}

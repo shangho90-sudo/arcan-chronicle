@@ -134,10 +134,10 @@ function npcIdle(t, look) {
     Head: mul(ry(Math.max(-35, Math.min(35, look)) + sw * 3), rx(Math.sin(t * 0.9) * 2)),
   };
 }
-const NUM = ['bob', 'lean', 'twist', 'legL', 'legR', 'wOff', 'offOff', 'fall', 'sink', 'tuck'];
+const NUM = ['bob', 'lean', 'twist', 'legL', 'legR', 'wOff', 'offOff', 'fall', 'sink', 'tuck', 'adv'];
 // weapon-swing keys (see SWING below): hand = [azimuth, elevation, reach] of the sword hand around the right shoulder,
 // blade = [azimuth, elevation] of the blade, elbow = pole the elbow points at, step = [left, right] foot offsets (m)
-const VEC = ['hand', 'blade', 'elbow', 'step'];
+const VEC = ['hand', 'blade', 'elbow', 'step', 'lift'];   // lift = [left, right] ankle lift (m), adv = root travel (m) of a combo strike
 const ikW = p => (p.hand ? (p.ik ?? 1) : 0), plantW = p => (p.step ? (p.plant ?? 1) : 0);
 function lerpPose(a, b, k) {
   const o = { armR: [a.armR[0] + (b.armR[0] - a.armR[0]) * k, a.armR[1] + (b.armR[1] - a.armR[1]) * k], armL: [a.armL[0] + (b.armL[0] - a.armL[0]) * k, a.armL[1] + (b.armL[1] - a.armL[1]) * k], squint: k < 0.5 ? a.squint : b.squint, held: a.held };
@@ -426,6 +426,9 @@ function blendBones(A, B, w) {
 /** Samples the actual blade (base + tip) every frame while the action's `trail` window is open and draws a fading
  *  ribbon through them (Catmull-Rom smoothed), so the afterimage always matches the sword - in every facing. */
 const TRAIL_LIFE = 0.11, TRAIL_SUB = 4, TRAIL_MAX = 40;
+/** blade afterimage on/off switch (window.SWING_TRAIL.on = false hides every swing trail; the trail is its own mesh) */
+export const SWING_TRAIL = { on: true };
+if (typeof window !== 'undefined') window.SWING_TRAIL = SWING_TRAIL;
 class SwingTrail {
   constructor(scene) {
     this.scene = scene; this.s = []; this.mesh = null;
@@ -612,7 +615,7 @@ export class ModelBody {
     // swing afterimage from the real blade while the action's trail window [start, end] (seconds) is open
     // (trail = one [start, end] window, or a list of them: skill flurries only trail the cutting part of each strike)
     const a = this.sh.actions[this.action], tw = a && a.trail, wins = tw ? (typeof tw[0] === 'number' ? [tw] : tw) : [];
-    const on = this.swingW > 0.5 && wins.some(w => this.t >= w[0] && this.t <= w[1]);
+    const on = this.swingW > 0.5 && SWING_TRAIL.on && wins.some(w => this.t >= w[0] && this.t <= w[1]);
     if (on || (this.trail && this.trail.s.length)) { if (!this.trail) this.trail = new SwingTrail(this.scene); this.trail.update(dt, on ? this.bladePoints() : null, a && a.trailColor, a && a.trailLife, a && a.trailBase); }
   }
   poseOf(name) {
@@ -637,9 +640,9 @@ export class ModelBody {
     const md = this.md;
     // walking / running: legs and upper body come from the procedural gait; underneath it is the idle stance, never the
     // key-framed walk cycle (that one slid its feet while the gait blended in or when the character pushed into a wall)
-    let p = this.action === 'walk' && md.leg && !md.cfg.npc ? this.poseOf('idle') : this.currentPose();
+    let p = this.action === 'walk' && md.leg && !md.cfg.npc ? this.poseOf('idle') : this.currentPose(); const p0 = p;   // p0: before the cross-fade (root motion reads it)
     if (this.fadeDur > 0 && this.fromPose) { const k = this.fadeT / this.fadeDur; if (k < 1) p = lerpPose(this.fromPose, p, EASE.s(k)); else this.fadeDur = 0; }
-    this.lastPose = p;
+    this.rawPose = p0; this.lastPose = p;
     let Q = md.cfg.npc ? npcIdle(this.t, this.lookYaw || 0) : poseToBones(p, md.cfg.headPitch);
     let bodyY = md.cfg.npc ? 0 : (p.bob || 0) - (p.sink || 0), swayX = 0;
     if (!md.cfg.npc && md.leg) Q = alignLegs(md, Q);
@@ -708,7 +711,8 @@ export class ModelBody {
       // same spot and toe-out as the idle stance (alignLegs), so blending in / out of a swing does not move the feet
       const c = ch[side], g = leg[side], yaw = c.sg * Math.min(g.toeOut, TOE_OUT) * DEG;
       const Hn = c.H.clone().sub(ch.pelvis).applyMatrix4(RH).add(ch.pelvis);
-      const A = _v(c.sg * (g.ankX - Math.min(STAND_IN, Math.max(0, g.ankX - 0.09))), -bodyY + g.ha, c.A.z + p.step[i]);
+      // step is in the action-start space: minus the root travel (adv) so far = where the planted foot is under the body now
+      const A = _v(c.sg * (g.ankX - Math.min(STAND_IN, Math.max(0, g.ankX - 0.09))), -bodyY + g.ha + (p.lift ? p.lift[i] : 0), c.A.z + p.step[i] - (p.adv || 0));
       const pole = _v(Math.sin(yaw) * 0.9 + c.sg * 0.15, 0, Math.cos(yaw)).normalize();
       const r = solveLeg(c, Hn, A, pole, yaw, 0);
       out[side + '_UpperLeg'] = mul(RHi, r.Rth); out[side + '_LowerLeg'] = mul(r.Rth.clone().invert(), r.Rsh); out[side + '_Foot'] = mul(r.Rsh.clone().invert(), r.Rft);
