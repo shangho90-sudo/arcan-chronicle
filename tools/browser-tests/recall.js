@@ -14,7 +14,7 @@ const OUT = process.env.OUT || '/tmp/recall'; fs.mkdirSync(OUT, { recursive: tru
     const ready = () => pg.waitForFunction(() => window.G && G.inWorld && G.player && !G.loading && G.zone && !document.querySelector('.prologue'), null, { timeout: 300000 });
     await ready(); await pg.waitForTimeout(1500);
     const R = {}; const tap = async () => { const r = await ev(() => { const b = document.querySelector('.abtn.recall').getBoundingClientRect(); return [b.x + b.width / 2, b.y + b.height / 2]; }); if (touch) await pg.touchscreen.tap(r[0], r[1]); else await pg.keyboard.press('KeyH'); };
-    await tap(); await pg.waitForTimeout(300); R.inTown = await ev(() => ({ zone: G.zone.def.id, recallT: G.player.recallT, dim: document.querySelector('.abtn.recall').classList.contains('dim') }));
+    await tap(); await pg.waitForTimeout(300); R.inTown = await ev(() => ({ zone: G.zone.def.id, recallT: G.player.recallT, dim: document.querySelector('.abtn.recall').classList.contains('rcoff') }));
     await ev(() => G.travel('forest')); await pg.waitForTimeout(800); await ready(); await pg.waitForTimeout(1500);
     // 1) 움직이면 취소
     await tap(); await pg.waitForTimeout(400); await ev(() => { G.input.stick = { x: 1, y: 0 }; }); await pg.waitForTimeout(600); await ev(() => { G.input.stick = { x: 0, y: 0 }; });

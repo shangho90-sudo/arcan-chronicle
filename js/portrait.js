@@ -36,3 +36,43 @@ export function renderPortrait(body, size = 192) {
   } catch (e) { console.warn('portrait', e); return null; }
   finally { if (parent) parent.add(root); root.position.copy(pos); root.rotation.y = rot; root.visible = vis; }
 }
+
+/** Small picture of any 3D body (monster / NPC) for lists such as the area map's "이 지역" panel.
+ *  mode 'full' frames the whole model (monsters), 'bust' the head and shoulders (people, via renderPortrait).
+ *  Temporarily moves the body's root into its own scene, like renderPortrait. Returns a data URL or null. */
+export function renderThumb(body, mode = 'full', size = 96) {
+  if (!body || !body.root) return null;
+  if (mode === 'bust' && body.bones && body.bones.some(b => /head/i.test(b.name))) return renderPortrait(body, size);
+  const R = G.render.r, S = size * 2;
+  const root = body.root, parent = root.parent, pos = root.position.clone(), rot = root.rotation.y, vis = root.visible;
+  const scene = new THREE.Scene();
+  scene.add(new THREE.HemisphereLight(0xfff4e0, 0x6a5a70, 1.7));
+  const key = new THREE.DirectionalLight(0xffe8c8, 2.2); key.position.set(-1.2, 2.0, 2.2); scene.add(key);
+  const rim = new THREE.DirectionalLight(0xa8d0ff, 1.2); rim.position.set(1.6, 1.2, -1.5); scene.add(rim);
+  try {
+    scene.add(root); root.position.set(0, 0, 0); root.rotation.y = 0.5; root.visible = true; root.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(root), c = box.getCenter(new THREE.Vector3()), sz = box.getSize(new THREE.Vector3());
+    if (!isFinite(sz.x) || sz.length() < 1e-3) return null;
+    const fov = 24, r = Math.max(sz.y, Math.hypot(sz.x, sz.z) * 0.8) * 0.62, d = r / Math.tan(fov * Math.PI / 360);
+    const cam = new THREE.PerspectiveCamera(fov, 1, 0.05, d * 4);
+    cam.position.set(c.x, c.y + d * 0.28, c.z + d); cam.lookAt(c.x, c.y, c.z);
+    const rt = new THREE.WebGLRenderTarget(S, S, { samples: 4 });
+    const prevT = R.getRenderTarget(), prevC = R.getClearColor(new THREE.Color()), prevA = R.getClearAlpha();
+    R.setRenderTarget(rt); R.setClearColor(0x000000, 0); R.clear(); R.render(scene, cam);
+    const px = new Uint8Array(S * S * 4); R.readRenderTargetPixels(rt, 0, 0, S, S, px);
+    R.setRenderTarget(prevT); R.setClearColor(prevC, prevA); rt.dispose();
+    const cv = document.createElement('canvas'); cv.width = cv.height = S; const g = cv.getContext('2d'); const img = g.createImageData(S, S);
+    const lut = new Uint8Array(256); for (let i = 0; i < 256; i++) { const v = i / 255; lut[i] = Math.round(255 * (v <= 0.0031308 ? v * 12.92 : 1.055 * Math.pow(v, 1 / 2.4) - 0.055)); }
+    for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
+      const s = ((S - 1 - y) * S + x) * 4, o = (y * S + x) * 4;
+      img.data[o] = lut[px[s]]; img.data[o + 1] = lut[px[s + 1]]; img.data[o + 2] = lut[px[s + 2]]; img.data[o + 3] = px[s + 3];
+    }
+    g.putImageData(img, 0, 0);
+    const out = document.createElement('canvas'); out.width = out.height = size; const og = out.getContext('2d');
+    const bg = og.createRadialGradient(size / 2, size * 0.45, size * 0.05, size / 2, size / 2, size * 0.72);
+    bg.addColorStop(0, '#f7e7c4'); bg.addColorStop(1, '#b98d58'); og.fillStyle = bg; og.fillRect(0, 0, size, size);
+    og.imageSmoothingQuality = 'high'; og.drawImage(cv, 0, 0, size, size);
+    return out.toDataURL('image/png');
+  } catch (e) { console.warn('thumb', e); return null; }
+  finally { if (parent) parent.add(root); root.position.copy(pos); root.rotation.y = rot; root.visible = vis; root.updateMatrixWorld(true); }
+}

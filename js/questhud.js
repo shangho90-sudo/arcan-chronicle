@@ -69,7 +69,7 @@ const QUEST_HUD = {
     const st = this.qstate(), goals = questGoals();
     // feedback inside the window: an objective that just completed gets a check + short highlight; a finished quest /
     // tutorial step stays visible as "완료" for a moment before the next goal replaces it
-    const sig = JSON.stringify(goals.map(g => [g.key, g.rows.map(r => r.done), g.ready]));
+    const sig = JSON.stringify(goals.map(g => [g.key, g.rows.map(r => [r.done, r.prog]), g.ready, g.hint]));   // 진행 숫자(0/6 → 1/6)도 바뀌면 바로 다시 그림
     const prev = this.qprev; this.qprev = goals;
     const justDone = new Set();
     if (prev) {

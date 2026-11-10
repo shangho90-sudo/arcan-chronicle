@@ -599,3 +599,9 @@
 - 칼 잔상: 각 타격 순간에만 실제 칼날 궤적(`SwingTrail`), 흰 중심·옅은 청색(`trailColor`), 5타만 넓고 밝게, 찌르기는 직선. 콤보 타격에서는 예전 Tripo 초승달·픽셀 '베기' 스프라이트를 끔. 모든 칼 잔상은 `window.SWING_TRAIL.on = false`로 끌 수 있음. 전체 히트스톱은 넣지 않음(기존 규칙: 기본 계수 1.5 이상일 때만).
 - Blender: `tools/browser-tests/combo_bake.js`(게임 몸 60 fps 굽기) → `python3 tools/blender/combo5.py` → `tools/blender/combo5/`(`combo5.blend`, `combo5.fbx` — `Sword_Combo_5Hit`·`Attack_01`~`05`와 각 `_InPlace`, 마커 `Hit`/`Chain_Open`/`Chain_Close`, `Root` 뼈 = 루트 이동, 궤적 컬렉션 `Trails` — `preview_quarter.mp4`, `views_front_side.png`, 설명 `README.md`). Blender 뼈 위치·칼끝은 굽기 값과 오차 0 mm로 확인.
 - 확인 `tools/browser-tests/combo_film.js`(실제 게임 루프, `DIRS= SIZE= TAP= FILM=`) + `tools/anim/combo_report.py`(디딘 발 미끄러짐): 8방향 모두 1→5타 순서·타격 시각 확인, 휴대폰 390×844 버튼 연타 확인, 칼끝 최저 0.25 m. 디딘 발 미끄러짐은 이어 누를 때 타당 0~2 cm(프레임당 최대 약 2 cm), 회복 도중 늦게 이어 누르면 다음 타 시작 0.05 s 동안 최대 약 3.5 cm/프레임 이동. 실기기·여자 모델·다른 직업 모델 화면은 확인하지 않음. core 504 통과/50 생략, skills2 620 통과(귀환·4번 칸 반영 main 위에서 다시 확인).
+
+### 2026-11-11 — 지역 지도 몬스터·NPC 목록, 마을 귀환 버튼 위치, 키패드 숫자 주아체, 퀘스트 창 실시간 갱신
+- 지역 지도(`ui.js` `showAreaMap`) 오른쪽 아래에 목록: 필드는 몬스터 종류별 그림·이름·레벨(보스는 빨간 테), 마을은 NPC 그림·이름·직함(퀘스트 있는 사람은 초록 `!`/`?`). 그림은 실제 3D 모델을 한 번 찍어 캐시(`portrait.js` `renderThumb`, 사람은 머리·어깨 `renderPortrait`), 모델이 아직 없으면 첫 글자 원으로 두고 다시 시도(`ui.js` `fillAreaList`). 휴대폰은 두 줄씩. 확인 `tools/browser-tests/amlist.js`(마을·숲 PC, 마을 휴대폰).
+- 마을에서 귀환 버튼이 엉뚱한 곳에 있던 문제: 마을에서 붙이던 클래스 `dim`이 전체 화면 덮개용 전역 클래스(`position:absolute; inset:0`)와 겹쳤음 → `rcoff`로 바꿈. 이제 마을에서도 포션 바로 위.
+- 키패드 숫자(포션 개수·남은 대기시간·기력)를 주아체로(`index.html` `.abtn .cdt, .abtn .sub`).
+- 퀘스트 창이 진행 숫자(0/6 → 1/6, 모은 개수)가 바뀌어도 다시 그리지 않던 문제: 바뀜 판단(`questhud.js` `renderQuestHud`의 `sig`)에 진행 숫자·안내를 넣음. 화면 확인은 아직 안 함(코드 원인 확인 + 기존 이벤트 `updated`/15프레임마다 갱신 경로).

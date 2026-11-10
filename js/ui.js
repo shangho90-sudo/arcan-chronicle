@@ -4,7 +4,7 @@ import { showWorldMap } from './worldmap.js';
 import { THREE, tex, CAM } from './render.js';
 import { ModelBody, loadPlayerModel, loadActions } from './model.js';
 import { renderItemIcons } from './items3d.js';
-import { renderPortrait } from './portrait.js';
+import { renderPortrait, renderThumb } from './portrait.js';
 import { Minimap } from './minimap.js';
 import { installQuestHud, bindQuestHud } from './questhud.js';
 
@@ -311,7 +311,7 @@ export class UI {
     set(this.btn.interact, "skill_ui_interact", 0, "", "", !this.interactAvail);
     const rb = this.btn.recall, inTown = G.zone && G.zone.def.kind === "town";
     if (!rb._ic) { rb._ic = 1; rb.querySelector(".ic").innerHTML = RECALL_ICON; rb.title = "마을 귀환 (H)"; }
-    rb.classList.toggle("dim", inTown); rb.classList.toggle("going", p.recallT > 0);
+    rb.classList.toggle("rcoff", inTown);   // not "dim": that is a global full-screen overlay class rb.classList.toggle("going", p.recallT > 0);
     rb.querySelector(".cd").style.background = p.recallT > 0 ? `conic-gradient(rgba(120,220,255,.55) ${(1 - p.recallT / 3) * 360}deg, transparent 0)` : "none";
     rb.querySelector(".cdt").textContent = p.recallT > 0 ? Math.ceil(p.recallT) : "";
   }
@@ -615,7 +615,9 @@ export class UI {
     side.innerHTML = `<div class="amzoom"><button type="button" class="btn ivory" data-z="in" aria-label="확대">＋</button><button type="button" class="btn ivory" data-z="out" aria-label="축소">－</button></div>
       <button type="button" class="btn teal" data-z="all">전체 보기</button><button type="button" class="btn teal" data-z="me">내 위치</button>
       <div class="amlegend"><b>표시</b><span><i class="lg me"></i>나</span><span><i class="lg q">?</i>퀘스트 NPC</span><span><i class="lg npc"></i>NPC</span><span><i class="lg warp"></i>이동 장소</span><span><i class="lg mon"></i>몬스터</span>${z.boss ? '<span><i class="lg boss"></i>보스</span>' : ""}</div>
-      ${lv ? `<div class="small muted amlv">${lv}</div>` : ""}<div class="small muted amhelp">휠·두 손가락으로 확대, 끌어서 이동</div>`;
+      ${lv ? `<div class="small muted amlv">${lv}</div>` : ""}<div class="small muted amhelp">휠·두 손가락으로 확대, 끌어서 이동</div>
+      <div class="amlist"><b>${z.def.kind === "town" ? "이 마을 사람들" : "이 지역 몬스터"}</b><div class="amitems"></div></div>`;
+    this.fillAreaList(z, side.querySelector(".amitems"));
     let M = null;
     const clampV = () => { view.zoom = Math.max(1, Math.min(5, view.zoom)); const [x0, z0, x1, z1] = z.def.bounds, hx = (x1 - x0) / 2, hz = (z1 - z0) / 2, f = 1 - 1 / view.zoom; view.x = Math.max(-hx * f, Math.min(hx * f, view.x)); view.z = Math.max(-hz * f, Math.min(hz * f, view.z)); if (view.zoom === 1) view.x = view.z = 0; };
     // canvas px (CSS) -> world offset from the current centre
@@ -636,6 +638,41 @@ export class UI {
     const up = e => { pts.delete(e.pointerId); pinch = 0; }; cv.addEventListener("pointerup", up); cv.addEventListener("pointercancel", up);
     const loop = () => { if (this.current !== b.closest(".window") || !cv.isConnected) return; M = this.minimap.drawFull(G, cv, view); requestAnimationFrame(loop); };
     requestAnimationFrame(loop);
+  }
+  /** 지역 지도 오른쪽 아래 목록: 필드는 몬스터 종류(그림·이름·레벨), 마을은 NPC(그림·이름·직함). 그림은 실제 3D 모델을
+   *  한 번 찍어 캐시(`portrait.js` renderThumb); 아직 모델이 없으면 첫 글자 원으로 두고 잠시 뒤 다시 시도. */
+  fillAreaList(z, box) {
+    const cache = this.thumbCache || (this.thumbCache = new Map());
+    const items = [];
+    if (z.def.kind === "town") {
+      for (const n of z.npcs) if (n.def && n.def.name) items.push({ key: "n:" + n.def.id + ":" + (n.def.model || ""), name: n.def.name, sub: n.def.title || "", body: n.body, mode: "bust", quest: G.questState && G.questState(n.def.id) });
+    } else {
+      const seen = new Map();
+      for (const sp of z.spawners) {
+        const id = sp.def.monster, md = G.data.monsters[id]; if (!md) continue;
+        const live = sp.alive.find(a => a && a.body && a.body.root) || z.actors.find(a => a.def && a.def.id === id && a.body && a.body.root);
+        const lv = sp.def.level || md.level || 0, e = seen.get(id);
+        if (e) { e.lo = Math.min(e.lo, lv); e.hi = Math.max(e.hi, lv); e.n += sp.def.count || 0; if (!e.body && live) e.body = live.body; continue; }
+        const it = { key: "m:" + id, name: md.name, lo: lv, hi: lv, n: sp.def.count || 0, body: live && live.body, mode: "full", boss: !!md.boss || /^boss_/.test(id) };
+        seen.set(id, it); items.push(it);
+      }
+      if (z.boss && z.boss.def && !seen.has(z.boss.def.id)) items.push({ key: "m:" + z.boss.def.id, name: z.boss.def.name, lo: z.boss.def.level || 0, hi: z.boss.def.level || 0, body: z.boss.body, mode: "full", boss: true });
+      for (const it of items) it.sub = (it.boss ? "보스 · " : "") + (it.lo ? (it.lo === it.hi ? `Lv ${it.lo}` : `Lv ${it.lo}~${it.hi}`) : "");
+    }
+    if (!items.length) { box.innerHTML = `<div class="small muted">${z.def.kind === "town" ? "NPC가 없습니다" : "몬스터가 없습니다"}</div>`; return; }
+    box.innerHTML = items.map((it, i) => `<div class="amitem${it.boss ? " boss" : ""}" data-i="${i}"><i class="amthumb"><span>${esc(it.name.slice(0, 1))}</span></i><span class="amname">${esc(it.name)}${it.quest === "ready" || it.quest === "avail" ? ` <em class="amq">${it.quest === "ready" ? "?" : "!"}</em>` : ""}<small>${esc(it.sub || "")}</small></span></div>`).join("");
+    let tries = 0;
+    const paint = () => {
+      if (!box.isConnected) return; let missing = 0;
+      items.forEach((it, i) => {
+        const el = box.querySelector(`[data-i="${i}"] .amthumb`); if (!el || el._ok) return;
+        let url = cache.get(it.key);
+        if (url === undefined && it.body && it.body.root) { url = renderThumb(it.body, it.mode, 96); if (url) cache.set(it.key, url); }
+        if (url) { el.style.backgroundImage = `url(${url})`; el.classList.add("on"); el._ok = 1; } else missing++;
+      });
+      if (missing && ++tries < 6) setTimeout(() => { for (const it of items) if (!it.body) { const a = z.actors.find(a => a.def && "m:" + a.def.id === it.key && a.body && a.body.root); if (a) it.body = a.body; } paint(); }, 800);
+    };
+    requestAnimationFrame(paint);
   }
   confirm(text, yes, no) {
     const pz = G.paused;                                   // a question asked from the pause / save window keeps the game paused
