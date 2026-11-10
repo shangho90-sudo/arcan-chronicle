@@ -121,7 +121,7 @@ export class SkillEngine {
     if (!b.usable(d.id)) return b.level(d.id) ? '현재 직업의 스킬이 아닙니다' : '배우지 않은 스킬입니다';
     if (d.type === 'passive') return '패시브는 자동 적용됩니다';
     if (d.type === 'craft') return '제작 메뉴에서 사용합니다';
-    if (d.type === 'ultimate' ? b.sk.ult !== d.id : !b.sk.slots.includes(d.id)) return '장착되지 않은 스킬입니다';
+    if (!b.sk.slots.includes(d.id)) return '장착되지 않은 스킬입니다';
     if (pc.dead) return '';
     if (pc.stunned) return '행동 불가 상태';
     if (this.casting || this.channel || pc.skills.busy) return '';

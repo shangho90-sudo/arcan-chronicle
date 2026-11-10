@@ -585,3 +585,8 @@
 - `tools/skills2/gen.py`에 각 공격의 `sfx`, `sfxAt: strike`, `sfxLead`와 hit/proj op의 `sfx`를 정의하고 `skills2.json` 재생성. `skillrt.js`는 동작 타격 시각에 맞춰 휘두름을 예약(연은 2~6타 각각), 명중은 기존 opHit/투사체 충돌에서만 재생. 허공은 휘두름만 재생. `SFX_NAMES` 등록으로 기존 사전 로딩·음량·음소거·중복 제한 사용.
 - 확인: core 504 통과/50 생략, skills2 617 통과, audio 테스트 통과. 새 `tests/novice-audio.test.mjs`: 실제 cast→pending→hit/proj 경로 16개 시나리오(연 Lv1~5, 명중/허공, 투사체 비행 지연, 실패 시전 무음) 통과. MP3 8개 ffmpeg 디코딩 확인. 브라우저 실행은 환경의 socket 권한 제한으로 미실시, 사람 청음·실기기 확인 미실시.
 - 기존 `tests/interaction-audio.test.mjs`는 변경 전부터 NPC 인사 매니페스트 30개/현재 NPC 53개 불일치로 실패(이번 공격 효과음 변경과 무관).
+
+### 2026-11-10 — 마을 귀환 버튼, 궁극기 칸 → 일반 4번 칸, 견습생·약사 1차 스킬 그림 아이콘
+- 마을 귀환: 휴대폰 포션 버튼 위 버튼(PC `H` 키). 3초 모은 뒤 마지막으로 들른 마을(`profile.returnZone`/`returnSpawn`)로 이동(`actors.js` `startRecall`/`updateRecall`/`cancelRecall`, `RECALL_TIME`). 움직이거나 스킬을 쓰거나 맞으면 취소, 다시 누르면 취소, 마을 안·보스 결계 안에서는 안 됨. 버튼에 남은 초와 진행 원(`ui.js` `RECALL_ICON`, CSS `.abtn.recall`). 확인 `tools/browser-tests/recall.js`(마을에서 막힘·움직이면 취소·맞으면 취소·끝까지 기다리면 숲 → 마을, 390×844 터치).
+- 스킬 칸: 궁극기 전용 R 칸을 없애고 일반 칸 4개(`skillsys.js` `NORMAL_SLOTS = 4`, 키 `4`, R도 4번으로 동작). 궁극기도 일반 칸에 장착하며 한 번에 하나만(`book.equippedUlt`). 예전 저장의 `sk.ult`는 불러올 때 4번(비었으면) 또는 빈 칸으로 옮김(저장 형식 버전은 그대로 4). 휴대폰 부채꼴의 R 자리 버튼이 4번. 테스트 `skills2` 617 → 620.
+- 스킬 아이콘: 사용자가 준 스킬창 참고 그림 두 장(`tools/ui/ref/skill_window_ref.png`, `pharmacist_ref.png`)에서 잘라 `assets/ui/skills/<id>.png`(128 px) — 견습생 8종(둥근 사각형)·약사 1차 15종(원형). 만들기 `python3 tools/ui/skill_icons_crop.py`, 게임은 `skillui.js` `SKILL_ART`(나머지 직업은 예전 캔버스 아이콘). 확인 `tools/browser-tests/skillicons.js`(스킬창·약사 탭·키패드). 그림을 잘라 키운 것이라 128 px에서 약간 흐림.

@@ -16,7 +16,7 @@ const OUT = process.env.OUT || '/tmp/keypad'; fs.mkdirSync(OUT, { recursive: tru
     await pg.waitForTimeout(2500);
     const info = await ev(() => {
       const r = s => { const e = document.querySelector(s); if (!e || getComputedStyle(e).display === 'none') return null; const b = e.getBoundingClientRect(); return { x: Math.round(b.x), y: Math.round(b.y), w: Math.round(b.width), h: Math.round(b.height) }; };
-      const names = ['attack', 'skill1', 'skill2', 'skill3', 'ult', 'dodge', 'potion', 'interact', 'skill4'], R = {};
+      const names = ['attack', 'skill1', 'skill2', 'skill3', 'skill4', 'dodge', 'potion', 'recall', 'interact', 'ult'], R = {};
       for (const n of names) R[n] = r('.abtn.' + n);
       const ov = [], list = names.filter(n => R[n]);
       for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++) {

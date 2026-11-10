@@ -54,6 +54,10 @@ function modText(m) {
 }
 
 // painted-style SVG icons for the round action buttons
+// 마을 귀환 버튼 아이콘: 금테 안의 작은 집 + 아래로 내려앉는 빛
+const RECALL_ICON = `<svg viewBox="0 0 48 48" width="40" height="40" aria-hidden="true"><defs><radialGradient id="rcg" cx="50%" cy="58%" r="55%"><stop offset="0" stop-color="#bff3ff" stop-opacity=".9"/><stop offset="1" stop-color="#4fb6e8" stop-opacity="0"/></radialGradient></defs>
+<ellipse cx="24" cy="38" rx="16" ry="5" fill="url(#rcg)"/><path d="M24 7v6M18 9l2 4M30 9l-2 4" stroke="#bff3ff" stroke-width="2" stroke-linecap="round"/>
+<path d="M10 25 24 14l14 11" fill="none" stroke="#f3d488" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><path d="M14 23v14h20V23" fill="#2a3d6a" stroke="#f3d488" stroke-width="2.4" stroke-linejoin="round"/><path d="M21 37v-7h6v7" fill="#f3d488"/></svg>`;
 const HUD_ICON = (() => {
   const W = (d, extra = '') => `<svg viewBox="0 0 64 64" width="100%" height="100%" ${extra}><defs>
     <linearGradient id="gS" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#c8d4e4"/><stop offset="1" stop-color="#7a8aa0"/></linearGradient>
@@ -268,7 +272,7 @@ export class UI {
     const c = this.controls;
     c.innerHTML = `<div class="stickarea" id="cStick"><div class="stickbase">${PAD_BASE}<div class="knob">${PAD_KNOB}</div></div></div><div class="actions" id="cActions"></div>`;
     const acts = this.controls.querySelector("#cActions");
-    const defs = [["attack", "Space", "big"], ["skill1", "1", "sk"], ["skill2", "2", "sk"], ["skill3", "3", "sk"], ["dodge", "Shift", "sm"], ["potion", "Q", "sm"], ["interact", "F", "sm"]];
+    const defs = [["attack", "Space", "big"], ["skill1", "1", "sk"], ["skill2", "2", "sk"], ["skill3", "3", "sk"], ["dodge", "Shift", "sm"], ["potion", "Q", "sm"], ["recall", "H", "sm"], ["interact", "F", "sm"]];
     this.btn = {};
     for (const [a, key, size] of defs) {
       const b = $("div", "abtn " + size + " " + a, acts, `<div class="ic"></div><div class="cd"></div><div class="cdt"></div><div class="key">${key}</div><div class="sub"></div>`);
@@ -305,6 +309,11 @@ export class UI {
     const pots = p.sheet.bag.count("c_potion_s") + p.sheet.bag.count("c_potion_m");
     set(this.btn.potion, "c_potion_s", p.potionCd > 0 ? p.potionCd / G.data.config.potionCooldown : 0, pots, "", pots === 0);
     set(this.btn.interact, "skill_ui_interact", 0, "", "", !this.interactAvail);
+    const rb = this.btn.recall, inTown = G.zone && G.zone.def.kind === "town";
+    if (!rb._ic) { rb._ic = 1; rb.querySelector(".ic").innerHTML = RECALL_ICON; rb.title = "마을 귀환 (H)"; }
+    rb.classList.toggle("dim", inTown); rb.classList.toggle("going", p.recallT > 0);
+    rb.querySelector(".cd").style.background = p.recallT > 0 ? `conic-gradient(rgba(120,220,255,.55) ${(1 - p.recallT / 3) * 360}deg, transparent 0)` : "none";
+    rb.querySelector(".cdt").textContent = p.recallT > 0 ? Math.ceil(p.recallT) : "";
   }
 
   // ------------------------------------------------------------------ world labels
@@ -557,7 +566,7 @@ export class UI {
     tog("섬광 효과 줄이기", () => s.reduceFlash ? "켜짐" : "꺼짐", () => { s.reduceFlash = !s.reduceFlash; G.reduceFlash = s.reduceFlash; if (G.skillFx) G.skillFx.constructor.reduceFlash = s.reduceFlash; });
     tog("그래픽 효과 (빛 번짐·색감)", () => s.graphicsFx !== false ? "켜짐" : "꺼짐", () => s.graphicsFx = s.graphicsFx === false);
     tog("모바일 조작 버튼", () => ["자동", "항상 표시", "숨김"][s.mobileControls], () => s.mobileControls = (s.mobileControls + 1) % 3);
-    $("div", "help small muted", b, "PC: WASD/방향키 이동 · 클릭 이동/공격 · Space 공격 · 1~3 스킬 · R 궁극기 · K 스킬창 · N 제작 · Shift 회피 · Q 물약 · F 대화 · I 가방 · O 퀘스트 · Esc 메뉴");
+    $("div", "help small muted", b, "PC: WASD/방향키 이동 · 클릭 이동/공격 · Space 공격 · 1~4 스킬 · K 스킬창 · N 제작 · Shift 회피 · Q 물약 · H 마을 귀환 · F 대화 · I 가방 · O 퀘스트 · Esc 메뉴");
     const bb = $("div", "pbtns", b);
     this.button(bb, "게임 재개", "gold", () => this.close());
     this.button(bb, "저장하기", "teal", () => this.showSaveSlots("save", null, () => this.showPause()));

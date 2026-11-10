@@ -8,7 +8,7 @@
 ## 기본
 - 빌드 없음. `python3 -m http.server 8765` 후 `http://localhost:8765/index.html`.
 - three.js r160을 로컬 import map(`index.html`, `vendor/three-r160/`)으로 불러옵니다. CDN 장애 시 0% 멈춤을 방지하기 위해 동일 버전과 LICENSE를 저장소에 포함합니다. npm 의존성 없음. 새 라이브러리 추가 금지(필요하면 먼저 사용자에게 확인).
-- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs` (현재 504 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 617 통과).
+- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs` (현재 504 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 620 통과).
 - 테스트하지 않은 것을 "검증됨"이라고 보고하지 말 것.
 
 ## 데이터 우선
@@ -23,7 +23,7 @@
 - 판정은 발 위치 기준. 텔레그래프와 피격 판정은 같은 `HitShape`를 사용(rect는 시전 위치에서 앞으로 뻗음).
 - 스킬 이펙트 연출 등급: `(차수-1)*3 + 스킬Lv`(궁극기 `+2+Lv`), 최대 10. 물리 스킬은 Lv 2마다 연타 +1, 타당 계수 `coef*base/hits*(1+0.06*추가타)`.
 - 쿨타임은 슬롯 교체·재접속 후에도 유지. 스킬 초기화는 마을에서만.
-- 스킬 슬롯은 일반 3개(1~3, `skillsys.js` `NORMAL_SLOTS`) + 궁극기 R. 휴대폰 버튼은 공격 버튼 둘레 부채꼴(1·2·3·R), 왼쪽 대시·포션, 맨 위 대화(`index.html` `.abtn.*`, 확인 `tools/browser-tests/keypad.js`).
+- 스킬 슬롯은 일반 4개(1~4, `skillsys.js` `NORMAL_SLOTS`, 2026-11-10 궁극기 R 칸 → 일반 4번, R 키도 4번; 궁극기는 일반 칸에 하나만 `equippedUlt`, 예전 `sk.ult`는 불러올 때 칸으로 옮김). 휴대폰 버튼은 공격 버튼 둘레 부채꼴(1·2·3·4), 왼쪽 대시·포션, 포션 위 마을 귀환(`H`, 3초, `actors.js` `startRecall`, 확인 `recall.js`), 맨 위 대화(`index.html` `.abtn.*`, 확인 `tools/browser-tests/keypad.js`).
 - 회피(Shift)는 앞구르기 동작 `roll`(`swings.py`에서 생성, 몸 전체 회전은 동작 필드 `flips`, `model.js` `apply`). 스킬 돌진은 `dash`.
 - 능력치(힘·지능·민첩·생명력·행운, `core.js` `ATTRS`/`ATTR_FX`): 레벨당 3포인트(`P.apoints`), 투자분만 효과(기본 5는 직업 기본값에 포함). 명중·회피는 `missChance`(`Actor.takeDamage`에서 판정), 제작 성공은 `skillsys.js` `craftSuccessRate`(1단계 항상 성공). 수치를 바꾸면 `tests/core.test.mjs` TestAttributes도 함께.
 - 기본 검술(`job: novice`, `nv_*` 8종 — 일격참·연·비연참·배쉬(Lv7, `push` 밀치기)·회복력 증가·검수련·회피율 증가(Lv5, `eva`)·급소치기(Lv9, `crit`), 공격 스킬은 모두 단일 대상 `target: 'enemy'`/`single`, 계수는 배우는 레벨 순 — 일격참 2.4·연 0.5×타수·배쉬 2.8·비연참 3.4, 확인 `tools/browser-tests/novice_single.js`)은 모든 직업의 계보 맨 앞에 붙어 전직 후에도 유지되며, 직업 포인트(`sk.points`)와 별개인 `sk.npoints`를 씁니다(Lv1부터 레벨당 1).
@@ -115,7 +115,7 @@
 - `skilltest.js`: 180개 스킬 자동 시전 (`JOBS=painter ONLY=pt_a1 node skilltest.js`).
 
 ## 알려진 미완료
-- 스킬 아이콘은 코드 생성 임시 아이콘.
+- 스킬 아이콘은 견습생·약사 1차만 그림(`assets/ui/skills`, `tools/ui/skill_icons_crop.py`가 참고 그림 `tools/ui/ref/`에서 잘라 냄, `skillui.js` `SKILL_ART`), 나머지는 코드 생성 임시 아이콘.
 - 몬스터: 귀여운 모델(`cute_*`)은 리깅이 없어 모든 동작이 절차 동작. 불씨 비룡 계열(drake)만 예전 모델.
 - 모든 필드(40곳)가 `js/nature.js` 렌더(존별 `nature.ground`/`tint`/`rockTint`/`grass`/`lod`). 서리 고원은 색조만 차갑게(눈 덮인 잎 없음).
 - 휴대폰 화면은 자동 화면 확인만 함(실기기 미확인). 사람이 처음부터 끝까지 플레이한 검증 없음.

@@ -37,6 +37,7 @@ export class Combatant {
       if (!d.silent) G.ui.floatText(this.pos, this.faction === "player" ? "회피" : "MISS", this.faction === "player" ? "#bfe4ff" : "#e8e2d4", 1);
       d.missed = true; return;
     }
+    if (this.recallT > 0 && !d.dot) this.cancelRecall("공격을 받아 귀환이 취소되었습니다");
     let amount = d.amount;
     if (d.source && d.source !== this && d.source.faction !== this.faction) amount = Math.max(1, Math.round(amount * levelGapDamage(d.source, this)));   // level gap
     if (this.faction === "player" && this.skills2) {
@@ -216,6 +217,7 @@ export class SkillRunner {
 }
 
 // ======================================================================================= player
+const RECALL_TIME = 3;   // 마을 귀환 모으는 시간(초)
 export class Player extends Combatant {
   constructor(zone, pos, sheet, quests, cfg) {
     super(zone, pos, cfg.playerRadius, "player");
@@ -225,7 +227,7 @@ export class Player extends Combatant {
     this.hp = clamp(sheet.p.hp < 0 ? sheet.final.maxHp : sheet.p.hp, 1, sheet.final.maxHp);
     this.sp = clamp(sheet.p.sp < 0 ? sheet.final.maxSp : sheet.p.sp, 0, sheet.final.maxSp);
     this.lastMove = { x: 0, z: 0 }; this.vel = { x: 0, z: 0 }; this.path = []; this.stuck = 0;
-    this.dodgeCd = 0; this.potionCd = 0; this.dashT = 0; this.target = null; this.npcTarget = null; this.lockOn = null;
+    this.dodgeCd = 0; this.potionCd = 0; this.recallT = 0; this.dashT = 0; this.target = null; this.npcTarget = null; this.lockOn = null;
     sheet.events.job.push(() => { this.refreshLook(); this.skills.reset(); this.skills2.clearTemp(); });
     sheet.events.stats.push(() => { this.hp = Math.min(this.hp, this.maxHp); this.sp = Math.min(this.sp, this.maxSp); });
   }
@@ -283,19 +285,35 @@ export class Player extends Combatant {
     if (input.block) { this.vel = { x: 0, z: 0 }; this.idle(); G.fx.lockMark && G.fx.lockMark(null); return; }
     this.actions(input);
     if (this.dashT > 0) return;   // 이번 프레임에 회피(구르기)를 시작했으면 이동/대기 동작으로 덮어쓰지 않음
-    if (this.skills.busy) { this.vel = { x: 0, z: 0 }; return; }
+    if (this.skills.busy) { this.vel = { x: 0, z: 0 }; if (this.recallT > 0) this.cancelRecall("귀환이 취소되었습니다"); return; }
     this.movement(input, dt);
+    if (this.recallT > 0) this.updateRecall(dt);
+  }
+  /** 마을 귀환 (H 키 / 휴대폰 포션 위 버튼): RECALL_TIME 초 동안 제자리에서 모은 뒤 마지막으로 들른 마을(profile.returnZone)로. 움직이거나 스킬·회피·피격이면 취소. */
+  startRecall() {
+    if (this.dead || G.loading) return;
+    if (this.zone.def.kind === "town") { G.ui.toast("이미 마을에 있습니다"); return; }
+    if (this.zone.barrier) { G.ui.toast("결계 안에서는 귀환할 수 없습니다"); return; }
+    this.recallT = RECALL_TIME; this.vel = { x: 0, z: 0 }; this.target = null; this.npcTarget = null; this.path = [];
+    G.ui.toast("마을로 귀환합니다… (움직이면 취소)"); G.fx.play("ring", { x: this.pos.x, y: this.pos.y + 0.1, z: this.pos.z }, 1.2, true);
+  }
+  cancelRecall(msg) { if (this.recallT <= 0) return; this.recallT = 0; if (msg) G.ui.toast(msg); }
+  updateRecall(dt) {
+    if (Math.hypot(this.vel.x, this.vel.z) > 0.2 || this.dashT > 0) return this.cancelRecall("움직여서 귀환이 취소되었습니다");
+    this.recallT -= dt;
+    if (this.recallT <= 0) { this.recallT = 0; const P = G.profile; G.travel(P.returnZone, P.returnSpawn); }
   }
   actions(input) {
     if (input.down.dodge) this.tryDodge(input);
     if (input.down.potion) this.usePotion();
+    if (input.down.recall) { if (this.recallT > 0) this.cancelRecall("귀환을 취소했습니다"); else this.startRecall(); }
     if (input.down.interact) { const n = this.zone.nearestNpc(this.pos, this.cfg.interactRange); if (n) G.interact(n); }
     const sk = this.sheet.book.sk;
     const NS = sk.slots.length;
-    for (let i = 0; i <= NS; i++) {
-      const key = i < NS ? "skill" + (i + 1) : "ult"; if (!input.down[key]) continue;
-      const id = i < NS ? sk.slots[i] : sk.ult;
-      if (!id) { G.ui.toast(i < NS ? "빈 슬롯입니다 (스킬창 K)" : "궁극기가 장착되지 않았습니다"); continue; }
+    for (let i = 0; i < NS; i++) {
+      const key = "skill" + (i + 1); if (!input.down[key]) continue;
+      const id = sk.slots[i];
+      if (!id) { G.ui.toast("빈 슬롯입니다 (스킬창 K)"); continue; }
       const d = G.data.skill2(id);
       const e = this.skills2.cast(id, this.aimFor({ targeting: d.target === "ground" ? "ground" : d.target === "self" ? "self" : "dir", range: d.range }, input));
       if (e) G.ui.toast(e);

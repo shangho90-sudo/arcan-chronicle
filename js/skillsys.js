@@ -2,7 +2,7 @@
 // Save data lives in profile.sk (see ensureSk). Combat execution is in skillrt.js.
 
 export const ADV1_LEVEL = 10, ADV2_LEVEL = 30, ULT_MIN_LEVEL = 45;
-export const NORMAL_SLOTS = 3;
+export const NORMAL_SLOTS = 4;   // 2026-11-10: 예전 궁극기(R) 칸을 일반 4번 칸으로 — 궁극기도 일반 칸에 장착(한 번에 하나만)
 export const UNLOCK1 = [10, 12, 15, 18, 20], UNLOCK2 = [30, 33, 36, 40, 45];
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
@@ -28,14 +28,18 @@ export function ensureSk(p, data) {
   sk.slots = sk.slots.map(id => (typeof id === 'string' && sk.learned[id] && data.skill2(id) && isSlottable(data.skill2(id))) ? id : '');
   // no duplicates
   sk.slots = sk.slots.map((id, i) => id && sk.slots.indexOf(id) === i ? id : '');
-  sk.ult = (typeof sk.ult === 'string' && sk.learned[sk.ult] && data.skill2(sk.ult)?.type === 'ultimate') ? sk.ult : '';
+  // 예전 저장의 궁극기 칸(sk.ult)은 비어 있는 일반 칸(4번 우선)으로 옮김; 궁극기는 칸 전체에서 하나만
+  { const u = (typeof sk.ult === 'string' && sk.learned[sk.ult] && data.skill2(sk.ult)?.type === 'ultimate') ? sk.ult : '';
+    if (u && !sk.slots.includes(u)) { const i = sk.slots[NORMAL_SLOTS - 1] ? sk.slots.indexOf('') : NORMAL_SLOTS - 1; if (i >= 0) sk.slots[i] = u; }
+    let seen = false; sk.slots = sk.slots.map(id => { if (id && data.skill2(id).type === 'ultimate') { if (seen) return ''; seen = true; } return id; }); }
+  sk.ult = '';
   sk.cds = (sk.cds && typeof sk.cds === 'object') ? sk.cds : {};          // long cooldown end times (epoch ms)
   for (const k of Object.keys(sk.cds)) if (!data.skill2(k) || !(sk.cds[k] > 0)) delete sk.cds[k];
   sk.res = {};                                                                 // job resources are transient (reset on load)
   sk.dye = (sk.dye && typeof sk.dye === 'object') ? sk.dye : {};
   p.sk = sk; return sk;
 }
-export const isSlottable = d => d && ['attack', 'support', 'summon'].includes(d.type);
+export const isSlottable = d => d && ['attack', 'support', 'summon', 'ultimate'].includes(d.type);
 
 export class SkillBook {
   constructor(data, sheet) { this.data = data; this.sheet = sheet; this.p = sheet.p; this.sk = ensureSk(this.p, data); this.grantPoints(); }
@@ -77,7 +81,7 @@ export class SkillBook {
     const d = this.data.skill2(id);
     this.sk[this.poolOf(d)] -= 1; this.sk.learned[id] = this.level(id) + 1;
     // first copy auto-equips into a free slot for convenience
-    if (this.level(id) === 1) { if (isSlottable(d)) { const i = this.sk.slots.indexOf(''); if (i >= 0) this.sk.slots[i] = id; } else if (d.type === 'ultimate' && !this.sk.ult) this.sk.ult = id; }
+    if (this.level(id) === 1) { if (isSlottable(d) && !(d.type === 'ultimate' && this.equippedUlt())) { const i = this.sk.slots.indexOf(''); if (i >= 0) this.sk.slots[i] = id; } }
     this.sheet.recalc(); return null;
   }
   // ---------------------------------------------------------------- slots
@@ -85,15 +89,17 @@ export class SkillBook {
     if (inCombat) return '전투 중에는 슬롯을 바꿀 수 없습니다';
     const d = this.data.skill2(id); if (!d || !this.level(id)) return '배우지 않은 스킬입니다';
     if (!this.lineage.includes(d.job)) return '현재 직업의 스킬이 아닙니다';
-    if (d.type === 'ultimate') { this.sk.ult = id; return null; }
     if (!isSlottable(d)) return d.type === 'passive' ? '패시브는 자동 적용됩니다' : '제작 스킬은 제작 메뉴에서 사용합니다';
     slot = clamp(slot | 0, 0, NORMAL_SLOTS - 1);
     const cur = this.sk.slots.indexOf(id); if (cur >= 0) this.sk.slots[cur] = this.sk.slots[slot];
+    if (d.type === 'ultimate') { const u = this.equippedUlt(); if (u && u !== id) this.sk.slots[this.sk.slots.indexOf(u)] = ''; }   // 궁극기는 하나만
     this.sk.slots[slot] = id; return null;
   }
+  /** 일반 칸에 장착된 궁극기 id ('' = 없음) */
+  equippedUlt() { return this.sk.slots.find(id => id && this.data.skill2(id)?.type === 'ultimate') || ''; }
   unequip(slot, inCombat) {
     if (inCombat) return '전투 중에는 슬롯을 바꿀 수 없습니다';
-    if (slot === 'ult') this.sk.ult = ''; else this.sk.slots[clamp(slot | 0, 0, NORMAL_SLOTS - 1)] = '';
+    this.sk.slots[clamp(slot | 0, 0, NORMAL_SLOTS - 1)] = '';
     return null;
   }
   /** refund every point; keeps job, crafted items, granted history */

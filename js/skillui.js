@@ -33,8 +33,11 @@ function glyph(g, d) {
   else { g.lineWidth = 6; g.beginPath(); g.moveTo(0, 24); g.lineTo(0, -20); g.moveTo(-14, -6); g.lineTo(0, -22); g.lineTo(14, -6); g.stroke(); }
   g.restore();
 }
+// 그림 아이콘이 있는 스킬(견습생 기본 검술 8종·약사 1차 15종, tools/ui/skill_icons_crop.py → assets/ui/skills/<id>.png). 나머지는 아래 캔버스 임시 아이콘.
+const SKILL_ART = new Set(['nv_a1', 'nv_a2', 'nv_a3', 'nv_a4', 'nv_p1', 'nv_p2', 'nv_p3', 'nv_p4', ...'abc'.split('').flatMap(c => [1, 2, 3, 4, 5].map(i => `ph1_${c}${i}`))]);   // 견습생(둥근 사각형) + 약사 1차(원형)
 export function skillIcon(d, size = 48) {
   const k = d.id + size; if (iconCache.has(k)) return iconCache.get(k);
+  if (SKILL_ART.has(d.id)) { const html = `<span class="icon i3d skic ${d.id.startsWith('nv_') ? 'skart' : 'skround'}" style="width:${size}px;height:${size}px;background:url(assets/ui/skills/${d.id}.png) center/contain no-repeat;image-rendering:auto"></span>`; iconCache.set(k, html); return html; }
   const c = document.createElement('canvas'); c.width = c.height = 96; const g = c.getContext('2d');
   const [c0, c1, c2] = ICON_BG[d.type] || ICON_BG.attack;
   const gr = g.createRadialGradient(40, 34, 4, 48, 50, 44); gr.addColorStop(0, c0); gr.addColorStop(0.45, c1); gr.addColorStop(1, c2);
@@ -102,7 +105,7 @@ Object.assign(UI.prototype, {
       for (const d of items) {
         const L = book.level(d.id), blk = book.learnBlock(d.id), max = L >= d.maxLv;
         const [tn, tc] = TYPE[d.type];
-        const equipped = sk.slots.includes(d.id) || sk.ult === d.id;
+        const equipped = sk.slots.includes(d.id);
         const row = $('div', 'skrow' + (L ? ' learned' : '') + (this.skSel === d.id ? ' sel' : ''), col,
           `${skillIcon(d, 76)}<div class="skinfo"><div><b>${d.name}</b> <span class="sktype t-${d.type}" style="background:${tc}">${tn}</span>${equipped ? ' <span class="sktag eq">장착</span>' : ''}</div>` +
           `<div class="small">Lv <b>${L}</b>/${d.maxLv} · 해금 Lv${book.unlockLevel(d)}${d.mp ? ` · 기력 ${d.mp}` : ''}${d.cd ? ` · ${d.cd}초` : ''}${d.range && d.type !== 'passive' && d.type !== 'craft' ? ` · 사거리 ${d.range}m` : ''}</div></div>`);
@@ -121,11 +124,10 @@ Object.assign(UI.prototype, {
         (L < sel.maxLv ? `<div class="sknext">다음 레벨: ${levelText(sel, L + 1)}</div>` : '<div class="good">최대 레벨</div>') +
         (blk && L < sel.maxLv ? `<div class="small bad">잠금 사유: ${blk}</div>` : '') +
         ((sel.prereq || []).length ? `<div class="small">선행 조건: ${sel.prereq.map(x => (G.data.skill2(x.id)?.name || x.id) + ' Lv' + x.lv).join(', ')}</div>` : '') + `</div>`;
-      if (L && ['attack', 'support', 'summon'].includes(sel.type)) {
+      if (L && ['attack', 'support', 'summon', 'ultimate'].includes(sel.type)) {
         const eqb = $('div', 'skeq', det);
         for (let i = 0; i < NORMAL_SLOTS; i++) this.button(eqb, `${i + 1}번 슬롯`, sk.slots[i] === sel.id ? 'gold' : 'teal', () => { const e = book.equip(sel.id, i, p.skills2.inCombat); if (e) return this.toast(e); this.showSkills(show); });
       }
-      if (L && sel.type === 'ultimate') { const eqb = $('div', 'skeq', det); this.button(eqb, sk.ult === sel.id ? '궁극기 장착됨' : '궁극기 슬롯에 장착', 'gold', () => { const e = book.equip(sel.id, 0, p.skills2.inCombat); if (e) return this.toast(e); this.showSkills(show); }); }
       if (L && sel.type === 'craft') { const eqb = $('div', 'skeq', det); this.button(eqb, '제작 메뉴 열기', 'teal', () => this.showCraft(sel.id)); }
     } else det.innerHTML = '<div class="small muted">스킬을 선택하면 자세한 설명과 다음 레벨 변화를 볼 수 있습니다. 패시브는 배우면 자동 적용되고, 제작 스킬은 제작 메뉴(N)에서 사용합니다.</div>';
     this.slotBar(b);
@@ -133,10 +135,10 @@ Object.assign(UI.prototype, {
   slotBar(b) {
     const p = G.player, book = p.sheet.book, sk = book.sk;
     const bar = $('div', 'skslots', b, '<span class="sklabel"><i class="fstar4"></i>장착 슬롯</span>');
-    for (let i = 0; i <= NORMAL_SLOTS; i++) {
-      const id = i < NORMAL_SLOTS ? sk.slots[i] : sk.ult, d = G.data.skill2(id);
-      const s = $('div', 'skslot' + (i === NORMAL_SLOTS ? ' ult' : ''), bar, (d ? skillIcon(d, 58) : '<span class="skempty-slot">+</span>') + `<small>${i < NORMAL_SLOTS ? i + 1 : 'R 궁극'}</small>`);
-      if (d) { s.title = d.name + ' (클릭하여 해제)'; s.onclick = () => { const e = book.unequip(i < NORMAL_SLOTS ? i : 'ult', p.skills2.inCombat); if (e) return this.toast(e); this.showSkills(); }; }
+    for (let i = 0; i < NORMAL_SLOTS; i++) {
+      const id = sk.slots[i], d = G.data.skill2(id);
+      const s = $('div', 'skslot', bar, (d ? skillIcon(d, 58) : '<span class="skempty-slot">+</span>') + `<small>${i + 1}</small>`);
+      if (d) { s.title = d.name + ' (클릭하여 해제)'; s.onclick = () => { const e = book.unequip(i, p.skills2.inCombat); if (e) return this.toast(e); this.showSkills(); }; }
     }
     $('div', 'sknote', bar, p.skills2.inCombat ? '<span class="bad">전투 중에는 슬롯을 바꿀 수 없습니다</span>' : '쿨타임은 슬롯을 바꿔도 유지됩니다');
   },
@@ -233,7 +235,7 @@ const origBuild = UI.prototype.buildControls;
 UI.prototype.buildControls = function () {
   origBuild.call(this);
   const acts = this.controls.querySelector('#cActions');
-  for (const [a, key] of [['ult', 'R']]) {
+  for (const [a, key] of [['skill4', '4']]) {
     const b = $('div', 'abtn sk ' + a, acts, `<div class="ic"></div><div class="cd"></div><div class="cdt"></div><div class="key">${key}</div><div class="sub"></div>`);
     b.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); b.setPointerCapture(e.pointerId); b.classList.add('on'); G.input.press(a); G.audio.unlock(); });
     const up = () => b.classList.remove('on'); b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up);
@@ -259,7 +261,6 @@ UI.prototype.updateControls = function () {
     b.classList.toggle('nores', !!noRes);
   };
   for (let i = 0; i < NORMAL_SLOTS; i++) set(this.btn['skill' + (i + 1)], G.data.skill2(sk.slots[i]), i);
-  set(this.btn.ult, G.data.skill2(sk.ult), 4);
   // job resources only for the jobs that use them
   const job = p.sheet.p.job; let html = '';
   if (job === 'engineer') html = `전력 <b>${Math.floor(eng.res.power)}</b>/10 · 기계 ${eng.summons.filter(s => s.machine && !s.dead).length}`;

@@ -64,10 +64,10 @@ Ok(/45/.test(ch.book.learnBlock("wp_a5") || ""), "ultimate needs Lv45");
 ch.p.level = 45; ch.book.grantPoints(); ch.recalc();
 Ok(ch.book.learn("wp_a5") == null && ch.book.learn("wp_b5") == null, "two ultimates learned");
 ch.book.equip("wp_a5", 0, false); ch.book.equip("wp_b5", 0, false);
-Eq(ch.book.sk.ult, "wp_b5", "only one ultimate equipped");
+Eq(ch.book.equippedUlt(), "wp_b5", "only one ultimate equipped"); Ok(!ch.book.sk.slots.includes("wp_a5"), "previous ultimate unequipped");
 // slots
 ch.book.learn("wp_a1"); ch.book.learn("wp_a2"); ch.book.learn("wp_a3"); ch.book.learn("wp_a4"); ch.book.learn("wp_b3");
-Ok(ch.book.sk.slots.filter(Boolean).length <= 3, "3 normal slots");
+Ok(ch.book.sk.slots.filter(Boolean).length <= 4 && ch.book.sk.slots.length === 4, "4 normal slots");
 Ok(ch.book.equip("wp_b3", 0, true) != null, "no slot change in combat");
 Ok(ch.book.equip("wp_b4", 0, false) != null, "passive cannot be slotted");
 Ok(ch.book.equip("wp_b3", 2, false) == null && ch.book.sk.slots[2] === "wp_b3", "equip into slot 3");
@@ -125,7 +125,9 @@ Ok(p2.sk.cds.ck1_a1 > Date.now(), "long cooldown saved");
 const p3 = migrate(JSON.parse(JSON.stringify(p2))); p3.sk.learned = { ck1_a1: 99, nope: 3, ck1_a2: -1 }; p3.sk.slots = ["nope", "ck1_a1", "ck1_a1", 7, "x"]; p3.sk.ult = "ck1_a1"; p3.sk.points = -5;
 const ch3 = new CharacterSheet(d, p3);
 Eq(ch3.book.level("ck1_a1"), 5, "over-max level clamped"); Ok(!("nope" in ch3.book.sk.learned), "unknown id dropped");
-Eq(ch3.book.sk.slots.length, 3, "slot array repaired"); Eq(ch3.book.sk.slots.filter(x => x === "ck1_a1").length, 1, "duplicate slot removed"); Eq(ch3.book.sk.ult, "", "invalid ult cleared");
+Eq(ch3.book.sk.slots.length, 4, "slot array repaired"); Eq(ch3.book.sk.slots.filter(x => x === "ck1_a1").length, 1, "duplicate slot removed"); Eq(ch3.book.sk.ult, "", "invalid ult cleared");
+{ const p5 = migrate(JSON.parse(JSON.stringify(p2))); p5.level = 45; p5.job = "western_pharmacist"; p5.sk.learned = { wp_a5: 1, ph1_a1: 1 }; p5.sk.slots = ["ph1_a1", "", ""]; p5.sk.ult = "wp_a5";
+  const ch5 = new CharacterSheet(d, p5); Eq(ch5.book.sk.slots[3], "wp_a5", "old ultimate slot moved to normal slot 4"); Eq(ch5.book.sk.ult, "", "ult field emptied"); }
 Ok(ch3.book.sk.points >= 0, "negative points repaired");
 // v2 save -> v3: job kept (legacy), no points below 10
 const v2 = { version: 2, name: "옛날", gender: "f", job: "cook", level: 6, exp: 0, gold: 10, inventory: [], learnedSkills: ["ck_chop"], quests: [], flags: [] };

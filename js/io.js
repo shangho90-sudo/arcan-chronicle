@@ -3,13 +3,13 @@ import { screenToWorldDir } from './render.js';
 import { SFX_NAMES, SFX_REWARDS, SFX_EVENTS } from './sfx.js';
 
 const KEYS = {
-  attack: ["Space", "KeyJ"], skill1: ["Digit1", "Numpad1"], skill2: ["Digit2", "Numpad2"], skill3: ["Digit3", "Numpad3"], ult: ["KeyR", "Digit5"], skillWin: ["KeyK"], craftWin: ["KeyN"],
-  dodge: ["ShiftLeft", "ShiftRight"], potion: ["KeyQ"], interact: ["KeyF", "KeyE"], inventory: ["KeyI", "KeyB", "KeyC"], quests: ["KeyO"], questHud: ["KeyL"], stats: ["KeyP"], map: ["KeyM"], pause: ["Escape"]
+  attack: ["Space", "KeyJ"], skill1: ["Digit1", "Numpad1"], skill2: ["Digit2", "Numpad2"], skill3: ["Digit3", "Numpad3"], skill4: ["Digit4", "Numpad4", "KeyR"], skillWin: ["KeyK"], craftWin: ["KeyN"],
+  dodge: ["ShiftLeft", "ShiftRight"], potion: ["KeyQ"], recall: ["KeyH"], interact: ["KeyF", "KeyE"], inventory: ["KeyI", "KeyB", "KeyC"], quests: ["KeyO"], questHud: ["KeyL"], stats: ["KeyP"], map: ["KeyM"], pause: ["Escape"]
 };
 
 /**
  * PC: WASD / arrows move in SCREEN directions, left click on the ground = move (hold to follow), click a monster = attack,
- * Space/J attack (hold = repeat), 1/2/3 skills, Shift dodge, Q potion, F interact, I bag, O quests, Esc menu.
+ * Space/J attack (hold = repeat), 1/2/3 skills, Shift dodge, Q potion, H 마을 귀환, F interact, I bag, O quests, Esc menu.
  * Mobile: floating left stick + right buttons, each finger tracked separately. Pointers that start on UI never reach the world.
  */
 export class Input {
