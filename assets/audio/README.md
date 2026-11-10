@@ -52,3 +52,16 @@
 생성 프롬프트: [world-music-plan.json](world-music-plan.json). 작업 ID: [music-credits.json](music-credits.json).
 
 연결 재생성: python3 tools/world/world.py --music-only. 전체 월드 재생성도 같은 매핑을 적용합니다. 반복 재생과 배경음악 음량은 게임의 기존 설정을 따릅니다. 브라우저 디코딩·재생 검증은 수행했으며 사람의 전곡 청음은 미실시입니다.
+
+## 견습생 공격 효과음 (2026-11-10)
+
+Runway로 만든 전용 시전·명중 MP3 8개입니다. 생성 정보는 [novice-sfx-credits.json](novice-sfx-credits.json).
+
+| 스킬 | 휘두름/발사 | 명중 |
+|---|---|---|
+| 일격참 | `sfx_nv_sal_cast.mp3` — 날카로운 찌르기 | `sfx_nv_sal_hit.mp3` — 금속 관통·별빛 |
+| 연 | `sfx_nv_yeon_cast.mp3` — 짧은 베기 | `sfx_nv_yeon_hit.mp3` — 경쾌한 절삭 |
+| 비연참 | `sfx_nv_biyeon_cast.mp3` — 검풍 발사 | `sfx_nv_biyeon_hit.mp3` — 바람 칼날 충돌 |
+| 배쉬 | `sfx_nv_bash_cast.mp3` — 무거운 돌진 | `sfx_nv_bash_hit.mp3` — 둔탁한 충격 |
+
+연은 실제 레벨별 2~6회 칼 동작에 맞춰 반복합니다. 명중음은 실제 타격 시점(비연참은 투사체 충돌)에 재생하며, 허공에서는 휘두름만 납니다. 기존 효과음 음량/음소거 설정을 따릅니다. 타격 시각 검사는 `node tests/novice-audio.test.mjs`. MP3 디코딩과 런타임 자동 검사는 통과했고, 사람 청음·브라우저 재생 확인은 미실시입니다.

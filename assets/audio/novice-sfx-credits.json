@@ -1,0 +1,54 @@
+{
+  "provider": "Runway",
+  "generatedOn": "2026-11-10",
+  "assets": [
+    {
+      "file": "sfx_nv_sal_cast.mp3",
+      "taskId": "59e83f26-a077-4062-a7ef-042b6351fb37",
+      "prompt": "Rapier blade thrust, one very fast piercing air swish with a bright magical zip, close dry fantasy RPG sound effect, immediate attack, short clean tail, no impact, no voice or music.",
+      "duration": 0.5
+    },
+    {
+      "file": "sfx_nv_sal_hit.mp3",
+      "taskId": "2add8e2c-deb8-4385-a46f-f8d2591ef2c5",
+      "prompt": "Single magical rapier stab impact: sharp metallic puncture and a brilliant crystalline starburst, punchy immediate transient then tiny shimmering pink energy decay. Clean fantasy RPG combat one shot, no whoosh, no voice, no music.",
+      "duration": 0.8
+    },
+    {
+      "file": "sfx_nv_yeon_cast.mp3",
+      "taskId": "7d1d3d09-ede7-40a9-860e-4ffa691c9650",
+      "prompt": "One swift sword slash through air, crisp light blade swish, immediate transient and very short dry tail, agile fantasy RPG sword combo component, exactly one swing, no hit, no music or voice.",
+      "duration": 0.5
+    },
+    {
+      "file": "sfx_nv_yeon_hit.mp3",
+      "taskId": "92c6b60d-340f-4a19-9936-a6beb0f10423",
+      "prompt": "One crisp light sword cutting impact, tight metallic tick layered with a soft solid thwack, immediate attack and very short clean decay for rapid RPG sword combos. Single hit only, no music, no voice.",
+      "duration": 0.5
+    },
+    {
+      "file": "sfx_nv_biyeon_cast.mp3",
+      "taskId": "e07ea974-eb4d-4efd-8c83-649f8f5a020a",
+      "prompt": "Sword launches a crescent of wind magic: sharp sweeping blade whoosh into a rising airy energy whistle that races away, immediate attack then fast fade. Fantasy RPG ranged sword skill, single shot, no impact, no music or voice.",
+      "duration": 0.9
+    },
+    {
+      "file": "sfx_nv_biyeon_hit.mp3",
+      "taskId": "4cb68479-e36d-4fe4-8891-1f93f07b71c0",
+      "prompt": "A magical wind blade strikes: crisp slicing snap with a small bright crystalline cross flash, short airy ring decay, punchy immediate single impact for a fantasy RPG. No voice or music.",
+      "duration": 0.6
+    },
+    {
+      "file": "sfx_nv_bash_cast.mp3",
+      "taskId": "398b3e2e-cccc-46aa-a384-76cb96d756b5",
+      "prompt": "Heavy sword hilt and shoulder rush through air: short low forceful swish with leather armor movement, immediate attack, dry clean fantasy RPG combat one shot. No impact, no voice or music.",
+      "duration": 0.5
+    },
+    {
+      "file": "sfx_nv_bash_hit.mp3",
+      "taskId": "3dcb1990-94d4-496a-85a1-06f23afa2ba2",
+      "prompt": "Heavy sword hilt slams a solid target: one deep punchy blunt thud with metallic clank and brief gritty crunch, immediate powerful impact and short dry decay, fantasy RPG bash knockback. No explosion, no voice or music.",
+      "duration": 0.8
+    }
+  ]
+}
