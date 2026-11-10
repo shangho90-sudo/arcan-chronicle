@@ -97,7 +97,7 @@ Object.assign(UI.prototype, {
     const cols = $('div', 'skcols', b);
     const list = G.data.skillsOf(show);
     for (let cat = 0; cat < 3; cat++) {
-      const items = list.filter(s => s.cat === cat).sort((a, c) => a.idx - c.idx); if (!items.length) continue;
+      const items = list.filter(s => s.cat === cat).sort((a, c) => book.unlockLevel(a) - book.unlockLevel(c) || a.idx - c.idx); if (!items.length) continue;   // 배우는 레벨 순(같으면 원래 순서)
       const col = $('div', 'skcol', cols, `<div class="skcat"><i class="fstar4"></i>${'ABC'[cat]}. ${items[0].catName}<i class="fstar4 r"></i></div>`);
       for (const d of items) {
         const L = book.level(d.id), blk = book.learnBlock(d.id), max = L >= d.maxLv;
