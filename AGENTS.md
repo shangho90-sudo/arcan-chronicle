@@ -64,7 +64,7 @@
 - 네 필드는 160 m × 160 m(이전 80 m의 가로·세로 2배). 변환은 `tools/zones/scale_fields.py`(한 번만, 존에 `"scaled": 2` 표시): 좌표 2배, 고지대·경사로·보스 전장은 크기 그대로 통째로 이동, 길 폭 1.25배, 원형 패치 1.4배, 존 메시(`assets/zone_<id>.json`, 자연 존에서 보이는 지형·물·보스 바닥만)는 데이터에서 다시 생성. 숲은 `tools/forest/layout.py forest --write`, 나머지 세 필드의 빈 곳은 `tools/zones/fill_fields.py --write`(`"fill": true` 항목만 다시 만듦).
 - 몬스터 스포너의 `"spread"`(m): 무리 대신 넓은 범위(`radius`)에 한 마리씩 최소 간격을 두고 나무 사이에도 생성, 각자 자기 자리 주변(최대 5 m)을 돌아다님. 플레이어 12 m 안에서는 다시 생기지 않음(`Zone.spacedSpot`). 스포너 중심 2.5 m 안에는 나무를 두지 않음.
 - 충돌 판정 `ZoneGeometry.blocked`는 4 m 격자 버킷(`GRID_CELL`, 반지름 2 m 이하 질의)으로 찾음 — 소품이 수천 개라 필요.
-- 숲 `to_grove` 워프 뒤 버섯 집: 소품 타입 `landmark`(`model` = `assets/props/<model>.glb.json`, `h` 높이, `r` 충돌), 만들기 `tools/props/mushhouse.py tripo|blender` → `tools/props/mushhouse_trim.py`(받침판 제거·틈 메움). 게임 재질 `nature.js` `landmarkMat`(손그림 음영 + 아래쪽 풀색 섞기), 둘레 꽃·덤불 `layout.py` `landmark_skirt`. 문은 모델 +X, `rot` 90 = 워프(-z) 쪽. 확인 `tools/browser-tests/mushhouse.js`. 글씨 표지판은 `signpost` + `text`(주아체 캔버스).
+- 숲 `to_grove` 워프 뒤 버섯 집: 소품 타입 `landmark`(`model` = `assets/props/<model>.glb.json`, `h` 높이, `r` 충돌), 만들기 `tools/props/mushhouse.py tripo|blender` → `tools/props/mushhouse_trim.py`(받침판 제거·틈 메움). 게임 재질 `nature.js` `landmarkMat`(손그림 음영 + 아래쪽 풀색 섞기), 둘레 꽃·덤불 `layout.py` `landmark_skirt`. 문은 모델 +X, `rot` 90 = 워프(-z) 쪽. 위치 (13.0, 44.6)(2026-11-10 워프 쪽으로 당김, `zones.json`만 고침 — `layout.py forest --write`를 다시 돌리면 숲 전체 배치가 바뀜). 확인 `tools/browser-tests/mushhouse.js`. 글씨 표지판은 `signpost` + `text`(주아체 캔버스).
 - 버섯 보스는 별도 존 `mushroom_grove`(독버섯 군락지, 경계 [-8,1,39,39]): 숲 북동쪽 길 끝 워프 `to_grove` ↔ `to_forest`. 배치는 `tools/forest/layout.py mushroom_grove --write`.
 
 ## 용흔 대륙 세계 (2026-11-06, 배경 스토리 『아르칸 연대기 — 흑룡의 계절』)
