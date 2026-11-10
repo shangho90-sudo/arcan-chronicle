@@ -4,6 +4,7 @@ new craft items. Balance numbers live here (tunable) — the runtime (js/skillrt
 Skill fields: id (stable), job, tier, cat (0..2), catName, idx (1..5), name, desc, type
   (attack|support|summon|passive|craft|ultimate), maxLv, unlock, prereq[{id,lv}], weapon, target
   (enemy|ground|self|dir), range, mp, res {type,cost} | {type,gain}, cd, cast, recover, ops[], mods[], flags{},
+  sfx (cast sample), sfxAt ('strike' = animation timing), sfxLead (seconds before strike),
   fx {color, anim}, status {data, impl, fx, test, play}
 """
 import json, os
@@ -44,20 +45,20 @@ def custom(fn, **k): return dict(op='custom', fn=fn, **k)
 # 2026-11-10 계수(배우는 레벨 순): 일격참 2.4(Lv1)·연 0.5×2~6타(Lv5)·배쉬 2.8(Lv7)·비연참 3.4(Lv10)
 # 2026-11-09: 견습생 공격 스킬은 모두 단일 대상(target='enemy', shape 'single', 비연참은 관통 없음)
 J, C = 'novice', 0xcfe6ff
-S(J, 0, 0, '기본 검술', 1, 'nv_a1', '일격참', 'attack', '칼을 허리춤으로 끌어당겼다가 적 하나에게 뛰어들며 한 번에 깊게 찌른다. 칼끝에서 뻗은 섬광이 닿은 적에게 별 모양 빛살이 터진다.', target='enemy', range=3.2, mp=8, cd=5, anim='nv_ilgyeok', recover=0.3,
+S(J, 0, 0, '기본 검술', 1, 'nv_a1', '일격참', 'attack', '칼을 허리춤으로 끌어당겼다가 적 하나에게 뛰어들며 한 번에 깊게 찌른다. 칼끝에서 뻗은 섬광이 닿은 적에게 별 모양 빛살이 터진다.', target='enemy', range=3.2, mp=8, cd=5, anim='nv_ilgyeok', sfx='nv_sal_cast', sfxAt='strike', sfxLead=0.1, recover=0.3,
   ops=[dict(op='lunge', dist=1.4, dur=0.14, at=-0.12),
        dict(op='fx', sal='cast', len=3.4, at=-0.10),   # '살' effect (js/salfx.js): tip gather 0.05 s, beam sword tip -> target hit point (max 3.4 m from the body) at the hit
-       hit('single', 2.4, len=3.4, noExtra=True, at=0.0, knock=1.4, st=[st('stagger', 0.6)], fx=dict(sal=True), shake=[0.24, 0.3])], fx=dict(color=C))
-S(J, 0, 0, '기본 검술', 2, 'nv_a2', '연', 'attack', '적 하나를 칼로 이리저리 연속으로 벤다. 처음엔 2연타, 스킬 레벨이 오를 때마다 1타씩 늘어 최대 6연타.', target='enemy', range=2.2, mp=10, cd=6, anim='nv_yeon', recover=0.2,
+       hit('single', 2.4, len=3.4, noExtra=True, at=0.0, knock=1.4, st=[st('stagger', 0.6)], sfx='nv_sal_hit', fx=dict(sal=True), shake=[0.24, 0.3])], fx=dict(color=C))
+S(J, 0, 0, '기본 검술', 2, 'nv_a2', '연', 'attack', '적 하나를 칼로 이리저리 연속으로 벤다. 처음엔 2연타, 스킬 레벨이 오를 때마다 1타씩 늘어 최대 6연타.', target='enemy', range=2.2, mp=10, cd=6, anim='nv_yeon', sfx='nv_yeon_cast', sfxAt='strike', sfxLead=0.05, recover=0.2,
   ops=[dict(op='lunge', dist=1.0, dur=0.2, at=-0.1), dict(op='lunge', dist=0.8, dur=0.3, at=0.2),
-       hit('single', 0.5, r=2.2, ang=110, hits=2, hitsPerLv=1, gap=0.13, noExtra=True, alt=True, fx=dict(yeon=True))], fx=dict(color=0x78dfff))   # '연' crescents: js/yeonfx.js
-S(J, 0, 0, '기본 검술', 3, 'nv_a3', '비연참', 'attack', '칼을 크게 휘둘러 초승달 모양의 검풍을 날린다. 처음 닿은 적 하나를 벤다.', target='enemy', range=9, mp=14, cd=7, anim='nv_biyeon', recover=0.3,
-  ops=[dict(op='lunge', dist=0.9, dur=0.18, at=-0.12), proj('normal', 3.4, speed=13, range=10, w=1.3, fx='sword_wave', burst='hit_slash', biyeon=True),
+       hit('single', 0.5, r=2.2, ang=110, hits=2, hitsPerLv=1, gap=0.13, noExtra=True, alt=True, sfx='nv_yeon_hit', fx=dict(yeon=True))], fx=dict(color=0x78dfff))   # '연' crescents: js/yeonfx.js
+S(J, 0, 0, '기본 검술', 3, 'nv_a3', '비연참', 'attack', '칼을 크게 휘둘러 초승달 모양의 검풍을 날린다. 처음 닿은 적 하나를 벤다.', target='enemy', range=9, mp=14, cd=7, anim='nv_biyeon', sfx='nv_biyeon_cast', sfxAt='strike', sfxLead=0, recover=0.3,
+  ops=[dict(op='lunge', dist=0.9, dur=0.18, at=-0.12), proj('normal', 3.4, sfx='nv_biyeon_hit', speed=13, range=10, w=1.3, fx='sword_wave', burst='hit_slash', biyeon=True),
        dict(op='fx', biyeon='cast', at=-0.22)], fx=dict(color=0xbfe8ff))   # 비연파 js/biyeonfx.js: fx op at the cast (wind-up, sweep, side blades = decoration); the proj = centre blade + hit
-S(J, 0, 0, '기본 검술', 6, 'nv_a4', '배쉬', 'attack', '칼자루와 어깨로 적 하나를 세게 들이받아 약 2.6 m 뒤로 밀쳐 내며 피해를 준다. 무거운 몬스터도 밀려나고 잠깐 비틀거린다(보스 제외).', target='enemy', range=2.2, mp=9, cd=6, anim='attack2', recover=0.25,
+S(J, 0, 0, '기본 검술', 6, 'nv_a4', '배쉬', 'attack', '칼자루와 어깨로 적 하나를 세게 들이받아 약 2.6 m 뒤로 밀쳐 내며 피해를 준다. 무거운 몬스터도 밀려나고 잠깐 비틀거린다(보스 제외).', target='enemy', range=2.2, mp=9, cd=6, anim='attack2', sfx='nv_bash_cast', sfxAt='strike', sfxLead=0.12, recover=0.25,
   ops=[dict(op='lunge', dist=0.6, dur=0.12, at=-0.08),
        dict(op='fx', bash='cast', at=-0.24),   # 2026-11-10 배쉬 이펙트 (js/bashfx.js): tip gather + crescent on the real sword arc from the cast start
-       hit('single', 2.8, noExtra=True, push=2.6, st=[st('stagger', 0.7)], fx=dict(bash=True), shake=[0.12, 0.2])], fx=dict(color=0xffd9a0))
+       hit('single', 2.8, noExtra=True, push=2.6, st=[st('stagger', 0.7)], sfx='nv_bash_hit', fx=dict(bash=True), shake=[0.12, 0.2])], fx=dict(color=0xffd9a0))
 S(J, 0, 1, '기본 검술', 4, 'nv_p1', '회복력 증가', 'passive', '움직이지 않고 3초 동안 쉬면 3초마다 최대 체력의 일정 비율을 회복한다.',
   flags=dict(restRegen=[0.02, 0.01]))
 S(J, 0, 1, '기본 검술', 5, 'nv_p2', '검수련', 'passive', '칼을 다루는 솜씨가 늘어 공격력이 조금씩 오른다.',

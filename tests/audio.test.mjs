@@ -16,6 +16,15 @@ assert.equal(skillSound({}, { elem: 'ice' }), 'ice');
 assert.equal(skillSound({}, { tag: 'flask' }), 'splash');
 assert.equal(skillSound({ type: 'ultimate' }, {}), 'boss_slam');
 const skills = JSON.parse(readFileSync(new URL('../assets/data/skills2.json', import.meta.url))).skills;
+// Each novice attack has distinct swing/impact samples; passives stay silent.
+for (const [id, prefix] of [['nv_a1', 'sal'], ['nv_a2', 'yeon'], ['nv_a3', 'biyeon'], ['nv_a4', 'bash']]) {
+  const d = skills.find(s => s.id === id), op = d.ops.find(o => ['hit', 'proj'].includes(o.op));
+  assert.equal(skillSound(d), `nv_${prefix}_cast`);
+  assert.equal(skillSound(d, op), `nv_${prefix}_hit`);
+  assert.ok(SFX_NAMES.includes(skillSound(d, op)));
+  assert.equal(d.sfxAt, 'strike');
+}
+assert.ok(skills.filter(s => s.job === 'novice' && s.type === 'passive').every(s => !s.sfx));
 for (const skill of skills.filter(s => s.type !== 'passive')) assert.ok(SFX_NAMES.includes(skillSound(skill)), skill.id);
 
 // Exercise the actual audio class without importing the renderer or requiring a device.

@@ -183,8 +183,15 @@ export class SkillEngine {
   /** cast time finished (or instant): schedule every op */
   release(ctx) {
     const pc = this.pc, sh = pc.body.sh, d = ctx.d, anim = ctx.act || d.anim || 'cast', cb = ctx.combo;
-    G.audio.sfx(skillSound(d));
+    if (d.sfxAt !== 'strike') G.audio.sfx(skillSound(d));
     const ht = d.cast ? 0 : Math.min(0.35, (sh.actions[anim] ? sh.actions[anim].hitFrame / sh.actions[anim].fps : 0.2) || 0.2);
+    // 전용 검술 소리는 버튼을 누른 순간 대신 실제 칼 동작에 맞춘다.
+    // 연은 레벨별 동작의 hitTimes마다 재생하며, 허공에서도 휘두르는 소리만 남는다.
+    if (d.sfxAt === 'strike') {
+      const times = cb && cb.hitTimes ? cb.hitTimes : [ht];
+      for (const t of times) this.pending.push({ time: this.clock + Math.max(0, t - (d.sfxLead || 0)),
+        op: { op: '_run', run: () => { if (!pc.dead) G.audio.sfx(skillSound(d)); } }, ctx });
+    }
     let span = 0; for (const op of d.ops) { if (op.op === 'lunge') continue; const n = (op.hits || 1) + (op.hitsPerLv ? Math.floor(op.hitsPerLv * (ctx.L - 1)) : 0); span = Math.max(span, (op.at || 0) + (cb && op.hitsPerLv ? cb.hitTimes[n - 1] - cb.hitTimes[0] : (n - 1) * (op.gap || 0.13))); }
     pc.skills.lock = Math.max(pc.skills.lock, ht + span + Math.max(d.recover || 0.3, cb && cb.recover || 0));
     for (const op of d.ops) { if (cb && cb.lunges && op.op === 'lunge') continue; this.pending.push({ time: this.clock + Math.max(0, ht + (op.at || 0)), op, ctx }); }
