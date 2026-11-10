@@ -622,6 +622,8 @@ export class ModelBody {
     const a = this.sh.actions[name]; if (!a) return this.currentPose();
     const n = a.frames, f = (this.t * a.fps) % n, i = Math.floor(f); return lerpPose(a.poses[i], a.poses[(i + 1) % n], f - i);
   }
+  /** the action's own pose at time t (no cross-fade, does not touch the body's clock) */
+  poseAt(t) { const t0 = this.t, f = this.finished; this.t = t; const p = this.currentPose(); this.t = t0; this.finished = f; return p; }
   currentPose() {
     const a = this.sh.actions[this.action], n = a.frames;
     if (a.keys) {                                                          // timed keys (seconds) with per-segment easing
@@ -640,9 +642,9 @@ export class ModelBody {
     const md = this.md;
     // walking / running: legs and upper body come from the procedural gait; underneath it is the idle stance, never the
     // key-framed walk cycle (that one slid its feet while the gait blended in or when the character pushed into a wall)
-    let p = this.action === 'walk' && md.leg && !md.cfg.npc ? this.poseOf('idle') : this.currentPose(); const p0 = p;   // p0: before the cross-fade (root motion reads it)
+    let p = this.action === 'walk' && md.leg && !md.cfg.npc ? this.poseOf('idle') : this.currentPose();
     if (this.fadeDur > 0 && this.fromPose) { const k = this.fadeT / this.fadeDur; if (k < 1) p = lerpPose(this.fromPose, p, EASE.s(k)); else this.fadeDur = 0; }
-    this.rawPose = p0; this.lastPose = p;
+    this.lastPose = p;
     let Q = md.cfg.npc ? npcIdle(this.t, this.lookYaw || 0) : poseToBones(p, md.cfg.headPitch);
     let bodyY = md.cfg.npc ? 0 : (p.bob || 0) - (p.sink || 0), swayX = 0;
     if (!md.cfg.npc && md.leg) Q = alignLegs(md, Q);

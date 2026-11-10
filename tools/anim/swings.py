@@ -251,7 +251,7 @@ C5 = [  # (t, ease, adv, step [L, R], lift [L, R], pose)
     # steps 0.22 and the pelvis follows (adv), arm and blade go straight out, then hold
     (F(76),   's',  0.11, [0.00, 0.18], [0, 0],    dict(twist=-40, lean=-2, sink=0.16, hand=[-78, -22, 0.52], blade=[-8, -2], elbow=[-0.5, -0.2, -1], armL=[40, 46])),
     (F(80),   's',  0.13, [0.08, 0.18], [0.06, 0], dict(twist=-44, lean=0, sink=0.18, hand=[-82, -24, 0.48], blade=[-6, -2], elbow=[-0.5, -0.2, -1], armL=[44, 48], squint=True)),
-    (F(82),   'i',  0.18, [0.20, 0.18], [0.02, 0], dict(twist=-14, lean=10, sink=0.20, hand=[-36, -10, 0.84], blade=[-2, -4], elbow=[-0.6, -0.5, -0.6], armL=[24, 40], squint=True)),
+    (F(82),   'i',  0.18, [0.22, 0.18], [0.025, 0], dict(twist=-14, lean=10, sink=0.20, hand=[-36, -10, 0.84], blade=[-2, -4], elbow=[-0.6, -0.5, -0.6], armL=[24, 40], squint=True)),
     (F(83),   None, 0.20, [0.22, 0.18], [0, 0],    dict(twist=14, lean=20, sink=0.22, hand=[-6, -4, 1.02], blade=[0, -6], elbow=[-0.5, -0.8, -0.2], armL=[8, 52], squint=True)),
     (F(88),   'o',  0.21, [0.22, 0.18], [0, 0],    dict(twist=16, lean=22, sink=0.23, hand=[-4, -6, 1.03], blade=[0, -8], elbow=[-0.5, -0.8, -0.2], armL=[6, 54])),
     (F(94),   's',  0.21, [0.22, 0.18], [0, 0],    dict(twist=4, lean=12, sink=0.18, hand=[-40, 10, 0.80], blade=[-50, 30], elbow=[-0.6, -0.6, -0.6], armL=[20, 40])),
@@ -312,7 +312,7 @@ def c5_strike(i):
 C5_ACTS = [c5_strike(i) for i in range(5)]
 # the whole 150-frame chain in one action (previews, Blender export, tools/browser-tests/combo_film.js)
 C5_FULL = action('combo_full', [ck(*x[:5], **x[5]) for x in C5], C5_HIT[0], F(150), [[round(h - 0.05, 3), round(h + 0.045, 3)] for h in C5_HIT], fadeIn=0.05, fadeOut=0.14)
-C5_FULL.update(hitTimes=C5_HIT, trailColor=TRAIL_C, trailLife=0.12, trailBase=0.38, adv=0.24,
+C5_FULL.update(hitTimes=C5_HIT, combo='full', trailColor=TRAIL_C, trailLife=0.12, trailBase=0.38, adv=0.24,
                mark=dict(Hit=[round(h * CF) for h in C5_HIT], Strike=[round(t * CF) + 1 for t in C5_CUT[:5]]))
 
 SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)

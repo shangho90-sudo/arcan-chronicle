@@ -277,7 +277,7 @@ export class Player extends Combatant {
   update(dt, input) {
     this.baseUpdate(dt);
     if (this.dodgeCd > 0) this.dodgeCd -= dt; if (this.potionCd > 0) this.potionCd -= dt; if (this.repathT > 0) this.repathT -= dt; if (this.atkBuf > 0) this.atkBuf -= dt;
-    this.skills.tick(dt); this.skills2.tick(dt); this.comboRoot();
+    this.skills.tick(dt); this.skills2.tick(dt); this.comboRoot(dt);
     if (this.dead) { this.vel = { x: 0, z: 0 }; return; }
     this.sp = Math.min(this.maxSp, this.sp + this.stat("spRegen") * dt);
     this.sheet.p.playTime += dt;
@@ -375,8 +375,10 @@ export class Player extends Combatant {
   }
   /** combo strike root motion: the actor follows the action's adv (m forward of where the strike started), so the
    *  planted feet (step - adv in model.js) stay on the ground; blocked moves just stop there */
-  comboRoot() {
-    const B = this.body, A = B && B.sh && B.sh.actions[B.action], a = A && A.combo && B.rawPose ? B.rawPose.adv || 0 : null;
+  comboRoot(dt) {
+    // adv at the time the body will show after this frame (the zone updates the body right after the player), so the
+    // root and the planted feet move in the same frame
+    const B = this.body, A = B && B.sh && B.sh.actions[B.action], a = A && A.combo && B.poseAt ? B.poseAt(B.t + dt * Math.max(0, B.speed)).adv || 0 : null;
     if (a === null) { this.advPrev = null; return; }
     if (this.advPrev === null || this.advPrev === undefined || B.action !== this.advAct || B.t < this.advT) this.advPrev = 0;
     const d = a - this.advPrev; this.advPrev = a; this.advAct = B.action; this.advT = B.t;
