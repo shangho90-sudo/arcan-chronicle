@@ -567,3 +567,11 @@
 - Blender 생성기 `tools/blender/fx_biyeon.py` → `assets/fx/fx_biyeon.glb.json`(88삼각형, 칸 표 `cells`) + `fx_biyeon.png`(마스크 아틀라스), 원본 `.blend`/`.fbx`는 `tools/blender/biyeon/`, 안내 `tools/blender/fx_biyeon_README.md`. 스킬 데이터 `gen.py`의 nv_a3(`proj(…, biyeon=True)` + `fx` op `biyeon: 'cast'`), 연결 `skillrt.js`(`FX.biyeon`, `SkillProj`), `skillfx.js`.
 - 저사양(휴대폰·그래픽 효과 끔): 티끌 없음, 양옆 검풍 4개, 파편 5개, 핵심 섬광·가운데 검풍은 유지.
 - 확인: `tools/browser-tests/biyeon_skill.js`로 실제 시전, `SCENE=line`(같은 줄 더미 3마리) 90°·225° — 명중 0.30초, 피해 [87, 0, 0](첫 번째만). core 504 통과(50 생략), skills2 617 통과. '연' 이펙트와 합친 뒤 휴대폰 390×844 0°(SCENE=single, 명중 0.38초, 오류 없음)도 확인. 8방향 전부·그래픽 효과 끔 화면은 이번에 찍지 않음(앞선 작업이 서버 재시작으로 끊겨 이어서 마무리).
+
+### 2026-11-10 — 배쉬(nv_a4) 타격 이펙트
+- 새 `js/bashfx.js`(`SkillFx.bash.cast(pos, dir, {follow})` / `.hit(pos, dir, {cast, ground, whiff})`, 조절값 `BASH`: 색·intensity·size·speed·`stop`). 시전 시작: 칼끝에 옅은 푸른 기 모임 → 실제 칼끝 궤적에 맞춘 초승달 검기(#BDEEFF, 중심 두껍고 끝 뾰족, 칼 따라 머리가 움직이고 꼬리가 사라짐). 피해 순간(같은 `opHit` 호출): 대상 앞면·실제 칼 높이에 흰 십자/8각 별 섬광(약 0.13 s) + 에너지 구체 팽창(흰색→금빛 #FFDFA0)과 짧은 빛줄기, 공격자 쪽을 향한 세로 충격 링 + 발밑 바닥 링(#8DDCFF, 땅에서 0.06 m 띄움), 양옆으로 튀는 갈색·회색 먼지와 돌조각(중력·바닥에서 멈춤), 흰·금빛 파편과 잔불. 타격 뒤 약 0.6 s에 모두 사라지고 풀로 되돌림.
+- 히트스톱은 게임 전체가 아니라 시전자·대상만 `BASH.stop` 0.05 s(`freezeT`: `game.js` Zone.update에서 그 둘의 동작만 거의 멈춤, `actors.js` 밀치기는 멈춤 뒤 시작). 배쉬는 치명타 때도 전역 히트스톱 없음(`localStop`). 밀치기 `push` 2.6 m·피해·사거리·쿨타임·기력·판정은 그대로.
+- 에셋: `python3 tools/blender/fx_bash.py`(Blender bpy) → `assets/fx/fx_bash.glb.json`(초승달·별·링·구체·빛줄기·돌·파편·먼지 판 + `cells`) + `assets/fx/fx_bash.png`(마스크 아틀라스), 원본 `tools/blender/bash/fx_bash.blend`·`.fbx`. 휴대폰·그래픽 효과 끔에서는 섬광·구체·검기·링은 유지하고 빛줄기·먼지·돌·파편 수만 줄임.
+- 스킬 데이터(`gen.py`): `fx` op `bash: 'cast'` + hit op `fx.bash`(예전 `thrust`·`hit_blunt` 대신).
+- 확인: `tools/browser-tests/bash_skill.js`(`SCENE=single|close|whiff|chain DIRS= SIZE= FX= TAG= MARKS=`) — 실제 nv_a4 시전, 섬광 호출 프레임 = 피해 프레임, 섬광-대상 앞면 거리, 밀려난 거리, 히트스톱 구간, 끝난 뒤 남은 이펙트 수 기록. 결과는 아래 줄.
+- 결과(실제 게임, SwiftShader): 8방향(0~315°) 모두 섬광 호출 = 피해 프레임(0.233 s), 섬광-대상 중심 거리 0.495 m(대상 반지름 0.55, 앞면), 밀려난 거리 2.81 m, 히트스톱 0.233~0.267 s(시전자·대상만), 끝난 뒤 남은 이펙트 0. 연속 사용(0.5 s에 다시 시전) 두 번째 타격도 같은 결과, 휴대폰 390×844·그래픽 효과 끔 확인, 콘솔 오류 없음. 일부 방향은 빗나감(`missChance`)이라 피해가 0 — 빗나가도 섬광·밀치기가 나오는 건 예전 배쉬 판정 그대로(바꾸지 않음). core 504 통과(50 생략), skills2 617 통과. 실기기 성능은 보지 않음.

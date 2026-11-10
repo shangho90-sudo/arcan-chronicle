@@ -70,7 +70,7 @@ const MARKS = (process.env.MARKS || '-0.20,-0.08,-0.03,0,0.03,0.06,0.10,0.16,0.2
       const c = await ev(([i, fps, draw]) => {
         window.__t = i / fps; const p = G.player, f = window.__f, m = window.__ds[0];
         // chain: cast again as soon as the first cast's lock ends (cooldown reset: 연속 사용)
-        if (window.__chain === 1 && p.skills2.lock <= 0 && window.__t > 0.4) { window.__chain = 2; p.skills2.cd = {}; G.dev.full(); p.target = m; const e = p.skills2.cast('nv_a4', { x: m.pos.x, z: m.pos.z }); window.__recast = { t: window.__t, e }; }
+        if (window.__chain === 1 && (p.skills.lock || 0) <= 0 && window.__t > 0.4) { window.__chain = 2; p.skills2.cd = {}; G.dev.full(); m.teleport({ x: p.pos.x + f.x * 2.0, z: p.pos.z + f.z * 2.0 }); m.knock = { x: 0, z: 0 }; window.__p0 = { ...m.pos }; p.target = m; const e = p.skills2.cast('nv_a4', { x: m.pos.x, z: m.pos.z }); window.__recast = { t: window.__t, e }; }
         if (draw) G.step(1 / fps, true); else { G.step(1 / fps, false); if (G.skillFx) G.skillFx.update(1 / fps); }   // MARKONLY: render only the captured frames (effects still advance)
         if (m && !m.dead && m.hp < window.__hp) { window.__dmg.push({ t: window.__t, amount: window.__hp - m.hp }); window.__hp = m.hp; }
         if ((p.freezeT || 0) > 0 || (m && m.freezeT > 0)) window.__freeze.push(+window.__t.toFixed(3));
