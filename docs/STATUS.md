@@ -566,4 +566,4 @@
 - 판정은 사용자 선택대로 단일 대상 유지: 투사체 하나(속도 13, 사거리 10, 폭 1.3, 관통 없음)가 처음 닿은 적 하나만. 피해·쿨타임·MP·사거리 그대로. 양옆 검풍은 장식(피해 없음).
 - Blender 생성기 `tools/blender/fx_biyeon.py` → `assets/fx/fx_biyeon.glb.json`(88삼각형, 칸 표 `cells`) + `fx_biyeon.png`(마스크 아틀라스), 원본 `.blend`/`.fbx`는 `tools/blender/biyeon/`, 안내 `tools/blender/fx_biyeon_README.md`. 스킬 데이터 `gen.py`의 nv_a3(`proj(…, biyeon=True)` + `fx` op `biyeon: 'cast'`), 연결 `skillrt.js`(`FX.biyeon`, `SkillProj`), `skillfx.js`.
 - 저사양(휴대폰·그래픽 효과 끔): 티끌 없음, 양옆 검풍 4개, 파편 5개, 핵심 섬광·가운데 검풍은 유지.
-- 확인: `tools/browser-tests/biyeon_skill.js`로 실제 시전, `SCENE=line`(같은 줄 더미 3마리) 90°·225° — 명중 0.30초, 피해 [87, 0, 0](첫 번째만). core 504 통과(50 생략), skills2 617 통과. 휴대폰 화면·다른 방향 전부는 이번에 다시 찍지 못함(앞선 작업 세션이 서버 재시작으로 끊겨 이어서 마무리).
+- 확인: `tools/browser-tests/biyeon_skill.js`로 실제 시전, `SCENE=line`(같은 줄 더미 3마리) 90°·225° — 명중 0.30초, 피해 [87, 0, 0](첫 번째만). core 504 통과(50 생략), skills2 617 통과. '연' 이펙트와 합친 뒤 휴대폰 390×844 0°(SCENE=single, 명중 0.38초, 오류 없음)도 확인. 8방향 전부·그래픽 효과 끔 화면은 이번에 찍지 않음(앞선 작업이 서버 재시작으로 끊겨 이어서 마무리).
