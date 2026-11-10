@@ -315,7 +315,39 @@ C5_FULL = action('combo_full', [ck(*x[:5], **x[5]) for x in C5], C5_HIT[0], F(15
 C5_FULL.update(hitTimes=C5_HIT, combo='full', trailColor=TRAIL_C, trailLife=0.12, trailBase=0.38, adv=0.24,
                mark=dict(Hit=[round(h * CF) for h in C5_HIT], Strike=[round(t * CF) + 1 for t in C5_CUT[:5]]))
 
-SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
+# ------------------------------------------------------------------------------------------------ draw / sheathe
+# (2026-11-11) 무기 꺼내기 / 집어넣기. The weapon rides on the back (js/model.js backMount: grip over the right shoulder,
+# blade diagonal to the left hip) while the character is out of combat. Both motions are UPPER-BODY OVERLAYS (model.js
+# ModelBody.over): only hand / blade / elbow / ik / toBack (+ twist / lean when standing) are used, on top of idle or the
+# walking gait, so the legs never stop. toBack = 1 puts the hand exactly on the back grip (IK target from the mesh), the
+# weapon changes holder at grabT / releaseT and glides 0.1 s. ik 0 at both ends = the arm hands back to idle / gait.
+#   draw     reach over the right shoulder -> grab (grabT) -> pull up out of the holder -> sweep forward down to guard
+#            readyT = from here a swing / skill may take over (the first attack after a fast draw starts from this pose)
+#   sheathe  raise the sword -> over the shoulder, tip down behind the back -> let go (releaseT) -> the hand comes down
+HANG = dict(hand=[-12, -76, 0.96], blade=[0, -40], elbow=[-0.6, -1, -0.2])            # ~ the idle arm (ik 0 at the ends)
+OVER = dict(hand=[-150, 66, 0.52], blade=[100, -60], elbow=[-0.75, 0.55, 0.35], toBack=1.0)   # hand on the back grip
+DRAW = action('draw', [
+    key(0.00, None, ik=0, plant=0, **HANG),
+    key(0.11, 'o', ik=1, plant=0, twist=-10, lean=-2, **OVER),
+    key(0.16, 's', ik=1, plant=0, twist=-12, lean=-2, **OVER),
+    key(0.26, 'o', ik=1, plant=0, twist=-14, lean=-3, hand=[-72, 64, 0.88], blade=[-140, 72], elbow=[-0.7, 0.1, -0.7], toBack=0.0),
+    key(0.36, 's', ik=1, plant=0, twist=-4, hand=[-42, 12, 0.86], blade=[-22, 40], elbow=[-0.7, -1, -0.3]),
+    key(0.46, 's', ik=1, plant=0, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2]),
+    key(0.58, 's', ik=0, plant=0, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2]),
+], 0.0, 0.58, None, fadeIn=0.0, fadeOut=0.0)
+DRAW.update(grabT=0.14, readyT=0.27, overlay=True)
+SHEATHE = action('sheathe', [
+    key(0.00, None, ik=0, plant=0, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2]),
+    key(0.12, 'o', ik=1, plant=0, twist=-4, hand=[-42, 18, 0.86], blade=[-24, 46], elbow=[-0.7, -1, -0.3]),
+    key(0.25, 's', ik=1, plant=0, twist=-12, lean=-2, hand=[-74, 66, 0.88], blade=[-140, 74], elbow=[-0.7, 0.1, -0.7]),
+    key(0.37, 'o', ik=1, plant=0, twist=-12, lean=-2, **OVER),
+    key(0.43, 's', ik=1, plant=0, twist=-10, lean=-2, **OVER),
+    key(0.54, 'o', ik=0.6, plant=0, twist=-3, hand=[-40, 8, 0.62], blade=[-10, -30], elbow=[-0.6, -1, -0.3]),
+    key(0.66, 's', ik=0, plant=0, **HANG),
+], 0.0, 0.66, None, fadeIn=0.0, fadeOut=0.0)
+SHEATHE.update(releaseT=0.41, overlay=True)
+
+SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL] + [DRAW, SHEATHE]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
 
 acts = json.load(open(P))
 names = {'attack', 'attack2'} | {x['name'] for x in SKILL_ACTS}

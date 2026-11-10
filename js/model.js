@@ -39,6 +39,10 @@ export const NPC_MODELS = {
   daisen:             { file: 'npc_blacksmith', tex: 'npc_daisen', height: 1.95, headPitch: -6, npc: true },
   boldran:            { file: 'npc_blacksmith', tex: 'npc_boldran', height: 1.62, headPitch: -6, npc: true },
 };
+/** back holder (backMount): grip at x = this fraction of the right shoulder's x, up / out (m) above the shoulder joint and
+ *  behind the back surface; dir = blade direction in bind space (+x = the character's left, +y up, +z forward) */
+const BACK_MOUNT = { x: 0.62, up: 0.06, out: 0.055, dir: [0.62, -1, -0.1] };
+const XFER = 0.1;   // s the weapon glides between the back holder and the hand at the grab / release
 const WEAPON = { novice: 'sword', pharmacist: 'pestle', cook: 'knife', blacksmith: 'hammer', hairdresser: 'scissors', artist: 'brush' };
 const OFF = { cook: 'pan', hairdresser: 'dryer', artist: 'palette' };
 
@@ -134,7 +138,7 @@ function npcIdle(t, look) {
     Head: mul(ry(Math.max(-35, Math.min(35, look)) + sw * 3), rx(Math.sin(t * 0.9) * 2)),
   };
 }
-const NUM = ['bob', 'lean', 'twist', 'legL', 'legR', 'wOff', 'offOff', 'fall', 'sink', 'tuck', 'adv'];
+const NUM = ['bob', 'lean', 'twist', 'legL', 'legR', 'wOff', 'offOff', 'fall', 'sink', 'tuck', 'adv', 'toBack'];   // toBack = 0..1 the sword hand goes to the grip on the back (draw / sheathe)
 // weapon-swing keys (see SWING below): hand = [azimuth, elevation, reach] of the sword hand around the right shoulder,
 // blade = [azimuth, elevation] of the blade, elbow = pole the elbow points at, step = [left, right] foot offsets (m)
 const VEC = ['hand', 'blade', 'elbow', 'step', 'lift'];   // lift = [left, right] ankle lift (m), adv = root travel (m) of a combo strike
@@ -386,7 +390,7 @@ function gaitPose(body, ph, v, base, settle = 0) {
   // ---- arms opposite the legs; elbows bend into a pump when running; the hand holding a weapon / tool swings less
   const armA = lerp(17, 40, run) * live, armF = lerp(5, 14, run);
   for (const [side, nm, sgn] of [[-1, 'Right', 1], [1, 'Left', -1]]) {
-    const held = side < 0 ? !!body.weapon : !!body.off, k = held ? 0.55 : 1;
+    const held = (side < 0 ? !!body.weapon : !!body.off) && (body.armW ?? 1) > 0.5, k = held ? 0.55 : 1;
     const f = armF + sgn * armA * k * sw, down = Math.max(0, 90 - (base[side > 0 ? 'armL' : 'armR'][1] || 12)) - 4 * run;
     const bend = lerp(18, 88, run) + (held ? 10 : 0) + Math.max(0, f) * lerp(0.35, 0.2, run);
     Q[nm + '_UpperArm'] = mul(rx(-f), rz(side > 0 ? -down : down));
@@ -495,10 +499,44 @@ export class ModelBody {
     const ss = shadowRadius * 2.6; this.shadow.scale.set(ss, ss, 1);
     scene.add(this.root, this.shadow);
     this.props = { R: null, L: null }; this.propKind = { R: null, L: null };
+    // weapon in the hand (armed, armW 1) or on the back (armW 0); draw / sheathe = upper-body overlay (this.over)
+    this.armed = true; this.armW = 1; this.over = null;
     this.setJob(job); this.apply();
   }
   setJob(job) { this.job = job; if (this.md.cfg.npc) { this.weapon = null; this.off = null; return; } this.weapon = WEAPON[job] || 'sword'; this.off = OFF[job] || null; }
   setSheet() { }   // sprite API compatibility (job change goes through setJob)
+  // ---- 무기 꺼내기 / 집어넣기 (draw / sheathe, actions from tools/anim/swings.py). The right-hand weapon lives on the back
+  // (diagonal, grip over the right shoulder, backMount) while sheathed; the motion plays as an upper-body overlay on top of
+  // idle / walking (hand, blade, elbow, ik, toBack of the overlay pose). The weapon changes holder at the action's grabT /
+  // releaseT (the hand is on the back grip then: toBack = 1) and glides between the two holders for XFER s.
+  /** snap without a motion (zone change, death, job model swap) */
+  setArmed(v) { this.over = null; this.armed = !!v; this.armW = v ? 1 : 0; }
+  /** start the draw (speed scales the motion: a fast draw before the first attack); no-op when the weapon is in the hand */
+  draw(speed = 1) {
+    if (this.md.cfg.npc || !this.sh.actions.draw) { this.setArmed(true); return; }
+    if (this.over && this.over.name === 'draw') { this.over.speed = Math.max(this.over.speed, speed); return; }
+    if (this.over && this.over.name === 'sheathe' && this.armed) { this.over = null; return; }   // still holding it: just stop putting it away
+    if (this.armed && !this.over) return;
+    this.over = { name: 'draw', t: 0, speed, switched: false };
+  }
+  sheathe() {
+    if (this.md.cfg.npc || !this.sh.actions.sheathe) { this.setArmed(false); return; }
+    if (!this.armed || this.over) return;
+    this.over = { name: 'sheathe', t: 0, speed: 1, switched: false };
+  }
+  /** the weapon is in the hand and the draw has come far enough for a swing / skill to take over */
+  get drawReady() { const o = this.over; return this.armed && (!o || o.name !== 'draw' || o.t >= (this.sh.actions.draw.readyT || 0)); }
+  get drawing() { return !!(this.over && this.over.name === 'draw'); }
+  updateOverlay(dt) {
+    const o = this.over;
+    if (o) {
+      const A = this.sh.actions[o.name]; o.t += dt * o.speed;
+      const sw = o.name === 'draw' ? A.grabT : A.releaseT;
+      if (!o.switched && o.t >= sw) { o.switched = true; this.armed = o.name === 'draw'; }
+      if (o.t >= A.dur) this.over = null;
+    }
+    const goal = this.armed ? 1 : 0; if (this.armW !== goal) this.armW = goal > this.armW ? Math.min(1, this.armW + dt / XFER) : Math.max(0, this.armW - dt / XFER);
+  }
   play(name, speed = 1, restart = false) {
     if (!this.sh.actions[name]) name = 'idle';
     this.speed = speed;
@@ -611,6 +649,7 @@ export class ModelBody {
     }
     if (this.gaitW > 0.01 && !settling) this.gaitPh = fract(this.gaitPh + dist / gaitParams(Math.max(0.3, this.gaitV), this.md.leg).cycle);
     else if (this.gaitW <= 0.01) this.gaitPh = 0.15;                       // next start: mid-stance, not mid-stride
+    if (!this.md.cfg.npc) this.updateOverlay(dt);
     this.apply();
     // swing afterimage from the real blade while the action's trail window [start, end] (seconds) is open
     // (trail = one [start, end] window, or a list of them: skill flurries only trail the cutting part of each strike)
@@ -621,6 +660,13 @@ export class ModelBody {
   poseOf(name) {
     const a = this.sh.actions[name]; if (!a) return this.currentPose();
     const n = a.frames, f = (this.t * a.fps) % n, i = Math.floor(f); return lerpPose(a.poses[i], a.poses[(i + 1) % n], f - i);
+  }
+  /** pose of any keyed action A at time t (the draw / sheathe overlay; does not touch the body's own action) */
+  poseAtOf(A, t) {
+    const K = A.keys, P = A.poses, n = A.frames; if (t >= K[n - 1]) return P[n - 1];
+    let i = 0; while (i < n - 2 && t >= K[i + 1]) i++;
+    const u = (t - K[i]) / Math.max(1e-4, K[i + 1] - K[i]), e = EASE[P[i + 1].e] || (x => x);
+    return crPose(P[Math.max(0, i - 1)], P[i], P[i + 1], P[Math.min(n - 1, i + 2)], e(Math.min(1, Math.max(0, u))));
   }
   /** the action's own pose at time t (no cross-fade, does not touch the body's clock) */
   poseAt(t) { const t0 = this.t, f = this.finished; this.t = t; const p = this.currentPose(); this.t = t0; this.finished = f; return p; }
@@ -645,9 +691,23 @@ export class ModelBody {
     let p = this.action === 'walk' && md.leg && !md.cfg.npc ? this.poseOf('idle') : this.currentPose();
     if (this.fadeDur > 0 && this.fromPose) { const k = this.fadeT / this.fadeDur; if (k < 1) p = lerpPose(this.fromPose, p, EASE.s(k)); else this.fadeDur = 0; }
     this.lastPose = p;
+    // draw / sheathe overlay: its sword arm (hand / blade / elbow / ik / toBack) on top of idle or walking. A swing or skill
+    // (a pose with its own hand) takes over at once: a draw that got that far counts as done
+    if (this.over && !md.cfg.npc) {
+      if (p.hand) { if (this.over.name === 'draw') this.armed = true; this.over = null; }
+      else {
+        const A = this.sh.actions[this.over.name], po = this.poseAtOf(A, this.over.t), still = this.gaitW < 0.3;
+        p = Object.assign({}, p, { hand: po.hand, blade: po.blade, elbow: po.elbow, ik: po.ik, toBack: po.toBack || 0,
+          twist: (p.twist || 0) + (still ? po.twist || 0 : 0), lean: (p.lean || 0) + (still ? po.lean || 0 : 0) });
+      }
+    }
     let Q = md.cfg.npc ? npcIdle(this.t, this.lookYaw || 0) : poseToBones(p, md.cfg.headPitch);
     let bodyY = md.cfg.npc ? 0 : (p.bob || 0) - (p.sink || 0), swayX = 0;
     if (!md.cfg.npc && md.leg) Q = alignLegs(md, Q);
+    if (!md.cfg.npc && this.armW < 0.999) {                                 // empty right hand: fingers open up from the grip fist
+      const k = 1 - this.armW;
+      for (const fg of ['Index', 'Middle', 'Ring', 'Pinky']) { Q['Right_' + fg + 'Proximal'] = rz(60 - 38 * k); Q['Right_' + fg + 'Intermediate'] = rz(70 - 44 * k); }
+    }
     // swings: feet stay planted in a fighting stance while the pelvis twists and sinks (knees solved by IK)
     if (!md.cfg.npc && md.leg && p.plant > 0.01 && p.step) Q = blendBones(Q, this.plantLegs(p, Q, bodyY), Math.min(1, p.plant));
     if (!md.cfg.npc && this.gaitW > 0.01 && md.leg) {
@@ -666,7 +726,12 @@ export class ModelBody {
       const Rp = rotOnly(dSh), Sn = c.S.clone().applyMatrix4(dSh), L = c.L1 + c.L2;
       const T = Sn.clone().addScaledVector(dirAE(p.hand[0], p.hand[1]), L * p.hand[2]);
       const pole = p.elbow ? _v(...p.elbow).normalize() : _v(-0.6, -1, -0.35).normalize();
-      const r = solveArm(c, Sn, T, pole, p.blade ? dirAE(p.blade[0], p.blade[1]) : _v(0, 0.3, 1));
+      let bd = p.blade ? dirAE(p.blade[0], p.blade[1]) : _v(0, 0.3, 1);
+      if (p.toBack > 0.001) {                                                // draw / sheathe: the hand goes to the grip on the back
+        const bm = this.backMount(), uc = bm.bone, dUC = mul(_m().copy(W[uc]), md.bones[uc].inv), k = Math.min(1, p.toBack);
+        T.lerp(bm.grip.clone().applyMatrix4(dUC), k); bd = bd.clone().lerp(bm.dir.clone().transformDirection(dUC), k).normalize();
+      }
+      const r = solveArm(c, Sn, T, pole, bd);
       const Rpi = Rp.clone().invert(), ik = { Right_UpperArm: mul(Rpi, r.Rua), Right_LowerArm: mul(r.Rua.clone().invert(), r.Rla), Right_Hand: mul(r.Rla.clone().invert(), r.Rh) };
       Q = blendBones(Q, ik, this.swingW); W = this.worldOf(Q);
     }
@@ -690,8 +755,9 @@ export class ModelBody {
     if (ca && ca.spins) for (const [s0, s1, deg] of ca.spins) if (this.t > s0 && this.t < s1) spin += deg * EASE.io((this.t - s0) / (s1 - s0));
     this.root.rotation.y = this.yaw + spin * DEG;
     const wid = !p.held && this.weaponId ? this.weaponId() : null;
+    this.W = W;
     this.updateProp('R', p.held || (wid && isWeaponModel(wid) ? 'item:' + wid : this.weapon), (p.wOff - 90) * (1 - (this.swingW || 0)));
-    this.updateProp('L', p.held ? null : this.off, p.offOff - 90);
+    this.updateProp('L', p.held ? null : this.armW > 0.5 ? this.off : null, p.offOff - 90);
   }
   worldOf(Q) {
     const md = this.md, W = new Array(md.bones.length);
@@ -723,11 +789,25 @@ export class ModelBody {
   }
   /** blade base / tip of the right-hand weapon in world space (for the swing trail), or null */
   bladePoints() {
-    const h = this.props.R; if (!h || !this.visible) return null;
+    const h = this.props.R; if (!h || !this.visible || this.armW < 0.5) return null;
     this.root.updateMatrixWorld(true);
     if (h.userData.len === undefined) { const bb = new THREE.Box3().setFromObject(h.children[0]).applyMatrix4(_m().copy(h.matrixWorld).invert()); h.userData.len = Math.max(0.1, bb.max.z); }
     const L = h.userData.len, mw = h.matrixWorld;
     return [_v(0, 0, L * 0.38).applyMatrix4(mw), _v(0, 0, L).applyMatrix4(mw)];
+  }
+  /** back holder of the right-hand weapon (bind space, model units): grip just above and behind the right shoulder,
+   *  blade running diagonally down to the left hip, flat against the back. The back surface is measured from the mesh
+   *  (min z of the torso vertices at chest height), so male / female / job outfits each get their own depth. */
+  backMount() {
+    const md = this.md; if (md._back) return md._back;
+    const s = md.scale, P = n => md.bones[md.byName[n]].t, ua = P('Right_UpperArm'), uc = md.byName.UpperChest ?? md.byName.Chest;
+    const pos = md.geometry.attributes.position.array, y0 = P('Chest').y, y1 = P('Neck').y, xw = Math.abs(ua.x) * 0.9;
+    let zMin = Infinity; for (let i = 0; i < pos.length; i += 3) if (pos[i + 1] > y0 && pos[i + 1] < y1 && Math.abs(pos[i]) < xw) zMin = Math.min(zMin, pos[i + 2]);
+    if (!isFinite(zMin)) zMin = P('UpperChest').z - 0.12 / s;
+    const B = BACK_MOUNT, grip = _v(ua.x * B.x, ua.y + B.up / s, zMin - B.out / s);
+    const dir = _v(B.dir[0], B.dir[1], B.dir[2]).normalize(), X = _v(0, 0, 1).addScaledVector(dir, -dir.z).normalize(), Y = _v().crossVectors(dir, X);
+    const M = _m().makeBasis(X, Y, dir).setPosition(grip).multiply(_m().makeScale(1.3 / s, 1.3 / s, 1.3 / s));
+    return (md._back = { bone: uc, grip, dir, M });
   }
   updateProp(side, kind, tilt) {
     if (this.propKind[side] !== kind) {
@@ -735,15 +815,28 @@ export class ModelBody {
       this.propKind[side] = kind;
       if (kind) {
         const hi = this.md.byName[(side === 'R' ? 'Right' : 'Left') + '_Hand'];
+        // held in mesh space: the matrix is the hand grip (or, for the right weapon, the back holder / a glide between them)
         const holder = new THREE.Group(); holder.matrixAutoUpdate = false; holder.add(kind.startsWith('item:') ? itemModel(kind.slice(5)) : makeProp(kind));
-        this.bones[hi].add(holder); this.props[side] = holder; holder.userData.hi = hi;
+        this.mesh.add(holder); this.props[side] = holder; holder.userData.hi = hi;
       }
     }
     const h = this.props[side]; if (!h) return;
-    const md = this.md, b = md.bones[h.userData.hi], along = side === 'R' ? -1 : 1, s = md.scale;
+    const md = this.md, hi = h.userData.hi, b = md.bones[hi], along = side === 'R' ? -1 : 1, s = md.scale, W = this.W;
     // grip at the palm in bind space, item axis forward (+z) tilted by the pose, authored in metres
     const bindM = mul(_m().makeTranslation(b.t.x + along * 0.027 / s, b.t.y - 0.01, b.t.z + 0.01), rx(-(tilt || 0)), _m().makeScale(1.3 / s, 1.3 / s, 1.3 / s));
-    h.matrix.copy(mul(b.inv, bindM)); h.matrixWorldNeedsUpdate = true;
+    const inHand = mul(_m().copy(W[hi]), b.inv, bindM);
+    const a = side === 'R' && !md.cfg.npc ? this.armW : 1;
+    if (a >= 0.999) h.matrix.copy(inHand);
+    else {
+      const bm = this.backMount(), onBack = mul(_m().copy(W[bm.bone]), md.bones[bm.bone].inv, bm.M);
+      if (a <= 0.001) h.matrix.copy(onBack);
+      else {                                                                 // glide hand <-> back (position lerp, rotation slerp)
+        const p0 = _v(), p1 = _v(), q0 = new THREE.Quaternion(), q1 = new THREE.Quaternion(), s0 = _v(), s1 = _v();
+        onBack.decompose(p0, q0, s0); inHand.decompose(p1, q1, s1); const e = EASE.s(a);
+        h.matrix.compose(p0.lerp(p1, e), q0.slerp(q1, e), s0.lerp(s1, e));
+      }
+    }
+    h.matrixWorldNeedsUpdate = true;
   }
   dispose() {
     if (this.trail) this.trail.dispose();

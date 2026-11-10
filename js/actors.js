@@ -228,7 +228,10 @@ export class SkillRunner {
 }
 
 // ======================================================================================= player
-const RECALL_TIME = 3;   // 마을 귀환 모으는 시간(초)
+const RECALL_TIME = 3;
+const SHEATHE_AFTER = 3;   // 전투가 끝나고 이만큼(초) 지나면 무기를 등에 다시 멤
+const AGGRO_R = 10;        // 이 거리(m) 안에서 나를 쫓거나 공격 준비 중인 몬스터가 있으면 전투 중
+const DRAW_FAST = 1.6;     // 칼을 등에 둔 채 공격·스킬을 누르면 빠르게 꺼냄(배속)   // 마을 귀환 모으는 시간(초)
 export class Player extends Combatant {
   constructor(zone, pos, sheet, quests, cfg) {
     super(zone, pos, cfg.playerRadius, "player");
@@ -256,6 +259,7 @@ export class Player extends Combatant {
       const [md, sh] = await Promise.all([loadPlayerModel(g, this.jobKey()), loadActions()]);
       this.body = new ModelBody(G.render.scene, md, sh, this.radius, this.jobKey());
       this.body.weaponId = () => this.sheet.p.weapon;
+      this.body.setArmed(this.calmT !== undefined && this.calmT < SHEATHE_AFTER);   // 평소엔 등에 (전투 중 직업 모델이 바뀌면 손에)
       if (this.sheet.p.sk && this.sheet.p.sk.dye && this.sheet.p.sk.dye.outfit) this.body.setDye(this.sheet.p.sk.dye.outfit);
       this.body.setFacing(this.facing.x, this.facing.z); this.body.yaw = this.body.targetYaw;
       return;
@@ -280,6 +284,7 @@ export class Player extends Combatant {
     if (this.dodgeCd > 0) this.dodgeCd -= dt; if (this.potionCd > 0) this.potionCd -= dt; if (this.repathT > 0) this.repathT -= dt; if (this.atkBuf > 0) this.atkBuf -= dt;
     this.skills.tick(dt); this.skills2.tick(dt); this.comboRoot(dt);
     if (this.dead) { this.vel = { x: 0, z: 0 }; return; }
+    this.frameDt = dt; this.updateArms(dt);
     this.sp = Math.min(this.maxSp, this.sp + this.stat("spRegen") * dt);
     this.sheet.p.playTime += dt;
     // 견습생 '회복력 증가': standing still (no move, no skill) for 3 s -> heal a % of max HP every 3 s
@@ -325,10 +330,11 @@ export class Player extends Combatant {
       const key = "skill" + (i + 1); if (!input.down[key]) continue;
       const id = sk.slots[i];
       if (!id) { G.ui.toast("빈 슬롯입니다 (스킬창 K)"); continue; }
-      const d = G.data.skill2(id);
-      const e = this.skills2.cast(id, this.aimFor({ targeting: d.target === "ground" ? "ground" : d.target === "self" ? "self" : "dir", range: d.range }, input));
-      if (e) G.ui.toast(e);
+      // weapon on the back: a fast draw first, the skill goes off as soon as the draw is ready (pendSkill)
+      if (!this.weaponReady()) { this.combat(DRAW_FAST); this.pendSkill = { id, t: 0.8 }; continue; }
+      this.castSkill(id, input);
     }
+    if (this.pendSkill) { this.pendSkill.t -= this.frameDt || 1 / 60; if (this.pendSkill.t <= 0 || this.dashT > 0) this.pendSkill = null; else if (this.weaponReady() && !this.skills.busy) { const id = this.pendSkill.id; this.pendSkill = null; this.castSkill(id, input); } }
     this.updateLock(input);
     if (this.atkBuf > 0 && !this.skills.busy) this.basic(input);
     if (input.down.attack || input.held.attack) {
@@ -348,6 +354,29 @@ export class Player extends Combatant {
       const n = this.npcTarget; this.npcTarget = null; this.path = []; G.interact(n);
     }
   }
+  castSkill(id, input) {
+    const d = G.data.skill2(id);
+    const e = this.skills2.cast(id, this.aimFor({ targeting: d.target === "ground" ? "ground" : d.target === "self" ? "self" : "dir", range: d.range }, input));
+    if (e) G.ui.toast(e); else this.combat();
+  }
+  // ---- 무기 꺼내기 / 집어넣기: out of combat the weapon is on the back (ModelBody.armed false). Combat = attacking or casting,
+  // being hit, or a monster chasing / winding up at you within AGGRO_R m (bosses in their fight). Entering combat draws
+  // (an upper-body motion over idle / walking); SHEATHE_AFTER s after the last combat signal it goes back on the back.
+  // The first attack / skill while sheathed: a fast draw (DRAW_FAST x speed, ~0.2 s) and the swing starts from its
+  // raised pose (drawReady) - the press is kept meanwhile. Towns: no monster draws; zone change / death / recall = sheathed.
+  weaponReady() { const B = this.body; return !B || !B.setArmed || B.drawReady; }
+  combat(speed = 1) { this.calmT = 0; const B = this.body; if (B && B.draw && !this.dead) B.draw(speed); }
+  updateArms(dt) {
+    const B = this.body; if (!B || !B.setArmed) return;
+    this.calmT = (this.calmT ?? SHEATHE_AFTER) + dt;
+    if ((this.aggroScan = (this.aggroScan || 0) - dt) <= 0) {
+      this.aggroScan = 0.25;
+      if (this.zone.def.kind !== "town" && this.zone.actors.some(c => c && !c.dead && c.faction !== this.faction && (c.state === "chase" || c.state === "windup" || c.fight) && this.dist(c) < AGGRO_R)) this.combat();
+    }
+    if (this.calmT >= SHEATHE_AFTER && B.armed && !B.over && !this.skills.busy && this.dashT <= 0 && !this.pendSkill && !(this.atkBuf > 0) && (B.action === "idle" || B.action === "walk")) B.sheathe();
+  }
+  /** zone change / death / recall: weapon back on the back without a motion */
+  resetArms() { this.calmT = SHEATHE_AFTER; this.pendSkill = null; if (this.body && this.body.setArmed) this.body.setArmed(false); }
   basicReach(m) { const b = G.data.skill(this.sheet.job.basicAttack); return (b ? b.range : 1.5) + m.radius * 0.6; }
   /** lock-on: PC = the monster you clicked; phone = the nearest monster that comes close or attacks you (re-picks when
    *  the locked one dies, lets go when you walk away from it, and switches to a clearly closer one). Skills and basic attacks aim at the locked monster; the ring under it shows the lock. */
@@ -372,7 +401,8 @@ export class Player extends Combatant {
   basic(input) {
     // a press during a combo strike is remembered (Chain_Open .. the strike's lock end) and fires as soon as it ends
     if (this.skills.busy) { const A = this.body && this.body.sh && this.body.sh.actions[this.body.action]; if (A && A.combo && this.body.t >= A.chainOpen * 0.999) this.atkBuf = 0.4; return; }
-    this.atkBuf = 0; const s = G.data.skill(this.sheet.job.basicAttack); if (s) this.skills.tryCast(s, this.aimFor(s, input));
+    if (!this.weaponReady()) { this.combat(DRAW_FAST); this.atkBuf = Math.max(this.atkBuf || 0, 0.6); return; }   // draw first, swing when ready
+    this.atkBuf = 0; const s = G.data.skill(this.sheet.job.basicAttack); if (s && !this.skills.tryCast(s, this.aimFor(s, input))) this.combat();
   }
   /** combo strike root motion: the actor follows the action's adv (m forward of where the strike started), so the
    *  planted feet (step - adv in model.js) stay on the ground; blocked moves just stop there */
@@ -487,11 +517,12 @@ export class Player extends Combatant {
   onHitLanded(heavy) { G.render.addShake(heavy ? 0.1 : 0.03, heavy ? 0.16 : 0.07); if (heavy) G.hitStop(this.cfg.hitStop); }
   onDamaged(d, loss) {
     if (d.dot) return;
+    this.combat();
     if (!this.skills.busy && this.dashT <= 0) this.body.play("hit", 1, true);
     if (loss > this.maxHp * 0.08) G.render.addShake(0.1, 0.15);
     G.audio.sfx("hurt");
   }
-  onDeath() { this.skills.cancel(); this.skills2.clearTemp(); this.path = []; G.audio.sfx("die"); G.onPlayerDied(); }
+  onDeath() { this.resetArms(); this.skills.cancel(); this.skills2.clearTemp(); this.path = []; G.audio.sfx("die"); G.onPlayerDied(); }
   revive(f) {
     this.dead = false; this.status.clear(); this.hp = Math.max(1, this.maxHp * f); this.sp = this.maxSp * f; this.invuln = 2;
     this.body.play("idle", 1, true); G.fx.play("levelup", { x: this.pos.x, y: this.pos.y + 0.8, z: this.pos.z }, 1.2);
