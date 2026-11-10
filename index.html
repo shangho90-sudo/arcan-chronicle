@@ -752,24 +752,25 @@ small { font-size:.8em; }
 .window.fancy .fplaque { white-space:nowrap; } .window.fancy.pause .fplaque, .window.fancy.death .fplaque { font-size:36px; padding-left:44px; padding-right:44px; }
 
 /* ---------- quest window (fixed HUD, right side under the minimap) + area name banner ---------- */
-.qhud { position:absolute; right:14px; top:264px; width:320px; z-index:4; box-sizing:border-box; color:#ece4d0;
-  font-family:"Noto Sans KR","Noto Sans CJK KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif; font-weight:500; font-size:15px; line-height:1.5; text-align:left;
+.qhud { position:absolute; right:14px; top:264px; width:218px; z-index:4; box-sizing:border-box; color:#ece4d0;
+  font-family:"Noto Sans KR","Noto Sans CJK KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif; font-weight:500; font-size:14px; line-height:1.45; text-align:left;
   background:rgba(16,22,36,.84); border:1px solid rgba(201,160,82,.55); border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,.28);
   display:flex; flex-direction:column; max-height:max(60px, calc(100vh - 536px)); touch-action:manipulation; -webkit-user-select:none; user-select:none; }
 .winopen .qhud { z-index:auto; }
 .qhud.closed { display:none; }
-.qh-head { display:flex; align-items:center; gap:4px; padding:7px 8px 6px 16px; border-bottom:1px solid rgba(201,160,82,.32); flex:none; }
+.qh-head { display:flex; align-items:center; gap:4px; padding:7px 6px 6px 12px; border-bottom:1px solid rgba(201,160,82,.32); flex:none; }
 .qh-title { flex:1; font-size:17px; font-weight:700; color:#f1d48a; letter-spacing:.02em; }
 .qh-btn { width:30px; height:28px; border:0; border-radius:5px; background:transparent; color:#cbbf9f; font:15px/28px sans-serif; cursor:pointer; padding:0; }
 .qh-btn:hover, .qh-btn:focus-visible { background:rgba(255,255,255,.08); color:#fff; outline:none; }
-.qh-body { padding:10px 16px 12px; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:rgba(201,160,82,.5) transparent; }
-.qhud.min .qh-body { padding:8px 16px 10px; overflow:hidden; }
-.qh-main h3 { margin:0 0 4px; font-size:16px; font-weight:700; color:#fff6df; }
+.qh-body { padding:9px 12px 11px; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:rgba(201,160,82,.5) transparent; }
+.qhud.min .qh-body { padding:8px 12px 10px; overflow:hidden; }
+.qh-main h3 { margin:0 0 4px; font-size:15px; font-weight:700; color:#fff6df; }
 .qh-tag { font-style:normal; font-size:12px; font-weight:700; color:#16220f; background:#9fd68a; border-radius:3px; padding:1px 6px; margin-left:4px; vertical-align:2px; }
 .qh-main ul { list-style:none; margin:0; padding:0; }
 .qh-main li { display:flex; align-items:flex-start; gap:8px; padding:3px 0; border-radius:4px; }
 .qh-obj { flex:1; min-width:0; overflow-wrap:anywhere; }
 .qh-prog { flex:none; color:#d9c48c; font-size:14px; font-variant-numeric:tabular-nums; }
+.qh-main li { flex-wrap:wrap; row-gap:0; } .qh-prog { flex-basis:100%; padding-left:22px; font-size:13px; }   /* narrow window (minimap width): progress on its own line */
 .qh-main li.done .qh-obj { color:#a9b7a3; } .qh-main li.done .qh-prog { color:#9fd68a; }
 .qh-dot { flex:none; width:7px; height:7px; margin:8px 4px 0 3px; border-radius:50%; background:#d9b45f; }
 .qh-ck { flex:none; width:14px; height:14px; margin-top:4px; color:#9fd68a; } .qh-ck svg { display:block; width:14px; height:14px; }
@@ -799,7 +800,7 @@ small { font-size:.8em; }
 .areabanner.notice { font-size:18px; letter-spacing:.02em; padding:8px 18px; border-radius:8px; background:rgba(16,22,36,.72); border:1px solid rgba(201,160,82,.4); }
 .areabanner.out { opacity:0; }
 @keyframes abin { from { opacity:0; transform:translate(-50%, -6px); } to { opacity:1; transform:translate(-50%, 0); } }
-@media (max-width: 900px), (max-height: 520px) { .qhud { top:224px; width:300px; max-height:max(60px, calc(100vh - 492px)); } .qh-reopen { top:224px; } }
+@media (max-width: 900px), (max-height: 520px) { .qhud { top:224px; width:174px; max-height:max(60px, calc(100vh - 492px)); } .qh-reopen { top:224px; } }
 @media (max-width: 600px) {   /* portrait phones: right column under the HP/menu block, clear of the stick area (left 42%) and the action buttons */
   .qhud { right:6px; top:238px; width:min(250px, 56vw); font-size:14px; max-height:max(96px, calc(100vh - 238px - 270px)); }
   .qh-reopen { right:6px; top:238px; }

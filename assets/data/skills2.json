@@ -38,7 +38,7 @@
 {
 "op": "hit",
 "shape": "single",
-"coef": 3.2,
+"coef": 2.4,
 "len": 3.4,
 "noExtra": true,
 "at": 0.0,
@@ -111,7 +111,7 @@
 {
 "op": "hit",
 "shape": "single",
-"coef": 0.62,
+"coef": 0.5,
 "r": 2.2,
 "ang": 110,
 "hits": 2,
@@ -169,7 +169,7 @@
 {
 "op": "proj",
 "kind": "normal",
-"coef": 2.0,
+"coef": 3.4,
 "speed": 13,
 "range": 10,
 "w": 1.3,
@@ -233,7 +233,7 @@
 {
 "op": "hit",
 "shape": "single",
-"coef": 1.9,
+"coef": 2.8,
 "noExtra": true,
 "push": 2.6,
 "st": [
