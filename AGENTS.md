@@ -104,6 +104,7 @@
 ## 칼 휘두르기 (`js/model.js`, `tools/anim/swings.py`)
 - 공격 동작은 시간 키(`keys`, 초) + 구간 이징(`e`) + 칼 팔 IK(`hand`/`blade`/`elbow`) + 발 고정(`step`, `plant`)으로 정의합니다. actions.json의 `attack`/`attack2`는 `python3 tools/anim/swings.py`로 생성하세요(직접 편집 금지).
 - 기본 검술 스킬 동작(`nv_yeon_<타수>`, `nv_biyeon`)도 `swings.py`의 `combo()`(타격 묶음 `ST` + `spin`/`ov`)로 생성. 일격참 `nv_ilgyeok`은 연타가 아닌 한 번의 찌르기(`IL_KEYS`, 2026-11-09) + '살' 섬광(`js/salfx.js`). 여러 번 때리는 스킬은 `<anim>_<타수>` 동작이 있으면 그 동작의 `hitTimes`(타격 시각)·`hitFx`(타별 베기 효과)·`lunges`(전진)·`recover`를 씀(`skillrt.js` `cast`/`release`/`opHit`). 몸 회전은 `spins`(`model.js` `apply`). 확인 `tools/browser-tests/skill_film.js`(`SKILL= LV= ZOOM=`).
+- 기본공격 5단 콤보(2026-11-10): `swings.py`의 `C5` 타임라인(60 fps, 150프레임, 타격 12·34·58·83·116) → `combo_1`~`combo_5` + `combo_full`. 자세 값 `adv`(루트 전진)·`lift`(발 들기)로 디딘 발 고정(`model.js` `plantLegs`: `step - adv`, `actors.js` `comboRoot`). 연계는 `SkillRunner.tryCast`(`chainClose` 안이면 다음 타, `lock` = 다음 입력까지, `chainOpen` 이후 입력은 `Player.atkBuf`로 기억), 타별 배율은 동작 `atk`. 확인 `tools/browser-tests/combo_film.js` + `tools/anim/combo_report.py`. Blender 판은 `combo_bake.js` → `tools/blender/combo5.py` → `tools/blender/combo5/`(설명 `README.md`) — 동작을 바꾸면 다시 굽기.
 - 칼 잔상은 실제 칼날 위치에서 그립니다(`SwingTrail`, 동작의 `trail` 구간). 바꾼 뒤에는 `swing_film.js` → `tools/anim/strip.py`, `swing_report.py`(발 이동·그립·칼끝 속도)와 `attack_dirs.js`(실제 입력 8방향)로 확인하세요.
 
 ## 3D 자산

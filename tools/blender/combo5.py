@@ -60,7 +60,7 @@ for b in BONES:
 toM = lambda M: mathutils.Matrix(M.tolist())
 
 # ---------------------------------------------------------------- scene
-bpy.ops.wm.read_factory_settings(use_empty=True)
+bpy.ops.wm.read_factory_settings(use_empty=True); bpy.context.preferences.filepaths.save_version = 0
 scn = bpy.context.scene; scn.render.fps = FPS; scn.frame_start = 1
 # armature: Root (at the feet, +Y forward of the rig = travel axis -Y handled in the keys) -> the 67 game bones
 arm_d = bpy.data.armatures.new('Combo5_Rig'); arm = bpy.data.objects.new('Combo5_Rig', arm_d); scn.collection.objects.link(arm)
@@ -77,7 +77,7 @@ PARENT = [b['parent'] for b in BONES]
 # mesh (rest pose = bind), per-corner UVs, skin weights
 V = (C @ np.c_[POS * S, np.ones(len(POS))].T).T[:, :3]
 me = bpy.data.meshes.new('Combo5_Body'); me.from_pydata(V.tolist(), [], TRI.tolist()); me.update()
-uvl = me.uv_layers.new(name='UV'); uvd = UV.copy(); uvd[:, 1] = 1 - uvd[:, 1]
+uvl = me.uv_layers.new(name='UV'); uvd = UV.copy()          # already bottom-left origin (glb_to_model flipped V for three.js)
 for li, loop in enumerate(me.loops): uvl.data[li].uv = uvd[li]
 body = bpy.data.objects.new('Combo5_Body', me); scn.collection.objects.link(body); body.parent = arm
 for b in BONES: body.vertex_groups.new(name=b['name'])
@@ -232,7 +232,7 @@ if RENDER:
     cam.data.type = 'ORTHO'
     def aim(loc, target=(0, -0.2, 0.8), ortho=3.2):
         cam.location = loc; d = mathutils.Vector(target) - mathutils.Vector(loc); cam.rotation_euler = d.to_track_quat('-Z', 'Y').to_euler(); cam.data.ortho_scale = ortho
-    r = scn.render; r.engine = 'CYCLES'; scn.cycles.samples = 12; scn.cycles.use_denoising = False; scn.cycles.device = 'CPU'
+    r = scn.render; r.engine = 'CYCLES'; scn.cycles.samples = 8; scn.cycles.use_denoising = False; scn.cycles.device = 'CPU'
     r.resolution_x, r.resolution_y = 640, 480; r.film_transparent = False; r.image_settings.file_format = 'PNG'
     scn.view_settings.view_transform = 'Standard'
     # quarter view like the game (pitch 44 deg, looking from the front-right)

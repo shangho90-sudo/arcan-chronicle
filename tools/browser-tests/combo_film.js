@@ -23,7 +23,7 @@ const CW = +(process.env.CW || Math.min(VW, 460)), CH = +(process.env.CH || Math
   await pg.waitForTimeout(1500);
   await ev(z => {
     G.frame = () => {}; const c = G.render.cam; c.zoom = z; c.updateProjectionMatrix();
-    document.querySelectorAll('.hud,.toasts,.layer,.qhud,.qh-reopen,.plates').forEach(e => e.style.display = 'none');
+    document.querySelectorAll('.hud,.toasts,.layer:not(.controls),.qhud,.qh-reopen,.plates').forEach(e => e.style.display = 'none');
     const p = G.player; G.dev.level(5); G.dev.full();
     let spot = null; const sp0 = (G.zone.def.spawns || []).find(q => q.id === 'start') || { pos: [p.pos.x, p.pos.z] }, cx = sp0.pos[0], cz = sp0.pos[1];
     const cand = []; for (let r = 0; r <= 16; r += 1) for (let k = 0; k < Math.max(1, r * 6); k++) { const a = k / Math.max(1, r * 6) * Math.PI * 2; cand.push({ x: cx + Math.cos(a) * r, z: cz + Math.sin(a) * r }); }

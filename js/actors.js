@@ -195,7 +195,8 @@ export class SkillRunner {
         if (SF && !cm && !a.atTarget && (a.shape === "cone" || a.shape === "rect")) SF.slash(pc.pos, p.facing, pc.body && pc.body.action === "attack2" ? -1 : 1, { radius: Math.max(1.0, (a.radius || a.length || 1.5) * 0.85) });
         if (fx3 && !trail) { this.swing = ((this.swing || 0) + 1) % 3;
           G.skillFx.slash("blade", pc.pos, p.facing, { radius: a.radius * 1.05, angle: Math.max(110, a.angle + 20), mirror: this.swing === 1, tilt: [0.18, -0.22, 0.42][this.swing], grade: 3 }); }
-        else if (["slash", "wind", "paint_burst", "potion_splash", "ring"].includes(a.fx)) G.fx.play(a.fx, fp, a.fxScale, a.fx === "ring");
+        // combo strikes: only the thin blade trail of the real sword (no sprite crescent / big sword wave)
+        else if (!(cm && a.fx === "slash") && ["slash", "wind", "paint_burst", "potion_splash", "ring"].includes(a.fx)) G.fx.play(a.fx, fp, a.fxScale, a.fx === "ring");
         if (ts.length) { G.audio.sfx(a.sfx || "hit"); pc.onHitLanded(a0.coef >= 1.5); }
         else if (a.atTarget && a.sfx) G.audio.sfx(a.sfx);
         break;
@@ -420,7 +421,12 @@ export class Player extends Combatant {
       if (Math.hypot(mv.x, mv.z) > speed * dt * 0.15 || !this.body.md) { this.body.play("walk", rate); this.body.speed = rate; } else this.idle();
     } else { this.vel = { x: 0, z: 0 }; this.idle(); }
   }
-  idle() { if (!this.body || this.skills.busy) return; if (this.body.action === "hit" && !this.body.finished) return; this.body.play("idle", 1); }
+  idle() {
+    if (!this.body || this.skills.busy) return; if (this.body.action === "hit" && !this.body.finished) return;
+    // a combo strike plays its own recovery (feet step back under the body, guard) unless the player moves or chains on
+    const A = this.body.sh && this.body.sh.actions[this.body.action]; if (A && A.combo && !this.body.finished) return;
+    this.body.play("idle", 1);
+  }
   onClick(c) {
     const m = this.zone.pickActor(c.x, c.y); if (m) { this.target = m; this.lockOn = m; this.npcTarget = null; this.setDest(m.pos); return; }
     const n = this.zone.pickNpc(c.x, c.y); if (n) { this.npcTarget = n; this.target = null; this.setDest(n.pos); return; }
