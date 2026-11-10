@@ -6,6 +6,7 @@ import { HitShape, CombatMath, clamp, clamp01 } from './core.js';
 import { skillSound } from './sfx.js';
 import { salImpact } from './salfx.js';
 import { yeonImpact, LEAD as YEON_LEAD } from './yeonfx.js';
+import { biyeonImpact } from './biyeonfx.js';
 
 let G = null; export function bindSkillRt(g) { G = g; }
 const DEG = Math.PI / 180;
@@ -22,6 +23,7 @@ export const FX = {
   slash(kind, pos, dir, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.slash(kind, pos, dir, o); G.fx.play('slash', { x: pos.x, y: (pos.y || 0) + 0.7, z: pos.z }, 1); } catch (e) { console.warn('fx', kind, e); } },
   yeon(kind, a, b) { try { if (G.skillFx && G.skillFx.yeon) return kind === 'strike' ? G.skillFx.yeon.strike(a) : G.skillFx.yeon.hit(a, b); } catch (e) { console.warn('fx yeon', e); } },   // 견습생 '연' (js/yeonfx.js)
   sal(kind, pos, dir, o = {}) { try { if (G.skillFx && G.skillFx.sal) return G.skillFx.sal[kind](pos, dir, o); } catch (e) { console.warn('fx sal', e); } },   // 일격참 '살' (js/salfx.js)
+  biyeon(kind, pos, dir, o = {}) { try { if (G.skillFx && G.skillFx.biyeon) return G.skillFx.biyeon[kind](pos, dir, o); } catch (e) { console.warn('fx biyeon', e); } return null; },   // 비연참 '비연파' (js/biyeonfx.js)
   beam(kind, a, b, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.beam(kind, a, b, o); } catch (e) { console.warn('fx', kind, e); } },
   projectile(kind, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.projectile(kind, o) || NOOP; } catch (e) { console.warn('fx', kind, e); } return NOOP; },
   area(kind, pos, r, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.area(kind, pos, r, o) || NOOP; } catch (e) { console.warn('fx', kind, e); } return NOOP; },
@@ -335,7 +337,8 @@ export class SkillEngine {
         const c = op.atAim ? ctx.aim : pc.pos;
         FX.telegraph(c, op.r || op.w || 2, op.dur, { color: 0xffb040, shape: op.shape, dir: ctx.facing, length: op.len, width: op.w }); return;
       }
-      case 'fx': if (op.sal === 'cast') { const tg = ctx.tgt && !ctx.tgt.dead ? ctx.tgt : this.targetFor(ctx.d); ctx.salCast = FX.sal('cast', pc.pos, ctx.facing, { follow: pc, length: op.len || 3.4, width: op.w || 1, target: tg || null }); }   // beam: sword tip -> impact point (salImpact, max op.len m); the hit locks it
+      case 'fx': if (op.biyeon === 'cast') { const a = pc.body && pc.body.sh && pc.body.sh.actions[ctx.act]; ctx.biyeonCast = FX.biyeon('cast', pc.pos, ctx.facing, { follow: pc, swing: a && a.fps ? a.hitFrame / a.fps : 0.22 }); }   // wind-up + sweep + side blades (decoration); the centre blade rides the proj op
+        if (op.sal === 'cast') { const tg = ctx.tgt && !ctx.tgt.dead ? ctx.tgt : this.targetFor(ctx.d); ctx.salCast = FX.sal('cast', pc.pos, ctx.facing, { follow: pc, length: op.len || 3.4, width: op.w || 1, target: tg || null }); }   // beam: sword tip -> impact point (salImpact, max op.len m); the hit locks it
         if (op.slash) FX.slash(op.slash, pc.pos, ctx.facing, { radius: op.r || 1.6, angle: op.ang || 120, color: col, tilt: op.tilt || 0, mirror: !!op.mirror }); if (op.burst) FX.burst(op.burst, op.fwd ? { x: pc.pos.x + ctx.facing.x * op.fwd, y: pc.pos.y, z: pc.pos.z + ctx.facing.z * op.fwd } : pc.pos, { radius: op.r || 2, color: col }); return;   // fwd: m in front (일격참 땅 갈라짐)
       case 'repair': {
         for (const s of this.summons) if (s.machine && !s.dead) { const miss = 1 - s.hp / s.maxHp; s.hp = Math.min(s.maxHp, s.hp + s.maxHp * op.pct * ctx.mult * (1 + op.missingBonus * miss)); FX.burst('sparks', s.pos, { radius: 0.8 }); }
@@ -574,7 +577,8 @@ class SkillProj {
     this.to = { ...to }; const dx = to.x - this.pos.x, dz = to.z - this.pos.z, m = Math.hypot(dx, dz) || 1; this.dir = { x: dx / m, z: dz / m };
     if (op.kind === 'lob') { this.from = { ...this.pos }; this.flight = Math.max(0.25, m / this.speed); }
     if (op.toGround) { this.range = m + 0.2; }
-    this.fx = FX.projectile(op.fx || 'capsule', { color: ctx.d.fx && ctx.d.fx.color });
+    // 비연참: the centre crescent of the fan IS this projectile (js/biyeonfx.js); falls back to the generic wave until loaded
+    this.fx = (op.biyeon && FX.biyeon('proj', this.pos, this.dir, { groundY: pc.pos.y || 0 })) || FX.projectile(op.fx || 'capsule', { color: ctx.d.fx && ctx.d.fx.color });
     this.fx.set(this.pos, { x: this.dir.x, y: 0, z: this.dir.z });
   }
   update(dt) {
@@ -612,7 +616,8 @@ class SkillProj {
         this.eng.dmg(c, coef, this.ctx, op); this.eng.onHit(c, op, this.ctx);
         if (op.tri) { const m = marks(c); m.tri.add(op.tri); m.triT = 3; }
         if (op.stackSlow) { const s = c.status.list.find(x => x.def.id === 'slow'); if (s) s.value = Math.min(0.6, s.value + 0.06); }
-        FX.burst(op.burst || 'hit_pierce', c.pos, { radius: 0.6 });
+        if (op.biyeon) { const ip = biyeonImpact(c, this.dir); if (this.fx.hit) this.fx.hit(ip); FX.biyeon('hit', ip, this.dir); }   // only the enemy really damaged
+        else FX.burst(op.burst || 'hit_pierce', c.pos, { radius: 0.6 });
         if (op.chain) this.eng.chain(c, op.chain, this.ctx);
         if (!op.pierce && op.kind !== 'boomerang') return this.done();
       }

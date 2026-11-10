@@ -189,7 +189,8 @@ IL_KEYS = [
 IL = action('nv_ilgyeok', IL_KEYS, IL_T, IL_T + 0.50, [[IL_T - 0.045, IL_T + 0.02]], fadeIn=0.07, fadeOut=0.16)
 IL.update(hitTimes=[IL_T], trailLife=0.11, trailBase=0.45, trailColor=[1.55, 1.3, 1.5])
 # 비연참 (nv_a3): one huge horizontal sweep that throws the sword wave
-BI = combo('nv_biyeon', ['hz'], t0=0.22, lunge=False); del BI['hitFx']
+# (2026-11-10) 비연파: pale sky blade trail (js/biyeonfx.js colours) instead of the gold one; impact time 0.22 unchanged
+BI = combo('nv_biyeon', ['hz'], t0=0.22, lunge=False, trailColor=(1.25, 1.5, 1.7)); del BI['hitFx']
 # 구르기 (회피, Shift): crouch -> tucked ball rolling forward 360 deg about a point 0.5 m up (action.flips, js/model.js)
 # -> open up and stand. Matches config.json dodgeDuration 0.42 s (the flip ends just before the dash does)
 TUCK = dict(lean=58, sink=0.40, legL=150, legR=140, tuck=55, armR=[72, 6], armL=[72, 6], wOff=40.0, ik=0, plant=0)

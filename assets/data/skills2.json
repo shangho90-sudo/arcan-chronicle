@@ -174,14 +174,13 @@
 "range": 10,
 "w": 1.3,
 "fx": "sword_wave",
-"burst": "hit_slash"
+"burst": "hit_slash",
+"biyeon": true
 },
 {
 "op": "fx",
-"slash": "blade",
-"r": 1.7,
-"ang": 150,
-"tilt": -0.35
+"biyeon": "cast",
+"at": -0.22
 }
 ],
 "mods": [],

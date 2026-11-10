@@ -51,8 +51,8 @@ S(J, 0, 0, '기본 검술', 2, 'nv_a2', '연', 'attack', '적 하나를 칼로 �
   ops=[dict(op='lunge', dist=1.0, dur=0.2, at=-0.1), dict(op='lunge', dist=0.8, dur=0.3, at=0.2),
        hit('single', 0.62, r=2.2, ang=110, hits=2, hitsPerLv=1, gap=0.13, noExtra=True, alt=True, fx=dict(yeon=True))], fx=dict(color=0x78dfff))   # '연' crescents: js/yeonfx.js
 S(J, 0, 0, '기본 검술', 3, 'nv_a3', '비연참', 'attack', '칼을 크게 휘둘러 초승달 모양의 검풍을 날린다. 처음 닿은 적 하나를 벤다.', target='enemy', range=9, mp=14, cd=7, anim='nv_biyeon', recover=0.3,
-  ops=[dict(op='lunge', dist=0.9, dur=0.18, at=-0.12), proj('normal', 2.0, speed=13, range=10, w=1.3, fx='sword_wave', burst='hit_slash'),
-       dict(op='fx', slash='blade', r=1.7, ang=150, tilt=-0.35)], fx=dict(color=0xbfe8ff))
+  ops=[dict(op='lunge', dist=0.9, dur=0.18, at=-0.12), proj('normal', 2.0, speed=13, range=10, w=1.3, fx='sword_wave', burst='hit_slash', biyeon=True),
+       dict(op='fx', biyeon='cast', at=-0.22)], fx=dict(color=0xbfe8ff))   # 비연파 js/biyeonfx.js: fx op at the cast (wind-up, sweep, side blades = decoration); the proj = centre blade + hit
 S(J, 0, 0, '기본 검술', 6, 'nv_a4', '배쉬', 'attack', '칼자루와 어깨로 적 하나를 세게 들이받아 약 2.6 m 뒤로 밀쳐 내며 피해를 준다. 무거운 몬스터도 밀려나고 잠깐 비틀거린다(보스 제외).', target='enemy', range=2.2, mp=9, cd=6, anim='attack2', recover=0.25,
   ops=[dict(op='lunge', dist=0.6, dur=0.12, at=-0.08),
        hit('single', 1.9, noExtra=True, push=2.6, st=[st('stagger', 0.7)], fx=dict(slash='thrust', burst='hit_blunt'), shake=[0.12, 0.2])], fx=dict(color=0xffd9a0))
