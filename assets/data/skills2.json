@@ -471,8 +471,7 @@
 "shape": "single",
 "coef": 2.2,
 "fx": {
-"slash": "smash",
-"burst": "hit_blunt"
+"pharm": "smash"
 },
 "st": [
 {
@@ -487,7 +486,7 @@
 "mods": [],
 "flags": {},
 "fx": {
-"color": 4763776
+"color": 16765562
 },
 "status": {
 "data": true,
@@ -529,15 +528,14 @@
 "knock": 3.0,
 "vsImmune": 1.6,
 "fx": {
-"slash": "thrust",
-"burst": "hit_blunt"
+"pharm": "push"
 }
 }
 ],
 "mods": [],
 "flags": {},
 "fx": {
-"color": 4763776
+"color": 16769696
 },
 "status": {
 "data": true,
@@ -761,7 +759,9 @@
 "r": 1.6,
 "elem": "fire",
 "fx": "flask_fire",
-"burst": "explosion_fire",
+"pharmProj": true,
+"burst": "none",
+"pharm": "burst",
 "st": [
 {
 "id": "burn",
@@ -816,7 +816,10 @@
 "r": 1.8,
 "elem": "ice",
 "fx": "flask_ice",
-"burst": "explosion_ice",
+"pharmProj": true,
+"burst": "none",
+"pharm": "burst",
+"linger": 3,
 "st": [
 {
 "id": "slow",
@@ -921,7 +924,10 @@
 "r": 1.8,
 "elem": "acid",
 "fx": "flask_acid",
-"burst": "explosion_acid",
+"pharmProj": true,
+"burst": "none",
+"pharm": "burst",
+"linger": 5,
 "st": [
 {
 "id": "poison",

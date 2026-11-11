@@ -5,14 +5,19 @@
 //   c6 아드레날린    이동 속도·공격 속도 배율
 //   c7 약 보호막     보호막 = 최대 체력 25 %, 독을 걸어도 안 걸림
 //   c8 광역 회복진   체력 40 %에서 8초 동안 회복량
-// Usage: SCENES=a3,a6,b6,c6,c7,c8 SIZE=1100x760|390x844t FX=1 URL=http://localhost:8781/index.html node tools/browser-tests/pharm_skills.js
+//   a1 유봉 내려찍기 / a4 밀어내기(부채꼴 3마리, 밀림 거리) / b1 화염·b2 냉각·b4 부식 약병(3마리, 피해·상태이상) — 2026-11-11 남은 스킬
+// Usage: SCENES=a3,a6,b6,c6,c7,c8 (또는 a1,a4,b1,b2,b4) SIZE=1100x760|390x844t FX=1 URL=http://localhost:8781/index.html node tools/browser-tests/pharm_skills.js
 //   -> OUT/pharm_<scene>_<size>.png (시간 순서 가로 띠) + 콘솔 요약
 const { chromium } = require('playwright'); const fs = require('fs'); const { execSync } = require('child_process');
 const SCENES = (process.env.SCENES || 'a3,a6,b6,c6,c7,c8').split(','), SIZE = process.env.SIZE || '1100x760', TOUCH = SIZE.endsWith('t');
 const [VW, VH] = SIZE.replace('t', '').split('x').map(Number), FX = process.env.FX !== '0', OUT = process.env.OUT || '/tmp/pharm', FPS = 30, TAG = process.env.TAG || 'after';
 // 4×3 비교표(SHEET): 줄 = 유봉 휘두르기 / 천근쇄약 / 약병폭격 / 아드레날린·보호막·회복진, 칸 = 아래 프레임 번호
 const PICK = { a3: [1, 3, 5], a6: [5, 6, 7], b6: [2, 4, 6], c6: [4], c7: [2], c8: [2] };
+// 남은 스킬(2026-11-11) 5×3 비교표(SHEET2): 줄 = 유봉 내려찍기 / 밀어내기 / 화염 / 냉각 / 부식 약병
+const PICK2 = { a1: [2, 3, 5], a4: [2, 3, 5], b1: [3, 4, 6], b2: [3, 4, 7], b4: [3, 4, 7] }, IDS = { a1: 'ph1_a1', a4: 'ph1_a4', b1: 'ph1_b1', b2: 'ph1_b2', b4: 'ph1_b4', a3: 'ph1_a3', a6: 'ph1_a6', b6: 'ph1_b6', c6: 'ph1_c6', c7: 'ph1_c7', c8: 'ph1_c8' };
 const MARKS = { a3: [0.1, 0.2, 0.33, 0.46, 0.6, 0.72, 0.85, 1.1], a6: [0.1, 0.25, 0.36, 0.44, 0.5, 0.56, 0.62, 0.75, 1.0, 1.4], b6: [0.2, 0.5, 0.8, 1.1, 1.4, 1.7, 2.0, 2.6],
+  a1: [0.06, 0.14, 0.22, 0.28, 0.34, 0.42, 0.55, 0.8], a4: [0.06, 0.14, 0.22, 0.28, 0.34, 0.42, 0.6, 0.9],
+  b1: [0.2, 0.4, 0.55, 0.65, 0.72, 0.8, 0.95, 1.2, 1.8], b2: [0.2, 0.4, 0.55, 0.65, 0.72, 0.8, 0.95, 1.5, 2.6, 3.6], b4: [0.2, 0.4, 0.55, 0.65, 0.72, 0.8, 0.95, 1.5, 3.0, 5.4],
   c6: [0.15, 0.35, 0.5, 0.7, 1.0, 2.0], c7: [0.2, 0.5, 1.0, 3.0, 6.0, 8.2], c8: [0.3, 1.0, 2.0, 4.0, 6.0, 8.0, 8.6] };
 (async () => {
   fs.mkdirSync(OUT, { recursive: true });
@@ -47,6 +52,9 @@ const MARKS = { a3: [0.1, 0.2, 0.33, 0.46, 0.6, 0.72, 0.85, 1.1], a6: [0.1, 0.25
       if (sc === 'a3') ds = G.dev.dummies('mon_boar', 4, 1.7, p.pos);
       if (sc === 'a6') { ds = [...G.dev.dummies('mon_boar', 1, 0.01, at(4.5)), ...G.dev.dummies('mon_boar', 1, 0.01, at(4.5, 3.0))]; }
       if (sc === 'b6') ds = [...G.dev.dummies('mon_boar', 1, 0.01, at(5)), ...G.dev.dummies('mon_boar', 3, 2.0, at(5))];
+      if (sc === 'a1') ds = G.dev.dummies('mon_boar', 1, 0.01, at(1.5));
+      if (sc === 'a4') ds = [...G.dev.dummies('mon_boar', 1, 0.01, at(1.5)), ...G.dev.dummies('mon_boar', 1, 0.01, at(1.35, 0.95)), ...G.dev.dummies('mon_boar', 1, 0.01, at(1.35, -0.95))];
+      if (/^b[124]$/.test(sc)) ds = [...G.dev.dummies('mon_boar', 1, 0.01, at(5)), ...G.dev.dummies('mon_boar', 1, 0.01, at(5.3, 1.2)), ...G.dev.dummies('mon_boar', 1, 0.01, at(4.4, -1.1))];
       window.__ds = ds; window.__f = f; window.__at = at;
     }, sc);
     await pg.waitForFunction(() => window.__ds.every(m => m.body), null, { timeout: 120000 });
@@ -60,12 +68,13 @@ const MARKS = { a3: [0.1, 0.2, 0.33, 0.46, 0.6, 0.72, 0.85, 1.1], a6: [0.1, 0.25
       for (const [i, m] of ds.entries()) { m.__p0 = { ...m.pos }; const td = m.takeDamage.bind(m); m.takeDamage = d => { const h = m.hp; td({ ...d, noMiss: true }); window.__log.push({ i, t: +window.__t.toFixed(3), a: Math.round(h - m.hp) }); }; }
       const F = G.skillFx.pharm; window.__flasks = []; if (!F.__w) { F.__w = 1; const fl = F.flask.bind(F); F.flask = (pos, o) => { window.__flasks.push(o.elem); return fl(pos, o); }; }
       const r = {}; r.ms0 = p.stat('moveSpeed'); r.as0 = p.stat('atkSpeed');
-      const id = { a3: 'ph1_a3', a6: 'ph1_a6', b6: 'ph1_b6', c6: 'ph1_c6', c7: 'ph1_c7', c8: 'ph1_c8' }[sc];
+      const id = 'ph1_' + sc;
       if (sc === 'c8') { p.hp = Math.round(p.maxHp * 0.4); r.hp0 = p.hp; }
-      const aim = sc === 'a6' ? window.__at(4.5) : sc === 'b6' ? window.__at(5) : null;
+      const aim = sc === 'a6' ? window.__at(4.5) : /^b/.test(sc) ? window.__at(5) : null;
+      if (/^a[14]$/.test(sc)) { p.target = ds[0]; if (p.lockOn) try { p.lockOn(ds[0]); } catch (e) { /* no lock */ } }
       G.render.setFocus({ x: p.pos.x, y: 0, z: p.pos.z + (aim ? 3.2 : 0) }, true);
       if (!G.sheet.book.sk.slots.includes(id)) G.sheet.book.equip(id, 0, false);   // 칸이 4개뿐이라 시전 전에 1번 칸에 장착
-      const mid = G.render.toScreen({ x: p.pos.x, y: 0.6, z: p.pos.z + (sc === 'b6' ? 4.2 : aim ? 2.6 : 0) }); r.cx = Math.round(mid.x); r.cy = Math.round(mid.y);   // crop centre: between the caster and the aim
+      const mid = G.render.toScreen({ x: p.pos.x, y: 0.6, z: p.pos.z + (/^b/.test(sc) ? 4.2 : aim ? 2.6 : /^a[14]$/.test(sc) ? 1.2 : 0) }); r.cx = Math.round(mid.x); r.cy = Math.round(mid.y);   // crop centre: between the caster and the aim
       const e = p.skills2.cast(id, aim); r.err = e || null; return r;
     }, [sc, FPS]);
     // step + capture
@@ -95,6 +104,11 @@ const MARKS = { a3: [0.1, 0.2, 0.33, 0.46, 0.6, 0.72, 0.85, 1.1], a6: [0.1, 0.25
     const cells = [...PICK.a3.map(i => ['a3', i]), ...PICK.a6.map(i => ['a6', i]), ...PICK.b6.map(i => ['b6', i]), ['c6', PICK.c6[0]], ['c7', PICK.c7[0]], ['c8', PICK.c8[0]]].map(([sc, i]) => [`${OUT}/${TAG}_${sc}_${SIZE}_${i}.png`, ...centre[sc]]);
     const py = `from PIL import Image\nfs=${JSON.stringify(cells)}\nims=[Image.open(f[0]).convert('RGB') for f in fs]\nw,h=ims[0].size; cw=min(w,460); ch=min(h,330)\nS=Image.new('RGB',(cw*3,ch*4))\nfor i,im in enumerate(ims):\n  x0=max(0,min(w-cw,fs[i][1]-cw//2)); y0=max(0,min(h-ch,fs[i][2]-ch//2)); S.paste(im.crop((x0,y0,x0+cw,y0+ch)),((i%3)*cw,(i//3)*ch))\nS.save('${OUT}/sheet_${TAG}_${SIZE}.png')\n`;
     fs.writeFileSync(`${OUT}/_sheet.py`, py); execSync(`python3 ${OUT}/_sheet.py`);
+  }
+  if (Object.keys(PICK2).every(s => SCENES.includes(s))) {   // 남은 스킬 5줄 × 3칸
+    const cells = Object.entries(PICK2).flatMap(([sc, is]) => is.map(i => [`${OUT}/${TAG}_${sc}_${SIZE}_${i}.png`, ...centre[sc]]));
+    const py = `from PIL import Image\nfs=${JSON.stringify(cells)}\nims=[Image.open(f[0]).convert('RGB') for f in fs]\nw,h=ims[0].size; cw=min(w,460); ch=min(h,330)\nS=Image.new('RGB',(cw*3,ch*5))\nfor i,im in enumerate(ims):\n  x0=max(0,min(w-cw,fs[i][1]-cw//2)); y0=max(0,min(h-ch,fs[i][2]-ch//2)); S.paste(im.crop((x0,y0,x0+cw,y0+ch)),((i%3)*cw,(i//3)*ch))\nS.save('${OUT}/sheet2_${TAG}_${SIZE}.png')\n`;
+    fs.writeFileSync(`${OUT}/_sheet2.py`, py); execSync(`python3 ${OUT}/_sheet2.py`);
   }
   console.log('errors', JSON.stringify(errs.slice(0, 8)));
   await b.close();

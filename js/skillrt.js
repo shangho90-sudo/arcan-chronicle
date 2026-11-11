@@ -406,6 +406,12 @@ export class SkillEngine {
             const fd = { x: f.x * ca - f.z * sa, z: f.x * sa + f.z * ca };
             FX.slash(op.fx.slash, op.shape === 'single' && ts[0] ? ts[0].pos : (op.atAim ? ctx.aim : pc.pos), fd, { color: op.alt && h % 3 === 2 ? 0xffd27a : col, radius: op.r || 2, angle: op.ang || 100, length: op.len, width: op.w, mirror: mir, tilt: op.alt ? [0.22, -0.3, 0.45][h % 3] : (op.sweep || 0) * 0.2 });
           }
+          if (op.fx.pharm === 'smash') {   // 유봉 내려찍기: gold arc on the real pestle tip, compact star at the target's real hit point, small ring + chips at its feet
+            const t = ts[0]; let tipY = null; try { const b = pc.body.bladePoints(); if (b) tipY = b[1].y; } catch (e) { tipY = null; }
+            FX.pharm('smash', pc, t ? { f, hit: bashImpact(t, f, tipY), ground: { x: t.pos.x, y: t.pos.y || 0, z: t.pos.z }, h } : { f, whiff: true, h });
+            if (t) { pc.freezeT = Math.max(pc.freezeT || 0, 0.04); t.freezeT = Math.max(t.freezeT || 0, 0.04); }   // local hit-stop (these two only, like 배쉬) — never G.hitStop
+          }
+          if (op.fx.pharm === 'push') FX.pharm('push', pc, { f, r: op.r || 2.2, ang: op.ang || 80, hits: ts.map(t => ({ x: t.pos.x, y: t.pos.y || 0, z: t.pos.z, boss: !!t.isBoss })) });   // 밀어내기: wind ribbons across the real cone, dust streaks on each enemy pushed
           if (op.fx.pharm === 'spin') FX.pharm('spin', pc, { r: op.r, h, n: hits, last: h === hits - 1, hits: ts.map(t => t.pos) });   // 유봉 휘두르기: ribbons on the real pestle tip, thin ring on the last strike (js/pharmfx.js)
           if (op.fx.yeon) {  // '연': per-strike crescent (scheduled ahead in release, else now) + flash / cut / shards on the target
             const y = (cf && cf.yeon) || { p: h % 2 ? 'lr' : 'rl', roll: h % 2 ? -0.3 : 0.4, mirror: h % 2 === 1, var: 'ab'[h % 2], fin: h === hits - 1, size: h === hits - 1 ? 1.45 : 1 };
@@ -499,7 +505,7 @@ export class SkillEngine {
   blast(c, op, ctx) {
     const pc = this.pc, r = op.r || 1.5, ts = this.targets(HitShape.circle(c.x, c.z, r));
     if (op.burst !== 'none') FX.burst(op.burst || 'explosion_fire', c, { radius: op.burstR || r, color: ctx.d.fx && ctx.d.fx.color });   // 'none': the skill draws its own (약사 pharmfx)
-    if (op.pharm) FX.pharm(op.pharm, { x: c.x, y: c.y ?? pc.zone.geo.ground(c.x, c.z).y, z: c.z }, { elem: op.elem, r });
+    if (op.pharm) FX.pharm(op.pharm, { x: c.x, y: pc.zone.geo.ground(c.x, c.z).y, z: c.z }, { elem: op.elem, r, linger: op.linger });   // linger: 바닥 서리·웅덩이가 상태이상 시간만큼 옅게 남음
     if (op.shake && G.render.addShake && !G.reduceFlash) G.render.addShake(op.shake[0], op.shake[1]);
     const cb = this.book.passive('centerBonus');
     for (const t of ts) {
@@ -613,7 +619,7 @@ class SkillProj {
     if (op.kind === 'lob') { this.from = { ...this.pos }; this.flight = Math.max(0.25, m / this.speed); }
     if (op.toGround) { this.range = m + 0.2; }
     // 비연참: the centre crescent of the fan IS this projectile (js/biyeonfx.js); falls back to the generic wave until loaded
-    this.fx = (op.biyeon && FX.biyeon('proj', this.pos, this.dir, { groundY: pc.pos.y || 0 })) || FX.projectile(op.fx || 'capsule', { color: ctx.d.fx && ctx.d.fx.color });
+    this.fx = (op.biyeon && FX.biyeon('proj', this.pos, this.dir, { groundY: pc.pos.y || 0 })) || (op.pharmProj && FX.pharm('proj', this.pos, { elem: op.elem })) || FX.projectile(op.fx || 'capsule', { color: ctx.d.fx && ctx.d.fx.color });
     this.fx.set(this.pos, { x: this.dir.x, y: 0, z: this.dir.z });
   }
   update(dt) {

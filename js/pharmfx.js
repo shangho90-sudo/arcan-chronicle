@@ -18,7 +18,11 @@
 //                                     ⑤ shatter(): thick paving pieces lifted (centre higher), gold light through the gaps, crack
 //                                     lines, loose chunks, dust
 //   flask(pos, {elem, fall})        약병폭격: glass flask + tinted liquid + cork tumbling down, thin target ring, light streak
-//   burst(pos, {elem, r})           ⑥ 약병 폭발: thin ring + bright core + short light shards + a few soft translucent puffs
+//   burst(pos, {elem, r, linger})   ⑥ 약병 폭발: thin rings + bright core + light shards + layered soft puffs; fire = flame tongues + embers,
+//                                     ice = crystal burst (Tripo) + spikes + ground frost, acid = droplets + bubbling puddle (frost / puddle stay `linger` s)
+//   proj(pos, {elem})               던지는 약병(화염·냉각·부식): spinning Tripo flask (liquid = element colour) + thin trail; handle {set, dispose}
+//   smash(pc, {f, hit, ground})     유봉 내려찍기: gold overhead arc whose head is the REAL pestle tip, star flash at the real hit point, small ring + chips
+//   push(pc, {f, r, ang, hits})     밀어내기: wind ribbons sweeping the real cone, shock arc at its edge, dust streaks along each pushed enemy
 //   syringe(pc, {dur})              ⑦ 아드레날린 주사: syringe to the left arm, orange flash (ring, ribbons, arrows), dim loop
 //   shield(pc, {dur})               ⑧ 약 보호막: clear blue dome, thin flowing hex lines, fresnel rim, ripple where it is hit
 //   circle(pos, {r, dur})           ⑨ 광역 회복진: thin green circle + slow ribbons + rising crosses; .pulse() on each heal tick
@@ -37,18 +41,22 @@ export const PHARM = {
     fire:   { w: 0xfff2c0, b: 0xff7a1e, h: 0xc82800, s1: 0xffb070, s2: 0x5a2a18 },
     ice:    { w: 0xf0fbff, b: 0x6cd0ff, h: 0x2060d0, s1: 0xe0f6ff, s2: 0x5a90c0 },
     poison: { w: 0xf6e6ff, b: 0xb45cff, h: 0x5a18b0, s1: 0xd9a0ff, s2: 0x5a2090 },
+    acid:   { w: 0xfbffd0, b: 0xa6e02a, h: 0x3f8a10, s1: 0xd8f070, s2: 0x4a7a18 },
+    wind:   { w: 0xffffff, b: 0xffe6b0, h: 0xc88a3a, s1: 0xd8c8a8, s2: 0x7a6a58 },
     shield: { w: 0xe8fbff, b: 0x62c8ff, h: 0x2a70e0 },
     heal:   { w: 0xf2ffe0, b: 0x74f08a, h: 0x1fa050 },
   },
   spin: { life: 0.32, lastLife: 0.46, peak: 2.3, lastPeak: 3.0, lead: 0.5, ringTime: 0.30 },         // lead: rad the ribbon head runs ahead of the pestle tip
-  pestle: { height: 3.8, lean: 0.34, drop: 5.0, stay: 0.55, glow: 0.03, gain: 0.82 },
+  pestle: { height: 3.9, lean: 0.46, drop: 5.0, stay: 0.55, glow: 0.10, spec: 1.6, fill: 0.55 },   // procedural club (fx_pharm.py pharm_pestle), warm polished gold
+  smash: { life: 0.30, arc: 2.4, flash: 1.9, ring: 0.95, stop: 0.04 },                                // 유봉 내려찍기 (ring = ground ring radius, m)
+  push: { sweep: 0.16, life: 0.36, peak: 2.0, streak: 1.6 },                                           // 밀어내기
   shatter: { k: 0.58, maxR: 2.6, lift: 0.38, thick: 0.62, tilt: 0.24, up: 0.14, hang: 0.24, fall: 0.26, rest: 1.15, life: 1.75, glow: 0.9 },   // R = min(r * k, maxR)
-  burst: { ring: 0.26, core: 0.22, puffA: 0.8, puffLife: 1.3, coreA: 1.5, flareA: 1.3, ringA: 2.4 },
+  burst: { ring: 0.26, core: 0.24, puffA: 0.82, puffLife: 1.35, coreA: 2.0, flareA: 1.6, ringA: 2.4, hazeA: 0.55, frost: 0.5, puddle: 0.6 },   // frost / puddle = lingering alpha
   buff: { flash: 1.4, loop: 0.34 },
   shield: { rx: 1.25, ry: 1.7, fill: 0.07, line: 0.34, flow: 0.6, rim: 0.6, hexN: 7.0 },
   circle: { tex: 1.0, ribbon: 0.8, pulse: 1.2 },
 };
-export const ELEM_COL = { fire: PHARM.pal.fire.b, ice: PHARM.pal.ice.b, poison: PHARM.pal.poison.b };
+export const ELEM_COL = { fire: PHARM.pal.fire.b, ice: PHARM.pal.ice.b, poison: PHARM.pal.poison.b, acid: PHARM.pal.acid.b };
 
 const P3 = (p) => new THREE.Vector3(p.x, p.y || 0, -p.z);
 const lite = () => { const G = window.G; return !!(G && ((G.input && G.input.mobile) || (G.settings && G.settings.graphicsFx === false))); };
@@ -72,7 +80,7 @@ attribute vec3 color; varying vec3 vC, vN, vV, vWN;
 void main(){ vC = color; vN = normalize(normalMatrix * normal); vWN = normalize(mat3(modelMatrix) * normal); vec4 mv = modelViewMatrix * vec4(position, 1.); vV = normalize(-mv.xyz);
   gl_Position = projectionMatrix * mv; }`;
 const SOLID_FS = `
-uniform vec3 uTint, uRim, uEm; uniform float uA, uMode, uGlow, uSpec, uUnder;
+uniform vec3 uTint, uRim, uEm; uniform float uA, uMode, uGlow, uSpec, uUnder, uFill;
 varying vec3 vC, vN, vV, vWN;
 void main(){
   vec3 n = normalize(vN), L = normalize(vec3(-.4, .8, .5));
@@ -81,6 +89,7 @@ void main(){
   if (uMode > 1.5) { base = uTint * (.75 + .25 * vC.r); }                        // liquid: the element colour
   else if (uMode > .5) { base = vec3(.80, .90, 1.) * .5; a *= .30 + .65 * rim; }    // glass shell: clear, bright at the silhouette
   vec3 c = base * (.40 + .78 * d) + uRim * rim * .8;
+  c += base * uFill * (.35 + .65 * max(0., dot(n, normalize(vec3(.6, -.1, .55)))));          // warm fill (polished gold never goes olive in the shade)
   vec3 h = reflect(-L, n); c += vec3(1., .95, .8) * pow(max(0., dot(h, vV)), 28.) * uSpec;
   c += uEm * uGlow + uEm * uUnder * (.25 + .75 * clamp(-vWN.y + .35, 0., 1.));     // gold light from the cracks below
   if (uMode > 1.5) c += uTint * .35;
@@ -193,7 +202,7 @@ export class PharmFx {
         vertexShader: TEX_VS, fragmentShader: TEX_FS, transparent: true, depthWrite: true });
       case 'domeT': return new THREE.ShaderMaterial({ defines: { TINT: 1 }, uniforms: U({ uW: C(), uB: C(), uHitP: new THREE.Vector3(0, 0.5, 1), uA: 0, uT: 0, uHit: 0, uHitT: 0, uFill: 0, uLine: 0, uFlow: 0, uRim: 0, uHexN: 6 }),
         vertexShader: FLAT_VS, fragmentShader: DOME_FS, transparent: true, depthWrite: false, side: THREE.FrontSide });
-      default: return new THREE.ShaderMaterial({ uniforms: U({ uTint: C(), uRim: new THREE.Color(0xfff0c0), uEm: new THREE.Color(0), uA: 1, uMode: 0, uGlow: 0, uSpec: 0.8, uUnder: 0 }),
+      default: return new THREE.ShaderMaterial({ uniforms: U({ uTint: C(), uRim: new THREE.Color(0xfff0c0), uEm: new THREE.Color(0), uA: 1, uMode: 0, uGlow: 0, uSpec: 0.8, uUnder: 0, uFill: 0 }),
         vertexShader: SOLID_VS, fragmentShader: SOLID_FS, transparent: true, depthWrite: true });
     }
   }
@@ -208,9 +217,11 @@ export class PharmFx {
   spr(e, cellName, pal, order = 5) { const m = this._m(e, 'spr', this.geo.pharm_quad, order); m.material.uniforms.uCell.value.copy(this.cell(cellName)); m.material.uniforms.uCut.value = -1; m.material.uniforms.uA.value = 0; return this._pal(m, pal); }
   rib(e, pal, order = 5) { const m = this._m(e, 'spr', this.geo.pharm_ribbon, order); const u = m.material.uniforms; u.uCell.value.copy(this.cell('ribbon')); u.uCut.value = 0; u.uSoft.value = 0.35; u.uA.value = 0; return this._pal(m, pal); }
   ring(e, pal, wake = 0.35, order = 3) { const m = this._m(e, 'ring', this.geo.pharm_ring, order); m.material.uniforms.uWake.value = wake; m.material.uniforms.uA.value = 0; m.position.y = PHARM.ringLift; return this._pal(m, pal); }
+  /** atlas cell lying flat on the ground (pharm_circle, radius 1): additive */
+  flat(e, cellName, pal, order = 3) { const m = this.spr(e, cellName, pal, order); m.geometry = this.geo.pharm_circle; m.position.y = PHARM.ringLift; return m; }
   smoke(e, cellName, pal, order = 4) { const m = this._m(e, 'smoke', this.geo.pharm_quad, order); const u = m.material.uniforms; u.uCell.value.copy(this.cell(cellName)); u.uW.value.setHex(pal.s1); u.uB.value.setHex(pal.s2); u.uA.value = 0; return m; }
   solid(e, geo, o = {}) { const m = this._m(e, 'solid', geo, 1); const u = m.material.uniforms; u.uTint.value.setHex(o.tint ?? 0xffffff); u.uRim.value.setHex(o.rim ?? 0xfff0c0); u.uEm.value.setHex(o.em ?? 0);
-    u.uA.value = 1; u.uMode.value = o.mode || 0; u.uGlow.value = o.glow || 0; u.uSpec.value = o.spec ?? 0.8; u.uUnder.value = 0; m.material.depthWrite = (o.mode || 0) !== 1; return m; }
+    u.uA.value = 1; u.uMode.value = o.mode || 0; u.uGlow.value = o.glow || 0; u.uSpec.value = o.spec ?? 0.8; u.uUnder.value = 0; u.uFill.value = o.fill || 0; m.material.depthWrite = (o.mode || 0) !== 1; return m; }
   /** textured Tripo model `name` (fx_pharm_tripo), or null when that file / model is missing (the procedural mesh is used instead) */
   model(e, name, o = {}) { const t = this.tri[name]; if (!t) return null; const m = this._m(e, 'tex', t.geo, 1), u = m.material.uniforms; u.uMap.value = t.map; u.uTint.value.setHex(o.tint ?? 0xffffff); u.uRim.value.setHex(o.rim ?? 0xfff0c0);
     u.uEm.value.setHex(o.em ?? 0); u.uA.value = 1; u.uGlow.value = o.glow || 0; u.uSpec.value = o.spec ?? 0.5; u.uUnder.value = 0; u.uTintK.value = o.tintK || 0; u.uTintY.value = o.tintY ?? 0.2; u.uGain.value = o.gain ?? 1; return m; }
@@ -307,7 +318,8 @@ export class PharmFx {
       }
     });
     e.g.position.copy(p);
-    const pe = this.model(e, 'tripo_pestle', { rim: 0x6a4a10, em: 0xffc040, glow: Pc.glow, spec: 0.35, gain: Pc.gain }) || this.solid(e, this.geo.pharm_pestle, { rim: 0xffe9a0, em: 0xffc040, glow: Pc.glow, spec: 1.3 }); pe.scale.setScalar(Pc.height);
+    // the Tripo drafts kept coming out as a gourd / a pestle stuck in its mortar, so the pestle is the procedural club in warm polished gold
+    const pe = this.solid(e, this.geo.pharm_pestle, { rim: 0xffe6a0, em: 0xffb020, glow: Pc.glow, spec: Pc.spec, fill: Pc.fill }); pe.scale.setScalar(Pc.height);
     const mark = this.ring(e, pal, 0.0, 2), aim = this.ring(e, pal, 0.15, 3), wave = this.ring(e, pal, 0.4, 4); wave.position.y = PHARM.ringLift + 0.02;
     const trail = this.spr(e, 'streak', pal, 5), flash = this.spr(e, 'flare', pal, 8), glow = this.spr(e, 'glow', pal, 7), wraps = [];
     for (let i = 0, n = low ? 1 : 2; i < n; i++) { const m = this.rib(e, pal, 6); m.userData = { rr: 1.15 - i * 0.3, y0: 0.3 + i * 0.5, rise: 1.9, a: i * 2.6, w: 13 + i * 3, tx: i ? -0.2 : 0.16 }; wraps.push(m); }
@@ -370,33 +382,175 @@ export class PharmFx {
     const mark = this.ring(e, pal, 0.1, 2), tr = this.spr(e, 'streak', pal, 5);
     return e;
   }
+  /** ⑥ 약병 폭발 (약병폭격 + 화염·냉각·부식 약병): thin rings + bright core + light shards + layered soft puffs, then per element —
+   *  fire: flame tongues + embers; ice: crystal burst (Tripo) + flying spikes + ground frost; acid: droplets + bubbling puddle; poison: bubbles.
+   *  o.r = the real blast radius (nothing is drawn outside it), o.linger = seconds the frost / puddle stays faintly (the status duration). */
   burst(pos, o = {}) {
     if (!this._ok()) return null;
-    const B = PHARM.burst, pal = PHARM.pal[o.elem] || PHARM.pal.poison, I = PHARM.intensity, low = lite(), r = o.r || 1.5;
-    const e = this._fx('burst', B.puffLife + 0.3, (e) => {
+    const B = PHARM.burst, elem = o.elem || 'poison', pal = PHARM.pal[elem] || PHARM.pal.poison, I = PHARM.intensity, low = lite(), r = o.r || 1.5, linger = o.linger || 0;
+    const life = Math.max(B.puffLife + 0.3, linger ? linger + 0.5 : 0), G9 = 9.0;
+    const e = this._fx('burst', life, (e) => {
       const t = e.t;
       ring.scale.setScalar(r * (0.3 + 0.7 * easeOut(t / B.ring))); ring.material.uniforms.uA.value = I * B.ringA * smooth(0, 0.03, t) * (1 - smooth(0.12, 0.42, t));
+      ring2.scale.setScalar(r * 0.62 * (0.25 + 0.75 * easeOut((t - 0.05) / 0.3))); ring2.material.uniforms.uA.value = I * 1.3 * smooth(0.05, 0.09, t) * (1 - smooth(0.2, 0.5, t));
       core.visible = t < B.core + 0.1; core.quaternion.copy(this.camQ); core.scale.setScalar(r * (0.7 + 1.2 * easeOut(t / 0.1))); core.material.uniforms.uA.value = I * B.coreA * (1 - smooth(0.03, B.core + 0.1, t));
-      flare.visible = t < 0.16; flare.quaternion.copy(this.camQ); flare.scale.setScalar(r * (1.0 + 0.9 * easeOut(t / 0.1))); flare.material.uniforms.uA.value = I * B.flareA * (1 - smooth(0.02, 0.16, t));
+      flare.visible = t < 0.18; flare.quaternion.copy(this.camQ); flare.scale.setScalar(r * (1.0 + 0.9 * easeOut(t / 0.1))); flare.material.uniforms.uA.value = I * B.flareA * (1 - smooth(0.02, 0.18, t));
       for (const m of shards) { const d = m.userData, u = clamp01(t / d.life); m.visible = u < 1; if (!m.visible) continue;
-        const dist = d.r0 + d.len * 1.2 * easeOut(u); m.position.copy(d.dir).multiplyScalar(dist).setY(0.5 + d.dir.y * dist); this._aim(m, d.dir); m.scale.set(d.w, d.len * (1 - 0.5 * u), 1); m.material.uniforms.uA.value = I * 1.5 * (1 - smooth(0.25, 1, u)); }
+        const dist = d.r0 + d.len * 1.2 * easeOut(u); m.position.copy(d.dir).multiplyScalar(dist).setY(0.5 + d.dir.y * dist); this._aim(m, d.dir); m.scale.set(d.w, d.len * (1 - 0.5 * u), 1); m.material.uniforms.uA.value = I * 1.6 * (1 - smooth(0.25, 1, u)); }
+      for (const m of hazes) { const d = m.userData, u = clamp01((t - d.t0) / d.life); m.visible = u > 0 && u < 1; if (!m.visible) continue;       // luminous coloured body (additive, soft)
+        m.quaternion.copy(this.camQ); m.rotateZ(d.rot + u * d.spin); m.position.set(d.x, d.y + u * d.rise, d.z); m.scale.setScalar(d.s * (0.5 + 0.5 * easeOut(u))); m.material.uniforms.uA.value = I * B.hazeA * d.a * Math.sin(Math.PI * Math.pow(u, 0.45)); }
       for (const m of puffs) { const d = m.userData, u = clamp01((t - d.t0) / d.life); m.visible = u > 0 && u < 1; if (!m.visible) continue;
         m.quaternion.copy(this.camQ); m.rotateZ(d.rot + u * d.spin); m.position.set(d.x, d.y + u * d.rise, d.z); m.scale.setScalar(d.s * (0.45 + 0.55 * easeOut(u)));
         m.material.uniforms.uA.value = B.puffA * d.a * Math.sin(Math.PI * Math.pow(u, 0.5)); }
       for (const m of bits) { const d = m.userData, u = clamp01((t - d.t0) / d.life); m.visible = u > 0 && u < 1; if (!m.visible) continue;
         m.quaternion.copy(this.camQ); m.position.set(d.x, d.y + u * d.rise, d.z); m.scale.setScalar(d.s * (0.6 + 0.5 * u)); m.material.uniforms.uA.value = I * d.a * Math.sin(u * Math.PI); }
+      for (const m of flames) { const d = m.userData, u = clamp01((t - d.t0) / d.life); m.visible = u > 0 && u < 1; if (!m.visible) continue;       // fire: tongues licking up, swaying a little
+        const hh = d.h * (0.35 + 0.65 * easeOut(u * 2.2)) * (1 - 0.45 * smooth(0.5, 1, u)); m.quaternion.copy(this.yawQ); m.rotateZ(Math.sin(t * d.w + d.ph) * 0.12);
+        m.scale.set(d.wd * (1 - 0.35 * u), hh, 1); m.position.set(d.x, 0.08 + hh * 0.5 + u * 0.25, d.z); m.material.uniforms.uA.value = I * 1.5 * d.a * Math.sin(Math.PI * Math.pow(u, 0.6)); }
+      if (ice) { const u = t - 0.02, K = e.iceK, hold = e.iceHold;                                                                                 // ice: crystal burst pops out of the ground, holds, sinks
+        const k = u < 0 ? 0 : u < 0.14 ? 1.12 * easeOut(u / 0.14) : u < 0.24 ? 1.12 - 0.12 * smooth(0.14, 0.24, u) : 1;
+        ice.visible = u > 0 && u < hold + 0.45; const out = smooth(hold, hold + 0.45, u); ice.scale.setScalar(Math.max(0.001, K * k)); ice.position.y = -0.16 * K - out * 0.5 * K;
+        const U = ice.material.uniforms; U.uA.value = 0.86 * (1 - out); U.uGlow.value = 0.10 + 0.5 * (1 - smooth(0, 0.3, u)); }
+      for (const m of spikes) { const d = m.userData, u = t - d.t0; m.visible = u > 0 && u < d.life; if (!m.visible) continue;                   // flying / planted small spikes
+        const fl = Math.min(u, d.land), y = d.vy * fl - 0.5 * G9 * fl * fl; m.position.set(d.x + d.vx * fl, Math.max(0.02, 0.3 + y), d.z + d.vz * fl);
+        m.quaternion.setFromAxisAngle(d.ax, d.a0 + d.w * fl); m.material.uniforms.uA.value = 0.9 * (1 - smooth(d.life - 0.35, d.life, u)); m.material.uniforms.uGlow.value = 0.15 + 0.4 * (1 - smooth(0, 0.3, u)); }
+      for (const m of drops) { const d = m.userData, u = t - d.t0; m.visible = u > 0 && u < d.land; if (!m.visible) continue;                    // acid: droplets on ballistic arcs
+        const y = 0.35 + d.vy * u - 0.5 * G9 * u * u; m.position.set(d.x + d.vx * u, Math.max(0.05, y), d.z + d.vz * u); _a.set(-d.vx, -(d.vy - G9 * u), -d.vz); this._aim(m, _a);
+        m.scale.set(d.s, d.s * 1.5, 1); m.material.uniforms.uA.value = I * 1.3 * smooth(0, 0.04, u) * (1 - smooth(d.land - 0.08, d.land, u)); }
+      for (const m of grounds) { const d = m.userData; const fin = smooth(d.grow0, d.grow0 + d.grow, t), out = 1 - smooth(d.end - d.fade, d.end, t);                // frost / puddle on the floor
+        m.scale.set(d.R * (0.35 + 0.65 * easeOut((t - d.grow0) / d.grow)), 1, d.R * (0.35 + 0.65 * easeOut((t - d.grow0) / d.grow)));
+        m.material.uniforms.uA.value = (d.add ? I : 1) * (d.flash * (1 - smooth(0.1, 0.6, t)) + d.keep * (0.85 + 0.15 * Math.sin(t * 3.1 + d.ph))) * fin * out; m.visible = t < d.end; }
+      for (const m of pops) { const d = m.userData, u = clamp01((t - d.t0) / d.life); m.visible = u > 0 && u < 1; if (!m.visible) continue;       // bubbles rising out of the puddle and popping
+        m.quaternion.copy(this.camQ); m.position.set(d.x, 0.1 + u * d.rise, d.z); m.scale.setScalar(d.s * (0.5 + 0.7 * u)); m.material.uniforms.uA.value = I * 0.9 * Math.sin(Math.PI * Math.pow(u, 0.8)); }
     });
     e.g.position.copy(P3(pos));
-    const ring = this.ring(e, pal, 0.3), core = this.spr(e, 'glow', pal, 7), flare = this.spr(e, 'flare', pal, 8), shards = [], puffs = [], bits = [];
-    core.position.y = flare.position.y = 0.5;
-    for (let i = 0, n = low ? 5 : 9; i < n; i++) { const m = this.spr(e, 'spark', pal, 6), a = (i + Math.random() * 0.7) / n * 6.283, up = rnd(0.1, 0.9);
-      m.userData = { dir: new THREE.Vector3(Math.cos(a), up, Math.sin(a)).normalize(), r0: r * 0.25, len: r * rnd(0.4, 0.6), w: rnd(0.16, 0.26), life: rnd(0.22, 0.34) }; shards.push(m); }
-    // soft puffs sit around the rim (not one opaque ball on the centre), so whoever stands inside stays readable
-    for (let i = 0, n = low ? 3 : 6; i < n; i++) { const m = this.smoke(e, i % 2 ? 'puff' : 'puff2', pal, 4), a = (i + Math.random() * 0.6) / n * 6.283, rr = r * rnd(0.2, 0.45);
-      m.userData = { x: Math.cos(a) * rr, z: Math.sin(a) * rr, y: rnd(0.35, 0.7), rise: rnd(0.5, 1.0), s: r * rnd(0.85, 1.1), a: rnd(0.75, 1), rot: Math.random() * 6.283, spin: rnd(-0.6, 0.6), t0: rnd(0.02, 0.12), life: B.puffLife * rnd(0.75, 1) }; puffs.push(m); }
-    const bitCell = o.elem === 'poison' ? 'bubble' : 'star';
-    for (let i = 0, n = low ? 2 : 5; i < n; i++) { const m = this.spr(e, bitCell, pal, 6), a = Math.random() * 6.283, rr = r * rnd(0.2, 0.9);
-      m.userData = { x: Math.cos(a) * rr, z: Math.sin(a) * rr, y: rnd(0.3, 0.9), rise: rnd(0.5, 1.1), s: rnd(0.14, 0.3), a: bitCell === 'bubble' ? 0.9 : 1.3, t0: rnd(0.05, 0.4), life: rnd(0.4, 0.7) }; bits.push(m); }
+    const ring = this.ring(e, pal, 0.3), ring2 = this.ring(e, pal, 0.15), core = this.spr(e, 'glow', pal, 7), flare = this.spr(e, 'flare', pal, 8);
+    const shards = [], hazes = [], puffs = [], bits = [], flames = [], spikes = [], drops = [], grounds = [], pops = []; let ice = null;
+    core.position.y = flare.position.y = 0.5; ring2.position.y = PHARM.ringLift + 0.015;
+    for (let i = 0, n = low ? 6 : 12; i < n; i++) { const m = this.spr(e, 'spark', pal, 6), a = (i + Math.random() * 0.7) / n * 6.283, up = rnd(0.1, 0.9);
+      m.userData = { dir: new THREE.Vector3(Math.cos(a), up, Math.sin(a)).normalize(), r0: r * 0.22, len: r * rnd(0.4, 0.62), w: rnd(0.16, 0.28), life: rnd(0.22, 0.36) }; shards.push(m); }
+    for (let i = 0, n = low ? 2 : 4; i < n; i++) { const m = this.spr(e, i % 2 ? 'puff' : 'puff2', pal, 5), a = (i + Math.random()) / n * 6.283, rr = r * rnd(0.05, 0.3);
+      m.userData = { x: Math.cos(a) * rr, z: Math.sin(a) * rr, y: rnd(0.4, 0.75), rise: rnd(0.25, 0.6), s: r * rnd(1.0, 1.25), a: rnd(0.8, 1), rot: Math.random() * 6.283, spin: rnd(-0.5, 0.5), t0: rnd(0, 0.06), life: rnd(0.55, 0.8) }; hazes.push(m); }
+    // soft puffs: an inner ring that rises and an outer ring near the rim (never one opaque ball on the centre), so whoever stands inside stays readable
+    for (let i = 0, n = low ? 4 : 9; i < n; i++) { const inner = i % 3 === 0, m = this.smoke(e, i % 2 ? 'puff' : 'puff2', pal, 4), a = (i + Math.random() * 0.6) / n * 6.283, rr = r * (inner ? rnd(0.12, 0.28) : rnd(0.3, 0.5));
+      m.userData = { x: Math.cos(a) * rr, z: Math.sin(a) * rr, y: inner ? rnd(0.7, 1.0) : rnd(0.3, 0.6), rise: inner ? rnd(0.8, 1.3) : rnd(0.4, 0.9), s: r * (inner ? rnd(0.6, 0.8) : rnd(0.85, 1.0)), a: rnd(0.75, 1), rot: Math.random() * 6.283, spin: rnd(-0.6, 0.6),
+        t0: rnd(0.02, 0.16), life: B.puffLife * rnd(0.7, 1) }; puffs.push(m); }
+    const bitCell = elem === 'poison' || elem === 'acid' ? 'bubble' : 'star';
+    for (let i = 0, n = low ? 3 : 7; i < n; i++) { const m = this.spr(e, bitCell, pal, 6), a = Math.random() * 6.283, rr = r * rnd(0.2, 0.9);
+      m.userData = { x: Math.cos(a) * rr, z: Math.sin(a) * rr, y: rnd(0.3, 0.9), rise: rnd(0.5, 1.2), s: rnd(0.14, 0.3), a: bitCell === 'bubble' ? 0.9 : 1.3, t0: rnd(0.05, elem === 'fire' ? 0.9 : 0.4), life: rnd(0.4, elem === 'fire' ? 0.9 : 0.7) }; bits.push(m); }
+    if (elem === 'fire') for (let i = 0, n = low ? 3 : 7; i < n; i++) { const m = this.spr(e, 'flame', pal, 6), a = (i + Math.random() * 0.8) / n * 6.283, rr = r * rnd(0.08, 0.55);
+      m.userData = { x: Math.cos(a) * rr, z: Math.sin(a) * rr, h: r * rnd(0.6, 1.0), wd: r * rnd(0.34, 0.5), a: rnd(0.75, 1), w: rnd(9, 15), ph: Math.random() * 6.283, t0: rnd(0, 0.14), life: rnd(0.45, 0.75) }; flames.push(m); }
+    if (elem === 'ice') {
+      e.iceK = r * 0.62; e.iceHold = linger ? Math.min(1.5, linger * 0.5) : 0.55;
+      ice = this.model(e, 'tripo_ice', { rim: 0xffffff, em: 0x9fe4ff, glow: 0.1, spec: 0.9, gain: 1.15 }); if (ice) { ice.rotation.y = Math.random() * 6.283; ice.material.depthWrite = false; }
+      for (let i = 0, n = (ice ? 4 : 8) * (low ? 0.5 : 1); i < n && this.geo.pharm_crystal; i++) { const m = this.solid(e, this.geo.pharm_crystal, { rim: 0xffffff, em: 0x9fe4ff, glow: 0.15, spec: 1.2 }), a = (i + Math.random() * 0.6) / n * 6.283, sp = rnd(1.0, 2.0), vy = rnd(2.6, 4.2), land = Math.min((r * 0.9) / (sp + r * 0.3), 2 * vy / G9);
+        const rr = r * rnd(0.15, 0.3); m.scale.setScalar(r * rnd(0.16, 0.28)); m.userData = { x: Math.cos(a) * rr, z: Math.sin(a) * rr, vx: Math.cos(a) * sp, vz: Math.sin(a) * sp, vy, land, a0: rnd(0.3, 1.2), w: rnd(4, 9), t0: rnd(0, 0.05), life: land + rnd(0.5, 0.9),
+          ax: new THREE.Vector3(-Math.sin(a), 0, Math.cos(a)) }; spikes.push(m); }
+      const fr = this.flat(e, 'frost', pal, 3); fr.rotation.y = Math.random() * 6.283; fr.userData = { R: r * 0.98, grow0: 0, grow: 0.22, flash: 1.5, keep: linger ? B.frost : 0.25, end: linger ? linger + 0.4 : 1.2, fade: 0.6, add: true, ph: 0 }; grounds.push(fr);
+    }
+    if (elem === 'acid') {
+      for (let i = 0, n = low ? 5 : 11; i < n; i++) { const m = this.spr(e, 'drop', pal, 6), a = Math.random() * 6.283, vy = rnd(2.4, 4.6), land = (vy + Math.sqrt(vy * vy + 2 * G9 * 0.3)) / G9, sp = Math.min(rnd(0.8, 2.4), r * 0.85 / land);
+        m.userData = { x: 0, z: 0, vx: Math.cos(a) * sp, vz: Math.sin(a) * sp, vy, land, s: rnd(0.12, 0.22), t0: rnd(0, 0.06) }; drops.push(m); }
+      const end = linger ? linger + 0.4 : 1.4, rot = Math.random() * 6.283;
+      const pd = this.smoke(e, 'puddle', pal, 2); pd.geometry = this.geo.pharm_circle; pd.position.y = PHARM.ringLift - 0.02; pd.rotation.y = rot; pd.userData = { R: r * 0.9, grow0: 0.05, grow: 0.35, flash: 0, keep: B.puddle, end, fade: 0.7, add: false, ph: 1.3 }; grounds.push(pd);
+      const pg = this.flat(e, 'puddle', pal, 3); pg.rotation.y = rot; pg.userData = { R: r * 0.9, grow0: 0.05, grow: 0.35, flash: 0.9, keep: 0.35, end, fade: 0.7, add: true, ph: 0.4 }; grounds.push(pg);
+      for (let i = 0, n = Math.round((linger ? 3 + linger * 2 : 4) * (low ? 0.5 : 1)); i < n; i++) { const m = this.spr(e, 'bubble', pal, 6), a = Math.random() * 6.283, rr = r * rnd(0.1, 0.62);
+        m.userData = { x: Math.cos(a) * rr, z: Math.sin(a) * rr, rise: rnd(0.15, 0.45), s: rnd(0.14, 0.26), t0: rnd(0.35, Math.max(0.9, end - 0.9)), life: rnd(0.5, 0.8) }; pops.push(m); }
+    }
+    return e;
+  }
+
+  // ------------------------------------------------------------------ 던지는 약병 (화염·냉각·부식 약병이 날아가는 동안)
+  /** returns the projectile handle skillrt's SkillProj drives: set(pos, dir) every frame, dispose() when it lands */
+  proj(pos, o = {}) {
+    if (!this._ok()) return null;
+    const pal = PHARM.pal[o.elem] || PHARM.pal.poison, I = PHARM.intensity, last = P3(pos), vel = new THREE.Vector3(0, 1, 0), sp = (Math.random() < 0.5 ? -1 : 1) * rnd(8, 12);
+    const e = this._fx('proj', 8, (e) => {
+      fl.rotation.set(e.t * sp, 0, e.t * sp * 0.55);
+      _b.copy(vel).multiplyScalar(-1); this._aim(tr, _b); tr.scale.set(0.34, 1.5, 1); tr.position.copy(_b).multiplyScalar(0.75); tr.material.uniforms.uA.value = I * 1.0 * smooth(0, 0.08, e.t);
+      this._aim(tr2, _b); tr2.scale.set(0.9, 0.9, 1); tr2.position.copy(_b).multiplyScalar(0.3); tr2.material.uniforms.uA.value = I * 0.35 * smooth(0, 0.08, e.t);
+      gl.quaternion.copy(this.camQ); gl.scale.setScalar(0.75); gl.material.uniforms.uA.value = I * 0.55;
+    });
+    e.g.position.copy(last);
+    const fl = new THREE.Group(); e.g.add(fl); fl.scale.setScalar(1.45); e.extra = fl;
+    const tm = this.model(e, 'tripo_flask_gold', { tint: pal.b, tintK: 1, tintY: 0.21, spec: 0.8, rim: 0xffffff });
+    if (tm) { tm.position.y = -0.16; fl.add(tm); }
+    else { const liq = this.solid(e, this.geo.pharm_liquid, { mode: 2, tint: pal.b, spec: 0.5 }), cork = this.solid(e, this.geo.pharm_cork, { spec: 0.2 }), glass = this.solid(e, this.geo.pharm_flask, { mode: 1, rim: 0xffffff, spec: 1.4 });
+      glass.renderOrder = 2; for (const m of [liq, cork, glass]) { m.position.y = -0.16; fl.add(m); } }
+    const tr = this.spr(e, 'streak', pal, 5), tr2 = this.spr(e, 'streak', pal, 5), gl = this.spr(e, 'glow', pal, 4);
+    return { set: (p) => { const n = P3(p); _c.copy(n).sub(last); if (_c.lengthSq() > 1e-7) vel.copy(_c).normalize(); last.copy(n); e.g.position.copy(n); }, dispose: () => this._free(e) };
+  }
+
+  // ------------------------------------------------------------------ 유봉 내려찍기
+  /** once per strike at the damage moment. o.f = facing (game), o.hit = real impact point on the target (game, with y), o.ground = its feet; o.whiff when nothing was hit */
+  smash(pc, o = {}) {
+    if (!this._ok() || !pc) return null;
+    const S = PHARM.smash, pal = PHARM.pal.gold, I = PHARM.intensity, low = lite(), f = o.f || pc.facing || { x: 0, z: 1 }, hit = !o.whiff && o.hit;
+    const c = P3(pc.pos); c.y += 1.2; const f3 = new THREE.Vector3(f.x, 0, -f.z).normalize();
+    let tip = null; try { const b = pc.body && pc.body.bladePoints && pc.body.bladePoints(); if (b) tip = new THREE.Vector3(b[1].x, b[1].y, b[1].z); } catch (err) { tip = null; }
+    const rel = tip ? tip.sub(c) : f3.clone().multiplyScalar(1.15).setY(-0.55);
+    const rad = Math.max(0.95, Math.hypot(rel.dot(f3), rel.y)), c0 = Math.atan2(rel.y, rel.dot(f3)) + this.span;      // elevation of the ribbon's tail end; its head sits on the pestle tip
+    const X = f3.clone().multiplyScalar(Math.cos(c0)).addScaledVector(UP, Math.sin(c0)), Z = f3.clone().multiplyScalar(Math.sin(c0)).addScaledVector(UP, -Math.cos(c0)), Y = new THREE.Vector3().crossVectors(Z, X);
+    const hp = hit ? P3(o.hit) : c.clone().add(rel), gp = o.ground ? P3(o.ground) : null;
+    const e = this._fx('smash', 0.7, (e) => {
+      const t = e.t, fade = 1 - smooth(0.05, S.life, t);
+      for (const m of arcs) { const d = m.userData, U = m.material.uniforms; U.uA.value = I * S.arc * d.w * fade * (hit ? 1 : 0.55); U.uCut.value = d.cut + (0.97 - d.cut) * smooth(0, S.life, t); }
+      flare.visible = t < 0.16; flare.quaternion.copy(this.camQ); flare.scale.setScalar((hit ? 1.5 : 0.7) + 1.3 * easeOut(t / 0.09)); flare.material.uniforms.uA.value = I * S.flash * (hit ? 1 : 0.4) * (1 - smooth(0.02, 0.16, t));
+      star.visible = t < 0.22; star.quaternion.copy(this.camQ); star.rotateZ(0.5); star.scale.setScalar((hit ? 1.1 : 0.5) + 0.9 * easeOut(t / 0.12)); star.material.uniforms.uA.value = I * 1.6 * (hit ? 1 : 0.4) * (1 - smooth(0.04, 0.22, t));
+      glow.visible = t < 0.26; glow.quaternion.copy(this.camQ); glow.scale.setScalar(0.9 + 0.9 * easeOut(t / 0.15)); glow.material.uniforms.uA.value = I * 0.9 * (hit ? 1 : 0.35) * (1 - smooth(0.03, 0.26, t));
+      if (ring) { ring.scale.setScalar(S.ring * (0.3 + 0.7 * easeOut(t / 0.22))); ring.material.uniforms.uA.value = I * 1.6 * smooth(0, 0.03, t) * (1 - smooth(0.1, 0.36, t)); }
+      for (const m of rays) { const d = m.userData, u = clamp01(t / d.life); m.visible = u < 1; if (!m.visible) continue; const dist = 0.15 + d.len * easeOut(u); m.position.copy(hp).addScaledVector(d.dir, dist); this._aim(m, d.dir); m.scale.set(d.w, d.len * (1 - 0.5 * u), 1); m.material.uniforms.uA.value = I * 1.5 * (1 - smooth(0.2, 1, u)); }
+      for (const m of chips) { const d = m.userData, u = t - d.t0; m.visible = u > 0 && u < d.life; if (!m.visible) continue; const fl = Math.min(u, d.land), y = d.vy * fl - 4.5 * fl * fl;
+        m.position.set(gp.x + d.vx * fl, gp.y + Math.max(0.04, 0.1 + y), gp.z + d.vz * fl); m.quaternion.setFromAxisAngle(d.ax, d.w * fl); m.material.uniforms.uA.value = 1 - smooth(d.life - 0.2, d.life, u); }
+      for (const m of dust) { const d = m.userData, u = clamp01((t - d.t0) / d.life); m.visible = u > 0 && u < 1; if (!m.visible) continue;
+        m.quaternion.copy(this.camQ); m.position.set(gp.x + d.x * (1 + u), gp.y + 0.2 + u * 0.3, gp.z + d.z * (1 + u)); m.scale.setScalar(d.s * (0.5 + 0.8 * easeOut(u))); m.material.uniforms.uA.value = 0.3 * Math.sin(Math.PI * Math.pow(u, 0.55)); }
+    });
+    const arcs = [{ k: 1.0, w: 1, cut: 0.5, off: 0 }, { k: 0.8, w: 0.5, cut: 0.62, off: 0.09 }].slice(0, low ? 1 : 2).map(d => { const m = this.rib(e, pal, 6); _mx.makeBasis(X, Y, Z); m.quaternion.setFromRotationMatrix(_mx);
+      m.position.copy(c).addScaledVector(Y, d.off); m.scale.setScalar(rad * d.k); m.material.uniforms.uSoft.value = 0.3; m.userData = d; return m; });
+    const flare = this.spr(e, 'flare', pal, 8), star = this.spr(e, 'star', pal, 8), glow = this.spr(e, 'glow', pal, 7); for (const m of [flare, star, glow]) m.position.copy(hp);
+    const ring = hit && gp ? this.ring(e, pal, 0.25, 3) : null; if (ring) ring.position.set(gp.x, gp.y + PHARM.ringLift, gp.z);
+    const rays = [], chips = [], dust = [];
+    if (hit) for (let i = 0, n = low ? 4 : 7; i < n; i++) { const m = this.spr(e, 'spark', pal, 7), a = (i + Math.random() * 0.6) / n * 6.283; _a.set(Math.cos(a), 0.25 + 0.6 * Math.abs(Math.sin(a * 1.7)), Math.sin(a)).normalize();
+      m.userData = { dir: _a.clone(), len: rnd(0.45, 0.8), w: rnd(0.12, 0.2), life: rnd(0.16, 0.26) }; rays.push(m); }
+    if (hit && gp) {
+      for (let i = 0, n = low ? 2 : 5; i < n; i++) { const name = this.triShards.length ? this.triShards[i % this.triShards.length] : null, m = (name && this.model(e, name, { rim: 0x2a2018, spec: 0.05, gain: 0.9 })) || this.solid(e, this.shards[i % this.shards.length], { rim: 0x2a2018, spec: 0.05 });
+        const a = Math.random() * 6.283, sp = rnd(0.8, 2.0), vy = rnd(1.6, 2.8); m.scale.setScalar(rnd(0.05, 0.10)); m.userData = { vx: Math.cos(a) * sp, vz: Math.sin(a) * sp, vy, land: vy / 4.5, w: rnd(8, 16), t0: rnd(0, 0.03), life: vy / 4.5 + rnd(0.15, 0.3), ax: new THREE.Vector3(rnd(-1, 1), rnd(-1, 1), rnd(-1, 1)).normalize() }; chips.push(m); }
+      for (let i = 0, n = low ? 0 : 2; i < n; i++) { const m = this.smoke(e, 'dust', pal), a = Math.random() * 6.283; m.userData = { x: Math.cos(a) * 0.3, z: Math.sin(a) * 0.3, s: rnd(0.7, 1.0), t0: rnd(0, 0.05), life: rnd(0.45, 0.6) }; dust.push(m); }
+    }
+    return e;
+  }
+
+  // ------------------------------------------------------------------ 밀어내기
+  /** fan-shaped gust at the damage moment: o.r / o.ang = the real cone (m, deg), o.f = facing, o.hits = [{x, y, z, boss}] enemies really pushed */
+  push(pc, o = {}) {
+    if (!this._ok() || !pc) return null;
+    const S = PHARM.push, pal = PHARM.pal.wind, I = PHARM.intensity, low = lite(), f = o.f || pc.facing || { x: 0, z: 1 }, r = o.r || 2.2, half = (o.ang || 80) * Math.PI / 360;
+    const A0 = Math.atan2(-f.z, f.x), base = P3(pc.pos), f3 = new THREE.Vector3(f.x, 0, -f.z).normalize();
+    const place = (m, headAt, sense, rr, d) => { m.scale.set(rr, rr, sense * rr); m.rotation.set(d.tx, -(headAt - sense * this.span), d.tz, 'YXZ'); m.position.set(base.x, base.y + d.y, base.z); };
+    const e = this._fx('push', 0.8, (e) => {
+      const t = e.t;
+      for (const m of ribs) { const d = m.userData, u = clamp01((t - d.t0) / S.sweep), k = easeOut(u), U = m.material.uniforms;
+        const swept = 2 * half * k; place(m, A0 + d.sense * (-half + swept), d.sense, r * d.rr * (0.6 + 0.4 * k), d);
+        U.uCut.value = 1 - Math.max(0.06, swept) / this.span; U.uA.value = I * S.peak * d.w * smooth(0, 0.25, u) * (1 - smooth(S.sweep + d.t0, S.life, t)); m.visible = t >= d.t0; }
+      { const k = easeOut(t / 0.2), U = edge.material.uniforms; place(edge, A0 + half, 1, r * (0.55 + 0.45 * k), edge.userData); U.uCut.value = 1 - 2 * half / this.span; U.uA.value = I * 1.5 * smooth(0, 0.04, t) * (1 - smooth(0.12, 0.4, t)); }
+      flash.visible = t < 0.14; flash.quaternion.copy(this.camQ); flash.scale.setScalar(0.8 + 1.0 * easeOut(t / 0.1)); flash.material.uniforms.uA.value = I * 1.0 * (1 - smooth(0.02, 0.14, t));
+      for (const m of streaks) { const d = m.userData, u = clamp01((t - d.t0) / d.life); m.visible = u > 0 && u < 1; if (!m.visible) continue;           // dust streaks dragged along the push
+        const len = d.len * easeOut(u * 1.3); m.position.copy(d.p).addScaledVector(d.dir, len * 0.5 + d.off); this._aim(m, d.dir); m.scale.set(d.w, Math.max(0.05, len), 1); m.material.uniforms.uA.value = I * d.a * (1 - smooth(0.35, 1, u)); }
+      for (const m of pops) { const d = m.userData; m.visible = t < 0.2; m.quaternion.copy(this.camQ); m.scale.setScalar(d.s * (0.5 + 0.9 * easeOut(t / 0.14))); m.material.uniforms.uA.value = I * 1.3 * (1 - smooth(0.02, 0.2, t)); }
+      for (const m of dust) { const d = m.userData, u = clamp01((t - d.t0) / d.life); m.visible = u > 0 && u < 1; if (!m.visible) continue;
+        m.quaternion.copy(this.camQ); m.position.copy(d.p).addScaledVector(d.dir, u * d.go); m.position.y += 0.25 + u * 0.3; m.scale.setScalar(d.s * (0.5 + 0.8 * easeOut(u))); m.material.uniforms.uA.value = 0.3 * Math.sin(Math.PI * Math.pow(u, 0.55)); }
+    });
+    const defs = [{ rr: 1.0, y: 0.78, tx: 0.05, tz: 0.04, t0: 0, w: 1, sense: 1 }, { rr: 0.74, y: 1.08, tx: -0.10, tz: 0.06, t0: 0.03, w: 0.8, sense: -1 }, { rr: 0.5, y: 0.5, tx: 0.08, tz: -0.05, t0: 0.055, w: 0.6, sense: 1 }];
+    const ribs = defs.slice(0, low ? 2 : 3).map(d => { const m = this.rib(e, pal, 6); m.material.uniforms.uSoft.value = 0.22; m.userData = d; return m; });
+    const edge = this.rib(e, pal, 5); edge.material.uniforms.uSoft.value = 0.12; edge.userData = { tx: 0, tz: 0, y: 0.12 };
+    const flash = this.spr(e, 'flare', pal, 8); flash.position.copy(base).addScaledVector(f3, 0.9); flash.position.y += 0.9;
+    const streaks = [], pops = [], dust = [];
+    for (const h of (o.hits || []).slice(0, 6)) { const p = P3(h); _a.copy(p).sub(base).setY(0); const dir = (_a.lengthSq() > 1e-4 ? _a.normalize() : f3).clone();
+      const pop = this.spr(e, 'star', pal, 8); pop.position.copy(p); pop.position.y += 0.7; pop.userData = { s: 0.9 }; pops.push(pop);
+      if (h.boss) continue;
+      for (let i = 0, n = low ? 2 : 3; i < n; i++) { const m = this.spr(e, 'spark', pal, 5), side = (i - (n - 1) / 2) * 0.32; m.userData = { p: p.clone().add(new THREE.Vector3(-dir.z, 0, dir.x).multiplyScalar(side)).setY(p.y + 0.14 + i * 0.16), dir, len: S.streak * rnd(0.7, 1.0), off: -0.2, w: rnd(0.16, 0.24), a: rnd(0.9, 1.3), t0: i * 0.02, life: rnd(0.26, 0.36) }; streaks.push(m); }
+      if (!low) { const m = this.smoke(e, 'dust', pal); m.userData = { p: p.clone(), dir, go: 0.9, s: rnd(0.8, 1.1), t0: 0.03, life: rnd(0.5, 0.65) }; dust.push(m); }
+    }
     return e;
   }
 
@@ -497,7 +651,8 @@ export class PharmFx {
     const G = window.G, cam = G && G.render && G.render.cam;
     if (cam) { this.camQ.copy(cam.quaternion); cam.getWorldDirection(_a); this.toCam.copy(_a).multiplyScalar(-1); this.yawQ.setFromAxisAngle(UP, Math.atan2(this.toCam.x, this.toCam.z));
       this.camR.set(1, 0, 0).applyQuaternion(cam.quaternion).setY(0).normalize(); }
-    for (const e of this.live) { e.t += dt; try { e.update(e, dt); } catch (err) { console.warn('pharmfx', e.kind, err); e.t = e.life; } if (e.t >= e.life) this._free(e); }
+    for (const e of this.live) { if (e.dead) continue;   // freed from outside (a thrown flask landing) since the last frame
+      e.t += dt; try { e.update(e, dt); } catch (err) { console.warn('pharmfx', e.kind, err); e.t = e.life; } if (e.t >= e.life) this._free(e); }
     this.live = this.live.filter(e => !e.dead);
   }
   _free(e) { if (e.dead) return; e.dead = true; this.root.remove(e.g);
