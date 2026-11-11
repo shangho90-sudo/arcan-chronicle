@@ -633,6 +633,15 @@ def spot_near(zid, spawn_id, k, taken):
         d = math.hypot(cx - x0, cz - z0) or 1; fx, fz = (cx - x0) / d, (cz - z0) / d
     props = [(p['pos'][0], p['pos'][1], p.get('r', 1.0)) for p in z.get('props', []) if 'pos' in p and p.get('type') not in ('flowers', 'shrub', 'mushdecor', 'grass')]
     blds = [(b['pos'][0], b['pos'][1], max(b.get('w', 4), b.get('d', 4)) * 0.6) for b in z.get('buildings', []) if 'pos' in b]
+    # 마을 장식(가로등·화단·분수 등, town3d): NPC가 가로등 기둥 속에 서서 가려지지 않게 (2026-11-11 왕도 요리사 곤)
+    t3 = z.get('town3d') or {}
+    for L in t3.get('lanterns') or []:
+        if isinstance(L, list) and len(L) >= 2: blds.append((L[0], L[1], 1.2))
+        elif isinstance(L, dict) and 'pos' in L: blds.append((L['pos'][0], L['pos'][1], 1.2))
+    for d in t3.get('decor') or []:
+        if isinstance(d, dict) and 'pos' in d: blds.append((d['pos'][0], d['pos'][1], d.get('r', 1.0) + 0.3))
+    for n in z.get('npcs', []):
+        if 'pos' in n: blds.append((n['pos'][0], n['pos'][1], 0.6))
     for ring in range(0, 8):
         for side in ([0, 1, -1, 2, -2, 3, -3] if ring == 0 else [1, -1, 2, -2, 3, -3, 4, -4]):
             dist = 3.5 + ring * 1.5; off = side * 1.6 + (k % 3) * 0.0

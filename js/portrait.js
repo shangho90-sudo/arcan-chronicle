@@ -76,3 +76,17 @@ export function renderThumb(body, mode = 'full', size = 96) {
   } catch (e) { console.warn('thumb', e); return null; }
   finally { if (parent) parent.add(root); root.position.copy(pos); root.rotation.y = rot; root.visible = vis; root.updateMatrixWorld(true); }
 }
+
+/** true when every texture on the body's meshes has finished loading (a portrait taken earlier comes out as a black silhouette) */
+export function bodyTexturesReady(body) {
+  if (!body || !body.root) return false;
+  let ok = true;
+  body.root.traverse(o => {
+    if (!ok || !o.isMesh) return;
+    for (const m of [].concat(o.material || [])) {
+      const t = m.map || (m.uniforms && m.uniforms.map && m.uniforms.map.value);
+      if (t && !(t.image && (t.image.complete === undefined || t.image.complete) && (t.image.width || t.image.naturalWidth))) ok = false;
+    }
+  });
+  return ok;
+}

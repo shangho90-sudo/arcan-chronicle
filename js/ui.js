@@ -4,7 +4,7 @@ import { showWorldMap } from './worldmap.js';
 import { THREE, tex, CAM } from './render.js';
 import { ModelBody, loadPlayerModel, loadActions } from './model.js';
 import { renderItemIcons } from './items3d.js';
-import { renderPortrait, renderThumb } from './portrait.js';
+import { renderPortrait, renderThumb, bodyTexturesReady } from './portrait.js';
 import { Minimap } from './minimap.js';
 import { installQuestHud, bindQuestHud } from './questhud.js';
 
@@ -232,8 +232,9 @@ export class UI {
     const badge = h("hBadge").parentElement; badge.style.borderColor = job.color;
     if (badge._g !== P.gender) { badge._g = P.gender; badge._3d = null; badge.style.backgroundImage = `url(assets/ui/portrait_${P.gender === "f" ? "girl" : "boy"}.png)`; badge.style.backgroundPosition = P.gender === "f" ? "-113px -98px" : "-113px -74px"; badge.style.backgroundSize = ""; }
     // sharper portrait rendered from the actual 3D model once it is loaded (falls back to the picture above)
-    const pk = P.gender + "|" + (P.dye || "");
-    if (badge._3d !== pk && p.body && p.body.bones && p.body.bones.length) { badge._3d = pk; const url = renderPortrait(p.body); if (url) { badge.style.backgroundImage = `url(${url})`; badge.style.backgroundPosition = "center"; badge.style.backgroundSize = "cover"; } }
+    // key = 모델 몸체 자체(전직하면 몸이 바뀜) + 염색; 텍스처가 다 받아진 뒤에만 찍음 — 전직 직후·불러오기 직후 검은 실루엣이 되던 문제(2026-11-11)
+    const pk = P.gender + "|" + (P.dye || "") + "|" + (p.body && p.body.root ? p.body.root.uuid : "");
+    if (badge._3d !== pk && p.body && p.body.bones && p.body.bones.length && bodyTexturesReady(p.body)) { badge._3d = pk; const url = renderPortrait(p.body); if (url) { badge.style.backgroundImage = `url(${url})`; badge.style.backgroundPosition = "center"; badge.style.backgroundSize = "cover"; } }
     h("hHp").style.width = (100 * p.hp / p.maxHp) + "%"; h("hShield").style.width = Math.min(100, 100 * p.shield / p.maxHp) + "%";
     h("hHpT").textContent = Math.ceil(p.hp) + " / " + Math.round(p.maxHp) + (p.shield > 0 ? `  (+${Math.round(p.shield)})` : "");
     h("hSp").style.width = (100 * p.sp / p.maxSp) + "%"; h("hSpT").textContent = "기력 " + Math.floor(p.sp) + " / " + Math.round(p.maxSp);
@@ -667,7 +668,7 @@ export class UI {
       items.forEach((it, i) => {
         const el = box.querySelector(`[data-i="${i}"] .amthumb`); if (!el || el._ok) return;
         let url = cache.get(it.key);
-        if (url === undefined && it.body && it.body.root) { url = renderThumb(it.body, it.mode, 96); if (url) cache.set(it.key, url); }
+        if (url === undefined && it.body && it.body.root && bodyTexturesReady(it.body)) { url = renderThumb(it.body, it.mode, 96); if (url) cache.set(it.key, url); }
         if (url) { el.style.backgroundImage = `url(${url})`; el.classList.add("on"); el._ok = 1; } else missing++;
       });
       if (missing && ++tries < 6) setTimeout(() => { for (const it of items) if (!it.body) { const a = z.actors.find(a => a.def && "m:" + a.def.id === it.key && a.body && a.body.root); if (a) it.body = a.body; } paint(); }, 800);
