@@ -546,7 +546,7 @@ SALVAGE = dict(skill='bs1_c4', rate=0.4, table={
     'w_hammer_c': [('m_iron', 2)], 'w_axe_c': [('m_iron', 2)], 'a_metal_c': [('m_iron', 3)], 'w_gun_pistol': [('m_iron', 3), ('m_gear', 1)],
     'w_gun_shotgun': [('m_iron', 4), ('m_gear', 1)], 'w_gun_rifle': [('m_iron', 4), ('m_gear', 2)], 'a_outfit_c': [('m_cloth', 3)],
     'w_hammer_1': [('m_iron', 1)], 'w_hammer_2': [('m_iron', 2)], 'w_hammer_3': [('m_iron', 3)], 'a_armor_2': [('m_cloth', 1)]})
-SHOP_ADD = dict(shop_general=['m_bottle', 'm_flour', 'm_meat', 'm_veg', 'm_pigment', 'm_cloth'], shop_smithy=['m_iron', 'm_gear'], shop_arms=['m_iron', 'm_silk'])
+SHOP_ADD = dict(shop_general=['m_bottle', 'm_flour', 'm_meat', 'm_veg', 'm_pigment', 'm_cloth'], shop_smithy=['m_iron', 'm_gear'], shop_forge=['m_iron', 'm_gear'], shop_weapons=['m_iron', 'm_silk'])   # shop_forge = 철산(제작 재료만), shop_weapons = 무기 상인(예전 shop_arms, tools/gear/gear.py)
 
 # ======================================================================= finalize
 for d in SK:

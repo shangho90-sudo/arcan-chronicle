@@ -71,7 +71,7 @@
    "title": "대장장이 마스터",
    "sheet": "npc_master_blacksmith",
    "role": "jobmaster",
-   "shop": "shop_smithy",
+   "shop": "shop_forge",
    "job": "blacksmith",
    "lines": [
     "쇠는 달궈졌을 때 두드려야지.",
@@ -107,15 +107,30 @@
   {
    "id": "armorer",
    "name": "단오",
-   "title": "무기상",
+   "title": "무기 상인",
    "sheet": "npc_armorer",
    "role": "merchant",
-   "shop": "shop_arms",
+   "shop": "shop_weapons",
    "job": "",
    "lines": [
-    "검이든 방패든, 손에 맞아야 진짜 장비지.",
-    "직업에 맞는 무기를 골라 봐."
+    "검이든 유봉이든, 손에 맞아야 진짜 무기지.",
+    "좋은 무기는 사냥터의 몬스터가 떨어뜨린다네. 여기선 기본만 팔아."
    ]
+  },
+  {
+   "id": "town_armor",
+   "name": "보라",
+   "title": "방어구·장신구 상인",
+   "sheet": "npc_merchant",
+   "model": "gear_armor",
+   "role": "merchant",
+   "shop": "shop_armor",
+   "job": "",
+   "lines": [
+    "갑옷은 몸에 맞아야 제값을 하죠.",
+    "귀한 장비는 몬스터가 품고 있답니다. 저는 기본만 팔아요."
+   ],
+   "gear": true
   },
   {
    "id": "roderick",
@@ -163,6 +178,36 @@
    "world": true
   },
   {
+   "id": "capital_weapons",
+   "name": "가렛",
+   "title": "무기 상인",
+   "sheet": "npc_armorer",
+   "model": "gear_weapon",
+   "role": "merchant",
+   "shop": "shop_weapons",
+   "job": "",
+   "lines": [
+    "왕도 병기창에서 나온 물건이오.",
+    "좋은 무기는 사냥터의 몬스터가 품고 있소."
+   ],
+   "world": true
+  },
+  {
+   "id": "capital_armor",
+   "name": "이벨",
+   "title": "방어구·장신구 상인",
+   "sheet": "npc_merchant",
+   "model": "gear_armor",
+   "role": "merchant",
+   "shop": "shop_armor",
+   "job": "",
+   "lines": [
+    "갑옷은 몸에 맞게 골라야 해요.",
+    "반지 하나가 목숨을 구하기도 한답니다."
+   ],
+   "world": true
+  },
+  {
    "id": "kerin",
    "name": "케린",
    "title": "노기사",
@@ -193,6 +238,34 @@
    "world": true
   },
   {
+   "id": "baltern_weapons",
+   "name": "브룬",
+   "title": "무기 상인",
+   "sheet": "npc_armorer",
+   "model": "gear_weapon",
+   "role": "merchant",
+   "shop": "shop_weapons",
+   "job": "",
+   "lines": [
+    "바위산 광석으로 벼린 무기요."
+   ],
+   "world": true
+  },
+  {
+   "id": "baltern_armor",
+   "name": "마야",
+   "title": "방어구·장신구 상인",
+   "sheet": "npc_merchant",
+   "model": "gear_armor",
+   "role": "merchant",
+   "shop": "shop_armor",
+   "job": "",
+   "lines": [
+    "절벽 바람엔 두꺼운 갑옷이 제일이죠."
+   ],
+   "world": true
+  },
+  {
    "id": "justina",
    "name": "저스티나",
    "title": "대사제",
@@ -219,6 +292,34 @@
    "lines": [
     "수정구가 요즘 자꾸 검게 흐려져요.",
     "순례길에는 환영이 나온대요."
+   ],
+   "world": true
+  },
+  {
+   "id": "lumiere_weapons",
+   "name": "테오",
+   "title": "무기 상인",
+   "sheet": "npc_armorer",
+   "model": "gear_weapon",
+   "role": "merchant",
+   "shop": "shop_weapons",
+   "job": "",
+   "lines": [
+    "순례길에도 무기는 필요합니다."
+   ],
+   "world": true
+  },
+  {
+   "id": "lumiere_armor",
+   "name": "세실",
+   "title": "방어구·장신구 상인",
+   "sheet": "npc_merchant",
+   "model": "gear_armor",
+   "role": "merchant",
+   "shop": "shop_armor",
+   "job": "",
+   "lines": [
+    "축복받은 장신구는 아니지만, 쓸 만해요."
    ],
    "world": true
   },
@@ -281,6 +382,34 @@
    "world": true
   },
   {
+   "id": "gravel_weapons",
+   "name": "도릭",
+   "title": "무기 상인",
+   "sheet": "npc_armorer",
+   "model": "gear_weapon",
+   "role": "merchant",
+   "shop": "shop_weapons",
+   "job": "",
+   "lines": [
+    "국경에선 무기가 곧 목숨이오."
+   ],
+   "world": true
+  },
+  {
+   "id": "gravel_armor",
+   "name": "나디아",
+   "title": "방어구·장신구 상인",
+   "sheet": "npc_merchant",
+   "model": "gear_armor",
+   "role": "merchant",
+   "shop": "shop_armor",
+   "job": "",
+   "lines": [
+    "남쪽 황무지에 가려면 갑옷부터 챙기세요."
+   ],
+   "world": true
+  },
+  {
    "id": "derkai",
    "name": "데르카이",
    "title": "실베른 영주",
@@ -306,6 +435,34 @@
    "job": "",
    "lines": [
     "습지 쪽은 안개가 짙어요."
+   ],
+   "world": true
+  },
+  {
+   "id": "silvern_weapons",
+   "name": "핀",
+   "title": "무기 상인",
+   "sheet": "npc_armorer",
+   "model": "gear_weapon",
+   "role": "merchant",
+   "shop": "shop_weapons",
+   "job": "",
+   "lines": [
+    "들판의 멧돼지도 얕보면 안 돼요."
+   ],
+   "world": true
+  },
+  {
+   "id": "silvern_armor",
+   "name": "로잔",
+   "title": "방어구·장신구 상인",
+   "sheet": "npc_merchant",
+   "model": "gear_armor",
+   "role": "merchant",
+   "shop": "shop_armor",
+   "job": "",
+   "lines": [
+    "습지 안개엔 속성 저항이 붙은 갑옷이 좋아요."
    ],
    "world": true
   },
@@ -341,14 +498,28 @@
   {
    "id": "marseon_armorer",
    "name": "세라",
-   "title": "방어구 상인",
+   "title": "방어구·장신구 상인",
    "sheet": "npc_armorer",
    "model": "armorer",
    "role": "merchant",
-   "shop": "shop_arms",
+   "shop": "shop_armor",
    "job": "",
    "lines": [
     "동쪽 전선에서 쓰던 방패요. 튼튼하지."
+   ],
+   "world": true
+  },
+  {
+   "id": "marseon_weapons",
+   "name": "자히드",
+   "title": "무기 상인",
+   "sheet": "npc_armorer",
+   "model": "gear_weapon",
+   "role": "merchant",
+   "shop": "shop_weapons",
+   "job": "",
+   "lines": [
+    "동쪽에서 건너온 무기들이오."
    ],
    "world": true
   },
@@ -397,6 +568,34 @@
    "world": true
   },
   {
+   "id": "baltazar_weapons",
+   "name": "울프",
+   "title": "무기 상인",
+   "sheet": "npc_armorer",
+   "model": "gear_weapon",
+   "role": "merchant",
+   "shop": "shop_weapons",
+   "job": "",
+   "lines": [
+    "대장장이의 나라답게 기본기는 확실하오."
+   ],
+   "world": true
+  },
+  {
+   "id": "baltazar_armor",
+   "name": "헬가",
+   "title": "방어구·장신구 상인",
+   "sheet": "npc_merchant",
+   "model": "gear_armor",
+   "role": "merchant",
+   "shop": "shop_armor",
+   "job": "",
+   "lines": [
+    "광산에 내려갈 거면 흉갑은 꼭 입어요."
+   ],
+   "world": true
+  },
+  {
    "id": "kreutz_captain",
    "name": "볼크",
    "title": "요새 수비대장",
@@ -422,6 +621,34 @@
    "job": "",
    "lines": [
     "털옷 없이 설원에 가면 얼어 죽어요."
+   ],
+   "world": true
+  },
+  {
+   "id": "kreutz_weapons",
+   "name": "이반",
+   "title": "무기 상인",
+   "sheet": "npc_armorer",
+   "model": "gear_weapon",
+   "role": "merchant",
+   "shop": "shop_weapons",
+   "job": "",
+   "lines": [
+    "설원에선 손이 얼어도 무기는 놓지 마시오."
+   ],
+   "world": true
+  },
+  {
+   "id": "kreutz_armor",
+   "name": "소냐",
+   "title": "방어구·장신구 상인",
+   "sheet": "npc_merchant",
+   "model": "gear_armor",
+   "role": "merchant",
+   "shop": "shop_armor",
+   "job": "",
+   "lines": [
+    "털 달린 갑옷이 잘 나가요."
    ],
    "world": true
   },
@@ -787,8 +1014,18 @@
    ]
   },
   {
-   "id": "shop_arms",
-   "name": "단오의 무기·방어구점",
+   "id": "shop_pharmacy",
+   "name": "소연의 약국",
+   "items": [
+    "c_potion_s",
+    "c_potion_m",
+    "c_sp_potion",
+    "c_antidote"
+   ]
+  },
+  {
+   "id": "shop_weapons",
+   "name": "무기 상점",
    "items": [
     "w_pestle_1",
     "w_knife_1",
@@ -800,19 +1037,36 @@
     "w_hammer_2",
     "w_scissors_2",
     "w_brush_2",
-    "a_armor_1",
-    "a_armor_2"
-   ]
+    "w_pestle_g1",
+    "w_pestle_g2",
+    "w_pestle_g3",
+    "w_pestle_g4",
+    "w_pestle_g5"
+   ],
+   "gear": true
   },
   {
-   "id": "shop_pharmacy",
-   "name": "소연의 약국",
+   "id": "shop_armor",
+   "name": "방어구·장신구 상점",
    "items": [
-    "c_potion_s",
-    "c_potion_m",
-    "c_sp_potion",
-    "c_antidote"
-   ]
+    "a_armor_g1",
+    "a_armor_g2",
+    "a_armor_g3",
+    "a_armor_g4",
+    "a_armor_g5",
+    "ac_g1",
+    "ac_g2",
+    "ac_g3",
+    "ac_g4",
+    "ac_g5"
+   ],
+   "gear": true
+  },
+  {
+   "id": "shop_forge",
+   "name": "철산의 대장간 (제작 재료)",
+   "items": [],
+   "gear": true
   }
  ]
 }

@@ -2666,6 +2666,2010 @@
     "cooldown": 1
    },
    "story": true
+  },
+  {
+   "id": "w_pestle_g1",
+   "name": "참나무 유봉",
+   "desc": "단단한 참나무를 깎아 만든 유봉. 갓 전직한 약사의 첫 무기.",
+   "type": "weapon",
+   "job": "pharmacist",
+   "tier": 1,
+   "levelReq": 10,
+   "price": 1070,
+   "sellPrice": 321,
+   "maxStack": 1,
+   "icon": "w_pestle_g1",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 32,
+     "mul": 0.0
+    },
+    {
+     "stat": "matk",
+     "add": 14,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true
+  },
+  {
+   "id": "w_pestle_g2",
+   "name": "청동 유봉",
+   "desc": "청동 머리를 씌워 묵직해진 유봉.",
+   "type": "weapon",
+   "job": "pharmacist",
+   "tier": 2,
+   "levelReq": 13,
+   "price": 1480,
+   "sellPrice": 444,
+   "maxStack": 1,
+   "icon": "w_pestle_g2",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 39,
+     "mul": 0.0
+    },
+    {
+     "stat": "matk",
+     "add": 18,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true
+  },
+  {
+   "id": "w_pestle_g3",
+   "name": "강철 유봉",
+   "desc": "강철 띠를 두른 유봉. 약재도 돌도 가리지 않는다.",
+   "type": "weapon",
+   "job": "pharmacist",
+   "tier": 3,
+   "levelReq": 16,
+   "price": 1920,
+   "sellPrice": 576,
+   "maxStack": 1,
+   "icon": "w_pestle_g3",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 45,
+     "mul": 0.0
+    },
+    {
+     "stat": "matk",
+     "add": 20,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true
+  },
+  {
+   "id": "w_pestle_g4",
+   "name": "백은 유봉",
+   "desc": "덩굴무늬를 새긴 백은 유봉. 회복 효율 +5%.",
+   "type": "weapon",
+   "job": "pharmacist",
+   "tier": 4,
+   "levelReq": 19,
+   "price": 2380,
+   "sellPrice": 714,
+   "maxStack": 1,
+   "icon": "w_pestle_g4",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 52,
+     "mul": 0.0
+    },
+    {
+     "stat": "matk",
+     "add": 23,
+     "mul": 0.0
+    },
+    {
+     "stat": "healPower",
+     "add": 0.05,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true
+  },
+  {
+   "id": "w_pestle_g5",
+   "name": "수정 유봉",
+   "desc": "푸른 수정 머리가 약효를 맑게 한다. 회복 효율 +8%.",
+   "type": "weapon",
+   "job": "pharmacist",
+   "tier": 5,
+   "levelReq": 22,
+   "price": 2860,
+   "sellPrice": 858,
+   "maxStack": 1,
+   "icon": "w_pestle_g5",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 58,
+     "mul": 0.0
+    },
+    {
+     "stat": "matk",
+     "add": 26,
+     "mul": 0.0
+    },
+    {
+     "stat": "healPower",
+     "add": 0.08,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true
+  },
+  {
+   "id": "w_pestle_g6",
+   "name": "안개꽃 유봉",
+   "desc": "안개 속에서만 피는 꽃을 새긴 옥 유봉. 회복 효율 +10%.",
+   "type": "weapon",
+   "job": "pharmacist",
+   "tier": 6,
+   "levelReq": 26,
+   "price": 0,
+   "sellPrice": 1056,
+   "maxStack": 1,
+   "icon": "w_pestle_g6",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 73,
+     "mul": 0.0
+    },
+    {
+     "stat": "matk",
+     "add": 33,
+     "mul": 0.0
+    },
+    {
+     "stat": "healPower",
+     "add": 0.1,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "mon_berg_bear",
+     "chance": 0.03
+    },
+    {
+     "monster": "mon_ash_toad",
+     "chance": 0.02
+    },
+    {
+     "monster": "mon_soldier",
+     "chance": 0.02
+    }
+   ]
+  },
+  {
+   "id": "w_pestle_g7",
+   "name": "서리 수정 유봉",
+   "desc": "녹지 않는 얼음 결정으로 만든 유봉. 속성 저항 +6%.",
+   "type": "weapon",
+   "job": "pharmacist",
+   "tier": 7,
+   "levelReq": 30,
+   "price": 0,
+   "sellPrice": 1263,
+   "maxStack": 1,
+   "icon": "w_pestle_g7",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 82,
+     "mul": 0.0
+    },
+    {
+     "stat": "matk",
+     "add": 37,
+     "mul": 0.0
+    },
+    {
+     "stat": "elemRes",
+     "add": 0.06,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "mon_frost_ram",
+     "chance": 0.025
+    },
+    {
+     "monster": "mon_crab",
+     "chance": 0.02
+    },
+    {
+     "monster": "mon_ice_fox",
+     "chance": 0.015
+    }
+   ]
+  },
+  {
+   "id": "w_pestle_g8",
+   "name": "용암 유봉",
+   "desc": "식지 않는 용암석 유봉. 치명타 +4%.",
+   "type": "weapon",
+   "job": "pharmacist",
+   "tier": 8,
+   "levelReq": 35,
+   "price": 0,
+   "sellPrice": 1533,
+   "maxStack": 1,
+   "icon": "w_pestle_g8",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 94,
+     "mul": 0.0
+    },
+    {
+     "stat": "matk",
+     "add": 42,
+     "mul": 0.0
+    },
+    {
+     "stat": "crit",
+     "add": 0.04,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "mon_salamander",
+     "chance": 0.03
+    },
+    {
+     "monster": "mon_mine_golem",
+     "chance": 0.03
+    },
+    {
+     "monster": "mon_crimson_fox",
+     "chance": 0.02
+    }
+   ]
+  },
+  {
+   "id": "w_pestle_g9",
+   "name": "용골 유봉",
+   "desc": "고룡의 뼈를 깎은 유봉. 재사용 대기시간 -5%.",
+   "type": "weapon",
+   "job": "pharmacist",
+   "tier": 9,
+   "levelReq": 41,
+   "price": 0,
+   "sellPrice": 1866,
+   "maxStack": 1,
+   "icon": "w_pestle_g9",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 108,
+     "mul": 0.0
+    },
+    {
+     "stat": "matk",
+     "add": 49,
+     "mul": 0.0
+    },
+    {
+     "stat": "cdr",
+     "add": 0.05,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "mon_cinder_lizard",
+     "chance": 0.03
+    },
+    {
+     "monster": "mon_tomb_golem",
+     "chance": 0.025
+    },
+    {
+     "monster": "mon_ember_drake",
+     "chance": 0.02
+    }
+   ]
+  },
+  {
+   "id": "w_pestle_g10",
+   "name": "흑룡의 황금 유봉",
+   "desc": "흑룡이 감긴 전설의 황금 유봉. 치명타 +6%, 회복 효율 +15%.",
+   "type": "weapon",
+   "job": "pharmacist",
+   "tier": 10,
+   "levelReq": 47,
+   "price": 0,
+   "sellPrice": 2214,
+   "maxStack": 1,
+   "icon": "w_pestle_g10",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 122,
+     "mul": 0.0
+    },
+    {
+     "stat": "matk",
+     "add": 55,
+     "mul": 0.0
+    },
+    {
+     "stat": "crit",
+     "add": 0.06,
+     "mul": 0.0
+    },
+    {
+     "stat": "healPower",
+     "add": 0.15,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "boss_ancient_dragon",
+     "chance": 0.25
+    },
+    {
+     "monster": "mon_drake_lord",
+     "chance": 0.02
+    },
+    {
+     "monster": "mon_abyss_drake",
+     "chance": 0.02
+    }
+   ]
+  },
+  {
+   "id": "a_armor_g1",
+   "name": "누비 갑옷",
+   "desc": "솜을 두껍게 누빈 갑옷.",
+   "type": "armor",
+   "job": "",
+   "tier": 1,
+   "levelReq": 10,
+   "price": 960,
+   "sellPrice": 288,
+   "maxStack": 1,
+   "icon": "a_armor_g1",
+   "stats": [
+    {
+     "stat": "def",
+     "add": 22,
+     "mul": 0.0
+    },
+    {
+     "stat": "maxHp",
+     "add": 120,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true
+  },
+  {
+   "id": "a_armor_g2",
+   "name": "사슬 조끼",
+   "desc": "가죽 위에 사슬을 엮은 조끼.",
+   "type": "armor",
+   "job": "",
+   "tier": 2,
+   "levelReq": 13,
+   "price": 1330,
+   "sellPrice": 399,
+   "maxStack": 1,
+   "icon": "a_armor_g2",
+   "stats": [
+    {
+     "stat": "def",
+     "add": 27,
+     "mul": 0.0
+    },
+    {
+     "stat": "maxHp",
+     "add": 150,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true
+  },
+  {
+   "id": "a_armor_g3",
+   "name": "강철 흉갑",
+   "desc": "가슴을 덮는 강철 흉갑.",
+   "type": "armor",
+   "job": "",
+   "tier": 3,
+   "levelReq": 16,
+   "price": 1730,
+   "sellPrice": 519,
+   "maxStack": 1,
+   "icon": "a_armor_g3",
+   "stats": [
+    {
+     "stat": "def",
+     "add": 33,
+     "mul": 0.0
+    },
+    {
+     "stat": "maxHp",
+     "add": 180,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true
+  },
+  {
+   "id": "a_armor_g4",
+   "name": "기사 판금 갑옷",
+   "desc": "푸른 천을 두른 기사의 판금 갑옷.",
+   "type": "armor",
+   "job": "",
+   "tier": 4,
+   "levelReq": 19,
+   "price": 2140,
+   "sellPrice": 642,
+   "maxStack": 1,
+   "icon": "a_armor_g4",
+   "stats": [
+    {
+     "stat": "def",
+     "add": 38,
+     "mul": 0.0
+    },
+    {
+     "stat": "maxHp",
+     "add": 210,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true
+  },
+  {
+   "id": "a_armor_g5",
+   "name": "은빛 미늘 갑옷",
+   "desc": "은빛 미늘이 촘촘한 갑옷. 속성 저항 +4%.",
+   "type": "armor",
+   "job": "",
+   "tier": 5,
+   "levelReq": 22,
+   "price": 2570,
+   "sellPrice": 771,
+   "maxStack": 1,
+   "icon": "a_armor_g5",
+   "stats": [
+    {
+     "stat": "def",
+     "add": 44,
+     "mul": 0.0
+    },
+    {
+     "stat": "maxHp",
+     "add": 240,
+     "mul": 0.0
+    },
+    {
+     "stat": "elemRes",
+     "add": 0.04,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true
+  },
+  {
+   "id": "a_armor_g6",
+   "name": "잿빛 늑대 가죽 갑옷",
+   "desc": "늑대 털가죽으로 만든 가벼운 갑옷. 회피 +3%.",
+   "type": "armor",
+   "job": "",
+   "tier": 6,
+   "levelReq": 26,
+   "price": 0,
+   "sellPrice": 951,
+   "maxStack": 1,
+   "icon": "a_armor_g6",
+   "stats": [
+    {
+     "stat": "def",
+     "add": 55,
+     "mul": 0.0
+    },
+    {
+     "stat": "maxHp",
+     "add": 302,
+     "mul": 0.0
+    },
+    {
+     "stat": "eva",
+     "add": 0.03,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "mon_berg_bear",
+     "chance": 0.025
+    },
+    {
+     "monster": "mon_soldier",
+     "chance": 0.02
+    },
+    {
+     "monster": "mon_ash_toad",
+     "chance": 0.02
+    }
+   ]
+  },
+  {
+   "id": "a_armor_g7",
+   "name": "서리 강철 갑옷",
+   "desc": "얼음 결정이 맺힌 강철 갑옷. 속성 저항 +8%.",
+   "type": "armor",
+   "job": "",
+   "tier": 7,
+   "levelReq": 30,
+   "price": 0,
+   "sellPrice": 1137,
+   "maxStack": 1,
+   "icon": "a_armor_g7",
+   "stats": [
+    {
+     "stat": "def",
+     "add": 63,
+     "mul": 0.0
+    },
+    {
+     "stat": "maxHp",
+     "add": 346,
+     "mul": 0.0
+    },
+    {
+     "stat": "elemRes",
+     "add": 0.08,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "mon_frost_ram",
+     "chance": 0.02
+    },
+    {
+     "monster": "mon_blackeye_wolf",
+     "chance": 0.02
+    },
+    {
+     "monster": "mon_soldier",
+     "chance": 0.02
+    }
+   ]
+  },
+  {
+   "id": "a_armor_g8",
+   "name": "용비늘 갑옷",
+   "desc": "붉은 용비늘을 엮은 갑옷. 받는 피해 -4%.",
+   "type": "armor",
+   "job": "",
+   "tier": 8,
+   "levelReq": 35,
+   "price": 0,
+   "sellPrice": 1380,
+   "maxStack": 1,
+   "icon": "a_armor_g8",
+   "stats": [
+    {
+     "stat": "def",
+     "add": 72,
+     "mul": 0.0
+    },
+    {
+     "stat": "maxHp",
+     "add": 400,
+     "mul": 0.0
+    },
+    {
+     "stat": "dmgReduce",
+     "add": 0.04,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "mon_ram_king",
+     "chance": 0.04
+    },
+    {
+     "monster": "mon_snow_bear",
+     "chance": 0.025
+    },
+    {
+     "monster": "mon_crimson_boar",
+     "chance": 0.02
+    }
+   ]
+  },
+  {
+   "id": "a_armor_g9",
+   "name": "심연 수호 갑옷",
+   "desc": "보랏빛 룬이 흐르는 수호자의 갑옷. 받는 피해 -6%.",
+   "type": "armor",
+   "job": "",
+   "tier": 9,
+   "levelReq": 41,
+   "price": 0,
+   "sellPrice": 1680,
+   "maxStack": 1,
+   "icon": "a_armor_g9",
+   "stats": [
+    {
+     "stat": "def",
+     "add": 84,
+     "mul": 0.0
+    },
+    {
+     "stat": "maxHp",
+     "add": 464,
+     "mul": 0.0
+    },
+    {
+     "stat": "dmgReduce",
+     "add": 0.06,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "mon_armor",
+     "chance": 0.03
+    },
+    {
+     "monster": "mon_tomb_golem",
+     "chance": 0.025
+    },
+    {
+     "monster": "mon_yeti",
+     "chance": 0.02
+    }
+   ]
+  },
+  {
+   "id": "a_armor_g10",
+   "name": "흑룡 판금 갑옷",
+   "desc": "흑룡의 비늘로 벼린 전설의 갑옷. 받는 피해 -8%, 속성 저항 +10%.",
+   "type": "armor",
+   "job": "",
+   "tier": 10,
+   "levelReq": 47,
+   "price": 0,
+   "sellPrice": 1995,
+   "maxStack": 1,
+   "icon": "a_armor_g10",
+   "stats": [
+    {
+     "stat": "def",
+     "add": 96,
+     "mul": 0.0
+    },
+    {
+     "stat": "maxHp",
+     "add": 529,
+     "mul": 0.0
+    },
+    {
+     "stat": "dmgReduce",
+     "add": 0.08,
+     "mul": 0.0
+    },
+    {
+     "stat": "elemRes",
+     "add": 0.1,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "boss_ancient_dragon",
+     "chance": 0.25
+    },
+    {
+     "monster": "mon_lake_bear",
+     "chance": 0.03
+    },
+    {
+     "monster": "mon_ruin_golem",
+     "chance": 0.025
+    }
+   ]
+  },
+  {
+   "id": "ac_g1",
+   "name": "은 반지",
+   "desc": "잘 닦인 은 반지.",
+   "type": "accessory",
+   "job": "",
+   "tier": 1,
+   "levelReq": 10,
+   "price": 1170,
+   "sellPrice": 351,
+   "maxStack": 1,
+   "icon": "ac_g1",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 5,
+     "mul": 0.0
+    },
+    {
+     "stat": "matk",
+     "add": 5,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true
+  },
+  {
+   "id": "ac_g2",
+   "name": "가죽 팔찌",
+   "desc": "청동 징을 박은 가죽 팔찌.",
+   "type": "accessory",
+   "job": "",
+   "tier": 2,
+   "levelReq": 13,
+   "price": 1630,
+   "sellPrice": 489,
+   "maxStack": 1,
+   "icon": "ac_g2",
+   "stats": [
+    {
+     "stat": "maxHp",
+     "add": 90,
+     "mul": 0.0
+    },
+    {
+     "stat": "def",
+     "add": 4,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true
+  },
+  {
+   "id": "ac_g3",
+   "name": "푸른 물방울 귀걸이",
+   "desc": "기력이 맑아지는 물방울 귀걸이.",
+   "type": "accessory",
+   "job": "",
+   "tier": 3,
+   "levelReq": 16,
+   "price": 2110,
+   "sellPrice": 633,
+   "maxStack": 1,
+   "icon": "ac_g3",
+   "stats": [
+    {
+     "stat": "maxSp",
+     "add": 40,
+     "mul": 0.0
+    },
+    {
+     "stat": "spRegen",
+     "add": 1.0,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true
+  },
+  {
+   "id": "ac_g4",
+   "name": "매 깃 목걸이",
+   "desc": "매의 깃과 발톱을 엮은 목걸이. 치명타 +4%, 명중 +4%.",
+   "type": "accessory",
+   "job": "",
+   "tier": 4,
+   "levelReq": 19,
+   "price": 2620,
+   "sellPrice": 786,
+   "maxStack": 1,
+   "icon": "ac_g4",
+   "stats": [
+    {
+     "stat": "crit",
+     "add": 0.04,
+     "mul": 0.0
+    },
+    {
+     "stat": "hit",
+     "add": 0.04,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true
+  },
+  {
+   "id": "ac_g5",
+   "name": "바람 발찌",
+   "desc": "작은 날개가 달린 발찌. 이동 속도 +5%, 회피 +3%.",
+   "type": "accessory",
+   "job": "",
+   "tier": 5,
+   "levelReq": 22,
+   "price": 3140,
+   "sellPrice": 942,
+   "maxStack": 1,
+   "icon": "ac_g5",
+   "stats": [
+    {
+     "stat": "moveSpeed",
+     "add": 0,
+     "mul": 0.05
+    },
+    {
+     "stat": "eva",
+     "add": 0.03,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true
+  },
+  {
+   "id": "ac_g6",
+   "name": "안개 진주 목걸이",
+   "desc": "안개빛 진주 목걸이. 속성 저항 +8%.",
+   "type": "accessory",
+   "job": "",
+   "tier": 6,
+   "levelReq": 24,
+   "price": 0,
+   "sellPrice": 1053,
+   "maxStack": 1,
+   "icon": "ac_g6",
+   "stats": [
+    {
+     "stat": "elemRes",
+     "add": 0.08,
+     "mul": 0.0
+    },
+    {
+     "stat": "maxHp",
+     "add": 160,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "mon_mist_bear",
+     "chance": 0.04
+    },
+    {
+     "monster": "mon_canyon_ram",
+     "chance": 0.025
+    },
+    {
+     "monster": "mon_frost_wolf",
+     "chance": 0.025
+    }
+   ]
+  },
+  {
+   "id": "ac_g7",
+   "name": "눈꽃 귀걸이",
+   "desc": "녹지 않는 눈꽃 결정. 재사용 대기시간 -5%.",
+   "type": "accessory",
+   "job": "",
+   "tier": 7,
+   "levelReq": 28,
+   "price": 0,
+   "sellPrice": 1275,
+   "maxStack": 1,
+   "icon": "ac_g7",
+   "stats": [
+    {
+     "stat": "maxSp",
+     "add": 70,
+     "mul": 0.0
+    },
+    {
+     "stat": "cdr",
+     "add": 0.05,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "mon_ice_fox",
+     "chance": 0.02
+    },
+    {
+     "monster": "mon_frost_ram",
+     "chance": 0.02
+    },
+    {
+     "monster": "mon_soldier",
+     "chance": 0.015
+    }
+   ]
+  },
+  {
+   "id": "ac_g8",
+   "name": "붉은 가시 반지",
+   "desc": "붉은숲 가시로 감은 반지. 치명타 +6%.",
+   "type": "accessory",
+   "job": "",
+   "tier": 8,
+   "levelReq": 32,
+   "price": 0,
+   "sellPrice": 1506,
+   "maxStack": 1,
+   "icon": "ac_g8",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 16,
+     "mul": 0.0
+    },
+    {
+     "stat": "crit",
+     "add": 0.06,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "mon_crimson_boar",
+     "chance": 0.025
+    },
+    {
+     "monster": "mon_blackeye_wolf",
+     "chance": 0.02
+    }
+   ]
+  },
+  {
+   "id": "ac_g9",
+   "name": "화염 심장 목걸이",
+   "desc": "불꽃이 뛰는 보석 목걸이. 치명 피해 +12%.",
+   "type": "accessory",
+   "job": "",
+   "tier": 9,
+   "levelReq": 36,
+   "price": 0,
+   "sellPrice": 1746,
+   "maxStack": 1,
+   "icon": "ac_g9",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 14,
+     "mul": 0.0
+    },
+    {
+     "stat": "matk",
+     "add": 14,
+     "mul": 0.0
+    },
+    {
+     "stat": "critDmg",
+     "add": 0.12,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "mon_crystal",
+     "chance": 0.03
+    },
+    {
+     "monster": "mon_lava_boar",
+     "chance": 0.025
+    },
+    {
+     "monster": "mon_salamander",
+     "chance": 0.02
+    }
+   ]
+  },
+  {
+   "id": "ac_g10",
+   "name": "수호자의 인장",
+   "desc": "방패 문장이 새겨진 인장 반지. 받는 피해 -5%.",
+   "type": "accessory",
+   "job": "",
+   "tier": 10,
+   "levelReq": 40,
+   "price": 0,
+   "sellPrice": 1992,
+   "maxStack": 1,
+   "icon": "ac_g10",
+   "stats": [
+    {
+     "stat": "def",
+     "add": 22,
+     "mul": 0.0
+    },
+    {
+     "stat": "dmgReduce",
+     "add": 0.05,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "mon_tomb_golem",
+     "chance": 0.03
+    },
+    {
+     "monster": "mon_crimson_bear",
+     "chance": 0.03
+    }
+   ]
+  },
+  {
+   "id": "ac_g11",
+   "name": "심연의 눈",
+   "desc": "심연을 들여다보는 보랏빛 눈. 치명타 +7%, 치명 피해 +15%.",
+   "type": "accessory",
+   "job": "",
+   "tier": 11,
+   "levelReq": 44,
+   "price": 0,
+   "sellPrice": 2244,
+   "maxStack": 1,
+   "icon": "ac_g11",
+   "stats": [
+    {
+     "stat": "matk",
+     "add": 24,
+     "mul": 0.0
+    },
+    {
+     "stat": "crit",
+     "add": 0.07,
+     "mul": 0.0
+    },
+    {
+     "stat": "critDmg",
+     "add": 0.15,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "mon_void_toad",
+     "chance": 0.03
+    },
+    {
+     "monster": "mon_ash_drake",
+     "chance": 0.03
+    }
+   ]
+  },
+  {
+   "id": "ac_g12",
+   "name": "용의 눈물",
+   "desc": "용의 발톱이 쥔 청록빛 눈물 보석. 모든 힘이 오른다.",
+   "type": "accessory",
+   "job": "",
+   "tier": 12,
+   "levelReq": 48,
+   "price": 0,
+   "sellPrice": 2502,
+   "maxStack": 1,
+   "icon": "ac_g12",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 26,
+     "mul": 0.0
+    },
+    {
+     "stat": "matk",
+     "add": 26,
+     "mul": 0.0
+    },
+    {
+     "stat": "maxHp",
+     "add": 300,
+     "mul": 0.0
+    },
+    {
+     "stat": "crit",
+     "add": 0.05,
+     "mul": 0.0
+    },
+    {
+     "stat": "elemRes",
+     "add": 0.08,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "boss_ancient_dragon",
+     "chance": 0.3
+    },
+    {
+     "monster": "mon_drake_lord",
+     "chance": 0.02
+    },
+    {
+     "monster": "mon_bat",
+     "chance": 0.015
+    }
+   ]
+  },
+  {
+   "id": "ac_j_pharm",
+   "name": "약사의 은 저울",
+   "desc": "약재를 한 치 오차 없이 다는 작은 은 저울.",
+   "type": "accessory",
+   "job": "",
+   "tier": 1,
+   "levelReq": 18,
+   "price": 0,
+   "sellPrice": 735,
+   "maxStack": 1,
+   "icon": "ac_j_pharm",
+   "stats": [
+    {
+     "stat": "maxSp",
+     "add": 30,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "mon_spider_elite",
+     "chance": 0.06
+    },
+    {
+     "monster": "mon_wisp",
+     "chance": 0.025
+    },
+    {
+     "monster": "mon_mist_wolf",
+     "chance": 0.02
+    }
+   ],
+   "jobBuff": {
+    "jobs": [
+     "pharmacist",
+     "western_pharmacist",
+     "herbalist"
+    ],
+    "stats": [
+     {
+      "stat": "healPower",
+      "add": 0.15,
+      "mul": 0.0
+     },
+     {
+      "stat": "matk",
+      "add": 0,
+      "mul": 0.08
+     }
+    ],
+    "text": "회복 효율 +15%, 마법력 +8%"
+   }
+  },
+  {
+   "id": "ac_j_cook",
+   "name": "요리사의 황금 국자",
+   "desc": "국물 맛을 지켜 주는 황금 국자 장식.",
+   "type": "accessory",
+   "job": "",
+   "tier": 2,
+   "levelReq": 18,
+   "price": 0,
+   "sellPrice": 735,
+   "maxStack": 1,
+   "icon": "ac_j_cook",
+   "stats": [
+    {
+     "stat": "maxHp",
+     "add": 80,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "mon_dust_boar",
+     "chance": 0.025
+    },
+    {
+     "monster": "mon_bog_boar",
+     "chance": 0.02
+    }
+   ],
+   "jobBuff": {
+    "jobs": [
+     "cook",
+     "chef"
+    ],
+    "stats": [
+     {
+      "stat": "foodPower",
+      "add": 0.2,
+      "mul": 0.0
+     },
+     {
+      "stat": "maxHp",
+      "add": 0,
+      "mul": 0.08
+     }
+    ],
+    "text": "음식 효과 +20%, 최대 체력 +8%"
+   }
+  },
+  {
+   "id": "ac_j_smith",
+   "name": "대장장이의 불꽃 모루",
+   "desc": "꺼지지 않는 불씨가 얹힌 작은 모루 부적.",
+   "type": "accessory",
+   "job": "",
+   "tier": 3,
+   "levelReq": 18,
+   "price": 0,
+   "sellPrice": 735,
+   "maxStack": 1,
+   "icon": "ac_j_smith",
+   "stats": [
+    {
+     "stat": "def",
+     "add": 6,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "mon_scorpion",
+     "chance": 0.025
+    },
+    {
+     "monster": "mon_canyon_ram",
+     "chance": 0.02
+    }
+   ],
+   "jobBuff": {
+    "jobs": [
+     "blacksmith",
+     "engineer"
+    ],
+    "stats": [
+     {
+      "stat": "def",
+      "add": 0,
+      "mul": 0.12
+     },
+     {
+      "stat": "dmgReduce",
+      "add": 0.05,
+      "mul": 0.0
+     },
+     {
+      "stat": "craftRate",
+      "add": 0.05,
+      "mul": 0.0
+     }
+    ],
+    "text": "방어력 +12%, 받는 피해 -5%, 제작 성공 +5%"
+   }
+  },
+  {
+   "id": "ac_j_hair",
+   "name": "미용사의 은빛 빗",
+   "desc": "한 올도 놓치지 않는 은빛 빗.",
+   "type": "accessory",
+   "job": "",
+   "tier": 4,
+   "levelReq": 18,
+   "price": 0,
+   "sellPrice": 735,
+   "maxStack": 1,
+   "icon": "ac_j_hair",
+   "stats": [
+    {
+     "stat": "crit",
+     "add": 0.02,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "mon_lantern_ghost",
+     "chance": 0.02
+    },
+    {
+     "monster": "mon_shadow_wolf",
+     "chance": 0.02
+    }
+   ],
+   "jobBuff": {
+    "jobs": [
+     "hairdresser",
+     "designer"
+    ],
+    "stats": [
+     {
+      "stat": "crit",
+      "add": 0.08,
+      "mul": 0.0
+     },
+     {
+      "stat": "atkSpeed",
+      "add": 0,
+      "mul": 0.08
+     }
+    ],
+    "text": "치명타 +8%, 공격 속도 +8%"
+   }
+  },
+  {
+   "id": "ac_j_art",
+   "name": "예술가의 무지개 팔레트",
+   "desc": "마르지 않는 물감이 담긴 팔레트 브로치.",
+   "type": "accessory",
+   "job": "",
+   "tier": 5,
+   "levelReq": 18,
+   "price": 0,
+   "sellPrice": 735,
+   "maxStack": 1,
+   "icon": "ac_j_art",
+   "stats": [
+    {
+     "stat": "matk",
+     "add": 6,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "mon_spirit_deer",
+     "chance": 0.03
+    },
+    {
+     "monster": "mon_panda",
+     "chance": 0.025
+    }
+   ],
+   "jobBuff": {
+    "jobs": [
+     "artist",
+     "painter",
+     "musician"
+    ],
+    "stats": [
+     {
+      "stat": "matk",
+      "add": 0,
+      "mul": 0.12
+     },
+     {
+      "stat": "cdr",
+      "add": 0.06,
+      "mul": 0.0
+     }
+    ],
+    "text": "마법력 +12%, 재사용 대기시간 -6%"
+   }
+  },
+  {
+   "id": "ac_j_herb",
+   "name": "현자의 약탕기",
+   "desc": "김이 오르는 작은 옥 약탕기 펜던트. 양약사·한약사 전용 효과.",
+   "type": "accessory",
+   "job": "",
+   "tier": 6,
+   "levelReq": 34,
+   "price": 0,
+   "sellPrice": 1626,
+   "maxStack": 1,
+   "icon": "ac_j_herb",
+   "stats": [
+    {
+     "stat": "maxSp",
+     "add": 60,
+     "mul": 0.0
+    },
+    {
+     "stat": "elemRes",
+     "add": 0.04,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "mon_mine_golem",
+     "chance": 0.03
+    },
+    {
+     "monster": "mon_crimson_fox",
+     "chance": 0.025
+    }
+   ],
+   "jobBuff": {
+    "jobs": [
+     "western_pharmacist",
+     "herbalist"
+    ],
+    "stats": [
+     {
+      "stat": "healPower",
+      "add": 0.25,
+      "mul": 0.0
+     },
+     {
+      "stat": "matk",
+      "add": 0,
+      "mul": 0.1
+     },
+     {
+      "stat": "elemRes",
+      "add": 0.1,
+      "mul": 0.0
+     }
+    ],
+    "text": "회복 효율 +25%, 마법력 +10%, 속성 저항 +10%"
+   }
+  },
+  {
+   "id": "ac_j_craft",
+   "name": "장인의 황금 톱니",
+   "desc": "망치와 바늘이 엇갈린 황금 톱니 브로치. 쉐프·엔지니어·디자이너 전용 효과.",
+   "type": "accessory",
+   "job": "",
+   "tier": 7,
+   "levelReq": 34,
+   "price": 0,
+   "sellPrice": 1626,
+   "maxStack": 1,
+   "icon": "ac_j_craft",
+   "stats": [
+    {
+     "stat": "atk",
+     "add": 12,
+     "mul": 0.0
+    },
+    {
+     "stat": "def",
+     "add": 10,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "mon_salamander",
+     "chance": 0.025
+    },
+    {
+     "monster": "mon_snow_bear",
+     "chance": 0.02
+    }
+   ],
+   "jobBuff": {
+    "jobs": [
+     "chef",
+     "engineer",
+     "designer"
+    ],
+    "stats": [
+     {
+      "stat": "atk",
+      "add": 0,
+      "mul": 0.1
+     },
+     {
+      "stat": "atkSpeed",
+      "add": 0,
+      "mul": 0.08
+     },
+     {
+      "stat": "craftRate",
+      "add": 0.08,
+      "mul": 0.0
+     }
+    ],
+    "text": "공격력 +10%, 공격 속도 +8%, 제작 성공 +8%"
+   }
+  },
+  {
+   "id": "ac_j_muse",
+   "name": "거장의 별빛 음표",
+   "desc": "별과 음표가 반짝이는 귀걸이. 화가·음악가 전용 효과.",
+   "type": "accessory",
+   "job": "",
+   "tier": 8,
+   "levelReq": 34,
+   "price": 0,
+   "sellPrice": 1626,
+   "maxStack": 1,
+   "icon": "ac_j_muse",
+   "stats": [
+    {
+     "stat": "matk",
+     "add": 14,
+     "mul": 0.0
+    },
+    {
+     "stat": "maxSp",
+     "add": 50,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "mon_crystal",
+     "chance": 0.03
+    },
+    {
+     "monster": "mon_crimson_boar",
+     "chance": 0.02
+    },
+    {
+     "monster": "mon_kreutz_wolf",
+     "chance": 0.02
+    }
+   ],
+   "jobBuff": {
+    "jobs": [
+     "painter",
+     "musician"
+    ],
+    "stats": [
+     {
+      "stat": "matk",
+      "add": 0,
+      "mul": 0.14
+     },
+     {
+      "stat": "cdr",
+      "add": 0.08,
+      "mul": 0.0
+     },
+     {
+      "stat": "maxSp",
+      "add": 0,
+      "mul": 0.1
+     }
+    ],
+    "text": "마법력 +14%, 재사용 대기시간 -8%, 최대 기력 +10%"
+   }
   }
  ]
 }

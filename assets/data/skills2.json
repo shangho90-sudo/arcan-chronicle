@@ -11536,7 +11536,11 @@
 "m_iron",
 "m_gear"
 ],
-"shop_arms": [
+"shop_forge": [
+"m_iron",
+"m_gear"
+],
+"shop_weapons": [
 "m_iron",
 "m_silk"
 ]

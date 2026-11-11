@@ -84,6 +84,8 @@ export class GameData {
     this.statuses = Object.fromEntries(files.skills.statuses.map(s => [s.id, s]));
     this.itemList = files.items.items; this.items = Object.fromEntries(this.itemList.map(i => [i.id, i]));
     this.monsters = Object.fromEntries(files.monsters.monsters.map(m => [m.id, m]));
+    // 장비(tools/gear/gear.py)의 드롭은 아이템 쪽 dropFrom에 있음(다른 생성기가 monsters.json을 다시 써도 남도록) → 몬스터 drops에 합침
+    for (const it of this.itemList) for (const d of it.dropFrom || []) { const m = this.monsters[d.monster]; if (m && !m.drops.some(x => x.item === it.id)) m.drops.push({ item: it.id, chance: d.chance, min: 1, max: 1, gear: true }); }
     if (!(files.config && files.config.balanceMonsters === false)) balanceMonsters(this.monsters, files.levels);
     this.questList = files.quests.quests; this.quests = Object.fromEntries(this.questList.map(q => [q.id, q])); this.storyNpcs = files.quests.storyNpcs || [];
     this.npcs = Object.fromEntries(files.npcs.npcs.map(n => [n.id, n]));
@@ -112,7 +114,7 @@ export class GameData {
   weaponFor(job, tier) {
     if (!job || job === "novice") job = "pharmacist";
     const j = this.job(job); if (j && j.tier === 2 && j.parent) job = j.parent;
-    const it = this.itemList.find(i => i.type === "weapon" && i.job === job && i.tier === tier);
+    const it = this.itemList.find(i => i.type === "weapon" && i.job === job && i.tier === tier && !i.gear);
     return it ? it.id : null;
   }
   validate() {
@@ -128,6 +130,8 @@ export class GameData {
   }
 }
 
+/** 직업 전용 장신구(item.jobBuff = { jobs, stats, text }): 착용자의 직업이 jobs에 있을 때만 stats가 더 붙음 */
+export const jobBuffActive = (item, job) => !!(item && item.jobBuff && item.jobBuff.jobs.includes(job));
 export const isEquipment = d => d && (d.type === "weapon" || d.type === "armor" || d.type === "accessory");
 export const slotOf = d => !d ? null : (d.type === "weapon" ? "weapon" : d.type === "armor" ? "armor" : d.type === "accessory" ? "accessory" : null);
 export const EQUIP_SLOTS = ["weapon", "armor", "accessory"];
@@ -347,7 +351,7 @@ export class CharacterSheet {
   recalc() {
     const base = CharacterSheet.baseStats(this.job, this.p.level), flat = emptyStats(), pct = emptyStats();
     const apply = mods => { for (const m of mods || []) { flat[m.stat] += m.add; pct[m.stat] += m.mul; } };
-    for (const s of EQUIP_SLOTS) { const it = this.data.item(this.p[s]); if (it) apply(it.stats); }
+    for (const s of EQUIP_SLOTS) { const it = this.data.item(this.p[s]); if (it) { apply(it.stats); if (jobBuffActive(it, this.p.job)) apply(it.jobBuff.stats); } }
     for (const id of this.p.learnedSkills) { const sk = this.data.skill(id); if (sk && sk.kind === "passive" && sk.job === this.p.job) apply(sk.passiveMods); }
     if (this.book) apply(this.book.passiveMods());
     for (const f of CharacterSheet.modProviders) apply(f(this));

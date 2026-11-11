@@ -83,6 +83,24 @@ TOWNS = [
          npcs=[('kreutz_captain', '볼크', '요새 수비대장', 'npc_guard', ['제국의 흑기사가 남쪽으로 내려갔다는 소문이 있소.', '호수 쪽 얼음이 밤마다 울린다오.']),
                ('kreutz_merchant', '미샤', '설원 상인', 'npc_merchant', ['털옷 없이 설원에 가면 얼어 죽어요.'], 'shop_general')]),
 ]
+# 무기 상인 / 방어구·장신구 상인 (2026-11-11, 상점·재고는 tools/gear/gear.py): 마을마다 한 쌍. 마르세온의 방어구 상인은 원래 있던 세라.
+# 7번째 값 = 3D 모델(model.js NPC_MODELS — gear_weapon / gear_armor는 색만 바꾼 텍스처, tools/npcs/recolor.py)
+GEAR_MERCHANTS = {
+    'kairion_capital': [('capital_weapons', '가렛', '무기 상인', ['왕도 병기창에서 나온 물건이오.', '좋은 무기는 사냥터의 몬스터가 품고 있소.']), ('capital_armor', '이벨', '방어구·장신구 상인', ['갑옷은 몸에 맞게 골라야 해요.', '반지 하나가 목숨을 구하기도 한답니다.'])],
+    'baltern': [('baltern_weapons', '브룬', '무기 상인', ['바위산 광석으로 벼린 무기요.']), ('baltern_armor', '마야', '방어구·장신구 상인', ['절벽 바람엔 두꺼운 갑옷이 제일이죠.'])],
+    'lumiere': [('lumiere_weapons', '테오', '무기 상인', ['순례길에도 무기는 필요합니다.']), ('lumiere_armor', '세실', '방어구·장신구 상인', ['축복받은 장신구는 아니지만, 쓸 만해요.'])],
+    'gravel': [('gravel_weapons', '도릭', '무기 상인', ['국경에선 무기가 곧 목숨이오.']), ('gravel_armor', '나디아', '방어구·장신구 상인', ['남쪽 황무지에 가려면 갑옷부터 챙기세요.'])],
+    'silvern': [('silvern_weapons', '핀', '무기 상인', ['들판의 멧돼지도 얕보면 안 돼요.']), ('silvern_armor', '로잔', '방어구·장신구 상인', ['습지 안개엔 속성 저항이 붙은 갑옷이 좋아요.'])],
+    'marseon': [('marseon_weapons', '자히드', '무기 상인', ['동쪽에서 건너온 무기들이오.'])],
+    'baltazar': [('baltazar_weapons', '울프', '무기 상인', ['대장장이의 나라답게 기본기는 확실하오.']), ('baltazar_armor', '헬가', '방어구·장신구 상인', ['광산에 내려갈 거면 흉갑은 꼭 입어요.'])],
+    'kreutz_fort': [('kreutz_weapons', '이반', '무기 상인', ['설원에선 손이 얼어도 무기는 놓지 마시오.']), ('kreutz_armor', '소냐', '방어구·장신구 상인', ['털 달린 갑옷이 잘 나가요.'])],
+}
+for _t in TOWNS:
+    _t['npcs'] = [(n[:5] + ('shop_armor',) if n[0] == 'marseon_armorer' else n) for n in _t['npcs']]
+    _t['npcs'] = [(n[0], n[1], '방어구·장신구 상인') + tuple(n[3:]) if n[0] == 'marseon_armorer' else n for n in _t['npcs']]
+    for nid, nm, title, lines in GEAR_MERCHANTS.get(_t['id'], []):
+        wpn = title == '무기 상인'
+        _t['npcs'].append((nid, nm, title, 'npc_armorer' if wpn else 'npc_merchant', lines, 'shop_weapons' if wpn else 'shop_armor', 'gear_weapon' if wpn else 'gear_armor'))
 # biomes: painted ground set, foliage tint, prop mix, density, light
 BIOMES = {
     'meadow':   dict(ground=None, density=0.45, grass=1.2, water=0.3, mix=dict(tree=.32, shrub=.22, flowers=.28, rock=.08, stone=.07, stump=.03), bgm='bgm_field',
@@ -519,6 +537,10 @@ def gen_town(t, M):
     for k, n in enumerate(t['npcs']):
         a = math.radians(ang[k % len(ang)]); r = 11.0
         x, z = r * math.cos(a), r * math.sin(a)
+        if len(n) > 6:      # 무기·방어구 상인: 가로등·장식·다른 NPC와 겹치지 않는 광장 둘레의 빈 자리(트인 곳)
+            for a2 in (160, 20, 180, 0, 140, 40, 335, 300, 120, 60, 235, 200):
+                x2, z2 = r * math.cos(math.radians(a2)), r * math.sin(math.radians(a2))
+                if all(math.hypot(x2 - ta, z2 - tb) >= min(tc, 2.4) + 0.9 for ta, tb, tc in taken): x, z = x2, z2; break
         npcs.append(dict(npc=n[0], pos=[round(x, 2), round(z, 2)], rot=yaw_to(-x, -z)))
         taken.append((x, z, 1.5))
     # portals: first neighbour through the gate, the others as warp circles inside the walls
@@ -615,6 +637,7 @@ def world_npcs():
             role = 'merchant' if shop else ('guard' if sheet == 'npc_guard' else 'elder')
             model = {'npc_guard': 'guard', 'npc_merchant': 'merchant', 'npc_elder': 'elder', 'npc_master_blacksmith': 'master_blacksmith', 'npc_master_pharmacist': 'master_pharmacist',
                      'npc_master_artist': 'master_artist', 'npc_armorer': 'armorer'}[sheet]
+            if len(n) > 6: model = n[6]
             out.append(dict(id=nid, name=name, title=title, sheet=sheet, model=model, role=role, shop=shop, job='', lines=lines, world=True))
     return out
 
