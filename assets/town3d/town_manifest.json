@@ -1,0 +1,182 @@
+{
+"town_arcan_board": [
+0.711,
+1.0,
+1.6041
+],
+"town_arcan_clocktower": [
+0.8624,
+1.0,
+2.4096
+],
+"town_arcan_inn": [
+0.8971,
+1.0,
+1.0674
+],
+"town_arcan_windmill": [
+0.8965,
+1.0,
+1.2134
+],
+"town_baltazar_anvil": [
+1.0,
+0.7644,
+1.2228
+],
+"town_baltazar_forge": [
+1.0,
+0.9445,
+1.0923
+],
+"town_baltazar_kingstatue": [
+1.0,
+0.9994,
+1.4276
+],
+"town_baltazar_tower": [
+1.0,
+0.9988,
+2.4277
+],
+"town_baltern_goat": [
+1.0,
+0.9984,
+0.8724
+],
+"town_baltern_tradehall": [
+0.7484,
+1.0,
+0.8989
+],
+"town_baltern_warehouse": [
+0.9707,
+1.0,
+0.7784
+],
+"town_baltern_windmill": [
+0.8782,
+1.0,
+1.3181
+],
+"town_gravel_crane": [
+0.5915,
+1.0,
+0.8294
+],
+"town_gravel_headframe": [
+1.0,
+0.6465,
+1.3605
+],
+"town_gravel_lordhall": [
+0.8377,
+1.0,
+0.9342
+],
+"town_gravel_orecart": [
+0.6822,
+1.0,
+0.5395
+],
+"town_kairion_academy": [
+0.9563,
+1.0,
+1.1659
+],
+"town_kairion_clocktower": [
+1.0,
+0.8349,
+2.5745
+],
+"town_kairion_guildhall": [
+1.0,
+0.9491,
+1.1132
+],
+"town_kairion_statue": [
+1.0,
+0.5973,
+1.8591
+],
+"town_kreutz_ballista": [
+1.0,
+0.6433,
+0.7977
+],
+"town_kreutz_barracks": [
+1.0,
+0.379,
+0.3783
+],
+"town_kreutz_brazier": [
+1.0,
+0.9148,
+2.6999
+],
+"town_kreutz_watchtower": [
+1.0,
+0.953,
+2.1896
+],
+"town_lumiere_belltower": [
+1.0,
+0.9494,
+3.3575
+],
+"town_lumiere_goddess": [
+1.0,
+0.9941,
+1.3598
+],
+"town_lumiere_pavilion": [
+1.0,
+0.9979,
+0.9895
+],
+"town_lumiere_shrine": [
+1.0,
+0.855,
+1.2474
+],
+"town_marseon_bathhouse": [
+1.0,
+0.9761,
+1.081
+],
+"town_marseon_bazaar": [
+0.8009,
+1.0,
+0.8323
+],
+"town_marseon_caravan": [
+0.6181,
+1.0,
+0.9529
+],
+"town_marseon_tower": [
+0.9435,
+1.0,
+1.8592
+],
+"town_silvern_deer": [
+1.0,
+0.7381,
+1.1543
+],
+"town_silvern_gazebo": [
+0.9985,
+1.0,
+0.8404
+],
+"town_silvern_manor": [
+1.0,
+0.9636,
+0.9445
+],
+"town_silvern_treehouse": [
+1.0,
+0.9943,
+0.8567
+]
+}

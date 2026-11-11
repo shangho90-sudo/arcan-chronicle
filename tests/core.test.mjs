@@ -223,7 +223,7 @@ function TestQuests() {
   Ok(!q.accept("q1_start"), "cannot accept twice");
   Eq(q.stateOf(q1), QS.Active, "q1 active");
   Ok(q.complete("q1_start") != null, "cannot complete early");
-  q.notify("talk", "master_blacksmith", 1);
+  q.notify("talk", "arcan_smith_boy", 1);
   Eq(q.stateOf(q1), QS.Completable, "q1 completable after talking to the smith");
   const gold = ch.p.gold, pots = ch.bag.count("c_potion_s");
   Ok(q.complete("q1_start") == null, "complete q1");
@@ -253,7 +253,7 @@ function TestQuests() {
   Eq(q.stateOf(d.quests["q5_gear"]), QS.Completable, "equip objective met");
   Ok(q.complete("q5_gear") == null, "complete q5");
   const ch2 = NewChar(d, "cook"); const ql2 = new QuestLog(d, ch2);
-  ql2.accept("q1_start"); ql2.notify("talk", "master_blacksmith", 1);
+  ql2.accept("q1_start"); ql2.notify("talk", "arcan_smith_boy", 1);
   ch2.bag.remove("c_potion_s", ch2.bag.count("c_potion_s"));
   for (let i = 0; i < 40; i++) ch2.bag.add("w_knife_1", 1);
   Ok(ql2.complete("q1_start") != null, "reward refused when bag is full");
@@ -266,7 +266,7 @@ function TestSave() {
   const d = LoadData();
   const ch = NewChar(d, "artist");
   const ql = new QuestLog(d, ch);
-  ql.accept("q1_start"); ql.notify("talk", "master_blacksmith", 1); ql.complete("q1_start"); ql.accept("q3_slime"); ql.notify("kill", "mon_slime", 4);
+  ql.accept("q1_start"); ql.notify("talk", "arcan_smith_boy", 1); ql.complete("q1_start"); ql.accept("q3_slime"); ql.notify("kill", "mon_slime", 4);
   ch.addExp(150); ch.bag.add("m_jelly", 7); ch.p.zone = "forest"; ch.p.hasPos = true; ch.p.posX = 3.5; ch.p.posZ = -7.25;
   setFlag(ch.p, "boss_dead");
   mem.clear();
@@ -412,12 +412,12 @@ function TestGeometry() {
   Ok(c.z < -5.0, "fountain basin blocks: z=" + c.z.toFixed(2));
   Ok(!town.blocked(0, -9.5, 0.32), "walkway south of fountain is free");
   Ok(town.blocked(0, 0, 0.32), "fountain centre blocked");
-  for (const id of ["bakery", "smithy", "pharmacy", "general", "dress", "arms", "wall_n", "wall_s1", "gate_t0"]) {
+  for (const id of ["bakery", "smithy", "pharmacy", "general", "dress", "arms", "wall_n0", "gate_forest_t0", "lm_arcan_inn"]) {
     const bp = blocks.find(q => q.id === id); Ok(!!bp, id + " footprint present"); if (!bp) continue;
     const cx = bp.pts.reduce((s, p) => s + p[0], 0) / bp.pts.length, cz = bp.pts.reduce((s, p) => s + p[1], 0) / bp.pts.length;
     Ok(town.blocked(cx, cz, 0.32), id + " footprint centre blocked");
   }
-  Ok(!town.blocked(3.0, -22.6, 0.32), "gate opening is passable");
+  for (const gt of d.zones["town"].town3d.gates) Ok(!town.blocked(gt.pos[0], gt.pos[1], 0.32), gt.id + " opening is passable");   // 2026-11-12 마을 리뉴얼: 성문이 이어진 필드 쪽 성벽에
   // Quaternion.Euler(38, 45, 0) * Vector3.forward  (Unity applies Z, then X, then Y)
   const pitch = 38 * DEG, yaw = 45 * DEG;
   const dir = { x: Math.sin(yaw) * Math.cos(pitch), y: -Math.sin(pitch), z: Math.cos(yaw) * Math.cos(pitch) };
@@ -524,7 +524,7 @@ function TestFullFlow() {
     return 1;
   };
   Ok(ql.accept("q1_start"), "flow: accept q1 from elder");
-  ql.notify("talk", "master_blacksmith", 1);
+  ql.notify("talk", "arcan_smith_boy", 1);
   Ok(ql.complete("q1_start") == null, "flow: q1 done");
   Ok(ql.accept("q2_merchant") && ql.accept("q3_slime"), "flow: accept q2,q3");
   ql.notify("talk", "merchant", 1);

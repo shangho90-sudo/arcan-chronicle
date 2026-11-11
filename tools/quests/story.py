@@ -516,8 +516,8 @@ SQ('qs05', '길가의 굴착꾼', 2, 'merchant@town', [kill('mon_mole', 8, '흙�
    say(('모아', '짐수레 길을 두더지들이 다 파헤쳐 놨어! 달팽이 껍데기는 포장재로 딱이고.')), say(('모아', '고마워! 이제 수레가 덜컹거리지 않겠어.')), 'mq01a')
 SQ('qs06', '걷는 나무들', 4, 'capital_cook@kairion_capital', [kill('mon_sapling', 5, '걷는 묘목'), kill('mon_stumpling', 5, '걷는 그루터기'), drop('qi_honey', 5, ['mon_hornet'], 0.55, '왕벌 꿀')],
    say(('곤', '수확제 요리에 꿀이 모자라! 사냥터 숲의 걷는 나무들이 벌통을 다 엎었다고.')), say(('곤', '이 꿀이면 왕도 최고의 파이를 굽지!')), 'mq02a')
-SQ('qs07', '딱정벌레 껍질', 6, 'master_blacksmith@town', [drop('qi_beetle_shell', 6, ['mon_beetle'], 0.55, '뿔 딱정벌레 껍질'), drop('qi_turtle_moss', 3, ['mon_turtle'], 0.5, '이끼 거북 등딱지')],
-   say(('철산', '구릉지 딱정벌레 껍질은 방패에 덧대기 좋지.')), say(('철산', '좋아, 이걸로 방패 몇 개는 더 만들겠군.')), 'mq04a', items=[('a_armor_2', 1)])
+SQ('qs07', '딱정벌레 껍질', 6, 'arcan_smith_boy@town', [drop('qi_beetle_shell', 6, ['mon_beetle'], 0.55, '뿔 딱정벌레 껍질'), drop('qi_turtle_moss', 3, ['mon_turtle'], 0.5, '이끼 거북 등딱지')],
+   say(('쇠돌', '구릉지 딱정벌레 껍질은 방패에 덧대기 좋대요. 스승님께 보낼 거예요!')), say(('쇠돌', '와, 이걸로 방패 몇 개는 더 만들겠어요.')), 'mq04a', items=[('a_armor_2', 1)])
 SQ('qs08', '달빛 늑대의 밤', 7, 'guard@town', [kill('mon_wolf', 8, '달빛 늑대')],
    say(('도윤', '밤마다 달빛 늑대가 마을까지 내려와. 숲과 구릉지의 늑대를 줄여 줘.')), say(('도윤', '오늘 밤은 다들 푹 자겠군.')), 'mq05a')
 SQ('qs09', '고블린 광부 쫓기', 7, 'baltern_merchant@baltern', [kill('mon_goblin_miner', 8, '고블린 광부'), drop('qi_stolen_pick', 4, ['mon_goblin_miner'], 0.5, '훔친 곡괭이')],
@@ -528,8 +528,8 @@ SQ('qs11', '채석장 다시 열기', 10, 'baltern_captain@baltern', [kill('mon_
    say(('가론', '피난민 숙소를 고칠 돌이 필요해. 채석장 아르마딜로들이 길을 막고 있어.')), say(('가론', '이걸로 지붕을 올리겠어.')), 'mq08a')
 SQ('qs12', '안개 두꺼비의 독샘', 11, 'baltern_herbalist@baltern', [drop('m_toad_gland', 6, ['mon_fog_toad'], 0.6, '안개 두꺼비 독샘')],
    say(('미르', '안개 골짜기 두꺼비 독샘으로 해독제를 만들어요.')), say(('미르', '해독제 몇 병 드릴게요.')), 'mq08a', items=[('c_antidote', 5)])
-SQ('qs13', '대나무 도둑', 14, 'master_cook@town', [kill('mon_panda', 6, '대나무 팬더'), gather('qi_bamboo', 8, 'mist_valley', '도둑맞은 죽순')],
-   say(('금강', '안개 골짜기 팬더들이 죽순을 다 가져갔어! 봄 요리에 꼭 필요한데.')), say(('금강', '오늘 저녁은 죽순 볶음이다!')), 'mq09a')
+SQ('qs13', '대나무 도둑', 14, 'arcan_innkeeper@town', [kill('mon_panda', 6, '대나무 팬더'), gather('qi_bamboo', 8, 'mist_valley', '도둑맞은 죽순')],
+   say(('보름', '안개 골짜기 팬더들이 죽순을 다 가져갔어요! 여관 봄 요리에 꼭 필요한데.')), say(('보름', '오늘 저녁은 죽순 볶음이에요!')), 'mq09a')
 SQ('qs14', '안개골의 왕', 18, 'baltern_captain@baltern', [kill('mon_mist_wolf', 10, '안개 늑대'), kill('mon_mist_bear', 1, '안개골 우두머리 곰 (정예)')],
    say(('가론', '고갯길 상인을 습격하는 우두머리 곰이 있다. 늑대 무리를 거느리고.')), say(('가론', '이제 고갯길에 상인들이 돌아오겠군.')), 'mq13a', items=[('ac_ring_3', 1)])
 SQ('qs15', '요정의 장난', 10, 'lumiere_pilgrim@blue_forest_edge', [gather('qi_pilgrim_lamp', 6, 'blue_forest_edge', '요정이 훔친 순례 등불'), kill('mon_blue_jelly', 8, '푸른숲 젤리')],
@@ -560,9 +560,9 @@ SQ('qs27', '겨울 가죽', 21, 'chirzen@gravel', [kill('mon_berg_bear', 6, '베
    say(('치르젠', '연합군 겨울 외투가 모자랍니다. 고원 곰 가죽을 부탁드립니다.')), say(('치르젠', '사만 명이 겨울을 날 수 있겠군요.')), 'mq16a')
 SQ('qs28', '재 속의 씨앗', 22, 'daisen@berg_burned', [kill('mon_wraith', 6, '그림자 망령'), gather('qi_barley_seed', 5, 'berg_burned', '타지 않은 고원 보리 씨앗')],
    say(('다이센', '전쟁이 끝나면 고원을 돌려받는다지. 그럼 심을 게 있어야지.')), say(('다이센', '…보리밭이 다시 생기겠군.')), 'mq16c')
-SQ('qs29', '고원의 겨울 준비 ① 산양 털', 23, 'master_hairdresser@town', [drop('m_frost_horn', 4, ['mon_frost_ram'], 0.6, '서리뿔 조각'), kill('mon_frost_ram', 10, '서리뿔 산양 (털 깎기)')],
+SQ('qs29', '고원의 겨울 준비 ① 산양 털', 23, 'master_hairdresser@kairion_capital', [drop('m_frost_horn', 4, ['mon_frost_ram'], 0.6, '서리뿔 조각'), kill('mon_frost_ram', 10, '서리뿔 산양 (털 깎기)')],
    say(('리라', '연합군 방한복을 만들어요. 서리 고원 산양 털이 최고예요.')), say(('리라', '이걸로 따뜻한 망토를 지을게요.')), 'mq18a')
-SQ('qs30', '고원의 겨울 준비 ② 얼음꽃 연고', 26, 'master_pharmacist@town', [kill('mon_ice_fox', 6, '얼음꽃 여우'), gather('qi_ice_flower', 5, 'frost_highland', '얼음꽃')],
+SQ('qs30', '고원의 겨울 준비 ② 얼음꽃 연고', 26, 'master_pharmacist@kairion_capital', [kill('mon_ice_fox', 6, '얼음꽃 여우'), gather('qi_ice_flower', 5, 'frost_highland', '얼음꽃')],
    say(('소연', '왕자님 오른팔 화상에는 얼음꽃 연고가 들어요.')), say(('소연', '연고 완성! 다음에 왕자님을 만나면 꼭 전해 줘요.')), 'qs29')
 SQ('qs31', '고원의 겨울 준비 ③ 오두막 습격', 29, 'highland_hunter@frost_highland', [kill('mon_snow_bear', 6, '설원 곰'), kill('mon_frost_wolf', 8, '서리 늑대')],
    say(('카야', '사냥꾼 오두막이 곰과 늑대에게 포위됐어!')), say(('카야', '살았어. 고원 깊은 곳의 산양왕 이야기 들어 봤어?')), 'qs30')

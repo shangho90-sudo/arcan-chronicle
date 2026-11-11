@@ -149,7 +149,7 @@ def gen_town2(t, exits, extra_npcs=()):
         (gx, gz), (ox, oz) = g['pos'], g['o']; inx, inz = gx - ox * 6.5, gz - oz * 6.5; d = math.hypot(inx, inz)
         streets.append(([(gx + ox * 1.0, gz + oz * 1.0), (inx, inz), (inx / d * (RP - 3.6), inz / d * (RP - 3.6))], 5.0, 'street'))
         g['out'] = ([(gx + ox * 0.5, gz + oz * 0.5), (gx + ox * (OUT - 1.5), gz + oz * (OUT - 1.5))], 5.2)
-    LX, LZ = round(W * 0.62, 1), round(Dd * 0.62, 1)
+    LX, LZ = round(W * 0.7, 1), round(Dd * 0.7, 1)
     loop = W >= 36
     if loop:
         streets.append(([(-LX, -LZ), (LX, -LZ), (LX, LZ), (-LX, LZ), (-LX, -LZ)], 4.0, 'street'))
@@ -174,6 +174,18 @@ def gen_town2(t, exits, extra_npcs=()):
                 x, z = ax + rad * math.cos(off + i / n * 6.283), az + rad * math.sin(off + i / n * 6.283)
                 if ok(x, z, r, **kw): return round(x, 2), round(z, 2)
         return None
+    def rect_pts(x, z, ww, dd, m=0.0):
+        nx, nz = max(2, int((ww + 2 * m) / 1.8) + 1), max(2, int((dd + 2 * m) / 1.8) + 1)
+        return [(x - ww / 2 - m + i * (ww + 2 * m) / (nx - 1), z - dd / 2 - m + j * (dd + 2 * m) / (nz - 1)) for i in range(nx) for j in range(nz)]
+    def find_rect(ax, az, w, d, reach=60.0, m=1.0):
+        """가장 가까운 빈 직사각형 자리 + 앞면 방향 (큰 건물은 원으로 재면 들어갈 곳이 없음)"""
+        for rad in [i * 1.5 for i in range(int(reach / 1.5) + 1)]:
+            n = 1 if rad == 0 else max(8, int(rad * 1.6)); off = rnd.random() * 6.28
+            for i in range(n):
+                x, z = ax + rad * math.cos(off + i / n * 6.283), az + rad * math.sin(off + i / n * 6.283); h = face_centre(x, z)
+                ww, dd = (w, d) if h in (0, 180) else (d, w)
+                if all(ok(px, pz, 0.3, road=0.3) for px, pz in rect_pts(x, z, ww, dd, m)): return round(x, 2), round(z, 2), h
+        return None
     for g in gates:                              # keep the inside of every gate open (arrival point, signpost)
         (gx, gz), (ox, oz) = g['pos'], g['o']; taken.append((gx - ox * 5, gz - oz * 5, 4.2))
 
@@ -183,7 +195,7 @@ def gen_town2(t, exits, extra_npcs=()):
     rnd.shuffle(quads)
     models, lm_at, decor, anchors = [], {}, [], {}
     centre = t.get('centre')                      # 아르칸: 여신의 분수
-    if centre: models.append(dict(centre)); add('fountain', circle(0, 0, 4.4, 18))
+    if centre: models.append(dict(centre)); add('fountain', circle(0, 0, 5.3, 24))
     else: decor.append(dict(type='planter', pos=[0.0, 0.0], r=3.0)); add('planter', circle(0, 0, 3.1, 18))
     def face_centre(x, z):                        # heading (multiple of 90) that turns a building's front to the town centre / nearest street
         return (90 if x < 0 else 270) if abs(x) > abs(z) * 1.15 else (0 if z < 0 else 180)
@@ -192,17 +204,23 @@ def gen_town2(t, exits, extra_npcs=()):
         models.append(dict(id=mid, file=file, pos=[x, z], h=h, scale=round(w / max(man[file][0], 1e-6), 4) if file in man else w, size=[round(w, 2), round(d, 2), round(hh, 2)], name=name))
         ww, dd = (w, d) if h in (0, 180) else (d, w)
         add(mid, [(x - ww * 0.44, z - dd * 0.44), (x + ww * 0.44, z - dd * 0.44), (x + ww * 0.44, z + dd * 0.44), (x - ww * 0.44, z + dd * 0.44)])
-        taken.append((x, z, math.hypot(w, d) / 2 * 0.9)); lm_at[mid] = (x, z, h, max(w, d) / 2)
+        for px, pz in rect_pts(x, z, ww, dd, 0.3): taken.append((px, pz, 1.3))
+        lm_at[mid] = (x, z, h, max(w, d) / 2)
     fixed = list(t.get('fixed_models', []))       # 아르칸: 대장간·약국 (원래 모델)
     bigs = [(f, s, n) for f, s, n, kind in th['lm'] if kind == 'big' and f in man]; props = [(f, s, n) for f, s, n, kind in th['lm'] if kind == 'prop' and f in man]
     qi = 0
+    for i, fm in enumerate(fixed):                # 원래 모델이 먼저 (꼭 들어가야 함): 광장 북쪽 좌우
+        p = find_rect((-1 if i % 2 == 0 else 1) * (RP + 6.0), RP + 7.0, fm['size'][0], fm['size'][1])
+        assert p, 'no room for ' + fm['id']
+        put_model(fm['id'], fm['file'], fm['size'], fm['name'], p[0], p[1], p[2]); models[-1]['scale'] = fm['scale']
     for f, s, n in bigs:
-        m = man[f]; size = (s, s * m[1] / m[0], s * m[2] / m[0]); ax, az = quads[qi % 4]; qi += 1
-        p = find(ax, az, math.hypot(size[0], size[1]) / 2 * 0.9 + 1.2)
-        if p: put_model(f.replace('town_', 'lm_'), f, size, n, p[0], p[1], face_centre(*p))
-    for fm in fixed:
-        ax, az = quads[qi % 4]; p = find(ax * 0.9, az * 1.25, math.hypot(fm['size'][0], fm['size'][1]) / 2 * 0.9 + 1.0)
-        if p: put_model(fm['id'], fm['file'], fm['size'], fm['name'], p[0], p[1], face_centre(*p)); models[-1]['scale'] = fm['scale']
+        m = man[f]; size = (s * m[0], s * m[1], s * m[2]); ax, az = quads[qi % 4]; qi += 1
+        p = None
+        for k in (1.0, 0.88, 0.76, 0.66):         # 작은 마을에서는 조금 줄여서라도 넣음
+            size = (s * k * m[0], s * k * m[1], s * k * m[2]); p = find_rect(ax, az, size[0], size[1], m=0.8)
+            if p: break
+        if p: put_model(f.replace('town_', 'lm_'), f, size, n, p[0], p[1], p[2])
+        else: print('  !! no room for', f, 'in', t['id'])
     anchors['market'] = quads[qi % 4]; qi += 1
     anchors['park'] = quads[qi % 4]; qi += 1
     # market: two rows of stalls round a small square
@@ -219,9 +237,10 @@ def gen_town2(t, exits, extra_npcs=()):
     grass = [dict(pts=[[round(pk[0] + 9 * math.cos(a) * (0.8 + 0.3 * rnd.random()), 2), round(pk[1] + 8 * math.sin(a) * (0.8 + 0.3 * rnd.random()), 2)] for a in [i / 10 * 6.283 for i in range(10)]])]
     spots = [(pk[0], pk[1]), (0.0, -(RP + 5.0)), (0.0, RP + 5.0), (RP + 5.0, 0.0), (-(RP + 5.0), 0.0)]
     for i, (f, s, n) in enumerate(props):
-        m = man[f]; size = (s, s * m[1] / m[0], s * m[2] / m[0]); ax, az = spots[i % len(spots)]
-        p = find(ax, az, math.hypot(size[0], size[1]) / 2 * 0.9 + 0.8, road=0.5)
-        if p: put_model(f.replace('town_', 'lm_'), f, size, n, p[0], p[1], face_centre(*p))
+        m = man[f]; size = (s * m[0], s * m[1], s * m[2]); ax, az = spots[i % len(spots)]
+        p = find_rect(ax, az, size[0], size[1], m=0.6)
+        if p: put_model(f.replace('town_', 'lm_'), f, size, n, p[0], p[1], p[2])
+        else: print('  !! no room for', f, 'in', t['id'])
 
     # ------------------------------------------------------------------ houses: rows along the walls + along the loop street
     slots = []

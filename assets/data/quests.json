@@ -6,15 +6,15 @@
    "category": "main",
    "giver": "elder",
    "turnIn": "elder",
-   "summary": "대장장이 철산에게 마을의 생활 직업 이야기를 듣자.",
+   "summary": "대장간 견습 쇠돌에게 마을의 생활 직업 이야기를 듣자.",
    "prereq": [],
    "minLevel": 1,
    "objectives": [
     {
      "type": "talk",
-     "target": "master_blacksmith",
+     "target": "arcan_smith_boy",
      "count": 1,
-     "text": "대장장이 철산과 대화하기"
+     "text": "대장간 견습 쇠돌과 대화하기"
     }
    ],
    "reward": {
@@ -28,9 +28,9 @@
     ]
    },
    "consumeCollected": true,
-   "offerText": "어서 오게, 아르칸 마을에 온 걸 환영하네. 이 마을 사람들은 모두 생활 직업으로 살아가지. 직업은 견습생으로 경험을 쌓아 레벨 10이 되면 정할 수 있다네. 먼저 대장간의 철산에게 이야기를 들어 보게.",
-   "progressText": "대장간은 광장 북서쪽에 있네.",
-   "completeText": "허허, 철산이 반가워하던가? 레벨 10이 되면 마음에 드는 마스터를 찾아가 전직하게. 이 물약은 선물일세."
+   "offerText": "어서 오게, 아르칸 마을에 온 걸 환영하네. 이 마을 사람들은 모두 생활 직업으로 살아가지. 직업은 견습생으로 경험을 쌓아 레벨 10이 되면 정할 수 있다네. 마스터들은 이제 카이리온 왕도의 길드 회관에 모여 있지. 먼저 대장간을 지키는 견습 쇠돌에게 이야기를 들어 보게.",
+   "progressText": "대장간은 지도에서 쇠돌을 찾으면 되네. 지붕에서 연기가 나는 집일세.",
+   "completeText": "허허, 쇠돌이 반가워하던가? 레벨 10이 되면 카이리온 왕도 길드 회관의 마스터를 찾아가 전직하게. 광장의 안내인 하늘이 길을 알려 줄 걸세. 이 물약은 선물일세."
   },
   {
    "id": "q2_merchant",
@@ -138,9 +138,9 @@
    "id": "q4_spore",
    "name": "도토리 채집",
    "category": "sub",
-   "giver": "master_pharmacist",
-   "turnIn": "master_pharmacist",
-   "summary": "도토리 다람쥐에게서 단단한 도토리 5개를 모아 약사 소연에게 가져가자.",
+   "giver": "arcan_pharm_clerk",
+   "turnIn": "arcan_pharm_clerk",
+   "summary": "도토리 다람쥐에게서 단단한 도토리 5개를 모아 약국 점원 다래에게 가져가자.",
    "prereq": [
     "q3_slime"
    ],
@@ -174,7 +174,7 @@
    "category": "sub",
    "giver": "master_blacksmith",
    "turnIn": "master_blacksmith",
-   "summary": "2단계 이상의 무기를 장착하고 대장장이 철산에게 보여주자.",
+   "summary": "2단계 이상의 무기를 장착하고 카이리온 왕도의 대장장이 철산에게 보여주자.",
    "prereq": [
     "q_job1"
    ],
@@ -193,8 +193,8 @@
     "items": []
    },
    "consumeCollected": true,
-   "offerText": "그 장비로 곰을 상대할 생각인가? 대장간이나 단오의 무기점에서 2단계 무기를 사거나 숲에서 구해서 장착하고 오게.",
-   "progressText": "무기는 내 가게에서 팔고 있네. 직업에 맞는 걸 고르게.",
+   "offerText": "그 장비로 곰을 상대할 생각인가? 무기 상인에게서 2단계 무기를 사거나 숲에서 구해서 장착하고 오게.",
+   "progressText": "무기는 마을마다 있는 무기 상인이 팔고 있네. 직업에 맞는 걸 고르게.",
    "completeText": "좋아, 손에 잘 맞는군. 이제야 모험가 같네!"
   },
   {
@@ -3844,8 +3844,8 @@
    "id": "qs07",
    "name": "딱정벌레 껍질",
    "category": "sub",
-   "giver": "master_blacksmith",
-   "turnIn": "master_blacksmith",
+   "giver": "arcan_smith_boy",
+   "turnIn": "arcan_smith_boy",
    "summary": "뿔 딱정벌레 껍질 · 이끼 거북 등딱지",
    "prereq": [
     "mq04a"
@@ -3888,9 +3888,9 @@
     ]
    },
    "consumeCollected": true,
-   "offerText": "<b class='gold'>철산</b> 구릉지 딱정벌레 껍질은 방패에 덧대기 좋지.",
+   "offerText": "<b class='gold'>쇠돌</b> 구릉지 딱정벌레 껍질은 방패에 덧대기 좋대요. 스승님께 보낼 거예요!",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
-   "completeText": "<b class='gold'>철산</b> 좋아, 이걸로 방패 몇 개는 더 만들겠군.",
+   "completeText": "<b class='gold'>쇠돌</b> 와, 이걸로 방패 몇 개는 더 만들겠어요.",
    "story": true
   },
   {
@@ -4111,8 +4111,8 @@
    "id": "qs13",
    "name": "대나무 도둑",
    "category": "sub",
-   "giver": "master_cook",
-   "turnIn": "master_cook",
+   "giver": "arcan_innkeeper",
+   "turnIn": "arcan_innkeeper",
    "summary": "대나무 팬더 · 도둑맞은 죽순",
    "prereq": [
     "mq09a"
@@ -4146,9 +4146,9 @@
     ]
    },
    "consumeCollected": true,
-   "offerText": "<b class='gold'>금강</b> 안개 골짜기 팬더들이 죽순을 다 가져갔어! 봄 요리에 꼭 필요한데.",
+   "offerText": "<b class='gold'>보름</b> 안개 골짜기 팬더들이 죽순을 다 가져갔어요! 여관 봄 요리에 꼭 필요한데.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
-   "completeText": "<b class='gold'>금강</b> 오늘 저녁은 죽순 볶음이다!",
+   "completeText": "<b class='gold'>보름</b> 오늘 저녁은 죽순 볶음이에요!",
    "story": true
   },
   {
@@ -6185,16 +6185,6 @@
    "from": "mq02a"
   },
   {
-   "npc": "master_blacksmith",
-   "zone": "town",
-   "pos": [
-    1.47,
-    -9.53
-   ],
-   "rot": -135.0,
-   "from": "mq04a"
-  },
-  {
    "npc": "baltern_captain",
    "zone": "baltern",
    "pos": [
@@ -6213,16 +6203,6 @@
    ],
    "rot": -175.2,
    "from": "mq08a"
-  },
-  {
-   "npc": "master_cook",
-   "zone": "town",
-   "pos": [
-    0.34,
-    -8.39
-   ],
-   "rot": -135.0,
-   "from": "mq09a"
   },
   {
    "npc": "lumiere_pilgrim",
@@ -6303,26 +6283,6 @@
    ],
    "rot": -175.2,
    "from": "mq13b"
-  },
-  {
-   "npc": "master_hairdresser",
-   "zone": "town",
-   "pos": [
-    2.61,
-    -10.66
-   ],
-   "rot": -135.0,
-   "from": "mq18a"
-  },
-  {
-   "npc": "master_pharmacist",
-   "zone": "town",
-   "pos": [
-    -0.79,
-    -7.26
-   ],
-   "rot": -135.0,
-   "from": "qs29"
   },
   {
    "npc": "highland_hunter",

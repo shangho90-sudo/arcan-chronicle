@@ -27,6 +27,12 @@ const ZONES = (process.env.ZONES || 'town').split(','), SHOTS = (process.env.SHO
       const t0 = Date.now(); await ev(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
       await pg.screenshot({ path: `${OUT}/${zid}_${name}_${SZ}.png`, timeout: 300000 });
     };
+    if (SHOTS.includes('over')) {                                                    // 높은 카메라로 마을 전체
+      const half = Math.max(info.bounds[2] - info.bounds[0], info.bounds[3] - info.bounds[1]) * (touch ? 0.62 : 0.4);
+      await ev(async h => { const m = await import('/js/render.js'); window.__cam = { ...m.CAM }; m.CAM.ortho = h; m.CAM.dist = 220; m.CAM.minWidth = 2 * h; G.render.resize(); document.body.classList.add('shot-clean'); for (const e of document.querySelectorAll('.hud,.botbar,.abtns,#hud,.plate,.qhud')) e.style.visibility = 'hidden'; }, half);
+      await at('over', 0, 0);
+      await ev(async () => { const m = await import('/js/render.js'); Object.assign(m.CAM, window.__cam); G.render.resize(); for (const e of document.querySelectorAll('.hud,.botbar,.abtns,#hud,.plate,.qhud')) e.style.visibility = ''; });
+    }
     if (SHOTS.includes('plaza')) await at('plaza', 0, -9);
     if (SHOTS.includes('gates')) for (const [id, pos, hd] of info.gates) { const a = (hd ?? 180) * Math.PI / 180; await at(id, pos[0] - Math.sin(a) * 6, pos[1] - Math.cos(a) * 6); await at(id + '_out', pos[0] + Math.sin(a) * 4.5, pos[1] + Math.cos(a) * 4.5); }
     if (SHOTS.includes('lm')) for (const [id, pos, size] of info.lm) await at(id, pos[0], pos[1] - size[1] / 2 - 5);

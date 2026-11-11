@@ -16,7 +16,7 @@ const fails = []; const ok = (c, m) => { console.log((c ? '  ok   ' : '  FAIL ')
     await ev(() => localStorage.clear()); await click('새 게임'); await click('모험 시작');
     await pg.waitForFunction(() => window.G && G.inWorld && G.player && !G.loading, null, { timeout: 300000 });
     // story: q1 done, q2 + job quest active; side: rabbit hunt active (6/10)
-    await ev(() => { const ql = G.quests; ql.accept('q1_start'); ql.notify('talk', 'master_blacksmith', 1); const p = ql.find('q1_start'); p.state = 'completed';
+    await ev(() => { const ql = G.quests; ql.accept('q1_start'); ql.notify('talk', 'arcan_smith_boy', 1); const p = ql.find('q1_start'); p.state = 'completed';
       ql.accept('q2_merchant'); ql.accept('q_job1'); ql.accept('q3_slime'); for (let i = 0; i < 6; i++) ql.notify('kill', G.data.quests.q3_slime.objectives[0].target, 1); G.profile.ui.track = null; G.ui.renderQuestHud(true); });
     await pg.waitForTimeout(2500); await ev(() => G.ui.renderQuestHud(true)); await pg.waitForTimeout(300); await shot('1_hud');
     const hud = await ev(() => [...document.querySelectorAll('.qhud .qh-cat')].map(e => e.textContent + ':' + e.parentElement.textContent));
