@@ -583,6 +583,7 @@
 "hits": 5,
 "gap": 0.13,
 "noExtra": true,
+"swingSfx": "ph_spin",
 "fx": {
 "pharm": "spin"
 },
@@ -604,7 +605,8 @@
 "fx": {
 "color": 16765562
 },
-"sfxAt": "strike",
+"sfx": "ph_spin",
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -655,6 +657,7 @@
 "coef": 4.5,
 "core": 0.5,
 "coreR": 1.5,
+"sfx": "ph_slam",
 "burst": "none",
 "st": [
 {
@@ -871,7 +874,8 @@
 "coef": 0.6,
 "fall": 0.5,
 "at": 0.05,
-"tag": "flask"
+"tag": "flask",
+"sfx": "ph_flask"
 }
 ],
 "mods": [],
@@ -1081,6 +1085,8 @@
 "fx": {
 "color": 8048895
 },
+"sfx": "ph_shield",
+"sfxAt": "strike",
 "status": {
 "data": true,
 "impl": true,
@@ -1143,6 +1149,8 @@
 "fx": {
 "color": 16744512
 },
+"sfx": "ph_adrenaline",
+"sfxAt": "strike",
 "status": {
 "data": true,
 "impl": true,
@@ -1183,7 +1191,8 @@
 "tick": 1.0,
 "atSelf": true,
 "fx": "none",
-"pharm": "circle"
+"pharm": "circle",
+"music": "bgm_ph_heal_bed"
 }
 ],
 "mods": [],
@@ -1191,6 +1200,8 @@
 "fx": {
 "color": 6348944
 },
+"sfx": "ph_heal",
+"sfxAt": "strike",
 "status": {
 "data": true,
 "impl": true,

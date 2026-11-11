@@ -187,7 +187,7 @@ export class SkillEngine {
   /** cast time finished (or instant): schedule every op */
   release(ctx) {
     const pc = this.pc, sh = pc.body.sh, d = ctx.d, anim = ctx.act || d.anim || 'cast', cb = ctx.combo;
-    if (d.sfxAt !== 'strike') G.audio.sfx(skillSound(d));
+    if (d.sfxAt !== 'strike' && d.sfxAt !== 'op') G.audio.sfx(skillSound(d));
     const ht = d.cast ? 0 : Math.min(0.35, (sh.actions[anim] ? sh.actions[anim].hitFrame / sh.actions[anim].fps : 0.2) || 0.2);
     // 전용 검술 소리는 버튼을 누른 순간 대신 실제 칼 동작에 맞춘다.
     // 연은 레벨별 동작의 hitTimes마다 재생하며, 허공에서도 휘두르는 소리만 남는다.
@@ -450,6 +450,7 @@ export class SkillEngine {
         }
         if (op.extendHerb) for (const a of this.areas) if (a.op.herb && this.shapeOf(op, ctx).overlaps(a.c.x, a.c.z, a.r)) a.extend(op.extendHerb, op.extendCap || 4);
         if (op.link && ts.length > 1) for (let i = 1; i < ts.length; i++) FX.beam('thread_link', ts[i - 1].pos, ts[i].pos, { duration: 2 });
+        if (op.swingSfx) G.audio.sfx(op.swingSfx);
         if (ts.length) G.audio.sfx(skillSound(d, op));
       };
       const ht_ = ctx.combo && op.hitsPerLv && ctx.combo.hitTimes ? ctx.combo.hitTimes[h] - ctx.combo.hitTimes[0] : h * (op.gap || 0.15);
@@ -668,6 +669,7 @@ class SkillArea {
     this.eng = eng; this.op = op; this.ctx = ctx; this.c = c; this.r = r; this.life = dur; this.maxLife = dur; this.tick = 0; this.extended = 0; this.empower = 0;
     const pos = c || eng.pc.pos;
     this.fx = op.fx === 'none' ? NOOP : FX.area(op.fx || (op.kind === 'heal' ? 'healing_mist' : 'danger'), pos, r, { color: ctx.d.fx && ctx.d.fx.color, duration: 0 });
+    if (op.music) this.stopMusic = G.audio.skillBed(op.music);
     if (op.pharm) this.pfx = FX.pharm(op.pharm, { x: pos.x, y: pos.y, z: pos.z }, { r, dur });   // 광역 회복진 (js/pharmfx.js)
     if (op.prop) { this.prop = FX.summon(op.prop, {}); this.prop.position.copy(T(pos)); G.render.scene.add(this.prop); }
   }
@@ -694,7 +696,7 @@ class SkillArea {
       if (op.empowerSummons) for (const s of eng.summons) if (!s.dead && s.living) s.empower = Math.max(s.empower || 0, op.empowerSummons);
     }
   }
-  dispose() { if (this.dead) return; this.dead = true; this.fx.dispose(); if (this.pfx && this.pfx.end) this.pfx.end(); if (this.prop) { G.render.scene.remove(this.prop); } }
+  dispose() { if (this.dead) return; this.dead = true; if (this.stopMusic) this.stopMusic(); this.fx.dispose(); if (this.pfx && this.pfx.end) this.pfx.end(); if (this.prop) { G.render.scene.remove(this.prop); } }
 }
 
 // ------------------------------------------------------------------ summons (Combatant-like; live in zone.actors, faction player)
@@ -881,7 +883,7 @@ export const CUSTOM = {
       eng.pending.push({ time: eng.clock + i * op.gap, op: { op: '_run', run: () => {
         FX.pharm('flask', p, { elem: k.elem, fall: op.fall, r: op.blast });
         eng.pending.push({ time: eng.clock + op.fall, op: { op: '_run', run: () => {
-          const ts = eng.blast(p, { r: op.blast, coef: op.coef, burst: 'none', pharm: 'burst', st: k.st, tag: op.tag, elem: k.elem }, ctx);   // 얇은 링 + 밝은 중심 + 옅은 연무 (js/pharmfx.js burst)
+          const ts = eng.blast(p, { r: op.blast, coef: op.coef, burst: 'none', pharm: 'burst', st: k.st, tag: op.tag, elem: k.elem, sfx: op.sfx }, ctx);   // 얇은 링 + 밝은 중심 + 옅은 연무 (js/pharmfx.js burst)
           ctx.flaskLog.push({ elem: k.elem, n: ts.length });
           G.render.addShake && !G.reduceFlash && G.render.addShake(0.05, 0.1);
         } }, ctx });

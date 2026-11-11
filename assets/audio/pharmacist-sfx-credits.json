@@ -1,0 +1,56 @@
+{
+  "provider": "Runway",
+  "generatedOn": "2026-11-11",
+  "processing": "Leading silence removed, loudness -20 LUFS / -3 dBTP, stereo 44.1kHz MP3 128kbps. Healing bed trimmed to 8 seconds with fades.",
+  "assets": [
+    {
+      "file": "sfx_ph_spin.mp3",
+      "taskId": "dc9cce2d-1237-415e-a960-72bc8455255d",
+      "prompt": "Golden heavy pestle spinning through air, one tight round whoosh with a light metallic shimmer. Immediate attack, short clean tail, designed to repeat for each spinning strike in a fantasy RPG. No voice, no music.",
+      "requestedDuration": 1,
+      "processedDuration": 1
+    },
+    {
+      "file": "sfx_ph_slam.mp3",
+      "taskId": "758cf615-adff-41ed-9605-fd5ec8df5c4e",
+      "prompt": "Giant golden stone pestle smashes into earth. Immediate massive bass thud, cracking stone, gritty debris and a short magical golden resonance. Single powerful fantasy RPG ground impact, no buildup, no voice, no music.",
+      "requestedDuration": 2,
+      "processedDuration": 2
+    },
+    {
+      "file": "sfx_ph_flask.mp3",
+      "taskId": "eb97e6ac-3a64-425d-854b-d56a177b0037",
+      "prompt": "One glass potion bottle shatters with a sharp bright glass crack, liquid splash and compact magical elemental pop. Immediate single impact, tight short decay for ten staggered potion explosions. Fantasy RPG, no voice, no music.",
+      "requestedDuration": 1,
+      "processedDuration": 1
+    },
+    {
+      "file": "sfx_ph_shield.mp3",
+      "taskId": "1dee6aeb-e4f1-4e12-95c5-283bd0bdace9",
+      "prompt": "Crystal blue magical shield materializes around a hero: soft glass bloom, ascending crystalline shimmer and a gentle resonant protective ring. Immediate onset, compact clean tail. Fantasy RPG sound, no voice or music.",
+      "requestedDuration": 1,
+      "processedDuration": 1
+    },
+    {
+      "file": "sfx_ph_adrenaline.mp3",
+      "taskId": "a2cc6e71-966a-4f89-81ae-765c9a1e226f",
+      "prompt": "Fantasy alchemist syringe activates: tiny mechanical click, compressed liquid hiss, then a warm energetic rising pulse. Quick crisp invigorating power-up, no heartbeat loop, no voice, no music.",
+      "requestedDuration": 1,
+      "processedDuration": 1
+    },
+    {
+      "file": "sfx_ph_heal.mp3",
+      "taskId": "0fd9c92e-6505-43a7-ba19-476282132db0",
+      "prompt": "Green healing magic blooms: gentle liquid droplets and sparkling crystal chimes rising softly, warm soothing magical pulse. Immediate soft onset, brief clean decay, fantasy RPG healing spell. No voice, no music.",
+      "requestedDuration": 1,
+      "processedDuration": 1
+    },
+    {
+      "file": "bgm_ph_heal_bed.mp3",
+      "taskId": "153be166-082e-4e81-bf0e-28e78f038ed8",
+      "prompt": "Instrumental fantasy RPG healing sanctuary background, no vocals, no drums. Soft celesta, harp arpeggios and warm airy strings, peaceful luminous green healing magic, gentle 72 BPM. Begin immediately with a delicate warm consonant chord and flowing sparkle, restrained volume and no dramatic climax. Original brief magical background cue suitable under a healing circle.",
+      "requestedDuration": 30.772167,
+      "processedDuration": 8
+    }
+  ]
+}

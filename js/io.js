@@ -82,7 +82,7 @@ export class Audio {
     if (this.ctx) { if (this.ctx.state === "suspended") this.ctx.resume().then(() => this.onState && this.onState()).catch(() => { }); return; }
     try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); this.gMusic = this.ctx.createGain(); this.gMusic.connect(this.ctx.destination); this.gSfx = this.ctx.createGain(); this.gSfx.connect(this.ctx.destination); this.apply(); this.ctx.onstatechange = () => this.onState && this.onState(); if (this.ctx.state === "suspended") this.ctx.resume().catch(() => { }); if (this.wantMusic) this.playMusic(this.wantMusic, true); this.preloadSfx(); } catch (e) { this.ctx = null; }
   }
-  apply() { if (this.ctx) { this.gMusic.gain.value = this.music * 0.5; this.gSfx.gain.value = this.sfxVol; if (this.sfxVol <= 0) this.stopNpcVoice(); } }
+  apply() { if (this.ctx) { this.gMusic.gain.value = this.music * 0.5; this.gSfx.gain.value = this.sfxVol; if (this.sfxVol <= 0) this.stopNpcVoice(); if (this.music <= 0 && this.stopSkillBed) this.stopSkillBed(); } }
   async loadNpcVoices() {
     try { const r = await fetch('assets/data/npc-voices.json'); if (!r.ok) throw new Error(r.status); this.npcVoices = await r.json(); }
     catch (e) { console.warn('NPC 인사 음성을 불러오지 못했습니다.', e); }
@@ -128,13 +128,32 @@ export class Audio {
     if ([...this.voices].filter(v => v.reward === reward).length >= (reward ? 4 : 12)) return;
     const s = this.ctx.createBufferSource(), g = this.ctx.createGain();
     s.buffer = b; s.playbackRate.value = reward || event ? 1 : 0.96 + Math.random() * 0.08;
-    g.gain.value = name === 'dialog' ? 0.24 : name === 'warp' ? 0.58 : reward ? 0.65 : 0.38; s.connect(g); g.connect(this.gSfx);
+    g.gain.value = name === 'ph_flask' ? 0.18 : name === 'ph_spin' ? 0.22 : name === 'ph_slam' ? 0.5 : name === 'dialog' ? 0.24 : name === 'warp' ? 0.58 : reward ? 0.65 : 0.38; s.connect(g); g.connect(this.gSfx);
     const voice = { s, reward }; this.voices.add(voice);
     s.onended = () => { this.voices.delete(voice); s.disconnect(); g.disconnect(); }; s.start();
+  }
+  // A short spell bed shares the music volume; its area owns cancellation, including pending loads.
+  skillBed(name) {
+    if (this.stopSkillBed) this.stopSkillBed();
+    let cancelled = false, source = null;
+    const stop = () => { cancelled = true; if (source) { try { source.stop(); } catch (e) {} source = null; } };
+    this.stopSkillBed = stop;
+    if (!this.audible || this.music <= 0) return stop;
+    const started = performance.now();
+    this.buf(name).then(b => {
+      if (!b || cancelled || !this.audible || this.music <= 0 || performance.now() - started > 300) return;
+      const s = this.ctx.createBufferSource(), g = this.ctx.createGain();
+      source = s; s.buffer = b; g.gain.value = 0.26;
+      s.connect(g); g.connect(this.gMusic);
+      s.onended = () => { s.disconnect(); g.disconnect(); if (source === s) source = null; };
+      s.start();
+    });
+    return stop;
   }
   async preloadSfx() {
     // Four concurrent fetch/decode workers; never block game startup on sound.
     const queue = [...SFX_NAMES];
+    await this.buf('bgm_ph_heal_bed');
     await Promise.all(Array.from({ length: 4 }, async () => { while (queue.length) await this.buf('sfx_' + queue.shift()); }));
     const greetings = Object.values(this.npcVoices).map(v => v.file);
     await Promise.all(Array.from({ length: 3 }, async () => { while (greetings.length) await this.buf(greetings.shift()); }));
@@ -181,6 +200,6 @@ export class Audio {
     if (this.cur) { try { this.cur.stop(); } catch (e) { } this.cur.disconnect(); }
     const s = this.ctx.createBufferSource(); s.buffer = b; s.loop = true; s.connect(this.gMusic); s.start(); this.cur = s; this.curName = name;
     // Forty-nine full-length region scores must not accumulate as decoded PCM in memory.
-    for (const key of this.buffers.keys()) if (key.startsWith('bgm_') && key !== name) this.buffers.delete(key);
+    for (const key of this.buffers.keys()) if (key.startsWith('bgm_') && key !== 'bgm_ph_heal_bed' && key !== name) this.buffers.delete(key);
   }
 }
