@@ -29,7 +29,14 @@ PROMPTS.update({
 PROMPTS['pestle_only'] = ('one single giant golden pestle club only, a heavy thick rounded bulbous head at the bottom tapering into a long straight '
                           'handle with engraved bands, a small jade ring and a round knob at the top, like a golden mace or baseball bat shape, '
                           'standing upright, shiny polished gold, absolutely no mortar, no bowl, no cup, no container, ' + STYLE)
-TARGET = {'pestle_gold': 6000, 'flask': 2500, 'syringe': 3000, 'flask_gold': 2500, 'shards': 4000, 'pestle_only': 6000}
+# 2026-11-11 (남은 스킬 이펙트): pestle_only도 호리병처럼 나와서 유봉을 '방망이' 모양으로 다시 요청, 냉각 약병의 얼음 결정
+PROMPTS['pestle_club'] = ('a single giant golden pestle shaped like a thick baseball bat or bowling pin: one smooth solid club, the lower half is a wide heavy '
+                          'rounded cylinder head with a flat rounded bottom, it narrows smoothly into a straight cylindrical handle in the upper half, two simple '
+                          'engraved rings on the handle, small round pommel on top, plain polished shiny yellow gold metal all over, no bottle, no flask, no neck '
+                          'stopper, no window, no gems, no mortar, no bowl, standing upright, ' + STYLE)
+PROMPTS['ice_crystals'] = ('a cluster of six sharp pointed ice crystal spikes growing outward from one centre like a frozen burst, different lengths, '
+                           'pale blue translucent-looking ice with white edges, faceted, no base rock, no snow pile, ' + STYLE)
+TARGET = {'pestle_gold': 6000, 'flask': 2500, 'syringe': 3000, 'flask_gold': 2500, 'shards': 4000, 'pestle_only': 6000, 'pestle_club': 6000, 'ice_crystals': 2500}
 
 def gen(name):
     sys.path.insert(0, HERE); import tripo

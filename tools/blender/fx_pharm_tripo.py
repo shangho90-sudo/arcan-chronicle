@@ -6,6 +6,7 @@ Blender에서 다듬어 한 파일 assets/fx/fx_pharm_tripo.glb.json 으로 묶�
   pharm_flask_gold  -> tripo_flask_gold  황금 약병(사용자 요청 2-A): 바닥 y 0, 높이 0.36
   pharm_flask       -> tripo_flask       약병폭격 약병: 바닥 y 0, 높이 0.36
   pharm_syringe     -> tripo_syringe     주사기: 긴 축 = +Y, 가는 쪽(바늘)이 위(y 1), 길이 1
+  pharm_ice_crystals-> tripo_ice         냉각 약병 얼음 결정 다발(2026-11-11): 가장 낮은 점 y 0, 높이 1, 축 가운데
   pharm_shards      -> tripo_shard_N     지면 파편: 떨어진 조각별로 나눠 큰 것 6~10개, 가장 얇은 축 = +Y, 반지름 ~1, 중심 원점
 
 정리: 메시 합치기 → 떠 있는 작은 조각 제거 → 삼각형 줄이기 → 중복 정점 합치기 → 노멀 다시 계산 → 축·크기·원점 맞춤 →
@@ -20,7 +21,8 @@ HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(os.pat
 RAW = os.environ.get('RAW', '/home/claude/new3d'); OUT = os.path.join(ROOT, 'assets', 'fx'); SRC = os.path.join(HERE, 'pharm')
 SPEC = {   # name: (out name, kind, target tris, texture px)
     'pestle_only': ('tripo_pestle', 'pestle', 3500, 1024), 'pestle_gold': ('tripo_pestle_mortar', 'pestle', 3500, 1024), 'flask_gold': ('tripo_flask_gold', 'flask', 1800, 512), 'flask': ('tripo_flask', 'flask', 1800, 512),
-    'syringe': ('tripo_syringe', 'syringe', 2000, 512), 'shards': ('tripo_shard', 'shards', 500, 512)}
+    'syringe': ('tripo_syringe', 'syringe', 2000, 512), 'shards': ('tripo_shard', 'shards', 500, 512),
+    'ice_crystals': ('tripo_ice', 'ice', 1600, 512), 'pestle_club': ('tripo_pestle_club', 'pestle', 3500, 1024)}
 
 def islands(bm):
     bm.faces.ensure_lookup_table(); seen, out = set(), []
@@ -101,6 +103,9 @@ def fit(ob, kind):
         if flip: ob.data.transform(Matrix.Rotation(math.pi, 4, 'X'))
         lo, hi, P = bounds(ob); s = 1.0 / (hi[2] - lo[2])
         ob.data.transform(Matrix.Translation((-(lo[0] + hi[0]) / 2, -(lo[1] + hi[1]) / 2, -lo[2]))); ob.data.transform(Matrix.Scale(s, 4))
+    elif kind == 'ice':                                                  # crystal burst: centre on the axis, lowest point y 0, height 1
+        lo, hi, P = bounds(ob); s = 1.0 / (hi[2] - lo[2])
+        ob.data.transform(Matrix.Translation((-(lo[0] + hi[0]) / 2, -(lo[1] + hi[1]) / 2, -lo[2]))); ob.data.transform(Matrix.Scale(s, 4))
     elif kind == 'flask':
         lo, hi, P = bounds(ob); s = 0.36 / (hi[2] - lo[2])
         ob.data.transform(Matrix.Translation((-(lo[0] + hi[0]) / 2, -(lo[1] + hi[1]) / 2, -lo[2]))); ob.data.transform(Matrix.Scale(s, 4))
@@ -122,7 +127,7 @@ def split_shards(ob, td):
     return out
 
 def main():
-    names = sys.argv[1:] or ['pestle_only', 'flask_gold', 'shards']   # 게임이 쓰는 것만 (flask·syringe·pestle_gold 초안은 품질·모양 때문에 제외)
+    names = sys.argv[1:] or ['flask_gold', 'shards', 'ice_crystals']   # 게임이 쓰는 것만 (flask·syringe 초안은 품질 때문에, pestle_gold·pestle_only·pestle_club은 절구 그릇·호리병 모양으로 나와 제외 — 유봉은 fx_pharm.py 절차 메시)
     bpy.ops.wm.read_factory_settings(use_empty=True); td = tempfile.mkdtemp(); obs = []; info = {}
     for n in names:
         out, kind, target, px = SPEC[n]; ob = load(n); nisl = drop_small(ob, 0.01 if kind != 'shards' else 0.05); mat = texture(ob, px, td, out)

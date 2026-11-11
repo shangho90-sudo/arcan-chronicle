@@ -24,6 +24,7 @@ Meshes (game axes: +Y up, +Z forward, metres; the game scales them) -> assets/fx
   pharm_quad        빌보드 쿼드 (아틀라스 모든 칸)        pharm_cracks  가는 균열선 r 0.55 .. 1.75
   pharm_piece_NN    지면 파쇄 원판(반지름 1)을 쪼갠 두께 있는 포장석 조각 (노드 위치 = 조각 중심)
   pharm_shard_N     튀는 돌 조각 (Tripo 파편이 없을 때)
+  pharm_crystal     냉각 약병 얼음 가시 하나 (밑 y 0 .. 끝 y 1, 육각)
 Atlas:   assets/fx/fx_pharm.png (1024, R = 뜨거운 중심, G = 몸통, B = 잔광, A = 덮임) + glb.json "cells"
 Texture: assets/fx/fx_pharm_circle.png  (green healing circle: double ring, runes, leaf crosses; RGBA)
 Icons:   assets/ui/skills/ph1_a6.png ph1_b6.png ph1_c6.png ph1_c7.png ph1_c8.png  (128 px, round gold rim like the
@@ -279,6 +280,21 @@ def shard_builder(i):
             for l in f.loops: l[col] = tuple(min(1, q * k) for q in c) + (1,)
     return build
 
+def crystal(bm, col, uvl):
+    """냉각 약병: one ice spike (6-sided, base y 0 radius ~0.2, tip y 1), flat shaded; vertex colours pale blue -> white at the tip / edges"""
+    rng = random.Random(SEED + 11); seg = 6; prof = [(0.12, 0.0), (0.20, 0.18), (0.17, 0.55), (0.0, 1.0)]
+    rings = []
+    for (r, y) in prof:
+        rings.append([bm.verts.new(V(math.cos(2 * math.pi * i / seg) * r * (1 + (0.12 if i % 2 else -0.08) * (r > 0)), y, math.sin(2 * math.pi * i / seg) * r)) for i in range(seg)] if r > 0 else [bm.verts.new(V(0, y, 0))])
+    for k in range(len(rings) - 1):
+        for i in range(seg):
+            j = (i + 1) % seg
+            f = bm.faces.new((rings[k][i], rings[k][j], rings[k + 1][j], rings[k + 1][i])) if len(rings[k + 1]) > 1 else bm.faces.new((rings[k][i], rings[k][j], rings[k + 1][0]))
+            tone = 0.72 + 0.28 * ((i * 3 + k) % 4) / 3
+            for l in f.loops:
+                h = l.vert.co.z; l[col] = (min(1, (0.55 + 0.45 * h) * tone + 0.1), min(1, (0.80 + 0.2 * h) * tone + 0.1), 1.0, 1)
+    bm.faces.new(list(reversed(rings[0])))
+
 def liquid(bm, col, uvl):
     """약병 속 액체: the flask body profile shrunk a little and cut flat at 62 % height (separate from the glass shell)"""
     P = [(0.0, 0.008)]
@@ -290,10 +306,12 @@ def liquid(bm, col, uvl):
     lathe(bm, col, P, 20, lambda k, p: (1, 0, 0, 1))
 
 # cells of fx_pharm.png (x0, y0, w, h) in atlas fractions, image space (y from the TOP; the game loads it with flipY = false)
-CELLS = {'ribbon': (0.0, 0.0, 1.0, 0.25),
-         'glow': (0.0, 0.25, 0.25, 0.25), 'star': (0.25, 0.25, 0.25, 0.25), 'puff': (0.5, 0.25, 0.25, 0.25), 'puff2': (0.75, 0.25, 0.25, 0.25),
-         'arrow': (0.0, 0.5, 0.25, 0.25), 'plus': (0.25, 0.5, 0.25, 0.25), 'spark': (0.5, 0.5, 0.25, 0.25), 'bubble': (0.75, 0.5, 0.25, 0.25),
-         'crack': (0.0, 0.75, 0.25, 0.25), 'streak': (0.25, 0.75, 0.25, 0.25), 'dust': (0.5, 0.75, 0.25, 0.25), 'flare': (0.75, 0.75, 0.25, 0.25)}
+# 2026-11-11 (남은 스킬): 4칸 × 4줄(높이 0.2)로 다시 나눠 불꽃·방울·서리·웅덩이 칸을 더함 — 게임은 glb.json의 "cells"만 읽음
+CELLS = {'ribbon': (0.0, 0.0, 1.0, 0.2),
+         'glow': (0.0, 0.2, 0.25, 0.2), 'star': (0.25, 0.2, 0.25, 0.2), 'puff': (0.5, 0.2, 0.25, 0.2), 'puff2': (0.75, 0.2, 0.25, 0.2),
+         'arrow': (0.0, 0.4, 0.25, 0.2), 'plus': (0.25, 0.4, 0.25, 0.2), 'spark': (0.5, 0.4, 0.25, 0.2), 'bubble': (0.75, 0.4, 0.25, 0.2),
+         'crack': (0.0, 0.6, 0.25, 0.2), 'streak': (0.25, 0.6, 0.25, 0.2), 'dust': (0.5, 0.6, 0.25, 0.2), 'flare': (0.75, 0.6, 0.25, 0.2),
+         'flame': (0.0, 0.8, 0.25, 0.2), 'drop': (0.25, 0.8, 0.25, 0.2), 'frost': (0.5, 0.8, 0.25, 0.2), 'puddle': (0.75, 0.8, 0.25, 0.2)}
 
 def atlas_png():
     """Masks the game recolours: R = hot core (-> near white), G = body (-> the skill colour), B = soft halo (-> deeper tone), A = coverage.
@@ -367,6 +385,33 @@ def atlas_png():
     X, Y, r = radial('flare')                                                          # impact flare: wide horizontal + short vertical blade, hot heart
     fl = np.clip(np.exp(-(np.abs(Y) / 0.035) ** 2) * np.exp(-(np.abs(X) / 0.8) ** 2) + np.exp(-(np.abs(X) / 0.035) ** 2) * np.exp(-(np.abs(Y) / 0.45) ** 2), 0, 1)
     put('flare', np.clip(fl + np.exp(-(r / 0.13) ** 2), 0, 1), np.clip(fl * 0.8 + np.exp(-(r / 0.3) ** 2), 0, 1), np.exp(-(r / 0.55) ** 2) * np.clip(1 - r, 0, 1) * 0.8)
+    # ---- 2026-11-11 남은 스킬 (화염·냉각·부식 약병)
+    X, Y, r = radial('flame'); n = fbm(X.shape, 4, 3)                                  # flame tongue: wide wavy base, pointed top; hot core low
+    t = (Y + 1) / 2; wob = 0.16 * np.sin(t * 7.0 + 1.3) * t + (n - 0.5) * 0.35 * t
+    half = 0.62 * (1 - t) ** 0.75 * ss(0.0, 0.10, t) + 0.02
+    cov = (1 - ss(0.55, 1.0, np.abs(X - wob) / half)) * (1 - ss(0.86, 1.0, t)) * ss(0.0, 0.06, t)
+    hot = (1 - ss(0.0, 0.55, np.abs(X - wob * 0.7) / (half * 0.55))) * (1 - ss(0.25, 0.75, t)) * ss(0.0, 0.08, t)
+    put('flame', hot, cov * (0.55 + 0.45 * (1 - t)), cov * t * 0.9, A=cov)
+    X, Y, r = radial('drop')                                                           # falling droplet: round bottom, thin tail up, highlight
+    t = (Y + 0.75) / 1.5; rad = np.where(Y < -0.25, np.sqrt(np.clip(0.25 - (Y + 0.25) ** 2, 0, 1)), 0.5 * np.clip(1 - (Y + 0.25) / 1.05, 0, 1) ** 1.6)
+    body = 1 - ss(0.8, 1.0, np.abs(X) / (rad + 1e-3)); body = body * (Y > -0.76) * (Y < 0.8)
+    hl = np.exp(-(np.hypot(X + 0.15, Y + 0.12) / 0.10) ** 2)
+    put('drop', np.clip(hl + body * 0.25, 0, 1), body, np.exp(-(r / 0.8) ** 2) * 0.25)
+    X, Y, r = radial('frost'); th = np.arctan2(Y, X)                                   # ground frost: 6 feathered arms + thin rim, no fill (lies flat)
+    arm = np.zeros_like(r)
+    for k in range(6):
+        a = k * math.pi / 3; pa = X * math.cos(a) + Y * math.sin(a); pp = -X * math.sin(a) + Y * math.cos(a)
+        arm += np.exp(-(np.abs(pp) / 0.022) ** 2) * (pa > 0.05) * (pa < 0.88)
+        for q, L in ((0.34, 0.20), (0.56, 0.16), (0.74, 0.10)):                         # side barbs at +-55 deg
+            for sgn in (-1, 1):
+                bx, by = pa - q, pp; ca, sa = math.cos(sgn * 0.96), math.sin(sgn * 0.96); la = bx * ca + by * sa; lp = -bx * sa + by * ca
+                arm += np.exp(-(np.abs(lp) / 0.018) ** 2) * (la > 0) * (la < L)
+    arm = np.clip(arm, 0, 1); rim = np.exp(-((r - 0.9) / 0.03) ** 2) * (0.55 + 0.45 * fbm(X.shape, 3, 6))
+    spk = (rng.random(X.shape) > 0.9985).astype(np.float32); spk = np.array(Image.fromarray((spk * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(1.4)), np.float32) / 255 * 6 * (r < 0.85)
+    put('frost', np.clip(arm * 0.9 + spk, 0, 1), np.clip(arm + rim + spk * 0.6, 0, 1), np.clip(np.exp(-(r / 0.7) ** 2) * 0.18 + arm * 0.3, 0, 1) * (r < 0.98))
+    X, Y, r = radial('puddle'); n = fbm(X.shape, 4, 3); n2 = fbm(X.shape, 3, 7)        # acid puddle: lumpy blob, bright edge line, mottled inside (lies flat)
+    rr = r + (n - 0.5) * 0.42; cov = 1 - ss(0.66, 0.74, rr); edge = np.exp(-((rr - 0.68) / 0.04) ** 2)
+    put('puddle', np.clip(edge * 0.6 + (n2 > 0.72) * cov * 0.5, 0, 1), np.clip(cov * (0.35 + 0.4 * n2) + edge, 0, 1), cov * 0.35, A=np.clip(cov * 0.8 + edge, 0, 1))
     im = Image.fromarray((np.clip(img, 0, 1) * 255 + 0.5).astype(np.uint8), 'RGBA')
     for q in (os.path.join(OUT, 'fx_pharm.png'), os.path.join(SRC, 'fx_pharm.png')): im.save(q, optimize=True)
     pad = 3 / ATLAS
@@ -514,7 +559,7 @@ def main():
     reset(); circle_png(); cells = atlas_png()
     obs = [new_obj('pharm_pestle', pestle), new_obj('pharm_flask', flask), new_obj('pharm_liquid', liquid), new_obj('pharm_cork', cork), new_obj('pharm_syringe', syringe),
            new_obj('pharm_circle', disc, False), new_obj('pharm_ring', ring, False), new_obj('pharm_dome', dome),
-           new_obj('pharm_ribbon', ribbon, False), new_obj('pharm_quad', quad, False), new_obj('pharm_cracks', cracks, False)]
+           new_obj('pharm_ribbon', ribbon, False), new_obj('pharm_quad', quad, False), new_obj('pharm_cracks', cracks, False), new_obj('pharm_crystal', crystal, False)]
     pieces = []
     for name, (cx, cz), build in fracture():
         o = new_obj(name, build, False); o.location = V(cx, 0, cz); obs.append(o); pieces.append(o)
