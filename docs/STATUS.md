@@ -618,3 +618,14 @@
 ### 2026-11-11 — 왕도 요리사 곤 자리, 전직 뒤 초상화 검은 실루엣
 - 이야기 NPC 자동 배치(`tools/quests/story.py` `spot_near`)가 마을 가로등·화단(`town3d.lanterns`/`decor`)과 원래 NPC를 피하지 않아, 생성 마을들의 같은 자리(가로등 기둥 속)에 NPC가 서 있었음 → 피하도록 고치고 다시 생성(`story.py --write`). 이야기 NPC 15명 자리가 옮겨짐(예: 카이리온 왕도 요리사 곤 (-2.09,-6.81) → (2.66,-7.49)). 확인 `tools/browser-tests/npcspot.js`(`ZONE= NPC= DONE=`).
 - 왼쪽 위 초상화가 1차 전직 뒤 검은 실루엣이던 문제: 모델 텍스처가 받아지기 전에 찍었고, 다시 찍을 기준(키)에 몸 모델이 빠져 있었음 → 키에 몸 모델(`root.uuid`) 추가, 텍스처가 다 받아진 뒤에만 찍음(`portrait.js` `bodyTexturesReady`, 지역 지도 목록 그림도 같음). 확인 `tools/browser-tests/portraitjob.js`(약사·대장장이 전직 직후, 약사 저장 후 다시 불러오기 — 모두 얼굴).
+
+### 2026-11-11 — 약사 1차 스킬 개편
+- 삭제: 유봉 두 번 치기(`ph1_a2`)·전격 약병(`ph1_b3`)·활력제 제작(`ph1_c2`)·응급 복용(`ph1_c3`)·정화 약제(`ph1_c4`)·알뜰 조제(`ph1_c5`). 예전 저장에서 이 스킬에 찍은 포인트는 불러올 때 돌려주고 칸에서 뺌(`skillsys.js` `ensureSk`, 테스트 `skills2` "points of removed skills refunded"). 활력제 레시피 `r_sp`도 삭제 — 기력 회복제(`c_sp_potion`)는 상점·몬스터 드롭으로 계속 구함.
+- A 유봉 전투: 유봉 내려찍기 Lv10 · 밀어내기 Lv13(18 → 13) · 유봉 휘두르기 Lv15(바뀜: `ph_spin` 두 바퀴 회전, 반경 2.8 m 주변 적 50% × 4 + 마지막 80% 밀쳐 냄 2.4 m, 기력 14·8초) · **천근쇄약** `ph1_a6` Lv18(황금 유봉이 떨어져 반경 4.2 m 450%, 가운데 1.5 m 안 +50%, 경직 0.6초, 땅 갈라짐, 기력 26·16초) · 유봉 숙련 Lv20.
+- B 기초 약병술: 화염 Lv10 · 냉각 Lv12 · **약병폭격** `ph1_b6` Lv15(반경 3.4 m에 약병 10개를 0.2초 간격으로 떨어뜨림, 병마다 화염(화상)·냉기(둔화)·독 무작위, 한 병 60% · 폭발 1.5 m, 기력 22·14초, CUSTOM `flask_rain`) · 부식 Lv18 · 정확한 투척 Lv20(중심 보너스는 약병 폭발에만).
+- C 조제와 응급처치: 회복제 제작 Lv10 · **약 보호막** `ph1_c7` Lv12(8초, 최대 체력 25%(+3%/Lv) 보호막 + 상태이상 면역 `immune`, 기력 16·20초) · **아드레날린 주사** `ph1_c6` Lv15(15초 이동 속도 +20%(+2%/Lv)·공격 속도 +25%(+2.5%/Lv), 기력 12·30초) · **광역 회복진** `ph1_c8` Lv18(반경 3.6 m, 8초 동안 1초마다 최대 체력 4% 회복, 기력 20·24초) · **약사 수련** `ph1_c9` Lv20 패시브(속성 저항 +6%(+3%/Lv, 최대 60%) — 화상·독 등 지속 피해와 속성 피해 감소, 마법력 +5%(+3%/Lv), 최대 기력 +6%(+3%/Lv)).
+- 새 상태: `aspdup`(공격 속도 증가), `immune`(상태이상 면역, `core.js` 디버프 거부), 새 능력치 `elemRes`(속성 저항, 능력치 창 표시).
+- 소품·이펙트: `js/pharmfx.js`(`SkillFx.pharm`: `pestle` 황금 유봉 낙하·박힘·충격 고리, `flask` 원소별 약병, `syringe` 주사기·심장 박동 고리, `shield` 육각 보호막 돔, `circle` 녹색 회복진). 메시는 Blender 절차 제작 `python3 tools/blender/fx_pharm.py` → `assets/fx/fx_pharm.glb.json` + `fx_pharm_circle.png`(원본 `tools/blender/pharm/`). Tripo 초안 스크립트 `tools/tripo/pharm_assets.py`는 만들었지만 2026-11-11 Tripo 크레딧 부족(403 "not enough credit")으로 생성 못 함 — 지금 게임은 Blender 소품을 씀. 크레딧이 생기면 `python3 tools/tripo/pharm_assets.py tripo` → `blender` 후 `pharmfx.js`에서 바꿔 끼우면 됨.
+- 동작: `swings.py` `ph_spin`(두 바퀴 회전 베기), `ph_slam`(내려찍기).
+- 아이콘: 새 스킬 6종은 Blender 렌더 원형 금테 아이콘(`assets/ui/skills/ph1_a6·b6·c6·c7·c8·c9.png`, `tools/ui/skill_icons_crop.py`), 지운 스킬 그림은 지움.
+- 확인: `tools/browser-tests/pharm_skills.js`(실제 `skills2.cast`, `SCENES=a3,a6,b6,c6,c7,c8 SIZE=`) — 휘두르기 4마리 모두 5타 + 2.77 m 밀림, 천근쇄약 가운데/가장자리 피해, 약병 10개 원소 기록과 걸린 상태이상, 이동·공격 속도 ×1.28/×1.35(Lv5), 보호막 161 = 최대 체력 434의 37%(Lv5)·독 막힘, 회복진 8초 동안 체력 회복. 메모: 이 스크립트처럼 `G.step(dt, false)`로 돌리면 스킬 이펙트가 진행되지 않으니 `G.skillFx.update`를 직접 부를 것.

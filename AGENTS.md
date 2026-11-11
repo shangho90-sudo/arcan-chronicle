@@ -99,6 +99,10 @@
 - 보행 진단: `gait_probe.js`(FPS=30 가능) → `gait_report.py`(미끄러짐·걸음) + `gait_ik_report.py`(IK 도달 실패·무릎 각도), 화면은 `gait_views.js`(측면/정면/후면/게임 시점, 관절·접지 표시)와 `gait_side.js`(배경 없이 격자 위 캐릭터만, `PITCH=8 YAW=0`이면 옆모습, `MAG=0.35` 걷기). 달리기 흔들림 다리는 뒤꿈치 차올림(`footAt`의 `kick`). 골반 좌우 이동은 `mesh.position.x`(시각 전용)이며 다리 IK 목표에서 빼서 보정합니다.
 - 이동 속도(4.6 m/s)를 낮춰서 보행을 맞추지 말 것. 바꾼 뒤에는 `tools/browser-tests/gait_probe.js` + `gait_report.py`로 디딘 발 미끄러짐·걸음 수를 남녀 모두 비교하고, `gait_film.js`로 화면을 확인하세요.
 
+## 약사 1차 스킬 (2026-11-11 개편)
+- A 유봉 내려찍기·밀어내기(Lv13)·유봉 휘두르기(`ph_spin` 5타 + 마지막 밀침)·천근쇄약 `ph1_a6`(황금 유봉, 450% + 중심 +50%)·유봉 숙련 / B 화염·냉각·약병폭격 `ph1_b6`(CUSTOM `flask_rain`, 10병 화염·냉기·독 무작위)·부식·정확한 투척 / C 회복제 제작·약 보호막 `ph1_c7`(최대 체력 25% + `immune`)·아드레날린 주사 `ph1_c6`(`haste`+`aspdup`)·광역 회복진 `ph1_c8`(area heal + `pharm: 'circle'`)·약사 수련 `ph1_c9`(`elemRes`·마법력·최대 기력). 지운 스킬(ph1_a2·b3·c2·c3·c4·c5) 포인트는 불러올 때 환불(`skillsys.js` `ensureSk`).
+- 소품·이펙트 `js/pharmfx.js`(`SkillFx.pharm.pestle/flask/syringe/shield/circle`, 스킬 데이터 `fx` op의 `pharm`), 메시 `python3 tools/blender/fx_pharm.py` → `assets/fx/fx_pharm.*`. Tripo판 `tools/tripo/pharm_assets.py`는 크레딧 부족으로 아직 미생성. 확인 `tools/browser-tests/pharm_skills.js`.
+
 ## 직업 모델 (2026-11-07)
 - 전직하면 모습이 바뀌는 직업은 `model.js` `JOB_MODELS`(지금은 약사 `pharmacist_m`/`_f`, 대장장이 `blacksmith_m`/`_f`, 예술가 `artist_m`/`_f`, 요리사 `cook_m`/`_f`, 미용사 `hairdresser_m`/`_f` — 1차 직업 5개 모두). 모델은 반드시 같은 67뼈 휴머노이드 뼈대 GLB를 `python3 tools/models/glb_to_model.py <in.glb> <이름>`로 변환. 변신 연출은 `rewardfx.js` `JobChangeFx`(빛기둥·고치·날개·나팔·`Audio.chime('fanfare')`), 확인 `tools/browser-tests/jobchange.js`(`JOB=`·`GENDER=`).
 
