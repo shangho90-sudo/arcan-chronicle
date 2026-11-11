@@ -29,7 +29,7 @@
 - 기본 검술(`job: novice`, `nv_*` 8종 — 일격참·연·비연참·배쉬(Lv7, `push` 밀치기)·회복력 증가·검수련·회피율 증가(Lv5, `eva`)·급소치기(Lv9, `crit`), 공격 스킬은 모두 단일 대상 `target: 'enemy'`/`single`, 계수는 배우는 레벨 순 — 일격참 2.4·연 0.5×타수·배쉬 2.8·비연참 3.4, 확인 `tools/browser-tests/novice_single.js`)은 모든 직업의 계보 맨 앞에 붙어 전직 후에도 유지되며, 직업 포인트(`sk.points`)와 별개인 `sk.npoints`를 씁니다(Lv1부터 레벨당 1).
 - 몬스터 능력치는 레벨 곡선으로 다시 계산(`core.js` `balanceMonsters`, monsters.json의 hp/atk/def/exp는 역할 판단용 원본), 레벨 차이 보정 `levelGapDamage`/`levelGapExp`. 필드 몬스터는 들어갈 때 고르게 다시 배치(`game.js` `Zone.evenSpawners`), 전체 수는 `config.json` `fieldMonsterMul`(지금 1.3배, 정예 1마리 무리 제외) — 확인 `tools/browser-tests/moncount.js`. 몬스터 이름표는 항상 표시(흰색 = 내 레벨 이하, 빨강 = 높음).
 - 몬스터 공격 방식은 `js/creature.js` `CREATURES[id].atk`(동작)와 `js/actors.js` `Monster.resolve`(판정·이펙트)에서 함께 정합니다.
-- UI 문구는 한국어. 키패드 숫자는 주아체(`.abtn .cdt/.sub`). 전역 CSS 클래스 `.dim`(전체 화면 덮개)을 다른 요소 상태 이름으로 쓰지 말 것(2026-11-11 귀환 버튼이 그 때문에 튀었음).
+- UI 문구는 한국어. 키패드 숫자와 머리 위 문구(`.float`, 확인 `floatfont.js`)는 주아체(`.abtn .cdt/.sub`). 전역 CSS 클래스 `.dim`(전체 화면 덮개)을 다른 요소 상태 이름으로 쓰지 말 것(2026-11-11 귀환 버튼이 그 때문에 튀었음).
 
 ## 화면 연출 (그래픽 효과)
 - `js/post.js`: HDR 렌더 → 블룸, 따뜻한 색보정(필믹 커브·채도·대비), 비네트. 화면 위아래 흐림(tilt)은 사용자 요청으로 0(꺼짐) — 다시 켜지 말 것. 값은 `Post.params`(옅은 보라 대기 `haze`·`hazeCol` 포함, 존별 `zones.json` "post"). 설정의 "그래픽 효과"로 끌 수 있음(`settings.graphicsFx`).
