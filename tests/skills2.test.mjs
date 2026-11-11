@@ -159,7 +159,7 @@ Eq(p4.version, 4, "migrated to v4"); Eq(ch4.p.job, "cook", "legacy job kept"); E
   Eq(ids, "ph1_a1,ph1_a3,ph1_a4,ph1_a5,ph1_a6,ph1_b1,ph1_b2,ph1_b4,ph1_b5,ph1_b6,ph1_c1,ph1_c6,ph1_c7,ph1_c8,ph1_c9", "pharmacist skill ids after the rework");
   const S = id => d.skill2(id);
   Eq(S("ph1_a4").unlock, 13, "밀어내기 Lv13"); Eq(S("ph1_a6").unlock, 18, "천근쇄약 Lv18"); Eq(S("ph1_b6").unlock, 15, "약병폭격 Lv15");
-  const sp = S("ph1_a3").ops[0]; Ok(sp.shape === "circle" && sp.hits === 5 && sp.last && sp.last.push > 0, "유봉 휘두르기: circle, 5 hits, last pushes");
+  const sp = S("ph1_a3").ops.find(o => o.op === "hit"); Ok(sp.shape === "circle" && sp.hits === 5 && sp.last && sp.last.push > 0, "유봉 휘두르기: circle, 5 hits, last pushes");
   const sl = S("ph1_a6").ops.find(o => o.op === "delay"); Ok(sl.coef === 4.5 && sl.core > 0 && sl.r >= 4, "천근쇄약 450% wide + centre bonus");
   const fr = S("ph1_b6").ops[0]; Ok(fr.op === "custom" && fr.fn === "flask_rain" && fr.n === 10, "약병폭격 10 flasks");
   const ad = S("ph1_c6").ops; Ok(ad.some(o => o.id === "haste" && o.val === 0.2 && o.dur === 15) && ad.some(o => o.id === "aspdup" && o.val === 0.25 && o.dur === 15), "아드레날린 15 s +20 % move +25 % attack speed");

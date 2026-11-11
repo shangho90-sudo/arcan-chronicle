@@ -17,7 +17,15 @@ PROMPTS = {
     'syringe': 'a big cartoon medical syringe injector, clear glass barrel with glowing orange-red liquid, brass plunger and finger '
                'rings, short silver needle, ' + STYLE,
 }
-TARGET = {'pestle_gold': 6000, 'flask': 2500, 'syringe': 3000}
+# 2026-11-11 그래픽 개선용(사용자 요청 2장): 황금 약병과 지면 파편. 크레딧이 없어 아직 못 만듦 — 지금 게임은
+# tools/blender/fx_pharm.py의 절차 메시(pharm_flask + pharm_liquid, pharm_piece_NN, pharm_shard_N)를 씀.
+PROMPTS.update({
+    'flask_gold': 'a round fantasy potion bottle, round body, short neck, clear mouth with a cork stopper, thin glass shell with warm amber '
+                  'golden liquid inside, tidy highlights, no glow ring, no base, no label text, low detail game asset, ' + STYLE,
+    'shards': 'a set of eight separate irregular broken paving stone chunks, grey-beige flagstone top, darker rough stone sides, thick '
+              'with small bevels and rough broken edges, laid out apart in a row, no glow, no cracks painted on, ' + STYLE,
+})
+TARGET = {'pestle_gold': 6000, 'flask': 2500, 'syringe': 3000, 'flask_gold': 2500, 'shards': 4000}
 
 def gen(name):
     sys.path.insert(0, HERE); import tripo

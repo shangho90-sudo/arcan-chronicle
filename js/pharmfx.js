@@ -32,7 +32,7 @@ export const PHARM = {
   intensity: 1.0,            // overall brightness of every additive layer (do NOT raise the global bloom instead)
   ringLift: 0.07,            // m above the ground for flat rings / circles (no z-fighting)
   pal: {                     // w = hot core, b = body, h = halo / deep tone; s1 / s2 = lit / shaded smoke
-    gold:   { w: 0xfff6d8, b: 0xffc030, h: 0xd86a00, s1: 0xd8c8a8, s2: 0x7a6a58 },
+    gold:   { w: 0xfff4cc, b: 0xffb41e, h: 0xe06a00, s1: 0xd8c8a8, s2: 0x7a6a58 },
     orange: { w: 0xfff0d0, b: 0xff8a2a, h: 0xd04000 },
     fire:   { w: 0xfff2c0, b: 0xff7a1e, h: 0xc82800, s1: 0xffb070, s2: 0x5a2a18 },
     ice:    { w: 0xf0fbff, b: 0x6cd0ff, h: 0x2060d0, s1: 0xe0f6ff, s2: 0x5a90c0 },
@@ -40,9 +40,9 @@ export const PHARM = {
     shield: { w: 0xe8fbff, b: 0x62c8ff, h: 0x2a70e0 },
     heal:   { w: 0xf2ffe0, b: 0x74f08a, h: 0x1fa050 },
   },
-  spin: { life: 0.30, lastLife: 0.44, peak: 1.5, lastPeak: 1.9, lead: 0.5, ringTime: 0.30 },         // lead: rad the ribbon head runs ahead of the pestle tip
+  spin: { life: 0.32, lastLife: 0.46, peak: 2.3, lastPeak: 3.0, lead: 0.5, ringTime: 0.30 },         // lead: rad the ribbon head runs ahead of the pestle tip
   pestle: { height: 4.6, lean: 0.30, drop: 6.5, stay: 0.55, glow: 0.12 },
-  shatter: { k: 0.58, maxR: 2.6, lift: 0.62, up: 0.14, hang: 0.24, fall: 0.26, rest: 1.15, life: 1.75, glow: 1.5 },   // R = min(r * k, maxR)
+  shatter: { k: 0.58, maxR: 2.6, lift: 0.5, thick: 0.42, tilt: 0.3, up: 0.14, hang: 0.24, fall: 0.26, rest: 1.15, life: 1.75, glow: 1.5 },   // R = min(r * k, maxR)
   burst: { ring: 0.26, core: 0.22, puffA: 0.40, puffLife: 1.1 },
   buff: { flash: 1.4, loop: 0.34 },
   shield: { rx: 1.25, ry: 1.7, fill: 0.03, line: 0.16, flow: 0.5, rim: 0.42, hexN: 6.0 },
@@ -102,7 +102,7 @@ void main(){ float u = vUv.x; float line = exp(-pow((u - .84) / .075, 2.)); floa
   gl_FragColor = vec4((uW * line * .7 + uB * (line + wake)) * uA, 1.); }`;
 // under-glow disc (gold light under the lifted pieces): hot centre, falls off to nothing at the rim
 const UNDER_FS = `uniform vec3 uW, uB; uniform float uA; varying vec3 vP;
-void main(){ float r = length(vP.xz); float k = pow(1. - smoothstep(0., 1., r), 1.4); gl_FragColor = vec4((uB * k + uW * k * k * .6) * uA, 1.); }`;
+void main(){ float r = length(vP.xz); float k = 1. - smoothstep(.72, 1., r); float c = 1. - smoothstep(0., .8, r); gl_FragColor = vec4((uB * k + uW * c * .5) * uA, 1.); }`;
 const CIRCLE_FS = `uniform sampler2D uMap; uniform vec3 uB; uniform float uA; varying vec2 vUv;
 void main(){ vec4 t = texture2D(uMap, vUv); gl_FragColor = vec4(t.rgb * t.a * uA, 1.); }`;
 // 보호막: clear dome, thin hex lines (azimuthal map from the top), a few cells light up and drift, fresnel rim, hit ripple
@@ -210,7 +210,7 @@ export class PharmFx {
     // the head of the outer ribbon sits on the real pestle tip (three coords); the turning sense comes from the tip's motion
     const tipAng = () => { try { const b = pc.body && pc.body.bladePoints && pc.body.bladePoints(); if (b) { const c = P3(pc.pos); return Math.atan2(b[1].z - c.z, b[1].x - c.x); } } catch (err) { /* no blade */ } return null; };
     let a0 = tipAng(), sense = this._spinSense || 1, base = a0 ?? (h * 2.4), prev = a0;
-    const defs = [{ rr: 0.98, y: 0.80, tx: 0.07, tz: -0.05, off: 0, w: 1 }, { rr: 0.66, y: 1.10, tx: -0.13, tz: 0.09, off: 2.3, w: 0.8 }];
+    const defs = [{ rr: 0.98, y: 0.80, tx: 0.07, tz: -0.05, off: 0, w: 1 }, { rr: 0.66, y: 1.10, tx: -0.13, tz: 0.09, off: 2.3, w: 0.8 }, { rr: 0.84, y: 0.62, tx: 0.03, tz: 0.10, off: 0.9, w: 0.55 }];
     if (last || (!low && h % 2 === 0)) defs.push({ rr: 0.42, y: 0.52, tx: 0.16, tz: 0.12, off: 4.3, w: 0.65 });
     const e = this._fx('spin', life + 0.05, (e, dt) => {
       const t = e.t; e.g.position.copy(P3(pc.pos));
@@ -278,7 +278,7 @@ export class PharmFx {
   /** ⑤ 황금 지면 파쇄: pos = centre (game coords), o.r = the skill's real radius (visual R = min(r * k, maxR), crack lines end inside r) */
   shatter(pos, o = {}) {
     if (!this._ok()) return null;
-    const S = PHARM.shatter, pal = PHARM.pal.gold, I = PHARM.intensity, low = lite(), R = Math.min((o.r || 4) * S.k, S.maxR), sy = R * 0.75;
+    const S = PHARM.shatter, pal = PHARM.pal.gold, I = PHARM.intensity, low = lite(), R = Math.min((o.r || 4) * S.k, S.maxR), sy = R * S.thick;
     const e = this._fx('shatter', S.life, (e, dt) => {
       const t = e.t, out = smooth(S.rest, S.life, t);
       for (const m of pcs) { const d = m.userData, u = t - d.t0; let k = 0;                         // k = lift 0..1 (up fast, hang, fall), then rest tilted
@@ -286,7 +286,7 @@ export class PharmFx {
         const y = d.h * k - out * (0.22 * sy + 0.05); m.position.set(d.x * (1 + d.push * k), 0.05 + y, d.z * (1 + d.push * k));
         m.quaternion.setFromAxisAngle(d.ax, d.ang * k);
         const U = m.material.uniforms; U.uA.value = 1 - smooth(0.2, 1, out); U.uUnder.value = S.glow * 0.5 * (1 - smooth(0.05, 0.9, t)); }
-      under.material.uniforms.uA.value = I * S.glow * (0.25 + 0.75 * (1 - smooth(0, 0.45, t))) * (1 - smooth(0.7, S.rest + 0.2, t)) * smooth(0, 0.03, t);
+      under.material.uniforms.uA.value = I * S.glow * 1.5 * (0.25 + 0.75 * (1 - smooth(0, 0.45, t))) * (1 - smooth(0.7, S.rest + 0.2, t)) * smooth(0, 0.03, t);
       lines.material.uniforms.uA.value = I * 1.4 * smooth(0, 0.05, t) * (1 - smooth(0.25, S.rest, t)); lines.material.uniforms.uCut.value = -1 + 0 * t;
       const grow = easeOut(t / 0.12); lines.scale.set(R * grow, 1, R * grow);
       for (const m of loose) { const d = m.userData, u = t - d.t0; m.visible = u > 0 && u < d.life; if (!m.visible) continue;
@@ -300,8 +300,8 @@ export class PharmFx {
     e.g.position.copy(P3(pos));
     const pcs = this.pieces.map(pc => { const m = this.solid(e, pc.geo, { em: 0xffb030, rim: 0xfff0d0, spec: 0.15 }); m.scale.set(R, sy, R);
       const cen = 1 - pc.rho;                                                              // 1 at the centre .. ~0.15 at the rim
-      m.userData = { x: pc.x * R, z: pc.z * R, h: R * S.lift * (0.10 + 0.9 * Math.pow(cen, 1.3)) * rnd(0.8, 1.15) / 2.4 * 2.4 * 0.42, t0: pc.rho * 0.09 + rnd(0, 0.03), hang: S.hang * rnd(0.7, 1.3), rest: rnd(0.10, 0.28),
-        push: 0.05 + 0.10 * pc.rho, ang: rnd(0.18, 0.5) * (0.5 + 0.7 * cen) * (Math.random() < 0.5 ? -1 : 1), ax: new THREE.Vector3(rnd(-1, 1), rnd(-0.15, 0.15), rnd(-1, 1)).normalize() }; return m; });
+      m.userData = { x: pc.x * R, z: pc.z * R, h: S.lift * (R / 2.4) * (0.12 + 0.88 * Math.pow(cen, 1.3)) * rnd(0.8, 1.15), t0: pc.rho * 0.09 + rnd(0, 0.03), hang: S.hang * rnd(0.7, 1.3), rest: rnd(0.10, 0.28),
+        push: 0.05 + 0.10 * pc.rho, ang: S.tilt * rnd(0.4, 1.0) * (0.5 + 0.7 * cen) * (Math.random() < 0.5 ? -1 : 1), ax: new THREE.Vector3(rnd(-1, 1), rnd(-0.15, 0.15), rnd(-1, 1)).normalize() }; return m; });
     const under = this._m(e, 'under', this.geo.pharm_circle, 2); this._pal(under, pal); under.scale.setScalar(R * 1.02); under.position.y = 0.04;
     const lines = this.spr(e, 'crack', pal, 3); lines.geometry = this.geo.pharm_cracks; lines.position.y = PHARM.ringLift;
     const loose = [], dust = [], stars = [];

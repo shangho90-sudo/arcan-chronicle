@@ -149,9 +149,9 @@ def dome(bm, col, uvl, seg=40, rows=14):
 # tunables (the game scales / colours everything; these only shape the unit meshes)
 RIB_SPAN = 210.0      # ribbon arc span (deg): tail at angle 0, head at RIB_SPAN, outer edge on radius 1
 RIB_SEG = 56
-RIB_W = 0.17          # max ribbon width (radius 1)
+RIB_W = 0.20          # max ribbon width (radius 1)
 PIECE_RINGS = [(0.0, 0.30, 5), (0.30, 0.63, 8), (0.63, 1.0, 12)]   # fracture: (r0, r1, sectors) of the unit shatter disc
-PIECE_GAP = 0.030     # half gap between neighbouring pieces (the gold light shows through)
+PIECE_GAP = 0.040     # half gap between neighbouring pieces (the gold light shows through)
 PIECE_T = 0.17        # piece thickness (unit disc; the game scales x/z by R and y by R * 0.75)
 PIECE_BEVEL = 0.028
 STONE_TOP, STONE_SIDE, STONE_EDGE = (0.74, 0.68, 0.58), (0.40, 0.35, 0.30), (0.90, 0.85, 0.74)   # 회베이지 포장석 윗면 / 어두운 옆면 / 밝은 모서리
