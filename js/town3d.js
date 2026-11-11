@@ -34,7 +34,8 @@ function M(key0) {
   const [name, tint] = key.slice(0, key.length - PAL_ID.length).split('#');
   let m;
   if (TILE[name]) {
-    m = new THREE.MeshStandardMaterial({ map: ttex(name), roughness: name === 'slate' ? 0.7 : 0.92, metalness: 0 });
+    const grey = PALETTE[name] && (name === 'slate' || name === 'bluewood');       // blue textures: tint a grey copy instead (tools/town/grey_tex.py)
+    m = new THREE.MeshStandardMaterial({ map: ttex(grey ? name + '_grey' : name), roughness: name === 'slate' ? 0.7 : 0.92, metalness: 0 });
     if (HAS_N.has(name)) { m.normalMap = ttex(name + '_n', false); m.normalScale.set(0.9, 0.9); }
   } else if (name === 'window') {
     m = new THREE.MeshStandardMaterial({ map: ttex('window'), emissive: 0xffb45a, emissiveMap: ttex('window'), emissiveIntensity: 0.65, roughness: 0.4 });

@@ -29,9 +29,9 @@ const ZONES = (process.env.ZONES || 'town').split(','), SHOTS = (process.env.SHO
     };
     if (SHOTS.includes('over')) {                                                    // 높은 카메라로 마을 전체
       const half = Math.max(info.bounds[2] - info.bounds[0], info.bounds[3] - info.bounds[1]) * (touch ? 0.62 : 0.4);
-      await ev(async h => { const m = await import('/js/render.js'); window.__cam = { ...m.CAM }; m.CAM.ortho = h; m.CAM.dist = 220; m.CAM.minWidth = 2 * h; G.render.resize(); document.body.classList.add('shot-clean'); for (const e of document.querySelectorAll('.hud,.botbar,.abtns,#hud,.plate,.qhud')) e.style.visibility = 'hidden'; }, half);
+      await ev(async h => { const m = await import('/js/render.js'); window.__cam = { ...m.CAM }; m.CAM.ortho = h; m.CAM.dist = 220; m.CAM.minWidth = 2 * h; G.render.cam.far = 800; G.render.resize(); document.body.classList.add('shot-clean'); for (const e of document.querySelectorAll('.hud,.botbar,.abtns,#hud,.plate,.qhud')) e.style.visibility = 'hidden'; }, half);
       await at('over', 0, 0);
-      await ev(async () => { const m = await import('/js/render.js'); Object.assign(m.CAM, window.__cam); G.render.resize(); for (const e of document.querySelectorAll('.hud,.botbar,.abtns,#hud,.plate,.qhud')) e.style.visibility = ''; });
+      await ev(async () => { const m = await import('/js/render.js'); Object.assign(m.CAM, window.__cam); G.render.cam.far = 160; G.render.resize(); for (const e of document.querySelectorAll('.hud,.botbar,.abtns,#hud,.plate,.qhud')) e.style.visibility = ''; });
     }
     if (SHOTS.includes('plaza')) await at('plaza', 0, -9);
     if (SHOTS.includes('gates')) for (const [id, pos, hd] of info.gates) { const a = (hd ?? 180) * Math.PI / 180; await at(id, pos[0] - Math.sin(a) * 6, pos[1] - Math.cos(a) * 6); await at(id + '_out', pos[0] + Math.sin(a) * 4.5, pos[1] + Math.cos(a) * 4.5); }
@@ -39,7 +39,7 @@ const ZONES = (process.env.ZONES || 'town').split(','), SHOTS = (process.env.SHO
     if (SHOTS.includes('market') && info.market) await at('market', info.market[0], info.market[1]);
     if (SHOTS.includes('park') && info.park) await at('park', info.park[0], info.park[1]);
     if (SHOTS.includes('map')) { await ev(() => G.ui.showAreaMap()); await pg.waitForTimeout(5000); await pg.screenshot({ path: `${OUT}/${zid}_map_${SZ}.png`, timeout: 300000 }); await ev(() => G.ui.close()); }
-    if (SHOTS.includes('perf')) console.log(zid, 'perf', JSON.stringify(await ev(async () => { const t = []; let l = performance.now(); for (let i = 0; i < 20; i++) { await new Promise(r => requestAnimationFrame(r)); const n = performance.now(); t.push(n - l); l = n; } const i = G.render.r.info.render; return { ms: +(t.reduce((a, b) => a + b) / t.length).toFixed(1), calls: i.calls, tris: i.triangles }; })));
+    if (SHOTS.includes('perf')) console.log(zid, 'perf', JSON.stringify(await ev(async () => { const t = []; let l = performance.now(); for (let i = 0; i < 20; i++) { await new Promise(r => requestAnimationFrame(r)); const n = performance.now(); t.push(n - l); l = n; } const R = G.render.r; R.info.autoReset = false; R.info.reset(); await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); const i = { calls: R.info.render.calls / 2 | 0, triangles: R.info.render.triangles / 2 | 0 }; R.info.autoReset = true; return { ms: +(t.reduce((a, b) => a + b) / t.length).toFixed(1), calls: i.calls, tris: i.triangles }; })));
   }
   console.log('errors', errs.slice(0, 6)); await b.close();
 })();

@@ -41,15 +41,15 @@ THEMES = {
     'town': dict(title='아늑한 시작 마을', palette={}, trees=['tree_broad_a', 'tree_broad_b', 'tree_forest_round'], flowers=['flower_white', 'flower_pink', 'flower_yellow', 'flower_mixed'],
                  lm=[('town_arcan_inn', 13, '산들바람 여관', 'big'), ('town_arcan_windmill', 11, '마을 풍차', 'big'), ('town_arcan_clocktower', 5.5, '마을 종탑', 'prop'), ('town_arcan_board', 3.2, '마을 게시판', 'prop')],
                  mix=[('well', 1), ('stall', 3), ('cart', 1), ('hay', 3), ('barrels', 3), ('crates', 3), ('bench', 8), ('planter', 8), ('tree', 26), ('shrub', 26), ('flowerpatch', 22)], stalls=5, lamps=18),
-    'kairion_capital': dict(title='왕국의 수도', palette=dict(wallstone='#f1ede4', basestone='#e6e2d8', slate='#6f88c8', plaster='#fbf6ea', pave='#f0eadc'), trees=['tree_broad_a', 'tree_forest_round'],
+    'kairion_capital': dict(centre='town_kairion_statue', title='왕국의 수도', palette=dict(wallstone='#f1ede4', basestone='#e6e2d8', slate='#4a66c8', plaster='#fbf6ea', pave='#f0eadc'), trees=['tree_broad_a', 'tree_forest_round'],
                  flowers=['flower_white', 'flower_yellow', 'flower_mixed'],
                  lm=[('town_kairion_guildhall', 20, '장인 길드 회관', 'big'), ('town_kairion_academy', 17, '왕립 학술원', 'big'), ('town_kairion_clocktower', 7, '왕도 시계탑', 'prop'), ('town_kairion_statue', 6, '건국왕 기마상', 'prop')],
                  mix=[('well', 2), ('stall', 6), ('cart', 2), ('barrels', 5), ('crates', 5), ('banner', 14), ('bench', 16), ('planter', 18), ('tree', 44), ('shrub', 40), ('flowerpatch', 34)], stalls=10, lamps=30),
-    'baltern': dict(title='바위산 교역 도시', palette=dict(wallstone='#c9ccd4', basestone='#b9bcc6', slate='#4f6fa8', plaster='#e9e6de', pave='#d9d9d6', grass='#c6d0b4'), trees=['tree_forest_tall', 'tree_broad_b'],
+    'baltern': dict(centre='town_baltern_goat', title='바위산 교역 도시', palette=dict(wallstone='#c9ccd4', basestone='#b9bcc6', slate='#5c7088', plaster='#e9e6de', pave='#d9d9d6', grass='#c6d0b4'), trees=['tree_forest_tall', 'tree_broad_b'],
                  flowers=['flower_white', 'clover'], rocks=True,
                  lm=[('town_baltern_tradehall', 16, '공국 교역소', 'big'), ('town_baltern_warehouse', 13, '상단 창고', 'big'), ('town_baltern_windmill', 8, '바위산 풍차', 'prop'), ('town_baltern_goat', 5.5, '산양 분수', 'prop')],
                  mix=[('well', 1), ('stall', 4), ('cart', 4), ('barrels', 8), ('crates', 8), ('hay', 3), ('banner', 5), ('bench', 6), ('rock', 14), ('tree', 16), ('shrub', 16), ('flowerpatch', 8)], stalls=6, lamps=18),
-    'lumiere': dict(title='신전 도시', palette=dict(wallstone='#fbfaf6', basestone='#f2f0ea', slate='#9fc4e8', plaster='#ffffff', pave='#f7f4ec', cobble='#efe9da'), trees=['tree_broad_a', 'tree_violet_round'],
+    'lumiere': dict(centre='town_lumiere_goddess', title='신전 도시', palette=dict(wallstone='#fbfaf6', basestone='#f2f0ea', slate='#9fc4e8', plaster='#ffffff', pave='#f7f4ec', cobble='#efe9da'), trees=['tree_broad_a', 'tree_violet_round'],
                  flowers=['flower_white', 'flower_white', 'flower_pink'],
                  lm=[('town_lumiere_shrine', 14, '빛의 성소', 'big'), ('town_lumiere_pavilion', 9, '기도의 정자', 'big'), ('town_lumiere_belltower', 5.5, '새벽 종탑', 'prop'), ('town_lumiere_goddess', 5, '여신상', 'prop')],
                  mix=[('well', 1), ('stall', 2), ('banner', 10), ('bench', 12), ('planter', 16), ('tree', 20), ('shrub', 22), ('flowerpatch', 30)], stalls=3, lamps=20),
@@ -57,7 +57,7 @@ THEMES = {
                  flowers=['clover', 'grass_short'], rocks=True,
                  lm=[('town_gravel_lordhall', 16, '영주관', 'big'), ('town_gravel_headframe', 10, '광산 권양탑', 'big'), ('town_gravel_crane', 6, '채석 기중기', 'prop'), ('town_gravel_orecart', 4.5, '광석 수레', 'prop')],
                  mix=[('well', 1), ('stall', 3), ('cart', 5), ('barrels', 8), ('crates', 10), ('hay', 4), ('dummy', 4), ('banner', 4), ('bench', 4), ('rock', 26), ('tree', 10), ('shrub', 12), ('flowerpatch', 6)], stalls=4, lamps=16),
-    'silvern': dict(title='숲의 영지', palette=dict(wallstone='#cfd6c0', basestone='#bcc5aa', slate='#5f9a62', plaster='#f1ecd6', pave='#dcdcc4', grass='#b8dba0', wood='#c8b088'), trees=['tree_forest_round', 'tree_forest_tall', 'tree_broad_a'],
+    'silvern': dict(centre='town_silvern_deer', title='숲의 영지', palette=dict(wallstone='#cfd6c0', basestone='#bcc5aa', slate='#5f9a62', plaster='#f1ecd6', pave='#dcdcc4', grass='#b8dba0', wood='#c8b088'), trees=['tree_forest_round', 'tree_forest_tall', 'tree_broad_a'],
                  flowers=['flower_mixed', 'flower_yellow', 'flower_pink', 'clover'],
                  lm=[('town_silvern_manor', 16, '실베른 영주관', 'big'), ('town_silvern_treehouse', 12, '고목의 집', 'big'), ('town_silvern_gazebo', 6.5, '덩굴 정자', 'prop'), ('town_silvern_deer', 4.5, '숲사슴 목각상', 'prop')],
                  mix=[('well', 1), ('stall', 4), ('cart', 2), ('hay', 4), ('barrels', 3), ('crates', 3), ('bench', 10), ('planter', 8), ('tree', 46), ('shrub', 40), ('flowerpatch', 34)], stalls=5, lamps=16),
@@ -65,11 +65,11 @@ THEMES = {
                  flowers=['flower_yellow', 'flower_mixed'],
                  lm=[('town_marseon_bazaar', 17, '대상 바자르', 'big'), ('town_marseon_bathhouse', 13, '터키석 목욕탕', 'big'), ('town_marseon_tower', 6.5, '봉화 등대', 'prop'), ('town_marseon_caravan', 5.5, '대상 낙타상', 'prop')],
                  mix=[('well', 2), ('stall', 10), ('cart', 4), ('barrels', 8), ('crates', 10), ('banner', 6), ('bench', 6), ('planter', 8), ('tree', 12), ('shrub', 14), ('flowerpatch', 10)], stalls=14, lamps=20),
-    'baltazar': dict(title='검은 돌과 대장간의 수도', palette=dict(wallstone='#77737c', basestone='#5f5b66', slate='#9a3a36', plaster='#b9b2ac', pave='#8f8a90', cobble='#77727a', grass='#9aa58a'), trees=['tree_forest_tall'],
+    'baltazar': dict(centre='town_baltazar_kingstatue', title='검은 돌과 대장간의 수도', palette=dict(wallstone='#77737c', basestone='#5f5b66', slate='#9a3a36', plaster='#b9b2ac', pave='#8f8a90', cobble='#77727a', grass='#9aa58a'), trees=['tree_forest_tall'],
                  flowers=['clover', 'grass_short'], rocks=True,
                  lm=[('town_baltazar_forge', 20, '왕립 대단조장', 'big'), ('town_baltazar_tower', 8, '붉은 종탑', 'big'), ('town_baltazar_anvil', 6.5, '거인의 모루', 'prop'), ('town_baltazar_kingstatue', 5.5, '망치왕 흑요석상', 'prop')],
                  mix=[('well', 2), ('stall', 5), ('cart', 4), ('barrels', 8), ('crates', 10), ('dummy', 8), ('banner', 12), ('bench', 8), ('rock', 20), ('tree', 18), ('shrub', 16), ('flowerpatch', 8)], stalls=8, lamps=28),
-    'kreutz_fort': dict(title='설원의 국경 요새', palette=dict(wallstone='#aab2be', basestone='#8f98a6', slate='#e8eef4', plaster='#cfd3d8', pave='#dfe6ee', cobble='#c4ccd6', grass='#eef3f8', wood='#9a8f88'), trees=['tree_forest_tall'],
+    'kreutz_fort': dict(centre='town_kreutz_brazier', title='설원의 국경 요새', palette=dict(wallstone='#aab2be', basestone='#8f98a6', slate='#e8eef4', plaster='#cfd3d8', pave='#dfe6ee', cobble='#c4ccd6', grass='#eef3f8', wood='#9a8f88'), trees=['tree_forest_tall'],
                  flowers=['grass_short'], rocks=True,
                  lm=[('town_kreutz_barracks', 16, '수비대 막사', 'big'), ('town_kreutz_watchtower', 8, '감시탑', 'big'), ('town_kreutz_ballista', 6, '공성 노포', 'prop'), ('town_kreutz_brazier', 4, '봉화대', 'prop')],
                  mix=[('well', 1), ('stall', 2), ('cart', 3), ('barrels', 8), ('crates', 10), ('dummy', 8), ('hay', 4), ('banner', 8), ('fence', 10), ('rock', 18), ('tree', 14), ('shrub', 6)], stalls=3, lamps=16),
@@ -196,7 +196,11 @@ def gen_town2(t, exits, extra_npcs=()):
     models, lm_at, decor, anchors = [], {}, [], {}
     centre = t.get('centre')                      # 아르칸: 여신의 분수
     if centre: models.append(dict(centre)); add('fountain', circle(0, 0, 5.3, 24))
-    else: decor.append(dict(type='planter', pos=[0.0, 0.0], r=3.0)); add('planter', circle(0, 0, 3.1, 18))
+    elif th.get('centre') in man:                 # 광장 한가운데 상징물 (동상·분수)
+        f = th['centre']; s0, n0 = next((s, n) for ff, s, n, _ in th['lm'] if ff == f); m = man[f]
+        models.append(dict(id=f.replace('town_', 'lm_'), file=f, pos=[0.0, 0.0], h=180, scale=s0, size=[round(s0 * m[0], 2), round(s0 * m[1], 2), round(s0 * m[2], 2)], name=n0))
+        add(f.replace('town_', 'lm_'), circle(0, 0, s0 * max(m[0], m[1]) / 2 * 0.92, 18)); lm_at[f.replace('town_', 'lm_')] = (0.0, 0.0, 180, s0 * max(m[0], m[1]) / 2)
+    else: decor.append(dict(type='well', pos=[0.0, 0.0])); add('well', circle(0, 0, 1.6, 14))
     def face_centre(x, z):                        # heading (multiple of 90) that turns a building's front to the town centre / nearest street
         return (90 if x < 0 else 270) if abs(x) > abs(z) * 1.15 else (0 if z < 0 else 180)
     def put_model(mid, file, size, name, x, z, h):
@@ -207,7 +211,7 @@ def gen_town2(t, exits, extra_npcs=()):
         for px, pz in rect_pts(x, z, ww, dd, 0.3): taken.append((px, pz, 1.3))
         lm_at[mid] = (x, z, h, max(w, d) / 2)
     fixed = list(t.get('fixed_models', []))       # 아르칸: 대장간·약국 (원래 모델)
-    bigs = [(f, s, n) for f, s, n, kind in th['lm'] if kind == 'big' and f in man]; props = [(f, s, n) for f, s, n, kind in th['lm'] if kind == 'prop' and f in man]
+    bigs = [(f, s, n) for f, s, n, kind in th['lm'] if kind == 'big' and f in man]; props = [(f, s, n) for f, s, n, kind in th['lm'] if kind == 'prop' and f in man and not (f == th.get('centre') and not centre)]
     qi = 0
     for i, fm in enumerate(fixed):                # 원래 모델이 먼저 (꼭 들어가야 함): 광장 북쪽 좌우
         p = find_rect((-1 if i % 2 == 0 else 1) * (RP + 6.0), RP + 7.0, fm['size'][0], fm['size'][1])
