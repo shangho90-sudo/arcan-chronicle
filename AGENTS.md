@@ -8,7 +8,7 @@
 ## 기본
 - 빌드 없음. `python3 -m http.server 8765` 후 `http://localhost:8765/index.html`.
 - three.js r160을 로컬 import map(`index.html`, `vendor/three-r160/`)으로 불러옵니다. CDN 장애 시 0% 멈춤을 방지하기 위해 동일 버전과 LICENSE를 저장소에 포함합니다. npm 의존성 없음. 새 라이브러리 추가 금지(필요하면 먼저 사용자에게 확인).
-- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs` (현재 504 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 620 통과).
+- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs` (현재 504 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 638 통과).
 - 테스트하지 않은 것을 "검증됨"이라고 보고하지 말 것.
 
 ## 데이터 우선
