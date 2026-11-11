@@ -177,12 +177,12 @@ def gen_town2(t, exits, extra_npcs=()):
     def rect_pts(x, z, ww, dd, m=0.0):
         nx, nz = max(2, int((ww + 2 * m) / 1.8) + 1), max(2, int((dd + 2 * m) / 1.8) + 1)
         return [(x - ww / 2 - m + i * (ww + 2 * m) / (nx - 1), z - dd / 2 - m + j * (dd + 2 * m) / (nz - 1)) for i in range(nx) for j in range(nz)]
-    def find_rect(ax, az, w, d, reach=60.0, m=1.0):
+    def find_rect(ax, az, w, d, reach=60.0, m=1.0, face=None):
         """가장 가까운 빈 직사각형 자리 + 앞면 방향 (큰 건물은 원으로 재면 들어갈 곳이 없음)"""
         for rad in [i * 1.5 for i in range(int(reach / 1.5) + 1)]:
             n = 1 if rad == 0 else max(8, int(rad * 1.6)); off = rnd.random() * 6.28
             for i in range(n):
-                x, z = ax + rad * math.cos(off + i / n * 6.283), az + rad * math.sin(off + i / n * 6.283); h = face_centre(x, z)
+                x, z = ax + rad * math.cos(off + i / n * 6.283), az + rad * math.sin(off + i / n * 6.283); h = face if face is not None and z > 0 else face_centre(x, z)
                 ww, dd = (w, d) if h in (0, 180) else (d, w)
                 if all(ok(px, pz, 0.3, road=0.3) for px, pz in rect_pts(x, z, ww, dd, m)): return round(x, 2), round(z, 2), h
         return None
@@ -191,8 +191,9 @@ def gen_town2(t, exits, extra_npcs=()):
 
     # ------------------------------------------------------------------ districts: landmark quarter(s), market, park
     q = 0.36 if loop else 0.5
-    quads = [(sx * W * q, sz * Dd * q) for sx, sz in ((1, 1), (-1, 1), (-1, -1), (1, -1))]
-    rnd.shuffle(quads)
+    # 큰 랜드마크는 북쪽 두 구역(앞면이 남쪽 = 카메라 쪽이라 건물이 그 앞의 NPC를 가리지 않음), 시장·공원은 남쪽 두 구역
+    north = [(W * q, Dd * q), (-W * q, Dd * q)]; south = [(W * q, -Dd * q), (-W * q, -Dd * q)]; rnd.shuffle(north); rnd.shuffle(south)
+    quads = north + south
     models, lm_at, decor, anchors = [], {}, [], {}
     centre = t.get('centre')                      # 아르칸: 여신의 분수
     if centre: models.append(dict(centre)); add('fountain', circle(0, 0, 5.3, 24))
@@ -214,14 +215,14 @@ def gen_town2(t, exits, extra_npcs=()):
     bigs = [(f, s, n) for f, s, n, kind in th['lm'] if kind == 'big' and f in man]; props = [(f, s, n) for f, s, n, kind in th['lm'] if kind == 'prop' and f in man and not (f == th.get('centre') and not centre)]
     qi = 0
     for i, fm in enumerate(fixed):                # 원래 모델이 먼저 (꼭 들어가야 함): 광장 북쪽 좌우
-        p = find_rect((-1 if i % 2 == 0 else 1) * (RP + 6.0), RP + 7.0, fm['size'][0], fm['size'][1])
+        p = find_rect((-1 if i % 2 == 0 else 1) * (RP + 6.0), RP + 7.0, fm['size'][0], fm['size'][1], face=180)
         assert p, 'no room for ' + fm['id']
         put_model(fm['id'], fm['file'], fm['size'], fm['name'], p[0], p[1], p[2]); models[-1]['scale'] = fm['scale']
     for f, s, n in bigs:
         m = man[f]; size = (s * m[0], s * m[1], s * m[2]); ax, az = quads[qi % 4]; qi += 1
         p = None
         for k in (1.0, 0.88, 0.76, 0.66):         # 작은 마을에서는 조금 줄여서라도 넣음
-            size = (s * k * m[0], s * k * m[1], s * k * m[2]); p = find_rect(ax, az, size[0], size[1], m=0.8)
+            size = (s * k * m[0], s * k * m[1], s * k * m[2]); p = find_rect(ax, az, size[0], size[1], m=0.8, face=180)
             if p: break
         if p: put_model(f.replace('town_', 'lm_'), f, size, n, p[0], p[1], p[2])
         else: print('  !! no room for', f, 'in', t['id'])

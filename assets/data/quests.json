@@ -6318,8 +6318,8 @@
    "npc": "miner_chief",
    "zone": "baltazar",
    "pos": [
-    -2.35,
-    -10.39
+    0.85,
+    -10.62
    ],
    "rot": -175.9,
    "from": "mq29a"
