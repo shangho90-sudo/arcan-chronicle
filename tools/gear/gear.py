@@ -98,7 +98,7 @@ JOB_ACCS = [
     ('ac_j_muse', '거장의 별빛 음표', 34, '별과 음표가 반짝이는 귀걸이. 화가·음악가 전용 효과.', [st('matk', 14), st('maxSp', 50)], ['painter', 'musician'],
      [st('matk', 0, 0.14), st('cdr', 0.08), st('maxSp', 0, 0.10)], '마법력 +14%, 재사용 대기시간 -8%, 최대 기력 +10%', [('mon_crystal', 0.03), ('mon_crimson_boar', 0.02), ('mon_kreutz_wolf', 0.02)]),
 ]
-SHOP_WEAPONS_OLD = ['w_pestle_1', 'w_knife_1', 'w_hammer_1', 'w_scissors_1', 'w_brush_1', 'w_pestle_2', 'w_knife_2', 'w_hammer_2', 'w_scissors_2', 'w_brush_2']   # 예전부터 팔던 1~2단계 직업 무기
+SHOP_WEAPONS_OLD = ['w_knife_1', 'w_hammer_1', 'w_scissors_1', 'w_brush_1', 'w_knife_2', 'w_hammer_2', 'w_scissors_2', 'w_brush_2']   # 예전부터 팔던 다른 직업의 1~2단계 무기(유봉은 새 5종만 팖)
 
 def item(id, name, typ, L, desc, stats, tier, k, job='', drops=None, jobbuff=None):
     d = {"id": id, "name": name, "desc": desc, "type": typ, "job": job, "tier": tier, "levelReq": L, "price": 0 if drops else price(L, k),

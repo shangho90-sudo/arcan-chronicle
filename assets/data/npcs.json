@@ -1027,12 +1027,10 @@
    "id": "shop_weapons",
    "name": "무기 상점",
    "items": [
-    "w_pestle_1",
     "w_knife_1",
     "w_hammer_1",
     "w_scissors_1",
     "w_brush_1",
-    "w_pestle_2",
     "w_knife_2",
     "w_hammer_2",
     "w_scissors_2",

@@ -8,7 +8,7 @@
 ## 기본
 - 빌드 없음. `python3 -m http.server 8765` 후 `http://localhost:8765/index.html`.
 - three.js r160을 로컬 import map(`index.html`, `vendor/three-r160/`)으로 불러옵니다. CDN 장애 시 0% 멈춤을 방지하기 위해 동일 버전과 LICENSE를 저장소에 포함합니다. npm 의존성 없음. 새 라이브러리 추가 금지(필요하면 먼저 사용자에게 확인).
-- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs` (현재 504 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 638 통과).
+- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs && node tests/gear.test.mjs` (현재 504 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 638 통과).
 - 테스트하지 않은 것을 "검증됨"이라고 보고하지 말 것.
 
 ## 데이터 우선
@@ -102,6 +102,15 @@
 ## 약사 1차 스킬 (2026-11-11 개편)
 - A 유봉 내려찍기·밀어내기(Lv13)·유봉 휘두르기(`ph_spin` 5타 + 마지막 밀침)·천근쇄약 `ph1_a6`(황금 유봉, 450% + 중심 +50%)·유봉 숙련 / B 화염·냉각·약병폭격 `ph1_b6`(CUSTOM `flask_rain`, 10병 화염·냉기·독 무작위)·부식·정확한 투척 / C 회복제 제작·약 보호막 `ph1_c7`(최대 체력 25% + `immune`)·아드레날린 주사 `ph1_c6`(`haste`+`aspdup`)·광역 회복진 `ph1_c8`(area heal + `pharm: 'circle'`)·약사 수련 `ph1_c9`(`elemRes`·마법력·최대 기력). 지운 스킬(ph1_a2·b3·c2·c3·c4·c5) 포인트는 불러올 때 환불(`skillsys.js` `ensureSk`).
 - 이펙트 `js/pharmfx.js`(`SkillFx.pharm.cast/spin/pestle/shatter/flask/burst/syringe/shield/circle` + 남은 스킬 `smash`(내려찍기, hit op `fx.pharm: 'smash'`, 히트스톱은 `freezeT`만)·`push`(밀어내기 `'push'`)·`proj`(던지는 약병, proj op `pharmProj`) — 화염·냉각·부식 약병 폭발은 약병폭격과 같은 `burst`(원소 `fire/ice/acid/poison`, `linger` = 서리·웅덩이가 남는 초), 조절값 `PHARM`: 색 `pal`·밝기 `intensity`·크기; 스킬 데이터 `fx` op의 `pharm`, hit op `fx.pharm: 'spin'`, `blast`의 `burst: 'none'` + `pharm`). 원칙: 얇은 밝은 중심선 + 색 몸통 + 부드러운 잔광, 가운데는 비움, 링·리본·연무는 실제 판정 반경을 넘지 않음, 최대 밝기 = 실제 피해 순간, 전역 블룸·노출은 올리지 말 것. 휘두르기 리본 머리는 실제 유봉 끝(`bladePoints`)을 따라감. 메시·아틀라스 `python3 tools/blender/fx_pharm.py fx`(아이콘까지는 인자 없이) → `assets/fx/fx_pharm.glb.json`(`cells`, 파쇄 조각 `pharm_piece_NN`) + `fx_pharm.png`. 아틀라스 칸을 더하면 `CELLS`만 고침(게임은 `cells`를 읽음). 아이콘은 사용자 그림에서 자른 것이니 `fx_pharm.py`를 인자 없이·`icons`로 돌리지 말 것. 천근쇄약 유봉은 절차 메시 `pharm_pestle`(Tripo 유봉 초안은 호리병·절구 모양이라 안 씀). Tripo 모델(황금 약병·지면 파편·얼음 결정 `tripo_ice`): `tools/tripo/pharm_assets.py tripo` → `python3 tools/blender/fx_pharm_tripo.py`(`RAW=` 초안 폴더) → `assets/fx/fx_pharm_tripo.glb.json`(없으면 Blender 메시로 대체). 메시는 종류별 풀에서 재사용, 휴대폰·그래픽 효과 끔은 입자·돌·연무만 줄임. 확인 `tools/browser-tests/pharm_skills.js`(`TAG= SIZE= FX= SCENES=`, 비교표 `sheet_<TAG>_<SIZE>.png`).
+
+## 장비 40종·무기/방어구 상인 (2026-11-11)
+- 유봉 10(`w_pestle_g1`~`g10`)·갑옷 10(`a_armor_g*`)·장신구 20(`ac_g1`~`g12` 일반, `ac_j_*` 직업 전용 8)은 `tools/gear/gear.py`가 주인(`"gear": true` 항목만 다시 씀: items/npcs/zones.json). 고친 뒤 `python3 tools/gear/gear.py --write`(인자 없이 = 표만 출력). 예전 아이템 id는 그대로.
+- 수치: 유봉 공격력 `10+2.2L`(마법력 45%), 갑옷 방어 `4+1.8L`·체력 `20+10L`, 드롭 전용은 ×1.08. 값 `60·L^1.25`(갑옷 ×0.9, 장신구 ×1.1), 되팔기 30%, 드롭 전용은 구매가 0.
+- 상점: 종류마다 낮은 5개만 판매(`shop_weapons` = 새 유봉 5 + 다른 직업 예전 1~2단계 무기, `shop_armor` = 갑옷 5 + 장신구 5). 나머지 25개는 아이템의 `dropFrom`(몬스터·확률) → `core.js`가 불러올 때 몬스터 `drops`에 합침(world.py·story.py가 monsters.json을 다시 써도 남음). 철산은 `shop_forge`(제작 재료만).
+- 직업 전용 효과: 아이템 `jobBuff {jobs, stats, text}` — `core.js` `jobBuffActive`, `recalc`에서 직업이 맞을 때만 더함. 설명 줄은 `ui.js` `gearLines`(적용 여부·얻는 곳).
+- 상인: 아르칸 마을 = 단오(무기, 원래 NPC) + 보라(`town_armor`), 생성 마을 8곳 = `world.py` `GEAR_MERCHANTS`(광장 둘레 빈 자리; 마르세온은 원래 있던 세라가 방어구 상인). 모델 `NPC_MODELS.gear_weapon/gear_armor`(색 바꾼 텍스처 `tools/npcs/recolor.py`). `world.py --write` 뒤에는 `story.py --write` → `gear.py --write` 순서로 다시.
+- 모델·아이콘: `tools/tripo/gear_assets.py`(Tripo 초안 40개, 원본은 저장소 밖 `RAW`) → `python3 tools/blender/gear.py`(아이콘 128 px `assets/ui/items/<id>.png`, 유봉 메시 2600삼각형·512 텍스처 `assets/items/<id>.glb.json`; `FORCE=1`로 다시). 게임: `items3d.js` `gearModel`(유봉은 임시 절차 모델 → 받아지면 교체, 갑옷·장신구의 떨어진 모습은 기존 절차 모델), 아이콘은 `ui.itemIcons`에 그림 경로.
+- 확인: `tests/gear.test.mjs`, `tools/browser-tests/gear.js`(`SIZE= GENDER= ONLY=merchants,shop,pestle,jobbuff,drop,sheets`).
 
 ## 직업 모델 (2026-11-07)
 - 전직하면 모습이 바뀌는 직업은 `model.js` `JOB_MODELS`(지금은 약사 `pharmacist_m`/`_f`, 대장장이 `blacksmith_m`/`_f`, 예술가 `artist_m`/`_f`, 요리사 `cook_m`/`_f`, 미용사 `hairdresser_m`/`_f` — 1차 직업 5개 모두). 모델은 반드시 같은 67뼈 휴머노이드 뼈대 GLB를 `python3 tools/models/glb_to_model.py <in.glb> <이름>`로 변환. 변신 연출은 `rewardfx.js` `JobChangeFx`(빛기둥·고치·날개·나팔·`Audio.chime('fanfare')`), 확인 `tools/browser-tests/jobchange.js`(`JOB=`·`GENDER=`).

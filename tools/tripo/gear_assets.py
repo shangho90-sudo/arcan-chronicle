@@ -24,7 +24,7 @@ PROMPTS = {
     'w_pestle_g7': CLUB + 'the head is frosted ice crystal with snowflake engravings, icy blue and white, silver handle, ' + STYLE,
     'w_pestle_g8': CLUB + 'the head is dark volcanic rock with glowing orange lava cracks, blackened iron handle, ' + STYLE,
     'w_pestle_g9': CLUB + 'carved from ivory dragon bone with a small horn spike, red dragon scale grip, ' + STYLE,
-    'w_pestle_g10': CLUB + 'ornate royal gold with a black dragon coiled around the head and a purple gem, luxurious legendary weapon, ' + STYLE,
+    'w_pestle_g10': CLUB + 'made entirely of shiny polished yellow gold, solid gold head and gold handle, black dragon scale grip wrap, one purple gem on the pommel, luxurious legendary weapon, ' + STYLE,
     # ---- 갑옷 10
     'a_armor_g1': ARMOR + 'quilted padded beige cloth gambeson with leather straps, ' + STYLE,
     'a_armor_g2': ARMOR + 'chainmail vest over a brown leather jerkin, ' + STYLE,
