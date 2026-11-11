@@ -1,5 +1,5 @@
 // HTML/CSS user interface (ivory / teal / gold, Galmuri pixel font). Port of the Unity uGUI views.
-import { QS, QUEST_CAT, questCategory, Shop, isEquipment, slotOf, EQUIP_SLOTS, ATTRS, ATTR_KR, ATTR_BASE, ATTR_FX } from './core.js';
+import { QS, QUEST_CAT, questCategory, Shop, jobBuffActive, isEquipment, slotOf, EQUIP_SLOTS, ATTRS, ATTR_KR, ATTR_BASE, ATTR_FX } from './core.js';
 import { showWorldMap } from './worldmap.js';
 import { THREE, tex, CAM } from './render.js';
 import { ModelBody, loadPlayerModel, loadActions } from './model.js';
@@ -46,6 +46,17 @@ const EQ_EMPTY = {
   accessory: '<svg viewBox="0 0 48 48" class="eqsil"><circle cx="24" cy="28" r="13" fill="none" stroke="#b8b0a0" stroke-width="5"/><path d="M18 12l6-8 6 8-6 5z" fill="#b8b0a0"/></svg>',
 };
 const TYPE_KR = { weapon: "무기", armor: "방어구", accessory: "장신구", consumable: "소비", material: "재료" };
+/** 장비 추가 설명: 직업 전용 효과(지금 직업에 적용되는지)와 얻는 곳(드롭 몬스터) */
+function gearLines(item, job) {
+  let h = "";
+  if (item.jobBuff) {
+    const on = jobBuffActive(item, job), names = item.jobBuff.jobs.map(j => G.data.job(j).name).join("·");
+    h += `<div class="gearbuff${on ? " on" : ""}">★ ${names} 전용 효과: ${item.jobBuff.text} <b>${on ? "(적용 중)" : "(지금 직업에는 적용 안 됨)"}</b></div>`;
+  }
+  if (item.dropFrom && item.dropFrom.length) h += `<div class="geardrop">얻는 곳: ${item.dropFrom.map(d => { const m = G.data.monsters[d.monster]; return (m ? m.name : d.monster) + " " + +(d.chance * 100).toFixed(1) + "%"; }).join(", ")}</div>`;
+  else if (item.gear) h += `<div class="geardrop">얻는 곳: 마을 상점</div>`;
+  return h;
+}
 function modText(m) {
   const out = [];
   if (Math.abs(m.add) > 1e-4) out.push(STAT_KR[m.stat] + " +" + (PCT.has(m.stat) ? Math.round(m.add * 100) + "%" : (m.add % 1 === 0 ? m.add : m.add.toFixed(1))));
@@ -126,7 +137,8 @@ export class UI {
   async load() {
     this.iconMeta = await (await fetch("assets/ui/icons.json")).json();
     // 3D item icons, rendered once from the item models (falls back to the pixel atlas for anything else)
-    try { this.itemIcons = renderItemIcons(G.data.itemList.map(i => i.icon || i.id)); } catch (e) { console.warn("3d icons", e); this.itemIcons = {}; }
+    try { this.itemIcons = renderItemIcons(G.data.itemList.filter(i => !i.gear).map(i => i.icon || i.id)); } catch (e) { console.warn("3d icons", e); this.itemIcons = {}; }
+    for (const i of G.data.itemList) if (i.gear) this.itemIcons[i.icon || i.id] = "assets/ui/items/" + i.id + ".png";      // 장비 40종: Blender로 그린 아이콘(tools/blender/gear.py)
   }
   icon(name, size = 48) {
     if (HUD_ICON[name]) return `<span class="icon svgic" style="width:${size}px;height:${size}px;display:flex">${HUD_ICON[name]}</span>`;
@@ -449,7 +461,7 @@ export class UI {
     else if (sel.slot !== undefined && bag.slots[sel.slot] && bag.slots[sel.slot].count > 0) item = G.data.item(bag.slots[sel.slot].id);
     if (!item) det.innerHTML = `<div class="hint"><i class="fstar">${STAR4}</i><span>${shopMode ? "판매할 아이템을 선택하세요." : "아이템을 선택하면 설명이 표시됩니다."}</span><i class="fstar">${STAR4}</i></div>`;
     else {
-      const info = $("div", "dinfo", det, `${this.icon(item.icon, 72)}<div><b>${item.name}</b> <small>${TYPE_KR[item.type]}${isEquipment(item) ? ` · ${item.tier}단계 · Lv${item.levelReq}` : ""}${item.job ? " · " + G.data.job(item.job).name + " 전용" : ""}</small><div class="small">${item.desc}</div><div class="mods">${(item.stats || []).map(modText).join(" ")}</div>${item.price ? `<div class="small muted">판매가 ${item.sellPrice} G</div>` : ""}</div>`);
+      const info = $("div", "dinfo", det, `${this.icon(item.icon, 72)}<div><b>${item.name}</b> <small>${TYPE_KR[item.type]}${isEquipment(item) ? ` · ${item.tier}단계 · Lv${item.levelReq}` : ""}${item.job ? " · " + G.data.job(item.job).name + " 전용" : ""}</small><div class="small">${item.desc}</div><div class="mods">${(item.stats || []).map(modText).join(" ")}</div>${gearLines(item, P.job)}${item.sellPrice > 0 ? `<div class="small muted">판매가 ${item.sellPrice} G</div>` : ""}</div>`);
       const btns = $("div", "dbtns", det);
       if (shopMode) {
         if (!equipped) { const slot = sel.slot, cnt = bag.slots[slot].count; this.button(btns, "1개 판매", "teal", () => this.sell(shopMode, slot, 1)); if (cnt > 1) this.button(btns, "모두 판매", "teal", () => this.sell(shopMode, slot, cnt)); }
@@ -483,7 +495,7 @@ export class UI {
     }
     const sel = G.data.item(this.shopSel);
     if (sel && shop.items.includes(sel.id)) {
-      const box = $("div", "buybox panel-dark", list, `<div><b>${sel.name}</b> <small>${TYPE_KR[sel.type]}${isEquipment(sel) ? " · Lv" + sel.levelReq : ""}${sel.job ? " · " + G.data.job(sel.job).name + " 전용" : ""}</small><div class="small">${sel.desc} <span class="mods">${(sel.stats || []).map(modText).join(" ")}</span></div></div>`);
+      const box = $("div", "buybox panel-dark", list, `<div><b>${sel.name}</b> <small>${TYPE_KR[sel.type]}${isEquipment(sel) ? " · Lv" + sel.levelReq : ""}${sel.job ? " · " + G.data.job(sel.job).name + " 전용" : ""}</small><div class="small">${sel.desc} <span class="mods">${(sel.stats || []).map(modText).join(" ")}</span></div>${gearLines(sel, p.sheet.p.job)}</div>`);
       const bb = $("div", "dbtns", box);
       this.button(bb, "1개 구매", "gold", () => this.buy(shop, sel.id, 1));
       if (sel.maxStack > 1) this.button(bb, "5개 구매", "gold", () => this.buy(shop, sel.id, 5));

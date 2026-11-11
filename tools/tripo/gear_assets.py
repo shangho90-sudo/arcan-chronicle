@@ -59,7 +59,7 @@ PROMPTS = {
     'ac_j_craft': 'a golden gear cog brooch with a small hammer and a needle crossed in the centre, artisan badge, ' + STYLE,
     'ac_j_muse': 'an earring with a golden star and a blue music note hanging from it, sparkling, ' + STYLE,
 }
-SEM = threading.Semaphore(int(os.environ.get('PAR', '6')))
+SEM = threading.Semaphore(int(os.environ.get('PAR', '4')))
 LOCK = threading.Lock()
 TASKS = os.path.join(RAW, 'gear_tasks.json')
 def tasks(): return json.load(open(TASKS)) if os.path.exists(TASKS) else {}
@@ -73,7 +73,10 @@ def gen(name):
     with SEM:
         tid = tasks().get(name)
         if not tid:
-            r = tripo.task({'type': 'text_to_model', 'model_version': 'v3.0-20250812', 'prompt': PROMPTS[name], 'texture': True, 'pbr': True, 'texture_quality': 'standard'})
+            for k in range(20):                                   # 429(동시 생성 한도)면 기다렸다가 다시
+                r = tripo.task({'type': 'text_to_model', 'model_version': 'v3.0-20250812', 'prompt': PROMPTS[name], 'texture': True, 'pbr': True, 'texture_quality': 'standard'})
+                if r.get('http_error') != 429: break
+                time.sleep(30)
             if 'data' not in r: print(name, 'Tripo 요청 실패:', json.dumps(r, ensure_ascii=False)[:300], flush=True); return
             tid = r['data']['task_id']; save_task(name, tid)
         d = tripo.wait(tid); d = d.get('data', d); out = d.get('output') or {}

@@ -2,6 +2,7 @@
 // Used three ways: held weapon on the player (grip at the origin, item axis +z), loot dropped in the world
 // (slowly spinning, bobbing) and UI icons (each model rendered once at start-up into a 128 px image).
 import { THREE } from './render.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 const matCache = new Map();
 function M(hex, o = {}) {
@@ -193,10 +194,44 @@ function dyeBottle(c) { const g = G(); add(g, cyl(0.045, 0.05, 0.12, 12), M(0xdf
 function spool(c) { const g = G(); add(g, cyl(0.04, 0.04, 0.1, 14), M(c, { r: 0.4 }), 0, 0.06); add(g, cyl(0.055, 0.055, 0.012, 14), WOOD, 0, 0.008); add(g, cyl(0.055, 0.055, 0.012, 14), WOOD, 0, 0.112); add(g, cyl(0.004, 0.004, 0.12, 4), metal('silver'), 0.06, 0.08, 0, 0.6); return g; }
 function charm(c) { const g = G(); add(g, box(0.1, 0.18, 0.008), M(0xf0e2b0, { r: 0.9 }), 0, 0.09); add(g, box(0.06, 0.06, 0.01), M(c), 0, 0.1); add(g, cyl(0.004, 0.004, 0.06, 4), M(c), 0, 0.2); return g; }
 function gun(len, wide) { const g = G(); add(g, box(0.04, 0.1, 0.04), DWOOD, 0, -0.02); add(g, cyl(wide ? 0.025 : 0.016, wide ? 0.025 : 0.016, len, 10), metal('iron'), 0, 0.03 + len / 2); add(g, box(0.05, 0.05, 0.06), metal('bronze'), 0, 0.04); return alongZ(g); }
-export const hasItemModel = id => !!(BY_ID[id] || EXTRA[id]);
-export function isWeaponModel(id) { if (/^w_(gun|hammer_c|axe_c)/.test(id)) return true; return BY_ID[id] && ['stick', 'pestle', 'knife', 'hammer', 'scissors', 'brush'].includes(BY_ID[id][0]); }
+// ---- 장비 40종 (tools/gear/gear.py): 유봉은 Tripo → Blender 모델(assets/items/<id>.glb.json, tools/blender/gear.py)을 손에 듦.
+// 갑옷·장신구는 가방·상점에서는 그림 아이콘(assets/ui/items)만 쓰고, 땅에 떨어진 모습은 기존 절차 모델을 빌림.
+const GEAR_WEAPON = /^w_pestle_g\d+$/, GEAR_ARMOR = /^a_armor_g(\d+)$/, GEAR_ACC = /^ac_(g\d+|j_\w+)$/;
+export const isGearItem = id => GEAR_WEAPON.test(id) || GEAR_ARMOR.test(id) || GEAR_ACC.test(id);
+export const GEAR_SCALE = 0.86;                 // 손에 든 유봉 크기(모델 길이 0.46 m × 이 값 × 손 배율 1.3)
+const gearCache = new Map();                    // id -> Promise<Object3D | null>
+function loadGear(id) {
+  if (!gearCache.has(id)) gearCache.set(id, (async () => {
+    try {
+      const r = await fetch('assets/items/' + id + '.glb.json'); if (!r.ok) throw new Error(id + ' ' + r.status);
+      const j = await r.json(), raw = atob(j.b64), u8 = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) u8[i] = raw.charCodeAt(i);
+      const gltf = await new Promise((res, rej) => new GLTFLoader().parse(u8.buffer, '', res, rej));
+      gltf.scene.traverse(o => { if (o.isMesh) { o.castShadow = true; o.material.roughness = 0.55; o.material.metalness = 0.05; } });
+      return gltf.scene;
+    } catch (e) { console.warn('gear model', e); return null; }
+  })());
+  return gearCache.get(id);
+}
+/** held / dropped model of a gear pestle: a simple pestle at once, swapped for the real model when it has loaded (grip at the origin, axis +z) */
+function gearWeapon(id) {
+  const g = G(); g.add(BUILD.pestle(2));
+  loadGear(id).then(src => {
+    if (!src) return;
+    const m = src.clone(true); m.scale.setScalar(GEAR_SCALE); m.rotation.x = R;           // model: head up (+y) -> item axis +z
+    g.clear(); g.add(m); g.userData.gearReady = true;
+    for (let p = g.parent; p; p = p.parent) if (p.userData && p.userData.len !== undefined) delete p.userData.len;      // blade length (model.js bladePoints) is measured again
+  });
+  return g;
+}
+function gearModel(id) {
+  if (GEAR_WEAPON.test(id)) return gearWeapon(id);
+  const a = GEAR_ARMOR.exec(id); if (a) return BUILD.armor(Math.min(3, 1 + Math.floor((+a[1] - 1) / 4)));
+  return /^ac_g(1|8|10)$/.test(id) ? BUILD.ring(3) : BUILD.amulet(2);
+}
+export const hasItemModel = id => !!(BY_ID[id] || EXTRA[id] || isGearItem(id));
+export function isWeaponModel(id) { if (/^w_(gun|hammer_c|axe_c)/.test(id) || GEAR_WEAPON.test(id)) return true; return BY_ID[id] && ['stick', 'pestle', 'knife', 'hammer', 'scissors', 'brush'].includes(BY_ID[id][0]); }
 /** new Object3D for an item id (null when unknown) */
-export function itemModel(id) { const b = BY_ID[id]; if (!b) return EXTRA[id] ? EXTRA[id]() : null; return BUILD[b[0]](b[1]); }
+export function itemModel(id) { if (isGearItem(id)) return gearModel(id); const b = BY_ID[id]; if (!b) return EXTRA[id] ? EXTRA[id]() : null; return BUILD[b[0]](b[1]); }
 
 /** world-space display group: centred, upright, sized ~0.45 m, weapons laid at an angle */
 export function lootModel(id) {

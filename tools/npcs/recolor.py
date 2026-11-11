@@ -6,7 +6,8 @@ import numpy as np
 from PIL import Image
 M = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'assets', 'models')
 # name: (source texture, hue shift deg, saturation mul, value mul)
-JOBS = {'castilla': ('npc_artist', 95, 1.05, 1.0), 'kylus': ('npc_guard', 20, 0.75, 0.82), 'daisen': ('npc_blacksmith', -15, 1.15, 0.85), 'boldran': ('npc_blacksmith', 0, 0.35, 0.95)}
+JOBS = {'castilla': ('npc_artist', 95, 1.05, 1.0), 'kylus': ('npc_guard', 20, 0.75, 0.82), 'daisen': ('npc_blacksmith', -15, 1.15, 0.85), 'boldran': ('npc_blacksmith', 0, 0.35, 0.95),
+        'gear_weapon': ('npc_armorer', 150, 1.1, 0.95), 'gear_armor': ('npc_merchant', -110, 1.1, 1.0)}
 def recolor(src, dh, ks, kv):
     im = Image.open(os.path.join(M, src + '.jpg')).convert('HSV'); a = np.asarray(im).astype(np.float32)
     h, s, v = a[..., 0], a[..., 1], a[..., 2]

@@ -38,6 +38,9 @@ export const NPC_MODELS = {
   kylus:              { file: 'npc_guard', tex: 'npc_kylus', height: 1.74, headPitch: -6, npc: true },
   daisen:             { file: 'npc_blacksmith', tex: 'npc_daisen', height: 1.95, headPitch: -6, npc: true },
   boldran:            { file: 'npc_blacksmith', tex: 'npc_boldran', height: 1.62, headPitch: -6, npc: true },
+  // 무기 상인·방어구 상인 (tools/gear/gear.py, tools/world/world.py GEAR_MERCHANTS): 기존 메시에 옷 색만 바꿈
+  gear_weapon:        { file: 'npc_armorer', tex: 'npc_gear_weapon', height: 1.68, headPitch: -6, npc: true },
+  gear_armor:         { file: 'npc_merchant', tex: 'npc_gear_armor', height: 1.52, headPitch: -6, npc: true },
 };
 /** back holder (backMount): grip at x = this fraction of the right shoulder's x, up / out (m) above the shoulder joint and
  *  behind the back surface; dir = blade direction in bind space (+x = the character's left, +y up, +z forward) */
