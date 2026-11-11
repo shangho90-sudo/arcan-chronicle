@@ -23,6 +23,7 @@ def gen(name):
     sys.path.insert(0, HERE); import tripo
     r = tripo.task({'type': 'text_to_model', 'model_version': 'v3.0-20250812', 'prompt': PROMPTS[name], 'texture': True, 'pbr': True, 'texture_quality': 'detailed'})
     print(name, json.dumps(r)[:200], flush=True)
+    if 'data' not in r: print(name, 'Tripo 요청 실패(크레딧 부족 등) — Blender 절차 소품(tools/blender/fx_pharm.py)을 그대로 씀', flush=True); return
     tid = r['data']['task_id']; d = tripo.wait(tid); d = d.get('data', d); out = d.get('output') or {}
     url = out.get('pbr_model') or out.get('model') or out.get('base_model'); print(name, d.get('status'), url is not None, flush=True)
     tripo.download(url, os.path.join(RAW, 'pharm_' + name + '.glb'))
