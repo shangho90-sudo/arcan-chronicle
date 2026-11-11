@@ -11,8 +11,8 @@ const { chromium } = require('playwright'); const fs = require('fs'); const { ex
 const SCENES = (process.env.SCENES || 'a3,a6,b6,c6,c7,c8').split(','), SIZE = process.env.SIZE || '1100x760', TOUCH = SIZE.endsWith('t');
 const [VW, VH] = SIZE.replace('t', '').split('x').map(Number), FX = process.env.FX !== '0', OUT = process.env.OUT || '/tmp/pharm', FPS = 30, TAG = process.env.TAG || 'after';
 // 4×3 비교표(SHEET): 줄 = 유봉 휘두르기 / 천근쇄약 / 약병폭격 / 아드레날린·보호막·회복진, 칸 = 아래 프레임 번호
-const PICK = { a3: [1, 3, 5], a6: [4, 5, 6], b6: [2, 4, 6], c6: [4], c7: [2], c8: [2] };
-const MARKS = { a3: [0.1, 0.2, 0.33, 0.46, 0.6, 0.72, 0.85, 1.1], a6: [0.1, 0.25, 0.36, 0.44, 0.5, 0.6, 0.75, 1.0, 1.4], b6: [0.2, 0.5, 0.8, 1.1, 1.4, 1.7, 2.0, 2.6],
+const PICK = { a3: [1, 3, 5], a6: [5, 6, 7], b6: [2, 4, 6], c6: [4], c7: [2], c8: [2] };
+const MARKS = { a3: [0.1, 0.2, 0.33, 0.46, 0.6, 0.72, 0.85, 1.1], a6: [0.1, 0.25, 0.36, 0.44, 0.5, 0.56, 0.62, 0.75, 1.0, 1.4], b6: [0.2, 0.5, 0.8, 1.1, 1.4, 1.7, 2.0, 2.6],
   c6: [0.15, 0.35, 0.5, 0.7, 1.0, 2.0], c7: [0.2, 0.5, 1.0, 3.0, 6.0, 8.2], c8: [0.3, 1.0, 2.0, 4.0, 6.0, 8.0, 8.6] };
 (async () => {
   fs.mkdirSync(OUT, { recursive: true });
@@ -65,7 +65,7 @@ const MARKS = { a3: [0.1, 0.2, 0.33, 0.46, 0.6, 0.72, 0.85, 1.1], a6: [0.1, 0.25
       const aim = sc === 'a6' ? window.__at(4.5) : sc === 'b6' ? window.__at(5) : null;
       G.render.setFocus({ x: p.pos.x, y: 0, z: p.pos.z + (aim ? 3.2 : 0) }, true);
       if (!G.sheet.book.sk.slots.includes(id)) G.sheet.book.equip(id, 0, false);   // 칸이 4개뿐이라 시전 전에 1번 칸에 장착
-      const mid = G.render.toScreen({ x: p.pos.x, y: 0.6, z: p.pos.z + (aim ? 2.6 : 0) }); r.cx = Math.round(mid.x); r.cy = Math.round(mid.y);   // crop centre: between the caster and the aim
+      const mid = G.render.toScreen({ x: p.pos.x, y: 0.6, z: p.pos.z + (sc === 'b6' ? 4.2 : aim ? 2.6 : 0) }); r.cx = Math.round(mid.x); r.cy = Math.round(mid.y);   // crop centre: between the caster and the aim
       const e = p.skills2.cast(id, aim); r.err = e || null; return r;
     }, [sc, FPS]);
     // step + capture
