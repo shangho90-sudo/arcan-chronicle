@@ -353,7 +353,7 @@ export class SkillEngine {
         const c = op.atAim ? ctx.aim : pc.pos;
         FX.telegraph(c, op.r || op.w || 2, op.dur, { color: 0xffb040, shape: op.shape, dir: ctx.facing, length: op.len, width: op.w }); return;
       }
-      case 'fx': if (op.pharm) { ctx.pharmFx = FX.pharm(op.pharm, op.pharm === 'pestle' ? { x: ctx.aim.x, y: pc.zone.geo.ground(ctx.aim.x, ctx.aim.z).y, z: ctx.aim.z } : pc, { follow: pc, dur: op.dur, fall: op.fall, r: op.r, facing: ctx.facing, L: ctx.L }); return; }
+      case 'fx': if (op.pharm) { ctx.pharmFx = FX.pharm(op.pharm, op.pharm === 'pestle' ? { x: ctx.aim.x, y: pc.zone.geo.ground(ctx.aim.x, ctx.aim.z).y, z: ctx.aim.z } : pc, { follow: pc, dur: op.dur, fall: op.fall, r: op.r, facing: ctx.facing, L: ctx.L, pal: op.pal }); return; }
         if (op.biyeon === 'cast') { const a = pc.body && pc.body.sh && pc.body.sh.actions[ctx.act]; ctx.biyeonCast = FX.biyeon('cast', pc.pos, ctx.facing, { follow: pc, swing: a && a.fps ? a.hitFrame / a.fps : 0.22 }); }   // wind-up + sweep + side blades (decoration); the centre blade rides the proj op
         if (op.bash === 'cast') ctx.bashCast = FX.bash('cast', pc.pos, ctx.facing, { follow: pc });   // crescent on the real sword arc (js/bashfx.js)
         if (op.sal === 'cast') { const tg = ctx.tgt && !ctx.tgt.dead ? ctx.tgt : this.targetFor(ctx.d); ctx.salCast = FX.sal('cast', pc.pos, ctx.facing, { follow: pc, length: op.len || 3.4, width: op.w || 1, target: tg || null }); }   // beam: sword tip -> impact point (salImpact, max op.len m); the hit locks it
@@ -406,6 +406,7 @@ export class SkillEngine {
             const fd = { x: f.x * ca - f.z * sa, z: f.x * sa + f.z * ca };
             FX.slash(op.fx.slash, op.shape === 'single' && ts[0] ? ts[0].pos : (op.atAim ? ctx.aim : pc.pos), fd, { color: op.alt && h % 3 === 2 ? 0xffd27a : col, radius: op.r || 2, angle: op.ang || 100, length: op.len, width: op.w, mirror: mir, tilt: op.alt ? [0.22, -0.3, 0.45][h % 3] : (op.sweep || 0) * 0.2 });
           }
+          if (op.fx.pharm === 'spin') FX.pharm('spin', pc, { r: op.r, h, n: hits, last: h === hits - 1, hits: ts.map(t => t.pos) });   // 유봉 휘두르기: ribbons on the real pestle tip, thin ring on the last strike (js/pharmfx.js)
           if (op.fx.yeon) {  // '연': per-strike crescent (scheduled ahead in release, else now) + flash / cut / shards on the target
             const y = (cf && cf.yeon) || { p: h % 2 ? 'lr' : 'rl', roll: h % 2 ? -0.3 : 0.4, mirror: h % 2 === 1, var: 'ab'[h % 2], fin: h === hits - 1, size: h === hits - 1 ? 1.45 : 1 };
             if (!ctx.yeonPre) FX.yeon('strike', { follow: pc, y, lead: 0 });
@@ -496,7 +497,8 @@ export class SkillEngine {
   /** area explosion used by delayed / lob / boom ops */
   blast(c, op, ctx) {
     const pc = this.pc, r = op.r || 1.5, ts = this.targets(HitShape.circle(c.x, c.z, r));
-    FX.burst(op.burst || 'explosion_fire', c, { radius: op.burstR || r, color: ctx.d.fx && ctx.d.fx.color });
+    if (op.burst !== 'none') FX.burst(op.burst || 'explosion_fire', c, { radius: op.burstR || r, color: ctx.d.fx && ctx.d.fx.color });   // 'none': the skill draws its own (약사 pharmfx)
+    if (op.pharm) FX.pharm(op.pharm, { x: c.x, y: c.y ?? pc.zone.geo.ground(c.x, c.z).y, z: c.z }, { elem: op.elem, r });
     if (op.shake && G.render.addShake && !G.reduceFlash) G.render.addShake(op.shake[0], op.shake[1]);
     const cb = this.book.passive('centerBonus');
     for (const t of ts) {
@@ -877,9 +879,9 @@ export const CUSTOM = {
       const k = K[Math.floor(Math.random() * 3)], a = Math.random() * 6.283, rr = i === 0 ? 0 : Math.sqrt(Math.random()) * op.r;
       const p = { x: c.x + Math.cos(a) * rr, z: c.z + Math.sin(a) * rr }; p.y = pc.zone.geo.ground(p.x, p.z).y;
       eng.pending.push({ time: eng.clock + i * op.gap, op: { op: '_run', run: () => {
-        FX.pharm('flask', p, { elem: k.elem, fall: op.fall });
+        FX.pharm('flask', p, { elem: k.elem, fall: op.fall, r: op.blast });
         eng.pending.push({ time: eng.clock + op.fall, op: { op: '_run', run: () => {
-          const ts = eng.blast(p, { r: op.blast, coef: op.coef, burst: k.burst, st: k.st, tag: op.tag, elem: k.elem }, ctx);
+          const ts = eng.blast(p, { r: op.blast, coef: op.coef, burst: 'none', pharm: 'burst', st: k.st, tag: op.tag, elem: k.elem }, ctx);   // 얇은 링 + 밝은 중심 + 옅은 연무 (js/pharmfx.js burst)
           ctx.flaskLog.push({ elem: k.elem, n: ts.length });
           G.render.addShake && !G.reduceFlash && G.render.addShake(0.05, 0.1);
         } }, ctx });

@@ -163,6 +163,16 @@ export class UI {
   floatText(pos, text, color, scale = 1, h = 1.4) {
     if (!G.settings.damageNumbers && /^[0-9]/.test(text)) return;
     const e = $("div", "float", this.floatLayer); e.textContent = text; e.style.color = color;
+    // 글자 라벨(상태 이름·보호막 등)이 같은 자리에 잇따라 뜨면 겹치지 않게: 뒤에 온 것은 조금 늦게, 한 줄 위에 (2026-11-11)
+    let delay = 0, lift = 0;
+    if (!/^[-+0-9]/.test(text)) {
+      const now = performance.now(), L = this.labelSlots || (this.labelSlots = []);
+      while (L.length && now - L[0].at > 1100) L.shift();
+      const n = L.filter(s => Math.hypot(s.x - pos.x, s.z - pos.z) < 1.2).length;
+      delay = n * 0.28; lift = n * 0.42; L.push({ x: pos.x, z: pos.z, at: now });
+      e.style.opacity = 0;
+      this.floats.push({ e, label: 1, pos: { x: pos.x, y: pos.y + h + lift, z: pos.z }, t: -delay, scale }); return;
+    }
     this.floats.push({ e, pos: { x: pos.x + (Math.random() - 0.5) * 0.5, y: pos.y + h, z: pos.z + (Math.random() - 0.5) * 0.3 }, t: 0, scale });
   }
   /** damage numbers with impact: kind = 'hit' (player hits a monster), 'crit', 'taken' (player is hit), 'dot' */
@@ -191,7 +201,8 @@ export class UI {
         f.e.style.opacity = k > 0.7 ? 1 - (k - 0.7) / 0.3 : 1;
         continue;
       }
-      const k = f.t / 0.9;
+      if (f.t < 0) continue;                           // staggered label: not shown yet
+      const k = f.t / (f.label ? 1.25 : 0.9);
       if (k >= 1) { f.e.remove(); this.floats.splice(this.floats.indexOf(f), 1); continue; }
       const s = G.render.toScreen({ x: f.pos.x, y: f.pos.y + k * 0.9, z: f.pos.z });
       const pop = k < 0.15 ? 1 + (0.15 - k) * 3 : 1;

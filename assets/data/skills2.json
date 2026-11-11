@@ -571,6 +571,11 @@
 "anim": "ph_spin",
 "ops": [
 {
+"op": "fx",
+"pharm": "cast",
+"at": -0.18
+},
+{
 "op": "hit",
 "shape": "circle",
 "coef": 0.5,
@@ -579,8 +584,7 @@
 "gap": 0.13,
 "noExtra": true,
 "fx": {
-"slash": "spin",
-"burst": "hit_blunt"
+"pharm": "spin"
 },
 "last": {
 "coef": 0.8,
@@ -590,9 +594,7 @@
 0.18
 ],
 "fx": {
-"slash": "spin",
-"burst": "hit_blunt",
-"burstR": 2.2
+"pharm": "spin"
 }
 }
 }
@@ -636,6 +638,11 @@
 "ops": [
 {
 "op": "fx",
+"pharm": "cast",
+"at": -0.3
+},
+{
+"op": "fx",
 "pharm": "pestle",
 "at": -0.12,
 "fall": 0.42,
@@ -648,8 +655,7 @@
 "coef": 4.5,
 "core": 0.5,
 "coreR": 1.5,
-"burst": "ground_crack",
-"burstR": 2.4,
+"burst": "none",
 "st": [
 {
 "id": "stagger",
@@ -1113,7 +1119,8 @@
 "val": 0.2,
 "target": "self",
 "fixed": true,
-"valLv": 0.02
+"valLv": 0.02,
+"noAura": true
 },
 {
 "op": "buff",
