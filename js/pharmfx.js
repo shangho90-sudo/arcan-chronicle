@@ -98,17 +98,18 @@ export class PharmFx {
     const halo = this._flat(this.geo.pharm_circle, MARK_FS, { uC: { value: new THREE.Color(0xfff0b0) }, uA: { value: 0 }, uK: { value: 4 } }, 4); halo.position.y = 0.07; halo.visible = false;
     g.add(mark, ring, halo, pe); g.position.copy(p);
     const yaw = Math.random() * 6.28;
-    return this._add({ kind: 'pestle', g, t: 0, life: fall + 1.0, update: (e, dt) => {
+    return this._add({ kind: 'pestle', g, t: 0, life: fall + 1.25, update: (e, dt) => {
       const t = e.t;
       if (t < fall) {   // drop: from 9 m, tilted 50 deg, accelerating, upright at the end
         const k = t / fall, f = k * k;
-        pe.position.set(0, 9 * (1 - f), 0); pe.rotation.set(0, yaw, (1 - smooth(0, 1, k)) * 0.9); pe.material.uniforms.uA.value = smooth(0, 0.15, k);
+        pe.position.set(0, 6.5 * (1 - f), 0);   // 6.5 m: 쿼터뷰 화면 안에서 떨어지는 게 보이게 pe.rotation.set(0, yaw, (1 - smooth(0, 1, k)) * 0.9); pe.material.uniforms.uA.value = smooth(0, 0.15, k);
         pe.material.uniforms.uGlow.value = 0.35 + 0.4 * k;
         mark.material.uniforms.uA.value = 0.25 + 0.75 * k; mark.material.uniforms.uK.value = k;
       } else {
         const u = t - fall;
-        pe.position.set(0, -0.6 * smooth(0.2, 0.9, u) - 0.35 * Math.min(1, u * 12), 0); pe.rotation.set(0, yaw, 0);
-        pe.material.uniforms.uA.value = 1 - smooth(0.35, 0.95, u); pe.material.uniforms.uGlow.value = 0.9 * (1 - smooth(0, 0.4, u)) + 0.2;
+        // 찍은 뒤 0.55 s 동안 땅에 박힌 채 서 있다가(거대한 황금 유봉이 보이게) 가라앉으며 사라짐
+        pe.position.set(0, -0.6 * smooth(0.55, 1.15, u) - 0.35 * Math.min(1, u * 12), 0); pe.rotation.set(0, yaw, 0);
+        pe.material.uniforms.uA.value = 1 - smooth(0.6, 1.2, u); pe.material.uniforms.uGlow.value = 0.9 * (1 - smooth(0, 0.4, u)) + 0.2;
         mark.material.uniforms.uA.value = 1 - smooth(0, 0.3, u);
         ring.visible = halo.visible = true; const s = r * (0.35 + 0.75 * Math.sqrt(smooth(0, 0.45, u)));
         ring.scale.setScalar(s); ring.material.uniforms.uA.value = 1.6 * (1 - smooth(0.1, 0.5, u));

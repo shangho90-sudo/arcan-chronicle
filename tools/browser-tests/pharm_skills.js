@@ -62,12 +62,13 @@ const MARKS = { a3: [0.1, 0.2, 0.33, 0.46, 0.6, 0.72, 0.85, 1.1], a6: [0.1, 0.25
       if (sc === 'c8') { p.hp = Math.round(p.maxHp * 0.4); r.hp0 = p.hp; }
       const aim = sc === 'a6' ? window.__at(4.5) : sc === 'b6' ? window.__at(5) : null;
       G.render.setFocus({ x: p.pos.x, y: 0, z: p.pos.z + (aim ? 2.4 : 0) }, true);
+      if (!G.sheet.book.sk.slots.includes(id)) G.sheet.book.equip(id, 0, false);   // 칸이 4개뿐이라 시전 전에 1번 칸에 장착
       const e = p.skills2.cast(id, aim); r.err = e || null; return r;
     }, [sc, FPS]);
     // step + capture
     const frames = []; let t = 0;
     for (const mk of MARKS[sc]) {
-      const n = Math.round((mk - t) * FPS); await ev(([n, fps]) => { for (let i = 0; i < n; i++) { G.step(1 / fps, false); window.__t += 1 / fps; } G.step(0, true); }, [n, FPS]); t += n / FPS;
+      const n = Math.round((mk - t) * FPS); await ev(([n, fps]) => { for (let i = 0; i < n; i++) { G.step(1 / fps, false); if (G.skillFx) G.skillFx.update(1 / fps); window.__t += 1 / fps; } G.step(0, true); /* step(dt,false)는 스킬 이펙트를 진행시키지 않음 → 직접 update */ }, [n, FPS]); t += n / FPS;
       const f = `${OUT}/_${sc}_${frames.length}.png`; await pg.screenshot({ path: f, timeout: 300000 }); frames.push([f, mk]);
       if (sc === 'c7' && frames.length === 2) await ev(() => { const p = G.player; window.__poison = p.status.has('poison'); p.status.apply(G.data.status('poison'), 5, 9, null); window.__poisonAfter = p.status.has('poison'); window.__shieldNow = p.shield; });
     }

@@ -501,9 +501,9 @@ export class SkillEngine {
     const cb = this.book.passive('centerBonus');
     for (const t of ts) {
       const centre = Math.hypot(t.pos.x - c.x, t.pos.z - c.z) < r * 0.35;
-      // core: own centre bonus inside coreR (천근쇄약: +50 % within 1.5 m), on top of the 정확한 투척 passive rule
+      // core: own centre bonus inside coreR (천근쇄약: +50 % within 1.5 m), 정확한 투척(약병 전용) 중심 보너스와는 겹치지 않음
       const core = op.core && Math.hypot(t.pos.x - c.x, t.pos.z - c.z) <= (op.coreR || r * 0.35) ? 1 + op.core : 1;
-      this.dmg(t, op.coef * core, ctx, { ...op, centerHit: centre && cb > 0, centerBonus: 0 });
+      this.dmg(t, op.coef * core, ctx, { ...op, centerHit: centre && cb > 0 && !op.core, centerBonus: 0 });
       this.onHit(t, op, ctx);
       if (op.react) this.react(t, op.react, ctx);
     }
