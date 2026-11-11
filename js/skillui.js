@@ -109,7 +109,7 @@ Object.assign(UI.prototype, {
         const [tn, tc] = TYPE[d.type];
         const equipped = sk.slots.includes(d.id);
         const row = $('div', 'skrow' + (L ? ' learned' : '') + (this.skSel === d.id ? ' sel' : ''), col,
-          `${skillIcon(d, 76)}<div class="skinfo"><div><b>${d.name}</b> <span class="sktype t-${d.type}" style="background:${tc}">${tn}</span>${equipped ? ' <span class="sktag eq">장착</span>' : ''}</div>` +
+          `${skillIcon(d, 90)}<div class="skinfo"><div><b>${d.name}</b> <span class="sktype t-${d.type}" style="background:${tc}">${tn}</span>${equipped ? ' <span class="sktag eq">장착</span>' : ''}</div>` +
           `<div class="small">Lv <b>${L}</b>/${d.maxLv} · 해금 Lv${book.unlockLevel(d)}${d.mp ? ` · 기력 ${d.mp}` : ''}${d.cd ? ` · ${d.cd}초` : ''}${d.range && d.type !== 'passive' && d.type !== 'craft' ? ` · 사거리 ${d.range}m` : ''}</div></div>`);
         row.onclick = () => { this.skSel = d.id; G.audio.sfx('ui'); this.showSkills(show); };
         if (!max) { const lb = this.button(row, L ? '강화' : '습득', blk ? 'ivory lockb' : L ? 'gold' : 'blue', () => { const e = book.learn(d.id); if (e) return this.toast(e); G.audio.sfx('levelup'); this.showSkills(show); }); lb.classList.add('small'); if (blk) { lb.classList.add('locked'); lb.title = blk; } }

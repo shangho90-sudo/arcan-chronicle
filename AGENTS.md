@@ -122,7 +122,7 @@
 - `skilltest.js`: 180개 스킬 자동 시전 (`JOBS=painter ONLY=pt_a1 node skilltest.js`).
 
 ## 알려진 미완료
-- 스킬 아이콘은 견습생·약사 1차만 그림(`assets/ui/skills`, `tools/ui/skill_icons_crop.py`가 참고 그림 `tools/ui/ref/`에서 잘라 냄, `skillui.js` `SKILL_ART`), 나머지는 코드 생성 임시 아이콘.
+- 스킬 아이콘은 견습생·약사 1차만 그림(`assets/ui/skills`, `tools/ui/skill_icons_crop.py`가 참고 그림 `tools/ui/ref/`에서 잘라 냄 — 약사 15개는 `pharmacist_ref2.png`, `fx_pharm.py icons`를 돌린 뒤에는 다시 실행, `skillui.js` `SKILL_ART`), 나머지는 코드 생성 임시 아이콘.
 - 몬스터: 귀여운 모델(`cute_*`)은 리깅이 없어 모든 동작이 절차 동작. 불씨 비룡 계열(drake)만 예전 모델.
 - 모든 필드(40곳)가 `js/nature.js` 렌더(존별 `nature.ground`/`tint`/`rockTint`/`grass`/`lod`). 서리 고원은 색조만 차갑게(눈 덮인 잎 없음).
 - 휴대폰 화면은 자동 화면 확인만 함(실기기 미확인). 사람이 처음부터 끝까지 플레이한 검증 없음.

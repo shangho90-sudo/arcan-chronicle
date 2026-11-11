@@ -648,3 +648,7 @@
 - 회복진 음악은 음악 버스에 작게 섞으며 지역 BGM 유지. 장판 제거·사망·지역 이동·음악 음소거·재시전 시 중지, 비동기 다운로드 후 늦게 시작하지 않음.
 - 검증: core 504 통과/50 생략, skills2 638 통과. audio·novice-audio·pharmacist-audio 회귀 테스트 통과(회전 5타·착탄 10회·충돌 지연·음악 취소·음소거). 생성 MP3 전부 FFmpeg 디코딩 검사.
 - 기존 interaction-audio 테스트는 NPC 인사 30개/현재 NPC 53개 불일치로 실패(기존 manifest 미변경). Chromium 실행은 환경의 socket 제한으로 실패하여 브라우저/실기기 청음은 미확인.
+
+### 2026-11-11 — 약사 스킬창 아이콘·칸 배열을 참고 그림대로
+- 아이콘 15개를 사용자가 준 개편 뒤 스킬창 그림(`tools/ui/ref/pharmacist_ref2.png`)에서 다시 잘라 냄(`tools/ui/skill_icons_crop.py`) — Blender로 그렸던 새 스킬 5개(천근쇄약·약병폭격·아드레날린 주사·약 보호막·광역 회복진) 그림도 이 그림으로 바뀜. 주의: `python3 tools/blender/fx_pharm.py`를 인자 없이(또는 `icons`) 돌리면 그 5개를 Blender 그림으로 다시 덮어씀 → 그 뒤에는 `skill_icons_crop.py`를 다시 실행.
+- 스킬창 칸: 세 갈래의 칸 높이를 모두 같게(한 줄짜리 제작·패시브 칸 포함) 해서 가로줄이 서로 맞음, 아이콘 76 → 90, 아래 안내 문구를 크고 밝게, 꼬리표(공격·장착)가 낱말 중간에서 줄바꿈되지 않게(`index.html` `.fancy .skcol/.skrow`, `skillui.js`). 다른 직업 스킬창에도 같은 배열이 적용됨. 확인 `tools/browser-tests/skillicons.js`(1482×1061·390×844).

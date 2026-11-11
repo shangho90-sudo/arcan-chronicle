@@ -22,7 +22,7 @@ const OUT = process.env.OUT || '/tmp/skillicons'; fs.mkdirSync(OUT, { recursive:
     R.win = await ev(() => ({ arts: document.querySelectorAll('.window .skart, .window .skround').length, slots: [...document.querySelectorAll('.skslot small')].map(x => x.textContent) }));
     await pg.screenshot({ path: `${OUT}/skillicons_win_${sz}.png`, timeout: 300000 });
     // 약사 1차 탭 (전직 조건은 건너뛰고 직업만 바꿈)
-    await ev(() => { G.ui.close && G.ui.close(); const s = G.player.sheet; s.p.job = 'pharmacist'; s.refreshSkills && s.refreshSkills(true); s.book.grantPoints(); s.recalc(); for (const id of ['ph1_a1', 'ph1_b1', 'ph1_c3']) s.book.learn(id); s.recalc(); G.ui.showSkills('pharmacist'); });
+    await ev(() => { G.ui.close && G.ui.close(); const s = G.player.sheet; s.p.job = 'pharmacist'; s.refreshSkills && s.refreshSkills(true); s.book.grantPoints(); s.recalc(); for (const id of ['ph1_a1', 'ph1_b1']) s.book.learn(id); s.recalc(); G.ui.showSkills('pharmacist'); });
     await pg.waitForTimeout(1200);
     R.ph = await ev(() => document.querySelectorAll('.window .skround').length);
     await pg.screenshot({ path: `${OUT}/skillicons_ph_${sz}.png`, timeout: 300000 });
