@@ -4,9 +4,9 @@ Usage:  python3 tools/blender/fx_pharm.py            (bpy module, Blender 5.x)
         python3 tools/blender/fx_pharm.py icons      (아이콘만 다시)
         python3 tools/blender/fx_pharm.py fx         (메시·텍스처만)
 
-Tripo 초안(tools/tripo/pharm_assets.py)을 쓰려 했지만 2026-11-11 Tripo 잔액이 5 크레딧이라 작업을 만들 수 없었음
-(text_to_model 요청이 "not enough credit"으로 거절). 그래서 모든 소품을 여기서 절차적으로 만든다. 크레딧이 생기면
-pharm_assets.py로 Tripo 초안을 받아 같은 이름(pharm_pestle 등)으로 바꿔 끼울 수 있음(js/pharmfx.js가 이름으로 찾음).
+처음에는 Tripo 크레딧이 없어 모든 소품을 여기서 절차적으로 만들었다. 같은 날 크레딧 충전 뒤 황금 유봉·황금 약병·지면 파편은
+Tripo 초안(tools/tripo/pharm_assets.py) → tools/blender/fx_pharm_tripo.py 정리판을 게임이 우선 쓰고, 여기 메시는 그 파일이 없을 때의
+대체품 + 이펙트 전용 메시(리본·링·돔·파쇄 조각)이다.
 
 Meshes (game axes: +Y up, +Z forward, metres; the game scales them) -> assets/fx/fx_pharm.glb.json
   pharm_pestle      천근쇄약: ornate golden pestle, 1 m tall (head down at y 0 .. knob at y 1), vertex colours
@@ -18,6 +18,13 @@ Meshes (game axes: +Y up, +Z forward, metres; the game scales them) -> assets/fx
   pharm_circle      광역 회복진: flat disc radius 1 (planar UV) -> fx_pharm_circle.png
   pharm_ring        thin annulus (0.86 .. 1) for shock / shield ground rings
   pharm_dome        보호막: UV half-sphere radius 1 (UV v = height) -> hex pattern / fresnel in the shader
+  (2026-11-11 그래픽 개선)
+  pharm_liquid      약병 속 액체 (유리 pharm_flask와 분리)
+  pharm_ribbon      휘두르기·감김 리본: 반지름 1 호 (RIB_SPAN), 꼬리 u 0 -> 머리 u 1, v 0 안쪽 .. 1 바깥
+  pharm_quad        빌보드 쿼드 (아틀라스 모든 칸)        pharm_cracks  가는 균열선 r 0.55 .. 1.75
+  pharm_piece_NN    지면 파쇄 원판(반지름 1)을 쪼갠 두께 있는 포장석 조각 (노드 위치 = 조각 중심)
+  pharm_shard_N     튀는 돌 조각 (Tripo 파편이 없을 때)
+Atlas:   assets/fx/fx_pharm.png (1024, R = 뜨거운 중심, G = 몸통, B = 잔광, A = 덮임) + glb.json "cells"
 Texture: assets/fx/fx_pharm_circle.png  (green healing circle: double ring, runes, leaf crosses; RGBA)
 Icons:   assets/ui/skills/ph1_a6.png ph1_b6.png ph1_c6.png ph1_c7.png ph1_c8.png  (128 px, round gold rim like the
          cropped pharmacist icons; Cycles render of the props above + PIL frame)
