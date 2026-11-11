@@ -34,7 +34,7 @@ function glyph(g, d) {
   g.restore();
 }
 // 그림 아이콘이 있는 스킬(견습생 기본 검술 8종·약사 1차 15종, tools/ui/skill_icons_crop.py → assets/ui/skills/<id>.png). 나머지는 아래 캔버스 임시 아이콘.
-const SKILL_ART = new Set(['nv_a1', 'nv_a2', 'nv_a3', 'nv_a4', 'nv_p1', 'nv_p2', 'nv_p3', 'nv_p4', ...'abc'.split('').flatMap(c => [1, 2, 3, 4, 5].map(i => `ph1_${c}${i}`))]);   // 견습생(둥근 사각형) + 약사 1차(원형)
+const SKILL_ART = new Set(['nv_a1', 'nv_a2', 'nv_a3', 'nv_a4', 'nv_p1', 'nv_p2', 'nv_p3', 'nv_p4', ...['a1', 'a3', 'a4', 'a5', 'a6', 'b1', 'b2', 'b4', 'b5', 'b6', 'c1', 'c6', 'c7', 'c8', 'c9'].map(k => 'ph1_' + k)]);   // 견습생(둥근 사각형) + 약사 1차(원형, 2026-11-11 개편 뒤 15종)
 export function skillIcon(d, size = 48) {
   const k = d.id + size; if (iconCache.has(k)) return iconCache.get(k);
   if (SKILL_ART.has(d.id)) { const html = `<span class="icon i3d skic ${d.id.startsWith('nv_') ? 'skart' : 'skround'}" style="width:${size}px;height:${size}px;background:url(assets/ui/skills/${d.id}.png) center/contain no-repeat;image-rendering:auto"></span>`; iconCache.set(k, html); return html; }
@@ -55,7 +55,8 @@ export function skillIcon(d, size = 48) {
 
 function fmt(n) { return Math.abs(n - Math.round(n)) < 1e-6 ? String(Math.round(n)) : n.toFixed(1); }
 /** one-line summary of what a level changes */
-const STAT_KO = { atk: '공격력', atkSpeed: '공격 속도', crit: '치명타', def: '방어력', foodPower: '요리 효과', maxHp: '최대 HP' };
+const STAT_KO = { atk: '공격력', atkSpeed: '공격 속도', crit: '치명타', def: '방어력', foodPower: '요리 효과', maxHp: '최대 HP', matk: '마법력', maxSp: '최대 기력', elemRes: '속성 저항', eva: '회피율' };
+const PCT_ADD = new Set(['elemRes', 'eva', 'crit']);   // these add a fraction -> shown as %
 const FLAG_KO = { restRegen: '휴식 중 3초마다 체력 회복', basicDmg: '기본 공격 피해', beatHaste: '박자 가속', centerBonus: '중심부 추가 피해', cheatDeath: '치명상 버티기', craftDiscount: '제작 재료 절약', 'craftExtra:potion': '포션 추가 제작', 'craftReturn:food': '요리 재료 반환', fitting: '완벽한 피팅', flow: '흐름 지속', ingredientDrop: '재료 획득률', killHaste: '처치 시 가속', landscapeSize: '풍경화 범위', landscapeTime: '풍경화 지속', paintRange: '붓 사거리', phraseGain: '악절 획득', powerRefund: '동력 환급', projSpeed: '투사체 속도', residue: '잔여 효과', staggerBonus: '경직 추가 피해', switchBonus: '전환 추가 피해', throwRange: '투척 사거리', vsDefdown: '방어 약화 대상 추가 피해' };
 function levelText(d, L) {
   const m = 1 + (d.type === 'ultimate' ? 0.25 : 0.12) * (L - 1), out = [];
@@ -63,20 +64,21 @@ function levelText(d, L) {
     if (op.op === 'hit' && op.coef > 0) {
       const phys = !op.elem && d.type !== 'ultimate' && op.shape !== 'circle' || !!d.weapon, b = (op.hits || 1) + (op.hitsPerLv ? Math.floor(op.hitsPerLv * (L - 1)) : 0), h = b + (phys && !op.noExtra && !op.hitsPerLv ? Math.floor((L - 1) / 2) : 0);
       const per = op.coef * m * b / h * (1 + 0.06 * (h - b));
-      out.push(`피해 ${Math.round(per * 100)}%${h > 1 ? ` × ${h}회 (총 ${Math.round(per * h * 100)}%)` : ''}`);
+      if (op.last && h > 1) { const lp = (op.last.coef ?? op.coef) * m; out.push(`피해 ${Math.round(per * 100)}% × ${h - 1}회 + 마지막 ${Math.round(lp * 100)}% (총 ${Math.round((per * (h - 1) + lp) * 100)}%)${op.last.push ? ` · 밀쳐 냄 ${fmt(op.last.push)}m` : ''}`); }
+      else out.push(`피해 ${Math.round(per * 100)}%${h > 1 ? ` × ${h}회 (총 ${Math.round(per * h * 100)}%)` : ''}`);
     }
     if (op.op === 'proj' && op.coef > 0) { const n = op.count || 1; out.push(`투사체 ${Math.round(op.coef * m * 100)}%${n > 1 ? ` × ${n}발 (총 ${Math.round(op.coef * m * n * 100)}%)` : ''}`); }
     if (op.op === 'custom' && op.coef) { const n = op.n || op.hits || 1; out.push(`피해 ${Math.round(op.coef * m * 100)}%${n > 1 ? ` × ${n}회` : ''}${op.perStack ? ` (+표식당 ${Math.round(op.perStack * 100)}%)` : ''}${op.perColor ? ` (+색당 ${Math.round(op.perColor * 100)}%)` : ''}`); }
     if (op.op === 'channel') for (const o2 of op.ops) { if (o2.op === 'hit') out.push(`집중 ${fmt(op.dur)}초 · ${Math.round(o2.coef * m * 100)}%/${op.tick}초`); if (o2.op === 'mp') out.push(`집중 ${fmt(op.dur)}초 · MP ${fmt(o2.pct * m * 100)}%/${op.tick}초`); }
-    if (op.op === 'delay') out.push(`폭발 ${Math.round(op.coef * m * 100)}%`);
+    if (op.op === 'delay') out.push(`폭발 ${Math.round(op.coef * m * 100)}%${op.core ? ` (중심 ${fmt(op.coreR)}m 안 +${Math.round(op.core * 100)}%)` : ''}`);
     if (op.op === 'area' && op.coef) out.push(`장판 ${Math.round(op.coef * m * 100)}%/${op.tick}초`);
     if (op.op === 'area' && op.heal) out.push(`회복 ${fmt(op.heal * m * 100)}%/${op.tick}초`);
-    if (op.op === 'shield') out.push(`보호막 ${Math.round(op.base * m)}+${fmt(op.coef * m * 100)}%`);
+    if (op.op === 'shield') out.push(op.pctMaxHp ? `보호막 최대 체력의 ${fmt((op.pctMaxHp + (op.pctLv || 0) * (L - 1)) * 100)}% · ${fmt(op.dur)}초` : `보호막 ${Math.round(op.base * m)}+${fmt(op.coef * m * 100)}%`);
     if (op.op === 'heal') out.push(`회복 ${fmt(op.pct * m * 100)}%`);
     if (op.op === 'summon') out.push(`소환 ${op.n || 1}체 · ${fmt((op.life || 10) * (1 + 0.05 * (L - 1)))}초`);
-    if (op.op === 'buff') out.push(`${G.data.status(op.id)?.name || op.id} ${fmt(op.dur * (1 + 0.05 * (L - 1)))}초`);
+    if (op.op === 'buff') out.push(op.fixed ? `${G.data.status(op.id)?.name || op.id}${op.val && op.val < 1 && op.id !== 'immune' ? ' +' + fmt((op.val + (op.valLv || 0) * (L - 1)) * 100) + '%' : ''} ${fmt(op.dur)}초` : `${G.data.status(op.id)?.name || op.id} ${fmt(op.dur * (1 + 0.05 * (L - 1)))}초`);
   }
-  if (d.type === 'passive') { for (const m2 of d.mods || []) out.push(`${STAT_KO[m2.stat] || m2.stat} ${m2.add ? '+' + fmt(m2.add + (m2.addLv || 0) * (L - 1)) : ''}${m2.mul ? '+' + fmt((m2.mul + (m2.mulLv || 0) * (L - 1)) * 100) + '%' : ''}`); for (const [k, v] of Object.entries(d.flags || {})) out.push(`${FLAG_KO[k] || k} ${fmt((v[0] + (v[1] || 0) * (L - 1)) * (v[0] < 1 ? 100 : 1))}${v[0] < 1 ? '%' : ''}`); }
+  if (d.type === 'passive') { for (const m2 of d.mods || []) out.push(`${STAT_KO[m2.stat] || m2.stat} ${m2.add ? '+' + (PCT_ADD.has(m2.stat) ? fmt((m2.add + (m2.addLv || 0) * (L - 1)) * 100) + '%' : fmt(m2.add + (m2.addLv || 0) * (L - 1))) : ''}${m2.mul ? '+' + fmt((m2.mul + (m2.mulLv || 0) * (L - 1)) * 100) + '%' : ''}`); for (const [k, v] of Object.entries(d.flags || {})) out.push(`${FLAG_KO[k] || k} ${fmt((v[0] + (v[1] || 0) * (L - 1)) * (v[0] < 1 ? 100 : 1))}${v[0] < 1 ? '%' : ''}`); }
   if (d.cd) out.push(`쿨타임 ${fmt(d.cd * (1 - 0.03 * (L - 1)))}초`);
   if (!['passive', 'craft'].includes(d.type)) { const tier = G.data.job(d.job).tier, g = Math.max(1, Math.min(10, Math.max(0, tier - 1) * 3 + L + (d.type === 'ultimate' ? 2 + L : 0))); out.push(`연출 등급 ${g}`); }
   return out.join(' · ');

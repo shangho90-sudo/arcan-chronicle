@@ -499,120 +499,17 @@
 "implemented": true
 },
 {
-"id": "ph1_a2",
-"job": "pharmacist",
-"tier": 1,
-"cat": 0,
-"catName": "유봉 전투",
-"idx": 2,
-"name": "유봉 두 번 치기",
-"type": "attack",
-"desc": "두 번 타격하며 두 번째 타격이 더 강하다.",
-"maxLv": 5,
-"unlock": 12,
-"prereq": [],
-"weapon": "pestle",
-"target": "enemy",
-"range": 2.0,
-"mp": 10,
-"cd": 5,
-"cast": 0.0,
-"recover": 0.35,
-"anim": "attack",
-"ops": [
-{
-"op": "hit",
-"shape": "single",
-"coef": 1.1,
-"fx": {
-"slash": "arc",
-"burst": "hit_blunt"
-}
-},
-{
-"op": "hit",
-"shape": "single",
-"coef": 1.9,
-"at": 0.28,
-"fx": {
-"slash": "arc",
-"burst": "hit_blunt"
-}
-}
-],
-"mods": [],
-"flags": {},
-"fx": {
-"color": 4763776
-},
-"status": {
-"data": true,
-"impl": true,
-"fx": true,
-"test": false,
-"play": false
-},
-"implemented": true
-},
-{
-"id": "ph1_a3",
-"job": "pharmacist",
-"tier": 1,
-"cat": 0,
-"catName": "유봉 전투",
-"idx": 3,
-"name": "유봉 휘두르기",
-"type": "attack",
-"desc": "좁은 부채꼴 범위의 적을 휩쓴다.",
-"maxLv": 5,
-"unlock": 15,
-"prereq": [],
-"weapon": "pestle",
-"target": "dir",
-"range": 2.6,
-"mp": 12,
-"cd": 6,
-"cast": 0.0,
-"recover": 0.35,
-"anim": "attack",
-"ops": [
-{
-"op": "hit",
-"shape": "cone",
-"coef": 1.7,
-"r": 2.6,
-"ang": 70,
-"fx": {
-"slash": "arc"
-}
-}
-],
-"mods": [],
-"flags": {},
-"fx": {
-"color": 4763776
-},
-"status": {
-"data": true,
-"impl": true,
-"fx": true,
-"test": false,
-"play": false
-},
-"implemented": true
-},
-{
 "id": "ph1_a4",
 "job": "pharmacist",
 "tier": 1,
 "cat": 0,
 "catName": "유봉 전투",
-"idx": 4,
+"idx": 2,
 "name": "밀어내기",
 "type": "attack",
 "desc": "적을 밀쳐낸다. 밀치기에 면역인 적에게는 추가 피해.",
 "maxLv": 5,
-"unlock": 18,
+"unlock": 13,
 "prereq": [],
 "weapon": "pestle",
 "target": "enemy",
@@ -641,6 +538,136 @@
 "flags": {},
 "fx": {
 "color": 4763776
+},
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ph1_a3",
+"job": "pharmacist",
+"tier": 1,
+"cat": 0,
+"catName": "유봉 전투",
+"idx": 3,
+"name": "유봉 휘두르기",
+"type": "attack",
+"desc": "유봉을 들고 제자리에서 두 바퀴 돌며 주변의 적을 5번 연속으로 친다. 마지막 타격은 적을 밀쳐 낸다.",
+"maxLv": 5,
+"unlock": 15,
+"prereq": [],
+"weapon": "pestle",
+"target": "self",
+"range": 2.8,
+"mp": 14,
+"cd": 8,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "ph_spin",
+"ops": [
+{
+"op": "hit",
+"shape": "circle",
+"coef": 0.5,
+"r": 2.8,
+"hits": 5,
+"gap": 0.13,
+"noExtra": true,
+"fx": {
+"slash": "spin",
+"burst": "hit_blunt"
+},
+"last": {
+"coef": 0.8,
+"push": 2.4,
+"shake": [
+0.12,
+0.18
+],
+"fx": {
+"slash": "spin",
+"burst": "hit_blunt",
+"burstR": 2.2
+}
+}
+}
+],
+"mods": [],
+"flags": {},
+"fx": {
+"color": 16765562
+},
+"sfxAt": "strike",
+"status": {
+"data": true,
+"impl": true,
+"fx": true,
+"test": false,
+"play": false
+},
+"implemented": true
+},
+{
+"id": "ph1_a6",
+"job": "pharmacist",
+"tier": 1,
+"cat": 0,
+"catName": "유봉 전투",
+"idx": 4,
+"name": "천근쇄약",
+"type": "attack",
+"desc": "거대한 황금 유봉을 불러내 지면을 내려찍는다. 넓은 범위에 450% 피해, 한가운데 적은 50% 추가 피해.",
+"maxLv": 5,
+"unlock": 18,
+"prereq": [],
+"weapon": "pestle",
+"target": "ground",
+"range": 6,
+"mp": 26,
+"cd": 16,
+"cast": 0.0,
+"recover": 0.35,
+"anim": "ph_slam",
+"ops": [
+{
+"op": "fx",
+"pharm": "pestle",
+"at": -0.12,
+"fall": 0.42,
+"r": 4.2
+},
+{
+"op": "delay",
+"after": 0.3,
+"r": 4.2,
+"coef": 4.5,
+"core": 0.5,
+"coreR": 1.5,
+"burst": "ground_crack",
+"burstR": 2.4,
+"st": [
+{
+"id": "stagger",
+"dur": 0.6,
+"val": 0,
+"ch": 1.0
+}
+],
+"shake": [
+0.32,
+0.36
+]
+}
+],
+"mods": [],
+"flags": {},
+"fx": {
+"color": 16760896
 },
 "status": {
 "data": true,
@@ -807,47 +834,44 @@
 "implemented": true
 },
 {
-"id": "ph1_b3",
+"id": "ph1_b6",
 "job": "pharmacist",
 "tier": 1,
 "cat": 1,
 "catName": "기초 약병술",
 "idx": 3,
-"name": "전격 약병",
+"name": "약병폭격",
 "type": "attack",
-"desc": "전기 피해 후 가까운 적 하나에게 전이된다.",
+"desc": "하늘에서 약병 10개를 차례로 떨어뜨린다. 약병마다 화염(화상)·냉기(둔화)·독 중 하나가 무작위로 터진다.",
 "maxLv": 5,
 "unlock": 15,
 "prereq": [],
 "weapon": null,
 "target": "ground",
 "range": 7,
-"mp": 14,
-"cd": 6,
+"mp": 22,
+"cd": 14,
 "cast": 0.0,
 "recover": 0.35,
 "anim": "throw",
 "ops": [
 {
-"op": "proj",
-"kind": "lob",
-"coef": 1.5,
-"r": 1.2,
-"elem": "shock",
-"fx": "flask_shock",
-"burst": "explosion_shock",
-"chain": {
-"n": 1,
-"range": 4,
-"coef": 0.8
-},
+"op": "custom",
+"fn": "flask_rain",
+"n": 10,
+"gap": 0.2,
+"r": 3.4,
+"blast": 1.5,
+"coef": 0.6,
+"fall": 0.5,
+"at": 0.05,
 "tag": "flask"
 }
 ],
 "mods": [],
 "flags": {},
 "fx": {
-"color": 16769104
+"color": 13664511
 },
 "status": {
 "data": true,
@@ -1001,30 +1025,56 @@
 ]
 },
 {
-"id": "ph1_c2",
+"id": "ph1_c7",
 "job": "pharmacist",
 "tier": 1,
 "cat": 2,
 "catName": "조제와 응급처치",
 "idx": 2,
-"name": "활력제 제작",
-"type": "craft",
-"desc": "약초와 빈 병으로 기력(MP) 회복제를 만든다.",
+"name": "약 보호막",
+"type": "support",
+"desc": "약효로 몸을 감싸 8초 동안 최대 체력의 25%(레벨마다 +3%)만큼 피해를 막는 보호막을 만들고, 그동안 상태이상에 걸리지 않는다(걸려 있던 것도 풀림).",
 "maxLv": 5,
 "unlock": 12,
 "prereq": [],
 "weapon": null,
 "target": "self",
 "range": 2.0,
-"mp": 0,
-"cd": 0,
+"mp": 16,
+"cd": 20,
 "cast": 0.0,
 "recover": 0.35,
-"anim": null,
-"ops": [],
+"anim": "cast",
+"ops": [
+{
+"op": "shield",
+"base": 0,
+"coef": 0,
+"dur": 8,
+"pctMaxHp": 0.25,
+"pctLv": 0.03,
+"noAura": true
+},
+{
+"op": "buff",
+"id": "immune",
+"dur": 8,
+"val": 1,
+"target": "self",
+"fixed": true,
+"noAura": true
+},
+{
+"op": "fx",
+"pharm": "shield",
+"dur": 8
+}
+],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 8048895
+},
 "status": {
 "data": true,
 "impl": true,
@@ -1032,50 +1082,60 @@
 "test": false,
 "play": false
 },
-"implemented": true,
-"recipes": [
-"r_sp"
-]
+"implemented": true
 },
 {
-"id": "ph1_c3",
+"id": "ph1_c6",
 "job": "pharmacist",
 "tier": 1,
 "cat": 2,
 "catName": "조제와 응급처치",
 "idx": 3,
-"name": "응급 복용",
+"name": "아드레날린 주사",
 "type": "support",
-"desc": "HP 회복제 하나를 소비해 즉시 회복한다. 물약 공용 쿨타임 적용.",
+"desc": "아드레날린을 주사해 15초 동안 이동 속도 20%, 공격 속도 25%가 오른다(레벨마다 각각 +2%, +2.5%).",
 "maxLv": 5,
 "unlock": 15,
 "prereq": [],
 "weapon": null,
 "target": "self",
 "range": 2.0,
-"mp": 0,
-"cd": 2,
+"mp": 12,
+"cd": 30,
 "cast": 0.0,
 "recover": 0.35,
 "anim": "cast",
 "ops": [
 {
-"op": "consume",
-"tag": "hp_potion",
-"potionCd": true,
-"ops": [
+"op": "buff",
+"id": "haste",
+"dur": 15,
+"val": 0.2,
+"target": "self",
+"fixed": true,
+"valLv": 0.02
+},
 {
-"op": "heal",
-"pct": 0.08,
-"flat": 20,
-"boost": 0.3
-}
-]
+"op": "buff",
+"id": "aspdup",
+"dur": 15,
+"val": 0.25,
+"target": "self",
+"fixed": true,
+"valLv": 0.025,
+"noAura": true
+},
+{
+"op": "fx",
+"pharm": "syringe",
+"dur": 15
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16744512
+},
 "status": {
 "data": true,
 "impl": true,
@@ -1086,39 +1146,44 @@
 "implemented": true
 },
 {
-"id": "ph1_c4",
+"id": "ph1_c8",
 "job": "pharmacist",
 "tier": 1,
 "cat": 2,
 "catName": "조제와 응급처치",
 "idx": 4,
-"name": "정화 약제",
+"name": "광역 회복진",
 "type": "support",
-"desc": "자신의 독 또는 화상 하나를 제거한다.",
+"desc": "바닥에 녹색 회복진을 펼친다. 8초 동안 진 안의 아군(나와 소환수)이 1초마다 최대 체력의 4%씩 회복한다.",
 "maxLv": 5,
 "unlock": 18,
 "prereq": [],
 "weapon": null,
 "target": "self",
 "range": 2.0,
-"mp": 10,
-"cd": 12,
+"mp": 20,
+"cd": 24,
 "cast": 0.0,
 "recover": 0.35,
 "anim": "cast",
 "ops": [
 {
-"op": "cleanse",
-"n": 1,
-"ids": [
-"poison",
-"burn"
-]
+"op": "area",
+"kind": "heal",
+"r": 3.6,
+"dur": 8,
+"heal": 0.04,
+"tick": 1.0,
+"atSelf": true,
+"fx": "none",
+"pharm": "circle"
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 6348944
+},
 "status": {
 "data": true,
 "impl": true,
@@ -1129,15 +1194,15 @@
 "implemented": true
 },
 {
-"id": "ph1_c5",
+"id": "ph1_c9",
 "job": "pharmacist",
 "tier": 1,
 "cat": 2,
 "catName": "조제와 응급처치",
 "idx": 5,
-"name": "알뜰 조제",
+"name": "약사 수련",
 "type": "passive",
-"desc": "회복제·활력제 제작 시 확률적으로 하나 더 만든다. 추가 생산은 다시 발동하지 않는다.",
+"desc": "약을 다루며 몸과 마음을 단련한다. 속성 저항(화상·독·냉기 등 속성 피해와 그 지속 시간 감소)·마법력·최대 기력이 오른다.",
 "maxLv": 5,
 "unlock": 20,
 "prereq": [],
@@ -1150,13 +1215,24 @@
 "recover": 0.35,
 "anim": null,
 "ops": [],
-"mods": [],
-"flags": {
-"craftExtra:potion": [
-0.1,
-0.05
-]
+"mods": [
+{
+"stat": "elemRes",
+"add": 0.06,
+"addLv": 0.03
 },
+{
+"stat": "matk",
+"mul": 0.05,
+"mulLv": 0.03
+},
+{
+"stat": "maxSp",
+"mul": 0.06,
+"mulLv": 0.03
+}
+],
+"flags": {},
 "fx": {},
 "status": {
 "data": true,
@@ -9393,6 +9469,24 @@
 "color": "#80e0ff"
 },
 {
+"id": "aspdup",
+"name": "공격 속도 증가",
+"kind": "statMul",
+"stat": "atkSpeed",
+"buff": true,
+"stack": "max",
+"cap": 0.6,
+"color": "#ff9a50"
+},
+{
+"id": "immune",
+"name": "상태이상 면역",
+"kind": "flag",
+"buff": true,
+"stack": "max",
+"color": "#9ae0ff"
+},
+{
 "id": "mpregen",
 "name": "기력 회복",
 "kind": "statAdd",
@@ -10638,32 +10732,6 @@
 "gold": 0,
 "group": "potion",
 "minLv": 3,
-"kind": "make"
-},
-{
-"id": "r_sp",
-"skill": "ph1_c2",
-"inputs": [
-{
-"item": "m_herb",
-"count": 2
-},
-{
-"item": "m_bottle",
-"count": 1
-},
-{
-"item": "m_spore",
-"count": 1
-}
-],
-"output": {
-"item": "c_sp_potion",
-"count": 2
-},
-"gold": 0,
-"group": "potion",
-"minLv": 1,
 "kind": "make"
 },
 {

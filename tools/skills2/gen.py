@@ -70,32 +70,37 @@ S(J, 0, 1, '기본 검술', 8, 'nv_p4', '급소치기', 'passive', '적의 급�
 
 # ======================================================================= 약사 (pharmacist) — tier 1
 J, C = 'pharmacist', 0x48b080
+# 2026-11-11 약사 1차 개편: 유봉 두 번 치기·전격 약병·활력제 제작·응급 복용·정화 약제·알뜰 조제 삭제 -> 천근쇄약·약병폭격·
+# 아드레날린 주사·약 보호막·광역 회복진·약사 수련. 배우는 레벨 A 10/13/15/18/20, B·C 10/12/15/18/20. 새 소품·이펙트 js/pharmfx.js
+# (Blender tools/blender/fx_pharm.py). 지운 스킬에 찍은 포인트는 불러올 때 돌려줌(js/skillsys.js ensureSk)
 S(J, 1, 0, '유봉 전투', 1, 'ph1_a1', '유봉 내려찍기', 'attack', '정면의 적 하나를 유봉으로 강하게 내려친다.', weapon='pestle', target='enemy', range=2.0, mp=8, cd=4, anim='attack',
   ops=[hit('single', 2.2, fx=dict(slash='smash', burst='hit_blunt'), st=[st('stagger', 0.4)])], fx=dict(color=C))
-S(J, 1, 0, '유봉 전투', 2, 'ph1_a2', '유봉 두 번 치기', 'attack', '두 번 타격하며 두 번째 타격이 더 강하다.', weapon='pestle', target='enemy', range=2.0, mp=10, cd=5, anim='attack',
-  ops=[hit('single', 1.1, fx=dict(slash='arc', burst='hit_blunt')), hit('single', 1.9, at=0.28, fx=dict(slash='arc', burst='hit_blunt'))], fx=dict(color=C))
-S(J, 1, 0, '유봉 전투', 3, 'ph1_a3', '유봉 휘두르기', 'attack', '좁은 부채꼴 범위의 적을 휩쓴다.', weapon='pestle', range=2.6, mp=12, cd=6, anim='attack',
-  ops=[hit('cone', 1.7, r=2.6, ang=70, fx=dict(slash='arc'))], fx=dict(color=C))
-S(J, 1, 0, '유봉 전투', 4, 'ph1_a4', '밀어내기', 'attack', '적을 밀쳐낸다. 밀치기에 면역인 적에게는 추가 피해.', weapon='pestle', target='enemy', range=2.0, mp=10, cd=7, anim='attack',
+S(J, 1, 0, '유봉 전투', 2, 'ph1_a4', '밀어내기', 'attack', '적을 밀쳐낸다. 밀치기에 면역인 적에게는 추가 피해.', weapon='pestle', target='enemy', range=2.0, mp=10, cd=7, anim='attack', unlock=13,
   ops=[hit('cone', 1.4, r=2.2, ang=80, knock=3.0, vsImmune=1.6, fx=dict(slash='thrust', burst='hit_blunt'))], fx=dict(color=C))
+S(J, 1, 0, '유봉 전투', 3, 'ph1_a3', '유봉 휘두르기', 'attack', '유봉을 들고 제자리에서 두 바퀴 돌며 주변의 적을 5번 연속으로 친다. 마지막 타격은 적을 밀쳐 낸다.', weapon='pestle', target='self', range=2.8, mp=14, cd=8, anim='ph_spin', sfxAt='strike',
+  ops=[hit('circle', 0.5, r=2.8, hits=5, gap=0.13, noExtra=True, fx=dict(slash='spin', burst='hit_blunt'), last=dict(coef=0.8, push=2.4, shake=[0.12, 0.18], fx=dict(slash='spin', burst='hit_blunt', burstR=2.2)))], fx=dict(color=0xffd27a))
+S(J, 1, 0, '유봉 전투', 4, 'ph1_a6', '천근쇄약', 'attack', '거대한 황금 유봉을 불러내 지면을 내려찍는다. 넓은 범위에 450% 피해, 한가운데 적은 50% 추가 피해.', weapon='pestle', target='ground', range=6, mp=26, cd=16, anim='ph_slam',
+  ops=[dict(op='fx', pharm='pestle', at=-0.12, fall=0.42, r=4.2), delay(0.30, 4.2, 4.5, core=0.5, coreR=1.5, burst='ground_crack', burstR=2.4, st=[st('stagger', 0.6)], shake=[0.32, 0.36])], fx=dict(color=0xffc040))
 S(J, 1, 0, '유봉 전투', 5, 'ph1_a5', '유봉 숙련', 'passive', '유봉 기본 공격 피해와 공격 속도가 증가한다.', weapon='pestle',
   flags=dict(basicDmg=[0.06, 0.04]), mods=[dict(stat='atkSpeed', mul=0.04, mulLv=0.02)])
 S(J, 1, 1, '기초 약병술', 1, 'ph1_b1', '화염 약병', 'attack', '약병을 던져 작은 폭발과 화상을 일으킨다.', target='ground', range=7, mp=12, cd=5, anim='throw',
   ops=[proj('lob', 1.6, r=1.6, elem='fire', fx='flask_fire', burst='explosion_fire', st=[st('burn', 4, 0.12)], tag='flask')], fx=dict(color=0xff7a30))
 S(J, 1, 1, '기초 약병술', 2, 'ph1_b2', '냉각 약병', 'attack', '냉기 피해와 둔화를 준다.', target='ground', range=7, mp=12, cd=6, anim='throw',
   ops=[proj('lob', 1.4, r=1.8, elem='ice', fx='flask_ice', burst='explosion_ice', st=[st('slow', 3, 0.35)], tag='flask')], fx=dict(color=0x7ad0ff))
-S(J, 1, 1, '기초 약병술', 3, 'ph1_b3', '전격 약병', 'attack', '전기 피해 후 가까운 적 하나에게 전이된다.', target='ground', range=7, mp=14, cd=6, anim='throw',
-  ops=[proj('lob', 1.5, r=1.2, elem='shock', fx='flask_shock', burst='explosion_shock', chain=dict(n=1, range=4, coef=0.8), tag='flask')], fx=dict(color=0xffe050))
+S(J, 1, 1, '기초 약병술', 3, 'ph1_b6', '약병폭격', 'attack', '하늘에서 약병 10개를 차례로 떨어뜨린다. 약병마다 화염(화상)·냉기(둔화)·독 중 하나가 무작위로 터진다.', target='ground', range=7, mp=22, cd=14, anim='throw',
+  ops=[custom('flask_rain', n=10, gap=0.2, r=3.4, blast=1.5, coef=0.6, fall=0.5, at=0.05, tag='flask')], fx=dict(color=0xd080ff))
 S(J, 1, 1, '기초 약병술', 4, 'ph1_b4', '부식 약병', 'attack', '지속 피해와 방어력 감소를 남긴다.', target='ground', range=7, mp=14, cd=8, anim='throw',
   ops=[proj('lob', 0.8, r=1.8, elem='acid', fx='flask_acid', burst='explosion_acid', st=[st('poison', 5, 0.15), st('defdown', 5, 0.2)], tag='flask')], fx=dict(color=0x8ad040))
 S(J, 1, 1, '기초 약병술', 5, 'ph1_b5', '정확한 투척', 'passive', '약병 사거리가 늘고 폭발 중심의 적이 추가 피해를 받는다.', flags=dict(throwRange=[1.0, 0.5], centerBonus=[0.15, 0.05]))
 S(J, 1, 2, '조제와 응급처치', 1, 'ph1_c1', '회복제 제작', 'craft', '약초와 빈 병으로 HP 회복제를 만든다.')
-S(J, 1, 2, '조제와 응급처치', 2, 'ph1_c2', '활력제 제작', 'craft', '약초와 빈 병으로 기력(MP) 회복제를 만든다.')
-S(J, 1, 2, '조제와 응급처치', 3, 'ph1_c3', '응급 복용', 'support', 'HP 회복제 하나를 소비해 즉시 회복한다. 물약 공용 쿨타임 적용.', target='self', mp=0, cd=2, anim='cast',
-  ops=[consume('hp_potion', potionCd=True, ops=[heal(pct=0.08, flat=20, boost=0.3)])])
-S(J, 1, 2, '조제와 응급처치', 4, 'ph1_c4', '정화 약제', 'support', '자신의 독 또는 화상 하나를 제거한다.', target='self', mp=10, cd=12, anim='cast',
-  ops=[cleanse(1, ['poison', 'burn'])])
-S(J, 1, 2, '조제와 응급처치', 5, 'ph1_c5', '알뜰 조제', 'passive', '회복제·활력제 제작 시 확률적으로 하나 더 만든다. 추가 생산은 다시 발동하지 않는다.', flags={'craftExtra:potion': [0.10, 0.05]})
+S(J, 1, 2, '조제와 응급처치', 2, 'ph1_c7', '약 보호막', 'support', '약효로 몸을 감싸 8초 동안 최대 체력의 25%(레벨마다 +3%)만큼 피해를 막는 보호막을 만들고, 그동안 상태이상에 걸리지 않는다(걸려 있던 것도 풀림).', target='self', mp=16, cd=20, anim='cast',
+  ops=[shield(0, 0, 8, pctMaxHp=0.25, pctLv=0.03, noAura=True), buff('immune', 8, 1, fixed=True, noAura=True), dict(op='fx', pharm='shield', dur=8)], fx=dict(color=0x7ad0ff))
+S(J, 1, 2, '조제와 응급처치', 3, 'ph1_c6', '아드레날린 주사', 'support', '아드레날린을 주사해 15초 동안 이동 속도 20%, 공격 속도 25%가 오른다(레벨마다 각각 +2%, +2.5%).', target='self', mp=12, cd=30, anim='cast',
+  ops=[buff('haste', 15, 0.20, fixed=True, valLv=0.02), buff('aspdup', 15, 0.25, fixed=True, valLv=0.025, noAura=True), dict(op='fx', pharm='syringe', dur=15)], fx=dict(color=0xff8040))
+S(J, 1, 2, '조제와 응급처치', 4, 'ph1_c8', '광역 회복진', 'support', '바닥에 녹색 회복진을 펼친다. 8초 동안 진 안의 아군(나와 소환수)이 1초마다 최대 체력의 4%씩 회복한다.', target='self', mp=20, cd=24, anim='cast',
+  ops=[area('heal', 3.6, 8, heal=0.04, tick=1.0, atSelf=True, fx='none', pharm='circle')], fx=dict(color=0x60e090))
+S(J, 1, 2, '조제와 응급처치', 5, 'ph1_c9', '약사 수련', 'passive', '약을 다루며 몸과 마음을 단련한다. 속성 저항(화상·독·냉기 등 속성 피해와 그 지속 시간 감소)·마법력·최대 기력이 오른다.',
+  mods=[dict(stat='elemRes', add=0.06, addLv=0.03), dict(stat='matk', mul=0.05, mulLv=0.03), dict(stat='maxSp', mul=0.06, mulLv=0.03)])
 
 # ======================================================================= 양약사 (western_pharmacist)
 J, C = 'western_pharmacist', 0x5aa0ff
@@ -430,6 +435,8 @@ STATUSES = [
     dict(id='atkup', name='공격력 증가', kind='statMul', stat='atk', buff=True, stack='max', cap=1.0, color='#ff7060'),
     dict(id='defup', name='방어력 증가', kind='statMul', stat='def', buff=True, stack='max', cap=1.0, color='#e0c060'),
     dict(id='haste', name='이동 속도 증가', kind='statMul', stat='moveSpeed', buff=True, stack='max', cap=0.6, color='#80e0ff'),
+    dict(id='aspdup', name='공격 속도 증가', kind='statMul', stat='atkSpeed', buff=True, stack='max', cap=0.6, color='#ff9a50'),
+    dict(id='immune', name='상태이상 면역', kind='flag', buff=True, stack='max', color='#9ae0ff'),
     dict(id='mpregen', name='기력 회복', kind='statAdd', stat='spRegen', buff=True, stack='max', color='#60a0ff'),
     dict(id='ccres', name='경직 저항', kind='flag', buff=True, stack='max', color='#e0e0e0'),
     dict(id='slowres', name='둔화 저항', kind='flag', buff=True, stack='max', color='#a0e0ff'),
@@ -499,7 +506,7 @@ def R(id_, skill, inputs, out, n=1, gold=0, group='', minLv=1, kind='make'):
 RECIPES = [
     R('r_potion_s', 'ph1_c1', [('m_herb', 2), ('m_bottle', 1)], 'c_potion_s', 2, group='potion'),
     R('r_potion_m', 'ph1_c1', [('m_herb', 3), ('m_bottle', 1)], 'c_potion_m', 1, group='potion', minLv=3),
-    R('r_sp', 'ph1_c2', [('m_herb', 2), ('m_bottle', 1), ('m_spore', 1)], 'c_sp_potion', 2, group='potion'),
+    # r_sp (활력제, ph1_c2) 삭제 2026-11-11: 기력 회복제는 상점 판매·몬스터 드롭으로 구함
     R('r_potion_l', 'wp_c1', [('m_herb', 4), ('m_bottle', 1), ('m_wolf_fang', 1)], 'c_potion_l', 1, group='potion'),
     R('r_regen_hp', 'wp_c2', [('m_herb', 3), ('m_bottle', 1)], 'c_regen_hp', 1, group='potion'),
     R('r_regen_sp', 'wp_c2', [('m_herb', 2), ('m_spore', 2), ('m_bottle', 1)], 'c_regen_sp', 1, group='potion'),

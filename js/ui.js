@@ -12,8 +12,8 @@ let G = null;
 export function bindGame(g) { G = g; bindQuestHud(g); }
 const $ = (tag, cls, parent, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html !== undefined) e.innerHTML = html; if (parent) parent.appendChild(e); return e; };
 const esc = s => String(s).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
-const STAT_KR = { maxHp: "최대 체력", maxSp: "최대 기력", atk: "공격력", matk: "마법력", def: "방어력", crit: "치명타", critDmg: "치명 피해", moveSpeed: "이동 속도", atkSpeed: "공격 속도", spRegen: "기력 회복", healPower: "회복 효율", foodPower: "음식 효과", dmgReduce: "피해 감소", cdr: "재사용 감소", shieldPower: "보호막 강화" };
-const PCT = new Set(["crit", "critDmg", "healPower", "foodPower", "dmgReduce", "cdr", "shieldPower"]);
+const STAT_KR = { maxHp: "최대 체력", maxSp: "최대 기력", atk: "공격력", matk: "마법력", def: "방어력", crit: "치명타", critDmg: "치명 피해", moveSpeed: "이동 속도", atkSpeed: "공격 속도", spRegen: "기력 회복", healPower: "회복 효율", foodPower: "음식 효과", dmgReduce: "피해 감소", cdr: "재사용 감소", shieldPower: "보호막 강화", elemRes: "속성 저항" };
+const PCT = new Set(["crit", "critDmg", "healPower", "foodPower", "dmgReduce", "cdr", "shieldPower", "elemRes"]);
 // ---- ornate window pieces (inventory / skills): inline SVG so they stay sharp at any scale
 // every game window uses the ornate frame except the conversation box and the illustrated title / character screens
 const PLAIN = new Set(["dialog", "title", "create"]), BANNER = new Set(["inventory", "shop", "quests", "craft", "jobs"]);
@@ -455,7 +455,7 @@ export class UI {
       r.onclick = () => { this.sel = { equip: s }; G.audio.sfx("ui"); this.showInventory(); };
     });
     const st = p.sheet.final;
-    const show = ["maxHp", "maxSp", "atk", "matk", "def", "crit", "moveSpeed", "atkSpeed", "spRegen", "healPower", "dmgReduce", "cdr"].filter(k => !(["healPower", "dmgReduce", "cdr"].includes(k) && st[k] <= 1e-4));
+    const show = ["maxHp", "maxSp", "atk", "matk", "def", "crit", "moveSpeed", "atkSpeed", "spRegen", "healPower", "dmgReduce", "cdr", "elemRes"].filter(k => !(["healPower", "dmgReduce", "cdr", "elemRes"].includes(k) && st[k] <= 1e-4));
     $("div", "fbox stats", right, `<div class="fsect">${STAT_HEAD}<b>능력치</b> <small>${p.sheet.job.name} Lv${P.level}</small></div><div class="statgrid">` + show.map(k => `<span>${STAT_ICON[k] || STAT_ICON.def0}<em>${STAT_KR[k]}</em><b>${PCT.has(k) ? Math.round(st[k] * 100) + "%" : (["moveSpeed", "atkSpeed", "spRegen"].includes(k) ? st[k].toFixed(2) : Math.round(st[k]))}</b></span>`).join("") + "</div>");
   }
 

@@ -2,7 +2,7 @@
 import json, os, sys, time, urllib.request, mimetypes, uuid
 BASE = 'https://api.tripo3d.ai/v2/openapi'
 KEY = open(os.path.expanduser('~/.tripo/key')).read().strip()
-H = {'Authorization': 'Bearer ' + KEY}
+H = {'Authorization': 'Bearer ' + KEY, 'User-Agent': 'Mozilla/5.0 (arcan-chronicle asset tool)'}   # Cloudflare refuses Python's default UA (403 / 1010)
 
 def req(method, path, body=None, raw=None, ctype='application/json'):
     data = raw if raw is not None else (json.dumps(body).encode() if body is not None else None)

@@ -2,7 +2,7 @@
 // World coordinates follow the Unity project: x = east, y = up, z = north.
 import { SkillBook, ensureSk, advanceBlock, ADV1_LEVEL } from "./skillsys.js";
 
-export const STATS = ["maxHp", "maxSp", "atk", "matk", "def", "crit", "critDmg", "moveSpeed", "atkSpeed", "spRegen", "healPower", "foodPower", "dmgReduce", "cdr", "shieldPower", "hit", "eva", "craftRate"];
+export const STATS = ["maxHp", "maxSp", "atk", "matk", "def", "crit", "critDmg", "moveSpeed", "atkSpeed", "spRegen", "healPower", "foodPower", "dmgReduce", "cdr", "shieldPower", "hit", "eva", "craftRate", "elemRes"];   // elemRes: 속성 저항 (약사 수련) — 속성 지속 피해·상태이상 지속 시간 감소
 /** 능력치 (attribute points): 3 per level gained, spent freely; every character also has ATTR_BASE in each.
  *  Effects are per point spent (the base 5 is already part of the job's base stats):
  *  힘 str -> atk, 지능 int -> matk, 민첩 dex -> hit (명중) + eva (회피), 생명력 vit -> maxHp + maxSp, 행운 luk -> crit + craftRate */
@@ -355,7 +355,7 @@ export class CharacterSheet {
     const f = addStats(Object.assign({}, base), flat);
     for (const k of STATS) if (Math.abs(pct[k]) > 1e-6) f[k] *= 1 + pct[k];
     f.eva = clamp(f.eva, 0, EVA_CAP); f.hit = Math.max(0, f.hit); f.craftRate = Math.max(0, f.craftRate);
-    f.crit = clamp01(f.crit); f.dmgReduce = clamp(f.dmgReduce, 0, 0.8); f.cdr = clamp(f.cdr, 0, 0.5); f.atkSpeed = Math.max(0.3, f.atkSpeed);
+    f.elemRes = clamp(f.elemRes, 0, 0.6); f.crit = clamp01(f.crit); f.dmgReduce = clamp(f.dmgReduce, 0, 0.8); f.cdr = clamp(f.cdr, 0, 0.5); f.atkSpeed = Math.max(0.3, f.atkSpeed);
     this.final = f;
     if (this.p.hp < 0 || this.p.hp > f.maxHp) this.p.hp = f.maxHp;
     if (this.p.sp < 0 || this.p.sp > f.maxSp) this.p.sp = f.maxSp;
@@ -568,6 +568,7 @@ export class StatusSet {
    *  group: only one status of a group at a time (food buffs never stack with each other) */
   apply(def, dur, value, source) {
     if (!def || !(dur > 0)) return;
+    if (def.debuff && this.flag("immune")) return;   // 약 보호막: 상태이상 면역 (every path, monster attacks included)
     if (def.group) this.list = this.list.filter(x => !(x.def.group === def.group && x.def.id !== def.id));
     const s = this.list.find(x => x.def.id === def.id);
     if (def.cap != null && def.kind !== "dot") value = Math.sign(value) * Math.min(Math.abs(value), def.cap);

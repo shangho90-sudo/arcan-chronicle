@@ -29,7 +29,8 @@ for (const s of d.skill2List) {
   if (s.type === "ultimate") { Eq(s.maxLv, 3, s.id + " ult max 3"); Ok(s.unlock >= 45, s.id + " ult >= Lv45"); }
   else Eq(s.maxLv, 5, s.id + " max 5");
   const t = d.job(s.job).tier, exp = t === 0 ? [1, 5, 10, 3, 7, 7, 5, 9] : t === 1 ? [10, 12, 15, 18, 20] : [30, 33, 36, 40, 45];
-  if (s.type !== "ultimate") Eq(s.unlock, exp[s.idx - 1], s.id + " unlock by position");
+  const OVR = { ph1_a4: 13 };   // 2026-11-11 약사 개편: 밀어내기 Lv13 (사용자 요청)
+  if (s.type !== "ultimate") Eq(s.unlock, OVR[s.id] ?? exp[s.idx - 1], s.id + " unlock by position");
   if (s.type === "craft") Ok((s.recipes || []).length > 0, s.id + " has recipes");
   for (const r of s.recipes || []) if (r !== "salvage") { const rc = d.recipes.find(x => x.id === r); Ok(rc && d.item(rc.output.item) && rc.inputs.every(x => d.item(x.item)), r + " recipe items exist"); }
   for (const op of s.ops) for (const st of op.st || []) Ok(!!d.status(st.id), s.id + " status " + st.id + " defined");
@@ -105,7 +106,8 @@ const herbs = ch.bag.count("m_herb"), bottles = ch.bag.count("m_bottle");
 const r2 = sys.craft(d, ch, ch.book, rc, 1);
 Ok(r2.err && ch.bag.count("m_herb") === herbs && ch.bag.count("m_bottle") === bottles, "bag full -> materials kept: " + r2.err);
 // bonus output never re-triggers: rng 0 -> exactly one bonus batch
-ch = make(20); ch.p.job = "pharmacist"; ch.recalc(); ch.book.learn("ph1_c1"); ch.book.learn("ph1_c5");
+ch = make(20); ch.p.job = "pharmacist"; ch.recalc(); ch.book.learn("ph1_c1");
+{ const orig = ch.book.passive.bind(ch.book); ch.book.passive = k => k === "craftExtra:potion" ? 0.1 : orig(k); }   // 알뜰 조제 패시브는 2026-11-11 삭제 — 덤 생산 규칙 자체를 검사
 ch.bag.add("m_herb", 2); ch.bag.add("m_bottle", 1);
 const r3 = sys.craft(d, ch, ch.book, rc, 1, () => 0); Eq(r3.made, 4, "bonus output = one extra batch only");
 
@@ -152,5 +154,27 @@ Eq(p4.version, 4, "migrated to v4"); Eq(ch4.p.job, "cook", "legacy job kept"); E
   const r = c.book.reset(true, false); Ok(r === null && c.book.level("nv_a1") === 0 && c.book.sk.npoints === np2 + 1, "reset refunds novice points to their pool");
 }
 
+// ---- 2026-11-11 약사 1차 개편
+{ const ids = d.skill2List.filter(x => x.job === "pharmacist").map(x => x.id).sort().join(",");
+  Eq(ids, "ph1_a1,ph1_a3,ph1_a4,ph1_a5,ph1_a6,ph1_b1,ph1_b2,ph1_b4,ph1_b5,ph1_b6,ph1_c1,ph1_c6,ph1_c7,ph1_c8,ph1_c9", "pharmacist skill ids after the rework");
+  const S = id => d.skill2(id);
+  Eq(S("ph1_a4").unlock, 13, "밀어내기 Lv13"); Eq(S("ph1_a6").unlock, 18, "천근쇄약 Lv18"); Eq(S("ph1_b6").unlock, 15, "약병폭격 Lv15");
+  const sp = S("ph1_a3").ops[0]; Ok(sp.shape === "circle" && sp.hits === 5 && sp.last && sp.last.push > 0, "유봉 휘두르기: circle, 5 hits, last pushes");
+  const sl = S("ph1_a6").ops.find(o => o.op === "delay"); Ok(sl.coef === 4.5 && sl.core > 0 && sl.r >= 4, "천근쇄약 450% wide + centre bonus");
+  const fr = S("ph1_b6").ops[0]; Ok(fr.op === "custom" && fr.fn === "flask_rain" && fr.n === 10, "약병폭격 10 flasks");
+  const ad = S("ph1_c6").ops; Ok(ad.some(o => o.id === "haste" && o.val === 0.2 && o.dur === 15) && ad.some(o => o.id === "aspdup" && o.val === 0.25 && o.dur === 15), "아드레날린 15 s +20 % move +25 % attack speed");
+  const sh = S("ph1_c7").ops; Ok(sh.some(o => o.op === "shield" && o.pctMaxHp === 0.25 && o.dur === 8) && sh.some(o => o.id === "immune" && o.dur === 8), "약 보호막 25 % max HP 8 s + immunity");
+  const hc = S("ph1_c8").ops[0]; Ok(hc.op === "area" && hc.kind === "heal" && hc.dur === 8, "광역 회복진 8 s heal area");
+  Ok(d.status("aspdup") && d.status("immune"), "new statuses");
+  Ok(!d.recipes || !d.recipes.some || !d.recipes.some(r => r.id === "r_sp"), "활력제 recipe removed"); }
+// removed skills: points come back on load
+{ const p6 = newProfile(d, "환불", "m"); p6.level = 20; p6.job = "pharmacist"; p6.sk = { points: 0, granted: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], learned: { ph1_a1: 2, ph1_a2: 3, ph1_c3: 1, ph1_c5: 2 }, slots: ["ph1_a2", "ph1_a1", "", ""] };
+  const ch6 = new CharacterSheet(d, p6); Eq(ch6.book.sk.points, 6, "points of removed skills refunded"); Eq(ch6.book.level("ph1_a2"), 0, "removed skill dropped"); Eq(ch6.book.sk.slots[0], "", "removed skill unslotted"); Eq(ch6.book.level("ph1_a1"), 2, "kept skill kept"); }
+// 약사 수련 passive stats, immunity, element resistance
+{ const ch7 = make(20); ch7.p.job = "pharmacist"; ch7.recalc(); const sp0 = ch7.final.maxSp, ma0 = ch7.final.matk;
+  Ok(ch7.book.learn("ph1_c9") == null, "learn 약사 수련"); ch7.recalc();
+  Ok(Math.abs(ch7.final.elemRes - 0.06) < 1e-9 && ch7.final.maxSp > sp0 && ch7.final.matk > ma0, "약사 수련: elemRes 6 %, maxSp / matk up");
+  const st = new core.StatusSet(); st.apply(d.status("immune"), 8, 1); st.apply(d.status("poison"), 5, 3); st.apply(d.status("haste"), 5, 0.2);
+  Ok(!st.has("poison") && st.has("haste"), "immune blocks debuffs, not buffs"); }
 console.log(`skills2: ${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

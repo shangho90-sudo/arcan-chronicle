@@ -25,6 +25,7 @@ export const FX = {
   yeon(kind, a, b) { try { if (G.skillFx && G.skillFx.yeon) return kind === 'strike' ? G.skillFx.yeon.strike(a) : G.skillFx.yeon.hit(a, b); } catch (e) { console.warn('fx yeon', e); } },   // 견습생 '연' (js/yeonfx.js)
   sal(kind, pos, dir, o = {}) { try { if (G.skillFx && G.skillFx.sal) return G.skillFx.sal[kind](pos, dir, o); } catch (e) { console.warn('fx sal', e); } },   // 일격참 '살' (js/salfx.js)
   biyeon(kind, pos, dir, o = {}) { try { if (G.skillFx && G.skillFx.biyeon) return G.skillFx.biyeon[kind](pos, dir, o); } catch (e) { console.warn('fx biyeon', e); } return null; },   // 비연참 '비연파' (js/biyeonfx.js)
+  pharm(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.pharm) return G.skillFx.pharm[kind](a, o); } catch (e) { console.warn('fx pharm', e); } return null; },   // 약사 1차 소품 (js/pharmfx.js)
   bash(kind, pos, dir, o = {}) { try { if (G.skillFx && G.skillFx.bash) return G.skillFx.bash[kind](pos, dir, o); } catch (e) { console.warn('fx bash', e); } },   // 배쉬 (js/bashfx.js)
   beam(kind, a, b, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.beam(kind, a, b, o); } catch (e) { console.warn('fx', kind, e); } },
   projectile(kind, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.projectile(kind, o) || NOOP; } catch (e) { console.warn('fx', kind, e); } return NOOP; },
@@ -36,6 +37,7 @@ export const FX = {
 
 // ------------------------------------------------------------------ statuses with boss / immunity rules
 const CC = new Set(['freeze', 'root', 'stagger']);
+const ELEMENTAL = new Set(['burn', 'poison', 'slow', 'freeze']);   // 속성 상태이상 (속성 저항 elemRes가 지속 시간을 줄임)
 export function applyStatus(target, st, caster, lvMul = 1) {
   const def = G.data.status(st.id); if (!def || target.dead) return false;
   if (st.ch < 1 && Math.random() > st.ch) return false;
@@ -47,6 +49,8 @@ export function applyStatus(target, st, caster, lvMul = 1) {
     if (def.boss === 'half') val *= 0.5;
   }
   if (target.faction === 'player' && target.status) {
+    if (def.debuff && target.status.flag && target.status.flag('immune')) return false;   // 약 보호막
+    const er = target.stat ? target.stat('elemRes') : 0; if (er > 0 && ELEMENTAL.has(st.id)) dur *= 1 - Math.min(0.6, er);   // 약사 수련
     if (CC.has(st.id) && target.status.flag && target.status.flag('ccres') > 0) dur *= 1 - Math.min(0.8, target.status.flag('ccres'));
     if (st.id === 'slow' && target.status.flag && target.status.flag('slowres') > 0) return false;
   }
@@ -312,17 +316,20 @@ export class SkillEngine {
       case 'area': return this.addArea(op, ctx, op.atSelf || d.target === 'self' ? { ...pc.pos } : ctx.aim);
       case 'buff': {
         const targets = op.target === 'all' ? [pc, ...this.summons.filter(s => !s.dead && s.living)] : op.target === 'summons' ? this.summons : [pc];
-        const dur = op.dur * (1 + 0.05 * (ctx.L - 1)), val = op.val * (op.id === 'haste' || op.id === 'defup' || op.id === 'atkup' ? ctx.mult : 1);
+        // fixed: exact duration, value grows by valLv per skill level (약사 아드레날린 주사 / 약 보호막의 면역)
+        const dur = op.fixed ? op.dur : op.dur * (1 + 0.05 * (ctx.L - 1)), val = op.fixed ? op.val + (op.valLv || 0) * (ctx.L - 1) : op.val * (op.id === 'haste' || op.id === 'defup' || op.id === 'atkup' ? ctx.mult : 1);
         for (const t of targets) applyStatus(t, { id: op.id, dur, val, ch: 1 }, pc);
         const def = G.data.status(op.id); if (def) G.ui.floatText(pc.pos, def.name, def.color || '#fff', 0.85, 1.8);
-        FX.aura(op.id === 'atkup' ? 'buff_atk' : op.id === 'defup' ? 'buff_def' : op.id === 'haste' ? 'buff_speed' : 'heal', () => pc.pos, { duration: Math.min(dur, 3), color: col });
+        if (!op.noAura) FX.aura(op.id === 'atkup' ? 'buff_atk' : op.id === 'defup' ? 'buff_def' : op.id === 'haste' ? 'buff_speed' : 'heal', () => pc.pos, { duration: Math.min(dur, 3), color: col });
+        if (op.id === 'immune') { for (const s of pc.status.list.slice()) if (s.def.debuff && s.def.cleanse !== false) pc.status.remove(s.def.id); }
         return;
       }
       case 'shield': {
-        let n = (op.base + op.coef * pc.stat(op.power || primaryPower(pc))) * ctx.mult * (1 + pc.sheet.final.shieldPower);
+        let n = op.pctMaxHp ? pc.maxHp * (op.pctMaxHp + (op.pctLv || 0) * (ctx.L - 1)) * (1 + pc.sheet.final.shieldPower)   // 약 보호막: % of max HP
+          : (op.base + op.coef * pc.stat(op.power || primaryPower(pc))) * ctx.mult * (1 + pc.sheet.final.shieldPower);
         if (op.lowHp) n *= 1 + op.lowHp * (1 - pc.hp / pc.maxHp);
         pc.addShield(Math.round(n), op.dur); G.ui.floatText(pc.pos, '보호막 ' + Math.round(n), '#8ce6ff', 0.9, 1.6);
-        FX.aura('shield', () => pc.pos, { duration: op.dur }); return;
+        if (!op.noAura) FX.aura('shield', () => pc.pos, { duration: op.dur }); return;
       }
       case 'heal': { const n = (pc.maxHp * op.pct + (op.flat || 0)) * ctx.mult * (1 + pc.sheet.final.healPower + (op.boost || 0)); pc.heal(n); FX.burst('heal', pc.pos, { radius: 1.2 }); return; }
       case 'mp': { pc.sp = Math.min(pc.maxSp, pc.sp + pc.maxSp * op.pct * ctx.mult); return; }
@@ -346,7 +353,8 @@ export class SkillEngine {
         const c = op.atAim ? ctx.aim : pc.pos;
         FX.telegraph(c, op.r || op.w || 2, op.dur, { color: 0xffb040, shape: op.shape, dir: ctx.facing, length: op.len, width: op.w }); return;
       }
-      case 'fx': if (op.biyeon === 'cast') { const a = pc.body && pc.body.sh && pc.body.sh.actions[ctx.act]; ctx.biyeonCast = FX.biyeon('cast', pc.pos, ctx.facing, { follow: pc, swing: a && a.fps ? a.hitFrame / a.fps : 0.22 }); }   // wind-up + sweep + side blades (decoration); the centre blade rides the proj op
+      case 'fx': if (op.pharm) { ctx.pharmFx = FX.pharm(op.pharm, op.pharm === 'pestle' ? { x: ctx.aim.x, y: pc.zone.geo.ground(ctx.aim.x, ctx.aim.z).y, z: ctx.aim.z } : pc, { follow: pc, dur: op.dur, fall: op.fall, r: op.r, facing: ctx.facing, L: ctx.L }); return; }
+        if (op.biyeon === 'cast') { const a = pc.body && pc.body.sh && pc.body.sh.actions[ctx.act]; ctx.biyeonCast = FX.biyeon('cast', pc.pos, ctx.facing, { follow: pc, swing: a && a.fps ? a.hitFrame / a.fps : 0.22 }); }   // wind-up + sweep + side blades (decoration); the centre blade rides the proj op
         if (op.bash === 'cast') ctx.bashCast = FX.bash('cast', pc.pos, ctx.facing, { follow: pc });   // crescent on the real sword arc (js/bashfx.js)
         if (op.sal === 'cast') { const tg = ctx.tgt && !ctx.tgt.dead ? ctx.tgt : this.targetFor(ctx.d); ctx.salCast = FX.sal('cast', pc.pos, ctx.facing, { follow: pc, length: op.len || 3.4, width: op.w || 1, target: tg || null }); }   // beam: sword tip -> impact point (salImpact, max op.len m); the hit locks it
         if (op.slash) FX.slash(op.slash, pc.pos, ctx.facing, { radius: op.r || 1.6, angle: op.ang || 120, color: col, tilt: op.tilt || 0, mirror: !!op.mirror }); if (op.burst) FX.burst(op.burst, op.fwd ? { x: pc.pos.x + ctx.facing.x * op.fwd, y: pc.pos.y, z: pc.pos.z + ctx.facing.z * op.fwd } : pc.pos, { radius: op.r || 2, color: col }); return;   // fwd: m in front (일격참 땅 갈라짐)
@@ -371,7 +379,10 @@ export class SkillEngine {
     // hitsPerLv: the skill's own hit count grows with its level (견습생 '연'); noExtra: no automatic extra strikes
     const baseHits = Math.max(1, (op.hits || 1) + (op.hitsPerLv ? Math.floor(op.hitsPerLv * (ctx.L - 1)) : 0)), extra = physical && !op.noExtra && !op.hitsPerLv ? Math.floor((ctx.L - 1) / 2) : 0, hits = baseHits + extra;
     if (extra) op = { ...op, coef: op.coef * baseHits / hits * (1 + 0.06 * extra), gap: op.gap || 0.12 };   // total grows a little, split across more strikes
+    const op0 = op;
     for (let h = 0; h < hits; h++) {
+      // last: overrides for the final strike only (약사 유봉 휘두르기: 5번째 타격이 더 세고 적을 밀쳐 냄)
+      const op = op0.last && h === hits - 1 ? { ...op0, ...op0.last } : op0;
       const run = () => {
         if (pc.dead) return;
         let ts;
@@ -485,11 +496,14 @@ export class SkillEngine {
   /** area explosion used by delayed / lob / boom ops */
   blast(c, op, ctx) {
     const pc = this.pc, r = op.r || 1.5, ts = this.targets(HitShape.circle(c.x, c.z, r));
-    FX.burst(op.burst || 'explosion_fire', c, { radius: r, color: ctx.d.fx && ctx.d.fx.color });
+    FX.burst(op.burst || 'explosion_fire', c, { radius: op.burstR || r, color: ctx.d.fx && ctx.d.fx.color });
+    if (op.shake && G.render.addShake && !G.reduceFlash) G.render.addShake(op.shake[0], op.shake[1]);
     const cb = this.book.passive('centerBonus');
     for (const t of ts) {
       const centre = Math.hypot(t.pos.x - c.x, t.pos.z - c.z) < r * 0.35;
-      this.dmg(t, op.coef, ctx, { ...op, centerHit: centre && cb > 0, centerBonus: 0 });
+      // core: own centre bonus inside coreR (천근쇄약: +50 % within 1.5 m), on top of the 정확한 투척 passive rule
+      const core = op.core && Math.hypot(t.pos.x - c.x, t.pos.z - c.z) <= (op.coreR || r * 0.35) ? 1 + op.core : 1;
+      this.dmg(t, op.coef * core, ctx, { ...op, centerHit: centre && cb > 0, centerBonus: 0 });
       this.onHit(t, op, ctx);
       if (op.react) this.react(t, op.react, ctx);
     }
@@ -651,7 +665,8 @@ class SkillArea {
   constructor(eng, op, ctx, c, r, dur) {
     this.eng = eng; this.op = op; this.ctx = ctx; this.c = c; this.r = r; this.life = dur; this.maxLife = dur; this.tick = 0; this.extended = 0; this.empower = 0;
     const pos = c || eng.pc.pos;
-    this.fx = FX.area(op.fx || (op.kind === 'heal' ? 'healing_mist' : 'danger'), pos, r, { color: ctx.d.fx && ctx.d.fx.color, duration: 0 });
+    this.fx = op.fx === 'none' ? NOOP : FX.area(op.fx || (op.kind === 'heal' ? 'healing_mist' : 'danger'), pos, r, { color: ctx.d.fx && ctx.d.fx.color, duration: 0 });
+    if (op.pharm) this.pfx = FX.pharm(op.pharm, { x: pos.x, y: pos.y, z: pos.z }, { r, dur });   // 광역 회복진 (js/pharmfx.js)
     if (op.prop) { this.prop = FX.summon(op.prop, {}); this.prop.position.copy(T(pos)); G.render.scene.add(this.prop); }
   }
   extend(sec, cap) { if (this.extended >= cap) return; const k = Math.min(sec, cap - this.extended); this.extended += k; this.life += k; this.fx.pulse(); }
@@ -664,7 +679,7 @@ class SkillArea {
     if (this.tick > 0) return; this.tick = op.tick || 1;
     const k = this.ctx.mult * (1 + this.empower);
     if (op.kind === 'heal') {
-      if (Math.hypot(pc.pos.x - c.x, pc.pos.z - c.z) < this.r + 0.3) { pc.heal(pc.maxHp * op.heal * k * (1 + pc.sheet.final.healPower)); if (op.cleanse) { const s = pc.status.list.find(x => x.def.debuff && x.def.cleanse !== false); if (s) pc.status.remove(s.def.id); } }
+      if (Math.hypot(pc.pos.x - c.x, pc.pos.z - c.z) < this.r + 0.3) { pc.heal(pc.maxHp * op.heal * k * (1 + pc.sheet.final.healPower)); if (this.pfx && this.pfx.pulse) this.pfx.pulse(pc); if (op.cleanse) { const s = pc.status.list.find(x => x.def.debuff && x.def.cleanse !== false); if (s) pc.status.remove(s.def.id); } }
       for (const s of eng.summons) if (s.living && !s.dead && Math.hypot(s.pos.x - c.x, s.pos.z - c.z) < this.r + 0.3) s.hp = Math.min(s.maxHp, s.hp + s.maxHp * op.heal * k);
       return;
     }
@@ -677,7 +692,7 @@ class SkillArea {
       if (op.empowerSummons) for (const s of eng.summons) if (!s.dead && s.living) s.empower = Math.max(s.empower || 0, op.empowerSummons);
     }
   }
-  dispose() { if (this.dead) return; this.dead = true; this.fx.dispose(); if (this.prop) { G.render.scene.remove(this.prop); } }
+  dispose() { if (this.dead) return; this.dead = true; this.fx.dispose(); if (this.pfx && this.pfx.end) this.pfx.end(); if (this.prop) { G.render.scene.remove(this.prop); } }
 }
 
 // ------------------------------------------------------------------ summons (Combatant-like; live in zone.actors, faction player)
@@ -849,6 +864,25 @@ export const CUSTOM = {
         if (pc.zone.geo.blocked(p.x, p.z, 0.1)) return;
         FX.burst('explosion_fire', p, { radius: op.r }); FX.beam('skewer_row', p, { x: p.x, y: 1.2, z: p.z }, { duration: 0.6 });
         for (const t of eng.targets(HitShape.circle(p.x, p.z, op.r))) { eng.dmg(t, op.coef, ctx, {}); eng.onHit(t, { temp: op.temp, st: [{ id: 'burn', dur: 2, val: 0.08, ch: 1 }] }, ctx); }
+      } }, ctx });
+    }
+  },
+  flask_rain(eng, op, ctx) {      // 약병폭격: n flasks fall one after another on random points around the aim, each a random element
+    const pc = eng.pc, c = ctx.aim, K = [
+      { elem: 'fire', burst: 'explosion_fire', st: [{ id: 'burn', dur: 4, val: 0.12, ch: 1 }] },
+      { elem: 'ice', burst: 'explosion_ice', st: [{ id: 'slow', dur: 3, val: 0.35, ch: 1 }] },
+      { elem: 'poison', burst: 'explosion_acid', st: [{ id: 'poison', dur: 5, val: 0.15, ch: 1 }] }];
+    ctx.flaskLog = [];
+    for (let i = 0; i < op.n; i++) {
+      const k = K[Math.floor(Math.random() * 3)], a = Math.random() * 6.283, rr = i === 0 ? 0 : Math.sqrt(Math.random()) * op.r;
+      const p = { x: c.x + Math.cos(a) * rr, z: c.z + Math.sin(a) * rr }; p.y = pc.zone.geo.ground(p.x, p.z).y;
+      eng.pending.push({ time: eng.clock + i * op.gap, op: { op: '_run', run: () => {
+        FX.pharm('flask', p, { elem: k.elem, fall: op.fall });
+        eng.pending.push({ time: eng.clock + op.fall, op: { op: '_run', run: () => {
+          const ts = eng.blast(p, { r: op.blast, coef: op.coef, burst: k.burst, st: k.st, tag: op.tag, elem: k.elem }, ctx);
+          ctx.flaskLog.push({ elem: k.elem, n: ts.length });
+          G.render.addShake && !G.reduceFlash && G.render.addShake(0.05, 0.1);
+        } }, ctx });
       } }, ctx });
     }
   },

@@ -347,7 +347,36 @@ SHEATHE = action('sheathe', [
 ], 0.0, 0.66, None, fadeIn=0.0, fadeOut=0.0)
 SHEATHE.update(releaseT=0.41, overlay=True)
 
-SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL] + [DRAW, SHEATHE]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
+# ------------------------------------------------------------------------------------------------ 약사 1차 (2026-11-11)
+# 유봉 휘두르기 (ph1_a3, anim ph_spin): crouch with the pestle held straight out to the right, then two full turns on the
+# spot (720 deg, spins) while 5 hits land every 0.13 s (skill data hits=5 gap=0.13 from hitT 0.18); the last turn ends in a
+# low heavy sweep that pushes everything away, then recover. The whole body turns, so the feet stay planted (no lunges).
+SP_OUT = dict(hand=[-86, 2, 1.0], blade=[-96, -4], elbow=[-0.6, -0.8, -0.4], armL=[46, 54])
+PH_SPIN = action('ph_spin', [
+    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
+    key(0.10, 'o', twist=-40, lean=4, sink=0.16, **SP_OUT),
+    key(0.18, 'i', twist=-10, lean=8, sink=0.18, squint=True, **SP_OUT),
+    key(0.44, None, twist=-8, lean=8, sink=0.18, squint=True, **SP_OUT),
+    key(0.70, 'o', twist=-6, lean=14, sink=0.24, squint=True, **dict(SP_OUT, hand=[-80, -14, 1.02], blade=[-92, -22])),
+    key(0.80, 's', twist=18, lean=16, sink=0.24, hand=[30, -30, 0.92], blade=[60, -36], elbow=[-0.3, -1, 0.2], armL=[16, 40], step=[0.24, -0.2]),
+    key(1.02, 's', twist=6, lean=6, sink=0.06, hand=[10, -40, 0.78], blade=[30, -12], elbow=[-0.5, -1, -0.1]),
+    key(1.16, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
+], 0.18, 0.86, [[0.14, 0.76]], fadeIn=0.06, fadeOut=0.14)
+PH_SPIN.update(spins=[[0.12, 0.74, 720]], trailLife=0.18, trailBase=0.1, trailColor=[1.6, 1.35, 0.8], recover=0.3)
+# 천근쇄약 (ph1_a6, anim ph_slam): raise the pestle high with both arms (calling the giant golden pestle down from the
+# sky), hold, then drive it down at 0.30 s into a deep crouch as the giant one lands on the aim point (skill fx / delay ops)
+PH_SLAM = action('ph_slam', [
+    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
+    key(0.12, 'o', twist=-4, lean=-14, sink=0.06, hand=[-10, 80, 0.86], blade=[-4, 112], elbow=[-0.6, 0.3, -1], armL=[150, 30]),
+    key(0.24, 's', twist=-2, lean=-18, sink=0.04, hand=[-8, 86, 0.86], blade=[-2, 118], elbow=[-0.6, 0.3, -1], armL=[160, 34], squint=True),
+    key(0.30, None, twist=2, lean=30, sink=0.30, hand=[0, -24, 1.0], blade=[2, -54], elbow=[-0.4, -1, -0.2], armL=[30, 40], squint=True, step=[0.22, -0.18]),
+    key(0.40, 'o', twist=4, lean=34, sink=0.34, hand=[4, -34, 0.94], blade=[4, -68], elbow=[-0.4, -1, -0.1], armL=[20, 44], step=[0.22, -0.18]),
+    key(0.64, 's', twist=4, lean=24, sink=0.24, hand=[4, -32, 0.92], blade=[4, -60], elbow=[-0.4, -1, -0.1], armL=[16, 40], step=[0.22, -0.18]),
+    key(0.86, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
+], 0.30, 0.66, [[0.25, 0.33]], fadeIn=0.06, fadeOut=0.16)
+PH_SLAM.update(trailLife=0.16, trailColor=[1.7, 1.4, 0.7])
+
+SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL] + [DRAW, SHEATHE, PH_SPIN, PH_SLAM]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
 
 acts = json.load(open(P))
 names = {'attack', 'attack2'} | {x['name'] for x in SKILL_ACTS}

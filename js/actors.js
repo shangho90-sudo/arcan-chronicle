@@ -42,6 +42,7 @@ export class Combatant {
     if (d.source && d.source !== this && d.source.faction !== this.faction) amount = Math.max(1, Math.round(amount * levelGapDamage(d.source, this)));   // level gap
     if (this.faction === "player" && this.skills2) {
       if (!d.dot) this._hits = (this._hits || 0) + 1;
+      if ((d.dot || d.elem) && this.stat("elemRes") > 0) amount *= 1 - Math.min(0.6, this.stat("elemRes"));   // 속성 저항 (약사 수련): burn / poison / bleed ticks, elemental hits
       const fg = this.status.flag("frontguard"); if (fg && d.source && d.source.pos) { const dx = d.source.pos.x - this.pos.x, dz = d.source.pos.z - this.pos.z, m = Math.hypot(dx, dz) || 1; if ((dx * this.facing.x + dz * this.facing.z) / m > 0.3) amount *= 1 - fg; }
       if (this.skills2.casting && !d.dot && amount > this.maxHp * 0.15) this.skills2.interruptCast("강한 공격에 시전이 끊겼습니다");
       const sh = this.shield > 0 ? Math.min(this.shield, amount) : 0;

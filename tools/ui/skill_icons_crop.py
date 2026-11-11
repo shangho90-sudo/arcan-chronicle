@@ -43,9 +43,16 @@ def circle_box(im, cx, cy, r=52):
 
 def pharmacist():
     im = Image.open(SRC_PH).convert('RGB')
+    # 2026-11-11 약사 개편: 그림의 칸 -> 지금 스킬 id. 지운 스킬(두 번 치기·전격 약병·활력제 제작·응급 복용·정화 약제)의 칸은
+    # 쓰지 않음, '약물 조제'(c 5번째, 위로 솟는 초록 화살표) 그림은 새 패시브 '약사 수련'(ph1_c9)에 씀. 새 스킬 그림은
+    # tools/blender/fx_pharm.py가 Blender로 그림(ph1_a6·b6·c6·c7·c8)
+    use = {('a', 1): 'ph1_a1', ('a', 3): 'ph1_a3', ('a', 4): 'ph1_a4', ('a', 5): 'ph1_a5', ('b', 1): 'ph1_b1', ('b', 2): 'ph1_b2',
+           ('b', 4): 'ph1_b4', ('b', 5): 'ph1_b5', ('c', 1): 'ph1_c1', ('c', 5): 'ph1_c9'}
     for col, x in PH_COLS.items():
         for i, y in enumerate(PH_ROWS):
-            k = f'ph1_{col}{i + 1}'; b = PH_FIXED.get(k) or circle_box(im, x, y)
+            k = use.get((col, i + 1))
+            if not k: continue
+            b = PH_FIXED.get(f'ph1_{col}{i + 1}') or circle_box(im, x, y)
             ic = im.crop(b).resize((SIZE, SIZE), Image.LANCZOS).convert('RGBA')
             m = Image.new('L', (SIZE * 4, SIZE * 4), 0); ImageDraw.Draw(m).ellipse((2, 2, SIZE * 4 - 3, SIZE * 4 - 3), fill=255)
             ic.putalpha(m.resize((SIZE, SIZE), Image.LANCZOS)); ic.save(os.path.join(OUT, k + '.png'), optimize=True); print(k, b)

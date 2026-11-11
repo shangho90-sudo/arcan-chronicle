@@ -19,7 +19,9 @@ export function ensureSk(p, data) {
   sk.learned = (sk.learned && typeof sk.learned === 'object') ? sk.learned : {};
   for (const id of Object.keys(sk.learned)) {
     const d = data.skill2(id); const lv = sk.learned[id] | 0;
-    if (!d || lv <= 0) { if (d) { /* invalid level: refund nothing, drop */ } delete sk.learned[id]; continue; }
+    // a skill that no longer exists (2026-11-11 약사 1차 개편: ph1_a2·b3·c2·c3·c4·c5 삭제) -> its points come back
+    if (!d && lv > 0) { if (id.startsWith('nv_')) sk.npoints = (sk.npoints | 0) + lv; else sk.points = (sk.points | 0) + lv; delete sk.learned[id]; continue; }
+    if (!d || lv <= 0) { delete sk.learned[id]; continue; }
     if (lv > d.maxLv) { sk.points += lv - d.maxLv; sk.learned[id] = d.maxLv; }     // refund impossible levels
     else sk.learned[id] = lv;
   }
