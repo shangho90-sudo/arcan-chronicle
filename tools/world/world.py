@@ -101,6 +101,19 @@ for _t in TOWNS:
     for nid, nm, title, lines in GEAR_MERCHANTS.get(_t['id'], []):
         wpn = title == '무기 상인'
         _t['npcs'].append((nid, nm, title, 'npc_armorer' if wpn else 'npc_merchant', lines, 'shop_weapons' if wpn else 'shop_armor', 'gear_weapon' if wpn else 'gear_armor'))
+# 2026-11-12 마을 리뉴얼: 두 왕도는 가로·세로 약 2.5배, 나머지는 넓이 약 3배(가로·세로 약 1.73배); 집 수도 그만큼. 배치는 tools/world/towns.py
+import towns as TW
+from residents import R as RESIDENTS
+for _t in TOWNS:
+    _k = 2.5 if _t['id'] in ('kairion_capital', 'baltazar') else 1.73
+    _t['W'] = round(_t['W'] * _k); _t['D'] = round(_t['D'] * _k); _t['houses'] = round(_t['houses'] * (2.6 if _k > 2 else 2.0))
+JOB_MASTERS = ['master_pharmacist', 'master_cook', 'master_blacksmith', 'master_hairdresser', 'master_artist']   # 전직 NPC는 모두 카이리온 왕도 장인 길드 회관 앞
+ARCAN = dict(id='town', name='아르칸 마을', region='kairion', W=50, D=41, wallH=7.0, keep=(18, 12, 15), houses=14, banner='blue',
+             centre=dict(id='fountain', file='angel_fountain', pos=[0.0, 0.0], h=180, scale=11.5, size=[11.06645, 11.2401, 5.7891], name='여신의 분수'),
+             fixed_models=[dict(id='smithy', file='medieval_blacksmith_shop', scale=10.5, size=[10.3047, 7.0098, 6.15195], name='마을 대장간'),
+                           dict(id='pharmacy', file='fantasy_cottage', scale=11.5, size=[11.27575, 9.3449, 10.2074], name='약초 약국')],
+             named_houses=[('general', 'general', '모아의 잡화·물약점'), ('arms', 'arms', '단오의 무기 상점'), ('bakery', 'bakery', '화덕 빵집'), ('dress', 'dress', '라벤더 의상실')],
+             place=[('merchant', 'house:general'), ('armorer', 'house:arms'), ('town_armor', 'house:dress'), ('elder', 'plaza:235'), ('guard', 'gate:forest')])
 # biomes: painted ground set, foliage tint, prop mix, density, light
 BIOMES = {
     'meadow':   dict(ground=None, density=0.45, grass=1.2, water=0.3, mix=dict(tree=.32, shrub=.22, flowers=.28, rock=.08, stone=.07, stump=.03), bgm='bgm_field',
@@ -472,7 +485,7 @@ def seg_rect(a, b, t):
 STYLES = ['bakery', 'general', 'dress', 'arms']
 HOUSE_NAMES = {'bakery': '빵집', 'general': '잡화점', 'dress': '옷가게', 'arms': '무기고'}
 
-def gen_town(t, M):
+def gen_town_v1(t, M):   # 2026-11-12 이전 배치(쓰지 않음, 참고용)
     rnd = rng_for(t['id']); W, Dd = t['W'], t['D']; WT = 2.4
     nb = neighbours(t['id'])
     gx = 0.0; gz = -Dd                                   # gate in the south wall
@@ -590,6 +603,37 @@ def gen_town(t, M):
              post=dict(vignette=0.2, bloom=0.14, sat=1.2, contrast=0.3, exposure=1.02), region=t['region'], map=list(t['map']), level=list(t['level']))
     return Z
 
+def town_place(t):
+    """이야기 NPC·상인 자리 힌트 (towns.py stand)"""
+    out, ang = [], [200, 235, 300, 335, 160, 20, 110, 70]
+    for k, n in enumerate(t['npcs']):
+        shop = n[5] if len(n) > 5 else ''
+        out.append((n[0], 'market' if shop in ('shop_general', 'shop_weapons', 'shop_armor') else 'plaza:%d' % ang[k % len(ang)]))
+    return out
+def gen_town(t, M):
+    tid = t['id']; rnd = rng_for(tid)
+    exits = [(n, name_of(n), direction(tid, n, M), 'to_' + n, 'from_' + n, 'from_' + tid) for n in neighbours(tid)]
+    tt = dict(t); tt['place'] = town_place(t)
+    if tid == 'kairion_capital': tt['place'] += [(m, 'lm:kairion_guildhall', (i - 2) * 3.2) for i, m in enumerate(JOB_MASTERS)]
+    g = TW.gen_town2(tt, exits, [(r[0], r[4]) for r in RESIDENTS.get(tid, [])])
+    Z = dict(id=tid, name=t['name'], kind='town', bgm='bgm_arcan_town' if rnd.random() < 0.5 else 'bgm_town', bounds=g['bounds'],
+             groundTex='grass', ambient=[0.56, 0.53, 0.6], sun=[1.0, 0.84, 0.62, 1.5], spriteTint=[1.0, 0.98, 0.94], spawns=g['spawns'], buildings=[], props=g['props'],
+             npcs=g['npcs'], portals=g['portals'], heights=[], patches=[], monsters=[], boss=dict(boss='', center=[], radius=0, gate=[], gateRadius=0, bossPos=[], respawn=0),
+             respawnZone=tid, respawnSpawn='revive', imageArt=[], blockPolys=g['blockPolys'], town3d=g['town3d'],
+             post=dict(vignette=0.2, bloom=0.14, sat=1.2, contrast=0.3, exposure=1.02), region=t['region'], map=list(t['map']), level=list(t['level']))
+    return Z
+def gen_arcan(Z, M):
+    """아르칸 마을(zones.json의 손으로 만든 'town')도 같은 생성기로: 숲 워프 id(to_field / from_field)는 그대로"""
+    exits = [('forest', '속삭이는 숲', direction('town', 'forest', M), 'to_field', 'from_field', 'from_town'),
+             ('capital_road', name_of('capital_road'), direction('town', 'capital_road', M), 'to_capital_road', 'from_capital_road', 'from_town')]
+    g = TW.gen_town2(dict(ARCAN), exits, [(r[0], r[4]) for r in RESIDENTS['town']])
+    for n in g['npcs']:
+        if n['npc'] == 'town_armor': n['gear'] = True
+    for k in ('bounds', 'spawns', 'npcs', 'portals', 'blockPolys', 'town3d', 'props'): Z[k] = g[k]
+    for s in Z['spawns']:
+        if s['id'] in ('start', 'revive'): s['rot'] = 45.0
+    return Z
+
 # ======================================================================== monsters / creatures / npcs
 def make_variants(mons):
     base = {m['id']: m for m in mons}
@@ -639,6 +683,10 @@ def world_npcs():
                      'npc_master_artist': 'master_artist', 'npc_armorer': 'armorer'}[sheet]
             if len(n) > 6: model = n[6]
             out.append(dict(id=nid, name=name, title=title, sheet=sheet, model=model, role=role, shop=shop, job='', lines=lines, world=True))
+    for tid, rs in RESIDENTS.items():
+        for nid, name, title, model, hint, lines, hook in rs:
+            shop = {'arcan_pharm_clerk': 'shop_pharmacy', 'arcan_smith_boy': 'shop_forge'}.get(nid, '')
+            out.append(dict(id=nid, name=name, title=title, sheet='npc_elder', model=model, role='merchant' if shop else 'elder', shop=shop, job='', lines=lines, world=True, resident=True, hook=hook, town=tid))
     return out
 
 # ======================================================================== existing zones: links into the new world
@@ -674,6 +722,7 @@ if __name__ == '__main__':
     M = node_map()
     zones = json.load(open(D('assets', 'data', 'zones.json')))
     zones['zones'] = [z for z in zones['zones'] if not z.get('file')]
+    arcan = gen_arcan(next(z for z in zones['zones'] if z['id'] == 'town'), M)
     link_existing(zones, M)
     mons = json.load(open(D('assets', 'data', 'monsters.json')))
     mons['monsters'] = [m for m in mons['monsters'] if not m.get('world')]
@@ -720,4 +769,5 @@ if __name__ == '__main__':
         json.dump(mons, open(D('assets', 'data', 'monsters.json'), 'w'), ensure_ascii=False, indent=1)
         json.dump(npcs, open(D('assets', 'data', 'npcs.json'), 'w'), ensure_ascii=False, indent=1)
         open(D('js', 'creature.js'), 'w').write(cre)
+        json.dump(build_mesh(arcan), open(D('assets', 'zone_town.json'), 'w'), separators=(',', ':'))
         print('wrote')

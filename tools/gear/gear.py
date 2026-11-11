@@ -144,7 +144,8 @@ def main():
         if n['id'] == 'master_blacksmith': n['shop'] = 'shop_forge'          # 무기·갑옷 판매는 무기·방어구 상인이 맡음(2026-11-11), 철산은 제작 재료만
     N['shops'] = [s for s in N['shops'] if not s.get('gear') and s['id'] != 'shop_arms'] + SHOPS
     town = next(z for z in Z['zones'] if z['id'] == 'town')
-    town['npcs'] = [n for n in town['npcs'] if not n.get('gear')] + [TOWN_SPOT]
+    # 2026-11-12: 마을 배치는 tools/world/towns.py가 정함(보라는 의상실 앞). 배치에 없을 때만 예전 자리를 씀
+    if not any(n.get('npc') == 'town_armor' for n in town['npcs']): town['npcs'] = [n for n in town['npcs'] if not n.get('gear')] + [TOWN_SPOT]
     for h in town.get('town3d', {}).get('houses', []):
         if h.get('id') == 'arms': h['name'] = '단오의 무기 상점'
     n_shop = sum(1 for i in its if i['price']); print('items', len(its), 'shop', n_shop, 'drop', len(its) - n_shop)

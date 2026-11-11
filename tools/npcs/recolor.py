@@ -7,7 +7,9 @@ from PIL import Image
 M = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'assets', 'models')
 # name: (source texture, hue shift deg, saturation mul, value mul)
 JOBS = {'castilla': ('npc_artist', 95, 1.05, 1.0), 'kylus': ('npc_guard', 20, 0.75, 0.82), 'daisen': ('npc_blacksmith', -15, 1.15, 0.85), 'boldran': ('npc_blacksmith', 0, 0.35, 0.95),
-        'gear_weapon': ('npc_armorer', 150, 1.1, 0.95), 'gear_armor': ('npc_merchant', -110, 1.1, 1.0)}
+        'gear_weapon': ('npc_armorer', 150, 1.1, 0.95), 'gear_armor': ('npc_merchant', -110, 1.1, 1.0),
+        # 마을 주민(tools/world/residents.py, 2026-11-12): 같은 메시에 옷 색만 다르게
+        'res_artist_a': ('npc_artist', 40, 1.0, 1.0), 'res_artist_b': ('npc_artist', -150, 0.9, 0.95), 'res_pharmacist_a': ('npc_pharmacist', 60, 1.0, 1.0), 'res_pharmacist_b': ('npc_pharmacist', -120, 1.05, 0.95), 'res_blacksmith_a': ('npc_blacksmith', 100, 0.8, 1.0), 'res_blacksmith_b': ('npc_blacksmith', -60, 0.9, 0.9), 'res_cook_a': ('npc_cook', 150, 0.9, 1.0), 'res_cook_b': ('npc_cook', -70, 1.0, 0.95), 'res_elder_a': ('npc_elder', 120, 0.85, 1.0), 'res_hairdresser_a': ('npc_hairdresser', 70, 1.0, 1.0), 'res_hairdresser_b': ('npc_hairdresser', -130, 1.0, 0.95), 'res_guard_a': ('npc_guard', 90, 0.9, 1.0), 'res_guard_b': ('npc_guard', -90, 1.0, 0.9), 'res_merchant_a': ('npc_merchant', 60, 1.0, 1.0), 'res_merchant_b': ('npc_merchant', 170, 0.9, 0.95)}
 def recolor(src, dh, ks, kv):
     im = Image.open(os.path.join(M, src + '.jpg')).convert('HSV'); a = np.asarray(im).astype(np.float32)
     h, s, v = a[..., 0], a[..., 1], a[..., 2]

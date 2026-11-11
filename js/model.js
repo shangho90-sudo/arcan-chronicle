@@ -41,6 +41,22 @@ export const NPC_MODELS = {
   // 무기 상인·방어구 상인 (tools/gear/gear.py, tools/world/world.py GEAR_MERCHANTS): 기존 메시에 옷 색만 바꿈
   gear_weapon:        { file: 'npc_armorer', tex: 'npc_gear_weapon', height: 1.68, headPitch: -6, npc: true },
   gear_armor:         { file: 'npc_merchant', tex: 'npc_gear_armor', height: 1.52, headPitch: -6, npc: true },
+  // 마을 주민 (tools/world/residents.py): 기존 메시 + 옷 색만 바꾼 텍스처(tools/npcs/recolor.py), 키를 조금씩 다르게
+  res_artist_a: { file: 'npc_artist', tex: 'npc_res_artist_a', height: 1.47, headPitch: -6, npc: true },
+  res_artist_b: { file: 'npc_artist', tex: 'npc_res_artist_b', height: 1.56, headPitch: -6, npc: true },
+  res_pharmacist_a: { file: 'npc_pharmacist', tex: 'npc_res_pharmacist_a', height: 1.49, headPitch: -6, npc: true },
+  res_pharmacist_b: { file: 'npc_pharmacist', tex: 'npc_res_pharmacist_b', height: 1.58, headPitch: -6, npc: true },
+  res_blacksmith_a: { file: 'npc_blacksmith', tex: 'npc_res_blacksmith_a', height: 1.69, headPitch: -6, npc: true },
+  res_blacksmith_b: { file: 'npc_blacksmith', tex: 'npc_res_blacksmith_b', height: 1.78, headPitch: -6, npc: true },
+  res_cook_a: { file: 'npc_cook', tex: 'npc_res_cook_a', height: 1.47, headPitch: -6, npc: true },
+  res_cook_b: { file: 'npc_cook', tex: 'npc_res_cook_b', height: 1.56, headPitch: -6, npc: true },
+  res_elder_a: { file: 'npc_elder', tex: 'npc_res_elder_a', height: 1.47, headPitch: -6, npc: true },
+  res_hairdresser_a: { file: 'npc_hairdresser', tex: 'npc_res_hairdresser_a', height: 1.27, headPitch: -6, npc: true },
+  res_hairdresser_b: { file: 'npc_hairdresser', tex: 'npc_res_hairdresser_b', height: 1.61, headPitch: -6, npc: true },
+  res_guard_a: { file: 'npc_guard', tex: 'npc_res_guard_a', height: 1.59, headPitch: -6, npc: true },
+  res_guard_b: { file: 'npc_guard', tex: 'npc_res_guard_b', height: 1.68, headPitch: -6, npc: true },
+  res_merchant_a: { file: 'npc_merchant', tex: 'npc_res_merchant_a', height: 1.42, headPitch: -6, npc: true },
+  res_merchant_b: { file: 'npc_merchant', tex: 'npc_res_merchant_b', height: 1.51, headPitch: -6, npc: true },
 };
 /** back holder (backMount): grip at x = this fraction of the right shoulder's x, up / out (m) above the shoulder joint and
  *  behind the back surface; dir = blade direction in bind space (+x = the character's left, +y up, +z forward) */

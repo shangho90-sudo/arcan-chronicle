@@ -25,9 +25,13 @@ const HAS_N = new Set(['pave', 'cobble', 'wallstone', 'basestone', 'slate', 'pla
 // metres covered by one texture repeat
 const TILE = { pave: 4.2, cobble: 3.2, wallstone: 4.0, basestone: 3.2, slate: 3.0, plaster: 2.4, grass: 7.0, wood: 1.6, planks: 1.8, bluewood: 1.4 };
 const matCache = new Map();
-function M(key) {
+// per-town colour scheme (spec.palette: material name -> '#rrggbb' multiplied into the texture / colour), set by buildTown3D
+let PALETTE = {}, PAL_ID = '';
+function M(key0) {
+  const key = key0 + PAL_ID;
   if (matCache.has(key)) return matCache.get(key);
-  const [name, tint] = key.split('#');
+  key0 = null;
+  const [name, tint] = key.slice(0, key.length - PAL_ID.length).split('#');
   let m;
   if (TILE[name]) {
     m = new THREE.MeshStandardMaterial({ map: ttex(name), roughness: name === 'slate' ? 0.7 : 0.92, metalness: 0 });
@@ -45,6 +49,7 @@ function M(key) {
     if (name === 'water') { m.roughness = 0.2; }
   }
   if (tint) { m = m.clone(); m.color = new THREE.Color('#' + tint); }
+  if (PALETTE[name]) { if (!tint) m = m.clone(); m.color.multiply(new THREE.Color(PALETTE[name])); }
   matCache.set(key, m); return m;
 }
 const canvasCache = new Map();
@@ -550,24 +555,26 @@ function loadGLB(file) {
 /** returns { root, fadeGroups:[{name, occ, meshes}], smoke:[[x,y,z]], update(dt) } */
 export async function buildTown3D(spec, renderer) {
   ANISO = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+  PALETTE = spec.palette || {}; PAL_ID = Object.keys(PALETTE).length ? '|' + JSON.stringify(PALETTE) : '';
+  const gates = spec.gates || [spec.gate];
   const root = new THREE.Group(); root.name = 'town3d';
   const fade = []; const smoke = []; const flags = [];
   const addFade = (name, obj, occ) => { const meshes = []; obj.traverse(o => { if (o.isMesh) meshes.push(o); }); fade.push({ name, occ, meshes, faded: false, clear: 0 }); };
 
   // ground: meadow outside, flagstone courtyard inside the walls, cobbled roads, grass verges
   const [x0, z0, x1, z1] = spec.ground.inner;
-  const meadow = new THREE.Mesh(puv(new THREE.PlaneGeometry(240, 240).rotateX(-Math.PI / 2), TILE.grass), M('grass')); meadow.position.y = -0.04; meadow.receiveShadow = true; root.add(meadow);
+  const outer = spec.ground.outer || [-120, -120, 120, 120], MW = outer[2] - outer[0], MD = outer[3] - outer[1], MCX = (outer[0] + outer[2]) / 2, MCZ = (outer[1] + outer[3]) / 2;
+  const meadow = new THREE.Mesh(puv(new THREE.PlaneGeometry(MW, MD).rotateX(-Math.PI / 2).translate(MCX, 0, -MCZ), TILE.grass), M('grass')); meadow.position.y = -0.04; meadow.receiveShadow = true; root.add(meadow);
   const court = new THREE.Mesh(puv(new THREE.PlaneGeometry(x1 - x0, z1 - z0).rotateX(-Math.PI / 2).translate((x0 + x1) / 2, 0, -(z0 + z1) / 2), TILE.pave), M('pave'));
   court.receiveShadow = true; root.add(court);
-  const gateRoad = new THREE.Mesh(soft([[spec.gate.pos[0], spec.gate.pos[1] - 12], [spec.gate.pos[0], spec.gate.pos[1] - 1]], 5.2, 1.2), decalMat('cobble')); gateRoad.position.y = -0.02; root.add(gateRoad);
   const roadM = decalMat('cobble'), grassM = decalMat('grass');
-  gateRoad.material = roadM;
+  if (!spec.gates) { const gateRoad = new THREE.Mesh(soft([[spec.gate.pos[0], spec.gate.pos[1] - 12], [spec.gate.pos[0], spec.gate.pos[1] - 1]], 5.2, 1.2), roadM); gateRoad.position.y = -0.02; root.add(gateRoad); }
   // cobble paths that run entirely over the flagstone courtyard are skipped: two stone patterns blended on top of each
   // other read as tiles overlapping by mistake. Paths outside the courtyard (over grass) and the fountain ring stay.
   const inCourt = (q) => q[0] > x0 + 0.5 && q[0] < x1 - 0.5 && q[1] > z0 + 0.5 && q[1] < z1 - 0.5;
-  spec = { ...spec, ground: { ...spec.ground, roads: spec.ground.roads.filter(r => r.kind === 'ring' || !r.pts.every(inCourt)) } };
+  spec = { ...spec, ground: { ...spec.ground, roads: spec.ground.roads.filter(r => r.kind === 'ring' || r.kind === 'street' || !r.pts.every(inCourt)) } };   // 'street' = 큰길(2026-11-12): 마당 위에도 그림(턱돌로 경계)
   for (const r of spec.ground.roads) {
-    const g = r.kind === 'ring' ? ringGeo(r.pos[0], r.pos[1], r.r0, r.r1) : soft(r.pts, r.w, 0.5);   // remaining paths run over grass: softer edge
+    const g = r.kind === 'ring' ? ringGeo(r.pos[0], r.pos[1], r.r0, r.r1) : soft(r.pts, r.w, r.kind === 'street' ? 0.14 : 0.5);   // remaining paths run over grass: softer edge
     const m = new THREE.Mesh(g, roadM); m.position.y = 0.012; m.receiveShadow = true; m.renderOrder = -1; root.add(m);
   }
   // kerbs: crisp stone borders where cobbles meet the flagstones (instead of a wide soft blend of two tile patterns)
@@ -616,10 +623,10 @@ export async function buildTown3D(spec, renderer) {
     obj.traverse(o => { if (o.userData.flag) flags.push(o); });
     addFade(t.id, obj, [t.pos[0], 0, t.pos[1], t.r, t.r, 0, t.h + t.r * 1.5 + 1.2]);
   }
-  {
-    const gt = spec.gate, k = new Kit();
-    for (const p of gt.towers) towerAt(k, p[0] - gt.pos[0], -(p[1] - gt.pos[1]), gt.tr, gt.th, { slits: [Math.PI / 2] });
-    const span = gt.towers[1][0] - gt.towers[0][0];
+  for (const gt of gates) {
+    const k = new Kit();
+    const span = Math.hypot(gt.towers[1][0] - gt.towers[0][0], gt.towers[1][1] - gt.towers[0][1]);
+    for (const sx of [-1, 1]) towerAt(k, sx * span / 2, 0, gt.tr, gt.th, { slits: [Math.PI / 2] });
     k.block(span, gt.th - 1.2 - gt.h, gt.t + 0.6, 'wallstone', { y: gt.h });
     k.block(span, 0.4, gt.t + 0.9, 'basestone', { y: gt.h - 0.4 });
     // arch ring + raised portcullis + open doors
@@ -632,9 +639,9 @@ export async function buildTown3D(spec, renderer) {
     const shield = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 2.6), canvasMat('banner', 128, 384, drawBanner, { side: THREE.DoubleSide }));
     shield.position.set(0, gt.h + 1.9, gt.t / 2 + 0.36); k.mesh(shield);
     const shield2 = shield.clone(); shield2.position.z = -gt.t / 2 - 0.36; shield2.rotation.y = Math.PI; k.mesh(shield2);
-    const obj = k.build(); obj.position.copy(T({ x: gt.pos[0], y: 0, z: gt.pos[1] })); root.add(obj);
+    const hd = gt.heading ?? 180, obj = place(k.build(), gt.pos, hd); root.add(obj);
     obj.traverse(o => { if (o.userData.flag) flags.push(o); });
-    addFade('gate', obj, [gt.pos[0], 0, gt.pos[1], span / 2 + gt.tr, gt.tr, 0, gt.th + gt.tr * 1.5]);
+    addFade(gt.id || 'gate', obj, [gt.pos[0], 0, gt.pos[1], span / 2 + gt.tr, gt.tr, hd, gt.th + gt.tr * 1.5]);
   }
   if (spec.keep) {
     const kp = spec.keep, k = new Kit();

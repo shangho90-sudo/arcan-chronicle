@@ -6101,10 +6101,10 @@
    "npc": "castilla",
    "zone": "baltazar",
    "pos": [
-    1.08,
-    -7.26
+    -0.75,
+    -10.51
    ],
-   "rot": -171.9,
+   "rot": -175.9,
    "from": "mq32b",
    "until": "qs34"
   },
@@ -6123,10 +6123,10 @@
    "npc": "astel",
    "zone": "kairion_capital",
    "pos": [
-    1.08,
-    -7.26
+    -0.75,
+    -10.51
    ],
-   "rot": -171.9,
+   "rot": -175.9,
    "from": "mq34b",
    "until": "mq36a"
   },
@@ -6178,31 +6178,51 @@
    "npc": "capital_cook",
    "zone": "kairion_capital",
    "pos": [
-    2.66,
-    -7.49
+    0.85,
+    -10.62
    ],
-   "rot": -171.9,
+   "rot": -175.9,
    "from": "mq02a"
+  },
+  {
+   "npc": "master_blacksmith",
+   "zone": "town",
+   "pos": [
+    1.47,
+    -9.53
+   ],
+   "rot": -135.0,
+   "from": "mq04a"
   },
   {
    "npc": "baltern_captain",
    "zone": "baltern",
    "pos": [
-    1.08,
-    -7.26
+    -0.71,
+    -8.51
    ],
-   "rot": -171.9,
+   "rot": -175.2,
    "from": "mq07a"
   },
   {
    "npc": "baltern_herbalist",
    "zone": "baltern",
    "pos": [
-    2.66,
-    -7.49
+    -2.3,
+    -8.38
    ],
-   "rot": -171.9,
+   "rot": -175.2,
    "from": "mq08a"
+  },
+  {
+   "npc": "master_cook",
+   "zone": "town",
+   "pos": [
+    0.34,
+    -8.39
+   ],
+   "rot": -135.0,
+   "from": "mq09a"
   },
   {
    "npc": "lumiere_pilgrim",
@@ -6218,71 +6238,91 @@
    "npc": "lumiere_monk",
    "zone": "lumiere",
    "pos": [
-    1.08,
-    -7.26
+    -0.71,
+    -8.51
    ],
-   "rot": -171.9,
+   "rot": -175.2,
    "from": "mq10a"
   },
   {
    "npc": "lumiere_priest",
    "zone": "lumiere",
    "pos": [
-    2.66,
-    -7.49
+    0.89,
+    -8.64
    ],
-   "rot": -171.9,
+   "rot": -175.2,
    "from": "mq12a"
   },
   {
    "npc": "shepherd_wife",
    "zone": "silvern",
    "pos": [
-    1.08,
-    -7.26
+    -0.71,
+    -8.51
    ],
-   "rot": -171.9,
+   "rot": -175.2,
    "from": "mq13a"
   },
   {
    "npc": "silvern_hunter",
    "zone": "silvern",
    "pos": [
-    2.66,
-    -7.49
+    -2.3,
+    -8.38
    ],
-   "rot": -171.9,
+   "rot": -175.2,
    "from": "qs20"
   },
   {
    "npc": "shepherd",
    "zone": "silvern",
    "pos": [
-    -5.26,
-    -6.36
+    0.89,
+    -8.64
    ],
-   "rot": -171.9,
+   "rot": -175.2,
    "from": "qs20"
   },
   {
    "npc": "gravel_pharmacist",
    "zone": "gravel",
    "pos": [
-    1.08,
-    -7.26
+    -0.71,
+    -8.51
    ],
-   "rot": -171.9,
+   "rot": -175.2,
    "from": "mq13a"
   },
   {
    "npc": "gravel_refugee",
    "zone": "gravel",
    "pos": [
-    2.66,
-    -7.49
+    0.89,
+    -8.64
    ],
-   "rot": -171.9,
+   "rot": -175.2,
    "from": "mq13b"
+  },
+  {
+   "npc": "master_hairdresser",
+   "zone": "town",
+   "pos": [
+    2.61,
+    -10.66
+   ],
+   "rot": -135.0,
+   "from": "mq18a"
+  },
+  {
+   "npc": "master_pharmacist",
+   "zone": "town",
+   "pos": [
+    -0.79,
+    -7.26
+   ],
+   "rot": -135.0,
+   "from": "qs29"
   },
   {
    "npc": "highland_hunter",
@@ -6308,20 +6348,20 @@
    "npc": "tanner",
    "zone": "marseon",
    "pos": [
-    1.08,
-    -7.26
+    -0.71,
+    -8.51
    ],
-   "rot": -171.9,
+   "rot": -175.2,
    "from": "mq26a"
   },
   {
    "npc": "miner_chief",
    "zone": "baltazar",
    "pos": [
-    2.66,
-    -7.49
+    -2.35,
+    -10.39
    ],
-   "rot": -171.9,
+   "rot": -175.9,
    "from": "mq29a"
   },
   {
@@ -6338,10 +6378,10 @@
    "npc": "fort_watch",
    "zone": "kreutz_fort",
    "pos": [
-    1.08,
-    -7.26
+    -0.71,
+    -8.51
    ],
-   "rot": -171.9,
+   "rot": -175.2,
    "from": "qs44"
   },
   {
