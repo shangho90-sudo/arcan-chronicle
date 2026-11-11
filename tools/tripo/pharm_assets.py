@@ -25,7 +25,11 @@ PROMPTS.update({
     'shards': 'a set of eight separate irregular broken paving stone chunks, grey-beige flagstone top, darker rough stone sides, thick '
               'with small bevels and rough broken edges, laid out apart in a row, no glow, no cracks painted on, ' + STYLE,
 })
-TARGET = {'pestle_gold': 6000, 'flask': 2500, 'syringe': 3000, 'flask_gold': 2500, 'shards': 4000}
+# pestle_gold 첫 결과가 절구(그릇)까지 붙어 나와서, 절굿공이만 나오도록 다시 쓴 프롬프트 (2026-11-11)
+PROMPTS['pestle_only'] = ('one single giant golden pestle club only, a heavy thick rounded bulbous head at the bottom tapering into a long straight '
+                          'handle with engraved bands, a small jade ring and a round knob at the top, like a golden mace or baseball bat shape, '
+                          'standing upright, shiny polished gold, absolutely no mortar, no bowl, no cup, no container, ' + STYLE)
+TARGET = {'pestle_gold': 6000, 'flask': 2500, 'syringe': 3000, 'flask_gold': 2500, 'shards': 4000, 'pestle_only': 6000}
 
 def gen(name):
     sys.path.insert(0, HERE); import tripo

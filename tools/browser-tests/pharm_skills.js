@@ -11,7 +11,7 @@ const { chromium } = require('playwright'); const fs = require('fs'); const { ex
 const SCENES = (process.env.SCENES || 'a3,a6,b6,c6,c7,c8').split(','), SIZE = process.env.SIZE || '1100x760', TOUCH = SIZE.endsWith('t');
 const [VW, VH] = SIZE.replace('t', '').split('x').map(Number), FX = process.env.FX !== '0', OUT = process.env.OUT || '/tmp/pharm', FPS = 30, TAG = process.env.TAG || 'after';
 // 4×3 비교표(SHEET): 줄 = 유봉 휘두르기 / 천근쇄약 / 약병폭격 / 아드레날린·보호막·회복진, 칸 = 아래 프레임 번호
-const PICK = { a3: [1, 3, 5], a6: [3, 4, 6], b6: [2, 4, 6], c6: [3], c7: [2], c8: [2] };
+const PICK = { a3: [1, 3, 5], a6: [4, 5, 6], b6: [2, 4, 6], c6: [4], c7: [2], c8: [2] };
 const MARKS = { a3: [0.1, 0.2, 0.33, 0.46, 0.6, 0.72, 0.85, 1.1], a6: [0.1, 0.25, 0.36, 0.44, 0.5, 0.6, 0.75, 1.0, 1.4], b6: [0.2, 0.5, 0.8, 1.1, 1.4, 1.7, 2.0, 2.6],
   c6: [0.15, 0.35, 0.5, 0.7, 1.0, 2.0], c7: [0.2, 0.5, 1.0, 3.0, 6.0, 8.2], c8: [0.3, 1.0, 2.0, 4.0, 6.0, 8.0, 8.6] };
 (async () => {
@@ -36,12 +36,12 @@ const MARKS = { a3: [0.1, 0.2, 0.33, 0.46, 0.6, 0.72, 0.85, 1.1], a6: [0.1, 0.25
       for (let x = -6; x <= 6 && ok; x += 0.75) for (let z = -6; z <= 6 && ok; z += 0.75) if (x * x + z * z <= 36 && G.zone.geo.blocked(c.x + x, c.z + z, 0.35)) ok = false; if (ok) spot = c; }
     window.__spot = spot || { x: cx, z: cz };
   });
-  const out = {};
+  const out = {}, centre = {};
   for (const sc of SCENES) {
     await ev(sc => {
       const p = G.player, f = { x: 0, z: 1 };
       for (const m of [...G.zone.actors]) if (m !== p && m.def && m.body) m.remove && m.remove();
-      G.skillFx.clear(); p.skills2.clearTemp(); p.status.clear(); p.shield = 0; p.teleport(window.__spot); p.body.place(p.pos); p.setFacing(f.x, f.z); p.target = null; p.path = []; G.dev.full();
+      G.skillFx.clear(); for (const fl of G.ui.floats.splice(0)) fl.e.remove(); p.skills2.clearTemp(); p.status.clear(); p.shield = 0; p.teleport(window.__spot); p.body.place(p.pos); p.setFacing(f.x, f.z); p.target = null; p.path = []; G.dev.full();
       const at = (d, s = 0) => ({ x: p.pos.x + f.x * d + s, z: p.pos.z + f.z * d });
       let ds = [];
       if (sc === 'a3') ds = G.dev.dummies('mon_boar', 4, 1.7, p.pos);
@@ -65,12 +65,13 @@ const MARKS = { a3: [0.1, 0.2, 0.33, 0.46, 0.6, 0.72, 0.85, 1.1], a6: [0.1, 0.25
       const aim = sc === 'a6' ? window.__at(4.5) : sc === 'b6' ? window.__at(5) : null;
       G.render.setFocus({ x: p.pos.x, y: 0, z: p.pos.z + (aim ? 3.2 : 0) }, true);
       if (!G.sheet.book.sk.slots.includes(id)) G.sheet.book.equip(id, 0, false);   // 칸이 4개뿐이라 시전 전에 1번 칸에 장착
+      const mid = G.render.toScreen({ x: p.pos.x, y: 0.6, z: p.pos.z + (aim ? 2.6 : 0) }); r.cx = Math.round(mid.x); r.cy = Math.round(mid.y);   // crop centre: between the caster and the aim
       const e = p.skills2.cast(id, aim); r.err = e || null; return r;
     }, [sc, FPS]);
     // step + capture
     const frames = []; let t = 0;
     for (const mk of MARKS[sc]) {
-      const n = Math.round((mk - t) * FPS); await ev(([n, fps]) => { for (let i = 0; i < n; i++) { G.step(1 / fps, false); if (G.skillFx) G.skillFx.update(1 / fps); window.__t += 1 / fps; } G.step(0, true); /* step(dt,false)는 스킬 이펙트를 진행시키지 않음 → 직접 update */ }, [n, FPS]); t += n / FPS;
+      const n = Math.round((mk - t) * FPS); await ev(([n, fps]) => { for (let i = 0; i < n; i++) { G.step(1 / fps, false); if (G.skillFx) G.skillFx.update(1 / fps); G.ui.tick(1 / fps); window.__t += 1 / fps; } G.step(0, true); /* step(dt,false)는 스킬 이펙트를 진행시키지 않음 → 직접 update */ }, [n, FPS]); t += n / FPS;
       const f = `${OUT}/${TAG}_${sc}_${SIZE}_${frames.length}.png`; await pg.screenshot({ path: f, timeout: 300000 }); frames.push([f, mk]);
       if (sc === 'c7' && frames.length === 2) await ev(() => { const p = G.player; window.__poison = p.status.has('poison'); p.status.apply(G.data.status('poison'), 5, 9, null); window.__poisonAfter = p.status.has('poison'); window.__shieldNow = p.shield; });
     }
@@ -85,14 +86,14 @@ const MARKS = { a3: [0.1, 0.2, 0.33, 0.46, 0.6, 0.72, 0.85, 1.1], a6: [0.1, 0.25
       r.hp = p.hp; r.hpGain = r.hp0 != null ? p.hp - r.hp0 : undefined; r.fxLive = G.skillFx.pharm.live.length; r.power = p.stat('atk');
       return r;
     }, info);
-    out[sc] = res; console.log(sc, JSON.stringify(res));
+    out[sc] = res; centre[sc] = [info.cx, info.cy]; console.log(sc, JSON.stringify(res));
     // strip
-    const py = `from PIL import Image, ImageDraw\nfs=${JSON.stringify(frames)}\nims=[Image.open(f).convert('RGB') for f,_ in fs]\nw,h=ims[0].size; cw=min(w,560); ch=min(h,440)\nS=Image.new('RGB',(cw*len(ims),ch),'black')\nfor i,(im,(f,mk)) in enumerate(zip(ims,fs)):\n  x0=(w-cw)//2; y0=(h-ch)//2; c=im.crop((x0,y0,x0+cw,y0+ch)); ImageDraw.Draw(c).text((6,6),'${sc} +%.2fs'%mk,fill=(255,255,255)); S.paste(c,(i*cw,0))\nS.save('${OUT}/${TAG}_strip_${sc}_${SIZE}.png')\n`;
+    const py = `from PIL import Image, ImageDraw\nfs=${JSON.stringify(frames)}\nims=[Image.open(f).convert('RGB') for f,_ in fs]\nw,h=ims[0].size; cw=min(w,560); ch=min(h,440)\nS=Image.new('RGB',(cw*len(ims),ch),'black')\nfor i,(im,(f,mk)) in enumerate(zip(ims,fs)):\n  x0=max(0,min(w-cw,${info.cx}-cw//2)); y0=max(0,min(h-ch,${info.cy}-ch//2)); c=im.crop((x0,y0,x0+cw,y0+ch)); ImageDraw.Draw(c).text((6,6),'${sc} +%.2fs'%mk,fill=(255,255,255)); S.paste(c,(i*cw,0))\nS.save('${OUT}/${TAG}_strip_${sc}_${SIZE}.png')\n`;
     fs.writeFileSync(`${OUT}/_strip.py`, py); execSync(`python3 ${OUT}/_strip.py`);
   }
   if (['a3', 'a6', 'b6', 'c6', 'c7', 'c8'].every(s => SCENES.includes(s))) {   // same layout as the reference sheets (4 rows × 3)
-    const cells = [...PICK.a3.map(i => ['a3', i]), ...PICK.a6.map(i => ['a6', i]), ...PICK.b6.map(i => ['b6', i]), ['c6', PICK.c6[0]], ['c7', PICK.c7[0]], ['c8', PICK.c8[0]]].map(([sc, i]) => `${OUT}/${TAG}_${sc}_${SIZE}_${i}.png`);
-    const py = `from PIL import Image\nfs=${JSON.stringify(cells)}\nims=[Image.open(f).convert('RGB') for f in fs]\nw,h=ims[0].size; cw=min(w,460); ch=min(h,330)\nS=Image.new('RGB',(cw*3,ch*4))\nfor i,im in enumerate(ims):\n  x0=(w-cw)//2; y0=(h-ch)//2; S.paste(im.crop((x0,y0,x0+cw,y0+ch)),((i%3)*cw,(i//3)*ch))\nS.save('${OUT}/sheet_${TAG}_${SIZE}.png')\n`;
+    const cells = [...PICK.a3.map(i => ['a3', i]), ...PICK.a6.map(i => ['a6', i]), ...PICK.b6.map(i => ['b6', i]), ['c6', PICK.c6[0]], ['c7', PICK.c7[0]], ['c8', PICK.c8[0]]].map(([sc, i]) => [`${OUT}/${TAG}_${sc}_${SIZE}_${i}.png`, ...centre[sc]]);
+    const py = `from PIL import Image\nfs=${JSON.stringify(cells)}\nims=[Image.open(f[0]).convert('RGB') for f in fs]\nw,h=ims[0].size; cw=min(w,460); ch=min(h,330)\nS=Image.new('RGB',(cw*3,ch*4))\nfor i,im in enumerate(ims):\n  x0=max(0,min(w-cw,fs[i][1]-cw//2)); y0=max(0,min(h-ch,fs[i][2]-ch//2)); S.paste(im.crop((x0,y0,x0+cw,y0+ch)),((i%3)*cw,(i//3)*ch))\nS.save('${OUT}/sheet_${TAG}_${SIZE}.png')\n`;
     fs.writeFileSync(`${OUT}/_sheet.py`, py); execSync(`python3 ${OUT}/_sheet.py`);
   }
   console.log('errors', JSON.stringify(errs.slice(0, 8)));

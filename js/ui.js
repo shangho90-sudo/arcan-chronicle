@@ -166,10 +166,10 @@ export class UI {
     // 글자 라벨(상태 이름·보호막 등)이 같은 자리에 잇따라 뜨면 겹치지 않게: 뒤에 온 것은 조금 늦게, 한 줄 위에 (2026-11-11)
     let delay = 0, lift = 0;
     if (!/^[-+0-9]/.test(text)) {
-      const now = performance.now(), L = this.labelSlots || (this.labelSlots = []);
-      while (L.length && now - L[0].at > 1100) L.shift();
+      const now = this.fclock || 0, L = this.labelSlots || (this.labelSlots = []);   // fclock = game time of the float layer (tick)
+      while (L.length && now - L[0].at > 1.1) L.shift();
       const n = L.filter(s => Math.hypot(s.x - pos.x, s.z - pos.z) < 1.2).length;
-      delay = n * 0.28; lift = n * 0.42; L.push({ x: pos.x, z: pos.z, at: now });
+      delay = n * 0.3; lift = n * 0.62; L.push({ x: pos.x, z: pos.z, at: now });
       e.style.opacity = 0;
       this.floats.push({ e, label: 1, pos: { x: pos.x, y: pos.y + h + lift, z: pos.z }, t: -delay, scale }); return;
     }
@@ -185,6 +185,7 @@ export class UI {
       scale: 1, vx: heal ? side * 6 : side * (kind === "crit" ? 18 : 30 + Math.random() * 20), life: kind === "crit" ? 1.15 : heal ? 1.15 : 0.85 });
   }
   tick(dt) {
+    this.fclock = (this.fclock || 0) + dt;
     for (const e of [...this.toasts.children]) { e._t += dt; if (e._t > 2.6) e.remove(); }
     for (const e of [...this.feed.children]) { e._t += dt; if (e._t > 3.2) e.remove(); }
     for (const f of this.floats.slice()) {

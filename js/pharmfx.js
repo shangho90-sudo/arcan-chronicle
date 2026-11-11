@@ -41,12 +41,12 @@ export const PHARM = {
     heal:   { w: 0xf2ffe0, b: 0x74f08a, h: 0x1fa050 },
   },
   spin: { life: 0.32, lastLife: 0.46, peak: 2.3, lastPeak: 3.0, lead: 0.5, ringTime: 0.30 },         // lead: rad the ribbon head runs ahead of the pestle tip
-  pestle: { height: 4.6, lean: 0.30, drop: 6.5, stay: 0.55, glow: 0.12 },
-  shatter: { k: 0.58, maxR: 2.6, lift: 0.5, thick: 0.42, tilt: 0.3, up: 0.14, hang: 0.24, fall: 0.26, rest: 1.15, life: 1.75, glow: 1.5 },   // R = min(r * k, maxR)
-  burst: { ring: 0.26, core: 0.22, puffA: 0.40, puffLife: 1.1 },
+  pestle: { height: 4.6, lean: 0.30, drop: 5.0, stay: 0.55, glow: 0.12 },
+  shatter: { k: 0.58, maxR: 2.6, lift: 0.4, thick: 0.42, tilt: 0.3, up: 0.14, hang: 0.24, fall: 0.26, rest: 1.15, life: 1.75, glow: 0.9 },   // R = min(r * k, maxR)
+  burst: { ring: 0.26, core: 0.22, puffA: 0.62, puffLife: 1.2, coreA: 1.1, flareA: 1.2, ringA: 1.7 },
   buff: { flash: 1.4, loop: 0.34 },
-  shield: { rx: 1.25, ry: 1.7, fill: 0.03, line: 0.16, flow: 0.5, rim: 0.42, hexN: 6.0 },
-  circle: { tex: 0.8, ribbon: 0.5, pulse: 1.2 },
+  shield: { rx: 1.25, ry: 1.7, fill: 0.07, line: 0.34, flow: 0.6, rim: 0.6, hexN: 7.0 },
+  circle: { tex: 1.0, ribbon: 0.8, pulse: 1.2 },
 };
 export const ELEM_COL = { fire: PHARM.pal.fire.b, ice: PHARM.pal.ice.b, poison: PHARM.pal.poison.b };
 
@@ -86,12 +86,33 @@ void main(){
   if (uMode > 1.5) c += uTint * .35;
   gl_FragColor = vec4(c, a);
 }`;
+// Tripo models (tools/blender/fx_pharm_tripo.py): base-colour texture, same fixed light; uTintK > 0 recolours the liquid of a flask
+// (the saturated lower part, below uTintY in model space) to the element colour
+const TEX_VS = `
+varying vec3 vN, vV, vWN, vP; varying vec2 vUv;
+void main(){ vUv = uv; vP = position; vN = normalize(normalMatrix * normal); vWN = normalize(mat3(modelMatrix) * normal); vec4 mv = modelViewMatrix * vec4(position, 1.); vV = normalize(-mv.xyz);
+  gl_Position = projectionMatrix * mv; }`;
+const TEX_FS = `
+uniform sampler2D uMap; uniform vec3 uTint, uRim, uEm; uniform float uA, uGlow, uSpec, uUnder, uTintK, uTintY, uGain;
+varying vec3 vN, vV, vWN, vP; varying vec2 vUv;
+void main(){
+  vec3 base = texture2D(uMap, vUv).rgb * uGain;
+  float mx = max(base.r, max(base.g, base.b)), mn = min(base.r, min(base.g, base.b)), lum = dot(base, vec3(.3, .6, .1));
+  float liq = uTintK * smoothstep(.12, .3, (mx - mn) / max(mx, .001)) * (1. - smoothstep(uTintY - .02, uTintY + .02, vP.y));
+  base = mix(base, uTint * (.35 + 1.1 * lum), liq);
+  vec3 n = normalize(vN), L = normalize(vec3(-.4, .8, .5));
+  float d = max(0., dot(n, L)), rim = pow(1. - max(0., dot(n, vV)), 2.5);
+  vec3 c = base * (.46 + .74 * d) + uRim * rim * .5;
+  vec3 h = reflect(-L, n); c += vec3(1., .95, .8) * pow(max(0., dot(h, vV)), 28.) * uSpec;
+  c += uEm * uGlow + uEm * uUnder * (.25 + .75 * clamp(-vWN.y + .35, 0., 1.)) + uTint * liq * .25;
+  gl_FragColor = vec4(c, uA);
+}`;
 const FLAT_VS = `varying vec2 vUv; varying vec3 vP, vN, vV; void main(){ vUv = uv; vP = position; vN = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(position, 1.); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }`;
 // atlas sprite / ribbon (additive): uCut hides the tail side of a ribbon (u < uCut), uSoft = width of that fade
 const SPR_FS = `uniform sampler2D uMap; uniform vec4 uCell; uniform vec3 uW, uB, uH; uniform float uA, uCut, uSoft; varying vec2 vUv;
 void main(){ vec4 t = texture2D(uMap, vec2(mix(uCell.x, uCell.y, vUv.x), mix(uCell.z, uCell.w, vUv.y)));
   float k = uA * smoothstep(uCut, uCut + uSoft, vUv.x);
-  gl_FragColor = vec4((uW * t.r + uB * t.g * (1. - .55 * t.r) + uH * t.b) * k, 1.); }`;
+  gl_FragColor = vec4((uW * t.r * t.r * .8 + uB * t.g + uH * t.b) * k, 1.); }`;
 // soft smoke (normal blending): lit top -> s1, shade -> s2
 const SMOKE_FS = `uniform sampler2D uMap; uniform vec4 uCell; uniform vec3 uW, uB; uniform float uA; varying vec2 vUv;
 void main(){ vec4 t = texture2D(uMap, vec2(mix(uCell.x, uCell.y, vUv.x), mix(uCell.z, uCell.w, vUv.y)));
@@ -99,7 +120,7 @@ void main(){ vec4 t = texture2D(uMap, vec2(mix(uCell.x, uCell.y, vUv.x), mix(uCe
 // thin ring on pharm_ring (u = 0 inner .. 1 outer): sharp bright front line, short soft wake inside, clear centre
 const RING_FS = `uniform vec3 uW, uB; uniform float uA, uWake; varying vec2 vUv;
 void main(){ float u = vUv.x; float line = exp(-pow((u - .84) / .075, 2.)); float wake = smoothstep(0., .8, u) * (1. - smoothstep(.8, .97, u)) * uWake;
-  gl_FragColor = vec4((uW * line * .7 + uB * (line + wake)) * uA, 1.); }`;
+  gl_FragColor = vec4((uW * line * line * .3 + uB * (line + wake)) * uA, 1.); }`;
 // under-glow disc (gold light under the lifted pieces): hot centre, falls off to nothing at the rim
 const UNDER_FS = `uniform vec3 uW, uB; uniform float uA; varying vec3 vP;
 void main(){ float r = length(vP.xz); float k = 1. - smoothstep(.72, 1., r); float c = 1. - smoothstep(0., .8, r); gl_FragColor = vec4((uB * k + uW * c * .5) * uA, 1.); }`;
@@ -121,14 +142,14 @@ void main(){
   float ang = acos(clamp(dot(d, normalize(uHitP)), -1., 1.));
   float wave = exp(-pow((ang - uHitT * 1.9) / .11, 2.)) * uHit;
   float k = uFill + line * (uLine + uFlow * (lit * .8 + sweep * .5)) + fres * uRim + (1. - base) * .25 + wave * 1.1;
-  vec3 c = mix(uB, uW, clamp(line * lit * .7 + fres * .35 + wave, 0., 1.));
+  vec3 c = mix(uB, uW, clamp(line * lit * .45 + wave, 0., 1.));
   gl_FragColor = vec4(c * k * uA, 1.); }`;
 const ADD = { transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide };
 
 export class PharmFx {
   constructor(root) {
     this.root = root; this.live = []; this.ready = false; this.geo = {}; this.pieces = []; this.shards = []; this.loading = null; this.cells = {}; this.span = 3.6;
-    this.pool = {}; this.camQ = new THREE.Quaternion(); this.yawQ = new THREE.Quaternion(); this.toCam = new THREE.Vector3(0, 0.7, 0.7); this.camR = new THREE.Vector3(1, 0, 0);
+    this.tri = {}; this.triShards = []; this.pool = {}; this.camQ = new THREE.Quaternion(); this.yawQ = new THREE.Quaternion(); this.toCam = new THREE.Vector3(0, 0.7, 0.7); this.camR = new THREE.Vector3(1, 0, 0);
   }
   load() {
     if (this.loading) return this.loading;
@@ -139,7 +160,12 @@ export class PharmFx {
         if (o.name.startsWith('pharm_piece_')) this.pieces.push({ geo: o.geometry, x: o.position.x, z: o.position.z, rho: Math.hypot(o.position.x, o.position.z) });
         if (o.name.startsWith('pharm_shard_')) this.shards.push(o.geometry); });
       tex.flipY = false; tex.colorSpace = THREE.NoColorSpace; tex.generateMipmaps = true; tex.anisotropy = 2; tex.needsUpdate = true; this.tex = tex;
-      circ.colorSpace = THREE.SRGBColorSpace; circ.anisotropy = 4; this.circleTex = circ; this.ready = true;
+      circ.colorSpace = THREE.SRGBColorSpace; circ.anisotropy = 4; this.circleTex = circ;
+      try {   // optional Tripo models (황금 유봉·약병·지면 파편); without the file every prop falls back to the Blender procedural mesh
+        const tg = await loadWrapped('assets/fx/fx_pharm_tripo.glb.json', {});
+        tg.scene.traverse(o => { if (!o.isMesh || !o.material || !o.material.map) return; this.tri[o.name] = { geo: o.geometry, map: o.material.map }; if (o.name.startsWith('tripo_shard_')) this.triShards.push(o.name); });
+      } catch (err) { console.warn('pharmfx: no Tripo models', err && err.message); }
+      this.ready = true;
     })().catch(e => console.warn('pharmfx load', e));
     return this.loading;
   }
@@ -158,6 +184,8 @@ export class PharmFx {
       case 'circle': return new THREE.ShaderMaterial({ uniforms: U({ uMap: this.circleTex, uB: C(), uA: 0 }), vertexShader: FLAT_VS, fragmentShader: CIRCLE_FS, ...ADD });
       case 'dome': return new THREE.ShaderMaterial({ uniforms: U({ uW: C(), uB: C(), uHitP: new THREE.Vector3(0, 0.5, 1), uA: 0, uT: 0, uHit: 0, uHitT: 0, uFill: 0, uLine: 0, uFlow: 0, uRim: 0, uHexN: 6 }),
         vertexShader: FLAT_VS, fragmentShader: DOME_FS, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.FrontSide });
+      case 'tex': return new THREE.ShaderMaterial({ uniforms: U({ uMap: null, uTint: C(), uRim: new THREE.Color(0xfff0c0), uEm: new THREE.Color(0), uA: 1, uGlow: 0, uSpec: 0.5, uUnder: 0, uTintK: 0, uTintY: 0.2, uGain: 1 }),
+        vertexShader: TEX_VS, fragmentShader: TEX_FS, transparent: true, depthWrite: true });
       default: return new THREE.ShaderMaterial({ uniforms: U({ uTint: C(), uRim: new THREE.Color(0xfff0c0), uEm: new THREE.Color(0), uA: 1, uMode: 0, uGlow: 0, uSpec: 0.8, uUnder: 0 }),
         vertexShader: SOLID_VS, fragmentShader: SOLID_FS, transparent: true, depthWrite: true });
     }
@@ -176,6 +204,9 @@ export class PharmFx {
   smoke(e, cellName, pal, order = 4) { const m = this._m(e, 'smoke', this.geo.pharm_quad, order); const u = m.material.uniforms; u.uCell.value.copy(this.cell(cellName)); u.uW.value.setHex(pal.s1); u.uB.value.setHex(pal.s2); u.uA.value = 0; return m; }
   solid(e, geo, o = {}) { const m = this._m(e, 'solid', geo, 1); const u = m.material.uniforms; u.uTint.value.setHex(o.tint ?? 0xffffff); u.uRim.value.setHex(o.rim ?? 0xfff0c0); u.uEm.value.setHex(o.em ?? 0);
     u.uA.value = 1; u.uMode.value = o.mode || 0; u.uGlow.value = o.glow || 0; u.uSpec.value = o.spec ?? 0.8; u.uUnder.value = 0; m.material.depthWrite = (o.mode || 0) !== 1; return m; }
+  /** textured Tripo model `name` (fx_pharm_tripo), or null when that file / model is missing (the procedural mesh is used instead) */
+  model(e, name, o = {}) { const t = this.tri[name]; if (!t) return null; const m = this._m(e, 'tex', t.geo, 1), u = m.material.uniforms; u.uMap.value = t.map; u.uTint.value.setHex(o.tint ?? 0xffffff); u.uRim.value.setHex(o.rim ?? 0xfff0c0);
+    u.uEm.value.setHex(o.em ?? 0); u.uA.value = 1; u.uGlow.value = o.glow || 0; u.uSpec.value = o.spec ?? 0.5; u.uUnder.value = 0; u.uTintK.value = o.tintK || 0; u.uTintY.value = o.tintY ?? 0.2; u.uGain.value = o.gain ?? 1; return m; }
   _fx(kind, life, update) { const e = { kind, g: new THREE.Group(), items: [], t: 0, life, update }; this.root.add(e.g); this.live.push(e); return e; }
   /** quad whose +Y runs along dir (three coords) and whose face turns to the camera as far as it can (light shards / rays) */
   _aim(m, dir) { const y = _a.copy(dir).normalize(), z = _b.copy(this.toCam).addScaledVector(y, -this.toCam.dot(y)); if (z.lengthSq() < 1e-6) z.set(0, 0, 1); z.normalize();
@@ -269,7 +300,7 @@ export class PharmFx {
       }
     });
     e.g.position.copy(p);
-    const pe = this.solid(e, this.geo.pharm_pestle, { rim: 0xffe9a0, em: 0xffc040, glow: Pc.glow, spec: 1.3 }); pe.scale.setScalar(Pc.height);
+    const pe = this.model(e, 'tripo_pestle', { rim: 0xffe9a0, em: 0xffc040, glow: Pc.glow, spec: 0.9, gain: 1.15 }) || this.solid(e, this.geo.pharm_pestle, { rim: 0xffe9a0, em: 0xffc040, glow: Pc.glow, spec: 1.3 }); pe.scale.setScalar(Pc.height);
     const mark = this.ring(e, pal, 0.0, 2), aim = this.ring(e, pal, 0.15, 3), wave = this.ring(e, pal, 0.4, 4); wave.position.y = PHARM.ringLift + 0.02;
     const trail = this.spr(e, 'streak', pal, 5), flash = this.spr(e, 'flare', pal, 8), glow = this.spr(e, 'glow', pal, 7), wraps = [];
     for (let i = 0, n = low ? 1 : 2; i < n; i++) { const m = this.rib(e, pal, 6); m.userData = { rr: 1.15 - i * 0.3, y0: 0.3 + i * 0.5, rise: 1.9, a: i * 2.6, w: 13 + i * 3, tx: i ? -0.2 : 0.16 }; wraps.push(m); }
@@ -286,7 +317,7 @@ export class PharmFx {
         const y = d.h * k - out * (0.22 * sy + 0.05); m.position.set(d.x * (1 + d.push * k), 0.05 + y, d.z * (1 + d.push * k));
         m.quaternion.setFromAxisAngle(d.ax, d.ang * k);
         const U = m.material.uniforms; U.uA.value = 1 - smooth(0.2, 1, out); U.uUnder.value = S.glow * 0.5 * (1 - smooth(0.05, 0.9, t)); }
-      under.material.uniforms.uA.value = I * S.glow * 1.5 * (0.25 + 0.75 * (1 - smooth(0, 0.45, t))) * (1 - smooth(0.7, S.rest + 0.2, t)) * smooth(0, 0.03, t);
+      under.material.uniforms.uA.value = I * S.glow * (0.25 + 0.75 * (1 - smooth(0, 0.45, t))) * (1 - smooth(0.7, S.rest + 0.2, t)) * smooth(0, 0.03, t);
       lines.material.uniforms.uA.value = I * 1.4 * smooth(0, 0.05, t) * (1 - smooth(0.25, S.rest, t)); lines.material.uniforms.uCut.value = -1 + 0 * t;
       const grow = easeOut(t / 0.12); lines.scale.set(R * grow, 1, R * grow);
       for (const m of loose) { const d = m.userData, u = t - d.t0; m.visible = u > 0 && u < d.life; if (!m.visible) continue;
@@ -298,14 +329,14 @@ export class PharmFx {
         m.quaternion.copy(this.camQ); m.position.set(d.x, d.y + u * d.rise, d.z); m.scale.setScalar(d.s * (0.5 + Math.sin(u * Math.PI))); m.material.uniforms.uA.value = I * 1.3 * Math.sin(u * Math.PI); }
     });
     e.g.position.copy(P3(pos));
-    const pcs = this.pieces.map(pc => { const m = this.solid(e, pc.geo, { em: 0xffb030, rim: 0xfff0d0, spec: 0.15 }); m.scale.set(R, sy, R);
+    const pcs = this.pieces.map(pc => { const m = this.solid(e, pc.geo, { em: 0xffb030, rim: 0x2a2018, spec: 0.05 }); m.scale.set(R, sy, R);
       const cen = 1 - pc.rho;                                                              // 1 at the centre .. ~0.15 at the rim
       m.userData = { x: pc.x * R, z: pc.z * R, h: S.lift * (R / 2.4) * (0.12 + 0.88 * Math.pow(cen, 1.3)) * rnd(0.8, 1.15), t0: pc.rho * 0.09 + rnd(0, 0.03), hang: S.hang * rnd(0.7, 1.3), rest: rnd(0.10, 0.28),
         push: 0.05 + 0.10 * pc.rho, ang: S.tilt * rnd(0.4, 1.0) * (0.5 + 0.7 * cen) * (Math.random() < 0.5 ? -1 : 1), ax: new THREE.Vector3(rnd(-1, 1), rnd(-0.15, 0.15), rnd(-1, 1)).normalize() }; return m; });
     const under = this._m(e, 'under', this.geo.pharm_circle, 2); this._pal(under, pal); under.scale.setScalar(R * 1.02); under.position.y = 0.04;
     const lines = this.spr(e, 'crack', pal, 3); lines.geometry = this.geo.pharm_cracks; lines.position.y = PHARM.ringLift;
     const loose = [], dust = [], stars = [];
-    for (let i = 0, n = low ? 4 : 9; i < n && this.shards.length; i++) { const m = this.solid(e, this.shards[i % this.shards.length], { em: 0xffb030, rim: 0xfff0d0, spec: 0.1 }), a = Math.random() * 6.283, rr = R * rnd(0.15, 0.7), sp = rnd(1.2, 3.2), s = rnd(0.10, 0.22) * (R / 2.4);
+    for (let i = 0, n = low ? 4 : 9; i < n && this.shards.length; i++) { const m = (this.triShards.length && this.model(e, this.triShards[i % this.triShards.length], { em: 0xffb030, rim: 0x2a2018, spec: 0.05, gain: 0.9 })) || this.solid(e, this.shards[i % this.shards.length], { em: 0xffb030, rim: 0x2a2018, spec: 0.05 }), a = Math.random() * 6.283, rr = R * rnd(0.15, 0.7), sp = rnd(1.2, 3.2), s = rnd(0.10, 0.22) * (R / 2.4);
       const vy = rnd(3.4, 5.6); m.scale.setScalar(s); m.userData = { x: Math.cos(a) * rr, z: Math.sin(a) * rr, vx: Math.cos(a) * sp, vz: Math.sin(a) * sp, vy, land: vy / 7.5, w: rnd(6, 14), t0: rnd(0, 0.06), life: vy / 7.5 + rnd(0.35, 0.6), ax: new THREE.Vector3(rnd(-1, 1), rnd(-1, 1), rnd(-1, 1)).normalize() }; loose.push(m); }
     for (let i = 0, n = low ? 0 : 4; i < n; i++) { const m = this.smoke(e, 'dust', pal), a = Math.random() * 6.283, rr = R * rnd(0.5, 0.9); m.userData = { x: Math.cos(a) * rr, z: Math.sin(a) * rr, s: rnd(1.0, 1.6), rise: rnd(0.3, 0.7), t0: rnd(0.02, 0.12), life: rnd(0.7, 1.0) }; dust.push(m); }
     for (let i = 0, n = low ? 3 : 8; i < n; i++) { const m = this.spr(e, 'star', pal, 6), a = Math.random() * 6.283, rr = R * rnd(0.2, 1.1); m.userData = { x: Math.cos(a) * rr, z: Math.sin(a) * rr, y: rnd(0.3, 1.0), rise: rnd(0.4, 1.0), s: rnd(0.2, 0.4), t0: rnd(0, 0.35), life: rnd(0.3, 0.5) }; stars.push(m); }
@@ -325,8 +356,10 @@ export class PharmFx {
     });
     e.g.position.copy(p);
     const fl = new THREE.Group(); e.g.add(fl); fl.scale.setScalar(1.7); e.extra = fl;
-    const liq = this.solid(e, this.geo.pharm_liquid, { mode: 2, tint: pal.b, spec: 0.5 }), cork = this.solid(e, this.geo.pharm_cork, { spec: 0.2 }), glass = this.solid(e, this.geo.pharm_flask, { mode: 1, rim: 0xffffff, spec: 1.4 });
-    glass.renderOrder = 2; for (const m of [liq, cork, glass]) fl.add(m);
+    const tm = this.model(e, 'tripo_flask_gold', { tint: pal.b, tintK: 1, tintY: 0.21, spec: 0.8, rim: 0xffffff });   // Tripo 약병: the amber liquid takes the element colour
+    if (tm) fl.add(tm);
+    else { const liq = this.solid(e, this.geo.pharm_liquid, { mode: 2, tint: pal.b, spec: 0.5 }), cork = this.solid(e, this.geo.pharm_cork, { spec: 0.2 }), glass = this.solid(e, this.geo.pharm_flask, { mode: 1, rim: 0xffffff, spec: 1.4 });
+      glass.renderOrder = 2; for (const m of [liq, cork, glass]) fl.add(m); }
     const mark = this.ring(e, pal, 0.1, 2), tr = this.spr(e, 'streak', pal, 5);
     return e;
   }
@@ -335,9 +368,9 @@ export class PharmFx {
     const B = PHARM.burst, pal = PHARM.pal[o.elem] || PHARM.pal.poison, I = PHARM.intensity, low = lite(), r = o.r || 1.5;
     const e = this._fx('burst', B.puffLife + 0.3, (e) => {
       const t = e.t;
-      ring.scale.setScalar(r * (0.3 + 0.7 * easeOut(t / B.ring))); ring.material.uniforms.uA.value = I * 1.6 * smooth(0, 0.03, t) * (1 - smooth(0.12, 0.42, t));
-      core.visible = t < B.core + 0.1; core.quaternion.copy(this.camQ); core.scale.setScalar(r * (0.5 + 1.1 * easeOut(t / 0.1))); core.material.uniforms.uA.value = I * 1.5 * (1 - smooth(0.03, B.core + 0.1, t));
-      flare.visible = t < 0.16; flare.quaternion.copy(this.camQ); flare.scale.setScalar(r * (1.2 + 1.4 * easeOut(t / 0.1))); flare.material.uniforms.uA.value = I * 1.6 * (1 - smooth(0.02, 0.16, t));
+      ring.scale.setScalar(r * (0.3 + 0.7 * easeOut(t / B.ring))); ring.material.uniforms.uA.value = I * B.ringA * smooth(0, 0.03, t) * (1 - smooth(0.12, 0.42, t));
+      core.visible = t < B.core + 0.1; core.quaternion.copy(this.camQ); core.scale.setScalar(r * (0.5 + 1.1 * easeOut(t / 0.1))); core.material.uniforms.uA.value = I * B.coreA * (1 - smooth(0.03, B.core + 0.1, t));
+      flare.visible = t < 0.16; flare.quaternion.copy(this.camQ); flare.scale.setScalar(r * (1.2 + 1.4 * easeOut(t / 0.1))); flare.material.uniforms.uA.value = I * B.flareA * (1 - smooth(0.02, 0.16, t));
       for (const m of shards) { const d = m.userData, u = clamp01(t / d.life); m.visible = u < 1; if (!m.visible) continue;
         const dist = d.r0 + d.len * 1.2 * easeOut(u); m.position.copy(d.dir).multiplyScalar(dist).setY(0.5 + d.dir.y * dist); this._aim(m, d.dir); m.scale.set(d.w, d.len * (1 - 0.5 * u), 1); m.material.uniforms.uA.value = I * 1.5 * (1 - smooth(0.25, 1, u)); }
       for (const m of puffs) { const d = m.userData, u = clamp01((t - d.t0) / d.life); m.visible = u > 0 && u < 1; if (!m.visible) continue;
@@ -352,8 +385,8 @@ export class PharmFx {
     for (let i = 0, n = low ? 5 : 9; i < n; i++) { const m = this.spr(e, 'spark', pal, 6), a = (i + Math.random() * 0.7) / n * 6.283, up = rnd(0.1, 0.9);
       m.userData = { dir: new THREE.Vector3(Math.cos(a), up, Math.sin(a)).normalize(), r0: r * 0.25, len: r * rnd(0.45, 0.85), w: rnd(0.12, 0.2), life: rnd(0.2, 0.32) }; shards.push(m); }
     // soft puffs sit around the rim (not one opaque ball on the centre), so whoever stands inside stays readable
-    for (let i = 0, n = low ? 2 : 5; i < n; i++) { const m = this.smoke(e, i % 2 ? 'puff' : 'puff2', pal, 4), a = (i + Math.random() * 0.6) / n * 6.283, rr = r * rnd(0.35, 0.75);
-      m.userData = { x: Math.cos(a) * rr, z: Math.sin(a) * rr, y: rnd(0.35, 0.7), rise: rnd(0.5, 1.0), s: r * rnd(0.85, 1.25), a: rnd(0.75, 1), rot: Math.random() * 6.283, spin: rnd(-0.6, 0.6), t0: rnd(0.02, 0.12), life: B.puffLife * rnd(0.75, 1) }; puffs.push(m); }
+    for (let i = 0, n = low ? 3 : 6; i < n; i++) { const m = this.smoke(e, i % 2 ? 'puff' : 'puff2', pal, 4), a = (i + Math.random() * 0.6) / n * 6.283, rr = r * rnd(0.3, 0.7);
+      m.userData = { x: Math.cos(a) * rr, z: Math.sin(a) * rr, y: rnd(0.35, 0.7), rise: rnd(0.5, 1.0), s: r * rnd(1.1, 1.6), a: rnd(0.75, 1), rot: Math.random() * 6.283, spin: rnd(-0.6, 0.6), t0: rnd(0.02, 0.12), life: B.puffLife * rnd(0.75, 1) }; puffs.push(m); }
     const bitCell = o.elem === 'poison' ? 'bubble' : 'star';
     for (let i = 0, n = low ? 2 : 5; i < n; i++) { const m = this.spr(e, bitCell, pal, 6), a = Math.random() * 6.283, rr = r * rnd(0.2, 0.9);
       m.userData = { x: Math.cos(a) * rr, z: Math.sin(a) * rr, y: rnd(0.3, 0.9), rise: rnd(0.5, 1.1), s: rnd(0.14, 0.3), a: bitCell === 'bubble' ? 0.9 : 1.3, t0: rnd(0.05, 0.4), life: rnd(0.4, 0.7) }; bits.push(m); }
@@ -394,7 +427,7 @@ export class PharmFx {
     for (let i = 0; i < (low ? 1 : 2); i++) { const m = this.rib(e, pal); m.userData = { rr: 0.78 - i * 0.24, y: 0.12 + i * 0.3, a: i * 3.1, tx: i ? -0.12 : 0.1 }; ribs.push(m); }
     for (let i = 0, n = low ? 2 : 5; i < n; i++) { const m = this.spr(e, 'streak', pal), a = Math.random() * 6.283, rr = rnd(0.35, 0.7); m.userData = { x: Math.cos(a) * rr, z: Math.sin(a) * rr, w: rnd(0.1, 0.18), h: rnd(1.0, 1.9), t0: i * 0.04, life: rnd(0.3, 0.45) }; rays.push(m); }
     for (let i = 0, n = low ? 2 : 4; i < n; i++) { const m = this.spr(e, 'arrow', pal, 6), a = (i / n + 0.1) * 6.283, rr = rnd(0.45, 0.7);
-      m.userData = { x: Math.cos(a) * rr, z: Math.sin(a) * rr, s: rnd(0.22, 0.32), t0: i * 0.07, life: rnd(0.45, 0.6), period: 2.4, ph: i / n, duty: 0.3 }; arrows.push(m); }
+      m.userData = { x: Math.cos(a) * rr, z: Math.sin(a) * rr, s: rnd(0.3, 0.42), t0: i * 0.07, life: rnd(0.45, 0.6), period: 2.4, ph: i / n, duty: 0.3 }; arrows.push(m); }
     return e;
   }
 

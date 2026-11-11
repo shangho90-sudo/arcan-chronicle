@@ -154,7 +154,7 @@ PIECE_RINGS = [(0.0, 0.30, 5), (0.30, 0.63, 8), (0.63, 1.0, 12)]   # fracture: (
 PIECE_GAP = 0.040     # half gap between neighbouring pieces (the gold light shows through)
 PIECE_T = 0.17        # piece thickness (unit disc; the game scales x/z by R and y by R * 0.75)
 PIECE_BEVEL = 0.028
-STONE_TOP, STONE_SIDE, STONE_EDGE = (0.74, 0.68, 0.58), (0.40, 0.35, 0.30), (0.90, 0.85, 0.74)   # 회베이지 포장석 윗면 / 어두운 옆면 / 밝은 모서리
+STONE_TOP, STONE_SIDE, STONE_EDGE = (0.60, 0.53, 0.44), (0.30, 0.26, 0.22), (0.74, 0.67, 0.56)   # 회베이지 포장석 윗면 / 어두운 옆면 / 밝은 모서리
 N_SHARD = 8
 ATLAS = 1024
 SEED = 23
@@ -390,7 +390,7 @@ def circle_png():
         d.ellipse((x - 46, y - 46, x + 46, y + 46), outline=G1 + (235,), width=5)
         d.rectangle((x - 9, y - 30, x + 9, y + 30), fill=W + (235,)); d.rectangle((x - 30, y - 9, x + 30, y + 9), fill=W + (235,))
     # centre: big cross + small leaves
-    d.rounded_rectangle((c - 22, c - 96, c + 22, c + 96), 10, fill=W + (230,)); d.rounded_rectangle((c - 96, c - 22, c + 96, c + 22), 10, fill=W + (230,))
+    d.rounded_rectangle((c - 16, c - 80, c + 16, c + 80), 8, fill=W + (130,)); d.rounded_rectangle((c - 80, c - 16, c + 80, c + 16), 8, fill=W + (130,))
     for k in range(4):
         a = math.pi / 4 + k * math.pi / 2; x, y = c + math.cos(a) * 130, c + math.sin(a) * 130
         d.ellipse((x - 26, y - 14, x + 26, y + 14), fill=G1 + (210,))
