@@ -8,7 +8,7 @@
 ## 기본
 - 빌드 없음. `python3 -m http.server 8765` 후 `http://localhost:8765/index.html`.
 - three.js r160을 로컬 import map(`index.html`, `vendor/three-r160/`)으로 불러옵니다. CDN 장애 시 0% 멈춤을 방지하기 위해 동일 버전과 LICENSE를 저장소에 포함합니다. npm 의존성 없음. 새 라이브러리 추가 금지(필요하면 먼저 사용자에게 확인).
-- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs && node tests/gear.test.mjs` (현재 504 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 638 통과).
+- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs && node tests/gear.test.mjs` (현재 499 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 638 통과).
 - 테스트하지 않은 것을 "검증됨"이라고 보고하지 말 것.
 
 ## 데이터 우선
@@ -49,7 +49,7 @@
 - 나무·바위·덤불·풀/꽃·마을 소품은 Blender(bpy)로 절차 제작합니다: `paint.py`(손그림 텍스처) → `assets.py`(모델, LOD `_l0`/게임용/`_l2`/`_lo`) → `wrap.py`(→ `assets/forest/bl/`) → `validate_assets.py`. 직접 GLB를 고치지 말고 스크립트를 고친 뒤 다시 만드세요.
 - GLB에는 이미지를 넣지 않습니다. 재질 이름이 공유 텍스처를 고릅니다(`tools/blender/texmap.py` ↔ `js/nature.js` `MAT_TEX`). 칠한 빛(AO·그라데이션)은 정점 색입니다.
 - 잎 카드(`M_leaf*`)는 4정점이 한 점에 모인 카메라 빌보드(두 번째 UV = 크기·회전)입니다. 잘라낸 재질(`M_leaf*`, `M_plants`)은 뒷면 노멀을 뒤집지 않습니다.
-- 마을 장식 배치는 `python3 tools/town/props_layout.py --write`(`town3d.blprops` + 충돌용 `props`의 `bl: true` 항목). 주의: 지금 저장된 배치는 스크립트 결과와 조금 다름(2026-11-08 모아 가게 앞 통·상자를 손으로 지움, 스크립트에는 `CLEAR`로 반영) — 다시 돌리면 다른 장식 위치도 바뀌니 결과를 화면으로 확인할 것. 숲 배치는 `tools/forest/layout.py --write`. 둘 다 바꾼 뒤 `node tools/forest/check_nav.mjs forest|town`(마을은 boss_gate 실패가 원래 상태).
+- (2026-11-12부터 안 씀 — 아르칸 마을도 `tools/world/towns.py`가 배치) 예전 마을 장식 배치는 `python3 tools/town/props_layout.py --write`(`town3d.blprops` + 충돌용 `props`의 `bl: true` 항목). 주의: 지금 저장된 배치는 스크립트 결과와 조금 다름(2026-11-08 모아 가게 앞 통·상자를 손으로 지움, 스크립트에는 `CLEAR`로 반영) — 다시 돌리면 다른 장식 위치도 바뀌니 결과를 화면으로 확인할 것. 숲 배치는 `tools/forest/layout.py --write`. 바꾼 뒤 `node tools/forest/check_nav.mjs forest|town`.
 - 카메라는 약한 원근(`render.js` `CAM`: 피치 44°(2026-11-06, 48°→44°), 거리 26 m, `ortho` = 초점 거리에서의 화면 반높이). 미리 그린 배경 그림 투영은 `CAM.artPitch`(48°, 바꾸지 말 것). 화면 → 땅 광선은 `Renderer.screenRay`.
 - 화면 비교 캡처: `tools/browser-tests/styleshots.js`(마을 분수·대화, 숲 입구·길·나무·전투, 프레임 시간·draw call·삼각형).
 
@@ -71,11 +71,21 @@
 ## 용흔 대륙 세계 (2026-11-06, 배경 스토리 『아르칸 연대기 — 흑룡의 계절』)
 - `tools/world/world.py`가 마을 8곳(카이리온 왕도·발테른 공국·루미에르 신전·그라벨·실베른 영지·마르세온·발타자르 왕도·크로이츠 국경 요새)과 새 필드 35곳(기존 5곳 포함 필드 40곳), 연결(`LINKS`), 지도 좌표·권장 레벨·지역, 몬스터 변형, 이야기 NPC를 만듭니다. 결과: `assets/data/world/<id>.json`(존 전체 정의 + 존 메시 `mesh`), `zones.json`에는 스텁(`file`, `map`, `level`, `region`, `biome`)과 `"world"`(지역 이름·연결)만. 게임은 존에 들어갈 때 파일을 받습니다(`game.js` `buildZone`). 직접 고치지 말고 `world.py`를 고친 뒤 `python3 tools/world/world.py --write` → `node tools/forest/check_nav.mjs all`.
 - 필드 생성: 140 m, 출구(이웃 방향)→중심 허브 길, 공터, 연못/강(물은 충돌), 생물군(`BIOMES`: 들판·숲·푸른숲·붉은숲·바위산·설원·황무지·심연·고원·습지·협곡·강변)별 소품 혼합과 밀도, 몬스터는 `spread` 스포너. 존별 잎 색 바꾸기는 `nature.foliage`(crimson/azure/ash/snow, `nature.js` `folSwap`, 텍스처 `paint.py` `foliage_world()`), 바닥 세트 `g_ash_`/`g_crimson_`/`g_stone_`(`ground_variants_world()`).
-- 마을 생성: `town3d` 사양(성벽·탑·성문·궁/신전 `keep`(없어도 됨)·집·광장·장식·가로등)과 충돌 `blockPolys`. 첫 이웃은 남문 밖 워프, 나머지는 성 안 마법진 워프. NPC는 기존 3D 모델을 빌려 씀(npcs.json `model`), 마을마다 상인.
+- 마을 생성(2026-11-12 리뉴얼, 아래 "마을 리뉴얼" 절): `tools/world/towns.py` `gen_town2`가 9곳 모두(아르칸 포함)의 `town3d` 사양과 충돌 `blockPolys`·`props`를 만듦. 예전 생성기는 `world.py` `gen_town_v1`(안 씀).
 - 세계 지도: `js/worldmap.js`(M 키 / 메뉴 '지도'), 확대·축소, 장소를 누르면 권장 레벨·이어진 곳. 남색+금색 창(로고·나침반·범례·아래 정보 막대, CSS는 `index.html` "세계 지도 (js/worldmap.js, navy + gold chart)" 블록, 휴대폰은 로고 숨김). 배경 그림 `assets/ui/worldmap_bg.jpg`와 글꼴 `assets/fonts/ArcanSerif.woff`(Noto Serif CJK KR Bold 부분 집합, OFL)는 `python3 tools/world/paint_map.py`로 생성 — 세계 데이터(`world.py --write`)를 바꾸면 다시 실행. `paint_map.py`의 `OX, OY`와 `worldmap.js`의 `PAD`는 같아야 함. 글자 배치는 `layoutLabels`(화면 크기 고정·겹치면 자리 옮김/숨김, 확대할 때마다 다시). 확인 `tools/browser-tests/worldshots.js`(SIZE=390x844t 휴대폰).
 - 새 몬스터 17종: Tripo 초안(`tools/monsters/tripo_new.py`, 키는 `~/.tripo/key`) → Blender 정리(`tools/monsters/blender_new.py`: 조각 제거, 9천 삼각형으로 줄이기, 바닥 맞춤, 기본색만 1024 px + 손그림 느낌 처리, 무광) → `assets/creatures/w_<name>.glb.json`. 능력치는 `world.py` `SPECIES`(공격 방식별 기존 몬스터 + 레벨 곡선 보간). 화면 확인 `tools/browser-tests/monstershots.js`.
 - 몬스터 2차 묶음(`world.py` `SPECIES2`/`NEW_MONS`, Tripo `tools/monsters/tripo_more.py`): 모델이 있는 종만 들어감. 생성 필드의 무리는 필드 레벨 범위에 맞춘 `level`을 가짐(`core.js` `monsterAtLevel`).
 - 지형 마스크(`nature.js` `paintMask`)는 길을 날카롭게 그린 뒤 한 번만 흐림 — 선분마다 blur 필터를 걸면 소프트웨어 GL에서 몇 분 걸림.
+
+## 마을 리뉴얼 (2026-11-12, 9곳 모두)
+- 크기: 두 왕도(카이리온·발타자르)는 가로·세로 2.5배, 나머지 7곳은 넓이 3배(가로·세로 1.73배) — `world.py`가 `TOWNS`의 W/D에 곱함. 아르칸 마을도 `world.py` `ARCAN` + `gen_arcan`이 만들고(`zones.json` `town` 항목과 `assets/zone_town.json`을 다시 씀) `tools/town/props_layout.py`는 더 쓰지 않음(돌리지 말 것).
+- 성문·워프: 이웃 필드마다 성문 하나, 세계 지도에서 그 필드가 있는 쪽 성벽에(`town3d.gates[]`: id·pos·heading·label, 렌더 `town3d.js`가 여러 성문을 그림). 성문 밖 7 m에 워프, 안쪽 5 m에 도착 지점(`from_<이웃>`), 광장까지 길(`roads`의 `kind: 'street'`)과 글씨 표지판(`signpost` + `text`). 아르칸 ↔ 속삭이는 숲은 예전 id 그대로(`to_field`/`from_field`). 확인 `python3 tools/world/check_warps.py`(양방향·방향 cos, 용의 유적 → 아르칸은 원래 편도).
+- 구역: 광장(가운데 상징물 `THEMES[id].centre`) → 고리 길(0.7·W) → 랜드마크 구역·시장(노점)·공원(잔디·나무·벤치), 집은 성벽 줄과 고리 길 안쪽. 마을별 색은 `town3d.palette`(재질 이름 → 곱할 색; 파란 `slate`·`bluewood`는 무채색 사본 `tex/*_grey.jpg`에 곱함 — `tools/town/grey_tex.py`), 나무·꽃·장식 섞음은 `THEMES[id]`.
+- 랜드마크 36종(마을마다 4개): Tripo 초안 `tools/tripo/town_assets.py`(원본은 저장소 밖 `RAW`, 기본 `/home/claude/town3d`, 이어받기 가능) → `python3 tools/blender/town_assets.py`(조각 제거·6천 삼각형·1024 px 기본색·바닥 원점·가장 긴 가로 변 1) → `assets/town3d/town_<id>.glb.json` + `town_manifest.json`(크기 비율, `towns.py`가 읽어 자리·충돌을 정함 — 목록에 없는 모델은 배치하지 않음). 큰 건물은 직사각형으로 자리를 찾고(`find_rect`), 작은 마을에서 안 들어가면 0.88·0.76·0.66배로 줄임. 장식(우물·통·상자·건초·허수아비·수레·노점)은 `town3d.js` 절차 모델, 나무·덤불·꽃·벤치·가로등은 Blender 소품(`blprops`).
+- NPC: 전직 마스터 5명(소연·금강·철산·리라·노을)은 카이리온 왕도 길드 회관 앞(`world.py` `JOB_MASTERS`, `lm:kairion_guildhall`). 아르칸에는 안내인 하늘, 약국 점원 다래(`shop_pharmacy`), 대장간 견습 쇠돌(`shop_forge`)이 대신 섬 — 첫 퀘스트 `q1_start`는 쇠돌과 대화, `q4_spore`는 다래, 서브 `qs07` 쇠돌·`qs13` 여관 주인 보름, `qs29`·`qs30`은 카이리온의 리라·소연. Lv10 전직은 아르칸 동문 → 왕도 가는 길(Lv2~6, Lv10 이하 몬스터는 선공 없음) → 카이리온 서문 → 길 따라 길드 회관(메인 1~2장이 이미 왕도로 보냄).
+- 주민 68명(마을마다 7~9명): `tools/world/residents.py` `R[마을]` = (id, 이름, 직함, 모델, 자리 힌트, 대사, 나중에 쓸 서브 퀘스트 메모 `hook`). 자리 힌트는 `plaza[:각도]`·`market`·`park`·`gate:<이웃>`·`lm:<랜드마크>`·`house:<집>`·`street`. 모델은 색만 바꾼 `res_*`(`tools/npcs/recolor.py`, `model.js` `NPC_MODELS`). npcs.json에는 `resident: true`.
+- 다시 만들기 순서: `python3 tools/world/world.py --write` → `python3 tools/quests/story.py --write` → `python3 tools/gear/gear.py --write` → `node tools/forest/check_nav.mjs all`(마을 포함 49곳 모두 0 fail — 예전 아르칸 boss_gate 실패는 없어짐) → `python3 tools/world/check_warps.py`. 화면 확인 `tools/browser-tests/townshots.js`(`ZONES= SHOTS=over,plaza,gates,lm,market,park,map,perf SIZE=390x844t`).
+- 예전 저장: 마을 안 위치가 새 건물 속이면 시작 지점으로 돌아감(`game.js`, 저장 형식은 그대로 v4).
 
 ## 보스 전장 (독버섯 군락지 `mushroom_grove`, 2026-11-06)
 - 바닥: `nature.js` `arenaMaterial`(빌더 `boss_floor` 지형에 적용) — 보라 흙·짙은 보라·갈색·이끼 색 덩어리, 붓 터치, 갈라짐, 낙엽·조약돌·포자, 흔들리는 잎 그늘. 텍스처는 `paint.py` `magic_floor()`(g_magic_*)를 잔결로만 씀.
@@ -108,7 +118,7 @@
 - 수치: 유봉 공격력 `10+2.2L`(마법력 45%), 갑옷 방어 `4+1.8L`·체력 `20+10L`, 드롭 전용은 ×1.08. 값 `60·L^1.25`(갑옷 ×0.9, 장신구 ×1.1), 되팔기 30%, 드롭 전용은 구매가 0.
 - 상점: 종류마다 낮은 5개만 판매(`shop_weapons` = 새 유봉 5 + 다른 직업 예전 1~2단계 무기, `shop_armor` = 갑옷 5 + 장신구 5). 나머지 25개는 아이템의 `dropFrom`(몬스터·확률) → `core.js`가 불러올 때 몬스터 `drops`에 합침(world.py·story.py가 monsters.json을 다시 써도 남음). 철산은 `shop_forge`(제작 재료만).
 - 직업 전용 효과: 아이템 `jobBuff {jobs, stats, text}` — `core.js` `jobBuffActive`, `recalc`에서 직업이 맞을 때만 더함. 설명 줄은 `ui.js` `gearLines`(적용 여부·얻는 곳).
-- 상인: 아르칸 마을 = 단오(무기, 원래 NPC) + 보라(`town_armor`), 생성 마을 8곳 = `world.py` `GEAR_MERCHANTS`(광장 둘레 빈 자리; 마르세온은 원래 있던 세라가 방어구 상인). 모델 `NPC_MODELS.gear_weapon/gear_armor`(색 바꾼 텍스처 `tools/npcs/recolor.py`). `world.py --write` 뒤에는 `story.py --write` → `gear.py --write` 순서로 다시.
+- 상인: 아르칸 마을 = 단오(무기, 원래 NPC) + 보라(`town_armor`, 자리는 `world.py` `ARCAN` `place`), 생성 마을 8곳 = `world.py` `GEAR_MERCHANTS`(시장·광장 둘레; 마르세온은 원래 있던 세라가 방어구 상인). 모델 `NPC_MODELS.gear_weapon/gear_armor`(색 바꾼 텍스처 `tools/npcs/recolor.py`). `world.py --write` 뒤에는 `story.py --write` → `gear.py --write` 순서로 다시.
 - 모델·아이콘: `tools/tripo/gear_assets.py`(Tripo 초안 40개, 원본은 저장소 밖 `RAW`) → `python3 tools/blender/gear.py`(아이콘 128 px `assets/ui/items/<id>.png`, 유봉 메시 2600삼각형·512 텍스처 `assets/items/<id>.glb.json`; `FORCE=1`로 다시). 게임: `items3d.js` `gearModel`(유봉은 임시 절차 모델 → 받아지면 교체, 갑옷·장신구의 떨어진 모습은 기존 절차 모델), 아이콘은 `ui.itemIcons`에 그림 경로.
 - 확인: `tests/gear.test.mjs`, `tools/browser-tests/gear.js`(`SIZE= GENDER= ONLY=merchants,shop,pestle,jobbuff,drop,sheets`).
 

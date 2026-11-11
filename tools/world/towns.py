@@ -69,7 +69,7 @@ THEMES = {
                  flowers=['clover', 'grass_short'], rocks=True,
                  lm=[('town_baltazar_forge', 20, '왕립 대단조장', 'big'), ('town_baltazar_tower', 8, '붉은 종탑', 'big'), ('town_baltazar_anvil', 6.5, '거인의 모루', 'prop'), ('town_baltazar_kingstatue', 5.5, '망치왕 흑요석상', 'prop')],
                  mix=[('well', 2), ('stall', 5), ('cart', 4), ('barrels', 8), ('crates', 10), ('dummy', 8), ('banner', 12), ('bench', 8), ('rock', 20), ('tree', 18), ('shrub', 16), ('flowerpatch', 8)], stalls=8, lamps=28),
-    'kreutz_fort': dict(centre='town_kreutz_brazier', title='설원의 국경 요새', palette=dict(wallstone='#aab2be', basestone='#8f98a6', slate='#e8eef4', plaster='#cfd3d8', pave='#dfe6ee', cobble='#c4ccd6', grass='#eef3f8', wood='#9a8f88'), trees=['tree_forest_tall'],
+    'kreutz_fort': dict(centre='town_kreutz_brazier', title='설원의 국경 요새', palette=dict(wallstone='#aab2be', basestone='#8f98a6', slate='#e8eef4', plaster='#cfd3d8', pave='#dfe6ee', cobble='#c4ccd6', grass='#f4f7fb', snow='1', wood='#9a8f88'), trees=['tree_forest_tall'],
                  flowers=['grass_short'], rocks=True,
                  lm=[('town_kreutz_barracks', 16, '수비대 막사', 'big'), ('town_kreutz_watchtower', 8, '감시탑', 'big'), ('town_kreutz_ballista', 6, '공성 노포', 'prop'), ('town_kreutz_brazier', 4, '봉화대', 'prop')],
                  mix=[('well', 1), ('stall', 2), ('cart', 3), ('barrels', 8), ('crates', 10), ('dummy', 8), ('hay', 4), ('banner', 8), ('fence', 10), ('rock', 18), ('tree', 14), ('shrub', 6)], stalls=3, lamps=16),
