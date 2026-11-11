@@ -32,9 +32,10 @@ const MARKS = { a3: [0.1, 0.2, 0.33, 0.46, 0.6, 0.72, 0.85, 1.1], a6: [0.1, 0.25
   await pg.waitForSelector('.prologue.on', { timeout: 60000 }).then(() => click('건너뛰기')).catch(() => {});
   await pg.waitForFunction(() => window.G && G.inWorld && G.player && !G.loading && G.player.body && G.player.body.md, null, { timeout: 300000 });
   await pg.waitForFunction(() => G.skillFx && G.skillFx.pharm && G.skillFx.pharm.ready, null, { timeout: 120000 });
+  await ev(h => { window.__noHud = h; }, process.env.HUD === '0' || SCENES.some(s => /^(a1|a4|b1|b2|b4)$/.test(s)));   // 남은 스킬 장면은 화면 왼쪽 위(약병 낙하 지점)를 가리는 HUD를 숨김
   await ev(() => {
     G.frame = () => {}; const c = G.render.cam; c.zoom = 1.05; c.updateProjectionMatrix();
-    document.querySelectorAll('.controls,.toasts,.qhud,.qh-reopen').forEach(e => e.style.display = 'none');
+    document.querySelectorAll('.controls,.toasts,.qhud,.qh-reopen' + (window.__noHud ? ',.charpanel,#hTarget,.minimap,.botbar' : '')).forEach(e => e.style.display = 'none');
     G.dev.level(20); G.dev.job('pharmacist'); G.sheet.bag.add('w_pestle_1', 1); G.sheet.p.weapon = 'w_pestle_1'; G.dev.learnAll('pharmacist'); G.sheet.recalc(); G.dev.full(); G.input.block = true;
     const p = G.player; let spot = null; const cx = p.pos.x, cz = p.pos.z;
     for (let r = 0; r <= 16 && !spot; r++) for (let k = 0; k < Math.max(1, r * 6) && !spot; k++) { const a = k / Math.max(1, r * 6) * 6.283, c = { x: cx + Math.cos(a) * r, z: cz + Math.sin(a) * r }; let ok = true;
@@ -72,7 +73,7 @@ const MARKS = { a3: [0.1, 0.2, 0.33, 0.46, 0.6, 0.72, 0.85, 1.1], a6: [0.1, 0.25
       if (sc === 'c8') { p.hp = Math.round(p.maxHp * 0.4); r.hp0 = p.hp; }
       const aim = sc === 'a6' ? window.__at(4.5) : /^b/.test(sc) ? window.__at(5) : null;
       if (/^a[14]$/.test(sc)) { p.target = ds[0]; if (p.lockOn) try { p.lockOn(ds[0]); } catch (e) { /* no lock */ } }
-      G.render.setFocus({ x: p.pos.x, y: 0, z: p.pos.z + (aim ? 3.2 : 0) }, true);
+      G.render.setFocus({ x: p.pos.x, y: 0, z: p.pos.z + (/^b[124]$/.test(sc) ? 4.6 : aim ? 3.2 : /^a[14]$/.test(sc) ? 1.0 : 0) }, true);
       if (!G.sheet.book.sk.slots.includes(id)) G.sheet.book.equip(id, 0, false);   // 칸이 4개뿐이라 시전 전에 1번 칸에 장착
       const mid = G.render.toScreen({ x: p.pos.x, y: 0.6, z: p.pos.z + (/^b/.test(sc) ? 4.2 : aim ? 2.6 : /^a[14]$/.test(sc) ? 1.2 : 0) }); r.cx = Math.round(mid.x); r.cy = Math.round(mid.y);   // crop centre: between the caster and the aim
       const e = p.skills2.cast(id, aim); r.err = e || null; return r;

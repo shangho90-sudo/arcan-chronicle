@@ -495,9 +495,9 @@ export class PharmFx {
     const e = this._fx('smash', 0.7, (e) => {
       const t = e.t, fade = 1 - smooth(0.05, S.life, t);
       for (const m of arcs) { const d = m.userData, U = m.material.uniforms; U.uA.value = I * S.arc * d.w * fade * (hit ? 1 : 0.55); U.uCut.value = d.cut + (0.97 - d.cut) * smooth(0, S.life, t); }
-      flare.visible = t < 0.16; flare.quaternion.copy(this.camQ); flare.scale.setScalar((hit ? 1.5 : 0.7) + 1.3 * easeOut(t / 0.09)); flare.material.uniforms.uA.value = I * S.flash * (hit ? 1 : 0.4) * (1 - smooth(0.02, 0.16, t));
-      star.visible = t < 0.22; star.quaternion.copy(this.camQ); star.rotateZ(0.5); star.scale.setScalar((hit ? 1.1 : 0.5) + 0.9 * easeOut(t / 0.12)); star.material.uniforms.uA.value = I * 1.6 * (hit ? 1 : 0.4) * (1 - smooth(0.04, 0.22, t));
-      glow.visible = t < 0.26; glow.quaternion.copy(this.camQ); glow.scale.setScalar(0.9 + 0.9 * easeOut(t / 0.15)); glow.material.uniforms.uA.value = I * 0.9 * (hit ? 1 : 0.35) * (1 - smooth(0.03, 0.26, t));
+      flare.visible = t < 0.16; flare.quaternion.copy(this.camQ); flare.scale.setScalar((hit ? 1.0 : 0.6) + 0.9 * easeOut(t / 0.09)); flare.material.uniforms.uA.value = I * S.flash * (hit ? 1 : 0.4) * (1 - smooth(0.02, 0.16, t));
+      star.visible = t < 0.22; star.quaternion.copy(this.camQ); star.rotateZ(0.5); star.scale.setScalar((hit ? 0.8 : 0.45) + 0.6 * easeOut(t / 0.12)); star.material.uniforms.uA.value = I * 1.6 * (hit ? 1 : 0.4) * (1 - smooth(0.04, 0.22, t));
+      glow.visible = t < 0.26; glow.quaternion.copy(this.camQ); glow.scale.setScalar(0.6 + 0.6 * easeOut(t / 0.15)); glow.material.uniforms.uA.value = I * 0.7 * (hit ? 1 : 0.35) * (1 - smooth(0.03, 0.26, t));
       if (ring) { ring.scale.setScalar(S.ring * (0.3 + 0.7 * easeOut(t / 0.22))); ring.material.uniforms.uA.value = I * 1.6 * smooth(0, 0.03, t) * (1 - smooth(0.1, 0.36, t)); }
       for (const m of rays) { const d = m.userData, u = clamp01(t / d.life); m.visible = u < 1; if (!m.visible) continue; const dist = 0.15 + d.len * easeOut(u); m.position.copy(hp).addScaledVector(d.dir, dist); this._aim(m, d.dir); m.scale.set(d.w, d.len * (1 - 0.5 * u), 1); m.material.uniforms.uA.value = I * 1.5 * (1 - smooth(0.2, 1, u)); }
       for (const m of chips) { const d = m.userData, u = t - d.t0; m.visible = u > 0 && u < d.life; if (!m.visible) continue; const fl = Math.min(u, d.land), y = d.vy * fl - 4.5 * fl * fl;
@@ -548,7 +548,7 @@ export class PharmFx {
     for (const h of (o.hits || []).slice(0, 6)) { const p = P3(h); _a.copy(p).sub(base).setY(0); const dir = (_a.lengthSq() > 1e-4 ? _a.normalize() : f3).clone();
       const pop = this.spr(e, 'star', pal, 8); pop.position.copy(p); pop.position.y += 0.7; pop.userData = { s: 0.9 }; pops.push(pop);
       if (h.boss) continue;
-      for (let i = 0, n = low ? 2 : 3; i < n; i++) { const m = this.spr(e, 'spark', pal, 5), side = (i - (n - 1) / 2) * 0.32; m.userData = { p: p.clone().add(new THREE.Vector3(-dir.z, 0, dir.x).multiplyScalar(side)).setY(p.y + 0.14 + i * 0.16), dir, len: S.streak * rnd(0.7, 1.0), off: -0.2, w: rnd(0.16, 0.24), a: rnd(0.9, 1.3), t0: i * 0.02, life: rnd(0.26, 0.36) }; streaks.push(m); }
+      for (let i = 0, n = low ? 2 : 3; i < n; i++) { const m = this.spr(e, 'spark', pal, 5), side = (i - (n - 1) / 2) * 0.32; m.userData = { p: p.clone().add(new THREE.Vector3(-dir.z, 0, dir.x).multiplyScalar(side)).setY(p.y + 0.14 + i * 0.16), dir, len: S.streak * rnd(0.7, 1.0), off: -0.2, w: rnd(0.10, 0.16), a: rnd(0.7, 1.0), t0: i * 0.02, life: rnd(0.26, 0.36) }; streaks.push(m); }
       if (!low) { const m = this.smoke(e, 'dust', pal); m.userData = { p: p.clone(), dir, go: 0.9, s: rnd(0.8, 1.1), t0: 0.03, life: rnd(0.5, 0.65) }; dust.push(m); }
     }
     return e;
