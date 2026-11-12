@@ -515,7 +515,7 @@ export class UI {
     const list = warpTowns(D).sort((x, y) => (y.id === here) - (x.id === here) || known.has(y.id) - known.has(x.id) || warpPrice(D, here, x.id) - warpPrice(D, here, y.id));
     for (const t of list) {
       const cur = t.id === here, ok = known.has(t.id), price = warpPrice(D, here, t.id), afford = P.gold >= price;
-      const reg = regs.find(r => r.id === t.region), lv = t.level ? `권장 Lv ${t.level[0]}~${t.level[1]}` : "";
+      const reg = regs.find(r => r.id === t.region), lv = t.level && !(t.level[0] <= 1 && t.level[1] >= 50) ? `주변 권장 Lv ${t.level[0]}~${t.level[1]}` : "";
       const r = $("div", "twrow" + (cur ? " cur" : ok ? "" : " locked"), rows); r.dataset.town = t.id;
       $("div", "twname", r, `<b>${ok || cur ? esc(t.name) : "???"}</b><small>${ok || cur ? [reg ? esc(reg.name) : "", lv].filter(Boolean).join(" · ") : "아직 가 보지 않은 곳"}</small>`);
       if (cur) $("div", "twstate", r, "지금 있는 곳");

@@ -8,7 +8,7 @@
 ## 기본
 - 빌드 없음. `python3 -m http.server 8765` 후 `http://localhost:8765/index.html`.
 - three.js r160을 로컬 import map(`index.html`, `vendor/three-r160/`)으로 불러옵니다. CDN 장애 시 0% 멈춤을 방지하기 위해 동일 버전과 LICENSE를 저장소에 포함합니다. npm 의존성 없음. 새 라이브러리 추가 금지(필요하면 먼저 사용자에게 확인).
-- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs && node tests/gear.test.mjs` (현재 499 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 638 통과).
+- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs && node tests/gear.test.mjs && node tests/warp.test.mjs && node tests/pharmacist-audio.test.mjs` (현재 core 495 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 638 통과).
 - 테스트하지 않은 것을 "검증됨"이라고 보고하지 말 것.
 
 ## 데이터 우선
@@ -87,6 +87,11 @@
 - NPC가 카메라에 가려지지 않게: `tools/world/visible.py`(가리는 물체·판정) — `towns.py` 마지막 단계가 가려진 NPC를 옮기거나 가리는 나무를 치우고, `story.py` `spot_near`도 피함. 확인 `python3 tools/world/check_visible.py`(0 hidden이어야 함). 새 큰 장식을 더하면 `visible.occluders`에도 넣을 것.
 - 다시 만들기 순서: `python3 tools/world/world.py --write` → `python3 tools/quests/story.py --write` → `python3 tools/gear/gear.py --write` → `node tools/forest/check_nav.mjs all`(마을 포함 49곳 모두 0 fail — 예전 아르칸 boss_gate 실패는 없어짐) → `python3 tools/world/check_warps.py`. 화면 확인 `tools/browser-tests/townshots.js`(`ZONES= SHOTS=over,plaza,gates,lm,market,park,map,perf SIZE=390x844t`).
 - 예전 저장: 마을 안 위치가 새 건물 속이면 시작 지점으로 돌아감(`game.js`, 저장 형식은 그대로 v4).
+
+## 마을 간 워프·필드 워프 방향 (2026-11-12)
+- 워프 안내인: 마을마다 한 명(`world.py` `WARP_KEEPERS`, 자리 힌트 `WARP_HINT` = 광장 앞쪽, npcs.json `role: "warp"`, 모델 `NPC_MODELS.warp_keeper` = 약사 메시 + `recolor.py` 색). 대화 → "마을 이동" → `ui.js` `showTownWarp`(장식 창 `townwarp`, CSS `index.html` "마을 이동 창") → `game.js` `townWarp`(삯 → 섬광 `.warpflash` → 그 마을 안내인 앞 `warp` spawn, `warp_spawn`).
+- 규칙은 `core.js`: 가 본 마을 `profile.towns`(마을에 처음 들어갈 때 `discoverTown`, `game.js` `loadZone`), `warpPrice` = 30 G + 세계 지도 거리 × 0.25 G(5 G 단위, 최대 200 G — `WARP_FARE`), `warpBlock`/`payWarp`. 더하기만 하는 필드라 `SAVE_VERSION`은 4 그대로; 예전 저장은 `migrate`가 아르칸 + `returnZone` + 지금 있는 곳을 넣음(완료한 퀘스트로 미루어 열어 주지는 않음). 수치를 바꾸면 `tests/warp.test.mjs`도. 화면 확인 `tools/browser-tests/townwarp.js`(`URL= SIZES=1280x720,390x844t`).
+- 필드 워프는 대상 존의 세계 지도 방향 쪽에: `python3 tools/world/check_warps.py [-v]`가 워프마다 어긋난 각도를 재고 60° 넘으면 실패(지금 가장 큰 값 42° = 군락지 → 숲). 손으로 만든 필드는 `tools/zones/orient_fields.py`(한 번만, 존에 `"oriented"`)로 맞춤: 속삭이는 숲·독버섯 군락지 180° 돌림, 안개 골짜기 +90° 돌림(+ 서리 고원 워프를 북쪽 가장자리로), 서리 고원 `to_ruins`를 동쪽, 용의 유적 `to_town`(편도)을 남쪽으로. **그래서 이 문서의 숲·군락지 좌표 설명은 돌리기 전 값**: 지금 버섯 집 (-16.0, -47.6) `rot` 270, `to_grove` (-16.2, -41.8), 군락지 경계 [-8,1,39,39]는 같고 `to_forest`는 동쪽 (36.6, 21), 경사로 `axis: "-x"`. `tools/forest/layout.py forest|mushroom_grove --write`, `tools/zones/fill_fields.py --write`, `scale_fields.py`는 돌리기 전 좌표로 다시 만들므로 **돌리지 말 것**(필요하면 먼저 그 스크립트에 같은 회전을 넣을 것). `world.py` `NEW_MONS_EXISTING` 좌표도 돌린 값.
 
 ## 보스 전장 (독버섯 군락지 `mushroom_grove`, 2026-11-06)
 - 바닥: `nature.js` `arenaMaterial`(빌더 `boss_floor` 지형에 적용) — 보라 흙·짙은 보라·갈색·이끼 색 덩어리, 붓 터치, 갈라짐, 낙엽·조약돌·포자, 흔들리는 잎 그늘. 텍스처는 `paint.py` `magic_floor()`(g_magic_*)를 잔결로만 씀.

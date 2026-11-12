@@ -6,7 +6,7 @@ const OUT = process.env.OUT || '/tmp/mh', TAG = process.env.TAG || 'after'; fs.m
   const pg = await (await b.newContext({ viewport: { width: +(process.env.W || 1280), height: +(process.env.H || 720) } })).newPage(); const errs = [];
   pg.on('pageerror', e => errs.push(e.message)); pg.on('console', m => { if (m.type() === 'error' || /landmark/.test(m.text())) errs.push(m.text()); });
   const ev = (f, a) => pg.evaluate(f, a);
-  await pg.goto('http://localhost:8765/index.html');
+  await pg.goto(process.env.URL || 'http://localhost:8765/index.html');
   const click = async t => { await pg.waitForFunction(t => [...document.querySelectorAll('button,[aria-label]')].some(b => (b.getAttribute('aria-label') || b.textContent || '').trim() === t), t, { timeout: 300000 }); await ev(t => [...document.querySelectorAll('button,[aria-label]')].find(b => (b.getAttribute('aria-label') || b.textContent || '').trim() === t).click(), t); await pg.waitForTimeout(400); };
   await ev(() => localStorage.clear()); await click('새 게임'); await click('모험 시작'); await pg.waitForSelector('.prologue.on', { timeout: 60000 }); await click('건너뛰기');
   await pg.waitForFunction(() => window.G && G.inWorld && G.player && !G.loading && !document.querySelector('.prologue'), null, { timeout: 300000 });
