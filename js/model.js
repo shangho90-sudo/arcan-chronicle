@@ -54,6 +54,7 @@ export const NPC_MODELS = {
   res_elder_a: { file: 'npc_elder', tex: 'npc_res_elder_a', height: 1.47, headPitch: -6, npc: true },
   res_hairdresser_a: { file: 'npc_hairdresser', tex: 'npc_res_hairdresser_a', height: 1.27, headPitch: -6, npc: true },
   res_hairdresser_b: { file: 'npc_hairdresser', tex: 'npc_res_hairdresser_b', height: 1.61, headPitch: -6, npc: true },
+  royal_guard: { file: 'npc_guard', height: 1.72, headPitch: -6, npc: true },   // 왕궁 근위병: 원래 파랑·은빛·금 갑옷 그대로, 키만 큼
   res_guard_a: { file: 'npc_guard', tex: 'npc_res_guard_a', height: 1.59, headPitch: -6, npc: true },
   res_guard_b: { file: 'npc_guard', tex: 'npc_res_guard_b', height: 1.68, headPitch: -6, npc: true },
   res_merchant_a: { file: 'npc_merchant', tex: 'npc_res_merchant_a', height: 1.42, headPitch: -6, npc: true },

@@ -682,3 +682,10 @@
 - 필드 워프 방향: `check_warps.py`가 모든 워프(105개)의 방향을 세계 지도와 비교. 고치기 전 60° 넘게 어긋난 워프 6개(숲 → 골짜기 177°, 숲 → 아르칸 164°, 숲 → 군락지 155°, 군락지 → 숲 138°, 골짜기 → 숲 103°, 유적 → 아르칸 62°), 평균 11°. 고친 뒤 0개, 가장 큰 값 42°(군락지 → 숲), 평균 3°. 방법: 속삭이는 숲·독버섯 군락지를 통째로 180°, 안개 골짜기를 90° 돌리고(길·나무·몬스터·연못 모두 같이), 골짜기의 서리 고원 워프·고원의 용의 유적 워프·유적의 아르칸 워프는 지도 쪽 가장자리로 옮기고 길을 이음(`tools/zones/orient_fields.py`). 생성 필드 35곳과 마을은 원래 21° 이하라 그대로.
 - 확인: `tests/warp.test.mjs` 288 통과, core 495/50 생략·skills2 638·gear·pharmacist-audio 통과, `check_nav.mjs all` 49곳 0 fail, `check_warps.py` bad 0, `check_visible.py` 138명 0 hidden, `tools/browser-tests/townwarp.js`(PC 1280×720·휴대폰 390×844 모두 15항목 통과: 새 캐릭터는 아르칸만 열림 → 카이리온에 들어가면 둘 다 열림 → 골드 부족이면 단추 꺼짐 → 60 G 내고 아르칸 안내인 앞 도착), `storyquests.js` 오류 없이 끝남, 버섯 집 화면(`mushhouse.js`). 돌린 세 필드의 실제 화면은 숲의 군락지 워프 주변만 봄. 실기기 확인 없음.
 
+### 2026-11-12 — 마을 건물 다듬기 + 카이리온 왕궁
+- 원인: Tripo 초안은 UV 이음매마다 정점이 떨어져 있는데(학술원 경계 변 4만 개) 용접 없이 6천 삼각형으로 줄여서 이음매가 벌어지고 면이 찢어져 보였음. `tools/blender/town_assets.py`: 먼저 `remove_doubles` 용접 → 작은 떠 있는 조각만 제거 → 삼각형 예산을 건물 크기에 맞춤(가로 1 m당 1100개, 9천~2만 6천; 왕궁 3만 4천) → 가로 12 m 이상 건물 텍스처 2048 px. 랜드마크 37개 모두 다시 구움.
+- **왕립 학술원은 새로 모델링**: 다시 구운 초안도 기둥이 녹은 듯 울퉁불퉁해서 Blender 절차 모델로 다시 지음(`tools/blender/town_academy.py`, 6,626 삼각형·467 KB — 예전 6,000·384 KB). 가까운 화면 전/후는 `docs/shots/academy_before.png`·`academy_after.png`.
+- 카이리온 왕궁: 북쪽 성벽 안쪽 한가운데(가로 34 m, 흰 대리석·파란 지붕·금 왕관 첨탑), 광장 → 정문 큰길·깃발·붉은 융단, 근위병 레온·로한(`royal_guard`)·시종장 발렌, 지역 지도에 큰 건물 이름.
+- 성능(SwiftShader 1280×760, 카이리온 광장): 고치기 전 243 draw call·85.5만 삼각형 → 349·98.4만(왕궁·깃발 포함), 왕궁 앞 188·102만. 소프트웨어 렌더라 프레임 시간(1.5~1.9 s)은 비교용일 뿐 실기기 수치는 재지 않음.
+- 확인: core 495/50 생략·skills2 638·gear·pharmacist-audio·warp 288 통과, `check_nav.mjs all` 49곳 0 fail, `check_warps.py` bad 0, `check_visible.py` 141명 0 hidden. 가까운 화면은 `townshots.js` `SHOTS=close`(close·front·side 세 자리).
+
