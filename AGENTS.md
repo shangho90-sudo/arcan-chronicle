@@ -128,6 +128,13 @@
   - 타격감: 명중일 때만 시전자·대상 `freezeT` 0.06초(`SMASH_STOP`, max라 안 쌓임 — 전역 `G.hitStop`·무작위 `addShake` 안 씀: `takeDamage`의 `localStop: 'quiet'`, `onHitLanded(…, quiet)`), 대상 눌림·젖힘 `CreatureBody.punch`(화면만, 위치 그대로), 카메라 `Renderer.kick(x, z, 0.11, 0.1)`(타격 방향으로 한 번, 0.1초 안에 복귀, 재생 중이면 더 센 쪽만 — 누적 없음, "화면 흔들림" 설정 배율, HUD는 안 움직임).
   - 소리: `sfx_ph_smash_swing`(타격 0.09초 전, `sfxAt: 'strike'`)·`sfx_ph_smash_hit`(명중일 때만, hit op `sfx`) — Runway 크레딧 0이라 `python3 tools/audio/smash_sfx.py`로 합성(저음 쿵 + 단단한 타격 + 2~7 kHz 어택 + 돌가루 + 약한 종 여운을 한 파일에), 출처는 `pharmacist-sfx-credits.json` `synthesized`. 확인 `tools/browser-tests/smash_skill.js`(`SCENE=hit|whiff|repeat|kill|sheathed GENDER= SIZE= FX= TAG= MARKONLY=1`).
 
+## 요리사 1차 스킬 (2026-11-13 일부 개편: 식칼 썰기·팬 강타·미트볼 던지기)
+- 기력·재사용·사거리는 그대로. 총 피해 계수도 일반 규칙 그대로: hit/proj op의 `split` = 타수·개수가 늘어도 총합(`coef × 기본 수 × (1 + 0.06 × ⌊(Lv−1)/2⌋)`)을 고르게 나눔(`skillrt.js` `opHit`/`opProj`). 수를 바꾸면 총합이 변하지 않게 `split`을 유지할 것.
+- 식칼 썰기 `ck1_a1`: 캐릭터는 한 번만 썸(동작 `ck_chop`, 타격 0.22초, `noStretch` — 타수에 맞춰 동작을 늘리지 않음), 허공의 큰 식칼이 대상 위에서 2~6번(`hits=2, hitsPerLv=1`, 0.12초 간격) 내려 썸. fx op `cook: 'knife'`(누른 순간) → 핸들 `ctx.cookFx.strike(t, h, last)`가 피해 틱마다(썬 자국·작은 섬광·채소 조각), 벨 대상이 없으면 `miss()`로 물러남. 대상이 죽으면 남은 타는 사거리 안 다른 적에게 넘어감(단일 대상 스킬 공통 규칙).
+- 팬 강타 `ck1_a2`: 동작 `ck_pan`(타격 0.30초 — 예전 `attack` 0.25초보다 0.05초 늦음), fx op `cook: 'pan'`(대상 머리 위 공중에 큰 프라이팬 → `fall` 0.30초 뒤 낙하), hit op `oneHit`(레벨 추가타를 한 방에) + `stOnHit`(MISS면 상태이상·타격음·타격 연출 없음) + 새 상태 `stun`(기절 3초, 종류 `stun`, 보스 면역 — 경직과 같은 규칙). 타격 순간 시전자·대상 `freezeT` 0.07초(`PAN_STOP`), 대상 눌림 `punch`, 카메라 `kick` 한 번(`PAN_KICK`) — 전역 `G.hitStop`·`addShake` 안 씀. 기절 동안 머리 위 별 3개(`cookfx.js` `stun`, 기절이 풀리거나 죽으면 사라짐).
+- 미트볼 던지기 `ck1_b1`: proj op `count=2, countPerLv=1`(2~6개), `gap` 0.09초 간격, `spread`(손에서 옆으로 벌어져 출발) + `arc`(포물선은 그림만 — 판정은 바닥 직선), 모두 같은 대상(던지는 중 대상이 죽으면 그 자리)으로 날아가 하나하나 반경 1.2 m `blast`(`cook` = 작은 소스 섬광·얇은 고리·조각, `sfxOnHit` = 아무도 안 맞으면 소리 없음).
+- 이펙트 `js/cookfx.js`(`SkillFx.cook.knife/pan/stun/proj/splat`, 조절값 `COOK`), 메시 `python3 tools/blender/fx_cook.py` → `assets/fx/fx_cook.glb.json`(식칼·프라이팬·미트볼·조각 3종·별, 정점 색만, 원본 `tools/blender/cook/fx_cook.blend`). 빛(섬광·고리·썬 자국·김)은 텍스처 없이 셰이더 하나. 소리는 기존 `swing`/`hit`/`heavy`/`throw`. 확인 `tools/browser-tests/cook_skills.js`(`SKILL=chop|pan|ball LV= SCENE=hit|whiff|kill|stun GENDER= SIZE= FX= SEED=`).
+
 ## 장비 40종·무기/방어구 상인 (2026-11-11)
 - 유봉 10(`w_pestle_g1`~`g10`)·갑옷 10(`a_armor_g*`)·장신구 20(`ac_g1`~`g12` 일반, `ac_j_*` 직업 전용 8)은 `tools/gear/gear.py`가 주인(`"gear": true` 항목만 다시 씀: items/npcs/zones.json). 고친 뒤 `python3 tools/gear/gear.py --write`(인자 없이 = 표만 출력). 예전 아이템 id는 그대로.
 - 수치: 유봉 공격력 `10+2.2L`(마법력 45%), 갑옷 방어 `4+1.8L`·체력 `20+10L`, 드롭 전용은 ×1.08. 값 `60·L^1.25`(갑옷 ×0.9, 장신구 ×1.1), 되팔기 30%, 드롭 전용은 구매가 0.

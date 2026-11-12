@@ -75,8 +75,8 @@ const MARKS = (process.env.MARKS || (SKILL === 'pan' ? '0.05,0.15,0.22,0.27,0.30
     p.target = m; window.__sp0 = p.sp;
     if (scene === 'kill') m.hp = Math.max(2, Math.round(p.stat('atk') * 0.5));   // dies on the first or second tick; the rest must not crash or linger
     window.__hp = m.hp;
-    if (scene === 'whiff') { p.target = null; m.dead = true; m.remove(); }
     const e = p.skills2.cast(id, window.__at(dist)); if (e) return 'cast error: ' + e;
+    if (scene === 'whiff') { m.dead = true; m.remove(); }   // these skills need a target to start: a whiff = the target is gone before the hit
     return { hp: window.__hp, atk: p.stat('atk'), def: m.stat('def'), lv: p.skills2.lvl(id), mult: p.skills2.mult(d || { id, type: 'attack' }), desc: d && d.desc, cd: d && d.cd, mp: d && d.mp };
   }, [SCENE, FPS, ID, DIST, +(process.env.SEED || 12345)]);
   if (typeof info === 'string') { console.log(info); await b.close(); return; }

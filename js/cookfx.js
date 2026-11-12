@@ -19,8 +19,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 export const COOK = {
   intensity: 1.0,
   knife: { len: 1.25, hover: 0.85, dip: 0.22, yaw: 0.6, appear: 0.1, leave: 0.22, rock: 0.22, slide: 0.16, flash: 1.5, line: 2.2, lineLife: 0.16, chips: 3, chipsLite: 1 },
-  pan: { height: 3.0, rMin: 0.85, rMax: 1.5, pad: 0.4, appear: 0.12, dropPart: 0.42, stay: 0.12, fade: 0.26, ring: 2.0, ringLife: 0.28, flash: 1.8, flashT: 0.07, stars: 5, starsLite: 3 },
-  stun: { n: 3, r: 0.34, lift: 0.3, size: 0.13, spin: 5.0 },
+  pan: { height: 3.0, rest: 0.56, rMin: 0.85, rMax: 1.5, pad: 0.4, appear: 0.12, dropPart: 0.42, stay: 0.12, fade: 0.26, ring: 2.0, ringLife: 0.28, flash: 1.8, flashT: 0.07, stars: 5, starsLite: 3 },
+  stun: { n: 3, r: 0.42, lift: 0.28, size: 0.2, spin: 5.0 },
   ball: { r: 0.2, spin: 11 },
   splat: { life: 0.42, ring: 0.85, flash: 1.3, bits: 5, bitsLite: 2 },
   col: { steel: 0xeaf4ff, steelB: 0xa8cfff, gold: 0xffd27a, goldB: 0xff9a2a, warm: 0xfff0d0, sauce: 0xff6a2a, sauceB: 0xb83210, dust1: 0xd8c8a8, dust2: 0x7a6a58, steam1: 0xfff4e6, steam2: 0xb89880 },
@@ -145,7 +145,7 @@ export class CookFx {
     const total = first + (n - 1) * gap;
     const e = this._fx('knife', total + K.leave + 0.05, (e) => {
       if (tgt && !tgt.dead && !tgt.removed) { anchor.copy(P3(tgt.pos)); top = cookTop(tgt); rad = tgt.radius || 0.5; }
-      const p = (e.t - first) / gap, done = ended >= 0 ? ended : total, out = e.t > done ? clamp01((e.t - done) / K.leave) : 0;
+      const p = (e.t - first - shift) / gap, done = ended >= 0 ? ended : total + shift, out = e.t > done ? clamp01((e.t - done) / K.leave) : 0;
       // chop curve: up between the ticks, down ON every tick (p integer); after the last one it lifts away
       const fr = p < -1 ? 0.5 : p - Math.floor(p), up = e.t > done ? 0.25 + 0.75 * easeOut(out) : Math.pow(Math.sin(Math.PI * fr), 0.75);
       const idx = Math.max(0, Math.min(n - 1, Math.round(p))), step = Math.min(K.slide, rad * 1.5 / n), slide = (Math.max(-0.5, Math.min(n - 0.5, p)) - (n - 1) / 2) * step;
@@ -160,12 +160,13 @@ export class CookFx {
       gl.quaternion.copy(this.camQ); gl.position.copy(kn.position).setY(kn.position.y + 0.12 * sc); gl.scale.setScalar(sc * 1.1); gl.material.uniforms.uA.value = I * 0.22 * smooth(0, K.appear, e.t) * (1 - out);
       void idx;
     });
-    let glow = 0.6;
+    let glow = 0.6, shift = 0;   // shift: the game clock stood still for a moment (critical-hit stop) -> the chops re-lock on the real damage ticks
     const kn = this.solid(e, this.geo.cook_knife, { rim: COOK.col.steelB, spec: 1.3 }), gl = this.spr(e, 0, COOK.col.steel, COOK.col.steelB, 3);
     kn.renderOrder = 6;
     const self = this;
     e.strike = (t, h, last) => {
       if (e.dead) return; strikes++;
+      const sh = e.t - first - h * gap; if (Math.abs(sh - shift) > 0.02) { shift = sh; e.life = Math.max(e.life, total + shift + K.leave + 0.05); }
       if (t && t !== tgt) { tgt = t; anchor.copy(P3(t.pos)); top = cookTop(t); rad = t.radius || 0.5; }
       glow = last ? 1.4 : 0.9;
       const at = kn.position.clone(); at.y = anchor.y + top - K.dip * 0.5;
@@ -198,9 +199,9 @@ export class CookFx {
       if (landed < 0 && tgt && !tgt.dead && !tgt.removed) { anchor.copy(P3(tgt.pos)); top = cookTop(tgt); }
       let y, a = 1, tilt = 0, sq = 1;
       if (landed < 0) {   // appear (scale in with a wobble), hang, then the fast drop: lowest exactly at `fall`
-        const d = clamp01((e.t - dropAt) / (fall - dropAt)); y = top * 0.72 + (K.height - top * 0.72) * (1 - d * d * d); a = smooth(0, K.appear, e.t); tilt = 0.32 * (1 - smooth(0, 0.8, d)) + 0.06 * Math.sin(e.t * 30) * (1 - d);
+        const d = clamp01((e.t - dropAt) / (fall - dropAt)); y = top * K.rest + (K.height - top * K.rest) * (1 - d * d * d); a = smooth(0, K.appear, e.t); tilt = 0.32 * (1 - smooth(0, 0.8, d)) + 0.06 * Math.sin(e.t * 30) * (1 - d);
         if (e.t > fall + 0.12) { landed = e.t; hitT = null; }   // the hit never came (cast interrupted): just fade
-      } else { const k = e.t - landed; y = (hitT ? top * 0.72 : 0.06) + 0.22 * Math.sin(Math.min(1, k / 0.16) * Math.PI) * (hitT ? 1 : 0.4); sq = 1 + 0.12 * Math.max(0, 1 - k / 0.1); a = 1 - smooth(K.stay, K.stay + K.fade, k); if (k > K.stay + K.fade) e.t = e.life; }
+      } else { const k = e.t - landed; y = (hitT ? top * K.rest : 0.06) + 0.22 * Math.sin(Math.min(1, k / 0.16) * Math.PI) * (hitT ? 1 : 0.4); sq = 1 + 0.12 * Math.max(0, 1 - k / 0.1); a = 1 - smooth(K.stay, K.stay + K.fade, k); if (k > K.stay + K.fade) e.t = e.life; }
       pn.position.copy(anchor).setY(anchor.y + y); pn.rotation.set(0, yaw, tilt, 'YXZ'); pn.scale.set(R * sq, R / sq * (landed < 0 ? 0.5 + 0.5 * easeOut(e.t / K.appear) : 1), R * sq);
       const u = pn.material.uniforms; u.uA.value = a; u.uGlow.value = landed < 0 ? 0.35 * (1 - smooth(0, K.appear * 1.5, e.t)) : 0.16 * Math.max(0, 1 - (e.t - landed) / 0.1);
       // soft warm glow where it appears + a growing shadow-ish target ring on the ground (thin, the pan's own size)
@@ -212,14 +213,14 @@ export class CookFx {
     e.land = (t) => {
       if (e.dead || landed >= 0) return; landed = e.t; hitT = t || null;
       if (t) { anchor.copy(P3(t.pos)); top = cookTop(t); }
-      const g0 = anchor.clone(), hp = anchor.clone().setY(anchor.y + top * 0.72), low = lite();
+      const g0 = anchor.clone(), hp = anchor.clone().setY(anchor.y + top * K.rest), low = lite();
       if (!t) { this._puffs(g0, low ? 2 : 4, R, { a: 0.32, life: 0.4 }); return; }
       const fx = this._fx('panhit', K.ringLife + 0.1, (x) => {
         const k = x.t / K.ringLife; this._flat(rg, R * (0.55 + 0.45 * easeOut(k))); rg.material.uniforms.uA.value = I * K.ring * (1 - smooth(0.25, 1, k));
         fl.quaternion.copy(this.camQ); fl.scale.setScalar(R * 1.5 * (0.7 + 0.5 * easeOut(x.t / K.flashT))); fl.material.uniforms.uA.value = I * K.flash * (1 - smooth(0, K.flashT * 2.2, x.t));
       });
       const rg = this.spr(fx, 1, 0xfff6dc, COOK.col.gold, 3), fl = this.spr(fx, 3, 0xffffff, COOK.col.warm, 7); rg.material.uniforms.uP.value = 1;
-      fx.g.position.copy(g0); fl.position.set(0, top * 0.72 + 0.05, 0);
+      fx.g.position.copy(g0); fl.position.set(0, top * K.rest + 0.05, 0);
       this._puffs(g0, low ? 3 : 6, R, { a: 0.42, life: 0.42 });
       if (this.geo.cook_star) this._bits(hp, low ? K.starsLite : K.stars, { geo: this.geo.cook_star, size: [0.07, 0.11], speed: [1.6, 2.6], up: [2.2, 3.4], ground: anchor.y, life: 0.55 });
     };
