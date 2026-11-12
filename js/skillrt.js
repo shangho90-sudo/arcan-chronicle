@@ -6,6 +6,7 @@ import { HitShape, CombatMath, clamp, clamp01 } from './core.js';
 import { skillSound } from './sfx.js';
 import { salImpact } from './salfx.js';
 import { yeonImpact, LEAD as YEON_LEAD } from './yeonfx.js';
+const PAN_STOP = 0.07, PAN_KICK = [0.13, 0.11];     // 요리사 팬 강타: local hit-stop (s), camera kick [m, s]
 const SMASH_STOP = 0.06, SMASH_KICK = [0.11, 0.1];   // 유봉강타: local hit-stop (s, caster + target visuals only), camera kick [m, s]
 import { biyeonImpact } from './biyeonfx.js';
 import { bashImpact, BASH } from './bashfx.js';
@@ -27,6 +28,7 @@ export const FX = {
   sal(kind, pos, dir, o = {}) { try { if (G.skillFx && G.skillFx.sal) return G.skillFx.sal[kind](pos, dir, o); } catch (e) { console.warn('fx sal', e); } },   // 일격참 '살' (js/salfx.js)
   biyeon(kind, pos, dir, o = {}) { try { if (G.skillFx && G.skillFx.biyeon) return G.skillFx.biyeon[kind](pos, dir, o); } catch (e) { console.warn('fx biyeon', e); } return null; },   // 비연참 '비연파' (js/biyeonfx.js)
   pharm(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.pharm) return G.skillFx.pharm[kind](a, o); } catch (e) { console.warn('fx pharm', e); } return null; },   // 약사 1차 소품 (js/pharmfx.js)
+  cook(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.cook) return G.skillFx.cook[kind](a, o); } catch (e) { console.warn('fx cook', e); } return null; },   // 요리사 1차: 허공 식칼·큰 프라이팬·미트볼 (js/cookfx.js)
   bash(kind, pos, dir, o = {}) { try { if (G.skillFx && G.skillFx.bash) return G.skillFx.bash[kind](pos, dir, o); } catch (e) { console.warn('fx bash', e); } },   // 배쉬 (js/bashfx.js)
   beam(kind, a, b, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.beam(kind, a, b, o); } catch (e) { console.warn('fx', kind, e); } },
   projectile(kind, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.projectile(kind, o) || NOOP; } catch (e) { console.warn('fx', kind, e); } return NOOP; },
@@ -37,7 +39,7 @@ export const FX = {
 };
 
 // ------------------------------------------------------------------ statuses with boss / immunity rules
-const CC = new Set(['freeze', 'root', 'stagger']);
+const CC = new Set(['freeze', 'root', 'stagger', 'stun']);
 const ELEMENTAL = new Set(['burn', 'poison', 'slow', 'freeze']);   // 속성 상태이상 (속성 저항 elemRes가 지속 시간을 줄임)
 export function applyStatus(target, st, caster, lvMul = 1) {
   const def = G.data.status(st.id); if (!def || target.dead) return false;
@@ -174,6 +176,7 @@ export class SkillEngine {
       const hits = (hop.hits || 1) + Math.floor(hop.hitsPerLv * (Lv - 1)), cv = sh.actions[anim + '_' + hits];
       // sword flurry authored for exactly this many strikes (tools/anim/swings.py): its impacts drive the hit timing
       if (cv && cv.hitTimes && cv.hitTimes.length === hits) { act = anim + '_' + hits; ctx.combo = cv; }
+      else if (hop.noStretch) aspd = 1;   // 요리사 식칼 썰기: the character chops ONCE at normal speed, the knife in the air does the flurry
       else if (sh.actions[act]) { const a = sh.actions[act]; aspd = Math.max(0.6, (a.frames / a.fps) / Math.max(0.3, hits * (hop.gap || 0.13) + 0.25)); }
     }
     ctx.act = act;
@@ -266,12 +269,13 @@ export class SkillEngine {
     const r = CombatMath.compute(this.power(ctx), c, def, pc.stat('crit'), critDmg, t.stat('dmgReduce'));
     const kdir = { x: t.pos.x - pc.pos.x, z: t.pos.z - pc.pos.z };
     const knock = op.knock && !(t.isBoss) && !(t.def && t.def.ai === 'heavy') ? op.knock * 0.4 : 0;
-    t.takeDamage({ source: pc, amount: r.amount, crit: r.crit, kdir, knockback: knock, localStop: op.fx && op.fx.pharm === 'smash' ? 'quiet' : !!(op.fx && op.fx.bash) });
+    const quietFx = !!(op.fx && (op.fx.pharm === 'smash' || op.fx.cook === 'pan'));   // own local hit-stop + camera kick, never the global ones
+    t.takeDamage({ source: pc, amount: r.amount, crit: r.crit, kdir, knockback: knock, localStop: quietFx ? 'quiet' : !!(op.fx && op.fx.bash) });
     if (op.push && !t.isBoss && !t.dead) { const m = Math.hypot(kdir.x, kdir.z) || 1; t.knock = { x: kdir.x / m * op.push * 10, z: kdir.z / m * op.push * 10 }; t.hitReact = Math.max(t.hitReact || 0, 0.4); }   // push = m 밀어냄(배쉬, 무거운 몬스터 포함·보스 제외)
     if (op.pull && !t.isBoss && !t.dead) { const p = op.pullTo || ctx.aim; const ddx = p.x - t.pos.x, ddz = p.z - t.pos.z, m = Math.hypot(ddx, ddz); if (m > 0.3) t.knock = { x: ddx / m * op.pull * 3, z: ddz / m * op.pull * 3 }; }
     if (op.launch && !t.isBoss && !(t.def && t.def.ai === 'heavy')) applyStatus(t, { id: 'stagger', dur: op.launch, val: 1, ch: 1 }, pc);
     this.combatT = 5;
-    pc.onHitLanded && pc.onHitLanded(c >= 2 && !(op.fx && (op.fx.bash || op.fx.pharm === 'smash')), !!(op.fx && op.fx.pharm === 'smash'));   // 배쉬: no global hit-stop, its own local freeze (opHit, BASH.stop)
+    pc.onHitLanded && pc.onHitLanded(c >= 2 && !(op.fx && op.fx.bash) && !quietFx, quietFx);   // 배쉬: no global hit-stop, its own local freeze (opHit, BASH.stop)
     return r.amount;
   }
   /** shared on-hit extras: statuses, marks, temperature, gains */
@@ -354,7 +358,10 @@ export class SkillEngine {
         const c = op.atAim ? ctx.aim : pc.pos;
         FX.telegraph(c, op.r || op.w || 2, op.dur, { color: 0xffb040, shape: op.shape, dir: ctx.facing, length: op.len, width: op.w }); return;
       }
-      case 'fx': if (op.pharm) { ctx.pharmFx = FX.pharm(op.pharm, op.pharm === 'pestle' ? { x: ctx.aim.x, y: pc.zone.geo.ground(ctx.aim.x, ctx.aim.z).y, z: ctx.aim.z } : pc, { follow: pc, dur: op.dur, fall: op.fall, r: op.r, facing: ctx.facing, L: ctx.L, pal: op.pal, tgt: ctx.tgt }); return; }
+      case 'fx': if (op.cook) {   // 요리사 (js/cookfx.js): 'knife' hovers over the target and chops on every damage tick, 'pan' appears overhead and lands after `fall` s
+          const tg = ctx.tgt && !ctx.tgt.dead ? ctx.tgt : this.targetFor(d), hop = d.ops.find(o => o.op === 'hit');
+          ctx.cookFx = FX.cook(op.cook, pc, { tgt: tg || null, facing: ctx.facing, n: hop ? (hop.hits || 1) + Math.floor((hop.hitsPerLv || 0) * (ctx.L - 1)) : 1, gap: op.gap || (hop && hop.gap) || 0.12, first: -(op.at || 0), fall: op.fall || 0.3 }); return; }
+        if (op.pharm) { ctx.pharmFx = FX.pharm(op.pharm, op.pharm === 'pestle' ? { x: ctx.aim.x, y: pc.zone.geo.ground(ctx.aim.x, ctx.aim.z).y, z: ctx.aim.z } : pc, { follow: pc, dur: op.dur, fall: op.fall, r: op.r, facing: ctx.facing, L: ctx.L, pal: op.pal, tgt: ctx.tgt }); return; }
         if (op.biyeon === 'cast') { const a = pc.body && pc.body.sh && pc.body.sh.actions[ctx.act]; ctx.biyeonCast = FX.biyeon('cast', pc.pos, ctx.facing, { follow: pc, swing: a && a.fps ? a.hitFrame / a.fps : 0.22 }); }   // wind-up + sweep + side blades (decoration); the centre blade rides the proj op
         if (op.bash === 'cast') ctx.bashCast = FX.bash('cast', pc.pos, ctx.facing, { follow: pc });   // crescent on the real sword arc (js/bashfx.js)
         if (op.sal === 'cast') { const tg = ctx.tgt && !ctx.tgt.dead ? ctx.tgt : this.targetFor(ctx.d); ctx.salCast = FX.sal('cast', pc.pos, ctx.facing, { follow: pc, length: op.len || 3.4, width: op.w || 1, target: tg || null }); }   // beam: sword tip -> impact point (salImpact, max op.len m); the hit locks it
@@ -380,6 +387,8 @@ export class SkillEngine {
     // hitsPerLv: the skill's own hit count grows with its level (견습생 '연'); noExtra: no automatic extra strikes
     const baseHits = Math.max(1, (op.hits || 1) + (op.hitsPerLv ? Math.floor(op.hitsPerLv * (ctx.L - 1)) : 0)), extra = physical && !op.noExtra && !op.hitsPerLv ? Math.floor((ctx.L - 1) / 2) : 0, hits = baseHits + extra;
     let hits_ = hits;
+    // split (요리사 식칼 썰기): the level only adds strikes — the total stays what the general rule gives (coef x base hits x (1 + 0.06 x floor((Lv-1)/2)))
+    if (op.split && op.hitsPerLv) op = { ...op, coef: op.coef * (op.hits || 1) / baseHits * (1 + 0.06 * Math.floor((ctx.L - 1) / 2)) };
     // oneHit (약사 유봉강타): the level's extra strikes are folded into ONE heavy blow — same total damage
     if (extra && op.oneHit) { op = { ...op, coef: op.coef * (1 + 0.06 * extra) }; hits_ = baseHits; }
     else if (extra) op = { ...op, coef: op.coef * baseHits / hits * (1 + 0.06 * extra), gap: op.gap || 0.12 };   // total grows a little, split across more strikes
@@ -417,6 +426,18 @@ export class SkillEngine {
               pc.freezeT = Math.max(pc.freezeT || 0, SMASH_STOP); t.freezeT = Math.max(t.freezeT || 0, SMASH_STOP);
               if (t.body && t.body.punch) t.body.punch(f.x, f.z, 0.2);                                     // visual squash + flinch along the blow (no position change)
               if (G.render.kick && !G.reduceFlash) G.render.kick(f.x, f.z, SMASH_KICK[0], SMASH_KICK[1]);   // one short directional camera kick
+            }
+          }
+          if (op.fx.cook === 'chop') {   // 식칼 썰기: the knife in the air comes down on THIS damage tick (slice line + chips on the real target); nothing left to cut -> it leaves
+            const t = ts[0], k = ctx.cookFx; if (k && k.strike) { if (t) k.strike(t, h, h === hits_ - 1); else k.miss(h === hits_ - 1); }
+          }
+          if (op.fx.cook === 'pan') {    // 팬 강타: the giant pan lands now; local hit-stop on these two only, squash, one camera kick, stars for the stun
+            const t = ts[0], k = ctx.cookFx; if (k && k.land) k.land(t || null);
+            if (t) {
+              pc.freezeT = Math.max(pc.freezeT || 0, PAN_STOP); t.freezeT = Math.max(t.freezeT || 0, PAN_STOP);
+              if (t.body && t.body.punch) t.body.punch(f.x, f.z, 0.22);
+              if (G.render.kick && !G.reduceFlash) G.render.kick(f.x, f.z, PAN_KICK[0], PAN_KICK[1]);
+              const sd = (op.st || []).find(x => x.id === 'stun'); if (sd && !t.isBoss) FX.cook('stun', t, { dur: sd.dur });
             }
           }
           if (op.fx.pharm === 'push') FX.pharm('push', pc, { f, r: op.r || 2.2, ang: op.ang || 80, hits: ts.map(t => ({ x: t.pos.x, y: t.pos.y || 0, z: t.pos.z, boss: !!t.isBoss })) });   // 밀어내기: wind ribbons across the real cone, dust streaks on each enemy pushed
@@ -494,10 +515,12 @@ export class SkillEngine {
     FX.burst(r.burst || 'explosion_steam', t.pos, { radius: r.r || 1.4 });
   }
   opProj(op, ctx) {
-    const pc = this.pc, n = Math.max(1, op.count || 1);
+    const pc = this.pc, n = Math.max(1, (op.count || 1) + Math.floor((op.countPerLv || 0) * (ctx.L - 1)));
     const speedMul = 1 + this.book.passive('projSpeed');
+    // split (요리사 미트볼 던지기): more projectiles with the level, the total coefficient follows the general rule (x (1 + 0.06 x floor((Lv-1)/2)))
+    if (op.split) op = { ...op, coef: op.coef / n * (1 + 0.06 * Math.floor((ctx.L - 1) / 2)) };
     for (let i = 0; i < n; i++) {
-      const fire = () => { if (!pc.dead) this.things.push(new SkillProj(this, op, ctx, speedMul)); };
+      const fire = () => { if (!pc.dead) this.things.push(new SkillProj(this, op, ctx, speedMul, i, n)); };
       if (i === 0 || !op.gap) fire(); else this.pending.push({ time: this.clock + i * op.gap, op: { op: '_run', run: fire }, ctx });
     }
     this.echo(op, ctx);
@@ -513,6 +536,7 @@ export class SkillEngine {
   blast(c, op, ctx) {
     const pc = this.pc, r = op.r || 1.5, ts = this.targets(HitShape.circle(c.x, c.z, r));
     if (op.burst !== 'none') FX.burst(op.burst || 'explosion_fire', c, { radius: op.burstR || r, color: ctx.d.fx && ctx.d.fx.color });   // 'none': the skill draws its own (약사 pharmfx)
+    if (op.cook) FX.cook('splat', { x: c.x, y: pc.zone.geo.ground(c.x, c.z).y, z: c.z }, { r, hit: ts.length > 0, top: ts[0] ? ts[0].radius : 0 });   // 미트볼: small splat (js/cookfx.js)
     if (op.pharm) FX.pharm(op.pharm, { x: c.x, y: pc.zone.geo.ground(c.x, c.z).y, z: c.z }, { elem: op.elem, r, linger: op.linger });   // linger: 바닥 서리·웅덩이가 상태이상 시간만큼 옅게 남음
     if (op.shake && G.render.addShake && !G.reduceFlash) G.render.addShake(op.shake[0], op.shake[1]);
     const cb = this.book.passive('centerBonus');
@@ -526,7 +550,7 @@ export class SkillEngine {
     }
     if (op.area) this.addArea({ op: 'area', ...op.area }, ctx, c);
     if (op.knock) for (const t of ts) if (!t.isBoss) { const dx = t.pos.x - c.x, dz = t.pos.z - c.z, m = Math.hypot(dx, dz) || 1; t.knock = { x: dx / m * op.knock * 3, z: dz / m * op.knock * 3 }; }
-    G.audio.sfx(skillSound(ctx.d, op));
+    if (!op.sfxOnHit || ts.length) G.audio.sfx(skillSound(ctx.d, op));   // sfxOnHit: silent when nothing was hit
     if (op.chain && ts[0]) this.chain(ts[0], op.chain, ctx);
     return ts;
   }
@@ -617,17 +641,19 @@ export class SkillEngine {
 
 // ------------------------------------------------------------------ projectile
 class SkillProj {
-  constructor(eng, op, ctx, speedMul) {
+  constructor(eng, op, ctx, speedMul, idx = 0, cnt = 1) {
     this.eng = eng; this.op = op; this.ctx = ctx; const pc = eng.pc;
     this.pos = { x: pc.pos.x + ctx.facing.x * 0.4, y: pc.pos.y + 1.0, z: pc.pos.z + ctx.facing.z * 0.4 };
     this.speed = (op.speed || 12) * speedMul; this.range = op.range || eng.range(ctx.d) + 1; this.trav = 0; this.hit = new Set(); this.back = false; this.t = 0;
     this.target = ctx.tgt && !ctx.tgt.dead ? ctx.tgt : null;
-    const to = op.kind === 'lob' || op.toGround ? ctx.aim : this.target ? this.target.pos : { x: pc.pos.x + ctx.facing.x * this.range, z: pc.pos.z + ctx.facing.z * this.range };
+    if (op.spread && cnt > 1) { const off = (idx - (cnt - 1) / 2) * op.spread; this.pos.x += -ctx.facing.z * off; this.pos.z += ctx.facing.x * off; }   // side by side out of the hand
+    const to = op.kind === 'lob' || op.toGround ? ctx.aim : this.target ? this.target.pos : op.arc && ctx.tgt ? ctx.aim : {   // arc: the target died while the others were still being thrown -> its last spot x: pc.pos.x + ctx.facing.x * this.range, z: pc.pos.z + ctx.facing.z * this.range };
     this.to = { ...to }; const dx = to.x - this.pos.x, dz = to.z - this.pos.z, m = Math.hypot(dx, dz) || 1; this.dir = { x: dx / m, z: dz / m };
     if (op.kind === 'lob') { this.from = { ...this.pos }; this.flight = Math.max(0.25, m / this.speed); }
     if (op.toGround) { this.range = m + 0.2; }
+    if (op.arc) { if (this.target || ctx.tgt) this.range = m + 0.4; this.arcLen = Math.max(0.6, Math.min(m, this.range)); this.arcH = op.arc * (0.75 + 0.5 * ((idx * 0.37) % 1)) * Math.min(1, m / 4); }   // thrown in an arc (drawn only: the hit test stays on the ground line)
     // 비연참: the centre crescent of the fan IS this projectile (js/biyeonfx.js); falls back to the generic wave until loaded
-    this.fx = (op.biyeon && FX.biyeon('proj', this.pos, this.dir, { groundY: pc.pos.y || 0 })) || (op.pharmProj && FX.pharm('proj', this.pos, { elem: op.elem })) || FX.projectile(op.fx || 'capsule', { color: ctx.d.fx && ctx.d.fx.color });
+    this.fx = (op.biyeon && FX.biyeon('proj', this.pos, this.dir, { groundY: pc.pos.y || 0 })) || (op.pharmProj && FX.pharm('proj', this.pos, { elem: op.elem })) || (op.cook && FX.cook('proj', this.pos, { kind: op.cook })) || FX.projectile(op.fx || 'capsule', { color: ctx.d.fx && ctx.d.fx.color });
     this.fx.set(this.pos, { x: this.dir.x, y: 0, z: this.dir.z });
   }
   update(dt) {
@@ -646,7 +672,8 @@ class SkillProj {
     if (op.kind === 'boomerang' && this.back) { const pc = eng.pc, dx = pc.pos.x - this.pos.x, dz = pc.pos.z - this.pos.z, m = Math.hypot(dx, dz); if (m < 0.6) return this.done(); this.dir = { x: dx / m, z: dz / m }; }
     const sx = this.dir.x * this.speed * dt, sz = this.dir.z * this.speed * dt;
     this.pos = { x: this.pos.x + sx, y: this.pos.y, z: this.pos.z + sz }; this.trav += Math.hypot(sx, sz);
-    this.fx.set(this.pos, { x: this.dir.x, y: 0, z: this.dir.z });
+    if (this.arcH) { const k = clamp01(this.trav / this.arcLen); this.fx.set({ x: this.pos.x, y: this.pos.y + Math.sin(k * Math.PI) * this.arcH - k * 0.45, z: this.pos.z }, { x: this.dir.x, y: Math.cos(k * Math.PI) * 0.6, z: this.dir.z }); }
+    else this.fx.set(this.pos, { x: this.dir.x, y: 0, z: this.dir.z });
     if (zone.geo.blocked(this.pos.x, this.pos.z, 0.05)) { if (op.r) this.landBlast(this.pos); else FX.burst('dust', this.pos, { radius: 0.5 }); return this.done(); }
     if (this.trav >= this.range) {
       if (op.kind === 'boomerang' && !this.back) { this.back = true; this.hit.clear(); return; }

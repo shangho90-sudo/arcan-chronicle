@@ -170,16 +170,21 @@ S(J, 2, 2, '음양오행 공격', 5, 'hb_c5', '수행·현무파', 'attack', '�
 
 # ======================================================================= 요리사 (cook)
 J, C = 'cook', 0xff9a40
-S(J, 1, 0, '식칼과 프라이팬', 1, 'ck1_a1', '식칼 썰기', 'attack', '빠르게 두 번 벤다.', weapon='knife', target='enemy', range=1.8, mp=6, cd=3, anim='attack',
-  ops=[hit('single', 1.0, hits=2, gap=0.14, fx=dict(slash='arc', burst='hit_slash'))])
-S(J, 1, 0, '식칼과 프라이팬', 2, 'ck1_a2', '팬 강타', 'attack', '프라이팬으로 강하게 내려쳐 짧게 경직시킨다.', weapon='knife', target='enemy', range=1.8, mp=10, cd=6, anim='attack',
-  ops=[hit('single', 2.3, st=[st('stagger', 0.6)], fx=dict(slash='smash', burst='hit_blunt'))])
+# 2026-11-13 요리사 개편(식칼 썰기·팬 강타·미트볼 던지기) — 이펙트 js/cookfx.js (Blender tools/blender/fx_cook.py), 동작 ck_chop / ck_pan.
+# 기력·재사용·사거리는 그대로. 총 피해 계수도 예전 규칙 그대로(split: 타수·개수가 늘어도 총합 = coef × 기본 타수 × (1 + 0.06 × ⌊(Lv-1)/2⌋)를 고르게 나눔).
+# 식칼 썰기: 캐릭터는 한 번 썰고(ck_chop 0.22 s) 허공의 큰 식칼이 대상 위에서 2~6번 썬다(Lv마다 +1, 0.12 s 간격, 타마다 피해).
+S(J, 1, 0, '식칼과 프라이팬', 1, 'ck1_a1', '식칼 썰기', 'attack', '칼을 한 번 내리치면 허공에 나타난 큰 식칼이 적 하나를 채소 썰듯 연달아 썬다. 처음엔 2연타, 스킬 레벨이 오를 때마다 1타씩 늘어 최대 6연타.', weapon='knife', target='enemy', range=1.8, mp=6, cd=3, anim='ck_chop',
+  ops=[dict(op='fx', cook='knife', at=-0.22, gap=0.12), hit('single', 1.0, hits=2, hitsPerLv=1, gap=0.12, split=True, noStretch=True, sfx='hit', fx=dict(cook='chop'))], fx=dict(color=0xe8f4ff))
+# 팬 강타: 대상 머리 위에 큰 프라이팬이 나타나 0.30 s에 내리찍음. 기절 3초(새 상태 stun — 보스는 경직과 같이 면역). 레벨 추가타는 한 방에 합침(oneHit, 총 피해 같음).
+S(J, 1, 0, '식칼과 프라이팬', 2, 'ck1_a2', '팬 강타', 'attack', '공중에 커다란 프라이팬을 불러내 적 하나를 내리찍는다. 맞은 적은 3초 동안 기절한다(보스 제외).', weapon='knife', target='enemy', range=1.8, mp=10, cd=6, anim='ck_pan',
+  ops=[dict(op='fx', cook='pan', at=-0.30, fall=0.30), hit('single', 2.3, oneHit=True, st=[st('stun', 3)], sfx='heavy', fx=dict(cook='pan'))], fx=dict(color=0xffc070))
 S(J, 1, 0, '식칼과 프라이팬', 3, 'ck1_a3', '뒤집기', 'attack', '일반 적을 잠시 띄운다. 띄우기 면역 적에게는 추가 피해.', weapon='knife', target='enemy', range=1.8, mp=12, cd=8, anim='attack',
   ops=[hit('single', 1.5, launch=0.8, vsImmune=1.6, fx=dict(slash='arc', burst='dust'))])
 S(J, 1, 0, '식칼과 프라이팬', 4, 'ck1_a4', '도마 방어', 'support', '정면에서 받는 피해를 줄인다.', target='self', mp=10, cd=14, anim='cast', ops=[buff('frontguard', 5, 0.5)])
 S(J, 1, 0, '식칼과 프라이팬', 5, 'ck1_a5', '손질 숙련', 'passive', '식칼 공격 속도와 식재료 획득량이 증가한다.', mods=[dict(stat='atkSpeed', mul=0.05, mulLv=0.02)], flags=dict(ingredientDrop=[0.1, 0.05]))
-S(J, 1, 1, '간단한 요리 공격', 1, 'ck1_b1', '미트볼 던지기', 'attack', '미트볼이 부딪히면 작은 범위 피해를 준다.', target='enemy', range=7, mp=10, cd=4, anim='throw',
-  ops=[proj('normal', 1.7, r=1.2, speed=12, fx='meatball', burst='hit_blunt')])
+# 미트볼 던지기: 미트볼 2~6개(Lv마다 +1)가 0.09 s 간격으로 조금씩 벌어져 포물선으로 날아가 같은 대상에 차례로 떨어짐. 하나하나가 예전처럼 반경 1.2 m 작은 범위 피해.
+S(J, 1, 1, '간단한 요리 공격', 1, 'ck1_b1', '미트볼 던지기', 'attack', '미트볼 여러 개를 연달아 던진다. 하나하나가 부딪힌 자리에 작은 범위 피해를 준다. 처음엔 2개, 스킬 레벨이 오를 때마다 1개씩 늘어 최대 6개.', target='enemy', range=7, mp=10, cd=4, anim='throw',
+  ops=[proj('normal', 1.7, count=2, countPerLv=1, split=True, gap=0.09, r=1.2, speed=12, arc=0.9, spread=0.32, cook='meatball', burst='none', sfx='hit', sfxOnHit=True)], fx=dict(color=0xb06a3a))
 S(J, 1, 1, '간단한 요리 공격', 2, 'ck1_b2', '뜨거운 국물', 'attack', '전방에 뜨거운 국물을 뿌려 피해와 화상을 준다.', range=3.2, mp=12, cd=6, anim='throw',
   ops=[hit('cone', 1.5, r=3.2, ang=60, elem='fire', st=[st('burn', 3, 0.12)], fx=dict(slash='fire_cone'))])
 S(J, 1, 1, '간단한 요리 공격', 3, 'ck1_b3', '후추 뿌리기', 'attack', '범위 피해와 함께 적의 공격력을 낮춘다.', target='ground', range=5, mp=12, cd=8, anim='throw',
@@ -431,6 +436,7 @@ STATUSES = [
     dict(id='freeze', name='빙결', kind='stun', debuff=True, cleanse=True, stack='refresh', boss='slow', color='#a8e8ff'),
     dict(id='root', name='속박', kind='root', debuff=True, cleanse=True, stack='refresh', boss='slow', color='#6ac060'),
     dict(id='stagger', name='경직', kind='stun', debuff=True, cleanse=False, stack='refresh', boss='immune', color='#ffffff'),
+    dict(id='stun', name='기절', kind='stun', debuff=True, cleanse=False, stack='refresh', boss='immune', color='#ffe680'),   # 요리사 팬 강타 (머리 위 별: js/cookfx.js stun)
     dict(id='defdown', name='방어력 감소', kind='statMul', stat='def', sign=-1, debuff=True, cleanse=True, stack='max', cap=0.5, boss='normal', color='#c08040'),
     dict(id='atkdown', name='공격력 감소', kind='statMul', stat='atk', sign=-1, debuff=True, cleanse=True, stack='max', cap=0.5, boss='normal', color='#c04040'),
     dict(id='prescribed', name='표적 처방', kind='mark', debuff=True, cleanse=False, boss='normal', color='#5aa0ff'),

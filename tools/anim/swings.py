@@ -391,7 +391,33 @@ PH_SMASH = action('ph_smash', [
 ], 0.25, 0.40, None, fadeIn=0.05, fadeOut=0.14)
 PH_SMASH.update(windT=0.17, strikeT=0.25)
 
-SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL] + [DRAW, SHEATHE, PH_SPIN, PH_SLAM, PH_SMASH]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
+# ------------------------------------------------------------------------------------------------ 요리사 1차 (2026-11-13)
+# 식칼 썰기 (ck1_a1, anim ck_chop): 짧게 들어 올렸다가 도마에 내리치듯 한 번 써는 동작(타격 0.22 s). 연타는 허공의 큰 식칼이
+# 대신 함(js/cookfx.js knife) — 캐릭터는 썬 자세로 잠깐 버틴 뒤 돌아옴. 발은 제자리, 칼 잔상은 짧게.
+CK_CHOP = action('ck_chop', [
+    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
+    key(0.10, 'o', twist=-8, lean=-6, sink=0.05, hand=[-14, 58, 0.78], blade=[-8, 104], elbow=[-0.6, 0.2, -1], armL=[30, 34]),
+    key(0.15, 's', twist=-10, lean=-8, sink=0.05, hand=[-10, 64, 0.80], blade=[-6, 112], elbow=[-0.6, 0.25, -1], armL=[34, 36], squint=True),
+    key(0.19, 'i', twist=-2, lean=4, sink=0.08, hand=[-4, 30, 0.96], blade=[-2, 44], elbow=[-0.5, -0.5, -0.5], armL=[28, 36], squint=True),
+    key(0.22, None, twist=4, lean=16, sink=0.14, hand=[0, -16, 1.0], blade=[2, -34], elbow=[-0.4, -1, -0.2], armL=[22, 40], squint=True),
+    key(0.28, 'o', twist=5, lean=19, sink=0.16, hand=[2, -24, 0.96], blade=[4, -46], elbow=[-0.4, -1, -0.1], armL=[18, 42], squint=True),
+    key(0.40, 's', twist=3, lean=10, sink=0.08, hand=[4, -34, 0.84], blade=[10, -22], elbow=[-0.5, -1, -0.1], armL=[14, 30]),
+    key(0.52, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
+], 0.22, 0.36, [[0.17, 0.27]], fadeIn=0.05, fadeOut=0.14)
+CK_CHOP.update(trailLife=0.12, trailColor=[1.5, 1.5, 1.45])
+# 팬 강타 (ck1_a2, anim ck_pan): 왼손을 높이 들어 하늘의 큰 프라이팬을 부르고(준비) 0.30 s에 두 팔을 내리꽂음 — 그 순간 팬이
+# 대상 위에 떨어짐(js/cookfx.js pan). 칼 잔상 없음.
+CK_PAN = action('ck_pan', [
+    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
+    key(0.12, 'o', twist=-4, lean=-12, sink=0.06, hand=[-12, 70, 0.84], blade=[-6, 104], elbow=[-0.6, 0.3, -1], armL=[150, 30]),
+    key(0.23, 's', twist=-2, lean=-16, sink=0.04, hand=[-8, 80, 0.86], blade=[-2, 114], elbow=[-0.6, 0.3, -1], armL=[162, 34], squint=True),
+    key(0.30, None, twist=2, lean=24, sink=0.24, hand=[0, -22, 1.0], blade=[2, -50], elbow=[-0.4, -1, -0.2], armL=[26, 40], squint=True),
+    key(0.38, 'o', twist=4, lean=28, sink=0.27, hand=[4, -32, 0.94], blade=[4, -62], elbow=[-0.4, -1, -0.1], armL=[18, 44]),
+    key(0.54, 's', twist=4, lean=14, sink=0.12, hand=[4, -34, 0.88], blade=[8, -30], elbow=[-0.5, -1, -0.1], armL=[14, 34]),
+    key(0.68, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
+], 0.30, 0.46, None, fadeIn=0.06, fadeOut=0.16)
+
+SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL] + [DRAW, SHEATHE, PH_SPIN, PH_SLAM, PH_SMASH, CK_CHOP, CK_PAN]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
 
 acts = json.load(open(P))
 names = {'attack', 'attack2'} | {x['name'] for x in SKILL_ACTS}

@@ -2836,7 +2836,7 @@
 "idx": 1,
 "name": "식칼 썰기",
 "type": "attack",
-"desc": "빠르게 두 번 벤다.",
+"desc": "칼을 한 번 내리치면 허공에 나타난 큰 식칼이 적 하나를 채소 썰듯 연달아 썬다. 처음엔 2연타, 스킬 레벨이 오를 때마다 1타씩 늘어 최대 6연타.",
 "maxLv": 5,
 "unlock": 10,
 "prereq": [],
@@ -2847,23 +2847,34 @@
 "cd": 3,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "attack",
+"anim": "ck_chop",
 "ops": [
+{
+"op": "fx",
+"cook": "knife",
+"at": -0.22,
+"gap": 0.12
+},
 {
 "op": "hit",
 "shape": "single",
 "coef": 1.0,
 "hits": 2,
-"gap": 0.14,
+"hitsPerLv": 1,
+"gap": 0.12,
+"split": true,
+"noStretch": true,
+"sfx": "hit",
 "fx": {
-"slash": "arc",
-"burst": "hit_slash"
+"cook": "chop"
 }
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 15267071
+},
 "status": {
 "data": true,
 "impl": true,
@@ -2882,7 +2893,7 @@
 "idx": 2,
 "name": "팬 강타",
 "type": "attack",
-"desc": "프라이팬으로 강하게 내려쳐 짧게 경직시킨다.",
+"desc": "공중에 커다란 프라이팬을 불러내 적 하나를 내리찍는다. 맞은 적은 3초 동안 기절한다(보스 제외).",
 "maxLv": 5,
 "unlock": 12,
 "prereq": [],
@@ -2893,29 +2904,38 @@
 "cd": 6,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "attack",
+"anim": "ck_pan",
 "ops": [
+{
+"op": "fx",
+"cook": "pan",
+"at": -0.3,
+"fall": 0.3
+},
 {
 "op": "hit",
 "shape": "single",
 "coef": 2.3,
+"oneHit": true,
 "st": [
 {
-"id": "stagger",
-"dur": 0.6,
+"id": "stun",
+"dur": 3,
 "val": 0,
 "ch": 1.0
 }
 ],
+"sfx": "heavy",
 "fx": {
-"slash": "smash",
-"burst": "hit_blunt"
+"cook": "pan"
 }
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16760944
+},
 "status": {
 "data": true,
 "impl": true,
@@ -3067,7 +3087,7 @@
 "idx": 1,
 "name": "미트볼 던지기",
 "type": "attack",
-"desc": "미트볼이 부딪히면 작은 범위 피해를 준다.",
+"desc": "미트볼 여러 개를 연달아 던진다. 하나하나가 부딪힌 자리에 작은 범위 피해를 준다. 처음엔 2개, 스킬 레벨이 오를 때마다 1개씩 늘어 최대 6개.",
 "maxLv": 5,
 "unlock": 10,
 "prereq": [],
@@ -3084,15 +3104,25 @@
 "op": "proj",
 "kind": "normal",
 "coef": 1.7,
+"count": 2,
+"countPerLv": 1,
+"split": true,
+"gap": 0.09,
 "r": 1.2,
 "speed": 12,
-"fx": "meatball",
-"burst": "hit_blunt"
+"arc": 0.9,
+"spread": 0.32,
+"cook": "meatball",
+"burst": "none",
+"sfx": "hit",
+"sfxOnHit": true
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 11561530
+},
 "status": {
 "data": true,
 "impl": true,
@@ -9418,6 +9448,16 @@
 "stack": "refresh",
 "boss": "immune",
 "color": "#ffffff"
+},
+{
+"id": "stun",
+"name": "기절",
+"kind": "stun",
+"debuff": true,
+"cleanse": false,
+"stack": "refresh",
+"boss": "immune",
+"color": "#ffe680"
 },
 {
 "id": "defdown",
