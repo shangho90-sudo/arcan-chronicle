@@ -74,11 +74,11 @@ J, C = 'pharmacist', 0x48b080
 # 아드레날린 주사·약 보호막·광역 회복진·약사 수련. 배우는 레벨 A 10/13/15/18/20, B·C 10/12/15/18/20. 새 소품·이펙트 js/pharmfx.js
 # (Blender tools/blender/fx_pharm.py). 지운 스킬에 찍은 포인트는 불러올 때 돌려줌(js/skillsys.js ensureSk)
 # 남은 스킬 이펙트(같은 날): 내려찍기 fx.pharm='smash', 밀어내기 'push', 던지는 약병 pharmProj(나는 약병) + burst='none' + pharm='burst'(원소별 폭발, linger = 바닥 잔상 초). 수치·판정은 그대로
-# 유봉 내려찍기 = '유봉강타' 연출(2026-11-12): 전용 동작 ph_smash(준비 0.17 s -> 타격 0.25 s, 예전과 같은 타격 시각·경직), fx op
+# 유봉강타(2026-11-12 이름 바꿈, 예전 이름은 docs/STATUS.md) 연출(2026-11-12): 전용 동작 ph_smash(준비 0.17 s -> 타격 0.25 s, 예전과 같은 타격 시각·경직), fx op
 # pharm='swing'(누른 순간부터: 유봉 끝에 청록 약력 응집 -> 반투명 상아색 마력 유봉 + 굵은 둔기 궤적), 타격 순간 'smash'(백금 섬광·금색
 # 지면 고리·균열·파편·청록 약력 잔향). oneHit: 스킬 레벨 추가타(Lv 2마다 +1)를 한 방에 합침 — 총 피해는 같음(coef * (1 + 0.06 * 추가타)).
 # 소리: 휘두름 ph_smash_swing(타격 0.09 s 전), 명중했을 때만 ph_smash_hit. 계수·기력·재사용·사거리·대상 수는 그대로
-S(J, 1, 0, '유봉 전투', 1, 'ph1_a1', '유봉 내려찍기', 'attack', '정면의 적 하나를 유봉으로 강하게 내려친다.', weapon='pestle', target='enemy', range=2.0, mp=8, cd=4, anim='ph_smash', sfx='ph_smash_swing', sfxAt='strike', sfxLead=0.09,
+S(J, 1, 0, '유봉 전투', 1, 'ph1_a1', '유봉강타', 'attack', '정면의 적 하나를 유봉으로 강하게 내려친다.', weapon='pestle', target='enemy', range=2.0, mp=8, cd=4, anim='ph_smash', sfx='ph_smash_swing', sfxAt='strike', sfxLead=0.09,
   ops=[dict(op='fx', pharm='swing', at=-0.25), hit('single', 2.2, oneHit=True, sfx='ph_smash_hit', fx=dict(pharm='smash'), st=[st('stagger', 0.4)])], fx=dict(color=0xffd27a))
 S(J, 1, 0, '유봉 전투', 2, 'ph1_a4', '밀어내기', 'attack', '적을 밀쳐낸다. 밀치기에 면역인 적에게는 추가 피해.', weapon='pestle', target='enemy', range=2.0, mp=10, cd=7, anim='attack', unlock=13,
   ops=[hit('cone', 1.4, r=2.2, ang=80, knock=3.0, vsImmune=1.6, fx=dict(pharm='push'))], fx=dict(color=0xffe2a0))

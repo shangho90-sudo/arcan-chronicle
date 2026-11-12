@@ -1,4 +1,4 @@
-"""약사 유봉 내려찍기 ph1_a1 ('유봉강타') 효과음 2개를 합성한다 (numpy + scipy, ffmpeg로 MP3). 2026-11-12.
+"""약사 유봉강타 ph1_a1 효과음 2개를 합성한다 (numpy + scipy, ffmpeg로 MP3). 2026-11-12.
 
 Usage:  python3 tools/audio/smash_sfx.py   ->  assets/audio/sfx_ph_smash_swing.mp3, sfx_ph_smash_hit.mp3 (+ /tmp/smash_sfx/*.wav)
 

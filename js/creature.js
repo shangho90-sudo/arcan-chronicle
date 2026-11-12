@@ -153,7 +153,7 @@ export class CreatureBody {
   setDir(d) { this.targetYaw = (((d % 8) + 8) % 8) * 45 * DEG; }
   setFacing(x, z) { if (x * x + z * z < 1e-6) return; this.targetYaw = Math.atan2(x, -z); }
   flash(d) { this.flashT = Math.max(this.flashT, d); }
-  /** heavy blow reaction (약사 유봉 내려찍기): squashed + tipped away from the blow at once, springs back over `d` s. Visual only —
+  /** heavy blow reaction (약사 유봉강타): squashed + tipped away from the blow at once, springs back over `d` s. Visual only —
    *  the actor's position is untouched. (x, z) = blow direction in game space. A new punch restarts it, never adds. */
   punch(x, z, d = 0.2) { const m = Math.hypot(x, z) || 1; this.punchT = d; this.punchD = d; this.punchX = x / m; this.punchZ = -z / m; }
   setTint(r, g, b) { for (const m of this.mats) m.color.setRGB(Math.min(1, r * 1.0), Math.min(1, g), Math.min(1, b)); }

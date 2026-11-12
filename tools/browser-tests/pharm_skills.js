@@ -5,7 +5,7 @@
 //   c6 아드레날린    이동 속도·공격 속도 배율
 //   c7 약 보호막     보호막 = 최대 체력 25 %, 독을 걸어도 안 걸림
 //   c8 광역 회복진   체력 40 %에서 8초 동안 회복량
-//   a1 유봉 내려찍기 / a4 밀어내기(부채꼴 3마리, 밀림 거리) / b1 화염·b2 냉각·b4 부식 약병(3마리, 피해·상태이상) — 2026-11-11 남은 스킬
+//   a1 유봉강타 / a4 밀어내기(부채꼴 3마리, 밀림 거리) / b1 화염·b2 냉각·b4 부식 약병(3마리, 피해·상태이상) — 2026-11-11 남은 스킬
 // Usage: SCENES=a3,a6,b6,c6,c7,c8 (또는 a1,a4,b1,b2,b4) SIZE=1100x760|390x844t FX=1 URL=http://localhost:8781/index.html node tools/browser-tests/pharm_skills.js
 //   -> OUT/pharm_<scene>_<size>.png (시간 순서 가로 띠) + 콘솔 요약
 const { chromium } = require('playwright'); const fs = require('fs'); const { execSync } = require('child_process');
@@ -13,7 +13,7 @@ const SCENES = (process.env.SCENES || 'a3,a6,b6,c6,c7,c8').split(','), SIZE = pr
 const [VW, VH] = SIZE.replace('t', '').split('x').map(Number), FX = process.env.FX !== '0', OUT = process.env.OUT || '/tmp/pharm', FPS = 30, TAG = process.env.TAG || 'after';
 // 4×3 비교표(SHEET): 줄 = 유봉 휘두르기 / 천근쇄약 / 약병폭격 / 아드레날린·보호막·회복진, 칸 = 아래 프레임 번호
 const PICK = { a3: [1, 3, 5], a6: [5, 6, 7], b6: [2, 4, 6], c6: [4], c7: [2], c8: [2] };
-// 남은 스킬(2026-11-11) 5×3 비교표(SHEET2): 줄 = 유봉 내려찍기 / 밀어내기 / 화염 / 냉각 / 부식 약병
+// 남은 스킬(2026-11-11) 5×3 비교표(SHEET2): 줄 = 유봉강타 / 밀어내기 / 화염 / 냉각 / 부식 약병
 const PICK2 = { a1: [2, 3, 5], a4: [2, 3, 5], b1: [3, 4, 6], b2: [3, 4, 7], b4: [3, 4, 7] }, IDS = { a1: 'ph1_a1', a4: 'ph1_a4', b1: 'ph1_b1', b2: 'ph1_b2', b4: 'ph1_b4', a3: 'ph1_a3', a6: 'ph1_a6', b6: 'ph1_b6', c6: 'ph1_c6', c7: 'ph1_c7', c8: 'ph1_c8' };
 const MARKS = { a3: [0.1, 0.2, 0.33, 0.46, 0.6, 0.72, 0.85, 1.1], a6: [0.1, 0.25, 0.36, 0.44, 0.5, 0.56, 0.62, 0.75, 1.0, 1.4], b6: [0.2, 0.5, 0.8, 1.1, 1.4, 1.7, 2.0, 2.6],
   a1: [0.06, 0.14, 0.22, 0.28, 0.34, 0.42, 0.55, 0.8], a4: [0.06, 0.14, 0.22, 0.28, 0.34, 0.42, 0.6, 0.9],

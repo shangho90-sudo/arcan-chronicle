@@ -56,7 +56,7 @@ export class Combatant {
       // critical hit on a monster: a beat of hit-stop, a camera kick and a star burst at the target
       if (d.crit && !d.dot && this.faction !== "player") {
         G.audio.sfx("crit");
-        if (!d.localStop) G.hitStop(0.05); if (d.localStop !== 'quiet') G.render.addShake(0.06, 0.12);   // 'quiet' (유봉 내려찍기): its own directional kick only   // localStop: 배쉬 freezes only itself + the target
+        if (!d.localStop) G.hitStop(0.05); if (d.localStop !== 'quiet') G.render.addShake(0.06, 0.12);   // 'quiet' (유봉강타): its own directional kick only   // localStop: 배쉬 freezes only itself + the target
         if (G.swingFx && G.swingFx.ready) G.swingFx.hit(this.pos, { crit: true });
         else if (G.skillFx) try { G.skillFx.burst('explosion_gold', { x: this.pos.x, y: this.pos.y + 0.6, z: this.pos.z }, { radius: 0.55 }); } catch (e) { }
       }
@@ -515,7 +515,7 @@ export class Player extends Combatant {
     this.sheet.recalc(); G.ui.toast(d.name + " 적용"); G.audio.sfx("heal"); return true;
   }
   onKilledMonster(m) { this.skills2.onKill(m); }
-  /** quiet: the skill does its own directional camera kick + local hit-stop (약사 유봉 내려찍기) */
+  /** quiet: the skill does its own directional camera kick + local hit-stop (약사 유봉강타) */
   onHitLanded(heavy, quiet) { if (quiet) return; G.render.addShake(heavy ? 0.1 : 0.03, heavy ? 0.16 : 0.07); if (heavy) G.hitStop(this.cfg.hitStop); }
   onDamaged(d, loss) {
     if (d.dot) return;

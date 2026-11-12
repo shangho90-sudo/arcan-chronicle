@@ -1,4 +1,4 @@
-// 약사 유봉 내려찍기 ph1_a1 ('유봉강타')를 실제 스킬 경로(skills2.cast → ph_smash 동작 → 타격 → js/pharmfx.js swing/smash)로
+// 약사 유봉강타 ph1_a1를 실제 스킬 경로(skills2.cast → ph_smash 동작 → 타격 → js/pharmfx.js swing/smash)로
 // 시전하고, 피해가 들어간 프레임 기준 같은 시점의 화면을 가로 띠로 저장. G.step(1/FPS) 한 프레임씩, Math.random 고정.
 // Usage: SCENE=hit|whiff|repeat|kill|sheathed GENDER=m|f SIZE=1100x760|390x844t FX=1|0 TAG=after DIR=90
 //        URL=http://localhost:8795/index.html OUT=/tmp/smash node tools/browser-tests/smash_skill.js

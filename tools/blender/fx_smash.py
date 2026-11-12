@@ -1,4 +1,4 @@
-"""약사 유봉 내려찍기 ph1_a1 ('유봉강타') 전용 이펙트 메시 (Blender bpy, headless, 2026-11-12).
+"""약사 유봉강타 ph1_a1 전용 이펙트 메시 (Blender bpy, headless, 2026-11-12).
 
 Usage:  python3 tools/blender/fx_smash.py        ->  assets/fx/fx_smash.glb.json  (+ tools/blender/pharm/fx_smash.blend)
 

@@ -60,12 +60,12 @@
       {
         "file": "sfx_ph_smash_swing.mp3",
         "duration": 0.3,
-        "description": "유봉 내려찍기 휘두름: band-passed noise whoosh, peak at 0.085 s (played 0.09 s before the impact)"
+        "description": "유봉강타 휘두름: band-passed noise whoosh, peak at 0.085 s (played 0.09 s before the impact)"
       },
       {
         "file": "sfx_ph_smash_hit.mp3",
         "duration": 0.8,
-        "description": "유봉 내려찍기 타격: low thud 96->44 Hz + hard knock (290/470/760/1180 Hz) + 2-7 kHz transient + falling grit from 0.05 s + faint bell tail"
+        "description": "유봉강타 타격: low thud 96->44 Hz + hard knock (290/470/760/1180 Hz) + 2-7 kHz transient + falling grit from 0.05 s + faint bell tail"
       }
     ]
   }

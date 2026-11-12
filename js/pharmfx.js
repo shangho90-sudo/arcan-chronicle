@@ -21,7 +21,7 @@
 //   burst(pos, {elem, r, linger})   ⑥ 약병 폭발: thin rings + bright core + light shards + layered soft puffs; fire = flame tongues + embers,
 //                                     ice = crystal burst (Tripo) + spikes + ground frost, acid = droplets + bubbling puddle (frost / puddle stay `linger` s)
 //   proj(pos, {elem})               던지는 약병(화염·냉각·부식): spinning Tripo flask (liquid = element colour) + thin trail; handle {set, dispose}
-//   swing(pc, {f})                  유봉 내려찍기('유봉강타') 준비~내려찍기: teal 약력 motes gather on the REAL pestle tip, then a translucent ivory + gold
+//   swing(pc, {f})                  유봉강타 준비~내려찍기: teal 약력 motes gather on the REAL pestle tip, then a translucent ivory + gold
 //                                     magic pestle (PHARM.smash.len m, ~1.4 x the character) lies over the real one and ONE thick blunt trail follows its head
 //   smash(pc, {f, hit, ground, r})  그 타격 순간(실제 명중일 때만 전부): platinum core flash + short hit lines at the real hit point, one thin gold ground ring
 //                                     sized to the target's own footprint, short cracks + low chips + ground dust, teal powder / crystals along the ring edge.
@@ -50,7 +50,7 @@ export const PHARM = {
     wind:   { w: 0xffffff, b: 0xffe6b0, h: 0xc88a3a, s1: 0xd8c8a8, s2: 0x7a6a58 },
     shield: { w: 0xe8fbff, b: 0x62c8ff, h: 0x2a70e0 },
     heal:   { w: 0xf2ffe0, b: 0x74f08a, h: 0x1fa050 },
-    // 유봉 내려찍기('유봉강타') 색 역할: 상아색 유봉 / 백금 중심 섬광 / 금색 충격 / 청록 약력 잔향
+    // 유봉강타 색 역할: 상아색 유봉 / 백금 중심 섬광 / 금색 충격 / 청록 약력 잔향
     ivory:    { w: 0xfffdf4, b: 0xf1e2bc, h: 0xd2a650 },
     platinum: { w: 0xffffff, b: 0xf0f3ff, h: 0xc4cee8 },
     teal:     { w: 0xeafffb, b: 0x36e2c8, h: 0x0e9a94, s1: 0xa9f2e6, s2: 0x2c8f89 },
@@ -58,7 +58,7 @@ export const PHARM = {
   },
   spin: { life: 0.32, lastLife: 0.46, peak: 2.3, lastPeak: 3.0, lead: 0.5, ringTime: 0.30 },         // lead: rad the ribbon head runs ahead of the pestle tip
   pestle: { height: 3.9, lean: 0.46, drop: 5.0, stay: 0.55, glow: 0.10, spec: 1.6, fill: 0.55 },   // procedural club (fx_pharm.py pharm_pestle), warm polished gold
-  smash: {                                                    // 유봉 내려찍기 ('유봉강타')
+  smash: {                                                    // 유봉강타
     wind: 0.17, hit: 0.25,                                    // s from the press: wind-up ends / impact (= action ph_smash windT / strikeT)
     len: 2.35, lenMin: 1.5, thick: 1.12, ghostA: 0.78, ghostFade: 0.15,     // magic pestle: length m (~1.4 x a 1.7 m character), girth x, peak opacity, fade after the hit s
     trailW: 0.55, trailLen: 0.3, trailA: 2.0, trailFade: 0.1,   // blunt trail: band width m, visible part (fraction of the arc mesh), brightness, fade s
@@ -176,7 +176,7 @@ void main(){
   gl_FragColor = vec4(c * k * uA, 1.);
   #endif
 }`;
-// 유봉 내려찍기: translucent magic pestle (vertex colour ivory / gold, brighter + more opaque at the silhouette)
+// 유봉강타: translucent magic pestle (vertex colour ivory / gold, brighter + more opaque at the silhouette)
 const GHOST_FS = `
 uniform vec3 uRim; uniform float uA; varying vec3 vC, vN, vV;
 void main(){ vec3 n = normalize(vN); float d = max(0., dot(n, normalize(vec3(-.4, .8, .5)))), rim = pow(1. - abs(dot(n, vV)), 1.8);
@@ -210,7 +210,7 @@ export class PharmFx {
         const tg = await loadWrapped('assets/fx/fx_pharm_tripo.glb.json', {});
         tg.scene.traverse(o => { if (!o.isMesh || !o.material || !o.material.map) return; this.tri[o.name] = { geo: o.geometry, map: o.material.map }; if (o.name.startsWith('tripo_shard_')) this.triShards.push(o.name); });
       } catch (err) { console.warn('pharmfx: no Tripo models', err && err.message); }
-      try {   // 유봉 내려찍기 전용 메시 (tools/blender/fx_smash.py); without it swing() draws nothing and smash() skips the cracks
+      try {   // 유봉강타 전용 메시 (tools/blender/fx_smash.py); without it swing() draws nothing and smash() skips the cracks
         const sj = await (await fetch('assets/fx/fx_smash.glb.json')).json(), raw = atob(sj.b64), u8 = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) u8[i] = raw.charCodeAt(i);
         const sg = await new Promise((res, rej) => new GLTFLoader().parse(u8.buffer, '', res, rej));
         sg.scene.traverse(o => { if (o.isMesh) this.geo[o.name] = o.geometry; }); this.trailSpan = (sj.trailSpan || 190) * Math.PI / 180; this.trailIn = sj.trailIn ?? 0.56;
@@ -519,7 +519,7 @@ export class PharmFx {
     return { set: (p) => { const n = P3(p); _c.copy(n).sub(last); if (_c.lengthSq() > 1e-7) vel.copy(_c).normalize(); last.copy(n); e.g.position.copy(n); }, dispose: () => this._free(e) };
   }
 
-  // ------------------------------------------------------------------ 유봉 내려찍기 ('유봉강타')
+  // ------------------------------------------------------------------ 유봉강타
   /** from the press (fx op, at = -hit): teal motes gather on the real pestle tip during the wind-up, then the translucent magic
    *  pestle lies over the real one and one thick blunt trail follows its head down. Everything is read from the real weapon
    *  (bladePoints) every frame, so it stays on the motion (also through the local hit-stop). Handle: .impact(hit) from smash(). */

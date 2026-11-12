@@ -28,7 +28,7 @@ for (const [id, sound, count] of [['ph1_a3','ph_spin',5],['ph1_a6','ph_slam',1],
   if(id==='ph1_b6') assert.ok(actual[0].t>=.5,'bottle waits for fall');
   if(id==='ph1_a6') assert.ok(actual[0].t>=.3,'slam waits for landing');
 }
-// 유봉 내려찍기 ('유봉강타'): whoosh once just before the impact (0.25 s - 0.09 s), never the hit sound on a whiff; one blow at every level
+// 유봉강타: whoosh once just before the impact (0.25 s - 0.09 s), never the hit sound on a whiff; one blow at every level
 { const d = skills.find(s => s.id === 'ph1_a1'), sounds = [];
   assert.equal(d.anim, 'ph_smash'); assert.equal(actions.ph_smash.hitT, 0.25); assert.equal(actions.ph_smash.dur, actions.attack.dur, 'same total motion time as before');
   const hitOp = d.ops.find(o => o.op === 'hit'); assert.equal(hitOp.coef, 2.2); assert.equal(hitOp.shape, 'single'); assert.ok(hitOp.oneHit); assert.equal(d.mp, 8); assert.equal(d.cd, 4); assert.equal(d.range, 2.0);

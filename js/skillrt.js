@@ -6,7 +6,7 @@ import { HitShape, CombatMath, clamp, clamp01 } from './core.js';
 import { skillSound } from './sfx.js';
 import { salImpact } from './salfx.js';
 import { yeonImpact, LEAD as YEON_LEAD } from './yeonfx.js';
-const SMASH_STOP = 0.06, SMASH_KICK = [0.11, 0.1];   // 유봉 내려찍기: local hit-stop (s, caster + target visuals only), camera kick [m, s]
+const SMASH_STOP = 0.06, SMASH_KICK = [0.11, 0.1];   // 유봉강타: local hit-stop (s, caster + target visuals only), camera kick [m, s]
 import { biyeonImpact } from './biyeonfx.js';
 import { bashImpact, BASH } from './bashfx.js';
 
@@ -380,7 +380,7 @@ export class SkillEngine {
     // hitsPerLv: the skill's own hit count grows with its level (견습생 '연'); noExtra: no automatic extra strikes
     const baseHits = Math.max(1, (op.hits || 1) + (op.hitsPerLv ? Math.floor(op.hitsPerLv * (ctx.L - 1)) : 0)), extra = physical && !op.noExtra && !op.hitsPerLv ? Math.floor((ctx.L - 1) / 2) : 0, hits = baseHits + extra;
     let hits_ = hits;
-    // oneHit (약사 유봉 내려찍기 '유봉강타'): the level's extra strikes are folded into ONE heavy blow — same total damage
+    // oneHit (약사 유봉강타): the level's extra strikes are folded into ONE heavy blow — same total damage
     if (extra && op.oneHit) { op = { ...op, coef: op.coef * (1 + 0.06 * extra) }; hits_ = baseHits; }
     else if (extra) op = { ...op, coef: op.coef * baseHits / hits * (1 + 0.06 * extra), gap: op.gap || 0.12 };   // total grows a little, split across more strikes
     const op0 = op;
@@ -410,7 +410,7 @@ export class SkillEngine {
             const fd = { x: f.x * ca - f.z * sa, z: f.x * sa + f.z * ca };
             FX.slash(op.fx.slash, op.shape === 'single' && ts[0] ? ts[0].pos : (op.atAim ? ctx.aim : pc.pos), fd, { color: op.alt && h % 3 === 2 ? 0xffd27a : col, radius: op.r || 2, angle: op.ang || 100, length: op.len, width: op.w, mirror: mir, tilt: op.alt ? [0.22, -0.3, 0.45][h % 3] : (op.sweep || 0) * 0.2 });
           }
-          if (op.fx.pharm === 'smash') {   // 유봉 내려찍기('유봉강타'): platinum flash at the target's real hit point, one thin gold ring + cracks + chips + teal residue at its feet
+          if (op.fx.pharm === 'smash') {   // 유봉강타: platinum flash at the target's real hit point, one thin gold ring + cracks + chips + teal residue at its feet
             const t = ts[0]; let tipY = null; try { const b = pc.body.bladePoints(); if (b) tipY = b[1].y; } catch (e) { tipY = null; }
             FX.pharm('smash', pc, t ? { f, hit: bashImpact(t, f, tipY), ground: { x: t.pos.x, y: t.pos.y || 0, z: t.pos.z }, h, r: t.radius, swing: ctx.pharmFx } : { f, whiff: true, h, swing: ctx.pharmFx });
             if (t) {   // only on a real hit, only these two (never G.hitStop); max() so repeated hits never add up
