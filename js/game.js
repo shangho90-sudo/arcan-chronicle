@@ -1,5 +1,5 @@
 // Game orchestrator + zone runtime. Port of Boot/ArcanGame.cs and World/ZoneRuntime.cs.
-import { GameData, SaveStore, SAVE_SLOTS, saveSlotKey, CharacterSheet, QuestLog, QS, ZoneGeometry, NavGrid, newProfile, DEG, clamp, HitShape, levelGapExp, monsterAtLevel } from './core.js';
+import { GameData, SaveStore, SAVE_SLOTS, saveSlotKey, CharacterSheet, QuestLog, QS, ZoneGeometry, NavGrid, newProfile, DEG, clamp, HitShape, levelGapExp, monsterAtLevel, discoverTown, payWarp, warpPrice } from './core.js';
 import { Renderer, Fx, TelegraphView, TG_TIME, loadSheet, preloadTextures, THREE, T } from './render.js';
 import { Player, Monster, Boss, Npc, Loot, bindGame as bindActors } from './actors.js';
 import { Input, Audio } from './io.js';
@@ -456,6 +456,23 @@ class Game {
     return z;
   }
   travel(zone, spawn) { if (this.loading) return; this.save(); this.audio.sfx('warp'); this.loadZone(zone, spawn, false); }
+  /** 마을 간 워프(워프 안내인): 가 본 마을로만, 삯을 내고, 짧은 시전 연출 뒤 그 마을 안내인 앞('warp' spawn)에 도착 */
+  townWarp(to) {
+    const P = this.profile, p = this.player, z = this.zone;
+    if (this.loading || !p || p.dead || !z || this.warping) return false;
+    if (z.barrier || z.def.kind !== "town") { this.ui.toast("지금은 워프할 수 없습니다"); return false; }
+    const from = z.def.id, price = warpPrice(this.data, from, to), e = payWarp(this.data, P, from, to);
+    if (e) { this.ui.toast(e); return false; }
+    this.ui.close(); this.input.block = true; this.warping = true; this.audio.sfx("coin");
+    if (this.fx && this.fx.play) this.fx.play("ring", { x: p.pos.x, y: p.pos.y + 0.1, z: p.pos.z }, 1.6, true);
+    const fl = document.createElement("div"); fl.className = "warpflash"; this.ui.root.appendChild(fl); setTimeout(() => fl.remove(), 1400);
+    const name = this.data.zones[to].name, session = this.session;
+    setTimeout(() => {
+      this.warping = false; if (session !== this.session) return;
+      this.travel(to, "warp"); this.ui.toast(`${name}(으)로 이동했습니다 (-${price} G)`);
+    }, 550);
+    return true;
+  }
   async fadeTo(a, dur) { const from = parseFloat(this.ui.fade.style.opacity || 0), t0 = performance.now(); while (true) { const k = Math.min(1, (performance.now() - t0) / 1000 / dur); this.ui.setFade(from + (a - from) * k); if (k >= 1) break; await new Promise(r => requestAnimationFrame(r)); } }
   async loadZone(zoneId, spawnId, usePos) {
     this.audio.stopNpcVoice();
@@ -468,6 +485,7 @@ class Game {
     if (session !== this.session) return;
     const z = this.zone, def = z.def, P = this.profile, cfg = this.data.config;
     P.zone = zoneId; if (def.kind === "town") { P.returnZone = zoneId; P.returnSpawn = def.respawnSpawn; }
+    if (discoverTown(this.data, P, zoneId)) setTimeout(() => { if (session === this.session) this.ui.toast(`새 마을 발견: ${def.name} — 이제 워프 안내인이 이곳으로 보내 줄 수 있어요`); }, 1200);
     let pos, yaw;
     if (usePos && P.hasPos && !z.geo.blocked(P.posX, P.posZ, cfg.playerRadius)) {
       pos = z.geo.ground(P.posX, P.posZ); yaw = P.facing;
@@ -517,6 +535,7 @@ class Game {
       else opts.push(["[진행 중] " + q.name, () => this.ui.showDialog(npc, q.progressText, this.back(npc))]);
     }
     if (npc.role === "jobmaster" && npc.job) opts.push(["직업 상담", () => this.ui.showJobs(npc.job)]);
+    if (npc.role === "warp") opts.push(["마을 이동", () => this.ui.showTownWarp(npc)]);
     if (npc.shop) opts.push(["상점", () => { this.ui.sel = {}; this.ui.showShop(this.data.shops[npc.shop]); }]);
     opts.push(["대화 종료", () => this.ui.close()]);
     while (opts.length > 4) opts.splice(opts.length - 2, 1);

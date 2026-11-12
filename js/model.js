@@ -41,6 +41,7 @@ export const NPC_MODELS = {
   // 무기 상인·방어구 상인 (tools/gear/gear.py, tools/world/world.py GEAR_MERCHANTS): 기존 메시에 옷 색만 바꿈
   gear_weapon:        { file: 'npc_armorer', tex: 'npc_gear_weapon', height: 1.68, headPitch: -6, npc: true },
   gear_armor:         { file: 'npc_merchant', tex: 'npc_gear_armor', height: 1.52, headPitch: -6, npc: true },
+  warp_keeper:        { file: 'npc_pharmacist', tex: 'npc_warp_keeper', height: 1.6, headPitch: -6, npc: true },   // 마을 간 워프 안내인 (world.py WARP_KEEPERS)
   // 마을 주민 (tools/world/residents.py): 기존 메시 + 옷 색만 바꾼 텍스처(tools/npcs/recolor.py), 키를 조금씩 다르게
   res_artist_a: { file: 'npc_artist', tex: 'npc_res_artist_a', height: 1.47, headPitch: -6, npc: true },
   res_artist_b: { file: 'npc_artist', tex: 'npc_res_artist_b', height: 1.56, headPitch: -6, npc: true },

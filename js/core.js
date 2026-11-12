@@ -143,7 +143,7 @@ export function newProfile(data, name, gender) {
     version: SAVE_VERSION, saveTime: "", playTime: 0, name: (name || "모험가").trim() || "모험가", gender: gender === "f" ? "f" : "m",
     job: "novice", level: 1, exp: 0, gold: data.levels.startGold, hp: -1, sp: -1, inventory: [], weapon: "w_stick_1", armor: "", accessory: "",
     learnedSkills: [], jobsUnlocked: [], quests: [], flags: [], sk: {}, crafted: {}, gearMods: {}, zone: data.levels.startZone, hasPos: false, posX: 0, posY: 0, posZ: 0, facing: 0,
-    returnZone: data.levels.startZone, returnSpawn: data.levels.startSpawn
+    returnZone: data.levels.startZone, returnSpawn: data.levels.startSpawn, towns: [data.levels.startZone]
   };
   const ch = new CharacterSheet(data, p);
   for (const it of data.levels.startItems || []) ch.bag.add(it.id, it.count);
@@ -168,8 +168,45 @@ export function migrate(p) {
   // v4 (2026-11-06): fields became twice as large and the mushroom boss moved to its own zone -> a position saved in a
   // field no longer means the same place; restart at the zone's entrance instead
   if ((p.version || 0) < 4 && p.zone && p.zone !== "town") p.hasPos = false;
+  // 마을 간 워프(2026-11-12): 가 본 마을 목록 p.towns (더하기만 하는 필드라 저장 버전은 그대로). 예전 저장에는 시작 마을,
+  // 마지막으로 들른 마을(returnZone), 지금 있는 곳을 넣음 — 마을이 아닌 id는 townsKnown이 걸러 냄.
+  if (!Array.isArray(p.towns)) p.towns = [];
+  for (const z of ["town", p.returnZone, p.zone]) if (typeof z === "string" && z && !p.towns.includes(z)) p.towns.push(z);
   p.version = SAVE_VERSION;
   return p;
+}
+
+// ======================================================================================= 마을 간 워프 (워프 안내인, npc.role === "warp")
+/** 삯 = 30 G + 세계 지도 거리 × 0.25 G (5 G 단위로 반올림, 최대 200 G). 같은 마을은 0. */
+export const WARP_FARE = { base: 30, per: 0.25, max: 200, step: 5 };
+export const warpTowns = data => Object.values(data.zones).filter(z => z.kind === "town" && Array.isArray(z.map));
+export function warpPrice(data, from, to) {
+  const a = data.zones[from], b = data.zones[to]; if (!a || !b || from === to || !a.map || !b.map || a.kind !== "town" || b.kind !== "town") return 0;
+  const d = Math.hypot(a.map[0] - b.map[0], a.map[1] - b.map[1]), F = WARP_FARE;
+  return Math.min(F.max, Math.round((F.base + d * F.per) / F.step) * F.step);
+}
+export const townsKnown = (data, p) => (p.towns || []).filter(id => data.zones[id] && data.zones[id].kind === "town");
+/** 마을에 처음 들어가면 기록. 새로 기록했으면 true. */
+export function discoverTown(data, p, zoneId) {
+  const z = data.zones[zoneId]; if (!z || z.kind !== "town") return false;
+  if (!Array.isArray(p.towns)) p.towns = [];
+  if (p.towns.includes(zoneId)) return false;
+  p.towns.push(zoneId); return true;
+}
+/** 워프할 수 없는 까닭(없으면 "") */
+export function warpBlock(data, p, from, to) {
+  const a = data.zones[from], b = data.zones[to];
+  if (!a || a.kind !== "town") return "워프 안내인은 마을에서만 만날 수 있습니다";
+  if (!b || b.kind !== "town") return "갈 수 없는 곳입니다";
+  if (from === to) return "지금 있는 마을입니다";
+  if (!townsKnown(data, p).includes(to)) return "아직 가 보지 않은 곳입니다";
+  if ((p.gold | 0) < warpPrice(data, from, to)) return "골드가 부족합니다";
+  return "";
+}
+/** 삯을 내고 이동을 허락: 실패하면 까닭, 성공하면 "" (골드만 줄임 — 실제 이동은 game.js townWarp) */
+export function payWarp(data, p, from, to) {
+  const e = warpBlock(data, p, from, to); if (e) return e;
+  p.gold -= warpPrice(data, from, to); return "";
 }
 
 /** save slots: 0 = 자동 저장 (the old single save key, written on warps / page hide / the first save), 1..SAVE_SLOTS = 직접 저장.

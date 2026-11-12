@@ -603,6 +603,24 @@ def gen_town_v1(t, M):   # 2026-11-12 이전 배치(쓰지 않음, 참고용)
              post=dict(vignette=0.2, bloom=0.14, sat=1.2, contrast=0.3, exposure=1.02), region=t['region'], map=list(t['map']), level=list(t['level']))
     return Z
 
+# 마을 간 워프 안내인 (2026-11-12): 마을마다 한 명, 광장 앞쪽(카메라 쪽). 가 본 마을로만 보내 줌 — js/core.js warpPrice / game.js townWarp.
+# 도착 지점은 안내인 앞 'warp' spawn(gen_town / gen_arcan의 warp_spawn).
+WARP_KEEPERS = {
+    'town': ('warp_town', '미르', ['다른 마을로 가시려고요? 한 번 가 본 곳이라면 어디든 보내 드려요.', '워프석은 발자국을 기억한답니다. 처음 가는 곳은 직접 걸어가셔야 해요.']),
+    'kairion_capital': ('warp_kairion_capital', '세이라', ['왕도의 워프석은 대륙에서 가장 오래됐어요.', '가 보신 마을이라면 눈 깜짝할 사이에 모셔다 드리죠.']),
+    'baltern': ('warp_baltern', '고르딘', ['바위산을 걸어 넘는 것보단 싸게 먹힐 거요.', '가 본 적 없는 곳은 나도 못 보내오.']),
+    'lumiere': ('warp_lumiere', '엘린', ['빛의 길이 당신의 발자국을 따라 열립니다.', '순례자님, 어디로 모실까요?']),
+    'gravel': ('warp_gravel', '하산', ['국경에선 빠른 발이 목숨이오. 어디로 가시오?', '멀수록 삯이 조금 더 붙소.']),
+    'silvern': ('warp_silvern', '누리', ['들바람보다 빠르게 보내 드릴게요.', '가 보신 마을 이름을 골라 주세요.']),
+    'marseon': ('warp_marseon', '자밀라', ['동쪽 끝에서 서쪽 끝까지, 금화 몇 닢이면 돼요.', '처음 가는 곳은 발로 길을 익히셔야 해요.']),
+    'baltazar': ('warp_baltazar', '브란', ['대장장이의 나라 워프석은 튼튼하오. 걱정 마시오.', '어디로 가시겠소?']),
+    'kreutz_fort': ('warp_kreutz_fort', '유리', ['이 추위에 걸어가긴 힘들죠. 어디로 보내 드릴까요?', '설원 너머 마을도 가 보셨다면 열려 있어요.']),
+}
+WARP_HINT = 'plaza:250'
+def warp_spawn(g, tid):
+    """안내인 앞(광장 가운데 쪽 2.4 m)에 도착 지점 'warp'"""
+    n = next(n for n in g['npcs'] if n['npc'] == WARP_KEEPERS[tid][0]); x, z = n['pos']; L = math.hypot(x, z) or 1.0
+    g['spawns'].append(dict(id='warp', pos=[round(x - x / L * 2.4, 2), round(z - z / L * 2.4, 2)], rot=round(yaw_to(x, z), 1)))
 def town_place(t):
     """이야기 NPC·상인 자리 힌트 (towns.py stand)"""
     out, ang = [], [200, 235, 300, 335, 160, 20, 110, 70]
@@ -615,7 +633,8 @@ def gen_town(t, M):
     exits = [(n, name_of(n), direction(tid, n, M), 'to_' + n, 'from_' + n, 'from_' + tid) for n in neighbours(tid)]
     tt = dict(t); tt['place'] = town_place(t)
     if tid == 'kairion_capital': tt['place'] += [(m, 'lm:kairion_guildhall', (i - 2) * 3.2) for i, m in enumerate(JOB_MASTERS)]
-    g = TW.gen_town2(tt, exits, [(r[0], r[4]) for r in RESIDENTS.get(tid, [])])
+    g = TW.gen_town2(tt, exits, [(r[0], r[4]) for r in RESIDENTS.get(tid, [])] + [(WARP_KEEPERS[tid][0], WARP_HINT)])
+    warp_spawn(g, tid)
     Z = dict(id=tid, name=t['name'], kind='town', bgm='bgm_arcan_town' if rnd.random() < 0.5 else 'bgm_town', bounds=g['bounds'],
              groundTex='grass', ambient=[0.56, 0.53, 0.6], sun=[1.0, 0.84, 0.62, 1.5], spriteTint=[1.0, 0.98, 0.94], spawns=g['spawns'], buildings=[], props=g['props'],
              npcs=g['npcs'], portals=g['portals'], heights=[], patches=[], monsters=[], boss=dict(boss='', center=[], radius=0, gate=[], gateRadius=0, bossPos=[], respawn=0),
@@ -626,7 +645,8 @@ def gen_arcan(Z, M):
     """아르칸 마을(zones.json의 손으로 만든 'town')도 같은 생성기로: 숲 워프 id(to_field / from_field)는 그대로"""
     exits = [('forest', '속삭이는 숲', direction('town', 'forest', M), 'to_field', 'from_field', 'from_town'),
              ('capital_road', name_of('capital_road'), direction('town', 'capital_road', M), 'to_capital_road', 'from_capital_road', 'from_town')]
-    g = TW.gen_town2(dict(ARCAN), exits, [(r[0], r[4]) for r in RESIDENTS['town']])
+    g = TW.gen_town2(dict(ARCAN), exits, [(r[0], r[4]) for r in RESIDENTS['town']] + [(WARP_KEEPERS['town'][0], WARP_HINT)])
+    warp_spawn(g, 'town')
     for n in g['npcs']:
         if n['npc'] == 'town_armor': n['gear'] = True
     for k in ('bounds', 'spawns', 'npcs', 'portals', 'blockPolys', 'town3d', 'props'): Z[k] = g[k]
@@ -683,6 +703,8 @@ def world_npcs():
                      'npc_master_artist': 'master_artist', 'npc_armorer': 'armorer'}[sheet]
             if len(n) > 6: model = n[6]
             out.append(dict(id=nid, name=name, title=title, sheet=sheet, model=model, role=role, shop=shop, job='', lines=lines, world=True))
+    for tid, (nid, name, lines) in WARP_KEEPERS.items():
+        out.append(dict(id=nid, name=name, title='워프 안내인', sheet='npc_master_pharmacist', model='warp_keeper', role='warp', shop='', job='', lines=lines, world=True, warp=True, town=tid))
     for tid, rs in RESIDENTS.items():
         for nid, name, title, model, hint, lines, hook in rs:
             shop = {'arcan_pharm_clerk': 'shop_pharmacy', 'arcan_smith_boy': 'shop_forge'}.get(nid, '')

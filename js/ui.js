@@ -1,5 +1,5 @@
 // HTML/CSS user interface (ivory / teal / gold, Galmuri pixel font). Port of the Unity uGUI views.
-import { QS, QUEST_CAT, questCategory, Shop, jobBuffActive, isEquipment, slotOf, EQUIP_SLOTS, ATTRS, ATTR_KR, ATTR_BASE, ATTR_FX } from './core.js';
+import { QS, QUEST_CAT, questCategory, Shop, jobBuffActive, isEquipment, slotOf, EQUIP_SLOTS, ATTRS, ATTR_KR, ATTR_BASE, ATTR_FX, warpTowns, warpPrice, townsKnown } from './core.js';
 import { showWorldMap } from './worldmap.js';
 import { THREE, tex, CAM } from './render.js';
 import { ModelBody, loadPlayerModel, loadActions } from './model.js';
@@ -504,6 +504,28 @@ export class UI {
   }
   buy(shop, id, n) { const e = Shop.buy(G.player.sheet, shop, id, n); if (e) this.toast(e); else { G.audio.sfx("coin"); this.toast(G.data.item(id).name + " x" + n + " 구매"); G.autoSave(); } this.showShop(shop); }
   sell(shop, slot, n) { const p = G.player, d = G.data.item(p.sheet.p.inventory[slot].id); const e = Shop.sell(p.sheet, slot, n); if (e) this.toast(e); else { G.audio.sfx("coin"); this.toast(`${d.name} x${n} 판매 (+${d.sellPrice * n} G)`); if (!(p.sheet.p.inventory[slot].count > 0)) this.sel = {}; } this.showShop(shop); }
+
+  /** 마을 이동 창 (워프 안내인): 마을 9곳 — 가 본 곳은 지역·권장 레벨·삯·'이동', 안 가 본 곳은 잠김, 지금 있는 곳 표시 */
+  showTownWarp(npc) {
+    const D = G.data, P = G.profile, here = G.zone.def.id, known = new Set(townsKnown(D, P));
+    const b = this.open("townwarp", "마을 이동", 1040, 0);
+    $("div", "twhead", b, `<span>${esc(npc && npc.name ? npc.name + " · " : "")}가 본 마을로만 보내 드려요. <small class="muted">${known.size} / ${warpTowns(D).length} 곳 발견</small></span><span class="goldtxt"><i class="coin"></i>${P.gold.toLocaleString()} G</span>`);
+    const rows = $("div", "twrows", b);
+    const regs = (D.world && D.world.regions) || [];
+    const list = warpTowns(D).sort((x, y) => (y.id === here) - (x.id === here) || known.has(y.id) - known.has(x.id) || warpPrice(D, here, x.id) - warpPrice(D, here, y.id));
+    for (const t of list) {
+      const cur = t.id === here, ok = known.has(t.id), price = warpPrice(D, here, t.id), afford = P.gold >= price;
+      const reg = regs.find(r => r.id === t.region), lv = t.level ? `권장 Lv ${t.level[0]}~${t.level[1]}` : "";
+      const r = $("div", "twrow" + (cur ? " cur" : ok ? "" : " locked"), rows); r.dataset.town = t.id;
+      $("div", "twname", r, `<b>${ok || cur ? esc(t.name) : "???"}</b><small>${ok || cur ? [reg ? esc(reg.name) : "", lv].filter(Boolean).join(" · ") : "아직 가 보지 않은 곳"}</small>`);
+      if (cur) $("div", "twstate", r, "지금 있는 곳");
+      else if (!ok) $("div", "twstate", r, "🔒 직접 가야 열려요");
+      else {
+        $("div", "twprice " + (afford ? "goldtxt" : "bad"), r, `<i class="coin"></i>${price} G${afford ? "" : "<small>골드 부족</small>"}`);
+        const bt = this.button(r, "이동", "gold", () => G.townWarp(t.id), "ui"); bt.disabled = !afford; if (!afford) bt.title = "골드가 부족합니다";
+      }
+    }
+  }
 
   /** 능력치 창: 5 attributes (+1 / +5), unspent points, what each point gives, the resulting combat numbers */
   showStats() {

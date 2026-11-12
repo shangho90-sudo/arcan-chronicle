@@ -843,6 +843,22 @@ small { font-size:.8em; }
   .areabanner { top:64px; font-size:20px; }
 }
 
+/* ---------- 마을 이동 창 (워프 안내인, ui.js showTownWarp) ---------- */
+.window.townwarp .twhead { display:flex; justify-content:space-between; align-items:center; gap:12px; font-size:20px; margin-bottom:10px; flex-wrap:wrap; }
+.window.townwarp .twrows { display:flex; flex-direction:column; gap:8px; max-height:640px; overflow-y:auto; padding-right:4px; }
+.window.townwarp .twrow { display:flex; align-items:center; gap:14px; padding:10px 14px; border-radius:8px; font-size:20px; background:linear-gradient(#fbf6ea, #f0e5cc); box-shadow:inset 0 0 0 1.5px #d4bc88, 0 1px 2px rgba(80,50,10,.2); }
+.window.townwarp .twrow.cur { box-shadow:inset 0 0 0 2.5px var(--gold), 0 1px 2px rgba(80,50,10,.2); }
+.window.townwarp .twrow.locked { filter:grayscale(.8); opacity:.62; }
+.window.townwarp .twname { flex:1; min-width:0; display:flex; flex-direction:column; }
+.window.townwarp .twname b { font-size:22px; }
+.window.townwarp .twname small { font-size:15px; opacity:.75; }
+.window.townwarp .twstate { font-size:16px; opacity:.8; white-space:nowrap; }
+.window.townwarp .twprice { font-size:20px; white-space:nowrap; display:flex; flex-direction:column; align-items:flex-end; }
+.window.townwarp .twprice small { font-size:13px; }
+.window.townwarp .twrow .btn { font-size:19px; padding:6px 22px; }
+.window.townwarp .twrow .btn:disabled { filter:grayscale(1); opacity:.5; cursor:default; }
+.warpflash { position:absolute; inset:0; pointer-events:none; z-index:60; background:radial-gradient(circle at 50% 55%, rgba(255,255,255,.95), rgba(150,225,255,.55) 35%, rgba(120,160,255,0) 70%); opacity:0; animation:warpflash 1.3s ease-out forwards; }
+@keyframes warpflash { 0% { opacity:0; } 35% { opacity:1; } 100% { opacity:0; } }
 /* ---------- phone compact layout (2026-11-04): keep the middle of the screen free ----------
    portrait: one top-left block (portrait + name + HP/SP/EXP inside the character panel, small icon menu row under it),
    quest window under it on the left (ends above the stick area), minimap + loot feed top-right, monster bar / talk prompt /

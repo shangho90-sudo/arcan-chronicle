@@ -653,6 +653,159 @@
    "world": true
   },
   {
+   "id": "warp_town",
+   "name": "미르",
+   "title": "워프 안내인",
+   "sheet": "npc_master_pharmacist",
+   "model": "warp_keeper",
+   "role": "warp",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "다른 마을로 가시려고요? 한 번 가 본 곳이라면 어디든 보내 드려요.",
+    "워프석은 발자국을 기억한답니다. 처음 가는 곳은 직접 걸어가셔야 해요."
+   ],
+   "world": true,
+   "warp": true,
+   "town": "town"
+  },
+  {
+   "id": "warp_kairion_capital",
+   "name": "세이라",
+   "title": "워프 안내인",
+   "sheet": "npc_master_pharmacist",
+   "model": "warp_keeper",
+   "role": "warp",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "왕도의 워프석은 대륙에서 가장 오래됐어요.",
+    "가 보신 마을이라면 눈 깜짝할 사이에 모셔다 드리죠."
+   ],
+   "world": true,
+   "warp": true,
+   "town": "kairion_capital"
+  },
+  {
+   "id": "warp_baltern",
+   "name": "고르딘",
+   "title": "워프 안내인",
+   "sheet": "npc_master_pharmacist",
+   "model": "warp_keeper",
+   "role": "warp",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "바위산을 걸어 넘는 것보단 싸게 먹힐 거요.",
+    "가 본 적 없는 곳은 나도 못 보내오."
+   ],
+   "world": true,
+   "warp": true,
+   "town": "baltern"
+  },
+  {
+   "id": "warp_lumiere",
+   "name": "엘린",
+   "title": "워프 안내인",
+   "sheet": "npc_master_pharmacist",
+   "model": "warp_keeper",
+   "role": "warp",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "빛의 길이 당신의 발자국을 따라 열립니다.",
+    "순례자님, 어디로 모실까요?"
+   ],
+   "world": true,
+   "warp": true,
+   "town": "lumiere"
+  },
+  {
+   "id": "warp_gravel",
+   "name": "하산",
+   "title": "워프 안내인",
+   "sheet": "npc_master_pharmacist",
+   "model": "warp_keeper",
+   "role": "warp",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "국경에선 빠른 발이 목숨이오. 어디로 가시오?",
+    "멀수록 삯이 조금 더 붙소."
+   ],
+   "world": true,
+   "warp": true,
+   "town": "gravel"
+  },
+  {
+   "id": "warp_silvern",
+   "name": "누리",
+   "title": "워프 안내인",
+   "sheet": "npc_master_pharmacist",
+   "model": "warp_keeper",
+   "role": "warp",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "들바람보다 빠르게 보내 드릴게요.",
+    "가 보신 마을 이름을 골라 주세요."
+   ],
+   "world": true,
+   "warp": true,
+   "town": "silvern"
+  },
+  {
+   "id": "warp_marseon",
+   "name": "자밀라",
+   "title": "워프 안내인",
+   "sheet": "npc_master_pharmacist",
+   "model": "warp_keeper",
+   "role": "warp",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "동쪽 끝에서 서쪽 끝까지, 금화 몇 닢이면 돼요.",
+    "처음 가는 곳은 발로 길을 익히셔야 해요."
+   ],
+   "world": true,
+   "warp": true,
+   "town": "marseon"
+  },
+  {
+   "id": "warp_baltazar",
+   "name": "브란",
+   "title": "워프 안내인",
+   "sheet": "npc_master_pharmacist",
+   "model": "warp_keeper",
+   "role": "warp",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "대장장이의 나라 워프석은 튼튼하오. 걱정 마시오.",
+    "어디로 가시겠소?"
+   ],
+   "world": true,
+   "warp": true,
+   "town": "baltazar"
+  },
+  {
+   "id": "warp_kreutz_fort",
+   "name": "유리",
+   "title": "워프 안내인",
+   "sheet": "npc_master_pharmacist",
+   "model": "warp_keeper",
+   "role": "warp",
+   "shop": "",
+   "job": "",
+   "lines": [
+    "이 추위에 걸어가긴 힘들죠. 어디로 보내 드릴까요?",
+    "설원 너머 마을도 가 보셨다면 열려 있어요."
+   ],
+   "world": true,
+   "warp": true,
+   "town": "kreutz_fort"
+  },
+  {
    "id": "arcan_guide",
    "name": "하늘",
    "title": "전직 안내인",
