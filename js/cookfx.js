@@ -19,8 +19,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 export const COOK = {
   intensity: 1.0,
   knife: { len: 1.25, hover: 0.85, dip: 0.22, yaw: 0.6, appear: 0.1, leave: 0.22, rock: 0.22, slide: 0.16, flash: 1.5, line: 2.2, lineLife: 0.16, chips: 3, chipsLite: 1 },
-  pan: { height: 3.0, rest: 0.56, rMin: 0.85, rMax: 1.5, pad: 0.4, appear: 0.12, dropPart: 0.42, stay: 0.12, fade: 0.26, ring: 2.0, ringLife: 0.28, flash: 1.8, flashT: 0.07, stars: 5, starsLite: 3 },
-  stun: { n: 3, r: 0.42, lift: 0.28, size: 0.2, spin: 5.0 },
+  pan: { height: 3.0, rest: 0.56, rMin: 0.85, rMax: 1.5, pad: 0.4, appear: 0.12, dropPart: 0.42, stay: 0.12, fade: 0.26, ring: 2.0, ringLife: 0.28, flash: 1.25, flashT: 0.07, stars: 5, starsLite: 3 },
+  stun: { n: 3, r: 0.42, lift: 0.28, size: 0.24, spin: 5.0 },
   ball: { r: 0.2, spin: 11 },
   splat: { life: 0.42, ring: 0.85, flash: 1.3, bits: 5, bitsLite: 2 },
   col: { steel: 0xeaf4ff, steelB: 0xa8cfff, gold: 0xffd27a, goldB: 0xff9a2a, warm: 0xfff0d0, sauce: 0xff6a2a, sauceB: 0xb83210, dust1: 0xd8c8a8, dust2: 0x7a6a58, steam1: 0xfff4e6, steam2: 0xb89880 },
@@ -217,7 +217,7 @@ export class CookFx {
       if (!t) { this._puffs(g0, low ? 2 : 4, R, { a: 0.32, life: 0.4 }); return; }
       const fx = this._fx('panhit', K.ringLife + 0.1, (x) => {
         const k = x.t / K.ringLife; this._flat(rg, R * (0.55 + 0.45 * easeOut(k))); rg.material.uniforms.uA.value = I * K.ring * (1 - smooth(0.25, 1, k));
-        fl.quaternion.copy(this.camQ); fl.scale.setScalar(R * 1.5 * (0.7 + 0.5 * easeOut(x.t / K.flashT))); fl.material.uniforms.uA.value = I * K.flash * (1 - smooth(0, K.flashT * 2.2, x.t));
+        fl.quaternion.copy(this.camQ); fl.scale.setScalar(R * 1.05 * (0.7 + 0.5 * easeOut(x.t / K.flashT))); fl.material.uniforms.uA.value = I * K.flash * (1 - smooth(0, K.flashT * 2.2, x.t));
       });
       const rg = this.spr(fx, 1, 0xfff6dc, COOK.col.gold, 3), fl = this.spr(fx, 3, 0xffffff, COOK.col.warm, 7); rg.material.uniforms.uP.value = 1;
       fx.g.position.copy(g0); fl.position.set(0, top * K.rest + 0.05, 0);

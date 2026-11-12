@@ -1,6 +1,6 @@
 // 요리사 1차 개편 스킬(식칼 썰기 ck1_a1 · 팬 강타 ck1_a2 · 미트볼 던지기 ck1_b1)을 실제 스킬 경로(skills2.cast → 동작 → 피해 →
 // js/cookfx.js)로 시전하고 화면 띠와 수치를 남김. G.step(1/FPS) 한 프레임씩, Math.random 고정.
-// Usage: SKILL=chop|pan|ball LV=1..5 SCENE=hit|whiff|kill|stun GENDER=m|f SIZE=1100x760|390x844t FX=1|0 TAG=after DIR=90
+// Usage: SKILL=chop|pan|ball LV=1..5 SCENE=hit|whiff|kill|stun|miss GENDER=m|f SIZE=1100x760|390x844t FX=1|0 TAG=after DIR=90
 //        SEED=12345(Math.random 씨앗 — MISS가 나오면 바꿈) DUR=초
 //        URL=http://localhost:8797/index.html OUT=/tmp/cook node tools/browser-tests/cook_skills.js
 //   -> OUT/<TAG>_<skill>_lv<LV>_<scene>_<gender>_<size>_fx<FX>.png (+ .json)
@@ -76,7 +76,8 @@ const MARKS = (process.env.MARKS || (SKILL === 'pan' ? '0.05,0.15,0.22,0.27,0.30
     if (scene === 'kill') m.hp = Math.max(2, Math.round(p.stat('atk') * 0.5));   // dies on the first or second tick; the rest must not crash or linger
     window.__hp = m.hp;
     const e = p.skills2.cast(id, window.__at(dist)); if (e) return 'cast error: ' + e;
-    if (scene === 'whiff') { m.dead = true; m.remove(); }   // these skills need a target to start: a whiff = the target is gone before the hit
+    if (scene === 'whiff') { m.dead = true; m.remove(); }
+    if (scene === 'miss') Math.random = () => 0.0001;   // every accuracy roll fails -> MISS (명중 판정)   // these skills need a target to start: a whiff = the target is gone before the hit
     return { hp: window.__hp, atk: p.stat('atk'), def: m.stat('def'), lv: p.skills2.lvl(id), mult: p.skills2.mult(d || { id, type: 'attack' }), desc: d && d.desc, cd: d && d.cd, mp: d && d.mp };
   }, [SCENE, FPS, ID, DIST, +(process.env.SEED || 12345)]);
   if (typeof info === 'string') { console.log(info); await b.close(); return; }
