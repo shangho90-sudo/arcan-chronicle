@@ -24,8 +24,8 @@ export function npcMapKind(def) {
 const GLYPH = {
   weapon(c) {      // 칼 (오른쪽 위로)
     c.save(); c.rotate(Math.PI / 4);
-    poly(c, [[-0.13, -0.78], [0, -0.98], [0.13, -0.78], [0.13, 0.2], [-0.13, 0.2]]);
-    rect(c, -0.42, 0.2, 0.84, 0.16); rect(c, -0.09, 0.36, 0.18, 0.36); circ(c, 0, 0.8, 0.13);
+    poly(c, [[-0.2, -0.72], [0, -1.0], [0.2, -0.72], [0.2, 0.22], [-0.2, 0.22]]);
+    rect(c, -0.5, 0.22, 1.0, 0.2); rect(c, -0.12, 0.42, 0.24, 0.34); circ(c, 0, 0.84, 0.15);
     c.restore();
   },
   armor(c) {       // 방패
@@ -86,7 +86,7 @@ export function drawMapIcon(ctx, kind, x, y, r) {
   ctx.fillStyle = K.bg; ctx.fill(); ctx.globalAlpha = 0.35; ctx.fillStyle = g; ctx.fill(); ctx.globalAlpha = 1;
   ctx.lineWidth = Math.max(1.5, r * 0.2); ctx.strokeStyle = K.rim; ctx.stroke();
   ctx.lineWidth = Math.max(0.8, r * 0.09); ctx.strokeStyle = K.job ? '#ffe9a8' : 'rgba(255,255,255,.75)'; ctx.beginPath(); ctx.arc(x, y, r * 0.86, 0, 6.283); ctx.stroke();
-  ctx.translate(x, y); ctx.scale(r * 0.66, r * 0.66); GLYPH[kind](ctx);
+  ctx.translate(x, y); ctx.scale(r * 0.72, r * 0.72); GLYPH[kind](ctx);
   ctx.restore();
   return true;
 }

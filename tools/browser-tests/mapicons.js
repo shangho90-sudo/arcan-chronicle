@@ -25,7 +25,7 @@ for (const st of zl) {
   const b = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
   for (const sz of (process.env.SIZES || '1280x720,390x844t').split(',')) {
     const touch = sz.endsWith('t'), [W, H] = sz.replace('t', '').split('x').map(Number);
-    const pg = await (await b.newContext({ viewport: { width: W, height: H }, hasTouch: touch, isMobile: touch, deviceScaleFactor: 2 })).newPage(); const errs = [];
+    const pg = await (await b.newContext({ viewport: { width: W, height: H }, hasTouch: touch, isMobile: touch, deviceScaleFactor: +(process.env.DSF || 2) })).newPage(); const errs = [];
     pg.on('pageerror', e => errs.push(e.message)); pg.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
     const ev = (f, a) => pg.evaluate(f, a);
     await pg.goto(URL + '/index.html');
@@ -33,7 +33,7 @@ for (const st of zl) {
     await ev(() => localStorage.clear()); await click('새 게임'); await click('모험 시작'); await pg.waitForSelector('.prologue.on', { timeout: 60000 }); await click('건너뛰기');
     const ready = () => pg.waitForFunction(() => window.G && G.inWorld && G.player && !G.loading && G.zone && !document.querySelector('.prologue'), null, { timeout: 300000 });
     await ready(); await pg.waitForTimeout(1500);
-    const clip = async (sel, file) => { const r = await ev(s => { const e = document.querySelector(s); if (!e) return null; const b = e.getBoundingClientRect(); return { x: Math.max(0, b.x), y: Math.max(0, b.y), width: Math.min(innerWidth - Math.max(0, b.x), b.width), height: Math.min(innerHeight - Math.max(0, b.y), b.height) }; }, sel); if (r && r.width > 4 && r.height > 4) await pg.screenshot({ path: file, clip: r, timeout: 300000 }); };
+    const clip = async (sel, file) => { const r = await ev(s => { const e = document.querySelector(s); if (!e) return null; const b = e.getBoundingClientRect(); return { x: Math.max(0, b.x), y: Math.max(0, b.y), width: Math.min(innerWidth - Math.max(0, b.x), b.width), height: Math.min(innerHeight - Math.max(0, b.y), b.height) }; }, sel); if (r && r.width > 4 && r.height > 4) await pg.screenshot({ path: file, clip: r, timeout: 900000 }); };
     for (const zid of (process.env.ZONES || 'town,kairion_capital,baltern').split(',')) {
       if (zid !== 'town') { await ev(z => G.travel(z), zid); await pg.waitForTimeout(800); await ready(); await pg.waitForTimeout(2500); }
       // 아이콘 NPC가 가장 많이 모인 곳 옆에 서서 미니맵을 찍음
