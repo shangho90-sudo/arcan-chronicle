@@ -25,13 +25,13 @@ for (const st of zl) {
   const b = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
   for (const sz of (process.env.SIZES || '1280x720,390x844t').split(',')) {
     const touch = sz.endsWith('t'), [W, H] = sz.replace('t', '').split('x').map(Number);
-    const pg = await (await b.newContext({ viewport: { width: W, height: H }, hasTouch: touch, isMobile: touch, deviceScaleFactor: +(process.env.DSF || 2) })).newPage(); const errs = [];
+    const pg = await (await b.newContext({ viewport: { width: W, height: H }, hasTouch: touch, isMobile: touch, deviceScaleFactor: +(process.env.DSF || 1) })).newPage(); const errs = [];
     pg.on('pageerror', e => errs.push(e.message)); pg.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
     const ev = (f, a) => pg.evaluate(f, a);
     await pg.goto(URL + '/index.html');
     const click = async t => { await pg.waitForFunction(t => [...document.querySelectorAll('button,[aria-label]')].some(b => (b.getAttribute('aria-label') || b.textContent || '').trim() === t), t, { timeout: 300000 }); await ev(t => [...document.querySelectorAll('button,[aria-label]')].find(b => (b.getAttribute('aria-label') || b.textContent || '').trim() === t).click(), t); await pg.waitForTimeout(400); };
     await ev(() => localStorage.clear()); await click('새 게임'); await click('모험 시작'); await pg.waitForSelector('.prologue.on', { timeout: 60000 }); await click('건너뛰기');
-    const ready = () => pg.waitForFunction(() => window.G && G.inWorld && G.player && !G.loading && G.zone && !document.querySelector('.prologue'), null, { timeout: 300000 });
+    const ready = () => pg.waitForFunction(() => window.G && G.inWorld && G.player && !G.loading && G.zone && !document.querySelector('.prologue'), null, { timeout: 900000 });
     await ready(); await pg.waitForTimeout(1500);
     const clip = async (sel, file) => { const r = await ev(s => { const e = document.querySelector(s); if (!e) return null; const b = e.getBoundingClientRect(); return { x: Math.max(0, b.x), y: Math.max(0, b.y), width: Math.min(innerWidth - Math.max(0, b.x), b.width), height: Math.min(innerHeight - Math.max(0, b.y), b.height) }; }, sel); if (r && r.width > 4 && r.height > 4) await pg.screenshot({ path: file, clip: r, timeout: 900000 }); };
     for (const zid of (process.env.ZONES || 'town,kairion_capital,baltern').split(',')) {
@@ -43,7 +43,6 @@ for (const st of zl) {
       await pg.waitForTimeout(1500);
       const mini = await ev(() => (G.ui.minimap.icons || []).map(i => [i.id, i.kind]));
       await clip('#hMap', `${OUT}/mapicons_${zid}_mini_${sz}.png`);
-      await pg.screenshot({ path: `${OUT}/mapicons_${zid}_hud_${sz}.png`, timeout: 300000 });
       await ev(() => G.ui.showAreaMap()); await pg.waitForTimeout(5000);
       const got = await ev(() => ({ icons: (G.ui.minimap.icons || []).map(i => [i.id, i.kind, Math.round(i.x), Math.round(i.y)]), legend: [...document.querySelectorAll('.amlegend span')].map(e => e.textContent.trim()), list: [...document.querySelectorAll('.amitem')].filter(e => e.querySelector('.amkind')).map(e => e.querySelector('.amname').firstChild.textContent + '=' + e.querySelector('.amkind').alt) }));
       await pg.screenshot({ path: `${OUT}/mapicons_${zid}_area_${sz}.png`, timeout: 300000 });

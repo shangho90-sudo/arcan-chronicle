@@ -127,6 +127,12 @@ export class Minimap {
       ctx.lineWidth = 2.2 * dpr; ctx.strokeStyle = '#0a3a18'; ctx.strokeText('?', x, y + r * 0.06); ctx.fillStyle = '#ffffff'; ctx.fillText('?', x, y + r * 0.06);
     };
     const ri = (full ? 11 : 7.5) * dpr;
+    // 붙어 선 NPC(전직 마스터 줄 등)의 아이콘이 겹치지 않게 서로 밀어 냄 (화면 위치만, 최대 몇 px)
+    for (let it = 0; it < 8; it++) for (let i = 0; i < ic.length; i++) for (let j = i + 1; j < ic.length; j++) {
+      const A = ic[i][0], B = ic[j][0]; let dx = B.x - A.x, dy = B.y - A.y, d = Math.hypot(dx, dy); const need = ri * 2.05;
+      if (d >= need) continue; if (d < 0.01) { dx = 1; dy = 0; d = 1; }
+      const m = (need - d) / 2 / d; A.x -= dx * m; A.y -= dy * m; B.x += dx * m; B.y += dy * m;
+    }
     this.icons = ic.map(([q, n, kind]) => ({ id: n.def.id, kind, x: q.x, y: q.y, r: ri }));      // 확인용(tools/browser-tests/mapicons.js)
     for (const [q, n, kind, quest] of ic) {
       drawMapIcon(ctx, kind, q.x, q.y, ri);
