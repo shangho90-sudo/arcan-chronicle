@@ -546,6 +546,8 @@ function loadGLB(file) {
       const m = o.material;
       for (const t of [m.map, m.normalMap, m.roughnessMap, m.metalnessMap]) if (t) { t.anisotropy = ANISO; t.needsUpdate = true; }
       m.envMapIntensity = 0;
+      // 랜드마크(town_*)는 앞면이 남쪽(카메라 쪽)이라 해를 등져 늘 그늘 — 기본색을 조금 스스로 밝혀 그늘에서도 색이 읽히게 (전역 블룸·노출은 그대로)
+      if (file.startsWith('town_') && m.map && !m.emissiveMap) { m.emissive = new THREE.Color(0xffffff); m.emissiveMap = m.map; m.emissiveIntensity = 0.2; }
     });
     return gltf.scene;
   })();

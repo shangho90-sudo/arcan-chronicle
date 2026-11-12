@@ -103,6 +103,8 @@ export class Minimap {
       ctx.fillStyle = '#62d8ff'; ctx.fill(); ctx.lineWidth = 1.2 * dpr; ctx.strokeStyle = '#0b3550'; ctx.stroke();
       label(q, pt.label || (G.data.zones[pt.targetZone] || {}).name, 9, '#bff0ff');
     }
+    // 큰 건물 이름 (왕궁·길드 회관 등, 지역 전체 지도에서만)
+    for (const m of (z.def.town3d && z.def.town3d.models) || []) if (m.name && m.size && m.size[0] >= 12) label(to(m.pos[0], m.pos[1]), m.name, -8, /palace/.test(m.id) ? '#ffe9a8' : '#e8ecf8');
     // monsters / boss
     for (const a of z.actors) {
       if (a === p || a.dead || !a.def || a.faction === 'player') continue;

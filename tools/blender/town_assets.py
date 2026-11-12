@@ -13,7 +13,7 @@ HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.join(HERE, '..
 RAW = os.environ.get('RAW', '/home/claude/town3d'); FORCE = os.environ.get('FORCE') == '1'
 OUT = os.path.join(ROOT, 'assets', 'town3d'); MAN = os.path.join(OUT, 'town_manifest.json')
 TEX = int(os.environ.get('TEX', 1024)); PER_M, MIN_T, MAX_T = 1100, 9000, 26000
-BUDGET = {'kairion_palace': 42000}; TEXSIZE = {'kairion_palace': 2048}
+BUDGET = {'kairion_palace': 42000}; TEXSIZE = {'kairion_palace': 2048}          # 가로 12 m 이상 건물은 2048 px, 나머지 1024 px
 YAW = {'kairion_palace': -90}            # Tripo 초안의 앞면이 +X인 모델: Z축으로 돌려 앞면을 -Y로
 import re
 _SIZES = {m.group(1): float(m.group(2)) for m in re.finditer(r"\('town_(\w+)', ([\d.]+),", open(os.path.join(HERE, '..', 'world', 'towns.py')).read())}
@@ -74,7 +74,7 @@ def process(name):
     td = tempfile.mkdtemp()
     if img:
         src = os.path.join(td, 'c.png'); img.filepath_raw = src; img.file_format = 'PNG'; img.save()
-        im = ImageEnhance.Color(Image.open(src).convert('RGB').resize((TEXSIZE.get(name, TEX),) * 2, Image.LANCZOS)).enhance(1.08)
+        im = ImageEnhance.Color(Image.open(src).convert('RGB').resize((TEXSIZE.get(name) or (2048 if _SIZES.get(name, 0) >= 12 else TEX),) * 2, Image.LANCZOS)).enhance(1.08)
         dst = os.path.join(td, name + '_col.png'); im.save(dst)
         [n for n in nt.nodes if n.type == 'TEX_IMAGE'][0].image = bpy.data.images.load(dst)
     glb = os.path.join(td, name + '.glb')
