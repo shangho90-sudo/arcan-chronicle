@@ -222,8 +222,8 @@ NEW_MONS = {
 }
 # the original hand-made fields get some of them too (their camps keep their own spots; a new camp gets "level")
 NEW_MONS_EXISTING = {
-    'forest': [('mon_hedgehog', 5, (-60.0, 30.0)), ('mon_mandrake', 4, (30.0, 10.0))],
-    'mist_valley': [('mon_frog_shaman', 5, (40.0, 60.0)), ('mon_swamp_serpent', 5, (-60.0, -50.0))],
+    'forest': [('mon_hedgehog', 5, (57.0, -33.0)), ('mon_mandrake', 4, (-33.0, -13.0))],      # 2026-11-12 orient_fields.py: 숲 180°, 골짜기 90° 돌린 좌표
+    'mist_valley': [('mon_frog_shaman', 5, (-60.0, 40.0)), ('mon_swamp_serpent', 5, (50.0, -60.0))],
     'frost_highland': [('mon_penguin_knight', 5, (0.0, 0.0)), ('mon_ice_golem', 3, (50.0, -50.0))],
     'dragon_ruins': [('mon_flame_imp', 5, (-30.0, 20.0)), ('mon_demon_knight', 3, (40.0, 40.0))],
 }

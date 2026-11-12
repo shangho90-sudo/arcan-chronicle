@@ -13,7 +13,7 @@ const OUT = process.env.OUT || '/tmp/mh', TAG = process.env.TAG || 'after'; fs.m
   if (process.env.ROT) await ev(r => { const z = G.data.zones.forest; for (const q of z.props) if (q.type === 'landmark') q.rot = r; }, +process.env.ROT);
   await ev(() => G.loadZone('forest', 'from_town')); await pg.waitForFunction(() => G.zone && G.zone.def.id === 'forest' && !G.loading, null, { timeout: 300000 });
   await ev(z => { window.__zoom = z; }, +(process.env.ZOOM || 1));
-  for (const [n, x, z, fx, fz] of (process.env.ONLY === 'house' ? [['house', 13.0, 43.5, 0, -1]] : [['near', 14.2, 41.6, 0, 1], ['warp', 12.4, 36.4, 0.3, 1], ['house', 13.0, 43.5, 0, -1]])) {
+  for (const [n, x, z, fx, fz] of (process.env.ONLY === 'house' ? [['house', -16.0, -46.5, 0, 1]] : [['near', -17.2, -44.6, 0, -1], ['warp', -15.4, -39.4, -0.3, -1], ['house', -16.0, -46.5, 0, 1]])) {
     await ev(([x, z, fx, fz]) => { const p = G.player; for (const a of G.zone.actors) if (a.faction === 'monster') a.hp = 0; p.teleport({ x, z }); p.setFacing(fx, fz); p.body.place(p.pos); G.render.setFocus(p.pos, true); if ((window.__zoom || 1) !== 1) { G.render.cam.zoom = (window.__zoom || 1); G.render.cam.updateProjectionMatrix(); } }, [x, z, fx, fz]);
     await pg.waitForTimeout(6000);
     await pg.screenshot({ path: `${OUT}/mushhouse_${TAG}_${n}.png`, timeout: 300000 });
