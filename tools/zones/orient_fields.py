@@ -72,13 +72,13 @@ def move_portal(Z, pid, pos, path, width, tex, spawn=None, sign=None, trim=None)
 def main():
     done = []
     F = zone('forest')
-    if not F.get('oriented'):
+    if 'oriented' not in F:
         transform(F, 180); F['oriented'] = 180; done.append('forest')
     G = zone('mushroom_grove')
-    if not G.get('oriented'):
+    if 'oriented' not in G:
         transform(G, 180); G['oriented'] = 180; done.append('mushroom_grove')
     M = zone('mist_valley')
-    if not M.get('oriented'):
+    if 'oriented' not in M:
         # the auto-made link to the Baltern pass goes back to world.py (it puts it on the map side of the turned zone)
         bp = next((p for p in M['portals'] if p['id'] == 'to_baltern_pass'), None)
         if bp:
@@ -89,14 +89,26 @@ def main():
                     spawn=('from_highland', [10.0, 66.5], 200.0), sign=([15.0, 67.5], 180), trim=(0, 1))
         M['oriented'] = 90; done.append('mist_valley')
     H = zone('frost_highland')
-    if not H.get('oriented'):
+    if 'oriented' not in H:
         move_portal(H, 'to_ruins', (73.0, 4.0), [(40.0, -20.0), (56.0, -8.0), (67.0, 2.0), (72.0, 4.0)], 3.0, 'cobble',
                     spawn=('from_ruins', [66.5, 2.0], 250.0), sign=([67.0, 7.0], 270), trim=(0, 1))
         H['oriented'] = 0; done.append('frost_highland')
     Dr = zone('dragon_ruins')
-    if not Dr.get('oriented'):
+    if 'oriented' not in Dr:
         move_portal(Dr, 'to_town', (-10.0, -73.0), [(-28.0, -52.0), (-16.0, -64.0), (-10.0, -72.0)], 3.25, 'cobble')
         Dr['oriented'] = 0; done.append('dragon_ruins')
+    # 숲을 돌린 뒤 버섯 집이 워프 앞(카메라 쪽)에 와서 워프를 가림 -> 워프 뒤 오른쪽(화면 위쪽)으로 옮기고 문을 워프 쪽으로,
+    # 둘레 꽃·덤불(skirt)도 같이, 새 자리 나무는 치움. 글씨 표지판은 글씨가 카메라를 보게 원래 각도(45)로.
+    lm = next((q for q in F['props'] if q['type'] == 'landmark'), None)
+    if lm and lm['pos'] == [-16.0, -47.6]:
+        new = (-10.2, -38.4); dx, dz = new[0] - lm['pos'][0], new[1] - lm['pos'][1]
+        for q in F['props']:
+            if q.get('skirt'): q['pos'] = [R2(q['pos'][0] + dx), R2(q['pos'][1] + dz)]
+        F['props'] = [q for q in F['props'] if q is lm or q.get('skirt') or q['type'] == 'signpost' or math.hypot(q['pos'][0] - new[0], q['pos'][1] - new[1]) > 4.2]
+        lm['pos'] = list(new); lm['rot'] = 150
+        for q in F['props']:
+            if q['type'] == 'signpost' and q.get('text'): q['rot'] = 45
+        if 'forest' not in done: done.append('forest')
     print('oriented:', done or 'nothing (already done)')
     if '--write' in sys.argv and done:
         open(ZPATH, 'w').write(json.dumps(zones, ensure_ascii=False, indent=1) + ('\n' if raw.endswith('\n') else ''))
