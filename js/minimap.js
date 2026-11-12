@@ -137,8 +137,8 @@ export class Minimap {
     for (const [q, n, kind, quest] of ic) {
       drawMapIcon(ctx, kind, q.x, q.y, ri);
       if (quest) qbadge(q.x + ri * 0.75, q.y - ri * 0.75, ri * 0.62);
-      label(q, n.def.name, 12, quest ? '#b8ffc8' : '#ffe9b0');
     }
+    for (const [q, n, , quest] of ic) label(q, n.def.name, 12, quest ? '#b8ffc8' : '#ffe9b0');      // 이름은 아이콘을 다 그린 뒤에(옆 아이콘에 가리지 않게)
     for (const [q, n] of qn) { qbadge(q.x, q.y, (full ? 9 : 6.2) * dpr); label(q, n.def.name, 11, '#b8ffc8'); }
     // player arrow
     const P = p.pos, c = to(P.x, P.z);
