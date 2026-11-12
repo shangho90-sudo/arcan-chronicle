@@ -45,6 +45,7 @@ THEMES = {
                  mix=[('well', 1), ('stall', 3), ('cart', 1), ('hay', 3), ('barrels', 3), ('crates', 3), ('bench', 8), ('planter', 8), ('tree', 26), ('shrub', 26), ('flowerpatch', 22)], stalls=5, lamps=18),
     'kairion_capital': dict(centre='town_kairion_statue', title='왕국의 수도', palette=dict(wallstone='#f1ede4', basestone='#e6e2d8', slate='#4a66c8', plaster='#fbf6ea', pave='#f0eadc'), trees=['tree_broad_a', 'tree_forest_round'],
                  flowers=['flower_white', 'flower_yellow', 'flower_mixed'],
+                 palace=('town_kairion_palace', 34, '카이리온 왕궁'),      # 북쪽 한가운데, 앞면 남쪽 — 성벽 밖 성채(keep) 대신 섬
                  lm=[('town_kairion_guildhall', 20, '장인 길드 회관', 'big'), ('town_kairion_academy', 17, '왕립 학술원', 'big'), ('town_kairion_clocktower', 7, '왕도 시계탑', 'prop'), ('town_kairion_statue', 6, '건국왕 기마상', 'prop')],
                  mix=[('well', 2), ('stall', 6), ('cart', 2), ('barrels', 5), ('crates', 5), ('banner', 14), ('bench', 16), ('planter', 18), ('tree', 44), ('shrub', 40), ('flowerpatch', 34)], stalls=10, lamps=30),
     'baltern': dict(centre='town_baltern_goat', title='바위산 교역 도시', palette=dict(wallstone='#c9ccd4', basestone='#b9bcc6', slate='#5c7088', plaster='#e9e6de', pave='#d9d9d6', grass='#c6d0b4'), trees=['tree_forest_tall', 'tree_broad_b'],
@@ -87,6 +88,11 @@ def gen_town2(t, exits, extra_npcs=()):
     def add(i, pts): blocks.append(dict(id=i, pts=[[round(x, 3), round(z, 3)] for x, z in pts]))
     RP = 12.5 if W >= 60 else 10.5              # plaza radius (ring road outer edge + margin)
     keep = dict(pos=[0.0, Dd + t['keep'][1] / 2 + 3.5], w=t['keep'][0], d=t['keep'][1], h=t['keep'][2]) if t.get('keep') else None
+    pal = None                                  # 왕궁: 북쪽 성벽 안쪽 한가운데 (x, z, 가로, 세로, 높이, 앞면 z)
+    if th.get('palace') and th['palace'][0] in man:
+        pm = man[th['palace'][0]]; ps = th['palace'][1]; pw, pd, ph = ps * pm[0], ps * pm[1], ps * pm[2]
+        pal = dict(file=th['palace'][0], name=th['palace'][2], x=0.0, z=round(Dd - 2.2 - pd / 2, 2), w=pw, d=pd, h=ph, front=round(Dd - 2.2 - pd, 2)); keep = None
+    nblock = (pal['w'] / 2 + 5) if pal else (keep['w'] / 2) if keep else None       # 북쪽 성문·탑이 피할 가운데 폭
 
     # ------------------------------------------------------------------ gates: one per neighbour, on the wall facing it
     gates, used = [], {'n': [], 's': [], 'e': [], 'w': []}
@@ -94,7 +100,7 @@ def gen_town2(t, exits, extra_npcs=()):
         side = ('n' if dz > 0 else 's') if abs(dz) >= abs(dx) else ('e' if dx > 0 else 'w')
         if side in 'ns': lim = W - 13; a = max(-lim, min(lim, dx / max(abs(dz), 1e-6) * Dd * 0.75))
         else: lim = Dd - 13; a = max(-lim, min(lim, dz / max(abs(dx), 1e-6) * W * 0.75))
-        if side == 'n' and keep and abs(a) < keep['w'] / 2 + 9: a = (1 if a >= 0 else -1) * (keep['w'] / 2 + 9)
+        if side == 'n' and nblock and abs(a) < nblock + 9: a = (1 if a >= 0 else -1) * (nblock + 9)
         for _ in range(8):                      # keep gates on one wall apart
             hit = [u for u in used[side] if abs(u - a) < 18]
             if not hit: break
@@ -120,7 +126,7 @@ def gen_town2(t, exits, extra_npcs=()):
         for side, pts in (('n', [(-W * 0.45, Dd), (W * 0.45, Dd)]), ('s', [(-W * 0.5, -Dd), (W * 0.5, -Dd)]), ('e', [(W, 0)]), ('w', [(-W, 0)])):
             for i, (x, z) in enumerate(pts):
                 a = x if side in 'ns' else z
-                if all(abs(g['a'] - a) > 12 for g in gates if g['side'] == side) and not (side == 'n' and keep and abs(x) < keep['w'] / 2 + 4):
+                if all(abs(g['a'] - a) > 12 for g in gates if g['side'] == side) and not (side == 'n' and nblock and abs(x) < nblock + 4):
                     towers.append(dict(id='tower_%s%d' % (side, i), pos=[round(x, 2), round(z, 2)], r=2.6, h=wallH + 2.5))
     for w in walls: add(w['id'], seg_rect(w['a'], w['b'], WT))
     for tw in towers: add(tw['id'], circle(*tw['pos'], tw['r'] + 0.1, 16))
@@ -149,14 +155,17 @@ def gen_town2(t, exits, extra_npcs=()):
     streets = []                                 # (pts, width, kind)
     for g in gates:
         (gx, gz), (ox, oz) = g['pos'], g['o']; inx, inz = gx - ox * 6.5, gz - oz * 6.5; d = math.hypot(inx, inz)
-        streets.append(([(gx + ox * 1.0, gz + oz * 1.0), (inx, inz), (inx / d * (RP - 3.6), inz / d * (RP - 3.6))], 5.0, 'street'))
+        if pal and g['side'] == 'n': streets.append(([(gx + ox * 1.0, gz + oz * 1.0), (inx, inz), (inx, pal['front'] - 7.0)], 5.0, 'street'))     # 왕궁 옆 성문: 곧장 남쪽 고리 길로 (왕궁을 가로지르지 않게)
+        else: streets.append(([(gx + ox * 1.0, gz + oz * 1.0), (inx, inz), (inx / d * (RP - 3.6), inz / d * (RP - 3.6))], 5.0, 'street'))
         g['out'] = ([(gx + ox * 0.5, gz + oz * 0.5), (gx + ox * (OUT - 1.5), gz + oz * (OUT - 1.5))], 5.2)
     LX, LZ = round(W * 0.7, 1), round(Dd * 0.7, 1)
+    LZN = round(pal['front'] - 7.0, 1) if pal else LZ           # 고리 길 북쪽 변 (왕궁이 있으면 앞마당 앞으로 당김)
     loop = W >= 36
     if loop:
-        streets.append(([(-LX, -LZ), (LX, -LZ), (LX, LZ), (-LX, LZ), (-LX, -LZ)], 4.0, 'street'))
+        streets.append(([(-LX, -LZ), (LX, -LZ), (LX, LZN), (-LX, LZN), (-LX, -LZ)], 4.0, 'street'))
         for sx, sz in ((1, 0), (-1, 0), (0, 1), (0, -1)):       # spokes plaza -> loop where no gate street already runs that way
-            ex, ez = sx * LX, sz * LZ
+            ex, ez = sx * LX, sz * (LZN if sz > 0 else LZ)
+            if pal and sz > 0: streets.append(([(0.0, RP - 3.6), (0.0, pal['front'] + 0.6)], 6.4, 'street')); continue      # 광장 → 왕궁 정문 큰길
             if all(seg_dist(ex, ez, s[0][1], s[0][2]) > 9 for s in streets if len(s[0]) == 3): streets.append(([(sx * (RP - 3.6), sz * (RP - 3.6)), (ex, ez)], 3.6, 'street'))
     def street_d(x, z):
         best = 1e9
@@ -213,6 +222,10 @@ def gen_town2(t, exits, extra_npcs=()):
         add(mid, [(x - ww * 0.44, z - dd * 0.44), (x + ww * 0.44, z - dd * 0.44), (x + ww * 0.44, z + dd * 0.44), (x - ww * 0.44, z + dd * 0.44)])
         for px, pz in rect_pts(x, z, ww, dd, 0.3): taken.append((px, pz, 1.3))
         lm_at[mid] = (x, z, h, max(w, d) / 2)
+    if pal:                                       # 왕궁이 먼저 자리를 잡음; 큰 랜드마크는 그 좌우(고리 길 북쪽)
+        put_model(pal['file'].replace('town_', 'lm_'), pal['file'], (pal['w'], pal['d'], pal['h']), pal['name'], pal['x'], pal['z'], 180)
+        lm_at[pal['file'].replace('town_', 'lm_')] = (pal['x'], pal['z'], 180, pal['d'] / 2)
+        zq = (LZN + Dd) / 2; quads[0] = (pal['w'] / 2 + 21.0, zq); quads[1] = (-pal['w'] / 2 - 21.0, zq)
     fixed = list(t.get('fixed_models', []))       # 아르칸: 대장간·약국 (원래 모델)
     bigs = [(f, s, n) for f, s, n, kind in th['lm'] if kind == 'big' and f in man]; props = [(f, s, n) for f, s, n, kind in th['lm'] if kind == 'prop' and f in man and not (f == th.get('centre') and not centre)]
     qi = 0
@@ -265,7 +278,7 @@ def gen_town2(t, exits, extra_npcs=()):
             ox, oz = SIDE[side]; L = (LX if side in 'ns' else LZ) - HD - 5; n = max(0, int((2 * L) // (HW + 3.0)))
             for i in range(n):
                 a = -L + (i + 0.5) * 2 * L / n; off = 2.0 + HD / 2 + 1.6
-                x, z = (a, oz * (LZ - off)) if side in 'ns' else (ox * (LX - off), a)
+                x, z = (a, oz * ((LZN if side == 'n' else LZ) - off)) if side in 'ns' else (ox * (LX - off), a)
                 slots.append((x, z, {'n': 0, 's': 180, 'e': 90, 'w': 270}[side], 'inner'))
     rnd.shuffle(slots); slots.sort(key=lambda s: s[3] != 'wall' and rnd.random() < 0.5)
     houses = []; names = list(t.get('named_houses', []))
@@ -296,7 +309,8 @@ def gen_town2(t, exits, extra_npcs=()):
         elif kind == 'gate':
             g = next((g for g in gates if g['nid'] == arg), gates[int(arg) % len(gates)] if arg.isdigit() else gates[0]); s = rnd.choice((-1, 1))
             ax, az = g['pos'][0] - g['o'][0] * 8.5 + g['tan'][0] * 4.6 * s, g['pos'][1] - g['o'][1] * 8.5 + g['tan'][1] * 4.6 * s
-        elif kind == 'lm' and ('lm_' + arg in lm_at or arg in lm_at):
+        elif kind == 'lm' and ('lm_' + arg.partition('@')[0] in lm_at or arg.partition('@')[0] in lm_at):      # lm:<랜드마크>[@옆으로 m]
+            arg, _, side_m = arg.partition('@'); extra = extra or side_m or 0
             x, z, h, r = lm_at.get('lm_' + arg) or lm_at[arg]; a = math.radians(h); off = float(extra or 0)
             ax, az = x + math.sin(a) * (r + 2.4) + math.cos(a) * off, z + math.cos(a) * (r + 2.4) - math.sin(a) * off; face = (x, z)
         elif kind == 'house' and any(hs['id'] == arg or hs['style'] == arg for hs in houses):
@@ -349,6 +363,19 @@ def gen_town2(t, exits, extra_npcs=()):
                 u = (i + 0.5) / n; s = 1 if (i + nl) % 2 else -1; nx, nz = -(b[1] - a[1]) / L, (b[0] - a[0]) / L
                 x, z = a[0] + (b[0] - a[0]) * u + nx * s * (w / 2 + 0.9), a[1] + (b[1] - a[1]) * u + nz * s * (w / 2 + 0.9)
                 if ok(x, z, 0.5, road=0.25): bl('town_lamp', x, z, 0, 1.0, 'lamp', 0.9); nl += 1
+
+    if pal:                                       # 왕궁 앞마당: 큰길 양옆 깃발 줄 + 정문 양옆 화단, 나머지는 비워 둠
+        fz = pal['front']
+        for i, z in enumerate((fz - 1.6, fz - 6.6, fz - 11.6, fz - 16.6)):
+            for sx in (-1, 1):
+                if z > RP + 4 and ok(sx * 4.9, z, 0.5, road=0.1): bl('town_banner', sx * 4.9, z, 180, 1.0, 'lamp', 0.8)
+        for sx in (-1, 1):
+            for x in (sx * pal['w'] * 0.3, sx * pal['w'] * 0.47):
+                z = fz - 3.2
+                if not ok(x, z, 1.6, road=0.2): continue
+                decor.append(dict(type='planter', pos=[round(x, 2), round(z, 2)], r=1.5)); add('pal_planter%d' % len(decor), circle(x, z, 1.5, 12)); taken.append((x, z, 2.0))
+                for j in range(5): a = j / 5 * 6.283; blprops.append(dict(model=rnd.choice(th['flowers']), pos=[round(x + 2.0 * math.cos(a), 2), round(z + 2.0 * math.sin(a), 2)], rot=round(rnd.uniform(0, 360), 1), scale=0.85))
+        for i in range(-5, 6): taken.append((i * pal['w'] / 10, fz - 3.4, 2.4))
 
     # ------------------------------------------------------------------ decoration by theme
     trees, flowers = th['trees'], th['flowers']

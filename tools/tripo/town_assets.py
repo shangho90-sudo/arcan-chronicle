@@ -20,6 +20,8 @@ PROMPTS = {
     'kairion_guildhall': 'a grand royal guild hall, white stone walls, tall arched windows, blue slate roofs with gold trim, two small corner turrets and a wide entrance stair, ' + B,
     'kairion_academy': 'a royal academy building with a large blue dome, white marble columns and a golden spire, ' + B,
     'kairion_clocktower': 'a tall elegant white stone clock tower with a blue pointed roof, golden clock face and royal banners, ' + B,
+    # 왕궁(2026-11-12): 왕이 사는 곳 — 북쪽 구역 한가운데
+    'kairion_palace': 'a majestic royal palace, the residence of a king: white marble walls, a tall central hall with a golden crown-shaped spire, four round corner towers with royal blue conical roofs and gold finials, blue slate roofs with gold trim, a grand wide front staircase with a red carpet leading to a huge arched golden double door, balconies, tall arched stained glass windows, long royal blue banners with a golden crest, symmetrical front facade, ' + B,
     'kairion_statue': 'a monument statue of a noble king knight on a rearing horse holding a sword high, grey stone on a tall carved pedestal with gold plaque, ' + P,
     # 발테른 공국 — 바위산 교역 도시
     'baltern_tradehall': 'a ducal trade hall of grey mountain stone with steep dark blue roofs, a covered arcade of arches on the ground floor and hanging merchant banners, ' + B,
@@ -57,6 +59,7 @@ PROMPTS = {
     'kreutz_ballista': 'a large wooden siege ballista on a wheeled frame with iron fittings and a stack of bolts, dusted with snow, ' + P,
     'kreutz_brazier': 'a tall iron signal brazier tower with a blazing fire bowl on top of a stone column with chains, ' + P,
 }
+DETAILED = {'kairion_palace'}                    # 가까이서 크게 보이는 건물은 텍스처를 한 단계 높게
 SEM = threading.Semaphore(int(os.environ.get('PAR', '4')))
 LOCK = threading.Lock()
 TASKS = os.path.join(RAW, 'town_tasks.json')
@@ -72,7 +75,7 @@ def gen(name):
         tid = tasks().get(name)
         if not tid:
             for k in range(20):                                   # 429(동시 생성 한도)면 기다렸다가 다시
-                r = tripo.task({'type': 'text_to_model', 'model_version': 'v3.0-20250812', 'prompt': PROMPTS[name], 'texture': True, 'pbr': True, 'texture_quality': 'standard'})
+                r = tripo.task({'type': 'text_to_model', 'model_version': 'v3.0-20250812', 'prompt': PROMPTS[name], 'texture': True, 'pbr': True, 'texture_quality': 'detailed' if name in DETAILED else 'standard'})
                 if r.get('http_error') != 429: break
                 time.sleep(30)
             if 'data' not in r: print(name, 'Tripo 요청 실패:', json.dumps(r, ensure_ascii=False)[:300], flush=True); return

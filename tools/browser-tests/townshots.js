@@ -1,5 +1,5 @@
 // 마을 리뉴얼 화면 확인: 마을로 가서 광장·성문(워프)·랜드마크·시장·공원·NPC 무리와 지역 지도를 캡처.
-// Usage: ZONES=town,kairion_capital SIZE=1280x760 [SHOTS=plaza,gates,lm,market,park,npcs,map] [PORT=8765] node tools/browser-tests/townshots.js -> OUT/<zone>_<shot>_<size>.png
+// Usage: ZONES=town,kairion_capital SIZE=1280x760 [SHOTS=plaza,gates,lm,close,market,park,npcs,map,perf] [TAG=before] [PORT=8765] node tools/browser-tests/townshots.js -> OUT/<zone>_<shot>_<size>.png
 const { chromium } = require('playwright'); const fs = require('fs');
 const OUT = process.env.OUT || '/tmp/towns'; fs.mkdirSync(OUT, { recursive: true });
 const PORT = process.env.PORT || 8765, SZ = process.env.SIZE || '1280x760', touch = SZ.endsWith('t'), [W, H] = SZ.replace('t', '').split('x').map(Number);
@@ -36,6 +36,8 @@ const ZONES = (process.env.ZONES || 'town').split(','), SHOTS = (process.env.SHO
     if (SHOTS.includes('plaza')) await at('plaza', 0, -9);
     if (SHOTS.includes('gates')) for (const [id, pos, hd] of info.gates) { const a = (hd ?? 180) * Math.PI / 180; await at(id, pos[0] - Math.sin(a) * 6, pos[1] - Math.cos(a) * 6); await at(id + '_out', pos[0] + Math.sin(a) * 4.5, pos[1] + Math.cos(a) * 4.5); }
     if (SHOTS.includes('lm')) for (const [id, pos, size] of info.lm) await at(id, pos[0], pos[1] - size[1] / 2 - 5);
+    // close: 랜드마크 바로 옆(앞면 오른쪽 모서리 3 m)에 서서 — 메시가 깨져 보이는지 가까이서 확인 (TAG로 전/후 구분)
+    if (SHOTS.includes('close')) for (const [id, pos, size] of info.lm.filter((m, i) => !process.env.LM || process.env.LM.split(',').some(k => m[0].includes(k))).slice(0, +process.env.NLM || 99)) await at(id + '_close' + (process.env.TAG ? '_' + process.env.TAG : ''), pos[0] + size[0] * 0.3, pos[1] - size[1] / 2 - 2.2);
     if (SHOTS.includes('market') && info.market) await at('market', info.market[0], info.market[1]);
     if (SHOTS.includes('park') && info.park) await at('park', info.park[0], info.park[1]);
     if (SHOTS.includes('map')) { await ev(() => G.ui.showAreaMap()); await pg.waitForTimeout(5000); await pg.screenshot({ path: `${OUT}/${zid}_map_${SZ}.png`, timeout: 300000 }); await ev(() => G.ui.close()); }
