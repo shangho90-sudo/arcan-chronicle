@@ -464,12 +464,19 @@
 "cd": 4,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "attack",
+"anim": "ph_smash",
 "ops": [
+{
+"op": "fx",
+"pharm": "swing",
+"at": -0.25
+},
 {
 "op": "hit",
 "shape": "single",
 "coef": 2.2,
+"oneHit": true,
+"sfx": "ph_smash_hit",
 "fx": {
 "pharm": "smash"
 },
@@ -488,6 +495,9 @@
 "fx": {
 "color": 16765562
 },
+"sfx": "ph_smash_swing",
+"sfxAt": "strike",
+"sfxLead": 0.09,
 "status": {
 "data": true,
 "impl": true,

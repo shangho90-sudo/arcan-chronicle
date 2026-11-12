@@ -153,6 +153,9 @@ export class CreatureBody {
   setDir(d) { this.targetYaw = (((d % 8) + 8) % 8) * 45 * DEG; }
   setFacing(x, z) { if (x * x + z * z < 1e-6) return; this.targetYaw = Math.atan2(x, -z); }
   flash(d) { this.flashT = Math.max(this.flashT, d); }
+  /** heavy blow reaction (약사 유봉 내려찍기): squashed + tipped away from the blow at once, springs back over `d` s. Visual only —
+   *  the actor's position is untouched. (x, z) = blow direction in game space. A new punch restarts it, never adds. */
+  punch(x, z, d = 0.2) { const m = Math.hypot(x, z) || 1; this.punchT = d; this.punchD = d; this.punchX = x / m; this.punchZ = -z / m; }
   setTint(r, g, b) { for (const m of this.mats) m.color.setRGB(Math.min(1, r * 1.0), Math.min(1, g), Math.min(1, b)); }
   setVisible(v) { this.visible = v; this.root.visible = v; this.shadow.visible = v; }
   get time01() { const a = this.sh.actions[this.action]; return Math.min(1, this.t * a.fps / a.frames); }
@@ -203,6 +206,11 @@ export class CreatureBody {
       case 'dash': P.position.z = Math.sin(u * Math.PI) * s * 0.25; P.rotation.x = 0.15; break;
       case 'hit': P.position.z = -Math.sin(u * Math.PI) * s * 0.08; P.rotation.x = -Math.sin(u * Math.PI) * 0.15; break;
       case 'death': P.rotation.z = Math.min(1, u * 1.6) * Math.PI / 2 * 0.95; P.position.y = -Math.max(0, u - 0.6) * s * 0.4; break;
+    }
+    if (this.punchT > 0) {   // squash down + lean / slide a little along the blow, overshoot once on the way back
+      this.punchT -= dt; const u = 1 - Math.max(0, this.punchT) / this.punchD, k = u < 0.3 ? 1 - 0.25 * (u / 0.3) : 0.75 * Math.cos((u - 0.3) / 0.7 * Math.PI * 1.5) * (1 - (u - 0.3) / 0.7);
+      const c = Math.cos(this.yaw), sn = Math.sin(this.yaw), lx = this.punchX * c - this.punchZ * sn, lz = this.punchX * sn + this.punchZ * c;   // blow direction in the root's local frame
+      sy *= 1 - 0.16 * k; sxz *= 1 + 0.09 * k; P.position.x += lx * 0.07 * s * k; P.position.z += lz * 0.07 * s * k; P.rotation.x += lz * 0.16 * k; P.rotation.z += -lx * 0.16 * k;
     }
     // squash & stretch around the scaled model (keeps the feet on the ground)
     this.innerScale = this.innerScale || sc; I.scale.set(this.innerScale * sxz, this.innerScale * sy, this.innerScale * sxz);

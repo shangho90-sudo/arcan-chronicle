@@ -375,8 +375,23 @@ PH_SLAM = action('ph_slam', [
     key(0.86, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
 ], 0.30, 0.66, [[0.25, 0.33]], fadeIn=0.06, fadeOut=0.16)
 PH_SLAM.update(trailLife=0.16, trailColor=[1.7, 1.4, 0.7])
+# 유봉 내려찍기 (ph1_a1 '유봉강타', anim ph_smash, 2026-11-12): 준비 0.17 s (무릎을 굽히고 상체를 뒤로 젖히며 유봉을 머리 위 뒤로)
+# -> 내려찍기 0.08 s (허리·어깨·팔이 함께, 가장 빠른 구간 끝이 타격 0.25 s = 예전 attack 동작과 같은 타격 시각) -> 앞으로 실린
+# 자세로 잠깐 버팀 -> 부드러운 복귀 (전체 0.55 s 그대로). 발은 제자리(STEP). 칼 잔상은 쓰지 않고(trail 없음) 둔기 궤적은
+# js/pharmfx.js swing()이 실제 유봉 끝을 따라 그림. windT / strikeT = 그 이펙트가 읽는 준비 끝 / 타격 시각.
+PH_SMASH = action('ph_smash', [
+    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
+    key(0.10, 'o', twist=-10, lean=-9, sink=0.13, hand=[-16, 66, 0.80], blade=[-10, 96], elbow=[-0.6, 0.2, -1], armL=[64, 30]),
+    key(0.17, 's', twist=-14, lean=-15, sink=0.11, hand=[-10, 84, 0.86], blade=[-4, 126], elbow=[-0.6, 0.3, -1], armL=[84, 34], squint=True),
+    key(0.215, 'i', twist=-2, lean=6, sink=0.15, hand=[-4, 44, 0.98], blade=[-2, 52], elbow=[-0.5, -0.4, -0.6], armL=[40, 36], squint=True),
+    key(0.25, None, twist=6, lean=27, sink=0.27, hand=[0, -22, 1.0], blade=[2, -50], elbow=[-0.4, -1, -0.2], armL=[24, 40], squint=True),
+    key(0.31, 'o', twist=8, lean=32, sink=0.31, hand=[2, -33, 0.95], blade=[4, -66], elbow=[-0.4, -1, -0.1], armL=[18, 44], squint=True),
+    key(0.43, 's', twist=5, lean=15, sink=0.13, hand=[4, -38, 0.84], blade=[12, -28], elbow=[-0.5, -1, -0.1], armL=[14, 30]),
+    key(0.55, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
+], 0.25, 0.40, None, fadeIn=0.05, fadeOut=0.14)
+PH_SMASH.update(windT=0.17, strikeT=0.25)
 
-SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL] + [DRAW, SHEATHE, PH_SPIN, PH_SLAM]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
+SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL] + [DRAW, SHEATHE, PH_SPIN, PH_SLAM, PH_SMASH]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
 
 acts = json.load(open(P))
 names = {'attack', 'attack2'} | {x['name'] for x in SKILL_ACTS}

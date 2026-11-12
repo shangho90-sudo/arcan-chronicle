@@ -6,6 +6,7 @@ import { HitShape, CombatMath, clamp, clamp01 } from './core.js';
 import { skillSound } from './sfx.js';
 import { salImpact } from './salfx.js';
 import { yeonImpact, LEAD as YEON_LEAD } from './yeonfx.js';
+const SMASH_STOP = 0.06, SMASH_KICK = [0.11, 0.1];   // 유봉 내려찍기: local hit-stop (s, caster + target visuals only), camera kick [m, s]
 import { biyeonImpact } from './biyeonfx.js';
 import { bashImpact, BASH } from './bashfx.js';
 
@@ -265,12 +266,12 @@ export class SkillEngine {
     const r = CombatMath.compute(this.power(ctx), c, def, pc.stat('crit'), critDmg, t.stat('dmgReduce'));
     const kdir = { x: t.pos.x - pc.pos.x, z: t.pos.z - pc.pos.z };
     const knock = op.knock && !(t.isBoss) && !(t.def && t.def.ai === 'heavy') ? op.knock * 0.4 : 0;
-    t.takeDamage({ source: pc, amount: r.amount, crit: r.crit, kdir, knockback: knock, localStop: !!(op.fx && op.fx.bash) });
+    t.takeDamage({ source: pc, amount: r.amount, crit: r.crit, kdir, knockback: knock, localStop: op.fx && op.fx.pharm === 'smash' ? 'quiet' : !!(op.fx && op.fx.bash) });
     if (op.push && !t.isBoss && !t.dead) { const m = Math.hypot(kdir.x, kdir.z) || 1; t.knock = { x: kdir.x / m * op.push * 10, z: kdir.z / m * op.push * 10 }; t.hitReact = Math.max(t.hitReact || 0, 0.4); }   // push = m 밀어냄(배쉬, 무거운 몬스터 포함·보스 제외)
     if (op.pull && !t.isBoss && !t.dead) { const p = op.pullTo || ctx.aim; const ddx = p.x - t.pos.x, ddz = p.z - t.pos.z, m = Math.hypot(ddx, ddz); if (m > 0.3) t.knock = { x: ddx / m * op.pull * 3, z: ddz / m * op.pull * 3 }; }
     if (op.launch && !t.isBoss && !(t.def && t.def.ai === 'heavy')) applyStatus(t, { id: 'stagger', dur: op.launch, val: 1, ch: 1 }, pc);
     this.combatT = 5;
-    pc.onHitLanded && pc.onHitLanded(c >= 2 && !(op.fx && op.fx.bash));   // 배쉬: no global hit-stop, its own local freeze (opHit, BASH.stop)
+    pc.onHitLanded && pc.onHitLanded(c >= 2 && !(op.fx && (op.fx.bash || op.fx.pharm === 'smash')), !!(op.fx && op.fx.pharm === 'smash'));   // 배쉬: no global hit-stop, its own local freeze (opHit, BASH.stop)
     return r.amount;
   }
   /** shared on-hit extras: statuses, marks, temperature, gains */
@@ -378,11 +379,14 @@ export class SkillEngine {
     const physical = !op.elem && op.coef > 0 && ctx.d.type !== 'ultimate' && op.shape !== 'circle' || (ctx.d.weapon && op.coef > 0);
     // hitsPerLv: the skill's own hit count grows with its level (견습생 '연'); noExtra: no automatic extra strikes
     const baseHits = Math.max(1, (op.hits || 1) + (op.hitsPerLv ? Math.floor(op.hitsPerLv * (ctx.L - 1)) : 0)), extra = physical && !op.noExtra && !op.hitsPerLv ? Math.floor((ctx.L - 1) / 2) : 0, hits = baseHits + extra;
-    if (extra) op = { ...op, coef: op.coef * baseHits / hits * (1 + 0.06 * extra), gap: op.gap || 0.12 };   // total grows a little, split across more strikes
+    let hits_ = hits;
+    // oneHit (약사 유봉 내려찍기 '유봉강타'): the level's extra strikes are folded into ONE heavy blow — same total damage
+    if (extra && op.oneHit) { op = { ...op, coef: op.coef * (1 + 0.06 * extra) }; hits_ = baseHits; }
+    else if (extra) op = { ...op, coef: op.coef * baseHits / hits * (1 + 0.06 * extra), gap: op.gap || 0.12 };   // total grows a little, split across more strikes
     const op0 = op;
-    for (let h = 0; h < hits; h++) {
+    for (let h = 0; h < hits_; h++) {
       // last: overrides for the final strike only (약사 유봉 휘두르기: 5번째 타격이 더 세고 적을 밀쳐 냄)
-      const op = op0.last && h === hits - 1 ? { ...op0, ...op0.last } : op0;
+      const op = op0.last && h === hits_ - 1 ? { ...op0, ...op0.last } : op0;
       const run = () => {
         if (pc.dead) return;
         let ts;
@@ -406,10 +410,14 @@ export class SkillEngine {
             const fd = { x: f.x * ca - f.z * sa, z: f.x * sa + f.z * ca };
             FX.slash(op.fx.slash, op.shape === 'single' && ts[0] ? ts[0].pos : (op.atAim ? ctx.aim : pc.pos), fd, { color: op.alt && h % 3 === 2 ? 0xffd27a : col, radius: op.r || 2, angle: op.ang || 100, length: op.len, width: op.w, mirror: mir, tilt: op.alt ? [0.22, -0.3, 0.45][h % 3] : (op.sweep || 0) * 0.2 });
           }
-          if (op.fx.pharm === 'smash') {   // 유봉 내려찍기: gold arc on the real pestle tip, compact star at the target's real hit point, small ring + chips at its feet
+          if (op.fx.pharm === 'smash') {   // 유봉 내려찍기('유봉강타'): platinum flash at the target's real hit point, one thin gold ring + cracks + chips + teal residue at its feet
             const t = ts[0]; let tipY = null; try { const b = pc.body.bladePoints(); if (b) tipY = b[1].y; } catch (e) { tipY = null; }
-            FX.pharm('smash', pc, t ? { f, hit: bashImpact(t, f, tipY), ground: { x: t.pos.x, y: t.pos.y || 0, z: t.pos.z }, h } : { f, whiff: true, h });
-            if (t) { pc.freezeT = Math.max(pc.freezeT || 0, 0.04); t.freezeT = Math.max(t.freezeT || 0, 0.04); }   // local hit-stop (these two only, like 배쉬) — never G.hitStop
+            FX.pharm('smash', pc, t ? { f, hit: bashImpact(t, f, tipY), ground: { x: t.pos.x, y: t.pos.y || 0, z: t.pos.z }, h, r: t.radius, swing: ctx.pharmFx } : { f, whiff: true, h, swing: ctx.pharmFx });
+            if (t) {   // only on a real hit, only these two (never G.hitStop); max() so repeated hits never add up
+              pc.freezeT = Math.max(pc.freezeT || 0, SMASH_STOP); t.freezeT = Math.max(t.freezeT || 0, SMASH_STOP);
+              if (t.body && t.body.punch) t.body.punch(f.x, f.z, 0.2);                                     // visual squash + flinch along the blow (no position change)
+              if (G.render.kick && !G.reduceFlash) G.render.kick(f.x, f.z, SMASH_KICK[0], SMASH_KICK[1]);   // one short directional camera kick
+            }
           }
           if (op.fx.pharm === 'push') FX.pharm('push', pc, { f, r: op.r || 2.2, ang: op.ang || 80, hits: ts.map(t => ({ x: t.pos.x, y: t.pos.y || 0, z: t.pos.z, boss: !!t.isBoss })) });   // 밀어내기: wind ribbons across the real cone, dust streaks on each enemy pushed
           if (op.fx.pharm === 'spin') FX.pharm('spin', pc, { r: op.r, h, n: hits, last: h === hits - 1, hits: ts.map(t => t.pos) });   // 유봉 휘두르기: ribbons on the real pestle tip, thin ring on the last strike (js/pharmfx.js)

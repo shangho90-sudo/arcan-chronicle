@@ -57,7 +57,7 @@ export class Renderer {
     this.hemi = new THREE.HemisphereLight(0xaab4c0, 0x707880, 2.2);
     this.scene.add(this.sun, this.sun.target, this.hemi);
     this.lightFrom = rotYUnity(CAM.yaw, { x: -0.55, y: 0.85, z: -0.45 });
-    this.shake = 0; this.shakeT = 0; this.shakeScale = 0.7;
+    this.shake = 0; this.shakeT = 0; this.shakeScale = 0.7; this.kickT = 0; this.kickA = 0; this.kickD = 0.1; this.kickX = 0; this.kickZ = 0;
     this.zoneRoot = null;
     try { this.post = new Post(this.r); } catch (e) { console.warn('post', e); this.post = null; }
     this.resize();
@@ -88,12 +88,23 @@ export class Renderer {
     const dx = u.x - f.x, dz = u.z - f.z, m = Math.hypot(dx, dz);
     if (m > 4) { f.x = u.x - dx / m * 4; f.z = u.z - dz / m * 4; }
   }
+  /** one short camera kick along a ground direction (game x / z): out fast, small counter-swing, at rest within `d` s. A kick
+   *  while one is still playing does not add: the stronger of the two wins and the timer restarts (repeated / multi hits never
+   *  pile up). The HUD is DOM, it does not move. Scaled by the "화면 흔들림" setting like addShake. */
+  kick(x, z, a = 0.1, d = 0.1) {
+    if (this.shakeScale <= 0) return; const m = Math.hypot(x, z) || 1, amp = Math.min(0.2, a) * this.shakeScale;
+    if (this.kickT > 0 && this.kickA * (this.kickT / this.kickD) > amp) return;
+    this.kickX = x / m; this.kickZ = z / m; this.kickA = amp; this.kickD = d; this.kickT = d;
+  }
   addShake(a, d) { if (this.shakeScale <= 0) return; this.shake = Math.max(this.shake, a * this.shakeScale); this.shakeT = Math.max(this.shakeT, d); }
   render(dt) {
     const b = this.basis();
     let sx = 0, sy = 0;
     if (this.shakeT > 0) { this.shakeT -= dt; const a = this.shake * clamp01(this.shakeT / 0.25); sx = (Math.random() * 2 - 1) * a; sy = (Math.random() * 2 - 1) * a; if (this.shakeT <= 0) this.shake = 0; }
-    const f = this.focusU;
+    let kx = 0, ky = 0, kz = 0;
+    if (this.kickT > 0) { this.kickT -= dt; const u = 1 - Math.max(0, this.kickT) / this.kickD, k = this.kickA * (u < 0.55 ? Math.sin(u / 0.55 * Math.PI) : -0.35 * Math.sin((u - 0.55) / 0.45 * Math.PI));   // push out, small counter-swing, rest
+      kx = this.kickX * k; kz = this.kickZ * k; ky = -Math.abs(k) * 0.35; if (this.kickT <= 0) this.kickA = 0; }
+    const f0 = this.focusU, f = { x: f0.x + kx, y: f0.y + ky, z: f0.z + kz };
     const pos = { x: f.x - b.f.x * CAM.dist + b.r.x * sx + b.u.x * sy, y: f.y - b.f.y * CAM.dist + b.u.y * sy, z: f.z - b.f.z * CAM.dist + b.r.z * sx + b.u.z * sy };
     this.cam.position.copy(T(pos));
     this.cam.lookAt(T({ x: pos.x + b.f.x, y: pos.y + b.f.y, z: pos.z + b.f.z }));
