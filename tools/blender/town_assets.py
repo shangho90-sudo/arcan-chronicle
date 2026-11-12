@@ -14,6 +14,7 @@ RAW = os.environ.get('RAW', '/home/claude/town3d'); FORCE = os.environ.get('FORC
 OUT = os.path.join(ROOT, 'assets', 'town3d'); MAN = os.path.join(OUT, 'town_manifest.json')
 TEX = int(os.environ.get('TEX', 1024)); PER_M, MIN_T, MAX_T = 1100, 9000, 26000
 BUDGET = {'kairion_palace': 34000}; TEXSIZE = {'kairion_palace': 2048}          # 가로 12 m 이상 건물은 2048 px, 나머지 1024 px
+PROCEDURAL = {'kairion_academy'}         # Tripo 초안 대신 Blender 절차 모델(tools/blender/town_academy.py) — 여기서는 건너뜀
 YAW = {'kairion_palace': -90}            # Tripo 초안의 앞면이 +X인 모델: Z축으로 돌려 앞면을 -Y로
 import re
 _SIZES = {m.group(1): float(m.group(2)) for m in re.finditer(r"\('town_(\w+)', ([\d.]+),", open(os.path.join(HERE, '..', 'world', 'towns.py')).read())}
@@ -90,5 +91,6 @@ if __name__ == '__main__':
     man = json.load(open(MAN)) if os.path.exists(MAN) else {}
     ids = sorted(os.path.basename(p)[5:-4] for p in glob.glob(os.path.join(RAW, 'town_*.glb')))
     for n in [a for a in sys.argv[1:] if a in ids] or ids:
+        if n in PROCEDURAL: continue
         if not FORCE and 'town_' + n in man and os.path.exists(os.path.join(OUT, 'town_' + n + '.glb.json')): continue
         man['town_' + n] = process(n); json.dump(man, open(MAN, 'w'), indent=0, sort_keys=True)

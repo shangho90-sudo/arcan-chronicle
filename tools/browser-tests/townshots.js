@@ -37,7 +37,8 @@ const ZONES = (process.env.ZONES || 'town').split(','), SHOTS = (process.env.SHO
     if (SHOTS.includes('gates')) for (const [id, pos, hd] of info.gates) { const a = (hd ?? 180) * Math.PI / 180; await at(id, pos[0] - Math.sin(a) * 6, pos[1] - Math.cos(a) * 6); await at(id + '_out', pos[0] + Math.sin(a) * 4.5, pos[1] + Math.cos(a) * 4.5); }
     if (SHOTS.includes('lm')) for (const [id, pos, size] of info.lm) await at(id, pos[0], pos[1] - size[1] / 2 - 5);
     // close: 랜드마크 바로 옆(앞면 오른쪽 모서리 3 m)에 서서 — 메시가 깨져 보이는지 가까이서 확인 (TAG로 전/후 구분)
-    if (SHOTS.includes('close')) for (const [id, pos, size] of info.lm.filter((m, i) => !process.env.LM || process.env.LM.split(',').some(k => m[0].includes(k))).slice(0, +process.env.NLM || 99)) await at(id + '_close' + (process.env.TAG ? '_' + process.env.TAG : ''), pos[0] + size[0] * 0.3, pos[1] - size[1] / 2 - 2.2);
+    if (SHOTS.includes('close')) for (const [id, pos, size] of info.lm.filter((m, i) => !process.env.LM || process.env.LM.split(',').some(k => m[0].includes(k))).slice(0, +process.env.NLM || 99)) { const T = process.env.TAG ? '_' + process.env.TAG : ''; await at(id + '_close' + T, pos[0] + size[0] * 0.3, pos[1] - size[1] / 2 - 2.2);
+      await at(id + '_front' + T, pos[0] - size[0] * 0.15, pos[1] - size[1] / 2 - 1.2); await at(id + '_side' + T, pos[0] - size[0] / 2 - 1.2, pos[1] - size[1] * 0.1); }   // front = 앞면 가운데 바로 앞(건물이 화면 위쪽), side = 서쪽 면 옆
     if (SHOTS.includes('market') && info.market) await at('market', info.market[0], info.market[1]);
     if (SHOTS.includes('park') && info.park) await at('park', info.park[0], info.park[1]);
     if (SHOTS.includes('map')) { await ev(() => G.ui.showAreaMap()); await pg.waitForTimeout(5000); await pg.screenshot({ path: `${OUT}/${zid}_map_${SZ}.png`, timeout: 300000 }); await ev(() => G.ui.close()); }
