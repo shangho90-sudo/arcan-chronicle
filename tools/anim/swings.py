@@ -383,7 +383,7 @@ PH_SMASH = action('ph_smash', [
     key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
     key(0.10, 'o', twist=-10, lean=-9, sink=0.13, hand=[-16, 66, 0.80], blade=[-10, 96], elbow=[-0.6, 0.2, -1], armL=[64, 30]),
     key(0.17, 's', twist=-14, lean=-15, sink=0.11, hand=[-10, 84, 0.86], blade=[-4, 126], elbow=[-0.6, 0.3, -1], armL=[84, 34], squint=True),
-    key(0.215, 'i', twist=-2, lean=6, sink=0.15, hand=[-4, 44, 0.98], blade=[-2, 52], elbow=[-0.5, -0.4, -0.6], armL=[40, 36], squint=True),
+    key(0.205, 'i', twist=-4, lean=3, sink=0.14, hand=[-5, 52, 0.97], blade=[-2, 66], elbow=[-0.5, -0.4, -0.6], armL=[40, 36], squint=True),
     key(0.25, None, twist=6, lean=27, sink=0.27, hand=[0, -22, 1.0], blade=[2, -50], elbow=[-0.4, -1, -0.2], armL=[24, 40], squint=True),
     key(0.31, 'o', twist=8, lean=32, sink=0.31, hand=[2, -33, 0.95], blade=[4, -66], elbow=[-0.4, -1, -0.1], armL=[18, 44], squint=True),
     key(0.43, 's', twist=5, lean=15, sink=0.13, hand=[4, -38, 0.84], blade=[12, -28], elbow=[-0.5, -1, -0.1], armL=[14, 30]),

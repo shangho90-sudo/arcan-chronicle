@@ -60,11 +60,11 @@ export const PHARM = {
   pestle: { height: 3.9, lean: 0.46, drop: 5.0, stay: 0.55, glow: 0.10, spec: 1.6, fill: 0.55 },   // procedural club (fx_pharm.py pharm_pestle), warm polished gold
   smash: {                                                    // 유봉 내려찍기 ('유봉강타')
     wind: 0.17, hit: 0.25,                                    // s from the press: wind-up ends / impact (= action ph_smash windT / strikeT)
-    len: 2.35, thick: 1.12, ghostA: 0.5, ghostFade: 0.15,     // magic pestle: length m (~1.4 x a 1.7 m character), girth x, peak opacity, fade after the hit s
-    trailW: 0.62, trailLen: 0.44, trailA: 1.25, trailFade: 0.13,   // blunt trail: band width m, visible part (fraction of the arc mesh), brightness, fade s
+    len: 2.35, lenMin: 1.5, thick: 1.12, ghostA: 0.78, ghostFade: 0.15,     // magic pestle: length m (~1.4 x a 1.7 m character), girth x, peak opacity, fade after the hit s
+    trailW: 0.55, trailLen: 0.3, trailA: 2.0, trailFade: 0.1,   // blunt trail: band width m, visible part (fraction of the arc mesh), brightness, fade s
     gather: 0.55,                                             // radius the teal motes start from, m
     flash: 2.3, flashT: 0.045, rays: 0.12,                    // platinum core: brightness, life s; hit lines life s
-    ringPad: 0.42, ringMin: 0.7, ringMax: 1.1, ringT: 0.14, ringLife: 0.26,   // gold ring radius = target radius + pad (clamped) — one target's footprint, not an area
+    ringPad: 0.3, ringMin: 0.65, ringMax: 1.0, ringT: 0.14, ringLife: 0.26,   // gold ring radius = target radius + pad (clamped) — one target's footprint, not an area
     crackLife: 0.34, dustLife: 0.32, tealLife: 0.6,           // main effect gone by ~0.35 s, teal motes by 0.6 s
   },
   push: { sweep: 0.16, life: 0.36, peak: 2.0, streak: 1.6 },                                           // 밀어내기
@@ -179,14 +179,15 @@ void main(){
 // 유봉 내려찍기: translucent magic pestle (vertex colour ivory / gold, brighter + more opaque at the silhouette)
 const GHOST_FS = `
 uniform vec3 uRim; uniform float uA; varying vec3 vC, vN, vV;
-void main(){ vec3 n = normalize(vN); float d = max(0., dot(n, normalize(vec3(-.4, .8, .5)))), rim = pow(1. - abs(dot(n, vV)), 2.2);
-  vec3 c = vC * (.78 + .34 * d) + uRim * rim * .55; gl_FragColor = vec4(c, uA * (.42 + .58 * rim)); }`;
+void main(){ vec3 n = normalize(vN); float d = max(0., dot(n, normalize(vec3(-.4, .8, .5)))), rim = pow(1. - abs(dot(n, vV)), 1.8);
+  vec3 c = vC * (.66 + .46 * d); c = mix(c, uRim, rim * .8);                    // deep gold outline so the ivory reads on pale ground too
+  gl_FragColor = vec4(c, uA * (.6 + .4 * rim)); }`;
 // blunt weapon trail on smash_trail (u along 0 -> 1, v across 0 inner .. 1 outer): only the part [uHead - uLen, uHead], band from uIn .. 1
 const TRAIL_FS = `uniform vec3 uW, uB, uH; uniform float uA, uHead, uLen, uIn; varying vec2 vUv;
 void main(){ float u = vUv.x, v = (vUv.y - uIn) / (1. - uIn);
   float along = smoothstep(uHead - uLen, uHead - uLen * .3, u) * (1. - smoothstep(uHead - .015, uHead, u));
   float across = smoothstep(0., .3, v) * (1. - smoothstep(.8, 1., v)), core = exp(-pow((v - .66) / .22, 2.)), lead = smoothstep(uHead - uLen * .45, uHead, u);
-  vec3 c = uH * across * .5 + uB * across * core * (.45 + .75 * lead) + uW * core * core * lead * .55;
+  vec3 c = uH * across * .9 + uB * across * core * (.8 + .9 * lead) + uW * core * core * lead * .9;
   gl_FragColor = vec4(c * along * uA * step(0., v), 1.); }`;
 const ADD = { transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide };
 
@@ -237,7 +238,7 @@ export class PharmFx {
         vertexShader: TEX_VS, fragmentShader: TEX_FS, transparent: true, depthWrite: true });
       case 'domeT': return new THREE.ShaderMaterial({ defines: { TINT: 1 }, uniforms: U({ uW: C(), uB: C(), uHitP: new THREE.Vector3(0, 0.5, 1), uA: 0, uT: 0, uHit: 0, uHitT: 0, uFill: 0, uLine: 0, uFlow: 0, uRim: 0, uHexN: 6 }),
         vertexShader: FLAT_VS, fragmentShader: DOME_FS, transparent: true, depthWrite: false, side: THREE.FrontSide });
-      case 'ghost': return new THREE.ShaderMaterial({ uniforms: U({ uRim: new THREE.Color(0xffd98a), uA: 0 }), vertexShader: SOLID_VS, fragmentShader: GHOST_FS, transparent: true, depthWrite: false });
+      case 'ghost': return new THREE.ShaderMaterial({ uniforms: U({ uRim: new THREE.Color(0xc9861c), uA: 0 }), vertexShader: SOLID_VS, fragmentShader: GHOST_FS, transparent: true, depthWrite: false, depthTest: false });   // drawn over everything: the silhouette must read at the impact, also against / inside the target
       case 'trail': return new THREE.ShaderMaterial({ uniforms: U({ uW: C(), uB: C(), uH: C(), uA: 0, uHead: 0, uLen: 0.4, uIn: 0 }), vertexShader: FLAT_VS, fragmentShader: TRAIL_FS, ...ADD });
       default: return new THREE.ShaderMaterial({ uniforms: U({ uTint: C(), uRim: new THREE.Color(0xfff0c0), uEm: new THREE.Color(0), uA: 1, uMode: 0, uGlow: 0, uSpec: 0.8, uUnder: 0, uFill: 0 }),
         vertexShader: SOLID_VS, fragmentShader: SOLID_FS, transparent: true, depthWrite: true });
@@ -527,14 +528,16 @@ export class PharmFx {
     const S = PHARM.smash, I = PHARM.intensity, low = lite(), teal = PHARM.pal.teal, ivory = PHARM.pal.ivory;
     const f0 = o.facing || pc.facing || { x: 0, z: 1 }, f3 = new THREE.Vector3(f0.x, 0, -f0.z).normalize();
     const base = new THREE.Vector3(), tip = new THREE.Vector3(), dir = new THREE.Vector3(0, 1, 0), grip = new THREE.Vector3(), head = new THREE.Vector3(), piv = new THREE.Vector3(), q = new THREE.Quaternion();
-    let el0 = null, elPrev = null, headU = 0, rad = 2, hitAt = null, whiff = false, seen = false;
+    let el0 = null, elPrev = null, headU = 0, rad = 2, hitAt = null, whiff = false, seen = false; const tgt = o.tgt;
     const X = new THREE.Vector3(), Y = new THREE.Vector3(), Z = new THREE.Vector3();
     const e = this._fx('swing', S.hit + 0.3, (e) => {
       const t = e.t; let b = null; try { b = pc.body && pc.body.bladePoints && pc.body.bladePoints(); } catch (err) { b = null; }
       if (!b || pc.dead) { for (const m of e.items) m.visible = false; if (seen || t > S.hit) e.t = e.life; return; }   // weapon away (interrupted / died): nothing floats on its own
       seen = true; base.set(b[0].x, b[0].y, b[0].z); tip.set(b[1].x, b[1].y, b[1].z); dir.copy(tip).sub(base); const bl = dir.length() || 1; dir.multiplyScalar(1 / bl);
       grip.copy(base).addScaledVector(dir, -bl * 0.38 / 0.62);
-      const gy = (pc.pos.y || 0) + 0.1; let L = S.len; if (dir.y < -0.05) L = Math.min(L, Math.max(0.9, (grip.y - gy) / -dir.y));   // the head stops on the ground, it never sinks in
+      let L = S.len;
+      if (tgt && tgt.pos && !tgt.removed) { const d = Math.hypot(tgt.pos.x - grip.x, -tgt.pos.z - grip.z); L += (Math.min(S.len, Math.max(S.lenMin, (d + 0.05) / 0.84)) - L) * smooth(S.wind, S.hit - 0.02, t); }   // coming down, the head closes on the target (it lands ON it, not past it)
+      const gy = (pc.pos.y || 0) + 0.1; if (dir.y < -0.05) L = Math.min(L, Math.max(0.9, (grip.y - gy) / -dir.y));   // the head stops on the ground, it never sinks in
       head.copy(grip).addScaledVector(dir, L * 0.84);
       // ---- wind-up: teal motes drawn into the tip, a small glow growing there
       const gu = clamp01(t / S.wind), gOn = 1 - smooth(S.wind, S.wind + 0.05, t);
@@ -543,7 +546,7 @@ export class PharmFx {
       tg.visible = gOn > 0; tg.position.copy(tip); tg.quaternion.copy(this.camQ); tg.scale.setScalar(0.25 + 0.5 * gu); tg.material.uniforms.uA.value = I * 1.1 * gu * gOn;
       // ---- magic pestle over the real one
       const after = hitAt != null ? t - hitAt : t - S.hit - 0.03, out = after > 0 ? 1 - smooth(0, whiff ? S.ghostFade * 0.6 : S.ghostFade, after) : 1;
-      const gA = smooth(S.wind - 0.07, S.wind + 0.02, t) * out;
+      const gA = smooth(S.wind - 0.09, S.wind - 0.01, t) * out;
       gh.visible = gA > 0.01; if (gh.visible) { q.setFromUnitVectors(UP, dir); gh.quaternion.copy(q); gh.position.copy(grip); gh.scale.set(L * S.thick, L, L * S.thick); gh.material.uniforms.uA.value = S.ghostA * gA; }
       // ---- blunt trail: arc in the vertical plane of the facing through the magic head; starts where the strike starts
       piv.set(pc.pos.x, (pc.pos.y || 0) + 1.25, -pc.pos.z); _a.copy(head).sub(piv); const el = Math.atan2(_a.y, _a.dot(f3));
@@ -557,7 +560,7 @@ export class PharmFx {
     });
     const motes = [], tg = this.spr(e, 'glow', teal, 7);
     for (let i = 0, n = low ? 4 : 9; i < n; i++) { const m = this.spr(e, i % 3 ? 'glow' : 'star', teal, 7), a = Math.random() * 6.283, y = rnd(-0.5, 0.9); m.userData = { off: new THREE.Vector3(Math.cos(a), y, Math.sin(a)).normalize(), s: rnd(0.10, 0.2), t0: rnd(0, S.wind * 0.45) }; m.visible = false; motes.push(m); }
-    const gh = this._m(e, 'ghost', this.geo.smash_pestle, 6); gh.visible = false;
+    const gh = this._m(e, 'ghost', this.geo.smash_pestle, 7); gh.visible = false;
     const tr = this._m(e, 'trail', this.geo.smash_trail || this.geo.pharm_quad, 5); this._pal(tr, ivory); tr.visible = false;
     e.impact = (hit) => { if (hitAt == null) { hitAt = e.t; whiff = !hit; e.life = Math.max(e.t + 0.02, e.t + Math.max(S.ghostFade, S.trailFade) + 0.03); } };
     return e;
