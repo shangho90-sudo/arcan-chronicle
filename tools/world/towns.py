@@ -9,7 +9,9 @@
   * NPC: 자리 힌트(plaza / market / park / gate / lm:<랜드마크> / guild …)로 트인 곳을 찾아 세움
 결과는 zone 정의(dict) — blockPolys(충돌), town3d(js/town3d.js가 그림), props(Blender 소품 충돌), npcs, portals, spawns.
 """
-import json, math, os, random, hashlib
+import json, math, os, random, hashlib, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import visible
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
 MANIFEST = os.path.join(ROOT, 'assets', 'town3d', 'town_manifest.json')      # tools/blender/town_assets.py가 씀: {file: [w, d, h]} (가장 긴 가로 변 = 1)
@@ -414,4 +416,25 @@ def gen_town2(t, exits, extra_npcs=()):
                   ground=dict(inner=[-W, -Dd, W, Dd], roads=roads, grass=grass, outer=[X0 - 60, Z0 - 60, X1 + 60, Z1 + 60]), decor=decor, lanterns=lanterns, rosettes=[],
                   canopies=canopies, banner=t.get('banner', 'blue'), temple=bool(t.get('temple')), blprops=blprops, palette=th.get('palette', {}), theme=th['title'],
                   districts=dict(market=[round(anchors['market'][0], 1), round(anchors['market'][1], 1)], park=[round(anchors['park'][0], 1), round(anchors['park'][1], 1)]))
+    # ------------------------------------------------------------------ 카메라에 가려진 NPC 고치기 (2026-11-12): 나무·덤불·깃발이 가리면 그것을 치우고,
+    # 집·랜드마크·성벽·노점이 가리면 NPC를 가장 가까운 잘 보이는 빈 자리로 옮김 (tools/world/visible.py)
+    occ = visible.occluders(town3d); drop = set(); moved = 0
+    for n in npcs:
+        x, z = n['pos']; hits = visible.blockers(occ, x, z)
+        if not hits: continue
+        if all(o[5] is not False for o in hits): drop.update(o[5] for o in hits); continue
+        best = None
+        for rad in [i * 1.0 for i in range(1, 40)]:
+            k = max(8, int(rad * 3))
+            for i in range(k):
+                px, pz = x + rad * math.cos(i / k * 6.283), z + rad * math.sin(i / k * 6.283)
+                if ok(px, pz, 1.0, road=0.25) and not visible.hidden(occ, px, pz): best = (round(px, 2), round(pz, 2)); break
+            if best: break
+        if best: n['pos'] = list(best); n.pop('building', None); taken.append((best[0], best[1], 1.7)); moved += 1
+        else: print('  !! still hidden:', n['npc'], 'in', tid)
+    if drop:
+        gone = {(blprops[i]['pos'][0], blprops[i]['pos'][1]) for i in drop}
+        blprops[:] = [b for i, b in enumerate(blprops) if i not in drop]
+        props_out[:] = [q for q in props_out if not (q.get('bl') and (q['pos'][0], q['pos'][1]) in gone)]
+    if drop or moved: print('  %s: NPC %d명 옮김, 가리던 나무·덤불 %d개 치움' % (tid, moved, len(drop)))
     return dict(bounds=[X0, Z0, X1, Z1], spawns=spawns, npcs=npcs, portals=portals, blockPolys=blocks, town3d=town3d, props=props_out, anchors=anchors, lm_at=lm_at)

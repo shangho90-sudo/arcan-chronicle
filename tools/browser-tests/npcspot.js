@@ -14,7 +14,7 @@ const ZONE = process.env.ZONE || 'kairion_capital', NPC = process.env.NPC || 'ca
   const ready = () => pg.waitForFunction(() => window.G && G.inWorld && G.player && !G.loading && G.zone && !document.querySelector('.prologue'), null, { timeout: 300000 });
   await ready();
   await ev(ids => { const P = G.profile; for (const id of ids) { const q = G.data.quests[id]; const e = P.quests.find(x => x.id === id); if (e) e.state = 'completed'; else P.quests.push({ id, state: 'completed', counts: q.objectives.map(o => o.count) }); } }, DONE);
-  await ev(z => G.travel(z), ZONE); await pg.waitForTimeout(800); await ready(); await pg.waitForTimeout(3000);
+  if (ZONE !== 'town') { await ev(z => G.travel(z), ZONE); await pg.waitForTimeout(800); await ready(); } await pg.waitForTimeout(3000);
   const r = await ev(id => { const n = G.zone.npcs.find(n => n.def.id === id); if (!n) return null; const p = G.player; p.pos.x = n.pos.x - 1.5; p.pos.z = n.pos.z - 4.5; return { pos: [n.pos.x, n.pos.z], name: n.def.name }; }, NPC);
   await pg.waitForTimeout(3000);
   await pg.screenshot({ path: `${OUT}/npcspot_${NPC}.png`, timeout: 300000 });

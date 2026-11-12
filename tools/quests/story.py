@@ -11,6 +11,8 @@
 js/actors.js (yieldAt / surviveSec 보스), js/core.js (job 'tier2', hpMul).
 """
 import json, math, os, re, sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'world'))
+import visible
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
 D = lambda *p: os.path.join(ROOT, 'assets', 'data', *p)
@@ -642,12 +644,14 @@ def spot_near(zid, spawn_id, k, taken):
         if isinstance(d, dict) and 'pos' in d: blds.append((d['pos'][0], d['pos'][1], d.get('r', 1.0) + 0.3))
     for n in z.get('npcs', []):
         if 'pos' in n: blds.append((n['pos'][0], n['pos'][1], 0.6))
-    for ring in range(0, 8):
+    occ = visible.occluders(t3) if t3 else []     # 카메라에 가려지는 자리는 피함 (tools/world/visible.py)
+    for ring in range(0, 10):
         for side in ([0, 1, -1, 2, -2, 3, -3] if ring == 0 else [1, -1, 2, -2, 3, -3, 4, -4]):
             dist = 3.5 + ring * 1.5; off = side * 1.6 + (k % 3) * 0.0
             x = x0 + fx * dist - fz * off; zz = z0 + fz * dist + fx * off
             if any(math.hypot(x - a, zz - b) < 0.9 for a, b in taken): continue
             if any(math.hypot(x - a, zz - b) < r + 0.9 for a, b, r in props + blds): continue
+            if occ and visible.hidden(occ, x, zz): continue
             bx0, bz0, bx1, bz1 = z['bounds']
             if not (bx0 + 3 < x < bx1 - 3 and bz0 + 3 < zz < bz1 - 3): continue
             taken.append((x, zz)); rot = math.degrees(math.atan2(-fx, -fz))

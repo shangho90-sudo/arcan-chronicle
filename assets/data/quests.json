@@ -6268,8 +6268,8 @@
    "npc": "gravel_pharmacist",
    "zone": "gravel",
    "pos": [
-    -0.71,
-    -8.51
+    0.89,
+    -8.64
    ],
    "rot": -175.2,
    "from": "mq13a"
@@ -6278,8 +6278,8 @@
    "npc": "gravel_refugee",
    "zone": "gravel",
    "pos": [
-    0.89,
-    -8.64
+    2.48,
+    -8.78
    ],
    "rot": -175.2,
    "from": "mq13b"

@@ -55,7 +55,7 @@ function layoutLabels(svg, selId) {
   const boxes = [], hit = (a, b) => a.x0 < b.x1 && a.x1 > b.x0 && a.y0 < b.y1 && a.y1 > b.y0;
   const nodes = [...svg.querySelectorAll('.wmnode')].map(g => { const t = g.transform.baseVal.consolidate().matrix; return { g, x: t.e, y: t.f, town: g.classList.contains('town'), cur: g.classList.contains('here'), id: g.dataset.z }; });
   for (const n of nodes) { const r = (n.town ? 21 : 11) + 1 / k; boxes.push({ x0: n.x - r, x1: n.x + r, y0: n.y - r - (n.town ? 6 : 0), y1: n.y + r, hard: true }); }
-  const regs = [...svg.querySelectorAll('.wmregion')], rpx = Math.max(16, Math.min(28, 31 * k));
+  const VB = svg.viewBox.baseVal, regs = [...svg.querySelectorAll('.wmregion')], rpx = Math.max(16, Math.min(28, 31 * k));
   for (const t of regs) { t.style.fontSize = (rpx / k) + 'px'; t.style.letterSpacing = (3 / k) + 'px'; t.style.strokeWidth = (4 / k) + 'px'; }
   const order = nodes.slice().sort((a, b) => (b.cur - a.cur) || ((b.id === selId) - (a.id === selId)) || (b.town - a.town));
   for (const n of order) {
@@ -79,8 +79,11 @@ function layoutLabels(svg, selId) {
     const x0 = +(t.dataset.x ??= t.getAttribute('x')), y0 = +(t.dataset.y ??= t.getAttribute('y'));
     t.setAttribute('x', x0); t.setAttribute('y', y0); const bb = t.getBBox(), step = rpx / k * 0.55;
     let best = [0, 0], bc = 1e9;
-    for (const dy of [0, -1, 1, -2, 2, -3, 3, -4, 4, -5, 5]) for (const dx of [0, -1.5, 1.5, -3, 3, -4.5, 4.5]) {
+    // 넓게 찾음(2026-11-12: '그라벨 변경령'·'베르그 고원'이 장소 이름 밑에 깔려 흐려졌음) — 가까운 자리부터, 아무것도 안 가리는 첫 자리
+    const DY = [0, -1, 1, -2, 2, -3, 3, -4, 4, -5, 5, -6, 6, -7, 7, -8, 8, -9, 9, -10, 10], DX = [0, -1.5, 1.5, -3, 3, -4.5, 4.5, -6, 6, -7.5, 7.5, -9, 9, -10.5, 10.5];
+    for (const dy of DY) for (const dx of DX) {
       const b = { x0: bb.x + dx * step, x1: bb.x + bb.width + dx * step, y0: bb.y + dy * step, y1: bb.y + bb.height + dy * step };
+      if ((dx || dy) && (b.x0 < VB.x + 4 || b.y0 < VB.y + 4 || b.x1 > VB.x + VB.width - 4 || b.y1 > VB.y + VB.height - 4)) continue;   // 옮길 때는 지도 밖으로 내보내지 않음
       let c = Math.abs(dx) * 0.2 + Math.abs(dy) * 0.25; for (const o of boxes) if (hit(b, o)) c += 10;
       if (c < bc) { bc = c; best = [dx * step, dy * step]; }
     }
