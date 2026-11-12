@@ -18,11 +18,11 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 export const COOK = {
   intensity: 1.0,
-  knife: { len: 1.25, hover: 0.62, yaw: 0.6, appear: 0.1, leave: 0.22, rock: 0.22, slide: 0.16, flash: 1.5, line: 2.2, lineLife: 0.16, chips: 3, chipsLite: 1 },
-  pan: { height: 3.0, rMin: 0.85, rMax: 1.5, pad: 0.4, appear: 0.12, dropPart: 0.42, stay: 0.16, fade: 0.3, ring: 2.0, ringLife: 0.28, flash: 1.8, flashT: 0.07, stars: 5, starsLite: 3 },
+  knife: { len: 1.25, hover: 0.85, dip: 0.22, yaw: 0.6, appear: 0.1, leave: 0.22, rock: 0.22, slide: 0.16, flash: 1.5, line: 2.2, lineLife: 0.16, chips: 3, chipsLite: 1 },
+  pan: { height: 3.0, rMin: 0.85, rMax: 1.5, pad: 0.4, appear: 0.12, dropPart: 0.42, stay: 0.12, fade: 0.26, ring: 2.0, ringLife: 0.28, flash: 1.8, flashT: 0.07, stars: 5, starsLite: 3 },
   stun: { n: 3, r: 0.34, lift: 0.3, size: 0.13, spin: 5.0 },
   ball: { r: 0.2, spin: 11 },
-  splat: { life: 0.42, ring: 1.3, flash: 1.3, bits: 5, bitsLite: 2 },
+  splat: { life: 0.42, ring: 0.85, flash: 1.3, bits: 5, bitsLite: 2 },
   col: { steel: 0xeaf4ff, steelB: 0xa8cfff, gold: 0xffd27a, goldB: 0xff9a2a, warm: 0xfff0d0, sauce: 0xff6a2a, sauceB: 0xb83210, dust1: 0xd8c8a8, dust2: 0x7a6a58, steam1: 0xfff4e6, steam2: 0xb89880 },
 };
 
@@ -119,7 +119,7 @@ export class CookFx {
         p.m.rotation.x += p.w * dt; p.m.rotation.z += p.w * 0.7 * dt; p.m.material.uniforms.uA.value = 1 - smooth(0.6, 1, k); }
     });
     for (let i = 0; i < n; i++) {
-      const geo = o.geo || this.chips[(Math.random() * this.chips.length) | 0], m = this.solid(e, geo, { tint: o.tint ?? 0xffffff, spec: 0.3 }), s = rnd(o.size ? o.size[0] : 0.07, o.size ? o.size[1] : 0.12), a = rnd(0, Math.PI * 2), sp = rnd(o.speed ? o.speed[0] : 1.2, o.speed ? o.speed[1] : 2.4);
+      const geo = o.geo || this.chips[(Math.random() * this.chips.length) | 0], m = this.solid(e, geo, { tint: o.tint ?? 0xffffff, spec: 0.3 }), s = rnd(o.size ? o.size[0] : 0.09, o.size ? o.size[1] : 0.15), a = rnd(0, Math.PI * 2), sp = rnd(o.speed ? o.speed[0] : 1.2, o.speed ? o.speed[1] : 2.4);
       m.scale.setScalar(s); m.position.copy(at); m.rotation.set(rnd(0, 6), rnd(0, 6), rnd(0, 6));
       parts.push({ m, v: new THREE.Vector3(Math.cos(a) * sp, rnd(o.up ? o.up[0] : 1.6, o.up ? o.up[1] : 3.0), Math.sin(a) * sp), w: rnd(-14, 14) });
     }
@@ -151,7 +151,7 @@ export class CookFx {
       const idx = Math.max(0, Math.min(n - 1, Math.round(p))), step = Math.min(K.slide, rad * 1.5 / n), slide = (Math.max(-0.5, Math.min(n - 0.5, p)) - (n - 1) / 2) * step;
       // blade length: turned K.yaw from the camera's right so both the flat and the edge read; the cut advances along the blade normal
       _a.copy(this.camR).applyAxisAngle(UP, K.yaw); _b.crossVectors(UP, _a).normalize();           // _a = length dir (x of the mesh), _b = normal
-      kn.position.copy(anchor).addScaledVector(_b, slide); kn.position.y = anchor.y + top + 0.02 + K.hover * up;
+      kn.position.copy(anchor).addScaledVector(_b, slide); kn.position.y = anchor.y + top - K.dip + (K.hover + K.dip) * up;
       _mx.makeBasis(_a, UP, _c.crossVectors(_a, UP)); kn.quaternion.setFromRotationMatrix(_mx);
       kn.rotateZ(K.rock * (up - 0.35));                                                               // tip dips into the cut, heel lifts between cuts
       const sc = K.len * Math.min(1.25, 0.8 + rad * 0.5) * (0.5 + 0.5 * easeOut(e.t / K.appear));
@@ -168,7 +168,7 @@ export class CookFx {
       if (e.dead) return; strikes++;
       if (t && t !== tgt) { tgt = t; anchor.copy(P3(t.pos)); top = cookTop(t); rad = t.radius || 0.5; }
       glow = last ? 1.4 : 0.9;
-      const at = kn.position.clone(); at.y = anchor.y + top;
+      const at = kn.position.clone(); at.y = anchor.y + top - K.dip * 0.5;
       // slice line along the blade + a small flash on the cut, both gone in ~0.16 s; chips fly out of the cut
       const dirL = _a.copy(self.camR).applyAxisAngle(UP, K.yaw).clone(), len = K.len * (last ? 1.15 : 0.9), lf = self._fx('slice', K.lineLife + (last ? 0.06 : 0), (x) => {
         const k = x.t / x.life; ln.material.uniforms.uA.value = I * K.line * (1 - smooth(0.15, 1, k)); ln.scale.set(len * (0.7 + 0.5 * easeOut(k)), 0.34, 1);
@@ -202,7 +202,7 @@ export class CookFx {
         if (e.t > fall + 0.12) { landed = e.t; hitT = null; }   // the hit never came (cast interrupted): just fade
       } else { const k = e.t - landed; y = (hitT ? top * 0.72 : 0.06) + 0.22 * Math.sin(Math.min(1, k / 0.16) * Math.PI) * (hitT ? 1 : 0.4); sq = 1 + 0.12 * Math.max(0, 1 - k / 0.1); a = 1 - smooth(K.stay, K.stay + K.fade, k); if (k > K.stay + K.fade) e.t = e.life; }
       pn.position.copy(anchor).setY(anchor.y + y); pn.rotation.set(0, yaw, tilt, 'YXZ'); pn.scale.set(R * sq, R / sq * (landed < 0 ? 0.5 + 0.5 * easeOut(e.t / K.appear) : 1), R * sq);
-      const u = pn.material.uniforms; u.uA.value = a; u.uGlow.value = landed < 0 ? 0.35 * (1 - smooth(0, K.appear * 1.5, e.t)) : 0.5 * Math.max(0, 1 - (e.t - landed) / 0.12);
+      const u = pn.material.uniforms; u.uA.value = a; u.uGlow.value = landed < 0 ? 0.35 * (1 - smooth(0, K.appear * 1.5, e.t)) : 0.16 * Math.max(0, 1 - (e.t - landed) / 0.1);
       // soft warm glow where it appears + a growing shadow-ish target ring on the ground (thin, the pan's own size)
       gl.quaternion.copy(this.camQ); gl.position.copy(pn.position); gl.scale.setScalar(R * 2.6); gl.material.uniforms.uA.value = I * 0.5 * (landed < 0 ? 1 - smooth(0, K.appear * 2.2, e.t) : 0);
       this._flat(mk, R * (landed < 0 ? 0.6 + 0.4 * smooth(0, fall, e.t) : 1)); mk.position.copy(anchor).setY(anchor.y + 0.06); mk.material.uniforms.uA.value = landed < 0 ? I * 0.55 * smooth(0, fall * 0.6, e.t) : 0;

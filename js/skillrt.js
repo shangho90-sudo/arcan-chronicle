@@ -270,7 +270,8 @@ export class SkillEngine {
     const kdir = { x: t.pos.x - pc.pos.x, z: t.pos.z - pc.pos.z };
     const knock = op.knock && !(t.isBoss) && !(t.def && t.def.ai === 'heavy') ? op.knock * 0.4 : 0;
     const quietFx = !!(op.fx && (op.fx.pharm === 'smash' || op.fx.cook === 'pan'));   // own local hit-stop + camera kick, never the global ones
-    t.takeDamage({ source: pc, amount: r.amount, crit: r.crit, kdir, knockback: knock, localStop: quietFx ? 'quiet' : !!(op.fx && op.fx.bash) });
+    const hd = { source: pc, amount: r.amount, crit: r.crit, kdir, knockback: knock, localStop: quietFx ? 'quiet' : !!(op.fx && op.fx.bash) };
+    t.takeDamage(hd); ctx.missed = !!hd.missed;
     if (op.push && !t.isBoss && !t.dead) { const m = Math.hypot(kdir.x, kdir.z) || 1; t.knock = { x: kdir.x / m * op.push * 10, z: kdir.z / m * op.push * 10 }; t.hitReact = Math.max(t.hitReact || 0, 0.4); }   // push = m 밀어냄(배쉬, 무거운 몬스터 포함·보스 제외)
     if (op.pull && !t.isBoss && !t.dead) { const p = op.pullTo || ctx.aim; const ddx = p.x - t.pos.x, ddz = p.z - t.pos.z, m = Math.hypot(ddx, ddz); if (m > 0.3) t.knock = { x: ddx / m * op.pull * 3, z: ddz / m * op.pull * 3 }; }
     if (op.launch && !t.isBoss && !(t.def && t.def.ai === 'heavy')) applyStatus(t, { id: 'stagger', dur: op.launch, val: 1, ch: 1 }, pc);
@@ -431,15 +432,6 @@ export class SkillEngine {
           if (op.fx.cook === 'chop') {   // 식칼 썰기: the knife in the air comes down on THIS damage tick (slice line + chips on the real target); nothing left to cut -> it leaves
             const t = ts[0], k = ctx.cookFx; if (k && k.strike) { if (t) k.strike(t, h, h === hits_ - 1); else k.miss(h === hits_ - 1); }
           }
-          if (op.fx.cook === 'pan') {    // 팬 강타: the giant pan lands now; local hit-stop on these two only, squash, one camera kick, stars for the stun
-            const t = ts[0], k = ctx.cookFx; if (k && k.land) k.land(t || null);
-            if (t) {
-              pc.freezeT = Math.max(pc.freezeT || 0, PAN_STOP); t.freezeT = Math.max(t.freezeT || 0, PAN_STOP);
-              if (t.body && t.body.punch) t.body.punch(f.x, f.z, 0.22);
-              if (G.render.kick && !G.reduceFlash) G.render.kick(f.x, f.z, PAN_KICK[0], PAN_KICK[1]);
-              const sd = (op.st || []).find(x => x.id === 'stun'); if (sd && !t.isBoss) FX.cook('stun', t, { dur: sd.dur });
-            }
-          }
           if (op.fx.pharm === 'push') FX.pharm('push', pc, { f, r: op.r || 2.2, ang: op.ang || 80, hits: ts.map(t => ({ x: t.pos.x, y: t.pos.y || 0, z: t.pos.z, boss: !!t.isBoss })) });   // 밀어내기: wind ribbons across the real cone, dust streaks on each enemy pushed
           if (op.fx.pharm === 'spin') FX.pharm('spin', pc, { r: op.r, h, n: hits, last: h === hits - 1, hits: ts.map(t => t.pos) });   // 유봉 휘두르기: ribbons on the real pestle tip, thin ring on the last strike (js/pharmfx.js)
           if (op.fx.yeon) {  // '연': per-strike crescent (scheduled ahead in release, else now) + flash / cut / shards on the target
@@ -478,15 +470,24 @@ export class SkillEngine {
           if (op.falloff) { const dd = pc.dist(t) / (op.r || 5); coef *= 1 + op.falloff * (1 - clamp01(dd)) - op.falloff * 0.5; }
           if (op.consume) coef *= 1 + consumed * op.consume.mulPer;
           if (op.coef > 0) this.dmg(t, coef, ctx, { ...op, centerHit: t === centre });
-          this.onHit(t, op, ctx);
+          if (!(op.stOnHit && ctx.missed)) this.onHit(t, op, ctx);   // stOnHit (팬 강타): a MISS applies nothing
           if (op.centerStack && t === centre) { t._cstack = (t._cstack || 0) + 1; if (t._cstack >= op.centerStack.n) { applyStatus(t, op.centerStack.st, pc); t._cstack = 0; } }
           if (op.react) this.react(t, op.react, ctx);
           if (op.extendHerb) for (const a of this.areas) if (a.op.herb && Math.hypot(a.c.x - t.pos.x, a.c.z - t.pos.z) < a.r + 2) a.extend(op.extendHerb, op.extendCap || 4);
         }
+        if (op.fx && op.fx.cook === 'pan') {    // 팬 강타 (after the damage, so a MISS reads as a miss): the giant pan lands now; local hit-stop on these two only, squash, one camera kick, stars while stunned
+          const t = ts[0], ok = t && !ctx.missed, k = ctx.cookFx; if (k && k.land) k.land(ok ? t : null);
+          if (ok) {
+            pc.freezeT = Math.max(pc.freezeT || 0, PAN_STOP); if (!t.dead) t.freezeT = Math.max(t.freezeT || 0, PAN_STOP);
+            if (t.body && t.body.punch) t.body.punch(f.x, f.z, 0.22);
+            if (G.render.kick && !G.reduceFlash) G.render.kick(f.x, f.z, PAN_KICK[0], PAN_KICK[1]);
+            const sd = !t.dead && t.status && t.status.get && t.status.get('stun'); if (sd) FX.cook('stun', t, { dur: sd.remaining });
+          }
+        }
         if (op.extendHerb) for (const a of this.areas) if (a.op.herb && this.shapeOf(op, ctx).overlaps(a.c.x, a.c.z, a.r)) a.extend(op.extendHerb, op.extendCap || 4);
         if (op.link && ts.length > 1) for (let i = 1; i < ts.length; i++) FX.beam('thread_link', ts[i - 1].pos, ts[i].pos, { duration: 2 });
         if (op.swingSfx) G.audio.sfx(op.swingSfx);
-        if (ts.length) G.audio.sfx(skillSound(d, op));
+        if (ts.length && !(op.stOnHit && ctx.missed)) G.audio.sfx(skillSound(d, op));
       };
       const ht_ = ctx.combo && op.hitsPerLv && ctx.combo.hitTimes ? ctx.combo.hitTimes[h] - ctx.combo.hitTimes[0] : h * (op.gap || 0.15);
       if (h === 0) run(); else this.pending.push({ time: this.clock + ht_, op: { op: '_run', run }, ctx });
@@ -647,7 +648,7 @@ class SkillProj {
     this.speed = (op.speed || 12) * speedMul; this.range = op.range || eng.range(ctx.d) + 1; this.trav = 0; this.hit = new Set(); this.back = false; this.t = 0;
     this.target = ctx.tgt && !ctx.tgt.dead ? ctx.tgt : null;
     if (op.spread && cnt > 1) { const off = (idx - (cnt - 1) / 2) * op.spread; this.pos.x += -ctx.facing.z * off; this.pos.z += ctx.facing.x * off; }   // side by side out of the hand
-    const to = op.kind === 'lob' || op.toGround ? ctx.aim : this.target ? this.target.pos : op.arc && ctx.tgt ? ctx.aim : {   // arc: the target died while the others were still being thrown -> its last spot x: pc.pos.x + ctx.facing.x * this.range, z: pc.pos.z + ctx.facing.z * this.range };
+    const to = op.kind === 'lob' || op.toGround ? ctx.aim : this.target ? this.target.pos : op.arc && ctx.tgt ? ctx.aim /* arc: the target died while the others were still being thrown -> its last spot */ : { x: pc.pos.x + ctx.facing.x * this.range, z: pc.pos.z + ctx.facing.z * this.range };
     this.to = { ...to }; const dx = to.x - this.pos.x, dz = to.z - this.pos.z, m = Math.hypot(dx, dz) || 1; this.dir = { x: dx / m, z: dz / m };
     if (op.kind === 'lob') { this.from = { ...this.pos }; this.flight = Math.max(0.25, m / this.speed); }
     if (op.toGround) { this.range = m + 0.2; }

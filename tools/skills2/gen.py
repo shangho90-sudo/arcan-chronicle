@@ -177,7 +177,7 @@ S(J, 1, 0, '식칼과 프라이팬', 1, 'ck1_a1', '식칼 썰기', 'attack', '�
   ops=[dict(op='fx', cook='knife', at=-0.22, gap=0.12), hit('single', 1.0, hits=2, hitsPerLv=1, gap=0.12, split=True, noStretch=True, sfx='hit', fx=dict(cook='chop'))], fx=dict(color=0xe8f4ff))
 # 팬 강타: 대상 머리 위에 큰 프라이팬이 나타나 0.30 s에 내리찍음. 기절 3초(새 상태 stun — 보스는 경직과 같이 면역). 레벨 추가타는 한 방에 합침(oneHit, 총 피해 같음).
 S(J, 1, 0, '식칼과 프라이팬', 2, 'ck1_a2', '팬 강타', 'attack', '공중에 커다란 프라이팬을 불러내 적 하나를 내리찍는다. 맞은 적은 3초 동안 기절한다(보스 제외).', weapon='knife', target='enemy', range=1.8, mp=10, cd=6, anim='ck_pan',
-  ops=[dict(op='fx', cook='pan', at=-0.30, fall=0.30), hit('single', 2.3, oneHit=True, st=[st('stun', 3)], sfx='heavy', fx=dict(cook='pan'))], fx=dict(color=0xffc070))
+  ops=[dict(op='fx', cook='pan', at=-0.30, fall=0.30), hit('single', 2.3, oneHit=True, stOnHit=True, st=[st('stun', 3)], sfx='heavy', fx=dict(cook='pan'))], fx=dict(color=0xffc070))
 S(J, 1, 0, '식칼과 프라이팬', 3, 'ck1_a3', '뒤집기', 'attack', '일반 적을 잠시 띄운다. 띄우기 면역 적에게는 추가 피해.', weapon='knife', target='enemy', range=1.8, mp=12, cd=8, anim='attack',
   ops=[hit('single', 1.5, launch=0.8, vsImmune=1.6, fx=dict(slash='arc', burst='dust'))])
 S(J, 1, 0, '식칼과 프라이팬', 4, 'ck1_a4', '도마 방어', 'support', '정면에서 받는 피해를 줄인다.', target='self', mp=10, cd=14, anim='cast', ops=[buff('frontguard', 5, 0.5)])

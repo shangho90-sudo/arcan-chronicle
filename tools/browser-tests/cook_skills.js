@@ -1,6 +1,7 @@
 // 요리사 1차 개편 스킬(식칼 썰기 ck1_a1 · 팬 강타 ck1_a2 · 미트볼 던지기 ck1_b1)을 실제 스킬 경로(skills2.cast → 동작 → 피해 →
 // js/cookfx.js)로 시전하고 화면 띠와 수치를 남김. G.step(1/FPS) 한 프레임씩, Math.random 고정.
 // Usage: SKILL=chop|pan|ball LV=1..5 SCENE=hit|whiff|kill|stun GENDER=m|f SIZE=1100x760|390x844t FX=1|0 TAG=after DIR=90
+//        SEED=12345(Math.random 씨앗 — MISS가 나오면 바꿈) DUR=초
 //        URL=http://localhost:8797/index.html OUT=/tmp/cook node tools/browser-tests/cook_skills.js
 //   -> OUT/<TAG>_<skill>_lv<LV>_<scene>_<gender>_<size>_fx<FX>.png (+ .json)
 //   로그: 피해 틱(시각·양), 타수와 기대 타수, 총 피해 / 기대 총 계수, 이펙트 호출(strike/land/splat/stun) 시각, 소리 호출, 히트스톱(시전자·대상 freezeT,
@@ -52,8 +53,8 @@ const MARKS = (process.env.MARKS || (SKILL === 'pan' ? '0.05,0.15,0.22,0.27,0.30
     const m = G.dev.dummies('mon_boar', 1, 0.01, at(dist))[0]; m.teleport(at(dist)); window.__ds = [m];
   }, [DIR, DIST]);
   await pg.waitForFunction(() => window.__ds.every(m => m.body), null, { timeout: 120000 });
-  const info = await ev(([scene, fps, id, dist]) => {
-    let seed = 12345; Math.random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+  const info = await ev(([scene, fps, id, dist, sd]) => {
+    let seed = +sd || 12345; Math.random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
     const p = G.player, f = window.__f, m = window.__ds[0];
     if (scene !== 'stun') m.thinkStep = () => {};
     m.teleport(m.pos); m.setFacing(-f.x, -f.z); m.body.place(m.pos);
@@ -77,7 +78,7 @@ const MARKS = (process.env.MARKS || (SKILL === 'pan' ? '0.05,0.15,0.22,0.27,0.30
     if (scene === 'whiff') { p.target = null; m.dead = true; m.remove(); }
     const e = p.skills2.cast(id, window.__at(dist)); if (e) return 'cast error: ' + e;
     return { hp: window.__hp, atk: p.stat('atk'), def: m.stat('def'), lv: p.skills2.lvl(id), mult: p.skills2.mult(d || { id, type: 'attack' }), desc: d && d.desc, cd: d && d.cd, mp: d && d.mp };
-  }, [SCENE, FPS, ID, DIST]);
+  }, [SCENE, FPS, ID, DIST, +(process.env.SEED || 12345)]);
   if (typeof info === 'string') { console.log(info); await b.close(); return; }
   const frames = [], total = Math.round(DUR * FPS); let dc = 0;
   for (let i = 0; i < total; i++) {
