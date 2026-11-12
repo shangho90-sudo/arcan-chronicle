@@ -5,6 +5,7 @@ const THEME = {
   frost_highland: ['#c9d6de', '#a9a49a'], dragon_ruins: ['#8e6c58', '#b0a08c'], mushroom_grove: ['#6e6488', '#a98f8a'],
 };
 import { CAM } from './render.js';
+import { npcMapKind, drawMapIcon } from './mapicons.js';
 const PPM = 3;   // background pixels per metre
 
 export class Minimap {
@@ -111,20 +112,28 @@ export class Minimap {
       const boss = a === z.boss; dot(to(a.pos.x, a.pos.z), boss ? 5 : 2.6, boss ? '#c06bff' : '#ff5a4a', boss ? '#2a0838' : '#4a0a06');
     }
     // npcs: plain gold dot, or a green "?" badge when they have a quest to give or to hand in (G.questState)
-    const qn = [];
+    //       상점·전직 NPC는 종류 아이콘(js/mapicons.js); 퀘스트가 있으면 아이콘 오른쪽 위에 작은 "?"를 겹침
+    const qn = [], ic = [];
     for (const n of z.npcs || []) {
-      const st = G.questState ? G.questState(n.def.id) : '', q = to(n.pos.x, n.pos.z);
-      if (st === 'ready' || st === 'avail') qn.push([q, n, st]); else { dot(q, 3.2, '#ffe07a', '#5a3a08'); label(q, n.def.name, 6, '#ffe9b0'); }
+      const st = G.questState ? G.questState(n.def.id) : '', q = to(n.pos.x, n.pos.z), kind = npcMapKind(n.def), quest = st === 'ready' || st === 'avail';
+      if (kind) ic.push([q, n, kind, quest]);
+      else if (quest) qn.push([q, n, 1]); else { dot(q, 3.2, '#ffe07a', '#5a3a08'); label(q, n.def.name, 6, '#ffe9b0'); }
     }
-    for (const [q, n] of qn) {
-      const r = (full ? 9 : 6.2) * dpr;
-      ctx.beginPath(); ctx.arc(q.x, q.y, r, 0, 6.283);
-      const g = ctx.createRadialGradient(q.x - r * 0.3, q.y - r * 0.35, r * 0.1, q.x, q.y, r); g.addColorStop(0, '#d8ffe0'); g.addColorStop(0.45, '#4fd36a'); g.addColorStop(1, '#16803a');
+    const qbadge = (x, y, r) => {
+      ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283);
+      const g = ctx.createRadialGradient(x - r * 0.3, y - r * 0.35, r * 0.1, x, y, r); g.addColorStop(0, '#d8ffe0'); g.addColorStop(0.45, '#4fd36a'); g.addColorStop(1, '#16803a');
       ctx.fillStyle = g; ctx.fill(); ctx.lineWidth = 1.6 * dpr; ctx.strokeStyle = '#0a3a18'; ctx.stroke();
       ctx.font = `bold ${Math.round(r * 1.45)}px Jua, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.lineWidth = 2.2 * dpr; ctx.strokeStyle = '#0a3a18'; ctx.strokeText('?', q.x, q.y + r * 0.06); ctx.fillStyle = '#ffffff'; ctx.fillText('?', q.x, q.y + r * 0.06);
-      label(q, n.def.name, 11, '#b8ffc8');
+      ctx.lineWidth = 2.2 * dpr; ctx.strokeStyle = '#0a3a18'; ctx.strokeText('?', x, y + r * 0.06); ctx.fillStyle = '#ffffff'; ctx.fillText('?', x, y + r * 0.06);
+    };
+    const ri = (full ? 11 : 7.5) * dpr;
+    this.icons = ic.map(([q, n, kind]) => ({ id: n.def.id, kind, x: q.x, y: q.y, r: ri }));      // 확인용(tools/browser-tests/mapicons.js)
+    for (const [q, n, kind, quest] of ic) {
+      drawMapIcon(ctx, kind, q.x, q.y, ri);
+      if (quest) qbadge(q.x + ri * 0.75, q.y - ri * 0.75, ri * 0.62);
+      label(q, n.def.name, 12, quest ? '#b8ffc8' : '#ffe9b0');
     }
+    for (const [q, n] of qn) { qbadge(q.x, q.y, (full ? 9 : 6.2) * dpr); label(q, n.def.name, 11, '#b8ffc8'); }
     // player arrow
     const P = p.pos, c = to(P.x, P.z);
     const f = p.facing || { x: 0, z: 1 }, fx = f.x * ex.x + f.z * ez.x, fy = f.x * ex.y + f.z * ez.y, fl = Math.hypot(fx, fy) || 1, ux = fx / fl, uy = fy / fl, s = 7 * dpr * u;

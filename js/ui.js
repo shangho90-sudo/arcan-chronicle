@@ -6,6 +6,7 @@ import { ModelBody, loadPlayerModel, loadActions } from './model.js';
 import { renderItemIcons } from './items3d.js';
 import { renderPortrait, renderThumb, bodyTexturesReady } from './portrait.js';
 import { Minimap } from './minimap.js';
+import { MAP_KINDS, npcMapKind, mapIconURL } from './mapicons.js';
 import { installQuestHud, bindQuestHud } from './questhud.js';
 
 let G = null;
@@ -659,9 +660,10 @@ export class UI {
     const side = $("div", "amside", wrap);
     const view = this.amView && this.amView.zone === z.def.id ? this.amView : (this.amView = { zone: z.def.id, zoom: 1, x: 0, z: 0 });
     const lv = z.def.level && z.def.kind !== "town" ? (Array.isArray(z.def.level) ? `권장 Lv ${z.def.level[0]}~${z.def.level[1]}` : `권장 Lv ${z.def.level}`) : "";
+    const kinds = Object.keys(MAP_KINDS).filter(k => (z.npcs || []).some(n => npcMapKind(n.def) === k));      // 이 지역에 있는 상점·전직 아이콘만 범례에
     side.innerHTML = `<div class="amzoom"><button type="button" class="btn ivory" data-z="in" aria-label="확대">＋</button><button type="button" class="btn ivory" data-z="out" aria-label="축소">－</button></div>
       <button type="button" class="btn teal" data-z="all">전체 보기</button><button type="button" class="btn teal" data-z="me">내 위치</button>
-      <div class="amlegend"><b>표시</b><span><i class="lg me"></i>나</span><span><i class="lg q">?</i>퀘스트 NPC</span><span><i class="lg npc"></i>NPC</span><span><i class="lg warp"></i>이동 장소</span><span><i class="lg mon"></i>몬스터</span>${z.boss ? '<span><i class="lg boss"></i>보스</span>' : ""}</div>
+      <div class="amlegend"><b>표시</b><span><i class="lg me"></i>나</span><span><i class="lg q">?</i>퀘스트 NPC</span><span><i class="lg npc"></i>NPC</span><span><i class="lg warp"></i>이동 장소</span><span><i class="lg mon"></i>몬스터</span>${z.boss ? '<span><i class="lg boss"></i>보스</span>' : ""}${kinds.map(k => `<span><img class="lg ic" src="${mapIconURL(k, 44)}" alt="">${MAP_KINDS[k].label}</span>`).join("")}</div>
       ${lv ? `<div class="small muted amlv">${lv}</div>` : ""}<div class="small muted amhelp">휠·두 손가락으로 확대, 끌어서 이동</div>
       <div class="amlist"><b>${z.def.kind === "town" ? "이 마을 사람들" : "이 지역 몬스터"}</b><div class="amitems"></div></div>`;
     this.fillAreaList(z, side.querySelector(".amitems"));
@@ -692,7 +694,7 @@ export class UI {
     const cache = this.thumbCache || (this.thumbCache = new Map());
     const items = [];
     if (z.def.kind === "town") {
-      for (const n of z.npcs) if (n.def && n.def.name) items.push({ key: "n:" + n.def.id + ":" + (n.def.model || ""), name: n.def.name, sub: n.def.title || "", body: n.body, mode: "bust", quest: G.questState && G.questState(n.def.id) });
+      for (const n of z.npcs) if (n.def && n.def.name) items.push({ key: "n:" + n.def.id + ":" + (n.def.model || ""), name: n.def.name, sub: n.def.title || "", body: n.body, mode: "bust", quest: G.questState && G.questState(n.def.id), kind: npcMapKind(n.def) });
     } else {
       const seen = new Map();
       for (const sp of z.spawners) {
@@ -707,7 +709,7 @@ export class UI {
       for (const it of items) it.sub = (it.boss ? "보스 · " : "") + (it.lo ? (it.lo === it.hi ? `Lv ${it.lo}` : `Lv ${it.lo}~${it.hi}`) : "");
     }
     if (!items.length) { box.innerHTML = `<div class="small muted">${z.def.kind === "town" ? "NPC가 없습니다" : "몬스터가 없습니다"}</div>`; return; }
-    box.innerHTML = items.map((it, i) => `<div class="amitem${it.boss ? " boss" : ""}" data-i="${i}"><i class="amthumb"><span>${esc(it.name.slice(0, 1))}</span></i><span class="amname">${esc(it.name)}${it.quest === "ready" || it.quest === "avail" ? ` <em class="amq">${it.quest === "ready" ? "?" : "!"}</em>` : ""}<small>${esc(it.sub || "")}</small></span></div>`).join("");
+    box.innerHTML = items.map((it, i) => `<div class="amitem${it.boss ? " boss" : ""}" data-i="${i}"><i class="amthumb"><span>${esc(it.name.slice(0, 1))}</span></i>${it.kind ? `<img class="amkind" src="${mapIconURL(it.kind, 44)}" alt="${MAP_KINDS[it.kind].label}" title="${MAP_KINDS[it.kind].label}">` : ""}<span class="amname">${esc(it.name)}${it.quest === "ready" || it.quest === "avail" ? ` <em class="amq">${it.quest === "ready" ? "?" : "!"}</em>` : ""}<small>${esc(it.sub || "")}</small></span></div>`).join("");
     let tries = 0;
     const paint = () => {
       if (!box.isConnected) return; let missing = 0;
