@@ -877,6 +877,8 @@ export class ModelBody {
         const hi = this.md.byName[(side === 'L' ? 'Left' : 'Right') + '_Hand'];
         // held in mesh space: the matrix is the hand grip (or, for the right weapon, the back holder / a glide between them)
         const holder = new THREE.Group(); holder.matrixAutoUpdate = false; holder.add(kind.startsWith('item:') ? itemModel(kind.slice(5)) : makeProp(kind));
+        // the player's weapon gets the same thin outline as the body (only its big parts: handle, head - small trims / gems skip it)
+        if (side === 'R' && !this.md.cfg.npc) { const ms = []; holder.traverse(o => { if (o.isMesh && o.geometry) { o.geometry.computeBoundingSphere(); if (o.geometry.boundingSphere.radius > 0.06) ms.push(o); } }); for (const o of ms) addOutline(o); }
         this.mesh.add(holder); this.props[side] = holder; holder.userData.hi = hi;
       }
     }
