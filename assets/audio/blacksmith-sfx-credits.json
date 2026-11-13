@@ -1,0 +1,70 @@
+{
+ "note": "Synthesized in-repo (no Runway credit). Regenerate with python3 tools/audio/smith_sfx.py (fixed seed).",
+ "generatedOn": "2026-11-13",
+ "assets": [
+  {
+   "file": "sfx_bs_swing.mp3",
+   "description": "무거운 망치가 공기를 가르는 짧은 '후웅'"
+  },
+  {
+   "file": "sfx_bs_hit.mp3",
+   "description": "망치 접촉: 짧은 쿵 + 금속 '깡'(짧게)"
+  },
+  {
+   "file": "sfx_bs_hit_heavy.mp3",
+   "description": "마무리 내려찍기: 더 낮은 쿵 + 긴 금속 울림 + 돌가루"
+  },
+  {
+   "file": "sfx_bs_anvil.mp3",
+   "description": "모루 착지: 아주 낮은 쿵 + 큰 모루 울림"
+  },
+  {
+   "file": "sfx_bs_anvil_ring.mp3",
+   "description": "모루 충격파: 맑은 모루 '땡' (짧은 저음 없음)"
+  },
+  {
+   "file": "sfx_bs_tongs.mp3",
+   "description": "집게가 닫힘: 두 번 겹친 '철컥'"
+  },
+  {
+   "file": "sfx_bs_quench.mp3",
+   "description": "냉각수 끼얹기: 물 튀김"
+  },
+  {
+   "file": "sfx_bs_steam.mp3",
+   "description": "수증기: 짧은 '치익'"
+  },
+  {
+   "file": "sfx_bs_steam3.mp3",
+   "description": "3중첩 수증기: 더 크고 선명한 '치이익' + 높은 쉭 소리"
+  },
+  {
+   "file": "sfx_bs_wall.mp3",
+   "description": "철판 펼침: 금속 마찰 '촤르륵' + '텅'"
+  },
+  {
+   "file": "sfx_bs_block.mp3",
+   "description": "철벽이 막음: 둔탁한 '텅'"
+  },
+  {
+   "file": "sfx_bs_rivet.mp3",
+   "description": "리벳 박기: 작은 '팅' 세 번"
+  },
+  {
+   "file": "sfx_bs_rivet_pop.mp3",
+   "description": "리벳 튕겨 나감: 높은 '핑'"
+  },
+  {
+   "file": "sfx_bs_rivet_shot.mp3",
+   "description": "리벳 발사: 빠른 '슉슉슉'"
+  },
+  {
+   "file": "sfx_bs_forge.mp3",
+   "description": "용광로 개방: 불꽃 '화르륵' + 쇳물 떨어지는 지글"
+  },
+  {
+   "file": "sfx_bs_break.mp3",
+   "description": "낙인 파괴: 금속 외피가 깨지는 '쨍그랑'"
+  }
+ ]
+}

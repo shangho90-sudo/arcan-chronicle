@@ -11,6 +11,8 @@ const PUSH_STOP = 0.05, PUSH_KICK = [0.09, 0.1];   // 밀어내기: local hit-st
 const SMASH_STOP = 0.06, SMASH_KICK = [0.11, 0.1];   // 유봉강타: local hit-stop (s, caster + target visuals only), camera kick [m, s]
 import { biyeonImpact } from './biyeonfx.js';
 import { bashImpact, BASH } from './bashfx.js';
+// 대장장이 1차: 가열·모루·집게·낙인·철벽·리벳 규칙 (js/smith.js)
+import { SmithKit, clearLine } from './smith.js';
 
 let G = null; export function bindSkillRt(g) { G = g; }
 const DEG = Math.PI / 180;
@@ -30,6 +32,7 @@ export const FX = {
   biyeon(kind, pos, dir, o = {}) { try { if (G.skillFx && G.skillFx.biyeon) return G.skillFx.biyeon[kind](pos, dir, o); } catch (e) { console.warn('fx biyeon', e); } return null; },   // 비연참 '비연파' (js/biyeonfx.js)
   pharm(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.pharm) return G.skillFx.pharm[kind](a, o); } catch (e) { console.warn('fx pharm', e); } return null; },   // 약사 1차 소품 (js/pharmfx.js)
   cook(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.cook) return G.skillFx.cook[kind](a, o); } catch (e) { console.warn('fx cook', e); } return null; },   // 요리사 1차: 허공 식칼·큰 프라이팬·미트볼 (js/cookfx.js)
+  smith(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.smith) return G.skillFx.smith[kind](a, o); } catch (e) { console.warn('fx smith', e); } return null; },   // 대장장이 1차 (js/smithfx.js)
   bash(kind, pos, dir, o = {}) { try { if (G.skillFx && G.skillFx.bash) return G.skillFx.bash[kind](pos, dir, o); } catch (e) { console.warn('fx bash', e); } },   // 배쉬 (js/bashfx.js)
   beam(kind, a, b, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.beam(kind, a, b, o); } catch (e) { console.warn('fx', kind, e); } },
   projectile(kind, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.projectile(kind, o) || NOOP; } catch (e) { console.warn('fx', kind, e); } return NOOP; },
@@ -103,6 +106,7 @@ export class SkillEngine {
     this.pc = pc; this.cd = {}; this.cdLen = {}; this.pending = []; this.casting = null; this.channel = null; this.clock = 0;
     this.things = []; this.summons = []; this.areas = []; this.res = { power: 6, phrase: 0 }; this.melody = null; this.lastFamily = ''; this.potionShared = 0;
     this.combatT = 0; this.cheatDeathT = 0; this.overclockT = 0; this.coolT = 0; this.lastMelodySwitch = 0; this.echoUsed = false;
+    this.smith = new SmithKit(this, { applyStatus, fx: FX.smith, G: () => G });   // 대장장이 1차 규칙 (js/smith.js)
     this.restoreCooldowns();
   }
   get book() { return this.pc.sheet.book; }
@@ -139,7 +143,8 @@ export class SkillEngine {
     if (d.res && d.res.cost && (this.res[d.res.type] || 0) < d.res.cost) return d.res.type === 'power' ? '전력이 부족합니다' : '자원이 부족합니다';
     for (const op of d.ops) if (op.op === 'consume' && !this.findConsumable(op.tag)) return op.tag === 'food' ? '먹을 음식이 없습니다' : '회복제가 없습니다';
     for (const op of d.ops) if (op.op === 'consume' && op.potionCd && pc.potionCd > 0) return '물약 재사용 대기 중';
-    if (d.target === 'enemy') { const t = this.targetFor(d); if (!t) return '대상이 없습니다'; if (pc.dist(t) > this.range(d) + t.radius + 0.8) return '사거리 밖입니다'; }
+    if (d.target === 'enemy') { const t = this.targetFor(d); if (!t) return '대상이 없습니다'; if (pc.dist(t) > this.range(d) + t.radius + 0.8) return '사거리 밖입니다';
+      if (d.ops.some(o => o.fn === 'smith_tongs') && !clearLine(pc.zone.geo, pc.pos, t.pos)) return '장애물에 막혀 있습니다'; }   // 집게는 벽 너머의 적을 잡지 못함
     if (d.target === 'ground' && d.ops.some(o => o.op === 'summon')) { const p = this.groundAim(d, aim); if (pc.zone.geo.blocked(p.x, p.z, 0.4)) return '설치할 수 없는 위치입니다'; if (this.nearPortal(p, 2.5)) return '출입구 근처에는 설치할 수 없습니다'; }
     return null;
   }
@@ -155,6 +160,7 @@ export class SkillEngine {
 
   // ---------------- cast
   cast(id, aim) {
+    if (this.smith.wall && this.smith.wall.id === id) return this.smith.kickWall(aim);   // 접이식 철벽: 떠 있는 동안 같은 칸 = 걷어차기(비용·대기 없음)
     const d = G.data.skill2(id); const e = this.validate(d, aim); if (e != null) return e;
     const pc = this.pc;
     const cost = this.mpCost(d);
@@ -187,6 +193,7 @@ export class SkillEngine {
     else this.release(ctx);
     if (d.ops.some(o => o.op === 'consume' && o.potionCd)) pc.potionCd = G.data.config.potionCooldown;
     this.combatT = Math.max(this.combatT, d.type === 'attack' || d.type === 'ultimate' ? 5 : 0);
+    this.smith.onCast(d);
     return null;
   }
   /** cast time finished (or instant): schedule every op */
@@ -250,6 +257,7 @@ export class SkillEngine {
     for (const a of this.areas) a.update(dt);
     this.areas = this.areas.filter(a => !a.dead);
     this.summons = this.summons.filter(s => !s.dead);
+    this.smith.tick(dt);
     if (this.melody) this.tickMelody(dt);
     if (this.overclockT > 0) { this.overclockT -= dt; if (this.overclockT <= 0) { applyStatus(pc, { id: 'cooldown_heat', dur: this.coolT, val: 1, ch: 1 }, pc); } }
     for (const m of pc.zone.actors) if (m._marks) tickMarks(m, dt);
@@ -260,6 +268,7 @@ export class SkillEngine {
     for (const a of this.areas) a.dispose(); this.areas = [];
     for (const s of this.summons) s.vanish(true); this.summons = [];
     if (this.melody) { this.melody.fx.dispose(); this.melody = null; }
+    this.smith.clear();
     this.pending = []; this.casting = null; if (this.channel) { this.channel = null; }
     for (const m of (this.pc.zone ? this.pc.zone.actors : [])) clearMarks(m);
   }
@@ -284,9 +293,11 @@ export class SkillEngine {
     const r = CombatMath.compute(this.power(ctx), c, def, pc.stat('crit'), critDmg, t.stat('dmgReduce'));
     const kdir = { x: t.pos.x - pc.pos.x, z: t.pos.z - pc.pos.z };
     const knock = op.knock && !(t.isBoss) && !(t.def && t.def.ai === 'heavy') ? op.knock * 0.4 : 0;
-    const quietFx = !!(op.fx && (op.fx.pharm === 'smash' || op.fx.pharm === 'push' || op.fx.cook === 'pan'));   // own local hit-stop + camera kick, never the global ones
+    const quietFx = !!(op.quiet || (op.fx && (op.fx.pharm === 'smash' || op.fx.pharm === 'push' || op.fx.cook === 'pan')));   // own local hit-stop + camera kick, never the global ones (quiet: 대장장이)
     const hd = { source: pc, amount: r.amount, crit: r.crit, kdir, knockback: knock, localStop: quietFx ? 'quiet' : !!(op.fx && op.fx.bash) };
+    if (op.derived) hd.derived = true;
     t.takeDamage(hd); ctx.missed = !!hd.missed;
+    if (!hd.missed && !op.derived) this.smith.directHit(t);   // 단조 낙인 타수: 직접 공격만(파생 피해 제외)
     if (op.push && !t.isBoss && !t.dead) { const m = Math.hypot(kdir.x, kdir.z) || 1; t.knock = { x: kdir.x / m * op.push * 10, z: kdir.z / m * op.push * 10 }; t.hitReact = Math.max(t.hitReact || 0, 0.4); }   // push = m 밀어냄(배쉬, 무거운 몬스터 포함·보스 제외)
     if (op.pull && !t.isBoss && !t.dead) { const p = op.pullTo || ctx.aim; const ddx = p.x - t.pos.x, ddz = p.z - t.pos.z, m = Math.hypot(ddx, ddz); if (m > 0.3) t.knock = { x: ddx / m * op.pull * 3, z: ddz / m * op.pull * 3 }; }
     if (op.launch && !t.isBoss && !(t.def && t.def.ai === 'heavy')) applyStatus(t, { id: 'stagger', dur: op.launch, val: 1, ch: 1 }, pc);
@@ -306,6 +317,7 @@ export class SkillEngine {
     if (op.color) addMark(t, 'color', 1, op.color);
     if (op.temp) { const m = marks(t); m.temp = clamp(m.temp + op.temp * 2, -5, 5); m.tempT = 6; showMarks(t); }
     if (op.gain) this.gain(op.gain.type, op.gain.n, ctx, op.gain.once);
+    if (op.heat || op.brand) this.smith.onHit(t, op, ctx);   // 대장장이: 가열 중첩 / 단조 낙인
   }
   gain(type, n, ctx, once) {
     if (once && ctx['g_' + type]) return; ctx['g_' + type] = 1;
@@ -417,6 +429,7 @@ export class SkillEngine {
         let ts;
         if (op.shape === 'single') { const t = ctx.tgt && !ctx.tgt.dead && !ctx.tgt.removed ? ctx.tgt : this.targetFor(d); ts = t && pc.dist(t) <= this.range(d) + t.radius + 1 ? [t] : []; }
         else ts = this.targets(this.shapeOf(op, ctx));
+        if (op.anvil) this.smith.strikeAnvil(this.shapeOf(op, ctx));   // 백련타: 판정 안의 내 모루가 충격파를 냄
         // fx
         const fxp = op.atAim ? ctx.aim : op.atTarget && ctx.tgt ? ctx.tgt.pos : { x: pc.pos.x + f.x * (op.fwd || 1.0), y: pc.pos.y, z: pc.pos.z + f.z * (op.fwd || 1.0) };
         if (op.fx) {
@@ -505,6 +518,11 @@ export class SkillEngine {
             if (G.render.kick && !G.reduceFlash) G.render.kick(f.x, f.z, PAN_KICK[0], PAN_KICK[1]);
             const sd = !t.dead && t.status && t.status.get && t.status.get('stun'); if (sd) FX.cook('stun', t, { dur: sd.remaining });
           }
+        }
+        if (op.fx && op.fx.smith) {   // 대장장이 타격 연출(피해 뒤 — MISS는 빗나간 것으로): 실제로 맞은 대상에만 불티·섬광, 시전자·대상만 잠깐 멈춤
+          const live = ts.filter(() => !ctx.missed || ts.length > 1), t0 = [...live].sort((a, b) => pc.dist(a) - pc.dist(b))[0], heavy = op.fx.smith === 'finish' || op.fx.smith === 'brand';
+          FX.smith('hit', pc, { kind: op.fx.smith, f, h, r: op.r, ang: op.ang, hits: live.map(t => ({ x: t.pos.x, y: t.pos.y || 0, z: t.pos.z, r: t.radius, heat: this.smith.heatOf(t) })) });
+          if (t0) this.smith.impact(t0, f, heavy);
         }
         if (op.extendHerb) for (const a of this.areas) if (a.op.herb && this.shapeOf(op, ctx).overlaps(a.c.x, a.c.z, a.r)) a.extend(op.extendHerb, op.extendCap || 4);
         if (op.link && ts.length > 1) for (let i = 1; i < ts.length; i++) FX.beam('thread_link', ts[i - 1].pos, ts[i].pos, { duration: 2 });
@@ -903,6 +921,9 @@ export class Summon {
 
 // ------------------------------------------------------------------ unique mechanics
 export const CUSTOM = {
+  // 대장장이 1차 (js/smith.js): 모루 떨구기 · 집게 낚아채기 · 급랭 담금질 · 접이식 철벽 · 즉석 리벳
+  smith_anvil(eng, op, ctx) { eng.smith.smith_anvil(op, ctx); }, smith_tongs(eng, op, ctx) { eng.smith.smith_tongs(op, ctx); }, smith_quench(eng, op, ctx) { eng.smith.smith_quench(op, ctx); },
+  smith_wall(eng, op, ctx) { eng.smith.smith_wall(op, ctx); }, smith_rivets(eng, op, ctx) { eng.smith.smith_rivets(op, ctx); },
   triple_check(eng, op, ctx) {   // 삼중 처방: a target hit by fire+ice+shock within 3 s explodes once
     eng.pending.push({ time: eng.clock + 0.9, op: { op: '_run', run: () => {
       for (const t of eng.pc.zone.actors) { const m = t._marks; if (!m || t.dead || m.tri.size < 3) continue; m.tri.clear(); eng.blast(t.pos, { r: op.r, coef: op.coef, burst: 'explosion_prism' }, ctx); }

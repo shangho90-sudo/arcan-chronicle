@@ -10,6 +10,7 @@ import { BiyeonFx } from './biyeonfx.js';
 import { BashFx } from './bashfx.js';
 import { PharmFx } from './pharmfx.js';
 import { CookFx } from './cookfx.js';
+import { SmithFx } from './smithfx.js';
 
 const TAU = Math.PI * 2, DEG = Math.PI / 180;
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -1649,6 +1650,7 @@ export class SkillFx {
     this.yeon = new YeonFx(this.root); this.yeon.load();                      // 견습생 '연' crescents (js/yeonfx.js)
     this.biyeon = new BiyeonFx(this.root); this.biyeon.load();                // 비연참 '비연파' crescent fan (js/biyeonfx.js)
     this.bash = new BashFx(this.root); this.bash.load();
+    this.smith = new SmithFx(this.root); this.smith.load();                   // 대장장이 1차: 모루·집게·철판·리벳·불티·수증기 (js/smithfx.js)
     this.cook = new CookFx(this.root); this.cook.load();                      // 요리사 1차: 허공 식칼·큰 프라이팬·미트볼 (js/cookfx.js)
     this.pharm = new PharmFx(this.root); this.pharm.load();                   // 약사 1차: 황금 유봉·약병·주사기·보호막·회복진 (js/pharmfx.js)                      // 배쉬 crescent / impact / dust meshes (js/bashfx.js)
     /** optional camera-shake hook: (amplitude, duration) => void. Suppressed when SkillFx.reduceFlash. */
@@ -1691,7 +1693,7 @@ export class SkillFx {
   // ------------------------------------------------------------------------------------ frame
   update(dt) {
     dt = Math.min(Math.max(dt, 0), 0.1); this.time += dt;
-    this.shatter.update(dt); this.sal.update(dt); this.yeon.update(dt); this.biyeon.update(dt); this.bash.update(dt); this.pharm.update(dt); this.cook.update(dt);
+    this.shatter.update(dt); this.sal.update(dt); this.yeon.update(dt); this.biyeon.update(dt); this.bash.update(dt); this.pharm.update(dt); this.cook.update(dt); this.smith.update(dt);
     const L = this.live;
     for (let i = 0; i < L.length; i++) {
       const e = L[i]; e.t += dt; e.lt = e.t * e.tk;
@@ -1702,7 +1704,7 @@ export class SkillFx {
     }
     this.pa.update(dt); this.pn.update(dt);
   }
-  clear() { this.shatter.clear(); this.sal.clear(); this.yeon.clear(); this.biyeon.clear(); this.bash.clear(); this.pharm.clear(); this.cook.clear(); for (const e of this.live) if (!e.dead) this._release(e); this.live.length = 0; this.pa.clear(); this.pn.clear(); }
+  clear() { this.shatter.clear(); this.sal.clear(); this.yeon.clear(); this.biyeon.clear(); this.bash.clear(); this.pharm.clear(); this.cook.clear(); this.smith.clear(); for (const e of this.live) if (!e.dead) this._release(e); this.live.length = 0; this.pa.clear(); this.pn.clear(); }
   /** remove from scene and free pooled rigs (shared caches stay) */
   dispose() { this.clear(); for (const p of this.pools.values()) for (const r of p) disposeRig(r); this.pools.clear(); this.root.removeFromParent(); this.pa.geo.dispose(); this.pn.geo.dispose(); this.pa.mat.dispose(); this.pn.mat.dispose(); }
 

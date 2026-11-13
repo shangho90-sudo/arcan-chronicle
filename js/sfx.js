@@ -21,6 +21,8 @@ export function skillSound(d, op = null) {
 export const SFX_EVENTS = new Set(['levelup', 'jobchange', 'dialog', 'warp']);
 export const SFX_NAMES = ['levelup', 'jobchange', 'dialog', 'warp', 'hit', 'heavy', 'swing', 'magic', 'fire', 'ice', 'splash',
   'ph_spin', 'ph_slam', 'ph_smash_swing', 'ph_smash_hit', 'ph_push_hit', 'ph_flask', 'ph_shield', 'ph_adrenaline', 'ph_heal',
+  'bs_swing', 'bs_hit', 'bs_hit_heavy', 'bs_anvil', 'bs_anvil_ring', 'bs_tongs', 'bs_quench', 'bs_steam', 'bs_steam3',   // 대장장이 1차 (tools/audio/smith_sfx.py)
+  'bs_wall', 'bs_block', 'bs_rivet', 'bs_rivet_pop', 'bs_rivet_shot', 'bs_forge', 'bs_break',
   'nv_sal_cast', 'nv_sal_hit', 'nv_yeon_cast', 'nv_yeon_hit',
   'nv_biyeon_cast', 'nv_biyeon_hit', 'nv_bash_cast', 'nv_bash_hit',
   'heal', 'shield', 'dodge', 'throw', 'boss_slam', 'monster_attack', 'monster_die',

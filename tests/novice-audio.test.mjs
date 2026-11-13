@@ -4,11 +4,12 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import { skillSound } from '../js/sfx.js';
 import { CombatMath } from '../js/core.js';
+import { SmithKit, clearLine } from '../js/smith.js';   // skillrt.js가 쓰는 대장장이 규칙 모듈
 const read = p => readFileSync(new URL(p, import.meta.url), 'utf8');
 const skills = JSON.parse(read('../assets/data/skills2.json')).skills;
 const actions = Object.fromEntries(JSON.parse(read('../assets/models/actions.json')).map(a => [a.name, a]));
 const source = read('../js/skillrt.js').replace(/^import .*;\n/gm, '').replace(/\bexport /g, '');
-const sandbox = { skillSound, CombatMath, YEON_LEAD: 0.05, BASH: { stop: 0.04 },
+const sandbox = { skillSound, CombatMath, SmithKit, clearLine, YEON_LEAD: 0.05, BASH: { stop: 0.04 },
   salImpact: t => t.pos, yeonImpact: t => t.pos, biyeonImpact: t => t.pos, bashImpact: t => t.pos,
   clamp: (n, a, b) => Math.max(a, Math.min(b, n)), clamp01: n => Math.max(0, Math.min(1, n)),
   console: { ...console, error: (...a) => { throw Error(a.join(' ')); } } };

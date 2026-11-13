@@ -158,9 +158,9 @@ function TestStats() {
   Ok(Math.abs(ch.final.atk - (atkL5 - 3)) < 0.01, "atk back without weapon");
   const ch2 = NewChar(d, "blacksmith"); ch2.p.level = 20; ch2.book.grantPoints(); ch2.recalc();
   const def20 = ch2.final.def, hp20 = ch2.final.maxHp;
-  Ok(ch2.book.learn("bs1_b5") == null, "learn passive 강철 체력");
-  Ok(Math.abs(ch2.final.def - (def20 + 3)) < 0.01, "passive +3 def at Lv1: " + ch2.final.def);
-  Ok(Math.abs(ch2.final.maxHp - hp20 * 1.05) < 0.6, "passive +5% max hp");
+  Ok(ch2.book.learn("bs1_b5") == null, "learn passive 충격 재활용(예전 강철 체력)");
+  Ok(Math.abs(ch2.final.def - (def20 + 2)) < 0.01, "passive +2 def at Lv1: " + ch2.final.def);   // 2026-11-13 대장장이 개편: 방어 +3 -> +2, 체력 +5% -> +3%
+  Ok(Math.abs(ch2.final.maxHp - hp20 * 1.03) < 0.6, "passive +3% max hp");
   const hd = NewChar(d, "hairdresser"), bs = NewChar(d, "blacksmith"), ar = NewChar(d, "artist");
   Ok(hd.final.moveSpeed > bs.final.moveSpeed, "hairdresser faster than blacksmith");
   Ok(bs.final.maxHp > hd.final.maxHp, "blacksmith tankier");

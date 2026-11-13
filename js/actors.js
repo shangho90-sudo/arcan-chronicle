@@ -44,6 +44,7 @@ export class Combatant {
       if (!d.dot) this._hits = (this._hits || 0) + 1;
       if ((d.dot || d.elem) && this.stat("elemRes") > 0) amount *= 1 - Math.min(0.6, this.stat("elemRes"));   // 속성 저항 (약사 수련): burn / poison / bleed ticks, elemental hits
       const fg = this.status.flag("frontguard"); if (fg && d.source && d.source.pos) { const dx = d.source.pos.x - this.pos.x, dz = d.source.pos.z - this.pos.z, m = Math.hypot(dx, dz) || 1; if ((dx * this.facing.x + dz * this.facing.z) / m > 0.3) amount *= 1 - fg; }
+      if (this.skills2.smith) amount = this.skills2.smith.guard(d, amount);   // 대장장이 접이식 철벽(정면)·즉석 리벳: 줄인 만큼 충격 재활용에 모임
       if (this.skills2.casting && !d.dot && amount > this.maxHp * 0.15) this.skills2.interruptCast("강한 공격에 시전이 끊겼습니다");
       const sh = this.shield > 0 ? Math.min(this.shield, amount) : 0;
       if (this.hp - (amount - sh) <= 0 && this.skills2.cheatDeath()) return;
@@ -202,7 +203,9 @@ export class SkillRunner {
     switch (a.type) {
       case "damage": {
         const sh = this.shape(a, p); const ts = Resolver.targets(pc, sh);
-        const bmul = p.s.kind === "basic" && pc.sheet && pc.sheet.book ? 1 + pc.sheet.book.passive("basicDmg") : 1;
+        const smith = p.s.kind === "basic" && pc.skills2 && pc.skills2.smith && pc.sheet.job && (pc.sheet.job.id === "blacksmith" || pc.sheet.job.parent === "blacksmith") ? pc.skills2.smith : null;
+        const emp = smith ? smith.basicSwing() : null;   // 장인의 박자: 스킬 뒤 다음 기본 공격 1회 강화 (js/smith.js)
+        const bmul = (p.s.kind === "basic" && pc.sheet && pc.sheet.book ? 1 + pc.sheet.book.passive("basicDmg") : 1) * (emp ? emp.mul : 1);
         // melee swings (slash / blunt) use the 3D effect library: a bright crescent that alternates direction each swing
         const fx3 = G.skillFx && !a.atTarget && a.shape === "cone" && (a.fx === "slash" || a.fx === "hit" || a.fx === "wind");
         const SF = G.swingFx && G.swingFx.ready ? G.swingFx : null;
@@ -227,6 +230,7 @@ export class SkillRunner {
         else if (!(cm && a.fx === "slash") && ["slash", "wind", "paint_burst", "potion_splash", "ring"].includes(a.fx)) G.fx.play(a.fx, fp, a.fxScale, a.fx === "ring");
         if (ts.length) { G.audio.sfx(a.sfx || "hit"); pc.onHitLanded(a0.coef >= 1.5); }
         else if (a.atTarget && a.sfx) G.audio.sfx(a.sfx);
+        if (smith) smith.basicLanded(ts, sh, p.facing, emp);   // 낙인 타수 · 모루 충격파 · (강화 타격) 리벳 발사 / 충격 방출
         break;
       }
       case "status": { const def = G.data.status(a.status); for (const t of Resolver.targets(pc, this.shape(a, p))) t.status.apply(def, a.duration, a.value, pc); break; }

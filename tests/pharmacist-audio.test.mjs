@@ -4,10 +4,11 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import { HitShape, CombatMath, clamp, clamp01 } from '../js/core.js';
 import { skillSound } from '../js/sfx.js';
+import { SmithKit, clearLine } from '../js/smith.js';   // skillrt.js가 가져다 쓰는 순수 규칙 모듈(대장장이)
 const read = p => readFileSync(new URL(p, import.meta.url), 'utf8');
 const skills = JSON.parse(read('../assets/data/skills2.json')).skills;
 const actions = Object.fromEntries(JSON.parse(read('../assets/models/actions.json')).map(a => [a.name, a]));
-const sandbox = { HitShape, CombatMath, clamp, clamp01, skillSound, console };
+const sandbox = { HitShape, CombatMath, clamp, clamp01, skillSound, SmithKit, clearLine, console };
 vm.createContext(sandbox);
 vm.runInContext(read('../js/skillrt.js').replace(/^import .*;\n/gm, '').replace(/\bexport /g, '') + '\nthis.api={SkillEngine,SkillArea,bindSkillRt,FX};', sandbox);
 const { SkillEngine, SkillArea, bindSkillRt, FX } = sandbox.api;

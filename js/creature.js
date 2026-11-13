@@ -167,7 +167,10 @@ export class CreatureBody {
     if (!a.loop && f >= n) this.finished = true;
     const u = a.loop ? (f % n) / n : Math.min(1, f / n);
     if (this.flashT > 0) this.flashT -= dt;
-    { const k = this.flashT > 0 ? 0.26 * Math.min(1, this.flashT / 0.1) : 0; for (const m of this.mats) m.emissiveIntensity = k; }   // 피격 번쩍임: 짧게 줄어듦(하얗게 날아가 반투명해 보이던 0.55 고정 대신)
+    // 피격 번쩍임: 짧게 줄어듦 / 가열(대장장이 1~3중첩, js/smith.js): 번쩍이지 않을 때 표면이 은은한 주황빛
+    const ht = this.flashT > 0 ? 0 : (this.heat | 0);
+    if (ht !== this._heatOn) { this._heatOn = ht; for (const m of this.mats) m.emissive.setHex(ht ? 0xff6a1a : 0xffffff); }
+    { const k = this.flashT > 0 ? 0.26 * Math.min(1, this.flashT / 0.1) : ht ? 0.10 + 0.07 * ht + 0.03 * Math.sin(this.phase * 5) : 0; for (const m of this.mats) m.emissiveIntensity = k; }
     let dy = this.targetYaw - this.yaw; dy = Math.atan2(Math.sin(dy), Math.cos(dy)); this.yaw += dy * Math.min(1, dt * 12);
     this.root.rotation.y = this.yaw;
     // skeletal walk cycle; idle = slow breathing on the paused pose

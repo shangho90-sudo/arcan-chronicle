@@ -1,6 +1,8 @@
 // Input (keyboard / mouse / multi-touch) and audio.
 import { screenToWorldDir } from './render.js';
 import { SFX_NAMES, SFX_REWARDS, SFX_EVENTS } from './sfx.js';
+// 대장장이 효과음 음량(합성 파일은 같은 정점으로 맞춰지므로 여기서 역할별로 나눔)
+const BS_GAIN = { bs_swing: 0.26, bs_hit: 0.42, bs_hit_heavy: 0.5, bs_anvil: 0.55, bs_anvil_ring: 0.36, bs_tongs: 0.4, bs_quench: 0.34, bs_steam: 0.3, bs_steam3: 0.42, bs_wall: 0.4, bs_block: 0.32, bs_rivet: 0.3, bs_rivet_pop: 0.3, bs_rivet_shot: 0.34, bs_forge: 0.42, bs_break: 0.48 };
 
 const KEYS = {
   attack: ["Space", "KeyJ"], skill1: ["Digit1", "Numpad1"], skill2: ["Digit2", "Numpad2"], skill3: ["Digit3", "Numpad3"], skill4: ["Digit4", "Numpad4", "KeyR"], skillWin: ["KeyK"], craftWin: ["KeyN"],
@@ -128,7 +130,7 @@ export class Audio {
     if ([...this.voices].filter(v => v.reward === reward).length >= (reward ? 4 : 12)) return;
     const s = this.ctx.createBufferSource(), g = this.ctx.createGain();
     s.buffer = b; s.playbackRate.value = reward || event ? 1 : 0.96 + Math.random() * 0.08;
-    g.gain.value = name === 'ph_flask' ? 0.18 : name === 'ph_spin' ? 0.22 : name === 'ph_slam' ? 0.5 : name === 'ph_smash_hit' ? 0.5 : name === 'ph_push_hit' ? 0.46 : name === 'ph_smash_swing' ? 0.3 : name === 'dialog' ? 0.24 : name === 'warp' ? 0.58 : reward ? 0.65 : 0.38; s.connect(g); g.connect(this.gSfx);
+    g.gain.value = name.startsWith('bs_') ? (BS_GAIN[name] ?? 0.4) : name === 'ph_flask' ? 0.18 : name === 'ph_spin' ? 0.22 : name === 'ph_slam' ? 0.5 : name === 'ph_smash_hit' ? 0.5 : name === 'ph_push_hit' ? 0.46 : name === 'ph_smash_swing' ? 0.3 : name === 'dialog' ? 0.24 : name === 'warp' ? 0.58 : reward ? 0.65 : 0.38; s.connect(g); g.connect(this.gSfx);
     const voice = { s, reward }; this.voices.add(voice);
     s.onended = () => { this.voices.delete(voice); s.disconnect(); g.disconnect(); }; s.start();
   }

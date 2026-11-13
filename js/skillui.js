@@ -34,7 +34,7 @@ function glyph(g, d) {
   g.restore();
 }
 // 그림 아이콘이 있는 스킬(견습생 기본 검술 8종·약사 1차 15종, tools/ui/skill_icons_crop.py → assets/ui/skills/<id>.png). 나머지는 아래 캔버스 임시 아이콘.
-const SKILL_ART = new Set(['nv_a1', 'nv_a2', 'nv_a3', 'nv_a4', 'nv_p1', 'nv_p2', 'nv_p3', 'nv_p4', ...['a1', 'a3', 'a4', 'a5', 'a6', 'b1', 'b2', 'b4', 'b5', 'b6', 'c1', 'c6', 'c7', 'c8', 'c9'].map(k => 'ph1_' + k)]);   // 견습생(둥근 사각형) + 약사 1차(원형, 2026-11-11 개편 뒤 15종)
+const SKILL_ART = new Set(['nv_a1', 'nv_a2', 'nv_a3', 'nv_a4', 'nv_p1', 'nv_p2', 'nv_p3', 'nv_p4', ...['a1', 'a3', 'a4', 'a5', 'a6', 'b1', 'b2', 'b4', 'b5', 'b6', 'c1', 'c6', 'c7', 'c8', 'c9'].map(k => 'ph1_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'bs1_' + k)]);   // + 대장장이 1차 15종(원형, tools/ui/smith_icons.py)   // 견습생(둥근 사각형) + 약사 1차(원형, 2026-11-11 개편 뒤 15종)
 export function skillIcon(d, size = 48) {
   const k = d.id + size; if (iconCache.has(k)) return iconCache.get(k);
   if (SKILL_ART.has(d.id)) { const html = `<span class="icon i3d skic ${d.id.startsWith('nv_') ? 'skart' : 'skround'}" style="width:${size}px;height:${size}px;background:url(assets/ui/skills/${d.id}.png) center/contain no-repeat;image-rendering:auto"></span>`; iconCache.set(k, html); return html; }
@@ -261,6 +261,10 @@ UI.prototype.updateControls = function () {
     b.querySelector('.sub').style.color = noRes ? '#ff7a7a' : '';
     ic.style.opacity = !d ? 0.35 : noRes ? 0.45 : 1;
     b.classList.toggle('nores', !!noRes);
+    // 대장장이 접이식 철벽: 떠 있는 동안 같은 칸 = 걷어차기 — 남은 시간과 '걷어차기'를 띄우고 칸을 주황으로(기력 부족이어도 누를 수 있음)
+    const rc = d && eng.smith ? eng.smith.recastLeft(d.id) : 0;
+    b.classList.toggle('recast', rc > 0);
+    if (rc > 0) { b.querySelector('.cd').style.background = 'none'; b.querySelector('.cdt').textContent = rc >= 1 ? Math.ceil(rc) : rc.toFixed(1); b.querySelector('.sub').textContent = '걷어차기'; b.querySelector('.sub').style.color = '#ffc070'; ic.style.opacity = 1; b.classList.remove('nores'); }
   };
   for (let i = 0; i < NORMAL_SLOTS; i++) set(this.btn['skill' + (i + 1)], G.data.skill2(sk.slots[i]), i);
   // job resources only for the jobs that use them

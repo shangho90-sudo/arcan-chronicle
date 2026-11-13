@@ -8,7 +8,7 @@
 ## 기본
 - 빌드 없음. `python3 -m http.server 8765` 후 `http://localhost:8765/index.html`.
 - three.js r160을 로컬 import map(`index.html`, `vendor/three-r160/`)으로 불러옵니다. CDN 장애 시 0% 멈춤을 방지하기 위해 동일 버전과 LICENSE를 저장소에 포함합니다. npm 의존성 없음. 새 라이브러리 추가 금지(필요하면 먼저 사용자에게 확인).
-- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs && node tests/gear.test.mjs && node tests/warp.test.mjs && node tests/pharmacist-audio.test.mjs` (현재 core 495 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 638 통과).
+- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs && node tests/gear.test.mjs && node tests/warp.test.mjs && node tests/pharmacist-audio.test.mjs && node tests/smith.test.mjs` (현재 core 495 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 638 통과).
 - 테스트하지 않은 것을 "검증됨"이라고 보고하지 말 것.
 
 ## 데이터 우선
@@ -139,6 +139,13 @@
 - 미트볼 던지기 `ck1_b1`: proj op `count=2, countPerLv=1`(2~6개), `gap` 0.09초 간격, `spread`(손에서 옆으로 벌어져 출발) + `arc`(포물선은 그림만 — 판정은 바닥 직선), 모두 같은 대상(던지는 중 대상이 죽으면 그 자리)으로 날아가 하나하나 반경 1.2 m `blast`(`cook` = 작은 소스 섬광·얇은 고리·조각, `sfxOnHit` = 아무도 안 맞으면 소리 없음).
 - 이펙트 `js/cookfx.js`(`SkillFx.cook.knife/pan/stun/proj/splat`, 조절값 `COOK`), 메시 `python3 tools/blender/fx_cook.py` → `assets/fx/fx_cook.glb.json`(식칼·프라이팬·미트볼·조각 3종·별, 정점 색만, 원본 `tools/blender/cook/fx_cook.blend`). 빛(섬광·고리·썬 자국·김)은 텍스처 없이 셰이더 하나. 소리는 기존 `swing`/`hit`/`heavy`/`throw`. 확인 `tools/browser-tests/cook_skills.js`(`SKILL=chop|pan|ball LV= SCENE=hit|whiff|kill|stun|miss GENDER= SIZE= FX= SEED=`).
 
+## 대장장이 1차 스킬 (2026-11-13 전면 개편)
+- 스킬 id·배우는 레벨·5단계는 그대로(`bs1_a1`~`c5`) — 예전 저장의 습득 레벨·장착 칸·포인트가 그대로 새 스킬이 됨(`SAVE_VERSION` 4 그대로, 확인 `tests/smith.test.mjs`). 계열 이름 A '단조와 제압' · B '열처리와 반격' · C '장인의 제작'. 데이터 `tools/skills2/gen.py`의 `bs1_*`(규칙 값은 op 필드, 기본값은 `js/smith.js` `SMITH`).
+- 규칙 `js/smith.js` `SmithKit`(`SkillEngine.smith`, 렌더 없음 — fx 핸들이 null이어도 동작): 가열(상태 `heat`, 최대 3중첩·5초, 더하면 시간 5초로 다시 채움; 용광로 개방 +2·백련타 마무리 +1, 머리 위 주황 점 + `CreatureBody.heat` 표면 주황빛) → 급랭 담금질이 모두 식히며 중첩마다 +50%·흰 수증기·곁의 적에게 번짐. 모루 떨구기(플레이어당 1개, 5초, 길을 막지 않음; 내 망치 판정이 닿으면 충격파 0.4초 간격·최대 4번), 집게 낚아채기(일반 적 = 내 앞으로 끌어옴·모루 곁이면 충돌 추가 피해, 보스·`ai: heavy` = 끌지 않고 내가 다가가 내려침, 벽 너머는 `clearLine`으로 거절), 불량품 판정(상태 `brand`, 직접 공격 3번에 깨짐 → 추가 피해 + `defdown`(최대값 규칙이라 안 쌓임)), 백련타(좌·우·좌 + 내려찍기, 타격 시각 = `bs_flurry.hitTimes`), 장인의 박자(스킬 뒤 4초 안 기본 공격 1회 강화, 안 쌓임 — `actors.js` 기본 공격 `basicSwing`/`basicLanded`), 접이식 철벽(정면 피해 감소, **같은 칸을 다시 누르면 걷어차기** — `skillrt.js` `cast` 첫 줄 `kickWall`, 비용·대기 없음; 칸에 남은 시간·'걷어차기' 표시 `skillui.js` `.abtn.recast`), 즉석 리벳(피격마다 1개·0.35초 간격, 강화 기본 공격 때 남은 리벳 발사), 충격 재활용(철벽·리벳이 실제로 줄인 양만 모음, 상한 공격력×`recycleCap`, 8초, 다음 강화 기본 공격에 방출), 고철(낙인 파괴·철벽 걷어차기 명중, 10초에 3개, 가방 X — C4 기력·C5 작은 보호막).
+- **파생 피해**(`derived`: 모루 충격파·충돌·급랭 번짐·낙인 파괴·리벳 발사·충격 방출)는 가열·낙인 타수·모루·충전을 다시 일으키지 않음 — 무한 연쇄 방지. 타격 정지는 시전자·대상 `freezeT`만, 카메라는 `Renderer.kick` 한 번(op `quiet`) — 전역 `G.hitStop`·`addShake` 안 씀. 정리: `SkillEngine.clearTemp`(사망·맵 이동·전직) → `SmithKit.clear`, 적이 죽으면 `tick`에서 표시 제거.
+- 이펙트 `js/smithfx.js`(`SkillFx.smith.heat/brand/anvil/tongs/hit/quench/wall/rivets/tempo/emp/release/scrap`, 조절값 `SMITHFX`, `CookFx`를 이어받아 풀 재사용), 메시 `python3 tools/blender/fx_smith.py` → `assets/fx/fx_smith.glb.json`(모루·균열·집게 턱/자루·철판·리벳·쇳물 방울·고철·파편, 정점 색만, 원본 `tools/blender/smith/fx_smith.blend`). 동작 `bs_call/bs_thrust/bs_slam/bs_flurry/bs_sweep/bs_kick`은 `swings.py`. 효과음 16종 `python3 tools/audio/smith_sfx.py`(합성, 출처 `assets/audio/blacksmith-sfx-credits.json`, 음량 `io.js` `BS_GAIN`). 아이콘 15종 `python3 tools/ui/smith_icons.py`(PIL, 원형 — `skillui.js` `SKILL_ART`).
+- 확인: `tests/smith.test.mjs`(규칙), `tools/browser-tests/smith_skills.js`(`SCENE=anvil|tongs|tongs_boss|brand|heat|wall|rivets|mobile` 또는 `PLAN="forge@0,flurry@0.9,quench@2.3"`, `LV= GENDER= SIZE= FX=`; SwiftShader에서 장면 하나 10~20분).
+
 ## 장비 40종·무기/방어구 상인 (2026-11-11)
 - 유봉 10(`w_pestle_g1`~`g10`)·갑옷 10(`a_armor_g*`)·장신구 20(`ac_g1`~`g12` 일반, `ac_j_*` 직업 전용 8)은 `tools/gear/gear.py`가 주인(`"gear": true` 항목만 다시 씀: items/npcs/zones.json). 고친 뒤 `python3 tools/gear/gear.py --write`(인자 없이 = 표만 출력). 예전 아이템 id는 그대로.
 - 수치: 유봉 공격력 `10+2.2L`(마법력 45%), 갑옷 방어 `4+1.8L`·체력 `20+10L`, 드롭 전용은 ×1.08. 값 `60·L^1.25`(갑옷 ×0.9, 장신구 ×1.1), 되팔기 30%, 드롭 전용은 구매가 0.
@@ -179,7 +186,7 @@
 - `skilltest.js`: 180개 스킬 자동 시전 (`JOBS=painter ONLY=pt_a1 node skilltest.js`).
 
 ## 알려진 미완료
-- 스킬 아이콘은 견습생·약사 1차만 그림(`assets/ui/skills`, `tools/ui/skill_icons_crop.py`가 참고 그림 `tools/ui/ref/`에서 잘라 냄 — 약사 15개는 `pharmacist_ref2.png`, `fx_pharm.py icons`를 돌린 뒤에는 다시 실행, `skillui.js` `SKILL_ART`), 나머지는 코드 생성 임시 아이콘.
+- 스킬 아이콘은 견습생·약사 1차·대장장이 1차만 그림(대장장이는 `tools/ui/smith_icons.py`)(`assets/ui/skills`, `tools/ui/skill_icons_crop.py`가 참고 그림 `tools/ui/ref/`에서 잘라 냄 — 약사 15개는 `pharmacist_ref2.png`, `fx_pharm.py icons`를 돌린 뒤에는 다시 실행, `skillui.js` `SKILL_ART`), 나머지는 코드 생성 임시 아이콘.
 - 몬스터: 귀여운 모델(`cute_*`)은 리깅이 없어 모든 동작이 절차 동작. 불씨 비룡 계열(drake)만 예전 모델.
 - 모든 필드(40곳)가 `js/nature.js` 렌더(존별 `nature.ground`/`tint`/`rockTint`/`grass`/`lod`). 서리 고원은 색조만 차갑게(눈 덮인 잎 없음).
 - 휴대폰 화면은 자동 화면 확인만 함(실기기 미확인). 사람이 처음부터 끝까지 플레이한 검증 없음.

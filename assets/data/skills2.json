@@ -4396,44 +4396,56 @@
 "job": "blacksmith",
 "tier": 1,
 "cat": 0,
-"catName": "망치와 도끼",
+"catName": "단조와 제압",
 "idx": 1,
-"name": "망치 내려찍기",
+"name": "모루 떨구기",
 "type": "attack",
-"desc": "강한 단일 타격과 짧은 경직.",
+"desc": "지정한 곳에 거대한 철 모루를 떨어뜨려 범위 피해와 짧은 경직을 준다. 모루는 5초 동안 남아, 내 망치 공격(기본 공격·백련타·집게 내려치기)이 닿으면 주변에 충격파를 낸다(0.4초 간격, 최대 4번). 모루는 하나만 둘 수 있고 길을 막지 않는다.",
 "maxLv": 5,
 "unlock": 10,
 "prereq": [],
 "weapon": "hammer",
-"target": "enemy",
-"range": 2.0,
-"mp": 10,
-"cd": 5,
+"target": "ground",
+"range": 5.0,
+"mp": 12,
+"cd": 7,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "attack",
+"recover": 0.25,
+"anim": "bs_call",
 "ops": [
 {
-"op": "hit",
-"shape": "single",
-"coef": 2.5,
+"op": "custom",
+"fn": "smith_anvil",
+"r": 2.0,
+"coef": 2.2,
+"fall": 0.34,
+"at": -0.3,
+"life": 5.0,
+"lifeLv": 0.25,
 "st": [
 {
 "id": "stagger",
-"dur": 0.6,
+"dur": 0.5,
 "val": 0,
 "ch": 1.0
 }
 ],
-"fx": {
-"slash": "smash",
-"burst": "hit_blunt"
+"pulse": {
+"r": 2.2,
+"coef": 0.6,
+"gap": 0.4,
+"max": 4
 }
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16747056
+},
+"sfx": "bs_swing",
+"sfxAt": "strike",
+"sfxLead": 0.1,
 "status": {
 "data": true,
 "impl": true,
@@ -4448,46 +4460,51 @@
 "job": "blacksmith",
 "tier": 1,
 "cat": 0,
-"catName": "망치와 도끼",
+"catName": "단조와 제압",
 "idx": 2,
-"name": "도끼 가르기",
+"name": "집게 낚아채기",
 "type": "attack",
-"desc": "전방 범위를 베어 출혈을 일으킨다.",
+"desc": "거대한 집게를 뻗어 적 하나를 붙잡아 내 앞으로 끌어온다. 끌려온 적이 내 모루 곁에 떨어지면 모루에 부딪혀 추가 피해를 받는다. 보스와 무거운 적은 끌려오지 않으므로 내가 다가가 집게로 내려친다. 장애물 너머의 적은 잡을 수 없다.",
 "maxLv": 5,
 "unlock": 12,
 "prereq": [],
 "weapon": "hammer",
-"target": "dir",
-"range": 2.6,
+"target": "enemy",
+"range": 6.5,
 "mp": 12,
-"cd": 6,
+"cd": 8,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "attack",
+"recover": 0.3,
+"anim": "bs_thrust",
 "ops": [
 {
-"op": "hit",
-"shape": "cone",
-"coef": 1.8,
-"r": 2.6,
-"ang": 100,
+"op": "custom",
+"fn": "smith_tongs",
+"coef": 1.3,
+"heavy": 2.1,
+"reach": 0.16,
+"pull": 0.24,
+"stop": 1.5,
+"anvil": 1.5,
+"at": -0.16,
 "st": [
 {
-"id": "bleed",
-"dur": 4,
-"val": 0.12,
+"id": "stagger",
+"dur": 0.6,
+"val": 0,
 "ch": 1.0
 }
-],
-"fx": {
-"slash": "arc",
-"burst": "hit_slash"
-}
+]
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 14212582
+},
+"sfx": "bs_swing",
+"sfxAt": "strike",
+"sfxLead": 0.08,
 "status": {
 "data": true,
 "impl": true,
@@ -4502,44 +4519,52 @@
 "job": "blacksmith",
 "tier": 1,
 "cat": 0,
-"catName": "망치와 도끼",
+"catName": "단조와 제압",
 "idx": 3,
-"name": "갑옷 파쇄",
+"name": "불량품 판정",
 "type": "attack",
-"desc": "피해와 함께 방어력을 낮춘다.",
+"desc": "적에게 붉은 단조 낙인을 찍는다(10초). 그 뒤 내 직접 공격이 3번 맞으면 낙인이 깨지며 추가 피해를 주고 6초 동안 방어력을 낮춘다. 지속 피해와 충격파 같은 파생 피해는 세지 않는다.",
 "maxLv": 5,
 "unlock": 15,
 "prereq": [],
 "weapon": "hammer",
 "target": "enemy",
-"range": 2.0,
+"range": 2.2,
 "mp": 12,
-"cd": 8,
+"cd": 9,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "attack",
+"anim": "bs_slam",
 "ops": [
 {
 "op": "hit",
 "shape": "single",
-"coef": 1.8,
-"st": [
-{
-"id": "defdown",
-"dur": 6,
-"val": 0.25,
-"ch": 1.0
-}
-],
+"coef": 1.4,
+"oneHit": true,
+"sfx": "bs_hit",
+"brand": {
+"dur": 10,
+"n": 3,
+"coef": 2.0,
+"defdown": 0.22,
+"defLv": 0.02,
+"defDur": 6
+},
 "fx": {
-"slash": "smash",
-"burst": "shield_break"
-}
+"smith": "brand"
+},
+"quiet": true,
+"stOnHit": true
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16734778
+},
+"sfx": "bs_swing",
+"sfxAt": "strike",
+"sfxLead": 0.09,
 "status": {
 "data": true,
 "impl": true,
@@ -4554,38 +4579,75 @@
 "job": "blacksmith",
 "tier": 1,
 "cat": 0,
-"catName": "망치와 도끼",
+"catName": "단조와 제압",
 "idx": 4,
-"name": "회전 망치",
+"name": "백련타",
 "type": "attack",
-"desc": "주변을 원형으로 휩쓴다.",
+"desc": "앞쪽을 빠르게 세 번 두드리고(좌·우·좌) 크게 들어 올려 한 번 내려찍는다. 마지막 내려찍기는 맞은 적을 달군다(가열 1중첩). 내 모루가 닿는 곳에 있으면 모루 충격파가 함께 터진다.",
 "maxLv": 5,
 "unlock": 18,
 "prereq": [],
 "weapon": "hammer",
-"target": "self",
+"target": "dir",
 "range": 2.4,
 "mp": 16,
 "cd": 9,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "attack",
+"recover": 0.3,
+"anim": "bs_flurry",
 "ops": [
 {
 "op": "hit",
-"shape": "circle",
-"coef": 1.0,
+"shape": "cone",
+"coef": 0.5,
 "r": 2.4,
+"ang": 110,
 "hits": 3,
-"gap": 0.18,
+"gap": 0.14,
+"oneHit": true,
+"anvil": true,
+"swingSfx": "bs_swing",
+"sfx": "bs_hit",
 "fx": {
-"slash": "spin"
+"smith": "tap"
+},
+"quiet": true,
+"stOnHit": true
+},
+{
+"op": "hit",
+"shape": "cone",
+"coef": 1.6,
+"r": 2.4,
+"ang": 80,
+"at": 0.62,
+"oneHit": true,
+"anvil": true,
+"heat": 1,
+"swingSfx": "bs_swing",
+"sfx": "bs_hit_heavy",
+"st": [
+{
+"id": "stagger",
+"dur": 0.4,
+"val": 0,
+"ch": 1.0
 }
+],
+"fx": {
+"smith": "finish"
+},
+"quiet": true,
+"stOnHit": true
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16747056
+},
+"sfx": "bs_swing",
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -4600,15 +4662,15 @@
 "job": "blacksmith",
 "tier": 1,
 "cat": 0,
-"catName": "망치와 도끼",
+"catName": "단조와 제압",
 "idx": 5,
-"name": "무거운 손맛",
+"name": "장인의 박자",
 "type": "passive",
-"desc": "망치·도끼 경직이 강해지고 방어력 감소 상태의 적에게 추가 피해.",
+"desc": "전투 스킬을 쓰면 4초 안의 다음 기본 공격 한 번이 강화 망치질이 된다(피해 +60%, 레벨마다 +10%). 겹쳐 쌓이지 않으며, 강화된 동안 망치에 주황색 테두리가 뜬다.",
 "maxLv": 5,
 "unlock": 20,
 "prereq": [],
-"weapon": null,
+"weapon": "hammer",
 "target": "self",
 "range": 2.0,
 "mp": 0,
@@ -4619,13 +4681,9 @@
 "ops": [],
 "mods": [],
 "flags": {
-"staggerBonus": [
-0.2,
+"tempo": [
+0.6,
 0.1
-],
-"vsDefdown": [
-0.1,
-0.04
 ]
 },
 "fx": {},
@@ -4643,34 +4701,50 @@
 "job": "blacksmith",
 "tier": 1,
 "cat": 1,
-"catName": "담금질과 방어",
+"catName": "열처리와 반격",
 "idx": 1,
-"name": "담금질",
-"type": "support",
-"desc": "공격력을 높인다.",
+"name": "급랭 담금질",
+"type": "attack",
+"desc": "앞쪽 부채꼴에 냉각수를 끼얹어 피해와 짧은 둔화를 준다. 가열된 적은 가열을 모두 식히며 중첩마다 50% 추가 피해를 받고 흰 수증기가 터져 곁의 적에게도 조금 번진다(번진 피해는 다시 번지지 않음).",
 "maxLv": 5,
 "unlock": 10,
 "prereq": [],
 "weapon": null,
-"target": "self",
-"range": 2.0,
-"mp": 12,
-"cd": 20,
+"target": "dir",
+"range": 3.2,
+"mp": 14,
+"cd": 9,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "cast",
+"anim": "bs_sweep",
 "ops": [
 {
-"op": "buff",
-"id": "atkup",
-"dur": 12,
-"val": 0.2,
-"target": "self"
+"op": "custom",
+"fn": "smith_quench",
+"r": 3.2,
+"ang": 80,
+"coef": 1.4,
+"per": 0.5,
+"splash": 0.2,
+"splashR": 1.6,
+"st": [
+{
+"id": "slow",
+"dur": 2.5,
+"val": 0.3,
+"ch": 1.0
+}
+]
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 12577023
+},
+"sfx": "bs_swing",
+"sfxAt": "strike",
+"sfxLead": 0.08,
 "status": {
 "data": true,
 "impl": true,
@@ -4685,34 +4759,45 @@
 "job": "blacksmith",
 "tier": 1,
 "cat": 1,
-"catName": "담금질과 방어",
+"catName": "열처리와 반격",
 "idx": 2,
-"name": "철판 방어",
+"name": "접이식 철벽",
 "type": "support",
-"desc": "피해를 흡수하는 보호막.",
+"desc": "앞에 철판을 펼쳐 5초 동안 앞쪽에서 오는 피해를 45%(레벨마다 +3%) 줄인다. 그동안 같은 버튼을 다시 누르면 철벽을 걷어차 앞으로 날려 피해를 주고 일반 적을 밀어낸다(보스는 피해만). 걷어차기는 기력이 들지 않고, 재사용 대기는 처음 펼칠 때부터 흐른다.",
 "maxLv": 5,
 "unlock": 12,
 "prereq": [],
 "weapon": null,
-"target": "self",
-"range": 2.0,
+"target": "dir",
+"range": 6.0,
 "mp": 14,
 "cd": 16,
 "cast": 0.0,
-"recover": 0.35,
+"recover": 0.1,
 "anim": "cast",
 "ops": [
 {
-"op": "shield",
-"base": 40,
-"coef": 1.0,
-"dur": 8,
-"power": "atk"
+"op": "custom",
+"fn": "smith_wall",
+"at": -0.3,
+"dur": 5.0,
+"block": 0.45,
+"blockLv": 0.03,
+"kick": {
+"coef": 1.8,
+"w": 2.4,
+"len": 6.0,
+"push": 2.6,
+"speed": 16
+}
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 12107980
+},
+"sfx": "bs_wall",
 "status": {
 "data": true,
 "impl": true,
@@ -4727,47 +4812,55 @@
 "job": "blacksmith",
 "tier": 1,
 "cat": 1,
-"catName": "담금질과 방어",
+"catName": "열처리와 반격",
 "idx": 3,
-"name": "불티 튀기기",
+"name": "용광로 개방",
 "type": "attack",
-"desc": "전방에 불티를 튀겨 피해와 화상.",
+"desc": "화구를 열어 앞쪽 부채꼴로 불꽃과 쇳물을 짧게 뿜는다. 맞은 적은 화상을 입고 달궈진다(가열 2중첩). 바닥의 쇳물 자국은 보이기만 한다.",
 "maxLv": 5,
 "unlock": 15,
 "prereq": [],
 "weapon": null,
 "target": "dir",
-"range": 3.0,
+"range": 3.2,
 "mp": 12,
-"cd": 6,
+"cd": 7,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "attack",
+"anim": "bs_thrust",
 "ops": [
 {
 "op": "hit",
 "shape": "cone",
-"coef": 1.4,
-"r": 3.0,
+"coef": 1.5,
+"r": 3.2,
 "ang": 70,
 "elem": "fire",
+"heat": 2,
+"sfx": "bs_forge",
 "st": [
 {
 "id": "burn",
 "dur": 3,
-"val": 0.1,
+"val": 0.08,
 "ch": 1.0
 }
 ],
 "fx": {
-"burst": "sparks",
-"slash": "fire_cone"
-}
+"smith": "forge"
+},
+"quiet": true,
+"stOnHit": true
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16747056
+},
+"sfx": "bs_swing",
+"sfxAt": "strike",
+"sfxLead": 0.08,
 "status": {
 "data": true,
 "impl": true,
@@ -4782,11 +4875,11 @@
 "job": "blacksmith",
 "tier": 1,
 "cat": 1,
-"catName": "담금질과 방어",
+"catName": "열처리와 반격",
 "idx": 4,
-"name": "긴급 보강",
+"name": "즉석 리벳",
 "type": "support",
-"desc": "방어력과 밀려남 저항을 높인다.",
+"desc": "갑옷에 빛나는 리벳 3개를 박는다(10초). 공격을 맞을 때마다 리벳 하나가 튕겨 나가며 그 피해를 35%(레벨마다 +3%) 줄인다. 리벳이 남은 채 강화 기본 공격을 하면 남은 리벳을 모두 쏘아 앞쪽에 추가 타격을 준다.",
 "maxLv": 5,
 "unlock": 18,
 "prereq": [],
@@ -4796,27 +4889,27 @@
 "mp": 12,
 "cd": 18,
 "cast": 0.0,
-"recover": 0.35,
+"recover": 0.1,
 "anim": "cast",
 "ops": [
 {
-"op": "buff",
-"id": "defup",
-"dur": 10,
-"val": 0.35,
-"target": "self"
-},
-{
-"op": "buff",
-"id": "knockres",
-"dur": 10,
-"val": 1,
-"target": "self"
+"op": "custom",
+"fn": "smith_rivets",
+"at": -0.3,
+"n": 3,
+"dur": 10.0,
+"block": 0.35,
+"blockLv": 0.03,
+"gap": 0.35,
+"shot": 0.5
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16762986
+},
+"sfx": "bs_rivet",
 "status": {
 "data": true,
 "impl": true,
@@ -4831,11 +4924,11 @@
 "job": "blacksmith",
 "tier": 1,
 "cat": 1,
-"catName": "담금질과 방어",
+"catName": "열처리와 반격",
 "idx": 5,
-"name": "강철 체력",
+"name": "충격 재활용",
 "type": "passive",
-"desc": "최대 HP와 방어력이 증가한다.",
+"desc": "접이식 철벽과 즉석 리벳으로 실제로 줄인 피해의 60%(레벨마다 +5%)를 8초 동안 모아 두었다가, 다음 강화 기본 공격이 맞을 때 추가 피해로 돌려준다(모을 수 있는 양에 상한). 최대 체력과 방어력도 조금 오른다.",
 "maxLv": 5,
 "unlock": 20,
 "prereq": [],
@@ -4851,16 +4944,25 @@
 "mods": [
 {
 "stat": "maxHp",
-"mul": 0.05,
-"mulLv": 0.025
+"mul": 0.03,
+"mulLv": 0.015
 },
 {
 "stat": "def",
-"add": 3,
-"addLv": 2
+"add": 2,
+"addLv": 1
 }
 ],
-"flags": {},
+"flags": {
+"recycle": [
+0.6,
+0.05
+],
+"recycleCap": [
+1.5,
+0.25
+]
+},
 "fx": {},
 "status": {
 "data": true,
@@ -4876,7 +4978,7 @@
 "job": "blacksmith",
 "tier": 1,
 "cat": 2,
-"catName": "대장간과 거래",
+"catName": "장인의 제작",
 "idx": 1,
 "name": "기초 무기 제작",
 "type": "craft",
@@ -4914,7 +5016,7 @@
 "job": "blacksmith",
 "tier": 1,
 "cat": 2,
-"catName": "대장간과 거래",
+"catName": "장인의 제작",
 "idx": 2,
 "name": "기초 방어구 제작",
 "type": "craft",
@@ -4951,7 +5053,7 @@
 "job": "blacksmith",
 "tier": 1,
 "cat": 2,
-"catName": "대장간과 거래",
+"catName": "장인의 제작",
 "idx": 3,
 "name": "숫돌 연마",
 "type": "craft",
@@ -4988,11 +5090,11 @@
 "job": "blacksmith",
 "tier": 1,
 "cat": 2,
-"catName": "대장간과 거래",
+"catName": "장인의 제작",
 "idx": 4,
 "name": "재료 회수",
 "type": "craft",
-"desc": "장비를 분해해 재료 일부를 얻는다.",
+"desc": "장비를 분해해 재료 일부를 얻는다. 전투에서는 낙인을 깨거나 철벽을 걷어차 맞히면 고철 조각이 튀어 저절로 모이고, 모을 때마다 기력을 조금 되찾는다(10초에 3개까지, 가방에는 들어가지 않음).",
 "maxLv": 5,
 "unlock": 18,
 "prereq": [],
@@ -5006,7 +5108,12 @@
 "anim": null,
 "ops": [],
 "mods": [],
-"flags": {},
+"flags": {
+"scrap": [
+3,
+1
+]
+},
 "fx": {},
 "status": {
 "data": true,
@@ -5025,11 +5132,11 @@
 "job": "blacksmith",
 "tier": 1,
 "cat": 2,
-"catName": "대장간과 거래",
+"catName": "장인의 제작",
 "idx": 5,
 "name": "알뜰 공급",
 "type": "passive",
-"desc": "기본 제작 비용이 줄어든다. (제작·분해·판매로 이익이 나지 않도록 상한 적용)",
+"desc": "기본 제작 비용이 줄어든다. (제작·분해·판매로 이익이 나지 않도록 상한 적용) 전투에서 고철 조각을 모으면 작은 보호막을 얻는다(겹치지 않음).",
 "maxLv": 5,
 "unlock": 20,
 "prereq": [],
@@ -5047,6 +5154,10 @@
 "craftDiscount": [
 0.05,
 0.03
+],
+"scrapShield": [
+0.04,
+0.01
 ]
 },
 "fx": {},
@@ -9496,6 +9607,26 @@
 "cap": 0.5,
 "boss": "normal",
 "color": "#c04040"
+},
+{
+"id": "heat",
+"name": "가열",
+"kind": "mark",
+"debuff": true,
+"cleanse": false,
+"stack": "max",
+"cap": 3,
+"boss": "normal",
+"color": "#ff9a3a"
+},
+{
+"id": "brand",
+"name": "단조 낙인",
+"kind": "mark",
+"debuff": true,
+"cleanse": false,
+"boss": "normal",
+"color": "#ff5a3a"
 },
 {
 "id": "prescribed",

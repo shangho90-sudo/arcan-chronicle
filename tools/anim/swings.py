@@ -500,7 +500,80 @@ CK_PAN = action('ck_pan', [
     key(0.68, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
 ], 0.30, 0.46, None, fadeIn=0.06, fadeOut=0.16)
 
-SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL] + BS_ACTS + [DRAW, SHEATHE, PH_SPIN, PH_SLAM, PH_SMASH, PH_PITCH, PH_SWEEP, CK_CHOP, CK_PAN]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
+# ------------------------------------------------------------------------------------------------ 대장장이 1차 (2026-11-13)
+# bs_call (모루 떨구기): 왼손을 높이 들어 하늘의 모루를 부르고 0.34 s에 망치를 내리그음 — 모루는 그 직후 떨어짐(js/smith.js). 잔상 없음.
+BS_CALL = action('bs_call', [
+    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
+    key(0.13, 'o', twist=-6, lean=-12, sink=0.07, hand=[-14, 66, 0.84], blade=[-8, 100], elbow=[-0.6, 0.3, -1], armL=[150, 30]),
+    key(0.26, 's', twist=-4, lean=-17, sink=0.05, hand=[-8, 80, 0.88], blade=[-2, 116], elbow=[-0.6, 0.3, -1], armL=[164, 34], squint=True),
+    key(0.34, None, twist=3, lean=25, sink=0.25, hand=[0, -22, 1.0], blade=[2, -52], elbow=[-0.4, -1, -0.2], armL=[26, 40], squint=True),
+    key(0.42, 'o', twist=4, lean=29, sink=0.28, hand=[4, -32, 0.94], blade=[4, -64], elbow=[-0.4, -1, -0.1], armL=[18, 44]),
+    key(0.58, 's', twist=4, lean=14, sink=0.12, hand=[4, -34, 0.88], blade=[8, -30], elbow=[-0.5, -1, -0.1], armL=[14, 34]),
+    key(0.72, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
+], 0.34, 0.50, None, fadeIn=0.06, fadeOut=0.16)
+# bs_thrust (집게 낚아채기 · 용광로 개방): 몸을 살짝 틀어 당겼다가 0.20 s에 두 팔을 앞으로 쭉 뻗고 잠깐 버팀. 잔상 없음.
+BS_THRUST = action('bs_thrust', [
+    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
+    key(0.09, 'o', twist=-18, lean=-6, sink=0.08, hand=[-50, -6, 0.52], blade=[-6, 10], elbow=[-1, -0.6, -0.5], armL=[20, 30]),
+    key(0.14, 's', twist=-22, lean=-8, sink=0.09, hand=[-56, -4, 0.48], blade=[-4, 12], elbow=[-1, -0.6, -0.6], armL=[24, 34], squint=True),
+    key(0.20, 'i', twist=10, lean=16, sink=0.13, hand=[-4, 4, 1.0], blade=[0, 6], elbow=[-0.6, -1, -0.1], armL=[78, 20], squint=True),
+    key(0.34, 'o', twist=12, lean=19, sink=0.14, hand=[-2, 2, 1.0], blade=[0, 2], elbow=[-0.6, -1, -0.1], armL=[82, 18], squint=True),
+    key(0.50, 's', twist=6, lean=9, sink=0.07, hand=[-14, -22, 0.84], blade=[-4, 10], elbow=[-0.6, -1, -0.2], armL=[36, 22]),
+    key(0.64, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
+], 0.20, 0.44, None, fadeIn=0.05, fadeOut=0.16)
+# bs_slam (불량품 판정 · 보스에게 집게 내려치기): 머리 위로 들었다가 0.25 s에 수직으로 내려찍음 — 준비 0.17 s, 타격 구간 0.08 s.
+BS_SLAM = action('bs_slam', [
+    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
+    key(0.10, 'o', twist=-10, lean=-9, sink=0.12, hand=[-16, 66, 0.80], blade=[-10, 96], elbow=[-0.6, 0.2, -1], armL=[60, 30]),
+    key(0.17, 's', twist=-13, lean=-14, sink=0.10, hand=[-10, 84, 0.86], blade=[-4, 124], elbow=[-0.6, 0.3, -1], armL=[80, 34], squint=True),
+    key(0.205, 'i', twist=-4, lean=3, sink=0.14, hand=[-5, 52, 0.97], blade=[-2, 66], elbow=[-0.5, -0.4, -0.6], armL=[40, 36], squint=True),
+    key(0.25, None, twist=6, lean=26, sink=0.26, hand=[0, -22, 1.0], blade=[2, -50], elbow=[-0.4, -1, -0.2], armL=[24, 40], squint=True),
+    key(0.32, 'o', twist=8, lean=31, sink=0.30, hand=[2, -33, 0.95], blade=[4, -66], elbow=[-0.4, -1, -0.1], armL=[18, 44], squint=True),
+    key(0.45, 's', twist=5, lean=15, sink=0.13, hand=[4, -38, 0.84], blade=[12, -28], elbow=[-0.5, -1, -0.1], armL=[14, 30]),
+    key(0.58, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
+], 0.25, 0.42, [[0.19, 0.30]], fadeIn=0.05, fadeOut=0.14)
+BS_SLAM.update(trailLife=0.14, trailColor=[1.9, 1.15, 0.5])
+# bs_flurry (백련타): 짧고 날카로운 가로 망치질 세 번(오른쪽에서 왼쪽 0.16 s -> 되받아 0.30 s -> 다시 0.44 s), 이어서 크게 들어 올려(준비 0.20 s)
+# 0.78 s에 수직으로 내려찍는 무거운 마무리. 타격 시각 = 스킬 데이터의 hit op 시각(첫 타 hitT, 간격 0.14 s, 마무리 +0.62 s)과 같아야 함.
+BS_FLURRY = action('bs_flurry', [
+    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
+    key(0.09, 'o', twist=-26, lean=-2, sink=0.06, hand=[-96, 8, 0.78], blade=[-138, 16], elbow=[-0.5, -0.6, -1], armL=[26, 28]),
+    key(0.16, 'i', twist=14, lean=9, sink=0.08, hand=[8, -2, 1.0], blade=[18, -6], elbow=[-0.5, -1, -0.1], armL=[16, 30], squint=True),
+    key(0.22, 'o', twist=28, lean=8, sink=0.08, hand=[62, -8, 0.84], blade=[112, -10], elbow=[0.0, -1, 0.4], armL=[10, 38], squint=True),
+    key(0.30, 'i', twist=-12, lean=9, sink=0.08, hand=[-18, 0, 1.0], blade=[-30, 2], elbow=[-0.6, -1, -0.2], armL=[24, 26], squint=True),
+    key(0.36, 'o', twist=-28, lean=4, sink=0.07, hand=[-90, 10, 0.82], blade=[-128, 18], elbow=[-0.6, -0.6, -0.9], armL=[30, 26], squint=True),
+    key(0.44, 'i', twist=14, lean=10, sink=0.09, hand=[10, -4, 1.0], blade=[20, -8], elbow=[-0.5, -1, -0.1], armL=[16, 30], squint=True),
+    key(0.52, 'o', twist=18, lean=4, sink=0.10, hand=[30, 6, 0.80], blade=[52, 20], elbow=[-0.3, -1, 0.1], armL=[20, 34]),
+    key(0.66, 's', twist=-12, lean=-16, sink=0.13, hand=[-12, 86, 0.88], blade=[-4, 128], elbow=[-0.6, 0.3, -1], armL=[92, 34], squint=True),
+    key(0.72, 's', twist=-13, lean=-18, sink=0.11, hand=[-10, 88, 0.88], blade=[-2, 132], elbow=[-0.6, 0.3, -1], armL=[96, 36], squint=True),
+    key(0.75, 'i', twist=-3, lean=4, sink=0.16, hand=[-4, 50, 0.98], blade=[-2, 62], elbow=[-0.5, -0.4, -0.6], armL=[42, 36], squint=True),
+    key(0.78, None, twist=7, lean=29, sink=0.29, hand=[0, -24, 1.0], blade=[2, -54], elbow=[-0.4, -1, -0.2], armL=[24, 40], squint=True),
+    key(0.86, 'o', twist=9, lean=33, sink=0.32, hand=[2, -34, 0.95], blade=[4, -68], elbow=[-0.4, -1, -0.1], armL=[18, 44], squint=True),
+    key(1.00, 's', twist=5, lean=15, sink=0.13, hand=[4, -38, 0.84], blade=[12, -28], elbow=[-0.5, -1, -0.1], armL=[14, 30]),
+    key(1.14, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
+], 0.16, 0.96, [[0.11, 0.20], [0.25, 0.34], [0.39, 0.48], [0.735, 0.84]], fadeIn=0.05, fadeOut=0.16)
+BS_FLURRY.update(trailLife=0.12, trailColor=[1.9, 1.2, 0.55], hitTimes=[0.16, 0.30, 0.44, 0.78])
+# bs_sweep (급랭 담금질): 왼손의 물통을 뒤로 뺐다가 0.22 s에 앞으로 크게 끼얹음. 망치는 옆으로 내려 둠. 잔상 없음.
+BS_SWEEP = action('bs_sweep', [
+    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
+    key(0.10, 'o', twist=24, lean=-4, sink=0.07, hand=[-40, -46, 0.70], blade=[-20, 10], elbow=[-0.8, -1, -0.3], armL=[-30, 46]),
+    key(0.16, 's', twist=30, lean=-6, sink=0.08, hand=[-44, -48, 0.68], blade=[-24, 8], elbow=[-0.8, -1, -0.3], armL=[-40, 52], squint=True),
+    key(0.22, 'i', twist=-16, lean=14, sink=0.12, hand=[-36, -44, 0.72], blade=[-16, 12], elbow=[-0.8, -1, -0.2], armL=[84, 40], squint=True),
+    key(0.32, 'o', twist=-24, lean=17, sink=0.13, hand=[-34, -44, 0.72], blade=[-14, 14], elbow=[-0.8, -1, -0.2], armL=[104, 26], squint=True),
+    key(0.46, 's', twist=-10, lean=8, sink=0.06, hand=[-32, -42, 0.70], blade=[-12, 18], elbow=[-0.7, -1, -0.2], armL=[40, 22]),
+    key(0.58, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
+], 0.22, 0.40, None, fadeIn=0.05, fadeOut=0.15)
+# bs_kick (접이식 철벽 걷어차기): 몸을 뒤로 젖히며 오른발을 앞으로 뻗어 찬다(0.10 s). 발 고정을 풀어(plant 0) 다리가 실제로 나감.
+BS_KICK = action('bs_kick', [
+    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
+    key(0.05, 'o', plant=0, twist=6, lean=-6, sink=0.06, legR=-18, hand=[-40, -30, 0.66], blade=[-20, 30], elbow=[-0.8, -1, -0.3], armL=[20, 26]),
+    key(0.10, 'i', plant=0, twist=-8, lean=-15, sink=0.02, legR=62, hand=[-58, -18, 0.70], blade=[-40, 40], elbow=[-0.9, -0.8, -0.4], armL=[34, 34], squint=True),
+    key(0.18, 'o', plant=0, twist=-10, lean=-17, sink=0.02, legR=70, hand=[-60, -16, 0.70], blade=[-42, 42], elbow=[-0.9, -0.8, -0.4], armL=[38, 36], squint=True),
+    key(0.30, 's', plant=0, twist=-4, lean=-5, sink=0.03, legR=16, hand=[-40, -34, 0.70], blade=[-18, 26], elbow=[-0.8, -1, -0.3], armL=[18, 24]),
+    key(0.40, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
+], 0.10, 0.32, None, fadeIn=0.04, fadeOut=0.12)
+
+SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL] + BS_ACTS + [DRAW, SHEATHE, PH_SPIN, PH_SLAM, PH_SMASH, PH_PITCH, PH_SWEEP, CK_CHOP, CK_PAN, BS_CALL, BS_THRUST, BS_SLAM, BS_FLURRY, BS_SWEEP, BS_KICK]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
 
 acts = json.load(open(P))
 names = {'attack', 'attack2'} | {x['name'] for x in SKILL_ACTS}
