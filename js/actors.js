@@ -115,6 +115,27 @@ export const Resolver = {
 };
 
 // ======================================================================================= skills
+/** 직업별 기본공격 모양 (tools/anim/swings.py <prefix>_combo_1..5: C5와 같은 시각·판정·이동, 상체 자세만 다름). 몸 모델의
+ *  직업 계열(body.job = 1차 직업 sheet) -> 접두사; 그 동작이 없으면 공용 combo_N */
+const HAMMER_STOP = 0.045, HAMMER_STOP_BIG = 0.07;
+function hammerImpact(pc, t, f, big, dd) {
+  if (dd && dd.missed) return;
+  const bp = pc.body.bladePoints && pc.body.bladePoints(), head = bp ? bp[1] : null, ty = t.pos.y || 0;
+  // the real hammer head (three space -> unity z flip), pulled onto the target's front if the swing is off to one side
+  let hp = head ? { x: head.x, y: head.y, z: -head.z } : { x: t.pos.x - f.x * 0.3, y: ty + 0.6, z: t.pos.z - f.z * 0.3 };
+  const r = (t.radius || 0.5), dx = hp.x - t.pos.x, dz = hp.z - t.pos.z, d = Math.hypot(dx, dz);
+  if (d > r + 0.35) { const k = (r + 0.1) / (d || 1); hp = { x: t.pos.x + dx * k, y: hp.y, z: t.pos.z + dz * k }; }
+  hp.y = Math.max(ty + 0.12, Math.min(ty + 1.3, hp.y));
+  G.hammerFx.hit(hp, { dir: f, big, ground: ty });
+  const st = big ? HAMMER_STOP_BIG : HAMMER_STOP; pc.freezeT = Math.max(pc.freezeT || 0, st); if (!t.dead) t.freezeT = Math.max(t.freezeT || 0, st);
+  if (t.body && t.body.punch) t.body.punch(t.pos.x - pc.pos.x, t.pos.z - pc.pos.z, big ? 0.18 : 0.12);
+  if (big && G.render && G.render.kick) G.render.kick(f.x, f.z, 0.07, 0.1);
+}
+export const JOB_COMBO = { blacksmith: 'bs', hairdresser: 'hd' };
+function comboName(pc, n) {
+  const pre = pc.body && JOB_COMBO[pc.body.job], sh = pc.body && pc.body.sh;
+  return pre && sh && sh.actions[pre + '_combo_' + n] ? pre + '_combo_' + n : 'combo_' + n;
+}
 export class SkillRunner {
   constructor(pc) { this.pc = pc; this.cdEnd = {}; this.cdLen = {}; this.pending = []; this.clock = 0; this.lock = 0; }
   cdLeft(id) { return Math.max(0, (this.cdEnd[id] || 0) - this.clock); }
@@ -132,11 +153,11 @@ export class SkillRunner {
     let cd = basic ? s.cooldown / atkSpd : CombatMath.cooldown(s.cooldown, pc.stat("cdr"));
     // 기본공격 5단 콤보 (actions combo_1..5, tools/anim/swings.py): the next strike if this press comes before the previous
     // strike's chainClose, else strike 1 again. Each strike blocks for its own lock (its timing replaces the cooldown).
-    let cmb = null; const sh0 = pc.body && pc.body.sh;
+    let cmb = null, cname = null; const sh0 = pc.body && pc.body.sh;
     if (basic && (s.anim || "attack") === "attack" && sh0 && sh0.actions.combo_1) {
-      const prev = this.comboN ? sh0.actions["combo_" + this.comboN] : null, since = (this.clock - (this.comboAt ?? -99)) * animSpeed;
+      const prev = this.comboN ? sh0.actions[comboName(pc, this.comboN)] : null, since = (this.clock - (this.comboAt ?? -99)) * animSpeed;
       this.comboN = prev && since <= prev.chainClose ? this.comboN % 5 + 1 : 1; this.comboAt = this.clock;
-      cmb = sh0.actions["combo_" + this.comboN]; cd = cmb.lock / animSpeed;
+      cname = comboName(pc, this.comboN); cmb = sh0.actions[cname]; cd = cmb.lock / animSpeed;
     }
     pc.sp -= s.cost; this.cdEnd[s.id] = this.clock + cd; this.cdLen[s.id] = cd;
     const o = { ...pc.pos };
@@ -144,7 +165,7 @@ export class SkillRunner {
     if (s.targeting === "ground") { const m = Math.hypot(dx, dz); if (m > s.range) { aim = { x: o.x + dx / m * s.range, z: o.z + dz / m * s.range }; } aim = pc.zone.geo.ground(aim.x, aim.z); }
     if (dx * dx + dz * dz > 0.01) pc.setFacing(dx, dz);
     const facing = { ...pc.facing };
-    let anim = cmb ? "combo_" + this.comboN : s.anim || "attack"; const sh = pc.body.sh;
+    let anim = cmb ? cname : s.anim || "attack"; const sh = pc.body.sh;
     // basic attacks alternate forehand / backhand while the button is held (the 2nd swing starts where the 1st ended)
     if (!cmb && basic && anim === "attack" && sh.actions.attack2) { this.combo = this.clock - (this.lastBasic ?? -9) < 0.9 ? ((this.combo || 0) + 1) % 2 : 0; this.lastBasic = this.clock; if (this.combo) anim = "attack2"; }
     const ht = hitTime(sh, anim) / animSpeed, du = duration(sh, anim) / animSpeed;
@@ -183,9 +204,13 @@ export class SkillRunner {
         // melee swings (slash / blunt) use the 3D effect library: a bright crescent that alternates direction each swing
         const fx3 = G.skillFx && !a.atTarget && a.shape === "cone" && (a.fx === "slash" || a.fx === "hit" || a.fx === "wind");
         const SF = G.swingFx && G.swingFx.ready ? G.swingFx : null;
+        // 망치 기본공격(bs_combo_*, action.impact 'hammer'): 실제 망치 머리에서 작은 섬광·고리·먼지·조각 (js/hammerfx.js) + 짧은
+        // 국소 히트스톱(시전자·대상 freezeT, 전역 G.hitStop 아님) — 5타만 카메라 kick 한 번. 판정·피해는 그대로.
+        const HA = G.hammerFx && pc.body && pc.body.sh && pc.body.sh.actions[pc.body.action], hammer = HA && HA.impact === 'hammer' && !a.atTarget ? HA : null;
         for (const t of ts) {
           const dd = Resolver.damage(pc, t, a.coef * bmul, a.power, a.knockback); t.takeDamage(dd);
-          if (SF && !a.atTarget) { if (!dd.crit) SF.hit(t.pos, { scale: a.fx === "hit" ? 1.15 : 1 }); }
+          if (hammer) hammerImpact(pc, t, p.facing, hammer.combo === 5, dd);
+          else if (SF && !a.atTarget) { if (!dd.crit) SF.hit(t.pos, { scale: a.fx === "hit" ? 1.15 : 1 }); }
           else if (fx3) G.skillFx.burst(a.fx === "hit" ? "hit_blunt" : "hit_slash", { x: t.pos.x, y: t.pos.y, z: t.pos.z }, { radius: 0.5, grade: 1 });
           else G.fx.play(a.fx === "hit" ? "hit" : (["paint_burst", "potion_splash"].includes(a.fx) ? a.fx : "hit"), { x: t.pos.x, y: t.pos.y + 0.6, z: t.pos.z }, a.fx === "hit" ? 1.2 : 1);
         }

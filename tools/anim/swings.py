@@ -274,18 +274,20 @@ C5_ATK = [dict(coef=0.8, r=1.0, ang=1.0), dict(coef=0.8, r=1.0, ang=1.0), dict(c
           dict(coef=0.9, r=1.2, ang=0.55), dict(coef=1.3, r=1.1, ang=1.1)]
 TRAIL_C = [1.45, 1.75, 2.15]; TRAIL_C5 = [1.9, 2.15, 2.6]   # white core / pale blue edge (HDR, the bloom whitens the middle)
 
-def c5_keys(t0, t1):
-    return [x for x in C5 if t0 - 1e-6 <= x[0] <= t1 + 1e-6]
+def c5_keys(t0, t1, TL=None):
+    return [x for x in (TL or C5) if t0 - 1e-6 <= x[0] <= t1 + 1e-6]
 
 def c5_mk(x, dt, da):
     t, e, adv, step, lift, pose = x
     return ck(round(t - dt, 4), e, round(adv - da, 3), [step[0] - da, step[1] - da], lift, **pose)
 
-def c5_strike(i):
-    """combo_<i+1>: the section of strike i, re-based to start at 0 with the root at 0, plus its own recovery"""
-    t0, t1 = C5_CUT[i], C5_CUT[i + 1]; a0 = next(x for x in C5 if abs(x[0] - t0) < 1e-6)[2]
-    ks = [c5_mk(x, t0, a0) for x in c5_keys(t0, t1)]
-    if i == 4: ks += [c5_mk(x, t0, a0) for x in C5 if x[0] > t1 + 1e-6]          # the real finish (f131-150)
+def c5_strike(i, TL=None, name='combo_%d'):
+    """combo_<i+1>: the section of strike i, re-based to start at 0 with the root at 0, plus its own recovery
+    (TL = another timeline with the SAME times / adv / step / lift, only other upper-body poses: a job variant)"""
+    TL = TL or C5
+    t0, t1 = C5_CUT[i], C5_CUT[i + 1]; a0 = next(x for x in TL if abs(x[0] - t0) < 1e-6)[2]
+    ks = [c5_mk(x, t0, a0) for x in c5_keys(t0, t1, TL)]
+    if i == 4: ks += [c5_mk(x, t0, a0) for x in TL if x[0] > t1 + 1e-6]          # the real finish (f131-150)
     else:
         end = ks[-1][1]; ad = end['adv']; T = ks[-1][0]
         L, R = end['step']
@@ -301,7 +303,7 @@ def c5_strike(i):
     h = C5_HIT[i] - t0
     trail = [[round(h - 0.035, 3), round(h + 0.012, 3)]] if i == 3 else [[round(h - (0.06 if i == 4 else 0.05), 3), round(h + (0.05 if i == 4 else 0.04), 3)]]
     lock = round(t1 - t0 + (0.12 if i == 4 else 0.0), 3)               # 5: a longer recovery before the next round
-    a = action('combo_%d' % (i + 1), ks, round(h, 4), lock, trail, fadeIn=0.05, fadeOut=0.14)
+    a = action(name % (i + 1), ks, round(h, 4), lock, trail, fadeIn=0.05, fadeOut=0.14)
     a.update(hitTimes=[round(h, 4)], chainOpen=round(h + 0.05, 3), chainClose=round(t1 - t0 + 0.30, 3), atk=C5_ATK[i],
              trailColor=TRAIL_C5 if i == 4 else TRAIL_C, trailLife=0.16 if i == 4 else 0.12, trailBase=0.2 if i == 4 else 0.38,
              adv=round(ks[-1][1]['adv'], 3), combo=i + 1,
@@ -314,6 +316,54 @@ C5_ACTS = [c5_strike(i) for i in range(5)]
 C5_FULL = action('combo_full', [ck(*x[:5], **x[5]) for x in C5], C5_HIT[0], F(150), [[round(h - 0.05, 3), round(h + 0.045, 3)] for h in C5_HIT], fadeIn=0.05, fadeOut=0.14)
 C5_FULL.update(hitTimes=C5_HIT, combo='full', trailColor=TRAIL_C, trailLife=0.12, trailBase=0.38, adv=0.24,
                mark=dict(Hit=[round(h * CF) for h in C5_HIT], Strike=[round(t * CF) + 1 for t in C5_CUT[:5]]))
+
+# ------------------------------------------------------------------------------------------------ job combo variants
+# (2026-11-13) 직업별 기본공격 모양: <prefix>_combo_1..5 (js/actors.js JOB_COMBO: blacksmith -> 'bs'). The timeline is C5
+# itself - SAME key times, hit frames, root travel (adv), foot steps and lifts, so damage timing, attack interval, chain
+# windows and root motion are identical - only the upper-body poses change. The game falls back to combo_N when a job
+# has no variant. 대장장이 'bs' = a heavy hammer: every wind-up rises (sink down, lean back) and holds a beat, the strike
+# accelerates late, the weight drops onto the front foot at the hit (sink / lean up), the follow-through is short and
+# heavy (the head stops instead of flying through), the off hand helps on the overhead blows.
+BS_POSE = {
+    # 1 overhead diagonal smash
+    F(5):  dict(twist=-30, lean=-12, sink=0.02, hand=[-62, 70, 0.78], blade=[-168, 74], elbow=[-0.4, 0.2, -1], armL=[60, 34]),
+    F(10): dict(twist=-12, lean=6, sink=0.10, hand=[-34, 34, 0.95], blade=[-44, 26], elbow=[-0.6, -0.6, -0.6], armL=[36, 28], squint=True),
+    F(12): dict(twist=10, lean=20, sink=0.17, hand=[-6, -18, 1.0], blade=[4, -40], elbow=[-0.5, -1, -0.1], armL=[16, 34], squint=True),
+    F(15): dict(twist=14, lean=22, sink=0.19, hand=[4, -28, 0.94], blade=[10, -52], elbow=[-0.5, -1, -0.1], armL=[12, 38]),
+    F(22): dict(twist=22, lean=12, sink=0.13, hand=[40, -32, 0.80], blade=[80, -36], elbow=[0.0, -1, 0.4], armL=[10, 36]),
+    # 2 rising upper swing: crouch low (anticipation), drive up with the legs
+    F(29): dict(twist=36, lean=12, sink=0.18, hand=[66, -40, 0.74], blade=[110, -48], elbow=[0.15, -1, 0.55], armL=[10, 44]),
+    F(32.5): dict(twist=10, lean=6, sink=0.11, hand=[22, -8, 0.95], blade=[24, 6], elbow=[-0.3, -1, 0.2], armL=[18, 30], squint=True),
+    F(34): dict(twist=-16, lean=0, sink=0.03, hand=[-22, 26, 1.0], blade=[-30, 52], elbow=[-0.6, -0.8, -0.3], armL=[26, 24], squint=True),
+    F(37): dict(twist=-28, lean=-4, sink=0.03, hand=[-66, 46, 0.88], blade=[-104, 66], elbow=[-0.6, -0.4, -0.8], armL=[32, 26]),
+    F(44): dict(twist=-42, lean=-2, sink=0.09, hand=[-102, 26, 0.84], blade=[-146, 28], elbow=[-0.5, -0.6, -0.8], armL=[34, 30]),
+    # 3 heavy horizontal sweep at waist height
+    F(52): dict(twist=-52, lean=-4, sink=0.15, hand=[-116, 6, 0.86], blade=[-162, 2], elbow=[-0.5, -0.6, -0.8], armL=[34, 36]),
+    F(56): dict(twist=-18, lean=4, sink=0.15, hand=[-50, 2, 0.98], blade=[-62, -2], elbow=[-0.6, -0.8, -0.5], armL=[26, 30], squint=True),
+    F(58): dict(twist=22, lean=9, sink=0.17, hand=[8, -2, 1.0], blade=[18, -6], elbow=[-0.5, -1, -0.1], armL=[14, 34], squint=True),
+    F(62): dict(twist=40, lean=10, sink=0.17, hand=[58, -8, 0.88], blade=[96, -12], elbow=[-0.1, -1, 0.3], armL=[10, 40]),
+    F(70): dict(twist=24, lean=5, sink=0.13, hand=[26, -24, 0.70], blade=[46, -8], elbow=[-0.2, -1, -0.2], armL=[18, 34]),
+    # 4 ram the hammer head forward from the hip (same step-in as the thrust)
+    F(76): dict(twist=-40, lean=-4, sink=0.17, hand=[-80, -18, 0.52], blade=[-14, 10], elbow=[-0.5, -0.2, -1], armL=[40, 46]),
+    F(80): dict(twist=-44, lean=-2, sink=0.19, hand=[-84, -20, 0.48], blade=[-12, 12], elbow=[-0.5, -0.2, -1], armL=[44, 48], squint=True),
+    F(82): dict(twist=-14, lean=10, sink=0.21, hand=[-36, -8, 0.84], blade=[-4, 8], elbow=[-0.6, -0.5, -0.6], armL=[24, 40], squint=True),
+    F(83): dict(twist=12, lean=20, sink=0.23, hand=[-6, -4, 1.02], blade=[0, 4], elbow=[-0.5, -0.8, -0.2], armL=[8, 52], squint=True),
+    F(88): dict(twist=14, lean=21, sink=0.24, hand=[-4, -8, 1.0], blade=[0, -4], elbow=[-0.5, -0.8, -0.2], armL=[6, 54]),
+    F(94): dict(twist=2, lean=10, sink=0.18, hand=[-40, 12, 0.80], blade=[-54, 34], elbow=[-0.6, -0.6, -0.6], armL=[20, 40]),
+    # 5 big overhead slam: rise and lean back with the hammer high behind the head, hold, then drop the whole body into it
+    F(103): dict(twist=-26, lean=-14, sink=0.00, hand=[-58, 80, 0.82], blade=[-170, 84], elbow=[-0.4, 0.3, -1], armL=[70, 34]),
+    F(111): dict(twist=-30, lean=-16, sink=0.00, hand=[-60, 84, 0.82], blade=[-174, 88], elbow=[-0.4, 0.3, -1], armL=[76, 34]),
+    F(114): dict(twist=-10, lean=10, sink=0.14, hand=[-26, 40, 0.97], blade=[-22, 30], elbow=[-0.6, -0.6, -0.6], armL=[40, 30], squint=True),
+    F(116): dict(twist=6, lean=26, sink=0.28, hand=[0, -22, 1.0], blade=[4, -52], elbow=[-0.5, -1, -0.1], armL=[18, 40], squint=True),
+    F(121): dict(twist=8, lean=28, sink=0.30, hand=[2, -30, 0.94], blade=[6, -60], elbow=[-0.5, -1, -0.1], armL=[14, 44]),
+    F(130): dict(twist=12, lean=22, sink=0.26, hand=[12, -34, 0.88], blade=[18, -56], elbow=[-0.3, -1, 0.0], armL=[12, 40]),
+}
+BS5 = [(t, e, adv, step, lift, BS_POSE.get(t, pose)) for t, e, adv, step, lift, pose in C5]
+assert len(BS_POSE) == sum(1 for x in C5 if x[0] in BS_POSE)
+BS_ACTS = [c5_strike(i, BS5, 'bs_combo_%d') for i in range(5)]
+for i, a in enumerate(BS_ACTS):   # short, warm, head-only trail (a basic attack: dimmer than the skills)
+    a.update(trailColor=[1.25, 1.05, 0.78] if i < 4 else [1.45, 1.2, 0.85], trailLife=0.09 if i < 4 else 0.12, trailBase=0.72, impact='hammer')
+    assert a['hitTimes'] == C5_ACTS[i]['hitTimes'] and a['lock'] == C5_ACTS[i]['lock'] and a['chainClose'] == C5_ACTS[i]['chainClose'] and a['adv'] == C5_ACTS[i]['adv']
 
 # ------------------------------------------------------------------------------------------------ draw / sheathe
 # (2026-11-11) 무기 꺼내기 / 집어넣기. The weapon rides on the back (js/model.js backMount: grip over the right shoulder,
@@ -450,7 +500,7 @@ CK_PAN = action('ck_pan', [
     key(0.68, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
 ], 0.30, 0.46, None, fadeIn=0.06, fadeOut=0.16)
 
-SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL] + [DRAW, SHEATHE, PH_SPIN, PH_SLAM, PH_SMASH, PH_PITCH, PH_SWEEP, CK_CHOP, CK_PAN]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
+SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL] + BS_ACTS + [DRAW, SHEATHE, PH_SPIN, PH_SLAM, PH_SMASH, PH_PITCH, PH_SWEEP, CK_CHOP, CK_PAN]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
 
 acts = json.load(open(P))
 names = {'attack', 'attack2'} | {x['name'] for x in SKILL_ACTS}

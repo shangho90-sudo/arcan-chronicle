@@ -7,7 +7,9 @@ import { clamp01, DEG, artBasis, artWorldToImage, artImageToGround, artFootprint
 export const T = (p) => new THREE.Vector3(p.x, p.y, -p.z);
 // quarter view with a weak perspective (long lens): `ortho` = half the visible height (m) at the focus distance, so sizes
 // on screen match the old orthographic camera at the player; things nearer the camera get slightly bigger (2.5D depth).
-export const CAM = { pitch: 44, artPitch: 48, yaw: 45, dist: 26, ortho: 4.75, minWidth: 8.5, sharp: 12, lookAhead: 0.6, depthOffset: 0.6 };
+// 2026-11-13: ortho 4.75 -> 4.4, phone minWidth 8.5 -> 7.6 m (the character was ~13% of the screen height; now ~8% / ~12% bigger,
+// the 2 m attack reach and monsters within ~3.8 m to each side stay on a portrait phone)
+export const CAM = { pitch: 44, artPitch: 48, yaw: 45, dist: 26, ortho: 4.4, minWidth: 7.6, sharp: 12, lookAhead: 0.6, depthOffset: 0.6 };
 
 const loader = new THREE.TextureLoader();
 const texCache = new Map();
@@ -761,7 +763,7 @@ export function paintMat(m, o = {}) {
   #endif
   float L = dot(outgoingLight, vec3(.299, .587, .114));
   outgoingLight *= mix(vec3(.80, .78, 1.0), vec3(1.05, 1.0, .94), band);                 // cool violet shade, warm light
-  outgoingLight *= mix(vec3(.86, .72, .74), vec3(1.), smoothstep(-.75, .1, wN.y));        // warm occlusion underneath
+  outgoingLight *= mix(vec3(.9, .82, .84), vec3(1.), smoothstep(-.75, .1, wN.y));         // warm occlusion underneath (softer 2026-11-13: no dark blotch under chins)
   outgoingLight = mix(vec3(dot(outgoingLight, vec3(.299, .587, .114))), outgoingLight, ${sat});
   float fr = pow(1. - clamp(dot(vN, vV), 0., 1.), 3.);
   outgoingLight += vec3(${rim.map(v => v.toFixed(3)).join(', ')}) * fr * ${rk} * (.4 + .6 * smoothstep(-.2, .6, wN.y));
@@ -772,13 +774,55 @@ export function paintMat(m, o = {}) {
   m.needsUpdate = true; return m;
 }
 
+// ---------------------------------------------------------------- thin toon outline (inverted hull, 2026-11-13)
+// A back-face copy of the mesh pushed out along its normals IN SCREEN SPACE (constant ~px width at any zoom / distance),
+// drawn in a dark warm violet (not black): separates characters / monsters from the bright plaza by value without a
+// full-screen edge filter. Shares the geometry (and skeleton for skinned meshes): +1 draw call per outlined mesh, no
+// new textures. OUTLINE.px = width in CSS px at 720 px screen height (scales with the screen); 0 turns it off.
+export const OUTLINE = { px: 1.5, color: 0x2e2236, alpha: 1 };
+const _outlineMats = new Map();
+export function outlineMat(skinned, px = OUTLINE.px, color = OUTLINE.color) {
+  const key = (skinned ? 's' : 'm') + px + '|' + color;
+  if (_outlineMats.has(key)) return _outlineMats.get(key);
+  const m = new THREE.MeshBasicMaterial({ color, side: THREE.BackSide, fog: false });
+  const w = (px / 360).toFixed(5);   // NDC units: 2 / 720 per px
+  m.onBeforeCompile = sh => {
+    sh.vertexShader = sh.vertexShader.replace('#include <project_vertex>', `#include <project_vertex>
+  {
+  #ifdef USE_SKINNING
+    vec3 oN = objectNormal;
+  #else
+    vec3 oN = normal;
+  #endif
+    vec4 cN = projectionMatrix * modelViewMatrix * vec4(oN, 0.0);
+    vec2 d = cN.xy; float l = length(d);
+    if (l > 1e-5) gl_Position.xy += d / l * ${w} * gl_Position.w;
+  }`);
+  };
+  m.customProgramCacheKey = () => 'outline' + key;
+  _outlineMats.set(key, m); return m;
+}
+/** add an outline hull to a mesh (Mesh or SkinnedMesh); returns the hull (child of the same parent, same transform) */
+export function addOutline(mesh, px = OUTLINE.px) {
+  if (!px || !mesh || !mesh.geometry || !mesh.geometry.attributes.normal) return null;
+  let o;
+  if (mesh.isSkinnedMesh) { o = new THREE.SkinnedMesh(mesh.geometry, outlineMat(true, px)); o.bind(mesh.skeleton, mesh.bindMatrix); o.bindMode = mesh.bindMode; }
+  else o = new THREE.Mesh(mesh.geometry, outlineMat(false, px));
+  // child of the mesh with an identity transform: follows it everywhere (a skinned hull in 'attached' mode lands on the
+  // same bones whatever its own transform is)
+  o.castShadow = false; o.receiveShadow = false; o.frustumCulled = mesh.frustumCulled; o.userData.outline = true; o.renderOrder = mesh.renderOrder;
+  mesh.add(o);
+  mesh.userData.outlineHull = o;
+  return o;
+}
+
 // soft contact shadow under characters (grounding): smooth radial falloff, deep violet instead of black
 let _contactTex = null;
 export function contactShadowTex() {
   if (_contactTex) return _contactTex;
   const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d');
   const g = x.createRadialGradient(64, 64, 0, 64, 64, 64);
-  g.addColorStop(0, 'rgba(34,20,52,0.62)'); g.addColorStop(0.45, 'rgba(38,24,60,0.42)'); g.addColorStop(0.8, 'rgba(44,30,70,0.12)'); g.addColorStop(1, 'rgba(44,30,70,0)');
+  g.addColorStop(0, 'rgba(40,26,60,0.42)'); g.addColorStop(0.45, 'rgba(44,30,66,0.26)'); g.addColorStop(0.8, 'rgba(48,34,74,0.07)');   // lighter (2026-11-13): the sun shadow also falls here - no double-dark blob g.addColorStop(1, 'rgba(44,30,70,0)');
   x.fillStyle = g; x.fillRect(0, 0, 128, 128);
   _contactTex = new THREE.CanvasTexture(c); _contactTex.colorSpace = THREE.SRGBColorSpace; return _contactTex;
 }

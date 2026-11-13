@@ -322,6 +322,7 @@ class Game {
     // 3D skill effects (loaded separately so a problem there never blocks the game)
     import('./rewardfx.js').then(m => { this.reward = new m.RewardFx(this); }).catch(e => console.warn('reward fx', e));
     import('./swingfx.js').then(m => { this.swingFx = new m.SwingFx(this.render.scene); }).catch(e => console.warn('swing fx', e));
+    import('./hammerfx.js').then(m => { this.hammerFx = new m.HammerFx(this.render.scene, this.render.cam); }).catch(e => console.warn('hammer fx', e));
     import('./skillfx.js').then(m => { this.skillFx = new m.SkillFx(this.render.scene); this.skillFx.onShake = (a, d) => this.render.addShake(a, d); m.SkillFx.reduceFlash = !!this.reduceFlash; }).catch(e => console.warn('skillfx', e));
     this.ui = new UI(document.getElementById("ui"));
     this.loadSheet = loadSheet; this.timeScale = 1; this.simSteps = Math.max(1, Math.min(8, parseInt(new URLSearchParams(location.search).get("sim")) || 1)); this.timers = []; this.session = 0; this.autoSaveT = 0;
@@ -476,7 +477,7 @@ class Game {
   async fadeTo(a, dur) { const from = parseFloat(this.ui.fade.style.opacity || 0), t0 = performance.now(); while (true) { const k = Math.min(1, (performance.now() - t0) / 1000 / dur); this.ui.setFade(from + (a - from) * k); if (k >= 1) break; await new Promise(r => requestAnimationFrame(r)); } }
   async loadZone(zoneId, spawnId, usePos) {
     this.audio.stopNpcVoice();
-    if (this.reward) this.reward.clear(); if (this.swingFx) this.swingFx.clear();
+    if (this.reward) this.reward.clear(); if (this.swingFx) this.swingFx.clear(); if (this.hammerFx) this.hammerFx.clear();
     this.loading = true; this.input.block = true; const session = this.session;
     await this.fadeTo(1, 0.25);
     if (this.player) this.player.skills2.clearTemp(); if (this.skillFx) this.skillFx.clear();
@@ -666,6 +667,7 @@ class Game {
     if (this.skillFx) try { this.skillFx.update(rdt); } catch (e) { console.warn('skillfx update', e); this.skillFx = null; }
     if (this.reward) try { this.reward.update(rdt); } catch (e) { console.warn('reward fx', e); this.reward.clear(); }
     if (this.swingFx) try { this.swingFx.update(rdt * (this.hitStopT > 0 ? 0.25 : 1), this.render.cam); } catch (e) { console.warn('swing fx', e); this.swingFx.clear(); }
+    if (this.hammerFx) try { this.hammerFx.low = !!((this.input && this.input.mobile) || (this.settings && this.settings.graphicsFx === false)); this.hammerFx.update(rdt); } catch (e) { console.warn('hammer fx', e); this.hammerFx.clear(); }
     this.render.render(rdt);
   }
 }

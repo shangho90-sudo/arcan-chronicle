@@ -2,7 +2,7 @@
 // Same interface as SpriteBody (play / setDir / flash / setTint / setVisible / place / update / dispose / sh),
 // so actors.js keeps working; animation comes from the game's pose table, applied to the skeleton and
 // interpolated every frame, and the body turns smoothly to any angle.
-import { THREE, T, tex, paintMat, contactShadowTex } from './render.js';
+import { THREE, T, tex, paintMat, contactShadowTex, addOutline } from './render.js';
 import { itemModel, isWeaponModel } from './items3d.js';
 
 const DEG = Math.PI / 180;
@@ -63,6 +63,17 @@ export const NPC_MODELS = {
 /** back holder (backMount): grip at x = this fraction of the right shoulder's x, up / out (m) above the shoulder joint and
  *  behind the back surface; dir = blade direction in bind space (+x = the character's left, +y up, +z forward) */
 const BACK_MOUNT = { x: 0.62, up: 0.1, out: 0.05, dir: [0.72, -1, -0.03] };   // 확인: python3 tools/anim/back_clip.py
+/** 비율 (2026-11-13 그래픽 개편, 씰M 같은 밝고 귀여운 3등신 방향): 플레이어 몸의 머리·손·발을 관절 기준으로 키움. 같은 메시·
+ *  뼈대·동작 그대로, 스키닝 행렬에만 곱함 (worldOf). 자식 뼈도 함께 커짐(손 → 손가락·쥔 무기, 머리 → 눈). 남자 모델은 원래
+ *  약 4등신이라 머리를 더, 여자 모델은 이미 약 3.3등신이라 조금만. 판정·이동·충돌은 그대로(그림만). NPC는 그대로. */
+export const PROPORTION = { m: { Head: 1.15, Right_Hand: 1.16, Left_Hand: 1.16, Right_Foot: 1.1, Left_Foot: 1.1 },
+  f: { Head: 1.05, Right_Hand: 1.14, Left_Hand: 1.14, Right_Foot: 1.08, Left_Foot: 1.08 } };
+function boneScales(md) {
+  const out = new Float32Array(md.bones.length).fill(1); if (md.cfg.npc) return out;
+  const P = PROPORTION[/(_f|girl)$/.test(md.cfg.file) ? 'f' : 'm'];
+  md.bones.forEach((b, i) => { if (P[b.name]) out[i] = P[b.name]; });
+  return out;
+}
 const XFER = 0.1;   // s the weapon glides between the back holder and the hand at the grab / release
 const WEAPON = { novice: 'sword', pharmacist: 'pestle', cook: 'knife', blacksmith: 'hammer', hairdresser: 'scissors', artist: 'brush' };
 const OFF = { cook: 'pan', hairdresser: 'dryer', artist: 'palette' };
@@ -505,7 +516,8 @@ export class ModelBody {
     this.gaitPh = 0; this.gaitW = 0; this.gaitV = 0; this.moved = 0; this.lastXZ = null; this.treadmill = 0;
     this.root = new THREE.Group();
     this.mat = new THREE.MeshLambertMaterial({ map: md.texture, emissive: 0xffffff, emissiveIntensity: 0 });
-    paintMat(this.mat, { rim: [1.0, 0.86, 0.62], rimK: 0.34, sat: 1.12 });   // reads a touch brighter than the painted ground
+    // 2026-11-13: rim cooler and weaker (the warm rim on a warm plaza did not separate); the outline hull does that now
+    paintMat(this.mat, md.cfg.npc ? { rim: [1.0, 0.86, 0.62], rimK: 0.3, sat: 1.1 } : { rim: [0.9, 0.92, 1.0], rimK: 0.22, sat: 1.1, skin: true });
     this.mesh = new THREE.SkinnedMesh(md.geometry, this.mat);
     this.mesh.castShadow = true; this.mesh.frustumCulled = false;
     this.mesh.scale.setScalar(md.scale);
@@ -515,6 +527,7 @@ export class ModelBody {
     md.bones.forEach((b, i) => (b.parent >= 0 ? this.bones[b.parent] : this.mesh).add(this.bones[i]));
     this.skeleton = new THREE.Skeleton(this.bones, md.bones.map(b => b.inv.clone()));
     this.mesh.bind(this.skeleton, new THREE.Matrix4());
+    addOutline(this.mesh);                                                   // 얇은 외곽선 (render.js OUTLINE): 플레이어·NPC
     if (!shadowMat) shadowMat = new THREE.MeshBasicMaterial({ map: contactShadowTex(), transparent: true, depthWrite: false });
     this.shadow = new THREE.Mesh(shadowGeo, shadowMat); this.shadow.rotation.x = -Math.PI / 2;
     const ss = shadowRadius * 2.6; this.shadow.scale.set(ss, ss, 1);
@@ -652,10 +665,10 @@ export class ModelBody {
     const tp = T(p); this.root.position.copy(tp); this.shadow.position.set(tp.x, tp.y + 0.03, tp.z);
   }
   update(dt) {
-    this.t += dt * Math.max(0, this.speed);
+    this.t += dt * Math.max(0, this.speed); this.life = (this.life || Math.random() * 10) + dt;
     if (this.fadeDur > 0) this.fadeT += dt;
     if (this.flashT > 0) this.flashT -= dt;
-    this.mat.emissiveIntensity = this.flashT > 0 ? 0.7 : 0;
+    this.mat.emissiveIntensity = this.flashT > 0 ? 0.45 * Math.min(1, this.flashT / 0.1) : 0;
     this.yaw0 = this.yaw;                                                   // facing before this frame's turn (start of a run)
     let dy = this.targetYaw - this.yaw; dy = Math.atan2(Math.sin(dy), Math.cos(dy));
     const swing = this.sh.actions[this.action] && this.sh.actions[this.action].keys;
@@ -735,6 +748,18 @@ export class ModelBody {
     let Q = md.cfg.npc ? npcIdle(this.t, this.lookYaw || 0) : poseToBones(p, md.cfg.headPitch);
     let bodyY = md.cfg.npc ? 0 : (p.bob || 0) - (p.sink || 0), swayX = 0;
     if (!md.cfg.npc && md.leg) Q = alignLegs(md, Q);
+    // idle breathing (2026-11-13): chest rises, shoulders lift a little, the free hands drift, the head nods on the breath;
+    // fades out with the gait (gaitW) so walking / swings are untouched
+    if (!md.cfg.npc && this.action === 'idle' && !this.over) {
+      const t = this.life || 0, br = Math.sin(t * 2.3), dr = Math.sin(t * 0.9 + 1.3), w = 1 - Math.min(1, this.gaitW || 0);
+      if (w > 0.01) {
+        const R = (b, m) => { Q[b] = Q[b] ? mul(Q[b], m) : m; };
+        R('Chest', rx(-1.6 * br * w)); R('Spine', rx(-0.6 * br * w)); R('Head', rx((1.0 * br - 0.6 * dr) * w));
+        R('Left_Shoulder', rz(-1.8 * br * w)); R('Right_Shoulder', rz(1.8 * br * w));
+        R('Left_UpperArm', mul(rx(2.2 * dr * w), rz(-1.5 * br * w))); R('Right_UpperArm', rz(1.5 * br * w));
+        R('Left_LowerArm', ry(-3 * dr * w));
+      }
+    }
     if (!md.cfg.npc && this.armW < 0.999) {                                 // empty right hand: fingers open up from the grip fist
       const k = 1 - this.armW;
       for (const fg of ['Index', 'Middle', 'Ring', 'Pinky']) { Q['Right_' + fg + 'Proximal'] = rz(60 - 38 * k); Q['Right_' + fg + 'Intermediate'] = rz(70 - 44 * k); }
@@ -795,11 +820,11 @@ export class ModelBody {
     this.updateProp('L', p.held && !stow ? null : this.armW > 0.5 ? this.off : null, p.offOff - 90);
   }
   worldOf(Q) {
-    const md = this.md, W = new Array(md.bones.length);
+    const md = this.md, W = new Array(md.bones.length), S = this.bscale || (this.bscale = boneScales(md));
     for (let i = 0; i < md.bones.length; i++) {
-      const b = md.bones[i], q = Q[b.name];
+      const b = md.bones[i], q = Q[b.name], k = S[i];
       let local = b.bind;
-      if (q) local = mul(_m().makeTranslation(b.t.x, b.t.y, b.t.z), q, _m().makeTranslation(-b.t.x, -b.t.y, -b.t.z), b.bind);
+      if (q || k !== 1) local = mul(_m().makeTranslation(b.t.x, b.t.y, b.t.z), q || _m(), k !== 1 ? _m().makeScale(k, k, k) : _m(), _m().makeTranslation(-b.t.x, -b.t.y, -b.t.z), b.bind);
       W[i] = b.parent < 0 ? local.clone() : mul(W[b.parent], md.bones[b.parent].inv, local);
     }
     return W;
@@ -877,6 +902,6 @@ export class ModelBody {
     if (this.trail) this.trail.dispose();
     this.scene.remove(this.root, this.shadow);
     this.mat.dispose();
-    this.root.traverse(o => { if (o.isMesh && o !== this.mesh) { o.geometry.dispose(); o.material.dispose(); } });
+    this.root.traverse(o => { if (o.isMesh && o !== this.mesh && !o.userData.outline) { o.geometry.dispose(); o.material.dispose(); } });   // outline hulls share the cached geometry / material
   }
 }

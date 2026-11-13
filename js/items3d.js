@@ -14,7 +14,9 @@ function M(hex, o = {}) {
   }
   return matCache.get(k);
 }
-const METAL = { iron: [0x8a8f9a, 0.45, 0.7], steel: [0xd2d8e2, 0.28, 0.85], gold: [0xe4bb4e, 0.3, 0.9], bronze: [0xb87a40, 0.4, 0.8], silver: [0xe8ecf4, 0.22, 0.9] };
+// metals: limited reflection (there is no environment map - high metalness rendered almost black on the shaded side and
+// read as plastic gloss next to the matte toon characters; 2026-11-13): colour carries the metal, low metalness, soft sheen
+const METAL = { iron: [0x9aa0ac, 0.55, 0.3], steel: [0xd2d8e2, 0.45, 0.35], gold: [0xe8bf52, 0.45, 0.35], bronze: [0xc08448, 0.5, 0.3], silver: [0xe8ecf4, 0.42, 0.35] };
 const metal = n => M(METAL[n][0], { r: METAL[n][1], m: METAL[n][2] });
 const WOOD = M(0x7a4e2c, { r: 0.8 }), DWOOD = M(0x4e3020, { r: 0.8 }), LEATHER = M(0x6a3e22, { r: 0.85 });
 const GEM = c => M(c, { r: 0.15, m: 0.1, e: c, ei: 0.35 });
@@ -62,12 +64,17 @@ const BUILD = {
     return alongZ(g);
   },
   hammer(t) {
-    const T = TIER[t], g = G(); add(g, cyl(0.018, 0.022, 0.38), t === 1 ? WOOD : DWOOD, 0, 0.13);
-    add(g, cyl(0.024, 0.024, 0.07), LEATHER, 0, -0.02);
-    const head = add(g, box(0.19, 0.09, 0.09), metal(T.blade), 0, 0.33);
-    add(g, box(0.05, 0.1, 0.1), metal(T.trim), 0, 0.33);
-    add(g, cyl(0.05, 0.05, 0.03, 12), metal(T.blade), 0.105, 0.33, 0, 0, 0, R); add(g, cyl(0.05, 0.05, 0.03, 12), metal(T.blade), -0.105, 0.33, 0, 0, 0, R);
-    if (T.gem) add(g, sph(0.02, 10), GEM(T.gem), 0, 0.33, 0.05);
+    // 2026-11-13: a chunky smith's hammer that reads at play size - thick handle, big rounded barrel head with two broad
+    // striking faces and a centre band (big shapes, few colours), short leather grip, a pommel knob
+    const T = TIER[t], g = G(), H = 0.42;
+    add(g, cyl(0.024, 0.029, 0.46), t === 1 ? WOOD : DWOOD, 0, 0.17);
+    add(g, cyl(0.032, 0.032, 0.11), LEATHER, 0, 0.0);
+    add(g, sph(0.036, 12), metal(T.trim), 0, -0.065);
+    add(g, cyl(0.082, 0.082, 0.24, 18), metal(T.blade), 0, H, 0, 0, 0, R);
+    for (const x of [-1, 1]) add(g, cyl(0.092, 0.088, 0.04, 18), metal(T.blade), x * 0.13, H, 0, 0, 0, R);
+    add(g, cyl(0.088, 0.088, 0.05, 18), metal(T.trim), 0, H, 0, 0, 0, R);
+    add(g, cyl(0.034, 0.03, 0.05, 10), metal(T.trim), 0, H - 0.09);
+    if (T.gem) add(g, sph(0.024, 10), GEM(T.gem), 0, H, 0.088);
     return alongZ(g);
   },
   scissors(t) {
