@@ -1,6 +1,7 @@
 """약사 유봉강타 ph1_a1 효과음 2개를 합성한다 (numpy + scipy, ffmpeg로 MP3). 2026-11-12.
 
-Usage:  python3 tools/audio/smash_sfx.py   ->  assets/audio/sfx_ph_smash_swing.mp3, sfx_ph_smash_hit.mp3 (+ /tmp/smash_sfx/*.wav)
+Usage:  python3 tools/audio/smash_sfx.py push  ->  assets/audio/sfx_ph_push_hit.mp3 (밀어내기, 2026-11-13)
+        python3 tools/audio/smash_sfx.py   ->  assets/audio/sfx_ph_smash_swing.mp3, sfx_ph_smash_hit.mp3 (+ /tmp/smash_sfx/*.wav)
 
 Runway 크레딧이 0이라 생성형 대신 직접 합성했다(시드 고정 — 다시 돌리면 같은 파일). 크레딧이 생기면 같은 이름으로 바꿔 넣으면 된다.
   ph_smash_swing  0.30 s  무거운 둔기가 공기를 가르는 짧은 '후웅' (대역 통과 잡음, 중심 주파수 240 -> 900 -> 380 Hz, 0.085 s에 정점 —
@@ -10,6 +11,7 @@ Runway 크레딧이 0이라 생성형 대신 직접 합성했다(시드 고정 �
                           ③ 중고음 어택(2 ~ 7 kHz, 12 ms — 휴대폰 스피커에서도 들리게)  ④ 0.05 s 뒤부터 흙·돌가루 떨어지는 알갱이
                           ⑤ 은은한 약력 여운(1319·1976·2637 Hz 종소리, 낮은 음량)
 """
+import sys
 import os, subprocess, wave
 import numpy as np
 from scipy import signal
@@ -65,6 +67,30 @@ def hit():
     x *= np.minimum(1, (d - t) / 0.08)
     return x / np.max(np.abs(x))
 
+def push_hit():
+    """밀어내기 타격(2026-11-13): 땅이 부채꼴로 뒤집히는 소리 — 낮은 흙 울림(70 -> 38 Hz) + 둔탁한 타격 + 흙·자갈이 쏟아지는 알갱이(0.04 s부터 0.5 s까지)
+    + 1.5~5 kHz 어택(휴대폰 스피커용) + 아주 옅은 종 여운. 자체 난수(시드 1113)라 다른 두 소리는 그대로."""
+    r = np.random.default_rng(1113); d = 0.85; t = T(d); x = np.zeros(len(t))
+    f = 38 + (70 - 38) * np.exp(-t / 0.07); ph = 2 * np.pi * np.cumsum(f) / SR
+    x += (np.sin(ph) + 0.4 * np.sin(2 * ph)) * np.exp(-t / 0.13) * 0.8
+    x += lp(r.standard_normal(len(t)), 700) * np.exp(-t / 0.04) * 1.2
+    for fq, dc, g in ((210, 0.07, 0.6), (340, 0.05, 0.45), (560, 0.035, 0.3)):
+        x += np.sin(2 * np.pi * fq * t + r.uniform(0, 6.28)) * np.exp(-t / dc) * g
+    x += bp(r.standard_normal(len(t)), 1500, 5000) * np.exp(-t / 0.016) * 1.3
+    g = np.zeros(len(t))
+    for k in range(90):
+        at = 0.04 + r.exponential(0.16); L = int(SR * r.uniform(0.005, 0.02))
+        if at > d - 0.06: continue
+        grain = r.standard_normal(L) * np.exp(-np.arange(L) / (L * 0.3)); place(g, grain, at, r.uniform(0.3, 1.0) * np.exp(-at / 0.24))
+    x += bp(g, 500, 3800) * 0.5
+    x += bp(r.standard_normal(len(t)), 250, 1400) * np.exp(-np.maximum(0, t - 0.02) / 0.14) * (t > 0.02) * 0.22      # earth sliding
+    tail = np.zeros(len(t))
+    for fq, g_, dc in ((1174.7, 1.0, 0.2), (1760.0, 0.6, 0.16), (2349.3, 0.35, 0.12)):
+        tail += np.sin(2 * np.pi * fq * t) * np.exp(-np.maximum(0, t - 0.04) / dc) * g_
+    x += tail * np.minimum(1, np.maximum(0, t - 0.04) / 0.02) * 0.05
+    x = np.tanh(x * 1.1); x *= np.minimum(1, (d - t) / 0.1)
+    return x / np.max(np.abs(x))
+
 def save(name, x):
     st = np.stack([x, x], 1); pcm = (np.clip(st, -1, 1) * 0.89 * 32767).astype('<i2')
     wav = os.path.join(TMP, name + '.wav')
@@ -74,4 +100,6 @@ def save(name, x):
     print(name, '%.2f s' % (len(x) / SR), os.path.getsize(mp3), 'bytes')
 
 if __name__ == '__main__':
-    save('sfx_ph_smash_swing', swing()); save('sfx_ph_smash_hit', hit())
+    a = sys.argv[1:]
+    if not a or 'smash' in a: save('sfx_ph_smash_swing', swing()); save('sfx_ph_smash_hit', hit())
+    if 'push' in a: save('sfx_ph_push_hit', push_hit())      # python3 tools/audio/smash_sfx.py push

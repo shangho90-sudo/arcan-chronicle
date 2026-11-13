@@ -469,7 +469,7 @@
 {
 "op": "fx",
 "pharm": "swing",
-"at": -0.25
+"at": -0.34
 },
 {
 "op": "hit",
@@ -516,7 +516,7 @@
 "idx": 2,
 "name": "밀어내기",
 "type": "attack",
-"desc": "적을 밀쳐낸다. 밀치기에 면역인 적에게는 추가 피해.",
+"desc": "유봉을 가로로 크게 휘둘러 앞쪽 부채꼴의 땅을 뒤집는다. 범위 안의 적 모두에게 피해를 주고 뒤로 밀어낸다. 밀치기에 면역인 적에게는 추가 피해.",
 "maxLv": 5,
 "unlock": 13,
 "prereq": [],
@@ -527,16 +527,18 @@
 "cd": 7,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "attack",
+"anim": "ph_sweep",
 "ops": [
 {
 "op": "hit",
 "shape": "cone",
 "coef": 1.4,
-"r": 2.2,
-"ang": 80,
-"knock": 3.0,
+"r": 3.0,
+"ang": 110,
+"knock": 7.5,
 "vsImmune": 1.6,
+"oneHit": true,
+"sfx": "ph_push_hit",
 "fx": {
 "pharm": "push"
 }
@@ -547,6 +549,9 @@
 "fx": {
 "color": 16769696
 },
+"sfx": "ph_smash_swing",
+"sfxAt": "strike",
+"sfxLead": 0.08,
 "status": {
 "data": true,
 "impl": true,
@@ -760,7 +765,7 @@
 "cd": 5,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "throw",
+"anim": "ph_pitch",
 "ops": [
 {
 "op": "proj",
@@ -788,6 +793,8 @@
 "fx": {
 "color": 16742960
 },
+"sfxAt": "strike",
+"sfxLead": 0.02,
 "status": {
 "data": true,
 "impl": true,
@@ -817,7 +824,7 @@
 "cd": 6,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "throw",
+"anim": "ph_pitch",
 "ops": [
 {
 "op": "proj",
@@ -846,6 +853,8 @@
 "fx": {
 "color": 8048895
 },
+"sfxAt": "strike",
+"sfxLead": 0.02,
 "status": {
 "data": true,
 "impl": true,
@@ -875,7 +884,7 @@
 "cd": 14,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "throw",
+"anim": "ph_pitch",
 "ops": [
 {
 "op": "custom",
@@ -925,7 +934,7 @@
 "cd": 8,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "throw",
+"anim": "ph_pitch",
 "ops": [
 {
 "op": "proj",
@@ -960,6 +969,8 @@
 "fx": {
 "color": 9097280
 },
+"sfxAt": "strike",
+"sfxLead": 0.02,
 "status": {
 "data": true,
 "impl": true,

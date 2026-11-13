@@ -376,20 +376,53 @@ PH_SLAM = action('ph_slam', [
 ], 0.30, 0.66, [[0.25, 0.33]], fadeIn=0.06, fadeOut=0.16)
 PH_SLAM.update(trailLife=0.16, trailColor=[1.7, 1.4, 0.7])
 # 유봉강타 (ph1_a1, anim ph_smash, 2026-11-12): 준비 0.17 s (무릎을 굽히고 상체를 뒤로 젖히며 유봉을 머리 위 뒤로)
-# -> 내려찍기 0.08 s (허리·어깨·팔이 함께, 가장 빠른 구간 끝이 타격 0.25 s = 예전 attack 동작과 같은 타격 시각) -> 앞으로 실린
+# -> 내려찍기 (허리·어깨·팔이 함께, 가장 빠른 구간 끝이 타격) -> 앞으로 실린
 # 자세로 잠깐 버팀 -> 부드러운 복귀 (전체 0.55 s 그대로). 발은 제자리(STEP). 칼 잔상은 쓰지 않고(trail 없음) 둔기 궤적은
 # js/pharmfx.js swing()이 실제 유봉 끝을 따라 그림. windT / strikeT = 그 이펙트가 읽는 준비 끝 / 타격 시각.
 PH_SMASH = action('ph_smash', [
     key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
-    key(0.10, 'o', twist=-10, lean=-9, sink=0.13, hand=[-16, 66, 0.80], blade=[-10, 96], elbow=[-0.6, 0.2, -1], armL=[64, 30]),
-    key(0.17, 's', twist=-14, lean=-15, sink=0.11, hand=[-10, 84, 0.86], blade=[-4, 126], elbow=[-0.6, 0.3, -1], armL=[84, 34], squint=True),
-    key(0.205, 'i', twist=-4, lean=3, sink=0.14, hand=[-5, 52, 0.97], blade=[-2, 66], elbow=[-0.5, -0.4, -0.6], armL=[40, 36], squint=True),
-    key(0.25, None, twist=6, lean=27, sink=0.27, hand=[0, -22, 1.0], blade=[2, -50], elbow=[-0.4, -1, -0.2], armL=[24, 40], squint=True),
-    key(0.31, 'o', twist=8, lean=32, sink=0.31, hand=[2, -33, 0.95], blade=[4, -66], elbow=[-0.4, -1, -0.1], armL=[18, 44], squint=True),
-    key(0.43, 's', twist=5, lean=15, sink=0.13, hand=[4, -38, 0.84], blade=[12, -28], elbow=[-0.5, -1, -0.1], armL=[14, 30]),
-    key(0.55, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
-], 0.25, 0.40, None, fadeIn=0.05, fadeOut=0.14)
-PH_SMASH.update(windT=0.17, strikeT=0.25)
+    key(0.12, 'o', twist=-10, lean=-9, sink=0.13, hand=[-16, 66, 0.80], blade=[-10, 96], elbow=[-0.6, 0.2, -1], armL=[64, 30]),
+    key(0.20, 's', twist=-14, lean=-16, sink=0.10, hand=[-10, 86, 0.86], blade=[-4, 128], elbow=[-0.6, 0.3, -1], armL=[84, 34], squint=True),
+    key(0.275, 'i', twist=-5, lean=2, sink=0.14, hand=[-5, 54, 0.97], blade=[-2, 68], elbow=[-0.5, -0.4, -0.6], armL=[40, 36], squint=True),
+    key(0.34, None, twist=6, lean=28, sink=0.28, hand=[0, -24, 1.0], blade=[2, -54], elbow=[-0.4, -1, -0.2], armL=[24, 40], squint=True),
+    key(0.42, 'o', twist=8, lean=33, sink=0.32, hand=[2, -34, 0.95], blade=[4, -68], elbow=[-0.4, -1, -0.1], armL=[18, 44], squint=True),
+    key(0.55, 's', twist=5, lean=15, sink=0.13, hand=[4, -38, 0.84], blade=[12, -28], elbow=[-0.5, -1, -0.1], armL=[14, 30]),
+    key(0.67, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
+], 0.34, 0.50, None, fadeIn=0.05, fadeOut=0.14)
+PH_SMASH.update(windT=0.20, strikeT=0.34)
+# (2026-11-13 '살짝 천천히 땅을 타격': 준비 0.20 s, 내려찍기 0.14 s — 타격 0.25 -> 0.34 s, 전체 0.55 -> 0.67 s. 더 커진 마력 유봉이 땅에
+#  닿는 모습이 보이도록 내려오는 구간을 늘림)
+
+# 약병 투구 (ph1_b1·b2·b4·b6, anim ph_pitch, 2026-11-13): 야구공을 던지듯 뒤에서 앞으로. 왼발을 들어 앞으로 내디디며 상체를 오른쪽
+# 뒤로 틀고 오른손(약병)을 어깨 뒤로 젖힘(0.16 s) -> 허리·어깨가 먼저 돌고 팔이 머리 위로 넘어오며(가장 빠른 구간) 0.24 s에 손을 떠남
+# (throwT = hitT: js/skillrt.js가 이때 실제 손 위치 handPoint에서 약병을 만듦) -> 팔이 몸 앞을 가로질러 내려가는 마무리 -> 복귀.
+# stow: 유봉은 동작 내내 등에 있음(js/model.js: 손에 들고 있었으면 0.1 s에 등으로). 손의 약병은 js/skillrt.js release가 누른 순간부터
+# 실제 손(handPoint)에 붙여 그리는 약병 이펙트(js/pharmfx.js proj) — 놓는 순간 그 약병이 그대로 날아감.
+PH_PITCH = action('ph_pitch', [
+    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18], lift=[0.0, 0.0]),
+    key(0.09, 'o', twist=-30, lean=-5, sink=0.02, hand=[-118, 8, 0.72], blade=[-140, 30], elbow=[-0.8, -0.2, -0.7], armL=[72, 14], step=[0.14, 0.0], lift=[0.13, 0.0]),
+    key(0.16, 's', twist=-44, lean=-11, sink=0.06, hand=[-152, 34, 0.66], blade=[-170, 62], elbow=[-0.9, 0.25, -0.5], armL=[88, 10], step=[0.36, 0.0], lift=[0.04, 0.0], squint=True),
+    key(0.205, 'i', twist=-10, lean=6, sink=0.11, hand=[-66, 78, 0.92], blade=[-60, 80], elbow=[-0.8, 0.5, 0.2], armL=[46, 28], step=[0.40, 0.0], lift=[0.0, 0.0], squint=True),
+    key(0.24, None, twist=24, lean=19, sink=0.15, hand=[-8, 40, 1.0], blade=[0, 30], elbow=[-0.6, -0.3, 0.3], armL=[22, 36], step=[0.40, 0.0], lift=[0.0, 0.03], squint=True),
+    key(0.31, 'o', twist=44, lean=29, sink=0.19, hand=[42, -34, 0.92], blade=[60, -50], elbow=[-0.2, -1, 0.3], armL=[8, 42], step=[0.40, 0.0], lift=[0.0, 0.07]),
+    key(0.44, 's', twist=16, lean=11, sink=0.08, hand=[12, -44, 0.78], blade=[20, -20], elbow=[-0.5, -1, -0.1], armL=[10, 26], step=[0.22, 0.0], lift=[0.05, 0.0]),
+    key(0.56, 's', hand=[-30, -40, 0.70], blade=[-10, 20], lift=[0.0, 0.0]),
+], 0.24, 0.40, None, fadeIn=0.05, fadeOut=0.14)
+PH_PITCH.update(stow=True, throwT=0.24)
+
+# 밀어내기 (ph1_a4, anim ph_sweep, 2026-11-13): 유봉을 오른쪽 뒤로 낮게 당겼다가 땅을 훑듯 가로로 크게 휘두름(오른쪽 -> 왼쪽, 타격 0.26 s).
+# 그 순간 앞쪽 부채꼴의 땅이 바깥으로 뒤집히며 흙이 튐(js/pharmfx.js push). 발은 제자리, 잔상은 흙빛으로 짧게.
+PH_SWEEP = action('ph_sweep', [
+    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
+    key(0.11, 'o', twist=-44, lean=3, sink=0.15, hand=[-112, -8, 0.86], blade=[-152, -18], elbow=[-0.5, -0.6, -0.8], armL=[30, 34]),
+    key(0.17, 's', twist=-50, lean=4, sink=0.17, hand=[-120, -6, 0.86], blade=[-162, -18], elbow=[-0.5, -0.6, -0.8], armL=[34, 36], squint=True),
+    key(0.22, 'i', twist=-14, lean=12, sink=0.21, hand=[-50, -24, 1.0], blade=[-62, -32], elbow=[-0.5, -1, -0.5], armL=[22, 30], squint=True),
+    key(0.26, None, twist=16, lean=17, sink=0.23, hand=[10, -28, 1.0], blade=[20, -36], elbow=[-0.4, -1, 0.0], armL=[14, 36], squint=True),
+    key(0.33, 'o', twist=48, lean=13, sink=0.19, hand=[84, -12, 0.86], blade=[130, -14], elbow=[0.0, -1, 0.5], armL=[10, 42]),
+    key(0.46, 's', twist=18, lean=6, sink=0.08, hand=[22, -38, 0.78], blade=[36, -14], elbow=[-0.5, -1, -0.1], armL=[10, 26]),
+    key(0.58, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
+], 0.26, 0.42, [[0.20, 0.32]], fadeIn=0.06, fadeOut=0.16)
+PH_SWEEP.update(trailLife=0.14, trailColor=[1.5, 1.2, 0.8], strikeT=0.26)
 
 # ------------------------------------------------------------------------------------------------ 요리사 1차 (2026-11-13)
 # 식칼 썰기 (ck1_a1, anim ck_chop): 짧게 들어 올렸다가 도마에 내리치듯 한 번 써는 동작(타격 0.22 s). 연타는 허공의 큰 식칼이
@@ -417,7 +450,7 @@ CK_PAN = action('ck_pan', [
     key(0.68, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
 ], 0.30, 0.46, None, fadeIn=0.06, fadeOut=0.16)
 
-SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL] + [DRAW, SHEATHE, PH_SPIN, PH_SLAM, PH_SMASH, CK_CHOP, CK_PAN]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
+SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL] + [DRAW, SHEATHE, PH_SPIN, PH_SLAM, PH_SMASH, PH_PITCH, PH_SWEEP, CK_CHOP, CK_PAN]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
 
 acts = json.load(open(P))
 names = {'attack', 'attack2'} | {x['name'] for x in SKILL_ACTS}

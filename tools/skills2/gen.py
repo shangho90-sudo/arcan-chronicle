@@ -78,23 +78,26 @@ J, C = 'pharmacist', 0x48b080
 # pharm='swing'(누른 순간부터: 유봉 끝에 청록 약력 응집 -> 반투명 상아색 마력 유봉 + 굵은 둔기 궤적), 타격 순간 'smash'(백금 섬광·금색
 # 지면 고리·균열·파편·청록 약력 잔향). oneHit: 스킬 레벨 추가타(Lv 2마다 +1)를 한 방에 합침 — 총 피해는 같음(coef * (1 + 0.06 * 추가타)).
 # 소리: 휘두름 ph_smash_swing(타격 0.09 s 전), 명중했을 때만 ph_smash_hit. 계수·기력·재사용·사거리·대상 수는 그대로
+# 2026-11-13: 유봉강타 타격 0.25 -> 0.34 s(더 큰 마력 유봉이 조금 천천히 땅을 찍음 + 찌그러진 구덩이, js/pharmfx.js). 밀어내기 = 가로 휘두르기
+# ph_sweep + 부채꼴(반지름 2.2 -> 3.0 m, 80 -> 110도) 땅 뒤집힘·흙 파편, 범위 안 모두 피해 + 밀어냄, oneHit(레벨 추가타를 한 방에 — 땅이 한 번만
+# 뒤집힘, 총 피해 같음), 명중했을 때만 ph_push_hit. 약병(b1·b2·b4·b6) 동작 = 야구 투구 ph_pitch(0.24 s에 실제 손에서 약병이 떠남, 유봉은 등에)
 S(J, 1, 0, '유봉 전투', 1, 'ph1_a1', '유봉강타', 'attack', '정면의 적 하나를 유봉으로 강하게 내려친다.', weapon='pestle', target='enemy', range=2.0, mp=8, cd=4, anim='ph_smash', sfx='ph_smash_swing', sfxAt='strike', sfxLead=0.09,
-  ops=[dict(op='fx', pharm='swing', at=-0.25), hit('single', 2.2, oneHit=True, sfx='ph_smash_hit', fx=dict(pharm='smash'), st=[st('stagger', 0.4)])], fx=dict(color=0xffd27a))
-S(J, 1, 0, '유봉 전투', 2, 'ph1_a4', '밀어내기', 'attack', '적을 밀쳐낸다. 밀치기에 면역인 적에게는 추가 피해.', weapon='pestle', target='enemy', range=2.0, mp=10, cd=7, anim='attack', unlock=13,
-  ops=[hit('cone', 1.4, r=2.2, ang=80, knock=3.0, vsImmune=1.6, fx=dict(pharm='push'))], fx=dict(color=0xffe2a0))
+  ops=[dict(op='fx', pharm='swing', at=-0.34), hit('single', 2.2, oneHit=True, sfx='ph_smash_hit', fx=dict(pharm='smash'), st=[st('stagger', 0.4)])], fx=dict(color=0xffd27a))
+S(J, 1, 0, '유봉 전투', 2, 'ph1_a4', '밀어내기', 'attack', '유봉을 가로로 크게 휘둘러 앞쪽 부채꼴의 땅을 뒤집는다. 범위 안의 적 모두에게 피해를 주고 뒤로 밀어낸다. 밀치기에 면역인 적에게는 추가 피해.', weapon='pestle', target='enemy', range=2.0, mp=10, cd=7, anim='ph_sweep', unlock=13, sfx='ph_smash_swing', sfxAt='strike', sfxLead=0.08,
+  ops=[hit('cone', 1.4, r=3.0, ang=110, knock=7.5, vsImmune=1.6, oneHit=True, sfx='ph_push_hit', fx=dict(pharm='push'))], fx=dict(color=0xffe2a0))
 S(J, 1, 0, '유봉 전투', 3, 'ph1_a3', '유봉 휘두르기', 'attack', '유봉을 들고 제자리에서 두 바퀴 돌며 주변의 적을 5번 연속으로 친다. 마지막 타격은 적을 밀쳐 낸다.', weapon='pestle', target='self', range=2.8, mp=14, cd=8, anim='ph_spin', sfx='ph_spin', sfxAt='op',
   ops=[dict(op='fx', pharm='cast', at=-0.18), hit('circle', 0.5, r=2.8, hits=5, gap=0.13, noExtra=True, swingSfx='ph_spin', fx=dict(pharm='spin'), last=dict(coef=0.8, push=2.4, shake=[0.12, 0.18], fx=dict(pharm='spin')))], fx=dict(color=0xffd27a))
 S(J, 1, 0, '유봉 전투', 4, 'ph1_a6', '천근쇄약', 'attack', '거대한 황금 유봉을 불러내 지면을 내려찍는다. 넓은 범위에 450% 피해, 한가운데 적은 50% 추가 피해.', weapon='pestle', target='ground', range=6, mp=26, cd=16, anim='ph_slam',
   ops=[dict(op='fx', pharm='cast', at=-0.30), dict(op='fx', pharm='pestle', at=-0.12, fall=0.42, r=4.2), delay(0.30, 4.2, 4.5, core=0.5, coreR=1.5, sfx='ph_slam', burst='none', st=[st('stagger', 0.6)], shake=[0.32, 0.36])], fx=dict(color=0xffc040))
 S(J, 1, 0, '유봉 전투', 5, 'ph1_a5', '유봉 숙련', 'passive', '유봉 기본 공격 피해와 공격 속도가 증가한다.', weapon='pestle',
   flags=dict(basicDmg=[0.06, 0.04]), mods=[dict(stat='atkSpeed', mul=0.04, mulLv=0.02)])
-S(J, 1, 1, '기초 약병술', 1, 'ph1_b1', '화염 약병', 'attack', '약병을 던져 작은 폭발과 화상을 일으킨다.', target='ground', range=7, mp=12, cd=5, anim='throw',
+S(J, 1, 1, '기초 약병술', 1, 'ph1_b1', '화염 약병', 'attack', '약병을 던져 작은 폭발과 화상을 일으킨다.', target='ground', range=7, mp=12, cd=5, anim='ph_pitch', sfxAt='strike', sfxLead=0.02,
   ops=[proj('lob', 1.6, r=1.6, elem='fire', fx='flask_fire', pharmProj=True, burst='none', pharm='burst', st=[st('burn', 4, 0.12)], tag='flask')], fx=dict(color=0xff7a30))
-S(J, 1, 1, '기초 약병술', 2, 'ph1_b2', '냉각 약병', 'attack', '냉기 피해와 둔화를 준다.', target='ground', range=7, mp=12, cd=6, anim='throw',
+S(J, 1, 1, '기초 약병술', 2, 'ph1_b2', '냉각 약병', 'attack', '냉기 피해와 둔화를 준다.', target='ground', range=7, mp=12, cd=6, anim='ph_pitch', sfxAt='strike', sfxLead=0.02,
   ops=[proj('lob', 1.4, r=1.8, elem='ice', fx='flask_ice', pharmProj=True, burst='none', pharm='burst', linger=3, st=[st('slow', 3, 0.35)], tag='flask')], fx=dict(color=0x7ad0ff))
-S(J, 1, 1, '기초 약병술', 3, 'ph1_b6', '약병폭격', 'attack', '하늘에서 약병 10개를 차례로 떨어뜨린다. 약병마다 화염(화상)·냉기(둔화)·독 중 하나가 무작위로 터진다.', target='ground', range=7, mp=22, cd=14, anim='throw',
+S(J, 1, 1, '기초 약병술', 3, 'ph1_b6', '약병폭격', 'attack', '하늘에서 약병 10개를 차례로 떨어뜨린다. 약병마다 화염(화상)·냉기(둔화)·독 중 하나가 무작위로 터진다.', target='ground', range=7, mp=22, cd=14, anim='ph_pitch',
   ops=[custom('flask_rain', n=10, gap=0.2, r=3.4, blast=1.5, coef=0.6, fall=0.5, at=0.05, tag='flask', sfx='ph_flask')], fx=dict(color=0xd080ff))
-S(J, 1, 1, '기초 약병술', 4, 'ph1_b4', '부식 약병', 'attack', '지속 피해와 방어력 감소를 남긴다.', target='ground', range=7, mp=14, cd=8, anim='throw',
+S(J, 1, 1, '기초 약병술', 4, 'ph1_b4', '부식 약병', 'attack', '지속 피해와 방어력 감소를 남긴다.', target='ground', range=7, mp=14, cd=8, anim='ph_pitch', sfxAt='strike', sfxLead=0.02,
   ops=[proj('lob', 0.8, r=1.8, elem='acid', fx='flask_acid', pharmProj=True, burst='none', pharm='burst', linger=5, st=[st('poison', 5, 0.15), st('defdown', 5, 0.2)], tag='flask')], fx=dict(color=0x8ad040))
 S(J, 1, 1, '기초 약병술', 5, 'ph1_b5', '정확한 투척', 'passive', '약병 사거리가 늘고 폭발 중심의 적이 추가 피해를 받는다.', flags=dict(throwRange=[1.0, 0.5], centerBonus=[0.15, 0.05]))
 S(J, 1, 2, '조제와 응급처치', 1, 'ph1_c1', '회복제 제작', 'craft', '약초와 빈 병으로 HP 회복제를 만든다.')

@@ -27,7 +27,8 @@
 //                                     sized to the target's own footprint, short cracks + low chips + ground dust, teal powder / crystals along the ring edge.
 //                                     colour roles: platinum = core, gold = shock, teal = 약력 residue. whiff: a small dim dust puff only
 //   (smash meshes: assets/fx/fx_smash.glb.json from tools/blender/fx_smash.py — smash_pestle / smash_trail / smash_cracks)
-//   push(pc, {f, r, ang, hits})     밀어내기: wind ribbons sweeping the real cone, shock arc at its edge, dust streaks along each pushed enemy
+//   push(pc, {f, r, ang, hits})     밀어내기(2026-11-13): the ground of the real cone buckles outward (earth plates flip up band by band, dark soil below),
+//                                     Tripo clods / slab chips fly and land inside it, low dust, thin teal line on the wave front, drag streaks per pushed enemy
 //   syringe(pc, {dur})              ⑦ 아드레날린 주사: syringe to the left arm, orange flash (ring, ribbons, arrows), dim loop
 //   shield(pc, {dur})               ⑧ 약 보호막: clear blue dome, thin flowing hex lines, fresnel rim, ripple where it is hit
 //   circle(pos, {r, dur})           ⑨ 광역 회복진: thin green circle + slow ribbons + rising crosses; .pulse() on each heal tick
@@ -55,19 +56,21 @@ export const PHARM = {
     platinum: { w: 0xffffff, b: 0xf0f3ff, h: 0xc4cee8 },
     teal:     { w: 0xeafffb, b: 0x36e2c8, h: 0x0e9a94, s1: 0xa9f2e6, s2: 0x2c8f89 },
     crack:    { s1: 0x2a2018, s2: 0x15100c },
+    earth:    { w: 0xfff2d8, b: 0xd9a25c, h: 0x8a5a2a, s1: 0xcbb38f, s2: 0x6b5238 },   // 밀어내기: 뒤집힌 흙
   },
   spin: { life: 0.32, lastLife: 0.46, peak: 2.3, lastPeak: 3.0, lead: 0.5, ringTime: 0.30 },         // lead: rad the ribbon head runs ahead of the pestle tip
   pestle: { height: 3.9, lean: 0.46, drop: 5.0, stay: 0.55, glow: 0.10, spec: 1.6, fill: 0.55 },   // procedural club (fx_pharm.py pharm_pestle), warm polished gold
   smash: {                                                    // 유봉강타
-    wind: 0.17, hit: 0.25,                                    // s from the press: wind-up ends / impact (= action ph_smash windT / strikeT)
-    len: 2.35, lenMin: 1.5, thick: 1.12, ghostA: 0.78, ghostFade: 0.15,     // magic pestle: length m (~1.4 x a 1.7 m character), girth x, peak opacity, fade after the hit s
+    wind: 0.20, hit: 0.34,                                    // s from the press: wind-up ends / impact (fallback; read from action ph_smash windT / strikeT)
+    len: 3.2, grip: 0.9, slant: 0.5, reach: 1.7, thick: 1.15, ghostA: 0.86, ghostHold: 0.11, ghostFade: 0.2,   // magic pestle: length m (~1.9 x a 1.7 m character), hand at this fraction from the head end during the wind-up, whiff: lands this far ahead, girth x, opacity, stays planted s, fade s
+    crater: 0.95, craterHold: 0.55, craterFade: 0.45, craterA: 0.8,   // dented ground: radius m, stays s, sinks back / fades s, darkness
     trailW: 0.55, trailLen: 0.3, trailA: 2.0, trailFade: 0.1,   // blunt trail: band width m, visible part (fraction of the arc mesh), brightness, fade s
     gather: 0.55,                                             // radius the teal motes start from, m
-    flash: 2.3, flashT: 0.045, rays: 0.12,                    // platinum core: brightness, life s; hit lines life s
+    flash: 1.5, flashT: 0.045, rays: 0.12,                    // platinum core: brightness, life s; hit lines life s
     ringPad: 0.3, ringMin: 0.65, ringMax: 1.0, ringT: 0.14, ringLife: 0.26,   // gold ring radius = target radius + pad (clamped) — one target's footprint, not an area
-    crackLife: 0.34, dustLife: 0.32, tealLife: 0.6,           // main effect gone by ~0.35 s, teal motes by 0.6 s
+    crackLife: 0.9, dustLife: 0.32, tealLife: 0.6,           // main effect gone by ~0.35 s, teal motes by 0.6 s
   },
-  push: { sweep: 0.16, life: 0.36, peak: 2.0, streak: 1.6 },                                           // 밀어내기
+  push: { wave: 0.17, tilt: 0.56, rest: 0.5, hold: 0.55, sink: 0.4, lift: 0.06, thick: 0.75, clods: 14, clodsLow: 6, dustA: 0.34, streak: 1.4, stop: 0.05, kick: [0.09, 0.1] },   // 밀어내기: wave reaches the edge s, plate tilt rad (peak) / resting fraction, plates stay s / sink s, lift m, plate thickness x, flying clods, dust alpha, drag streak m, local hit-stop s, camera kick [m, s]
   shatter: { k: 0.58, maxR: 2.6, lift: 0.38, thick: 0.62, tilt: 0.24, up: 0.14, hang: 0.24, fall: 0.26, rest: 1.15, life: 1.75, glow: 0.9 },   // R = min(r * k, maxR)
   burst: { ring: 0.26, core: 0.24, puffA: 0.82, puffLife: 1.35, coreA: 2.0, flareA: 1.6, ringA: 2.4, hazeA: 0.55, frost: 0.5, puddle: 0.6 },   // frost / puddle = lingering alpha
   buff: { flash: 1.4, loop: 0.34 },
@@ -189,6 +192,26 @@ void main(){ float u = vUv.x, v = (vUv.y - uIn) / (1. - uIn);
   float across = smoothstep(0., .3, v) * (1. - smoothstep(.8, 1., v)), core = exp(-pow((v - .66) / .22, 2.)), lead = smoothstep(uHead - uLen * .45, uHead, u);
   vec3 c = uH * across * .9 + uB * across * core * (.8 + .9 * lead) + uW * core * core * lead * .9;
   gl_FragColor = vec4(c * along * uA * step(0., v), 1.); }`;
+// dented ground (유봉강타 구덩이) on pharm_circle (radius 1, XZ): a shaded bowl painted over the real ground — dark floor, the inner wall
+// facing the light is lighter, the wall facing away darker, a pale lip. Normal blending (it darkens / lightens whatever ground is below)
+const CRATER_FS = `uniform float uA; uniform vec3 uDark, uLite; uniform vec2 uL; varying vec3 vP;
+void main(){ float r = length(vP.xz); vec2 n = r > 1e-4 ? vP.xz / r : vec2(0.); float lit = dot(-n, uL);
+  float bowl = 1. - smoothstep(.1, .9, r), wall = smoothstep(.3, .62, r) * (1. - smoothstep(.82, .97, r));
+  float dark = (.48 + .3 * bowl) * (1. - smoothstep(.84, .99, r)) + wall * max(0., -lit) * .5;
+  float hi = wall * max(0., lit) * .55 + smoothstep(.8, .9, r) * (1. - smoothstep(.93, 1., r)) * (.25 + .4 * max(0., -lit));
+  vec3 c = mix(uDark, uLite, clamp(hi / (hi + dark + 1e-4), 0., 1.));
+  gl_FragColor = vec4(c, clamp(dark + hi, 0., .92) * uA); }`;
+// turned soil of 밀어내기 on pharm_circle: only the sector |angle| < uHalf around local +X, out to the wave front uFront (0..1); broken
+// concentric buckle lines, a thin teal 약력 line riding the front (uGlow)
+const SECTOR_FS = `uniform float uA, uHalf, uFront, uGlow; uniform vec3 uDark, uLite, uTeal; varying vec3 vP;
+float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+void main(){ float r = length(vP.xz), an = atan(vP.z, vP.x);
+  float m = (1. - smoothstep(uHalf - .06, uHalf, abs(an))) * smoothstep(.08, .18, r) * (1. - smoothstep(uFront - .07, uFront, r));
+  float sl = floor((an + 3.2) * 7.), rid = .5 + .5 * sin(r * 30. + h(vec2(sl, 3.)) * 6.283), nz = h(floor(vec2(an * 16., r * 11.)));
+  vec3 c = mix(uDark, uLite, rid * .3 + nz * .22);
+  float fr = smoothstep(uFront - .12, uFront - .05, r) * (1. - smoothstep(uFront - .05, uFront, r)) * uGlow * (1. - smoothstep(uHalf - .06, uHalf, abs(an)));
+  c = mix(c, uTeal, fr * .85);
+  gl_FragColor = vec4(c, max(uA * m * (.55 + .25 * rid), fr * .8)); }`;
 const ADD = { transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide };
 
 export class PharmFx {
@@ -215,6 +238,15 @@ export class PharmFx {
         const sg = await new Promise((res, rej) => new GLTFLoader().parse(u8.buffer, '', res, rej));
         sg.scene.traverse(o => { if (o.isMesh) this.geo[o.name] = o.geometry; }); this.trailSpan = (sj.trailSpan || 190) * Math.PI / 180; this.trailIn = sj.trailIn ?? 0.56;
       } catch (err) { console.warn('pharmfx: no smash meshes', err && err.message); }
+      try {   // 밀어내기: 부채꼴 흙판 (tools/blender/fx_push.py) + Tripo 흙덩이·흙판 (fx_push_tripo, 없으면 절차 파편)
+        const pj = await (await fetch('assets/fx/fx_push.glb.json')).json(), raw = atob(pj.b64), u8 = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) u8[i] = raw.charCodeAt(i);
+        const pg = await new Promise((res, rej) => new GLTFLoader().parse(u8.buffer, '', res, rej)); this.plates = []; this.pushAng = pj.ang || 110;
+        pg.scene.traverse(o => { if (o.isMesh && o.name.startsWith('push_plate_')) this.plates.push({ geo: o.geometry, rho: Math.hypot(o.position.x, o.position.z), a: Math.atan2(o.position.z, o.position.x) }); });
+      } catch (err) { console.warn('pharmfx: no push plates', err && err.message); }
+      try {
+        const cg = await loadWrapped('assets/fx/fx_push_tripo.glb.json', {}); this.clods = [];
+        cg.scene.traverse(o => { if (!o.isMesh || !o.material || !o.material.map) return; this.tri[o.name] = { geo: o.geometry, map: o.material.map }; if (/^tripo_(clod|slab)_/.test(o.name)) this.clods.push(o.name); });
+      } catch (err) { console.warn('pharmfx: no Tripo soil models', err && err.message); }
       this.ready = true;
     })().catch(e => console.warn('pharmfx load', e));
     return this.loading;
@@ -239,6 +271,8 @@ export class PharmFx {
       case 'domeT': return new THREE.ShaderMaterial({ defines: { TINT: 1 }, uniforms: U({ uW: C(), uB: C(), uHitP: new THREE.Vector3(0, 0.5, 1), uA: 0, uT: 0, uHit: 0, uHitT: 0, uFill: 0, uLine: 0, uFlow: 0, uRim: 0, uHexN: 6 }),
         vertexShader: FLAT_VS, fragmentShader: DOME_FS, transparent: true, depthWrite: false, side: THREE.FrontSide });
       case 'ghost': return new THREE.ShaderMaterial({ uniforms: U({ uRim: new THREE.Color(0xc9861c), uA: 0 }), vertexShader: SOLID_VS, fragmentShader: GHOST_FS, transparent: true, depthWrite: false, depthTest: false });   // drawn over everything: the silhouette must read at the impact, also against / inside the target
+      case 'crater': return new THREE.ShaderMaterial({ uniforms: U({ uA: 0, uDark: new THREE.Color(0x35261a), uLite: new THREE.Color(0xf0dcb4), uL: new THREE.Vector2(-0.62, -0.78) }), vertexShader: FLAT_VS, fragmentShader: CRATER_FS, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+      case 'sector': return new THREE.ShaderMaterial({ uniforms: U({ uA: 0, uHalf: 1, uFront: 0, uGlow: 0, uDark: new THREE.Color(0x3a2a1c), uLite: new THREE.Color(0x8a6a48), uTeal: new THREE.Color(0x5cf0d8) }), vertexShader: FLAT_VS, fragmentShader: SECTOR_FS, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
       case 'trail': return new THREE.ShaderMaterial({ uniforms: U({ uW: C(), uB: C(), uH: C(), uA: 0, uHead: 0, uLen: 0.4, uIn: 0 }), vertexShader: FLAT_VS, fragmentShader: TRAIL_FS, ...ADD });
       default: return new THREE.ShaderMaterial({ uniforms: U({ uTint: C(), uRim: new THREE.Color(0xfff0c0), uEm: new THREE.Color(0), uA: 1, uMode: 0, uGlow: 0, uSpec: 0.8, uUnder: 0, uFill: 0 }),
         vertexShader: SOLID_VS, fragmentShader: SOLID_FS, transparent: true, depthWrite: true });
@@ -503,11 +537,13 @@ export class PharmFx {
   proj(pos, o = {}) {
     if (!this._ok()) return null;
     const pal = PHARM.pal[o.elem] || PHARM.pal.poison, I = PHARM.intensity, last = P3(pos), vel = new THREE.Vector3(0, 1, 0), sp = (Math.random() < 0.5 ? -1 : 1) * rnd(8, 12);
+    let t0 = o.held ? null : 0;   // held: in the hand (upright, no trail) until .release()
     const e = this._fx('proj', 8, (e) => {
-      fl.rotation.set(e.t * sp, 0, e.t * sp * 0.55);
-      _b.copy(vel).multiplyScalar(-1); this._aim(tr, _b); tr.scale.set(0.34, 1.5, 1); tr.position.copy(_b).multiplyScalar(0.75); tr.material.uniforms.uA.value = I * 1.0 * smooth(0, 0.08, e.t);
-      this._aim(tr2, _b); tr2.scale.set(0.9, 0.9, 1); tr2.position.copy(_b).multiplyScalar(0.3); tr2.material.uniforms.uA.value = I * 0.35 * smooth(0, 0.08, e.t);
-      gl.quaternion.copy(this.camQ); gl.scale.setScalar(0.75); gl.material.uniforms.uA.value = I * 0.55;
+      const ft = t0 == null ? 0 : e.t - t0, on = t0 == null ? 0 : smooth(0, 0.08, ft);
+      fl.rotation.set(ft * sp, 0, ft * sp * 0.55); fl.scale.setScalar(t0 == null ? 0.9 : 0.9 + 0.55 * smooth(0, 0.1, ft));   // hand-sized while held, full size in flight
+      _b.copy(vel).multiplyScalar(-1); this._aim(tr, _b); tr.scale.set(0.34, 1.5, 1); tr.position.copy(_b).multiplyScalar(0.75); tr.material.uniforms.uA.value = I * 1.0 * on;
+      this._aim(tr2, _b); tr2.scale.set(0.9, 0.9, 1); tr2.position.copy(_b).multiplyScalar(0.3); tr2.material.uniforms.uA.value = I * 0.35 * on;
+      gl.quaternion.copy(this.camQ); gl.scale.setScalar(0.75); gl.material.uniforms.uA.value = I * (0.25 + 0.3 * on);
     });
     e.g.position.copy(last);
     const fl = new THREE.Group(); e.g.add(fl); fl.scale.setScalar(1.45); e.extra = fl;
@@ -516,78 +552,105 @@ export class PharmFx {
     else { const liq = this.solid(e, this.geo.pharm_liquid, { mode: 2, tint: pal.b, spec: 0.5 }), cork = this.solid(e, this.geo.pharm_cork, { spec: 0.2 }), glass = this.solid(e, this.geo.pharm_flask, { mode: 1, rim: 0xffffff, spec: 1.4 });
       glass.renderOrder = 2; for (const m of [liq, cork, glass]) { m.position.y = -0.16; fl.add(m); } }
     const tr = this.spr(e, 'streak', pal, 5), tr2 = this.spr(e, 'streak', pal, 5), gl = this.spr(e, 'glow', pal, 4);
-    return { set: (p) => { const n = P3(p); _c.copy(n).sub(last); if (_c.lengthSq() > 1e-7) vel.copy(_c).normalize(); last.copy(n); e.g.position.copy(n); }, dispose: () => this._free(e) };
+    return { set: (p) => { const n = P3(p); _c.copy(n).sub(last); if (_c.lengthSq() > 1e-7) vel.copy(_c).normalize(); last.copy(n); e.g.position.copy(n); }, release: () => { if (t0 == null) t0 = e.t; }, dispose: () => this._free(e) };
   }
 
   // ------------------------------------------------------------------ 유봉강타
-  /** from the press (fx op, at = -hit): teal motes gather on the real pestle tip during the wind-up, then the translucent magic
-   *  pestle lies over the real one and one thick blunt trail follows its head down. Everything is read from the real weapon
-   *  (bladePoints) every frame, so it stays on the motion (also through the local hit-stop). Handle: .impact(hit) from smash(). */
+  /** from the press (fx op, at = -hit): teal motes gather on the real pestle tip during the wind-up, then a big translucent magic
+   *  pestle (PHARM.smash.len m) is swung by the same hand: over the head it follows the real pestle, coming down it tips over to a steep stand (slant) above the
+   *  contact point on the GROUND (at the target's feet; whiff: reach m ahead) and its head lands exactly there at the impact, where
+   *  it stays planted for ghostHold s before it fades. One thick blunt trail follows its head. Handle: .impact(hit) from smash(),
+   *  .contact = the ground point (three coords). */
   swing(pc, o = {}) {
     if (!this._ok() || !pc || !this.geo.smash_pestle) return null;
     const S = PHARM.smash, I = PHARM.intensity, low = lite(), teal = PHARM.pal.teal, ivory = PHARM.pal.ivory;
+    const act = pc.body && pc.body.sh && pc.body.sh.actions.ph_smash, WIND = (act && act.windT) || S.wind, HIT = (act && act.strikeT) || S.hit, L = S.len;
     const f0 = o.facing || pc.facing || { x: 0, z: 1 }, f3 = new THREE.Vector3(f0.x, 0, -f0.z).normalize();
     const base = new THREE.Vector3(), tip = new THREE.Vector3(), dir = new THREE.Vector3(0, 1, 0), grip = new THREE.Vector3(), head = new THREE.Vector3(), piv = new THREE.Vector3(), q = new THREE.Quaternion();
+    const C = new THREE.Vector3(), d = new THREE.Vector3(0, 1, 0), org = new THREE.Vector3(), dEnd = f3.clone().multiplyScalar(S.slant).addScaledVector(UP, -1).normalize();   // dEnd: how the pestle stands at the impact (steep, leaning towards the target)
     let el0 = null, elPrev = null, headU = 0, rad = 2, hitAt = null, whiff = false, seen = false; const tgt = o.tgt;
     const X = new THREE.Vector3(), Y = new THREE.Vector3(), Z = new THREE.Vector3();
-    const e = this._fx('swing', S.hit + 0.3, (e) => {
-      const t = e.t; let b = null; try { b = pc.body && pc.body.bladePoints && pc.body.bladePoints(); } catch (err) { b = null; }
-      if (!b || pc.dead) { for (const m of e.items) m.visible = false; if (seen || t > S.hit) e.t = e.life; return; }   // weapon away (interrupted / died): nothing floats on its own
-      seen = true; base.set(b[0].x, b[0].y, b[0].z); tip.set(b[1].x, b[1].y, b[1].z); dir.copy(tip).sub(base); const bl = dir.length() || 1; dir.multiplyScalar(1 / bl);
-      grip.copy(base).addScaledVector(dir, -bl * 0.38 / 0.62);
-      let L = S.len;
-      if (tgt && tgt.pos && !tgt.removed) { const d = Math.hypot(tgt.pos.x - grip.x, -tgt.pos.z - grip.z); L += (Math.min(S.len, Math.max(S.lenMin, (d + 0.05) / 0.84)) - L) * smooth(S.wind, S.hit - 0.02, t); }   // coming down, the head closes on the target (it lands ON it, not past it)
-      const gy = (pc.pos.y || 0) + 0.1; if (dir.y < -0.05) L = Math.min(L, Math.max(0.9, (grip.y - gy) / -dir.y));   // the head stops on the ground, it never sinks in
-      head.copy(grip).addScaledVector(dir, L * 0.84);
+    const contact = () => { const gy = pc.pos.y || 0;
+      if (tgt && tgt.pos && !tgt.removed) { const back = Math.min(0.3, (tgt.radius || 0.5) * 0.4); C.set(tgt.pos.x - f0.x * back, (tgt.pos.y ?? gy) + 0.03, -(tgt.pos.z - f0.z * back)); }
+      else C.set(pc.pos.x + f0.x * S.reach, gy + 0.03, -(pc.pos.z + f0.z * S.reach)); };
+    contact();
+    const e = this._fx('swing', HIT + 0.6, (e) => {
+      const t = e.t;
+      if (hitAt == null) {
+        let b = null; try { b = pc.body && pc.body.bladePoints && pc.body.bladePoints(); } catch (err) { b = null; }
+        if (!b || pc.dead) { for (const m of e.items) m.visible = false; if (seen || t > HIT) e.t = e.life; return; }   // weapon away (interrupted / died): nothing floats on its own
+        seen = true; base.set(b[0].x, b[0].y, b[0].z); tip.set(b[1].x, b[1].y, b[1].z); dir.copy(tip).sub(base); const bl = dir.length() || 1; dir.multiplyScalar(1 / bl);
+        grip.copy(base).addScaledVector(dir, -bl * 0.38 / 0.62); contact();
+        // magic pestle: over the head it lies along the real one (hand near its pommel); coming down it turns to the contact point and
+        // slides through the hand so that its head end meets the ground exactly at the impact
+        const k = smooth(WIND, HIT - 0.012, t);
+        d.copy(dir).lerp(dEnd, k).normalize();
+        org.copy(grip).addScaledVector(d, L * S.grip - L).lerp(_a.copy(C).addScaledVector(d, -L), k * k);   // wind-up: in the hand; impact: head end on C
+        const ty = org.y + d.y * L; if (ty < C.y && d.y < -0.05) org.addScaledVector(d, (C.y - ty) / d.y);   // never below the ground on the way down
+        head.copy(org).addScaledVector(d, L * 0.84);
+      }
       // ---- wind-up: teal motes drawn into the tip, a small glow growing there
-      const gu = clamp01(t / S.wind), gOn = 1 - smooth(S.wind, S.wind + 0.05, t);
-      for (const m of motes) { const d = m.userData, u = clamp01((t - d.t0) / (S.wind - d.t0)); m.visible = gOn > 0 && u > 0; if (!m.visible) continue;
-        const k = 1 - easeOut(u); m.position.copy(tip).addScaledVector(d.off, k * S.gather); m.quaternion.copy(this.camQ); m.scale.setScalar(d.s * (0.6 + 0.6 * u)); m.material.uniforms.uA.value = I * 1.5 * Math.sin(Math.PI * Math.min(1, u * 1.15)) * gOn; }
+      const gu = clamp01(t / WIND), gOn = 1 - smooth(WIND, WIND + 0.05, t);
+      for (const m of motes) { const dd = m.userData, u = clamp01((t - dd.t0) / (WIND - dd.t0)); m.visible = gOn > 0 && u > 0; if (!m.visible) continue;
+        const k = 1 - easeOut(u); m.position.copy(tip).addScaledVector(dd.off, k * S.gather); m.quaternion.copy(this.camQ); m.scale.setScalar(dd.s * (0.6 + 0.6 * u)); m.material.uniforms.uA.value = I * 1.5 * Math.sin(Math.PI * Math.min(1, u * 1.15)) * gOn; }
       tg.visible = gOn > 0; tg.position.copy(tip); tg.quaternion.copy(this.camQ); tg.scale.setScalar(0.25 + 0.5 * gu); tg.material.uniforms.uA.value = I * 1.1 * gu * gOn;
-      // ---- magic pestle over the real one
-      const after = hitAt != null ? t - hitAt : t - S.hit - 0.03, out = after > 0 ? 1 - smooth(0, whiff ? S.ghostFade * 0.6 : S.ghostFade, after) : 1;
-      const gA = smooth(S.wind - 0.09, S.wind - 0.01, t) * out;
-      gh.visible = gA > 0.01; if (gh.visible) { q.setFromUnitVectors(UP, dir); gh.quaternion.copy(q); gh.position.copy(grip); gh.scale.set(L * S.thick, L, L * S.thick); gh.material.uniforms.uA.value = S.ghostA * gA; }
+      // ---- the magic pestle (planted on the ground after the impact: ghostHold s, then it fades)
+      const after = hitAt != null ? t - hitAt : t - HIT - 0.05, hold = whiff ? S.ghostHold * 0.6 : S.ghostHold, out = after > 0 ? 1 - smooth(hold, hold + S.ghostFade, after) : 1;
+      const gA = smooth(WIND - 0.12, WIND - 0.02, t) * out;
+      gh.visible = gA > 0.01; if (gh.visible) { q.setFromUnitVectors(UP, d); gh.quaternion.copy(q); gh.position.copy(org); const sq = after > 0 ? 1 - 0.05 * Math.exp(-after / 0.03) : 1; gh.scale.set(L * S.thick, L * sq, L * S.thick); gh.material.uniforms.uA.value = S.ghostA * gA; }
       // ---- blunt trail: arc in the vertical plane of the facing through the magic head; starts where the strike starts
       piv.set(pc.pos.x, (pc.pos.y || 0) + 1.25, -pc.pos.z); _a.copy(head).sub(piv); const el = Math.atan2(_a.y, _a.dot(f3));
-      if (t < S.wind || el0 == null) { el0 = el; elPrev = el; rad = _a.length(); }
-      else if (hitAt == null) { let d = elPrev - el; d = Math.atan2(Math.sin(d), Math.cos(d)); if (d > 0) headU += d / this.trailSpan; elPrev = el; rad += (_a.length() - rad) * 0.5; }
-      const tA = (t >= S.wind ? 1 : 0) * (after > 0 ? 1 - smooth(0, S.trailFade, after) : 1) * smooth(0.01, 0.12, headU);
-      tr.visible = tA > 0.01 && this.geo.smash_trail;
+      if (t < WIND || el0 == null) { el0 = el; elPrev = el; rad = _a.length(); }
+      else if (hitAt == null) { let dl = elPrev - el; dl = Math.atan2(Math.sin(dl), Math.cos(dl)); if (dl > 0) headU += dl / this.trailSpan; elPrev = el; rad += (_a.length() - rad) * 0.5; }
+      const tA = (t >= WIND ? 1 : 0) * (after > 0 ? 1 - smooth(0, S.trailFade, after) : 1) * smooth(0.01, 0.12, headU);
+      tr.visible = tA > 0.01 && !!this.geo.smash_trail;
       if (tr.visible) { X.copy(f3).multiplyScalar(Math.cos(el0)).addScaledVector(UP, Math.sin(el0)); Z.copy(f3).multiplyScalar(Math.sin(el0)).addScaledVector(UP, -Math.cos(el0)); Y.crossVectors(Z, X);
         _mx.makeBasis(X, Y, Z); tr.quaternion.setFromRotationMatrix(_mx); tr.position.copy(piv); const R = rad + S.trailW * 0.4; tr.scale.setScalar(R);
         const U = tr.material.uniforms; U.uHead.value = Math.min(1, headU + 0.02); U.uLen.value = S.trailLen * (after > 0 ? 1 - 0.6 * smooth(0, S.trailFade, after) : 1); U.uIn.value = clamp01(1 - (S.trailW / R) / (1 - this.trailIn)); U.uA.value = I * S.trailA * tA * (low ? 0.8 : 1); }
     });
     const motes = [], tg = this.spr(e, 'glow', teal, 7);
-    for (let i = 0, n = low ? 4 : 9; i < n; i++) { const m = this.spr(e, i % 3 ? 'glow' : 'star', teal, 7), a = Math.random() * 6.283, y = rnd(-0.5, 0.9); m.userData = { off: new THREE.Vector3(Math.cos(a), y, Math.sin(a)).normalize(), s: rnd(0.10, 0.2), t0: rnd(0, S.wind * 0.45) }; m.visible = false; motes.push(m); }
-    const gh = this._m(e, 'ghost', this.geo.smash_pestle, 7); gh.visible = false;
+    for (let i = 0, n = low ? 4 : 9; i < n; i++) { const m = this.spr(e, i % 3 ? 'glow' : 'star', teal, 7), a = Math.random() * 6.283, y = rnd(-0.5, 0.9); m.userData = { off: new THREE.Vector3(Math.cos(a), y, Math.sin(a)).normalize(), s: rnd(0.10, 0.2), t0: rnd(0, WIND * 0.45) }; m.visible = false; motes.push(m); }
+    const gh = this._m(e, 'ghost', this.geo.smash_pestle, 10); gh.visible = false;   // above the impact flash: the head on the ground must stay readable
     const tr = this._m(e, 'trail', this.geo.smash_trail || this.geo.pharm_quad, 5); this._pal(tr, ivory); tr.visible = false;
-    e.impact = (hit) => { if (hitAt == null) { hitAt = e.t; whiff = !hit; e.life = Math.max(e.t + 0.02, e.t + Math.max(S.ghostFade, S.trailFade) + 0.03); } };
+    e.contact = C;
+    e.impact = (hit) => { if (hitAt != null) return; hitAt = e.t; whiff = !hit;
+      if (seen) { d.copy(dEnd); org.copy(C).addScaledVector(d, -L); head.copy(org).addScaledVector(d, L * 0.84); }   // the head end exactly on the ground point
+      e.life = e.t + S.ghostHold + S.ghostFade + 0.05; };
     return e;
   }
+  /** dented ground (temporary — the terrain itself is untouched): a shaded bowl painted over the ground (CRATER_FS on pharm_circle)
+   *  + a ring of earth pushed up around it (smash_rim). Returns the per-frame update (t = s since the impact). */
+  _crater(e, gp, Rc, k = 1) {
+    const S = PHARM.smash, dish = this._m(e, 'crater', this.geo.pharm_circle, 2), rim = this.geo.smash_rim ? this.solid(e, this.geo.smash_rim, { rim: 0x6a5238, spec: 0.03, fill: 0.55 }) : null;
+    dish.position.set(gp.x, gp.y + 0.03, gp.z); dish.material.uniforms.uA.value = 0;
+    if (rim) { rim.position.set(gp.x, gp.y, gp.z); rim.rotation.y = Math.random() * 6.283; rim.scale.set(Rc, 0.001, Rc); }
+    return (t) => { const sink = 1 - smooth(S.craterHold, S.craterHold + S.craterFade, t), a = smooth(0, 0.03, t) * sink, pop = easeOut(t / 0.07) * (1 + 0.4 * Math.max(0, 1 - t / 0.16));
+      dish.visible = a > 0.003; dish.material.uniforms.uA.value = S.craterA * a * k; dish.scale.setScalar(Rc * (0.65 + 0.35 * easeOut(t / 0.05)));
+      if (rim) { rim.visible = a > 0.003; rim.scale.set(Rc, Math.max(0.001, Rc * pop * sink * k), Rc); rim.material.uniforms.uA.value = Math.min(1, sink * 1.6); } };
+  }
   /** once, at the damage moment. o.f = facing (game), o.hit = real impact point on the target (game, with y), o.ground = its feet,
-   *  o.r = its radius, o.swing = the swing() handle; o.whiff when nothing was hit (then: no flash, no ring, a dim dust puff) */
+   *  o.r = its radius, o.swing = the swing() handle (its .contact = where the magic pestle lands); o.whiff when nothing was hit
+   *  (then: the pestle still dents the ground, but no flash, no ring, no cracks, no teal — a dim dust puff) */
   smash(pc, o = {}) {
     if (!this._ok() || !pc) return null;
     if (o.swing && o.swing.impact) o.swing.impact(!o.whiff && !!o.hit);
     const S = PHARM.smash, gold = PHARM.pal.gold, plat = PHARM.pal.platinum, teal = PHARM.pal.teal, I = PHARM.intensity, low = lite(), f = o.f || pc.facing || { x: 0, z: 1 }, hit = !o.whiff && o.hit;
-    const f3 = new THREE.Vector3(f.x, 0, -f.z).normalize();
-    if (!hit) {   // whiff: the pestle lands on nothing — one small dim puff where its tip came down, nothing else
-      let tp = null; try { const b = pc.body && pc.body.bladePoints && pc.body.bladePoints(); if (b) tp = new THREE.Vector3(b[1].x, (pc.pos.y || 0) + 0.15, b[1].z); } catch (err) { tp = null; }
-      if (!tp) tp = P3(pc.pos).addScaledVector(f3, 1.2).setY((pc.pos.y || 0) + 0.15);
-      const e = this._fx('smash', 0.3, (e) => { const u = clamp01(e.t / 0.28); puff.quaternion.copy(this.camQ); puff.position.copy(tp).setY(tp.y + u * 0.12); puff.scale.setScalar(0.35 + 0.35 * easeOut(u)); puff.material.uniforms.uA.value = 0.2 * Math.sin(Math.PI * Math.pow(u, 0.6)); });
-      const puff = this.smoke(e, 'dust', gold); return e;
+    const f3 = new THREE.Vector3(f.x, 0, -f.z).normalize(), END = S.craterHold + S.craterFade + 0.05;
+    const gp = o.swing && o.swing.contact ? o.swing.contact.clone() : o.ground ? P3(o.ground) : P3(pc.pos).addScaledVector(f3, S.reach); gp.y -= o.swing && o.swing.contact ? 0.03 : 0;
+    if (!hit) {
+      const e = this._fx('smash', END, (e) => { crater(e.t); const u = clamp01(e.t / 0.3); puff.visible = u < 1; puff.quaternion.copy(this.camQ); puff.position.copy(gp).setY(gp.y + 0.15 + u * 0.12); puff.scale.setScalar(0.5 + 0.5 * easeOut(u)); puff.material.uniforms.uA.value = 0.22 * Math.sin(Math.PI * Math.pow(u, 0.6)); });
+      const crater = this._crater(e, gp, S.crater * 0.85, 0.8), puff = this.smoke(e, 'dust', gold); return e;
     }
-    const hp = P3(o.hit), gp = o.ground ? P3(o.ground) : hp.clone().setY(pc.pos.y || 0), R = Math.min(S.ringMax, Math.max(S.ringMin, (o.r || 0.5) + S.ringPad));
-    const e = this._fx('smash', S.tealLife + 0.05, (e) => {
-      const t = e.t;
+    const hp = P3(o.hit), R = Math.min(S.ringMax, Math.max(S.ringMin, (o.r || 0.5) + S.ringPad));
+    const e = this._fx('smash', Math.max(S.tealLife + 0.05, END), (e) => {
+      const t = e.t; crater(t);
       // A: platinum core — sharp, small, gone in ~0.045 s; a few short hit lines
-      core.visible = t < S.flashT; if (core.visible) { core.quaternion.copy(this.camQ); core.scale.setScalar(0.75 + 0.5 * (t / S.flashT)); core.material.uniforms.uA.value = I * S.flash; }
-      star.visible = t < 0.1; if (star.visible) { star.quaternion.copy(this.camQ); star.rotateZ(0.4); star.scale.setScalar(0.55 + 0.5 * easeOut(t / 0.07)); star.material.uniforms.uA.value = I * 1.5 * (1 - smooth(0.03, 0.1, t)); }
+      core.visible = t < S.flashT; if (core.visible) { core.quaternion.copy(this.camQ); core.scale.setScalar(0.5 + 0.35 * (t / S.flashT)); core.material.uniforms.uA.value = I * S.flash; }
+      star.visible = t < 0.1; if (star.visible) { star.quaternion.copy(this.camQ); star.rotateZ(0.4); star.scale.setScalar(0.45 + 0.4 * easeOut(t / 0.07)); star.material.uniforms.uA.value = I * 1.2 * (1 - smooth(0.03, 0.1, t)); }
       for (const m of rays) { const d = m.userData, u = clamp01(t / d.life); m.visible = u < 1; if (!m.visible) continue; const dist = 0.12 + d.len * easeOut(u); m.position.copy(hp).addScaledVector(d.dir, dist); this._aim(m, d.dir); m.scale.set(d.w, d.len * (1 - 0.55 * u), 1); m.material.uniforms.uA.value = I * 1.7 * (1 - smooth(0.25, 1, u)); }
-      // B: one thin gold ring racing out to the target's footprint, short cracks, low chips, ground dust
+      // B: one thin gold ring racing out to the target's footprint, cracks out of the dent, low chips, ground dust
       ring.visible = t < S.ringLife; if (ring.visible) { ring.scale.setScalar(R * (0.22 + 0.78 * easeOut(t / S.ringT))); ring.material.uniforms.uA.value = I * 2.0 * smooth(0, 0.015, t) * (1 - smooth(S.ringT * 0.7, S.ringLife, t)); }
-      if (crk) { crk.visible = t < S.crackLife; crk.material.uniforms.uA.value = 0.78 * smooth(0, 0.02, t) * (1 - smooth(S.crackLife * 0.45, S.crackLife, t)); }
+      if (crk) { crk.visible = t < S.crackLife; crk.material.uniforms.uA.value = 0.8 * smooth(0, 0.02, t) * (1 - smooth(S.crackLife * 0.55, S.crackLife, t)); }
       if (crg) { crg.visible = t < 0.16; crg.material.uniforms.uA.value = I * 1.3 * (1 - smooth(0.02, 0.16, t)); }
       for (const m of chips) { const d = m.userData, u = t - d.t0; m.visible = u > 0 && u < d.life; if (!m.visible) continue; const fl = Math.min(u, d.land), y = d.vy * fl - 6.5 * fl * fl;
         m.position.set(gp.x + d.vx * fl, gp.y + Math.max(0.04, 0.08 + y), gp.z + d.vz * fl); m.quaternion.setFromAxisAngle(d.ax, d.w * fl); m.material.uniforms.uA.value = 1 - smooth(d.life - 0.1, d.life, u); }
@@ -599,18 +662,19 @@ export class PharmFx {
       for (const m of crys) { const d = m.userData, u = t - d.t0; m.visible = u > 0 && u < d.life; if (!m.visible) continue; const fl = Math.min(u, d.land), y = d.vy * fl - 6.5 * fl * fl, rr = R * 0.7 + d.sp * fl;
         m.position.set(gp.x + Math.cos(d.a) * rr, gp.y + Math.max(0.03, 0.06 + y), gp.z + Math.sin(d.a) * rr); m.quaternion.setFromAxisAngle(d.ax, d.w * fl); m.scale.setScalar(d.s * (1 - smooth(d.life - 0.15, d.life, u))); }
     });
+    const crater = this._crater(e, gp, S.crater);
     const core = this.spr(e, 'flare', plat, 9), star = this.spr(e, 'star', plat, 9); core.position.copy(hp); star.position.copy(hp);
     const rays = [], chips = [], dust = [], motes = [], crys = [];
     for (let i = 0, n = low ? 5 : 8; i < n; i++) { const m = this.spr(e, 'spark', i % 2 ? gold : plat, 8), a = (i + Math.random() * 0.5) / n * 6.283; _a.set(Math.cos(a), 0.15 + 0.7 * Math.abs(Math.sin(a * 1.7)), Math.sin(a)).addScaledVector(f3, 0.35).normalize();
       m.userData = { dir: _a.clone(), len: rnd(0.32, 0.6), w: rnd(0.07, 0.12), life: rnd(S.rays * 0.7, S.rays * 1.2) }; rays.push(m); }
     const ring = this.ring(e, gold, 0.06, 3); ring.position.set(gp.x, gp.y + PHARM.ringLift, gp.z);
-    const yaw = Math.random() * 6.283; let crk = null, crg = null;
+    const yaw = Math.random() * 6.283, CR = S.crater * 1.35; let crk = null, crg = null;
     if (this.geo.smash_cracks) {
-      crk = this.smoke(e, 'crack', PHARM.pal.crack, 2); crk.geometry = this.geo.smash_cracks; crk.position.set(gp.x, gp.y + PHARM.ringLift - 0.02, gp.z); crk.rotation.y = yaw; crk.scale.setScalar(R * 1.02);
-      if (!low) { crg = this.spr(e, 'crack', gold, 3); crg.geometry = this.geo.smash_cracks; crg.position.set(gp.x, gp.y + PHARM.ringLift - 0.01, gp.z); crg.rotation.y = yaw; crg.scale.setScalar(R * 1.02); }
+      crk = this.smoke(e, 'crack', PHARM.pal.crack, 2); crk.geometry = this.geo.smash_cracks; crk.position.set(gp.x, gp.y + PHARM.ringLift - 0.02, gp.z); crk.rotation.y = yaw; crk.scale.setScalar(CR);
+      if (!low) { crg = this.spr(e, 'crack', gold, 3); crg.geometry = this.geo.smash_cracks; crg.position.set(gp.x, gp.y + PHARM.ringLift - 0.01, gp.z); crg.rotation.y = yaw; crg.scale.setScalar(CR); }
     }
-    for (let i = 0, n = low ? 2 : 5; i < n; i++) { const name = this.triShards.length ? this.triShards[i % this.triShards.length] : null, m = (name && this.model(e, name, { rim: 0x2a2018, spec: 0.05, gain: 0.9 })) || this.solid(e, this.shards[i % this.shards.length], { rim: 0x2a2018, spec: 0.05 });
-      const a = Math.random() * 6.283, sp = rnd(1.0, 2.2), vy = rnd(1.3, 2.3); m.scale.setScalar(rnd(0.04, 0.08)); m.userData = { vx: Math.cos(a) * sp, vz: Math.sin(a) * sp, vy, land: vy / 6.5, w: rnd(8, 16), t0: rnd(0, 0.02), life: Math.min(0.34, vy / 6.5 + rnd(0.04, 0.1)), ax: new THREE.Vector3(rnd(-1, 1), rnd(-1, 1), rnd(-1, 1)).normalize() }; chips.push(m); }
+    for (let i = 0, n = low ? 3 : 7; i < n; i++) { const name = this.triShards.length ? this.triShards[i % this.triShards.length] : null, m = (name && this.model(e, name, { rim: 0x2a2018, spec: 0.05, gain: 0.9 })) || this.solid(e, this.shards[i % this.shards.length], { rim: 0x2a2018, spec: 0.05 });
+      const a = Math.random() * 6.283, sp = rnd(1.0, 2.4), vy = rnd(1.5, 2.8); m.scale.setScalar(rnd(0.05, 0.1)); m.userData = { vx: Math.cos(a) * sp, vz: Math.sin(a) * sp, vy, land: vy / 6.5, w: rnd(8, 16), t0: rnd(0, 0.02), life: Math.min(0.5, vy / 6.5 + rnd(0.06, 0.14)), ax: new THREE.Vector3(rnd(-1, 1), rnd(-1, 1), rnd(-1, 1)).normalize() }; chips.push(m); }
     for (let i = 0, n = low ? 1 : 3; i < n; i++) { const m = this.smoke(e, 'dust', gold), a = (i + Math.random()) / n * 6.283; m.userData = { x: Math.cos(a) * R * 0.55, z: Math.sin(a) * R * 0.55, s: rnd(0.55, 0.8), t0: rnd(0, 0.03), life: rnd(S.dustLife * 0.8, S.dustLife), a: 0.26 }; dust.push(m); }
     for (let i = 0, n = low ? 1 : 2; i < n; i++) { const m = this.smoke(e, 'puff', teal), a = Math.random() * 6.283; m.userData = { x: Math.cos(a) * R * 0.7, z: Math.sin(a) * R * 0.7, s: rnd(0.45, 0.6), t0: rnd(0.02, 0.06), life: rnd(0.36, 0.46), a: 0.2 }; dust.push(m); }   // teal powder
     for (let i = 0, n = low ? 5 : 11; i < n; i++) { const m = this.spr(e, i % 3 === 0 ? 'star' : 'glow', teal, 6); m.userData = { a: (i + Math.random()) / n * 6.283, y: rnd(0.08, 0.3), rise: rnd(0.1, 0.5), s: rnd(0.09, 0.2), k: rnd(1.0, 1.6), t0: rnd(0.01, 0.07), life: rnd(0.3, S.tealLife - 0.08) }; m.visible = false; motes.push(m); }
@@ -620,35 +684,49 @@ export class PharmFx {
   }
 
   // ------------------------------------------------------------------ 밀어내기
-  /** fan-shaped gust at the damage moment: o.r / o.ang = the real cone (m, deg), o.f = facing, o.hits = [{x, y, z, boss}] enemies really pushed */
+  /** at the damage moment of the horizontal sweep: the ground of the REAL cone (o.r m, o.ang deg, facing o.f) buckles outward — earth
+   *  plates (fx_push push_plate_NN) flip up on their inner edge one band after another, dark turned soil shows underneath (SECTOR_FS),
+   *  clods and slab chips (Tripo fx_push_tripo) fly up and land inside the cone, low dust, a thin teal 약력 line rides the wave front.
+   *  o.hits = [{x, y, z, boss}] enemies really hit: a small pop + drag streaks along each push. Nothing is drawn outside the cone. */
   push(pc, o = {}) {
     if (!this._ok() || !pc) return null;
-    const S = PHARM.push, pal = PHARM.pal.wind, I = PHARM.intensity, low = lite(), f = o.f || pc.facing || { x: 0, z: 1 }, r = o.r || 2.2, half = (o.ang || 80) * Math.PI / 360;
-    const A0 = Math.atan2(-f.z, f.x), base = P3(pc.pos), f3 = new THREE.Vector3(f.x, 0, -f.z).normalize();
-    const place = (m, headAt, sense, rr, d) => { m.scale.set(rr, rr, sense * rr); m.rotation.set(d.tx, -(headAt - sense * this.span), d.tz, 'YXZ'); m.position.set(base.x, base.y + d.y, base.z); };
-    const e = this._fx('push', 0.8, (e) => {
-      const t = e.t;
-      for (const m of ribs) { const d = m.userData, u = clamp01((t - d.t0) / S.sweep), k = easeOut(u), U = m.material.uniforms;
-        const swept = 2 * half * k; place(m, A0 + d.sense * (-half + swept), d.sense, r * d.rr * (0.6 + 0.4 * k), d);
-        U.uCut.value = 1 - Math.max(0.06, swept) / this.span; U.uA.value = I * S.peak * d.w * smooth(0, 0.25, u) * (1 - smooth(S.sweep + d.t0, S.life, t)); m.visible = t >= d.t0; }
-      { const k = easeOut(t / 0.2), U = edge.material.uniforms; place(edge, A0 + half, 1, r * (0.55 + 0.45 * k), edge.userData); U.uCut.value = 1 - 2 * half / this.span; U.uA.value = I * 1.5 * smooth(0, 0.04, t) * (1 - smooth(0.12, 0.4, t)); }
-      flash.visible = t < 0.14; flash.quaternion.copy(this.camQ); flash.scale.setScalar(0.8 + 1.0 * easeOut(t / 0.1)); flash.material.uniforms.uA.value = I * 1.0 * (1 - smooth(0.02, 0.14, t));
-      for (const m of streaks) { const d = m.userData, u = clamp01((t - d.t0) / d.life); m.visible = u > 0 && u < 1; if (!m.visible) continue;           // dust streaks dragged along the push
-        const len = d.len * easeOut(u * 1.3); m.position.copy(d.p).addScaledVector(d.dir, len * 0.5 + d.off); this._aim(m, d.dir); m.scale.set(d.w, Math.max(0.05, len), 1); m.material.uniforms.uA.value = I * d.a * (1 - smooth(0.35, 1, u)); }
-      for (const m of pops) { const d = m.userData; m.visible = t < 0.2; m.quaternion.copy(this.camQ); m.scale.setScalar(d.s * (0.5 + 0.9 * easeOut(t / 0.14))); m.material.uniforms.uA.value = I * 1.3 * (1 - smooth(0.02, 0.2, t)); }
+    const S = PHARM.push, earth = PHARM.pal.earth, teal = PHARM.pal.teal, wind = PHARM.pal.wind, I = PHARM.intensity, low = lite(), f = o.f || pc.facing || { x: 0, z: 1 }, r = o.r || 3, half = (o.ang || 110) * Math.PI / 360;
+    const base = P3(pc.pos), f3 = new THREE.Vector3(f.x, 0, -f.z).normalize(), yaw = Math.atan2(-f3.z, f3.x), aK = half / ((this.pushAng || 110) * Math.PI / 360), END = S.hold + S.sink;
+    const dirOf = (a) => new THREE.Vector3(Math.cos(a), 0, Math.sin(a)).applyAxisAngle(UP, yaw);
+    const e = this._fx('push', END + 0.12, (e) => {
+      const t = e.t, out = 1 - smooth(S.hold, END, t), front = easeOut(t / S.wave);
+      const U = und.material.uniforms; U.uFront.value = 0.14 + 0.9 * front; U.uA.value = 0.82 * smooth(0, 0.04, t) * out; U.uGlow.value = smooth(0, 0.03, t) * (1 - smooth(S.wave * 0.7, S.wave + 0.16, t));
+      for (const m of plates) { const d = m.userData, u = t - d.t0; m.visible = u > 0 && out > 0.01; if (!m.visible) continue;
+        const up = u < 0.07 ? easeOut(u / 0.07) : 1 - (1 - S.rest) * smooth(0.07, 0.32, u), k = up * out;
+        m.quaternion.setFromAxisAngle(d.ax, d.peak * k); m.position.set(d.x, 0.012 + S.lift / r * k, d.z); m.scale.set(1, S.thick * Math.min(1, out * 3), 1); m.material.uniforms.uA.value = Math.min(1, out * 2.5); }
+      for (const m of clods) { const d = m.userData, u = t - d.t0; m.visible = u > 0 && u < d.life; if (!m.visible) continue; const fl = Math.min(u, d.land), y = d.vy * fl - 4.75 * fl * fl;
+        m.position.set(d.p.x + d.v.x * fl, base.y + Math.max(d.s * 0.35, 0.05 + y), d.p.z + d.v.z * fl); m.quaternion.setFromAxisAngle(d.axr, d.w * fl); m.scale.setScalar(d.s * (1 - smooth(d.life - 0.2, d.life, u))); }
       for (const m of dust) { const d = m.userData, u = clamp01((t - d.t0) / d.life); m.visible = u > 0 && u < 1; if (!m.visible) continue;
-        m.quaternion.copy(this.camQ); m.position.copy(d.p).addScaledVector(d.dir, u * d.go); m.position.y += 0.25 + u * 0.3; m.scale.setScalar(d.s * (0.5 + 0.8 * easeOut(u))); m.material.uniforms.uA.value = 0.3 * Math.sin(Math.PI * Math.pow(u, 0.55)); }
+        m.quaternion.copy(this.camQ); m.position.copy(d.p).addScaledVector(d.dir, u * d.go); m.position.y += 0.2 + u * d.rise; m.scale.set(d.s * (0.6 + 0.8 * easeOut(u)), d.s * 0.6 * (0.6 + 0.6 * easeOut(u)), 1); m.material.uniforms.uA.value = d.a * Math.sin(Math.PI * Math.pow(u, 0.5)); }
+      for (const m of motes) { const d = m.userData, u = clamp01((t - d.t0) / d.life); m.visible = u > 0 && u < 1; if (!m.visible) continue;
+        m.position.copy(base).addScaledVector(d.dir, r * Math.min(0.97, d.rho * (0.5 + 0.5 * front))); m.position.y += d.y + d.rise * easeOut(u); m.quaternion.copy(this.camQ); m.scale.setScalar(d.s * (1 - 0.5 * u)); m.material.uniforms.uA.value = I * d.k * (1 - smooth(0.3, 1, u)); }
+      for (const m of streaks) { const d = m.userData, u = clamp01((t - d.t0) / d.life); m.visible = u > 0 && u < 1; if (!m.visible) continue;           // dust streaks dragged along each push
+        const len = d.len * easeOut(u * 1.3); m.position.copy(d.p).addScaledVector(d.dir, len * 0.5 + d.off); this._aim(m, d.dir); m.scale.set(d.w, Math.max(0.05, len), 1); m.material.uniforms.uA.value = I * d.a * (1 - smooth(0.35, 1, u)); }
+      for (const m of pops) { const d = m.userData; m.visible = t < 0.16; m.quaternion.copy(this.camQ); m.scale.setScalar(d.s * (0.5 + 0.9 * easeOut(t / 0.12))); m.material.uniforms.uA.value = I * 1.1 * (1 - smooth(0.02, 0.16, t)); }
     });
-    const defs = [{ rr: 1.0, y: 0.78, tx: 0.05, tz: 0.04, t0: 0, w: 1, sense: 1 }, { rr: 0.74, y: 1.08, tx: -0.10, tz: 0.06, t0: 0.03, w: 0.8, sense: -1 }, { rr: 0.5, y: 0.5, tx: 0.08, tz: -0.05, t0: 0.055, w: 0.6, sense: 1 }];
-    const ribs = defs.slice(0, low ? 2 : 3).map(d => { const m = this.rib(e, pal, 6); m.material.uniforms.uSoft.value = 0.22; m.userData = d; return m; });
-    const edge = this.rib(e, pal, 5); edge.material.uniforms.uSoft.value = 0.12; edge.userData = { tx: 0, tz: 0, y: 0.12 };
-    const flash = this.spr(e, 'flare', pal, 8); flash.position.copy(base).addScaledVector(f3, 0.9); flash.position.y += 0.9;
-    const streaks = [], pops = [], dust = [];
-    for (const h of (o.hits || []).slice(0, 6)) { const p = P3(h); _a.copy(p).sub(base).setY(0); const dir = (_a.lengthSq() > 1e-4 ? _a.normalize() : f3).clone();
-      const pop = this.spr(e, 'star', pal, 8); pop.position.copy(p); pop.position.y += 0.7; pop.userData = { s: 0.9 }; pops.push(pop);
+    // everything flat lives in a group turned to the facing and scaled to the real radius (unit sector around local +X)
+    const pg = new THREE.Group(); pg.position.set(base.x, base.y, base.z); pg.rotation.y = yaw; pg.scale.setScalar(r); e.g.add(pg); e.extra = pg;
+    const und = this._m(e, 'sector', this.geo.pharm_circle, 2); und.position.y = 0.03 / r; und.material.uniforms.uHalf.value = half; und.material.uniforms.uA.value = 0; pg.add(und);
+    const plates = (this.plates || []).map(pl => { const m = this.solid(e, pl.geo, { rim: 0x6a5238, spec: 0.03, fill: 0.5 }), a = pl.a * aK;
+      m.userData = { x: Math.cos(a) * pl.rho, z: Math.sin(a) * pl.rho, ax: new THREE.Vector3(-Math.sin(a), 0, Math.cos(a)), t0: pl.rho * S.wave * 0.95 + rnd(0, 0.015), peak: S.tilt * rnd(0.75, 1.15) * (0.8 + 0.4 * pl.rho) };
+      m.visible = false; pg.add(m); return m; });
+    const clods = [], dust = [], motes = [], streaks = [], pops = [], names = this.clods && this.clods.length ? this.clods : null;
+    for (let i = 0, n = low ? S.clodsLow : S.clods; i < n; i++) { const a = rnd(-half, half) * 0.92, rho = rnd(0.3, 0.95), dir = dirOf(a), vy = rnd(2.6, 4.6), land = vy / 4.75;
+      const name = names ? names[(i * 5 + 2) % names.length] : null, m = (name && this.model(e, name, { rim: 0x3a2a1a, spec: 0.03, gain: 0.95 })) || this.solid(e, this.shards[i % this.shards.length], { rim: 0x2a2018, spec: 0.05 });
+      const sp = Math.min(rnd(0.8, 2.6), Math.max(0, (r * (1 - rho) + 0.1) / land)), s = rnd(0.07, name && name.startsWith('tripo_slab') ? 0.17 : 0.13);   // lands inside the cone
+      m.userData = { p: base.clone().addScaledVector(dir, r * rho), v: dir.clone().multiplyScalar(sp), vy, land, s, w: rnd(5, 11), t0: rho * S.wave + rnd(0, 0.03), life: land + rnd(0.25, 0.45), axr: new THREE.Vector3(rnd(-1, 1), rnd(-1, 1), rnd(-1, 1)).normalize() }; m.visible = false; clods.push(m); }
+    for (let i = 0, n = low ? 2 : 6; i < n; i++) { const a = -half * 0.85 + 1.7 * half * (i + Math.random()) / n, rho = rnd(0.45, 0.85), m = this.smoke(e, 'dust', earth), dir = dirOf(a);
+      m.userData = { p: base.clone().addScaledVector(dir, r * rho), dir, go: Math.min(0.5, r * (0.97 - rho)), rise: rnd(0.2, 0.45), s: rnd(0.8, 1.2), a: S.dustA, t0: rho * S.wave, life: rnd(0.5, 0.75) }; m.visible = false; dust.push(m); }
+    for (let i = 0, n = low ? 4 : 9; i < n; i++) { const m = this.spr(e, i % 3 === 0 ? 'star' : 'glow', teal, 6); m.userData = { dir: dirOf(rnd(-half, half) * 0.9), rho: rnd(0.75, 1), y: rnd(0.1, 0.35), rise: rnd(0.15, 0.5), s: rnd(0.09, 0.18), k: rnd(0.9, 1.4), t0: rnd(0.02, 0.1), life: rnd(0.3, 0.5) }; m.visible = false; motes.push(m); }
+    for (const h of (o.hits || []).slice(0, 8)) { const p = P3(h); _a.copy(p).sub(base).setY(0); const dir = (_a.lengthSq() > 1e-4 ? _a.normalize() : f3).clone();
+      const pop = this.spr(e, 'star', wind, 8); pop.position.copy(p); pop.position.y += 0.6; pop.userData = { s: 0.75 }; pops.push(pop);
       if (h.boss) continue;
-      for (let i = 0, n = low ? 2 : 3; i < n; i++) { const m = this.spr(e, 'spark', pal, 5), side = (i - (n - 1) / 2) * 0.32; m.userData = { p: p.clone().add(new THREE.Vector3(-dir.z, 0, dir.x).multiplyScalar(side)).setY(p.y + 0.14 + i * 0.16), dir, len: S.streak * rnd(0.7, 1.0), off: -0.2, w: rnd(0.10, 0.16), a: rnd(0.7, 1.0), t0: i * 0.02, life: rnd(0.26, 0.36) }; streaks.push(m); }
-      if (!low) { const m = this.smoke(e, 'dust', pal); m.userData = { p: p.clone(), dir, go: 0.9, s: rnd(0.8, 1.1), t0: 0.03, life: rnd(0.5, 0.65) }; dust.push(m); }
+      for (let i = 0, n = low ? 1 : 3; i < n; i++) { const m = this.spr(e, 'spark', earth, 5), side = (i - (n - 1) / 2) * 0.32; m.userData = { p: p.clone().add(new THREE.Vector3(-dir.z, 0, dir.x).multiplyScalar(side)).setY(p.y + 0.14 + i * 0.14), dir, len: S.streak * rnd(0.7, 1.0), off: -0.2, w: rnd(0.10, 0.16), a: rnd(0.6, 0.9), t0: i * 0.02, life: rnd(0.26, 0.36) }; streaks.push(m); }
     }
     return e;
   }

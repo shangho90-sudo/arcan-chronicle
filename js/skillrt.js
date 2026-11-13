@@ -7,6 +7,7 @@ import { skillSound } from './sfx.js';
 import { salImpact } from './salfx.js';
 import { yeonImpact, LEAD as YEON_LEAD } from './yeonfx.js';
 const PAN_STOP = 0.07, PAN_KICK = [0.13, 0.11];     // 요리사 팬 강타: local hit-stop (s), camera kick [m, s]
+const PUSH_STOP = 0.05, PUSH_KICK = [0.09, 0.1];   // 밀어내기: local hit-stop (s), camera kick [m, s]
 const SMASH_STOP = 0.06, SMASH_KICK = [0.11, 0.1];   // 유봉강타: local hit-stop (s, caster + target visuals only), camera kick [m, s]
 import { biyeonImpact } from './biyeonfx.js';
 import { bashImpact, BASH } from './bashfx.js';
@@ -200,6 +201,20 @@ export class SkillEngine {
       for (const t of times) this.pending.push({ time: this.clock + Math.max(0, t - (d.sfxLead || 0)),
         op: { op: '_run', run: () => { if (!pc.dead) G.audio.sfx(skillSound(d)); } }, ctx });
     }
+    // 약사 약병 투구 (action.stow, ph_pitch): the flask the skill throws is in the real right hand from the press (the same effect
+    // object the projectile then flies with — no swap at the release); 약병폭격 has no projectile: its flask is tossed up and away
+    const A0 = sh.actions[anim];
+    if (A0 && A0.stow && !d.cast) {
+      const pop = d.ops.find(o => o.pharmProj), hp = () => { let h = null; try { h = pc.body && pc.body.handPoint && pc.body.handPoint(); } catch (e) { h = null; } return h ? { x: h.x, y: h.y, z: -h.z } : null; };
+      const fx = FX.pharm('proj', hp() || { x: pc.pos.x, y: (pc.pos.y || 0) + 1, z: pc.pos.z }, { elem: pop ? pop.elem : 'poison', held: true });
+      if (fx && fx.set) { const f = ctx.facing, h = ctx.heldFlask = { t: 0, dead: false, pos: null, fx,
+          update(dt) { this.t += dt; if (pc.dead) return this.dispose();
+            if (this.t <= ht) { const p = hp(); if (p) { this.pos = p; fx.set(p); } }
+            else if (pop) { if (this.t > ht + 0.1) this.dispose(); }                 // normally taken over by the SkillProj at ht
+            else { if (!this.pos || this.t > ht + 0.3) return this.dispose(); fx.release && fx.release(); this.pos = { x: this.pos.x + f.x * 3 * dt, y: this.pos.y + 16 * dt, z: this.pos.z + f.z * 3 * dt }; fx.set(this.pos); } },
+          dispose() { if (this.dead) return; this.dead = true; fx.dispose && fx.dispose(); } };
+        this.things.push(h); }
+    }
     let span = 0; for (const op of d.ops) { if (op.op === 'lunge') continue; const n = (op.hits || 1) + (op.hitsPerLv ? Math.floor(op.hitsPerLv * (ctx.L - 1)) : 0); span = Math.max(span, (op.at || 0) + (cb && op.hitsPerLv ? cb.hitTimes[n - 1] - cb.hitTimes[0] : (n - 1) * (op.gap || 0.13))); }
     pc.skills.lock = Math.max(pc.skills.lock, ht + span + Math.max(d.recover || 0.3, cb && cb.recover || 0));
     for (const op of d.ops) { if (cb && cb.lunges && op.op === 'lunge') continue; this.pending.push({ time: this.clock + Math.max(0, ht + (op.at || 0)), op, ctx }); }
@@ -269,7 +284,7 @@ export class SkillEngine {
     const r = CombatMath.compute(this.power(ctx), c, def, pc.stat('crit'), critDmg, t.stat('dmgReduce'));
     const kdir = { x: t.pos.x - pc.pos.x, z: t.pos.z - pc.pos.z };
     const knock = op.knock && !(t.isBoss) && !(t.def && t.def.ai === 'heavy') ? op.knock * 0.4 : 0;
-    const quietFx = !!(op.fx && (op.fx.pharm === 'smash' || op.fx.cook === 'pan'));   // own local hit-stop + camera kick, never the global ones
+    const quietFx = !!(op.fx && (op.fx.pharm === 'smash' || op.fx.pharm === 'push' || op.fx.cook === 'pan'));   // own local hit-stop + camera kick, never the global ones
     const hd = { source: pc, amount: r.amount, crit: r.crit, kdir, knockback: knock, localStop: quietFx ? 'quiet' : !!(op.fx && op.fx.bash) };
     t.takeDamage(hd); ctx.missed = !!hd.missed;
     if (op.push && !t.isBoss && !t.dead) { const m = Math.hypot(kdir.x, kdir.z) || 1; t.knock = { x: kdir.x / m * op.push * 10, z: kdir.z / m * op.push * 10 }; t.hitReact = Math.max(t.hitReact || 0, 0.4); }   // push = m 밀어냄(배쉬, 무거운 몬스터 포함·보스 제외)
@@ -432,7 +447,14 @@ export class SkillEngine {
           if (op.fx.cook === 'chop') {   // 식칼 썰기: the knife in the air comes down on THIS damage tick (slice line + chips on the real target); nothing left to cut -> it leaves
             const t = ts[0], k = ctx.cookFx; if (k && k.strike) { if (t) k.strike(t, h, h === hits_ - 1); else k.miss(h === hits_ - 1); }
           }
-          if (op.fx.pharm === 'push') FX.pharm('push', pc, { f, r: op.r || 2.2, ang: op.ang || 80, hits: ts.map(t => ({ x: t.pos.x, y: t.pos.y || 0, z: t.pos.z, boss: !!t.isBoss })) });   // 밀어내기: wind ribbons across the real cone, dust streaks on each enemy pushed
+          if (op.fx.pharm === 'push') {   // 밀어내기: the ground of the REAL cone (same r / ang as the hit shape) buckles outward, clods fly, drag streaks on each enemy pushed
+            FX.pharm('push', pc, { f, r: (op.r || 3) * this.ampMul(ctx), ang: op.ang || 110, hits: ts.map(t => ({ x: t.pos.x, y: t.pos.y || 0, z: t.pos.z, boss: !!t.isBoss })) });
+            if (ts.length) {   // only when something was hit: local hit-stop on the caster + those hit (max, never adds up), one camera kick — never G.hitStop
+              pc.freezeT = Math.max(pc.freezeT || 0, PUSH_STOP);
+              for (const t of ts) { t.freezeT = Math.max(t.freezeT || 0, PUSH_STOP); if (t.body && t.body.punch) t.body.punch(t.pos.x - pc.pos.x, t.pos.z - pc.pos.z, 0.16); }
+              if (G.render.kick && !G.reduceFlash) G.render.kick(f.x, f.z, PUSH_KICK[0], PUSH_KICK[1]);
+            }
+          }
           if (op.fx.pharm === 'spin') FX.pharm('spin', pc, { r: op.r, h, n: hits, last: h === hits - 1, hits: ts.map(t => t.pos) });   // 유봉 휘두르기: ribbons on the real pestle tip, thin ring on the last strike (js/pharmfx.js)
           if (op.fx.yeon) {  // '연': per-strike crescent (scheduled ahead in release, else now) + flash / cut / shards on the target
             const y = (cf && cf.yeon) || { p: h % 2 ? 'lr' : 'rl', roll: h % 2 ? -0.3 : 0.4, mirror: h % 2 === 1, var: 'ab'[h % 2], fin: h === hits - 1, size: h === hits - 1 ? 1.45 : 1 };
@@ -647,6 +669,8 @@ class SkillProj {
     this.pos = { x: pc.pos.x + ctx.facing.x * 0.4, y: pc.pos.y + 1.0, z: pc.pos.z + ctx.facing.z * 0.4 };
     this.speed = (op.speed || 12) * speedMul; this.range = op.range || eng.range(ctx.d) + 1; this.trav = 0; this.hit = new Set(); this.back = false; this.t = 0;
     this.target = ctx.tgt && !ctx.tgt.dead ? ctx.tgt : null;
+    // 약사 약병: the flask leaves the real right hand at the release frame of the pitch (ph_pitch), not a fixed point in front
+    if (op.pharmProj) { let h = null; try { h = pc.body && pc.body.handPoint && pc.body.handPoint(); } catch (e) { h = null; } if (h) this.pos = { x: h.x, y: h.y, z: -h.z }; }
     if (op.spread && cnt > 1) { const off = (idx - (cnt - 1) / 2) * op.spread; this.pos.x += -ctx.facing.z * off; this.pos.z += ctx.facing.x * off; }   // side by side out of the hand
     const to = op.kind === 'lob' || op.toGround ? ctx.aim : this.target ? this.target.pos : op.arc && ctx.tgt ? ctx.aim /* arc: the target died while the others were still being thrown -> its last spot */ : { x: pc.pos.x + ctx.facing.x * this.range, z: pc.pos.z + ctx.facing.z * this.range };
     this.to = { ...to }; const dx = to.x - this.pos.x, dz = to.z - this.pos.z, m = Math.hypot(dx, dz) || 1; this.dir = { x: dx / m, z: dz / m };
@@ -654,7 +678,8 @@ class SkillProj {
     if (op.toGround) { this.range = m + 0.2; }
     if (op.arc) { if (this.target || ctx.tgt) this.range = m + 0.4; this.arcLen = Math.max(0.6, Math.min(m, this.range)); this.arcH = op.arc * (0.75 + 0.5 * ((idx * 0.37) % 1)) * Math.min(1, m / 4); }   // thrown in an arc (drawn only: the hit test stays on the ground line)
     // 비연참: the centre crescent of the fan IS this projectile (js/biyeonfx.js); falls back to the generic wave until loaded
-    this.fx = (op.biyeon && FX.biyeon('proj', this.pos, this.dir, { groundY: pc.pos.y || 0 })) || (op.pharmProj && FX.pharm('proj', this.pos, { elem: op.elem })) || (op.cook && FX.cook('proj', this.pos, { kind: op.cook })) || FX.projectile(op.fx || 'capsule', { color: ctx.d.fx && ctx.d.fx.color });
+    const held = op.pharmProj && ctx.heldFlask && !ctx.heldFlask.dead ? ctx.heldFlask : null; if (held) { held.dead = true; held.fx.release && held.fx.release(); }   // the flask that was in the hand flies on
+    this.fx = (held && held.fx) || (op.biyeon && FX.biyeon('proj', this.pos, this.dir, { groundY: pc.pos.y || 0 })) || (op.pharmProj && FX.pharm('proj', this.pos, { elem: op.elem })) || (op.cook && FX.cook('proj', this.pos, { kind: op.cook })) || FX.projectile(op.fx || 'capsule', { color: ctx.d.fx && ctx.d.fx.color });
     this.fx.set(this.pos, { x: this.dir.x, y: 0, z: this.dir.z });
   }
   update(dt) {

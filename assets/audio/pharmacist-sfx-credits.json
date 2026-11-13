@@ -66,6 +66,12 @@
         "file": "sfx_ph_smash_hit.mp3",
         "duration": 0.8,
         "description": "유봉강타 타격: low thud 96->44 Hz + hard knock (290/470/760/1180 Hz) + 2-7 kHz transient + falling grit from 0.05 s + faint bell tail"
+      },
+      {
+        "file": "sfx_ph_push_hit.mp3",
+        "duration": 0.85,
+        "generatedOn": "2026-11-13",
+        "description": "밀어내기 타격: low earth rumble 70->38 Hz + dull knock + pouring soil / gravel grains 0.04-0.5 s + 1.5-5 kHz transient + very faint bell tail (python3 tools/audio/smash_sfx.py push)"
       }
     ]
   }

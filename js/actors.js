@@ -332,7 +332,7 @@ export class Player extends Combatant {
       const id = sk.slots[i];
       if (!id) { G.ui.toast("빈 슬롯입니다 (스킬창 K)"); continue; }
       // weapon on the back: a fast draw first, the skill goes off as soon as the draw is ready (pendSkill)
-      if (!this.weaponReady()) { this.combat(DRAW_FAST); this.pendSkill = { id, t: 0.8 }; continue; }
+      if (!this.weaponStow(id) && !this.weaponReady()) { this.combat(DRAW_FAST); this.pendSkill = { id, t: 0.8 }; continue; }   // (free-hand throws need no draw)
       this.castSkill(id, input);
     }
     if (this.pendSkill) { this.pendSkill.t -= this.frameDt || 1 / 60; if (this.pendSkill.t <= 0 || this.dashT > 0) this.pendSkill = null; else if (this.weaponReady() && !this.skills.busy) { const id = this.pendSkill.id; this.pendSkill = null; this.castSkill(id, input); } }
@@ -365,6 +365,8 @@ export class Player extends Combatant {
   // (an upper-body motion over idle / walking); SHEATHE_AFTER s after the last combat signal it goes back on the back.
   // The first attack / skill while sheathed: a fast draw (DRAW_FAST x speed, ~0.2 s) and the swing starts from its
   // raised pose (drawReady) - the press is kept meanwhile. Towns: no monster draws; zone change / death / recall = sheathed.
+  /** the skill's motion throws with the empty right hand (action.stow, 약사 약병 투구): no draw first, the weapon stays on the back */
+  weaponStow(id) { const d = G.data.skill2(id), B = this.body, a = d && B && B.sh && B.sh.actions[d.anim]; return !!(a && a.stow); }
   weaponReady() { const B = this.body; return !B || !B.setArmed || B.drawReady; }
   combat(speed = 1) { this.calmT = 0; const B = this.body; if (B && B.draw && !this.dead) B.draw(speed); }
   updateArms(dt) {

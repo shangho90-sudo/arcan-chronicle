@@ -11,6 +11,8 @@ Blender에서 다듬어 한 파일 assets/fx/fx_pharm_tripo.glb.json 으로 묶�
 
 정리: 메시 합치기 → 떠 있는 작은 조각 제거 → 삼각형 줄이기 → 중복 정점 합치기 → 노멀 다시 계산 → 축·크기·원점 맞춤 →
 기본색 텍스처만 남겨 512 px(유봉 1024) JPEG. Usage: RAW=/tmp/pharmfx2/raw python3 tools/blender/fx_pharm_tripo.py [name...]
+밀어내기 흙덩이·흙판(2026-11-13): RAW=/home/claude/new3d OUTFILE=fx_push_tripo python3 tools/blender/fx_pharm_tripo.py soil_clods earth_slabs
+  -> assets/fx/fx_push_tripo.glb.json (tripo_clod_N, tripo_slab_N: 조각별, 가장 얇은 축 = +Y, 반지름 ~1)
 """
 import base64, json, math, os, sys, tempfile
 import numpy as np
@@ -22,6 +24,7 @@ RAW = os.environ.get('RAW', '/home/claude/new3d'); OUT = os.path.join(ROOT, 'ass
 SPEC = {   # name: (out name, kind, target tris, texture px)
     'pestle_only': ('tripo_pestle', 'pestle', 3500, 1024), 'pestle_gold': ('tripo_pestle_mortar', 'pestle', 3500, 1024), 'flask_gold': ('tripo_flask_gold', 'flask', 1800, 512), 'flask': ('tripo_flask', 'flask', 1800, 512),
     'syringe': ('tripo_syringe', 'syringe', 2000, 512), 'shards': ('tripo_shard', 'shards', 500, 512),
+    'soil_clods': ('tripo_clod', 'shards', 420, 512), 'earth_slabs': ('tripo_slab', 'shards', 420, 512),   # 밀어내기(2026-11-13): OUTFILE=fx_push_tripo 로 따로 묶음
     'ice_crystals': ('tripo_ice', 'ice', 1600, 512), 'pestle_club': ('tripo_pestle_club', 'pestle', 3500, 1024)}
 
 def islands(bm):
@@ -111,7 +114,7 @@ def fit(ob, kind):
         ob.data.transform(Matrix.Translation((-(lo[0] + hi[0]) / 2, -(lo[1] + hi[1]) / 2, -lo[2]))); ob.data.transform(Matrix.Scale(s, 4))
     ob.data.update()
 
-def split_shards(ob, td):
+def split_shards(ob, td, prefix='tripo_shard', target=None):
     """one Tripo model of several chunks -> separate objects (loose parts), the 6 - 10 biggest, flattened axis up, radius ~1"""
     bpy.ops.object.select_all(action='DESELECT'); ob.select_set(True); bpy.context.view_layer.objects.active = ob
     bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.select_all(action='SELECT'); bpy.ops.mesh.remove_doubles(threshold=0.0008); bpy.ops.mesh.separate(type='LOOSE'); bpy.ops.object.mode_set(mode='OBJECT')
@@ -121,9 +124,9 @@ def split_shards(ob, td):
         if o not in keep: bpy.data.objects.remove(o)
     out = []
     for i, o in enumerate(keep):
-        decimate(o, SPEC['shards'][2]); c, w, v = pca(o); rotate_axis_to_z(o, v[:, 0])        # thinnest axis -> up
+        decimate(o, target or SPEC['shards'][2]); c, w, v = pca(o); rotate_axis_to_z(o, v[:, 0])        # thinnest axis -> up
         lo, hi, P = bounds(o); r = max(hi[0] - lo[0], hi[1] - lo[1]) / 2
-        o.data.transform(Matrix.Translation(tuple(-(lo + hi) / 2))); o.data.transform(Matrix.Scale(1.0 / r, 4)); o.data.update(); o.name = o.data.name = 'tripo_shard_%d' % i; out.append(o)
+        o.data.transform(Matrix.Translation(tuple(-(lo + hi) / 2))); o.data.transform(Matrix.Scale(1.0 / r, 4)); o.data.update(); o.name = o.data.name = '%s_%d' % (prefix, i); out.append(o)
     return out
 
 def main():
@@ -132,19 +135,19 @@ def main():
     for n in names:
         out, kind, target, px = SPEC[n]; ob = load(n); nisl = drop_small(ob, 0.01 if kind != 'shards' else 0.05); mat = texture(ob, px, td, out)
         if kind == 'shards':
-            parts = split_shards(ob, td); obs += parts; info[out] = {'parts': len(parts), 'tris': [len(p.data.polygons) for p in parts], 'islands': nisl}
+            parts = split_shards(ob, td, out, target); obs += parts; info[out] = {'parts': len(parts), 'tris': [len(p.data.polygons) for p in parts], 'islands': nisl}
         else:
             n0 = decimate(ob, target); fit(ob, kind); ob.name = ob.data.name = out; obs.append(ob); lo, hi, P = bounds(ob)
             info[out] = {'tris': [n0, len(ob.data.polygons)], 'size': [round(float(x), 3) for x in (hi - lo)], 'islands': nisl}
     bpy.ops.object.select_all(action='DESELECT')
     for o in obs: o.location = (0, 0, 0); o.select_set(True)
-    glb = os.path.join(td, 'fx_pharm_tripo.glb')
+    FILE = os.environ.get('OUTFILE', 'fx_pharm_tripo'); glb = os.path.join(td, FILE + '.glb')
     bpy.ops.export_scene.gltf(filepath=glb, use_selection=True, export_format='GLB', export_image_format='JPEG', export_jpeg_quality=88, export_yup=True, export_apply=True,
                               export_normals=True, export_tangents=False, export_animations=False)
     raw = open(glb, 'rb').read()
-    json.dump({'b64': base64.b64encode(raw).decode(), 'models': sorted(o.name for o in obs)}, open(os.path.join(OUT, 'fx_pharm_tripo.glb.json'), 'w'))
+    json.dump({'b64': base64.b64encode(raw).decode(), 'models': sorted(o.name for o in obs)}, open(os.path.join(OUT, FILE + '.glb.json'), 'w'))
     for i, o in enumerate(obs): o.location.x = i * 1.5
-    os.makedirs(SRC, exist_ok=True); bpy.ops.file.pack_all(); bpy.ops.wm.save_as_mainfile(filepath=os.path.join(SRC, 'fx_pharm_tripo.blend'), compress=True)
+    os.makedirs(SRC, exist_ok=True); bpy.ops.file.pack_all(); bpy.ops.wm.save_as_mainfile(filepath=os.path.join(SRC, FILE + '.blend'), compress=True)
     print(json.dumps(info), len(raw) // 1024, 'KB', flush=True)
 
 if __name__ == '__main__':

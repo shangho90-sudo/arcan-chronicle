@@ -36,7 +36,12 @@ PROMPTS['pestle_club'] = ('a single giant golden pestle shaped like a thick base
                           'stopper, no window, no gems, no mortar, no bowl, standing upright, ' + STYLE)
 PROMPTS['ice_crystals'] = ('a cluster of six sharp pointed ice crystal spikes growing outward from one centre like a frozen burst, different lengths, '
                            'pale blue translucent-looking ice with white edges, faceted, no base rock, no snow pile, ' + STYLE)
-TARGET = {'pestle_gold': 6000, 'flask': 2500, 'syringe': 3000, 'flask_gold': 2500, 'shards': 4000, 'pestle_only': 6000, 'pestle_club': 6000, 'ice_crystals': 2500}
+# 2026-11-13 밀어내기(ph1_a4) 개편: 부채꼴로 뒤집히는 땅의 흙덩이·흙판 (tools/blender/fx_pharm_tripo.py -> tripo_clod_N / tripo_slab_N)
+PROMPTS['soil_clods'] = ('a set of eight separate chunky lumps of dug-up brown earth soil clods, irregular rounded-angular dirt chunks with small pebbles '
+                         'and a few grass roots, rich dark brown and warm ochre soil, laid out apart in a row not touching, no grass tufts on top, no glow, ' + STYLE)
+PROMPTS['earth_slabs'] = ('a set of six separate thick broken slabs of cracked dry earth ground crust, flat tan top surface with fine cracks, rough dark brown '
+                          'soil underside and broken edges, wedge and plate shapes, laid out apart in a row not touching, no glow, ' + STYLE)
+TARGET = {'soil_clods': 4000, 'earth_slabs': 4000, 'pestle_gold': 6000, 'flask': 2500, 'syringe': 3000, 'flask_gold': 2500, 'shards': 4000, 'pestle_only': 6000, 'pestle_club': 6000, 'ice_crystals': 2500}
 
 def gen(name):
     sys.path.insert(0, HERE); import tripo

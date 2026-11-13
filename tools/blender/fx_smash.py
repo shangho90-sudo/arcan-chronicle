@@ -8,6 +8,8 @@ Meshes (game axes: +Y up, metres; js/pharmfx.js가 크기를 정함)
                  정점 색 R·G·B = 상아/금, A 대신 색으로만 구분(셰이더가 림·투명도를 정함)
   smash_trail    굵고 짧은 둔기 궤적: XZ 평면의 호(반지름 TR_IN .. 1, TRAIL_SPAN 도), u 0 = 시작(위·뒤) -> 1 = 끝(타격), v 0 안쪽 .. 1 바깥
   smash_cracks   짧은 방사형 균열 r 0.22 .. 1.0 (7줄 + 곁가지), 평면, u = 길이 방향, v = 폭 (fx_pharm.png 'crack' 칸)
+  smash_rim      (2026-11-13) 찌그러진 구덩이 둘레로 밀려 올라온 흙 턱: 반지름 ~1의 고리에 쐐기 조각 11개(안쪽 모서리가 솟고 바깥은 땅에 붙음),
+                 정점 색 = 윗면 흙빛 / 안쪽 벽 어두운 흙. 구덩이 바닥의 음영은 js/pharmfx.js CRATER_FS가 그림(메시는 pharm_circle)
 json: {b64, trailSpan(도), trailIn}
 """
 import os, sys, math, json, base64, random
@@ -68,9 +70,28 @@ def cracks(bm, col, uvl):
         if rng.random() < 0.55:
             bx, bz, bt = pts[2]; line(math.atan2(bz, bx) + rng.choice((-1, 1)) * rng.uniform(0.5, 0.8), math.hypot(bx, bz), math.hypot(bx, bz) + rng.uniform(0.14, 0.26), 0.028, 2)
 
+def rim(bm, col, uvl):
+    rng = random.Random(7); N = 11
+    TOP, TOP2, WALL, END = (0.62, 0.53, 0.42, 1), (0.50, 0.42, 0.33, 1), (0.25, 0.185, 0.13, 1), (0.36, 0.28, 0.21, 1)
+    for i in range(N):
+        a0 = 2 * math.pi * (i + rng.uniform(0.04, 0.12)) / N; a1 = 2 * math.pi * (i + 1 - rng.uniform(0.04, 0.12)) / N
+        rin, rout, h = rng.uniform(0.76, 0.86), rng.uniform(1.0, 1.14), rng.uniform(0.15, 0.27); K = 3
+        rows = []
+        for k in range(K + 1):
+            a = a0 + (a1 - a0) * k / K; e = 0.55 + 0.45 * math.sin(math.pi * k / K)        # lower towards both ends of a chunk
+            c, s_ = math.cos(a), math.sin(a); ri = rin + rng.uniform(-0.02, 0.02); ro = rout + rng.uniform(-0.03, 0.03)
+            rows.append((bm.verts.new(V(c * ri, h * e * rng.uniform(0.85, 1.1), s_ * ri)), bm.verts.new(V(c * ro, 0.0, s_ * ro)), bm.verts.new(V(c * (ri - 0.05), 0.0, s_ * (ri - 0.05)))))
+        def face(vs, c):
+            f = bm.faces.new(vs)
+            for l in f.loops: l[col] = c; l[uvl].uv = (0, 0)
+        for k in range(K):
+            t0, o0, b0 = rows[k]; t1, o1, b1 = rows[k + 1]
+            face((t0, t1, o1, o0), TOP if (i + k) % 2 else TOP2); face((b0, b1, t1, t0), WALL)
+        face(rows[0], END); face(rows[-1][::-1], END)
+
 def main():
     FP.reset()
-    obs = [new_obj('smash_pestle', pestle), new_obj('smash_trail', trail, False), new_obj('smash_cracks', cracks, False)]
+    obs = [new_obj('smash_pestle', pestle), new_obj('smash_trail', trail, False), new_obj('smash_cracks', cracks, False), new_obj('smash_rim', rim, False)]
     tris = {o.name: sum(len(p.vertices) - 2 for p in o.data.polygons) for o in obs}
     bpy.ops.object.select_all(action='DESELECT')
     for o in obs: o.select_set(True)

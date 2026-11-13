@@ -519,7 +519,7 @@ export class ModelBody {
     this.shadow = new THREE.Mesh(shadowGeo, shadowMat); this.shadow.rotation.x = -Math.PI / 2;
     const ss = shadowRadius * 2.6; this.shadow.scale.set(ss, ss, 1);
     scene.add(this.root, this.shadow);
-    this.props = { R: null, L: null }; this.propKind = { R: null, L: null };
+    this.props = { R: null, L: null, H: null }; this.propKind = { R: null, L: null, H: null };
     // weapon in the hand (armed, armW 1) or on the back (armW 0); draw / sheathe = upper-body overlay (this.over)
     this.armed = true; this.armW = 1; this.over = null;
     this.setJob(job); this.apply();
@@ -535,6 +535,7 @@ export class ModelBody {
   /** start the draw (speed scales the motion: a fast draw before the first attack); no-op when the weapon is in the hand */
   draw(speed = 1) {
     if (this.md.cfg.npc || !this.sh.actions.draw) { this.setArmed(true); return; }
+    if (this.stowing) return;                                                // a free-hand throw is playing: the weapon stays on the back until it ends
     if (this.over && this.over.name === 'draw') { this.over.speed = Math.max(this.over.speed, speed); return; }
     if (this.over && this.over.name === 'sheathe' && this.armed) { this.over = null; return; }   // still holding it: just stop putting it away
     if (this.armed && !this.over) return;
@@ -548,6 +549,14 @@ export class ModelBody {
   /** the weapon is in the hand and the draw has come far enough for a swing / skill to take over */
   get drawReady() { const o = this.over; return this.armed && (!o || o.name !== 'draw' || o.t >= (this.sh.actions.draw.readyT || 0)); }
   get drawing() { return !!(this.over && this.over.name === 'draw'); }
+  /** a stow action (action.stow, e.g. ph_pitch) is playing: the right hand throws, the weapon rides on the back */
+  get stowing() { const a = this.sh.actions[this.action]; return !!(a && a.stow) && !this.finished && !this.md.cfg.npc; }
+  /** right palm in world (three) space, or null — where a thrown item leaves the hand */
+  handPoint() {
+    const md = this.md, hi = md.byName.Right_Hand; if (hi === undefined || !this.W || !this.visible) return null;
+    this.root.updateMatrixWorld(true); const b = md.bones[hi];
+    return _v(b.t.x - 0.027 / md.scale, b.t.y - 0.01, b.t.z + 0.01).applyMatrix4(mul(_m().copy(this.W[hi]), b.inv)).applyMatrix4(this.mesh.matrixWorld);
+  }
   updateOverlay(dt) {
     const o = this.over;
     if (o) {
@@ -566,6 +575,7 @@ export class ModelBody {
     const a = this.sh.actions[name], prev = this.sh.actions[this.action];
     if (this.lastPose) { this.fromPose = this.lastPose; this.fadeT = 0; this.fadeDur = a.fadeIn ?? (prev && prev.fadeOut) ?? 0.1; }
     this.action = name; this.t = 0; this.finished = false;
+    if (a.stow && !this.md.cfg.npc) { this.over = null; this.armed = false; }   // free-hand throw: the weapon goes to (stays on) the back, glides there in XFER s
   }
   setDir(d) { this.dir = ((d % 8) + 8) % 8; this.targetYaw = this.dir * 45 * DEG; }
   /** continuous facing from a Unity-space ground vector */
@@ -777,8 +787,12 @@ export class ModelBody {
     this.root.rotation.y = this.yaw + spin * DEG;
     const wid = !p.held && this.weaponId ? this.weaponId() : null;
     this.W = W;
-    this.updateProp('R', p.held || (wid && isWeaponModel(wid) ? 'item:' + wid : this.weapon), (p.wOff - 90) * (1 - (this.swingW || 0)));
-    this.updateProp('L', p.held ? null : this.armW > 0.5 ? this.off : null, p.offOff - 90);
+    // stow actions (약사 약병 투구 ph_pitch): the weapon stays on the back for the whole motion and the thrown item sits in the
+    // empty right hand (prop slot H) until the release key; other actions with `held` swap the weapon for the item as before
+    const stow = !!(ca && ca.stow) && !md.cfg.npc, wkind = wid && isWeaponModel(wid) ? 'item:' + wid : this.weapon;
+    if (stow) { const w0 = this.weaponId ? this.weaponId() : null; this.updateProp('R', w0 && isWeaponModel(w0) ? 'item:' + w0 : this.weapon, 0); this.updateProp('H', p.held || null, (p.wOff - 90) * (1 - (this.swingW || 0))); }
+    else { this.updateProp('R', p.held || wkind, (p.wOff - 90) * (1 - (this.swingW || 0))); if (this.props.H) this.updateProp('H', null, 0); }
+    this.updateProp('L', p.held && !stow ? null : this.armW > 0.5 ? this.off : null, p.offOff - 90);
   }
   worldOf(Q) {
     const md = this.md, W = new Array(md.bones.length);
@@ -835,14 +849,14 @@ export class ModelBody {
       if (this.props[side]) { this.props[side].parent.remove(this.props[side]); this.props[side] = null; }
       this.propKind[side] = kind;
       if (kind) {
-        const hi = this.md.byName[(side === 'R' ? 'Right' : 'Left') + '_Hand'];
+        const hi = this.md.byName[(side === 'L' ? 'Left' : 'Right') + '_Hand'];
         // held in mesh space: the matrix is the hand grip (or, for the right weapon, the back holder / a glide between them)
         const holder = new THREE.Group(); holder.matrixAutoUpdate = false; holder.add(kind.startsWith('item:') ? itemModel(kind.slice(5)) : makeProp(kind));
         this.mesh.add(holder); this.props[side] = holder; holder.userData.hi = hi;
       }
     }
     const h = this.props[side]; if (!h) return;
-    const md = this.md, hi = h.userData.hi, b = md.bones[hi], along = side === 'R' ? -1 : 1, s = md.scale, W = this.W;
+    const md = this.md, hi = h.userData.hi, b = md.bones[hi], along = side === 'L' ? 1 : -1, s = md.scale, W = this.W;
     // grip at the palm in bind space, item axis forward (+z) tilted by the pose, authored in metres
     const bindM = mul(_m().makeTranslation(b.t.x + along * 0.027 / s, b.t.y - 0.01, b.t.z + 0.01), rx(-(tilt || 0)), _m().makeScale(1.3 / s, 1.3 / s, 1.3 / s));
     const inHand = mul(_m().copy(W[hi]), b.inv, bindM);
