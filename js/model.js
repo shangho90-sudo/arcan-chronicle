@@ -665,7 +665,7 @@ export class ModelBody {
     const tp = T(p); this.root.position.copy(tp); this.shadow.position.set(tp.x, tp.y + 0.03, tp.z);
   }
   update(dt) {
-    this.t += dt * Math.max(0, this.speed); this.life = (this.life || Math.random() * 10) + dt;
+    this.t += dt * Math.max(0, this.speed); this.life = (this.life ?? (this.md.bones.length * 0.37 + (this.md.cfg.height || 1) * 7.1) % 10) + dt;   // no Math.random: it would shift the game's miss / crit rolls
     if (this.fadeDur > 0) this.fadeT += dt;
     if (this.flashT > 0) this.flashT -= dt;
     this.mat.emissiveIntensity = this.flashT > 0 ? 0.45 * Math.min(1, this.flashT / 0.1) : 0;
