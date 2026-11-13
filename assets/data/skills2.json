@@ -2966,7 +2966,7 @@
 "idx": 3,
 "name": "뒤집기",
 "type": "attack",
-"desc": "일반 적을 잠시 띄운다. 띄우기 면역 적에게는 추가 피해.",
+"desc": "큰 뒤집개로 적 하나를 부침개처럼 퍼 올려 뒤집는다. 일반 적은 잠시 떠서 움직이지 못하고, 띄울 수 없는 적에게는 추가 피해.",
 "maxLv": 5,
 "unlock": 15,
 "prereq": [],
@@ -2980,20 +2980,27 @@
 "anim": "attack",
 "ops": [
 {
+"op": "fx",
+"cook": "flip",
+"at": -0.25
+},
+{
 "op": "hit",
 "shape": "single",
 "coef": 1.5,
 "launch": 0.8,
 "vsImmune": 1.6,
+"sfx": "ck_flip",
 "fx": {
-"slash": "arc",
-"burst": "dust"
+"cook": "flip"
 }
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16765562
+},
 "status": {
 "data": true,
 "impl": true,
@@ -3012,7 +3019,7 @@
 "idx": 4,
 "name": "도마 방어",
 "type": "support",
-"desc": "정면에서 받는 피해를 줄인다.",
+"desc": "커다란 도마를 방패처럼 세워 정면에서 받는 피해를 줄인다.",
 "maxLv": 5,
 "unlock": 18,
 "prereq": [],
@@ -3030,12 +3037,15 @@
 "id": "frontguard",
 "dur": 5,
 "val": 0.5,
-"target": "self"
+"target": "self",
+"cook": "board",
+"noAura": true
 }
 ],
 "mods": [],
 "flags": {},
 "fx": {},
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -3153,7 +3163,7 @@
 "idx": 2,
 "name": "뜨거운 국물",
 "type": "attack",
-"desc": "전방에 뜨거운 국물을 뿌려 피해와 화상을 준다.",
+"desc": "큰 국자로 펄펄 끓는 국물을 전방 부채꼴로 끼얹어 피해와 화상을 준다.",
 "maxLv": 5,
 "unlock": 12,
 "prereq": [],
@@ -3166,6 +3176,11 @@
 "recover": 0.35,
 "anim": "throw",
 "ops": [
+{
+"op": "fx",
+"cook": "soup",
+"at": -0.167
+},
 {
 "op": "hit",
 "shape": "cone",
@@ -3181,14 +3196,17 @@
 "ch": 1.0
 }
 ],
+"sfx": "ck_soup",
 "fx": {
-"slash": "fire_cone"
+"cook": "soup"
 }
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16751146
+},
 "status": {
 "data": true,
 "impl": true,
@@ -3207,7 +3225,7 @@
 "idx": 3,
 "name": "후추 뿌리기",
 "type": "attack",
-"desc": "범위 피해와 함께 적의 공격력을 낮춘다.",
+"desc": "큰 후추통을 흔들어 후춧가루를 뿌린다. 범위 피해와 함께 재채기하는 적의 공격력을 낮춘다.",
 "maxLv": 5,
 "unlock": 15,
 "prereq": [],
@@ -3220,6 +3238,11 @@
 "recover": 0.35,
 "anim": "throw",
 "ops": [
+{
+"op": "fx",
+"cook": "pepper",
+"at": -0.167
+},
 {
 "op": "hit",
 "shape": "circle",
@@ -3235,13 +3258,16 @@
 }
 ],
 "fx": {
-"burst": "pepper_puff"
+"cook": "pepper"
 }
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 10126440
+},
+"sfx": "ck_pepper",
 "status": {
 "data": true,
 "impl": true,
@@ -3260,7 +3286,7 @@
 "idx": 4,
 "name": "밀가루 구름",
 "type": "support",
-"desc": "적을 둔화시키는 밀가루 구름을 만든다.",
+"desc": "밀가루 포대를 터뜨려 적을 둔화시키는 밀가루 구름을 깔아 둔다.",
 "maxLv": 5,
 "unlock": 18,
 "prereq": [],
@@ -3273,6 +3299,11 @@
 "recover": 0.35,
 "anim": "throw",
 "ops": [
+{
+"op": "fx",
+"cook": "sack",
+"at": -0.167
+},
 {
 "op": "area",
 "kind": "slow",
@@ -3287,12 +3318,15 @@
 "ch": 1.0
 }
 ],
-"fx": "flour"
+"fx": "none",
+"cook": "flour"
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16777215
+},
 "status": {
 "data": true,
 "impl": true,
@@ -3311,7 +3345,7 @@
 "idx": 5,
 "name": "꼬치 찌르기",
 "type": "attack",
-"desc": "가까운 직선상의 적을 관통해 찌른다.",
+"desc": "커다란 꼬치로 가까운 직선상의 적을 한꺼번에 꿰뚫는다.",
 "maxLv": 5,
 "unlock": 20,
 "prereq": [],
@@ -3325,20 +3359,27 @@
 "anim": "attack",
 "ops": [
 {
+"op": "fx",
+"cook": "skewer",
+"at": -0.25
+},
+{
 "op": "hit",
 "shape": "line",
 "coef": 1.9,
 "len": 3.5,
 "w": 1.0,
+"sfx": "ck_skewer",
 "fx": {
-"slash": "thrust",
-"burst": "hit_pierce"
+"cook": "skewer"
 }
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 15267071
+},
 "status": {
 "data": true,
 "impl": true,
@@ -3447,6 +3488,7 @@
 {
 "op": "consume",
 "tag": "food",
+"cook": "meal",
 "ops": [
 {
 "op": "buff",
@@ -3461,6 +3503,7 @@
 "mods": [],
 "flags": {},
 "fx": {},
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -3495,6 +3538,7 @@
 {
 "op": "consume",
 "tag": "food",
+"cook": "snack",
 "ops": [
 {
 "op": "heal",
@@ -3514,6 +3558,7 @@
 "mods": [],
 "flags": {},
 "fx": {},
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,

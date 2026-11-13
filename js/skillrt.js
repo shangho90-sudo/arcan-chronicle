@@ -4,6 +4,7 @@
 import { THREE, T } from './render.js';
 import { HitShape, CombatMath, clamp, clamp01 } from './core.js';
 import { skillSound } from './sfx.js';
+import { cookImpact, cookCanToss } from './cookfx.js';
 import { salImpact } from './salfx.js';
 import { yeonImpact, LEAD as YEON_LEAD } from './yeonfx.js';
 const PAN_STOP = 0.07, PAN_KICK = [0.13, 0.11];     // 요리사 팬 강타: local hit-stop (s), camera kick [m, s]
@@ -293,8 +294,8 @@ export class SkillEngine {
     const r = CombatMath.compute(this.power(ctx), c, def, pc.stat('crit'), critDmg, t.stat('dmgReduce'));
     const kdir = { x: t.pos.x - pc.pos.x, z: t.pos.z - pc.pos.z };
     const knock = op.knock && !(t.isBoss) && !(t.def && t.def.ai === 'heavy') ? op.knock * 0.4 : 0;
-    const quietFx = !!(op.quiet || (op.fx && (op.fx.pharm === 'smash' || op.fx.pharm === 'push' || op.fx.cook === 'pan')));   // own local hit-stop + camera kick, never the global ones (quiet: 대장장이)
-    const hd = { source: pc, amount: r.amount, crit: r.crit, kdir, knockback: knock, localStop: quietFx ? 'quiet' : !!(op.fx && op.fx.bash) };
+    const quietFx = !!(op.quiet || (op.fx && (op.fx.pharm === 'smash' || op.fx.pharm === 'push' || (op.fx.cook && op.fx.cook !== 'chop'))));   // own local hit-stop + camera kick, never the global ones (quiet: 대장장이)
+    const hd = { source: pc, amount: r.amount, crit: r.crit, kdir, knockback: knock, localStop: quietFx ? 'quiet' : !!(op.fx && (op.fx.bash || op.fx.cook)) };   // 식칼 썰기: a critical chop no longer stops the whole game (the chops keep their rhythm)
     if (op.derived) hd.derived = true;
     t.takeDamage(hd); ctx.missed = !!hd.missed;
     if (!hd.missed && !op.derived) this.smith.directHit(t);   // 단조 낙인 타수: 직접 공격만(파생 피해 제외)
@@ -353,6 +354,7 @@ export class SkillEngine {
         const dur = op.fixed ? op.dur : op.dur * (1 + 0.05 * (ctx.L - 1)), val = op.fixed ? op.val + (op.valLv || 0) * (ctx.L - 1) : op.val * (op.id === 'haste' || op.id === 'defup' || op.id === 'atkup' ? ctx.mult : 1);
         for (const t of targets) applyStatus(t, { id: op.id, dur, val, ch: 1 }, pc);
         const def = G.data.status(op.id); if (def) G.ui.floatText(pc.pos, def.name, def.color || '#fff', 0.85, 1.8);
+        if (op.cook) FX.cook(op.cook, pc, { dur });   // 도마 방어: the big cutting board (js/cookfx.js)
         if (!op.noAura) FX.aura(op.id === 'atkup' ? 'buff_atk' : op.id === 'defup' ? 'buff_def' : op.id === 'haste' ? 'buff_speed' : 'heal', () => pc.pos, { duration: Math.min(dur, 3), color: col });
         if (op.id === 'immune') { for (const s of pc.status.list.slice()) if (s.def.debuff && s.def.cleanse !== false) pc.status.remove(s.def.id); }
         return;
@@ -378,6 +380,7 @@ export class SkillEngine {
         const it = this.findConsumable(op.tag); if (!it) return;            // validated before; item may vanish -> skip effects
         pc.sheet.bag.remove(it.id, 1);
         if (op.tag === 'food' && it.use && it.use.status) applyStatus(pc, { id: it.use.status, dur: it.use.duration * (1 + pc.sheet.final.foodPower), val: it.use.value, ch: 1 }, pc);
+        if (op.cook) FX.cook('eat', pc, { kind: op.cook });   // 든든한 한 끼·간식 시간: the dish is eaten in bites (js/cookfx.js)
         for (const o of op.ops || []) this.exec(o, ctx); return;
       }
       case 'res': this.gain(op.type, op.n, ctx); return;
@@ -388,7 +391,8 @@ export class SkillEngine {
       }
       case 'fx': if (op.cook) {   // 요리사 (js/cookfx.js): 'knife' hovers over the target and chops on every damage tick, 'pan' appears overhead and lands after `fall` s
           const tg = ctx.tgt && !ctx.tgt.dead ? ctx.tgt : this.targetFor(d), hop = d.ops.find(o => o.op === 'hit');
-          ctx.cookFx = FX.cook(op.cook, pc, { tgt: tg || null, facing: ctx.facing, n: hop ? (hop.hits || 1) + Math.floor((hop.hitsPerLv || 0) * (ctx.L - 1)) : 1, gap: op.gap || (hop && hop.gap) || 0.12, first: -(op.at || 0), fall: op.fall || 0.3 }); return; }
+          ctx.cookFx = FX.cook(op.cook, pc, { tgt: tg || null, facing: ctx.facing, n: hop ? (hop.hits || 1) + Math.floor((hop.hitsPerLv || 0) * (ctx.L - 1)) : 1, gap: op.gap || (hop && hop.gap) || 0.12, first: -(op.at || 0), fall: op.fall || 0.3,
+            lead: -(op.at || 0), aim: ctx.aim, ground: pc.zone.geo.ground(ctx.aim.x, ctx.aim.z).y, r: hop && hop.r, ang: hop && hop.ang, len: hop && hop.len, launch: hop && hop.launch, canToss: cookCanToss }); return; }   // lead·aim·r·ang·len: 뒤집개·국자·후추통·포대·꼬치 (2026-11-13)
         if (op.pharm) { ctx.pharmFx = FX.pharm(op.pharm, op.pharm === 'pestle' ? { x: ctx.aim.x, y: pc.zone.geo.ground(ctx.aim.x, ctx.aim.z).y, z: ctx.aim.z } : pc, { follow: pc, dur: op.dur, fall: op.fall, r: op.r, facing: ctx.facing, L: ctx.L, pal: op.pal, tgt: ctx.tgt }); return; }
         if (op.biyeon === 'cast') { const a = pc.body && pc.body.sh && pc.body.sh.actions[ctx.act]; ctx.biyeonCast = FX.biyeon('cast', pc.pos, ctx.facing, { follow: pc, swing: a && a.fps ? a.hitFrame / a.fps : 0.22 }); }   // wind-up + sweep + side blades (decoration); the centre blade rides the proj op
         if (op.bash === 'cast') ctx.bashCast = FX.bash('cast', pc.pos, ctx.facing, { follow: pc });   // crescent on the real sword arc (js/bashfx.js)
@@ -500,12 +504,14 @@ export class SkillEngine {
         if (op.consume && op.consume.type === 'phrase') { consumed = Math.floor(this.res.phrase); this.res.phrase = 0; }
         // centre bonus (cone): the target nearest the axis gets the bonus
         let centre = null; if (op.centerBonus && ts.length) centre = ts.reduce((b, t) => { const ax = Math.abs((t.pos.x - pc.pos.x) * f.z - (t.pos.z - pc.pos.z) * f.x); return !b || ax < b.ax ? { t, ax } : b; }, null).t;
+        const cookOk = op.fx && op.fx.cook && op.fx.cook !== 'chop' && op.fx.cook !== 'pan' ? [] : null;   // 요리사: targets really hit (not MISS) -> js/cookfx.js cookImpact
         for (const t of ts) {
           let coef = op.coef;
           if (op.falloff) { const dd = pc.dist(t) / (op.r || 5); coef *= 1 + op.falloff * (1 - clamp01(dd)) - op.falloff * 0.5; }
           if (op.consume) coef *= 1 + consumed * op.consume.mulPer;
           if (op.coef > 0) this.dmg(t, coef, ctx, { ...op, centerHit: t === centre });
           if (!(op.stOnHit && ctx.missed)) this.onHit(t, op, ctx);   // stOnHit (팬 강타): a MISS applies nothing
+          if (cookOk && !(op.coef > 0 && ctx.missed)) cookOk.push(t);
           if (op.centerStack && t === centre) { t._cstack = (t._cstack || 0) + 1; if (t._cstack >= op.centerStack.n) { applyStatus(t, op.centerStack.st, pc); t._cstack = 0; } }
           if (op.react) this.react(t, op.react, ctx);
           if (op.extendHerb) for (const a of this.areas) if (a.op.herb && Math.hypot(a.c.x - t.pos.x, a.c.z - t.pos.z) < a.r + 2) a.extend(op.extendHerb, op.extendCap || 4);
@@ -524,10 +530,11 @@ export class SkillEngine {
           FX.smith('hit', pc, { kind: op.fx.smith, f, h, r: op.r, ang: op.ang, hits: live.map(t => ({ x: t.pos.x, y: t.pos.y || 0, z: t.pos.z, r: t.radius, heat: this.smith.heatOf(t) })) });
           if (t0) this.smith.impact(t0, f, heavy);
         }
+        if (cookOk) cookImpact(G, pc, op, ctx, ts, cookOk, f);   // 뒤집기·뜨거운 국물·후추 뿌리기·꼬치 찌르기: the prop lands its blow now; local freeze / punch / toss / one kick only on a real hit
         if (op.extendHerb) for (const a of this.areas) if (a.op.herb && this.shapeOf(op, ctx).overlaps(a.c.x, a.c.z, a.r)) a.extend(op.extendHerb, op.extendCap || 4);
         if (op.link && ts.length > 1) for (let i = 1; i < ts.length; i++) FX.beam('thread_link', ts[i - 1].pos, ts[i].pos, { duration: 2 });
         if (op.swingSfx) G.audio.sfx(op.swingSfx);
-        if (ts.length && !(op.stOnHit && ctx.missed)) G.audio.sfx(skillSound(d, op));
+        if (ts.length && !(op.stOnHit && ctx.missed) && !(cookOk && !cookOk.length)) G.audio.sfx(skillSound(d, op));
       };
       const ht_ = ctx.combo && op.hitsPerLv && ctx.combo.hitTimes ? ctx.combo.hitTimes[h] - ctx.combo.hitTimes[0] : h * (op.gap || 0.15);
       if (h === 0) run(); else this.pending.push({ time: this.clock + ht_, op: { op: '_run', run }, ctx });
@@ -756,6 +763,7 @@ class SkillArea {
     this.fx = op.fx === 'none' ? NOOP : FX.area(op.fx || (op.kind === 'heal' ? 'healing_mist' : 'danger'), pos, r, { color: ctx.d.fx && ctx.d.fx.color, duration: 0 });
     if (op.music) this.stopMusic = G.audio.skillBed(op.music);
     if (op.pharm) this.pfx = FX.pharm(op.pharm, { x: pos.x, y: pos.y, z: pos.z }, { r, dur });   // 광역 회복진 (js/pharmfx.js)
+    if (op.cook) this.pfx = FX.cook(op.cook, { x: pos.x, y: eng.pc.zone.geo.ground(pos.x, pos.z).y, z: pos.z }, { r, dur, pre: ctx.cookFx });   // 밀가루 구름 (js/cookfx.js)
     if (op.prop) { this.prop = FX.summon(op.prop, {}); this.prop.position.copy(T(pos)); G.render.scene.add(this.prop); }
   }
   extend(sec, cap) { if (this.extended >= cap) return; const k = Math.min(sec, cap - this.extended); this.extended += k; this.life += k; this.fx.pulse(); }

@@ -181,27 +181,28 @@ S(J, 1, 0, '식칼과 프라이팬', 1, 'ck1_a1', '식칼 썰기', 'attack', '�
 # 팬 강타: 대상 머리 위에 큰 프라이팬이 나타나 0.30 s에 내리찍음. 기절 3초(새 상태 stun — 보스는 경직과 같이 면역). 레벨 추가타는 한 방에 합침(oneHit, 총 피해 같음).
 S(J, 1, 0, '식칼과 프라이팬', 2, 'ck1_a2', '팬 강타', 'attack', '공중에 커다란 프라이팬을 불러내 적 하나를 내리찍는다. 맞은 적은 3초 동안 기절한다(보스 제외).', weapon='knife', target='enemy', range=1.8, mp=10, cd=6, anim='ck_pan',
   ops=[dict(op='fx', cook='pan', at=-0.30, fall=0.30), hit('single', 2.3, oneHit=True, stOnHit=True, st=[st('stun', 3)], sfx='heavy', fx=dict(cook='pan'))], fx=dict(color=0xffc070))
-S(J, 1, 0, '식칼과 프라이팬', 3, 'ck1_a3', '뒤집기', 'attack', '일반 적을 잠시 띄운다. 띄우기 면역 적에게는 추가 피해.', weapon='knife', target='enemy', range=1.8, mp=12, cd=8, anim='attack',
-  ops=[hit('single', 1.5, launch=0.8, vsImmune=1.6, fx=dict(slash='arc', burst='dust'))])
-S(J, 1, 0, '식칼과 프라이팬', 4, 'ck1_a4', '도마 방어', 'support', '정면에서 받는 피해를 줄인다.', target='self', mp=10, cd=14, anim='cast', ops=[buff('frontguard', 5, 0.5)])
+# 2026-11-13 남은 스킬 연출(수치 그대로): 이름 그대로의 큰 주방 도구가 나타남 — js/cookfx.js. fx op의 at = -(동작의 타격 시각: attack 0.25, throw 0.167).
+S(J, 1, 0, '식칼과 프라이팬', 3, 'ck1_a3', '뒤집기', 'attack', '큰 뒤집개로 적 하나를 부침개처럼 퍼 올려 뒤집는다. 일반 적은 잠시 떠서 움직이지 못하고, 띄울 수 없는 적에게는 추가 피해.', weapon='knife', target='enemy', range=1.8, mp=12, cd=8, anim='attack',
+  ops=[dict(op='fx', cook='flip', at=-0.25), hit('single', 1.5, launch=0.8, vsImmune=1.6, sfx='ck_flip', fx=dict(cook='flip'))], fx=dict(color=0xffd27a))
+S(J, 1, 0, '식칼과 프라이팬', 4, 'ck1_a4', '도마 방어', 'support', '커다란 도마를 방패처럼 세워 정면에서 받는 피해를 줄인다.', target='self', mp=10, cd=14, anim='cast', sfxAt='op', ops=[buff('frontguard', 5, 0.5, cook='board', noAura=True)])
 S(J, 1, 0, '식칼과 프라이팬', 5, 'ck1_a5', '손질 숙련', 'passive', '식칼 공격 속도와 식재료 획득량이 증가한다.', mods=[dict(stat='atkSpeed', mul=0.05, mulLv=0.02)], flags=dict(ingredientDrop=[0.1, 0.05]))
 # 미트볼 던지기: 미트볼 2~6개(Lv마다 +1)가 0.09 s 간격으로 조금씩 벌어져 포물선으로 날아가 같은 대상에 차례로 떨어짐. 하나하나가 예전처럼 반경 1.2 m 작은 범위 피해.
 S(J, 1, 1, '간단한 요리 공격', 1, 'ck1_b1', '미트볼 던지기', 'attack', '미트볼 여러 개를 연달아 던진다. 하나하나가 부딪힌 자리에 작은 범위 피해를 준다. 처음엔 2개, 스킬 레벨이 오를 때마다 1개씩 늘어 최대 6개.', target='enemy', range=7, mp=10, cd=4, anim='throw',
   ops=[proj('normal', 1.7, count=2, countPerLv=1, split=True, gap=0.09, r=1.2, speed=12, arc=0.9, spread=0.32, cook='meatball', burst='none', sfx='hit', sfxOnHit=True)], fx=dict(color=0xb06a3a))
-S(J, 1, 1, '간단한 요리 공격', 2, 'ck1_b2', '뜨거운 국물', 'attack', '전방에 뜨거운 국물을 뿌려 피해와 화상을 준다.', range=3.2, mp=12, cd=6, anim='throw',
-  ops=[hit('cone', 1.5, r=3.2, ang=60, elem='fire', st=[st('burn', 3, 0.12)], fx=dict(slash='fire_cone'))])
-S(J, 1, 1, '간단한 요리 공격', 3, 'ck1_b3', '후추 뿌리기', 'attack', '범위 피해와 함께 적의 공격력을 낮춘다.', target='ground', range=5, mp=12, cd=8, anim='throw',
-  ops=[hit('circle', 1.2, r=2.2, atAim=True, st=[st('atkdown', 5, 0.2)], fx=dict(burst='pepper_puff'))])
-S(J, 1, 1, '간단한 요리 공격', 4, 'ck1_b4', '밀가루 구름', 'support', '적을 둔화시키는 밀가루 구름을 만든다.', target='ground', range=6, mp=14, cd=12, anim='throw',
-  ops=[area('slow', 2.6, 6, tick=0.5, st=[st('slow', 1.0, 0.4)], fx='flour')])
-S(J, 1, 1, '간단한 요리 공격', 5, 'ck1_b5', '꼬치 찌르기', 'attack', '가까운 직선상의 적을 관통해 찌른다.', range=3.5, mp=10, cd=5, anim='attack',
-  ops=[hit('line', 1.9, len=3.5, w=1.0, fx=dict(slash='thrust', burst='hit_pierce'))])
+S(J, 1, 1, '간단한 요리 공격', 2, 'ck1_b2', '뜨거운 국물', 'attack', '큰 국자로 펄펄 끓는 국물을 전방 부채꼴로 끼얹어 피해와 화상을 준다.', range=3.2, mp=12, cd=6, anim='throw',
+  ops=[dict(op='fx', cook='soup', at=-0.167), hit('cone', 1.5, r=3.2, ang=60, elem='fire', st=[st('burn', 3, 0.12)], sfx='ck_soup', fx=dict(cook='soup'))], fx=dict(color=0xff9a2a))
+S(J, 1, 1, '간단한 요리 공격', 3, 'ck1_b3', '후추 뿌리기', 'attack', '큰 후추통을 흔들어 후춧가루를 뿌린다. 범위 피해와 함께 재채기하는 적의 공격력을 낮춘다.', target='ground', range=5, mp=12, cd=8, anim='throw',
+  sfx='ck_pepper', ops=[dict(op='fx', cook='pepper', at=-0.167), hit('circle', 1.2, r=2.2, atAim=True, st=[st('atkdown', 5, 0.2)], fx=dict(cook='pepper'))], fx=dict(color=0x9a8468))
+S(J, 1, 1, '간단한 요리 공격', 4, 'ck1_b4', '밀가루 구름', 'support', '밀가루 포대를 터뜨려 적을 둔화시키는 밀가루 구름을 깔아 둔다.', target='ground', range=6, mp=14, cd=12, anim='throw',
+  ops=[dict(op='fx', cook='sack', at=-0.167), area('slow', 2.6, 6, tick=0.5, st=[st('slow', 1.0, 0.4)], fx='none', cook='flour')], fx=dict(color=0xffffff))
+S(J, 1, 1, '간단한 요리 공격', 5, 'ck1_b5', '꼬치 찌르기', 'attack', '커다란 꼬치로 가까운 직선상의 적을 한꺼번에 꿰뚫는다.', range=3.5, mp=10, cd=5, anim='attack',
+  ops=[dict(op='fx', cook='skewer', at=-0.25), hit('line', 1.9, len=3.5, w=1.0, sfx='ck_skewer', fx=dict(cook='skewer'))], fx=dict(color=0xe8f4ff))
 S(J, 1, 2, '식사와 기초 조리', 1, 'ck1_c1', '간단한 도시락', 'craft', '비전투용 HP 회복 음식을 만든다.')
 S(J, 1, 2, '식사와 기초 조리', 2, 'ck1_c2', '따뜻한 수프', 'craft', '지속 HP 회복 음식을 만든다.')
 S(J, 1, 2, '식사와 기초 조리', 3, 'ck1_c3', '든든한 한 끼', 'support', '준비된 음식을 먹어 최대 HP를 일시적으로 높인다.', target='self', mp=0, cd=30, anim='cast',
-  ops=[consume('food', ops=[buff('maxhp', 30, 0.15)])])
+  sfxAt='op', ops=[consume('food', cook='meal', ops=[buff('maxhp', 30, 0.15)])])
 S(J, 1, 2, '식사와 기초 조리', 4, 'ck1_c4', '간식 시간', 'support', '간식을 먹어 조금 회복하고 잠깐 빨라진다.', target='self', mp=0, cd=15, anim='cast',
-  ops=[consume('food', ops=[heal(pct=0.08), buff('haste', 4, 0.25)])])
+  sfxAt='op', ops=[consume('food', cook='snack', ops=[heal(pct=0.08), buff('haste', 4, 0.25)])])
 S(J, 1, 2, '식사와 기초 조리', 5, 'ck1_c5', '알뜰한 손질', 'passive', '요리 제작에 쓴 일반 식재료 일부를 확률적으로 돌려받는다.', flags={'craftReturn:food': [0.10, 0.05]})
 
 # ======================================================================= 쉐프 (chef) — temperature contrast

@@ -181,6 +181,7 @@ Object.assign(UI.prototype, {
       const r = craft(G.data, p.sheet, book, rc, n);
       if (r.err) return this.toast(r.err);
       if (r.made > 0) G.audio.sfx('levelup'); else G.audio.sfx('ui_back');
+      if (r.made > 0 && (out.id === 'f_lunch' || out.id === 'f_soup') && G.skillFx && G.skillFx.cook) G.skillFx.cook.made(p, { kind: out.id === 'f_soup' ? 'soup' : 'lunch' });   // 간단한 도시락·따뜻한 수프: the finished dish pops up (js/cookfx.js)
       this.toast(r.made > 0 ? `${out.name} x${r.made} 제작${r.failed ? ` (${r.failed}번 실패)` : ''}${r.bonus ? ` (추가 생산 +${r.bonus})` : ''}${r.returned ? ` · 재료 ${r.returned}개 반환` : ''}` : `제작 실패 — 재료가 사라졌습니다 (성공 확률 ${Math.round(r.rate * 100)}%)`); G.autoSave(); this.showCraft();
     });
   },

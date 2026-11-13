@@ -1,0 +1,6 @@
+{
+  "provider": "synthesized (tools/audio/cook_sfx.py, numpy + scipy, fixed seed)",
+  "generatedOn": "2026-11-13",
+  "note": "Runway 크레딧이 0이라 직접 합성. 같은 이름의 파일로 바꿔 넣으면 교체됨.",
+  "assets": ["sfx_ck_flip.mp3", "sfx_ck_board.mp3", "sfx_ck_soup.mp3", "sfx_ck_pepper.mp3", "sfx_ck_flour.mp3", "sfx_ck_skewer.mp3", "sfx_ck_eat.mp3"]
+}

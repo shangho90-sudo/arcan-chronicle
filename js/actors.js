@@ -5,6 +5,7 @@ import { SpriteBody, dirFromWorld, hitTime, duration, lockTime, action, Telegrap
 import { lootModel, hasItemModel } from './items3d.js';
 import { SkillEngine, applyStatus, clearMarks } from './skillrt.js';
 import { CreatureBody, loadCreature, loadCreatureLook, CREATURES } from './creature.js';
+import { cookFoodKind } from './cookfx.js';
 import { ModelBody, loadPlayerModel, loadNpcModel, loadActions, PLAYER_MODELS, NPC_MODELS, playerModelCfg } from './model.js';
 
 let G = null; // game context (set by game.js)
@@ -43,7 +44,7 @@ export class Combatant {
     if (this.faction === "player" && this.skills2) {
       if (!d.dot) this._hits = (this._hits || 0) + 1;
       if ((d.dot || d.elem) && this.stat("elemRes") > 0) amount *= 1 - Math.min(0.6, this.stat("elemRes"));   // 속성 저항 (약사 수련): burn / poison / bleed ticks, elemental hits
-      const fg = this.status.flag("frontguard"); if (fg && d.source && d.source.pos) { const dx = d.source.pos.x - this.pos.x, dz = d.source.pos.z - this.pos.z, m = Math.hypot(dx, dz) || 1; if ((dx * this.facing.x + dz * this.facing.z) / m > 0.3) amount *= 1 - fg; }
+      const fg = this.status.flag("frontguard"); if (fg && d.source && d.source.pos) { const dx = d.source.pos.x - this.pos.x, dz = d.source.pos.z - this.pos.z, m = Math.hypot(dx, dz) || 1; if ((dx * this.facing.x + dz * this.facing.z) / m > 0.3) { amount *= 1 - fg; if (G.skillFx && G.skillFx.cook && this._cookBoard) G.skillFx.cook.blocked(this); } }   // 도마 방어: knife mark on the board (js/cookfx.js)
       if (this.skills2.smith) amount = this.skills2.smith.guard(d, amount);   // 대장장이 접이식 철벽(정면)·즉석 리벳: 줄인 만큼 충격 재활용에 모임
       if (this.skills2.casting && !d.dot && amount > this.maxHp * 0.15) this.skills2.interruptCast("강한 공격에 시전이 끊겼습니다");
       const sh = this.shield > 0 ? Math.min(this.shield, amount) : 0;
@@ -536,6 +537,7 @@ export class Player extends Combatant {
     if (u.status) { const k = d.id.startsWith('f_') ? 1 + this.sheet.final.foodPower : 1; applyStatus(this, { id: u.status, dur: u.duration * k, val: u.value * (u.status === 'regen' ? this.maxHp : 1), ch: 1 }, this); }
     this.potionCd = Math.max(this.cfg.potionCooldown, u.cooldown);
     G.fx.play("heal", { x: this.pos.x, y: this.pos.y + 0.8, z: this.pos.z }, 1); G.audio.sfx("heal");
+    if (d.id.startsWith('f_') && G.skillFx && G.skillFx.cook) G.skillFx.cook.eat(this, { kind: cookFoodKind(d.id) });   // 음식: 도시락·수프 그릇이 나타나 한 입씩 (js/cookfx.js)
     return true;
   }
   /** dye / weapon module / embroidery consumables: applied to the equipped gear, recorded in the save */

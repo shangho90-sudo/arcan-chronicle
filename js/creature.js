@@ -156,6 +156,8 @@ export class CreatureBody {
   flash(d) { this.flashT = Math.max(this.flashT, d); }
   /** heavy blow reaction (약사 유봉강타): squashed + tipped away from the blow at once, springs back over `d` s. Visual only —
    *  the actor's position is untouched. (x, z) = blow direction in game space. A new punch restarts it, never adds. */
+  /** visual-only toss (요리사 뒤집기): the model flies up `h` m and turns one full flip like a pancake over `d` s; the actor's position is untouched. */
+  toss(d = 0.8, h = 1.5) { this.tossT = d; this.tossD = d; this.tossH = h; }
   punch(x, z, d = 0.2) { const m = Math.hypot(x, z) || 1; this.punchT = d; this.punchD = d; this.punchX = x / m; this.punchZ = -z / m; }
   setTint(r, g, b) { for (const m of this.mats) m.color.setRGB(Math.min(1, r * 1.0), Math.min(1, g), Math.min(1, b)); }
   setVisible(v) { this.visible = v; this.root.visible = v; this.shadow.visible = v; }
@@ -215,6 +217,12 @@ export class CreatureBody {
       this.punchT -= dt; const u = 1 - Math.max(0, this.punchT) / this.punchD, k = u < 0.3 ? 1 - 0.25 * (u / 0.3) : 0.75 * Math.cos((u - 0.3) / 0.7 * Math.PI * 1.5) * (1 - (u - 0.3) / 0.7);
       const c = Math.cos(this.yaw), sn = Math.sin(this.yaw), lx = this.punchX * c - this.punchZ * sn, lz = this.punchX * sn + this.punchZ * c;   // blow direction in the root's local frame
       sy *= 1 - 0.16 * k; sxz *= 1 + 0.09 * k; P.position.x += lx * 0.07 * s * k; P.position.z += lz * 0.07 * s * k; P.rotation.x += lz * 0.16 * k; P.rotation.z += -lx * 0.16 * k;
+    }
+    if (this.tossT > 0) {   // up and over: lands flat on the feet again, a small squash on the way out and on landing
+      this.tossT -= dt; const u = 1 - Math.max(0, this.tossT) / this.tossD, arc = 4 * u * (1 - u);
+      const th = Math.PI * 2 * (u < 0.5 ? 2 * u * u : 1 - 2 * (1 - u) * (1 - u)), cy = 0.45 * s;   // turn about the body's middle, not the feet
+      P.position.y += this.tossH * arc + cy * (1 - Math.cos(th)); P.position.z -= cy * Math.sin(th); P.rotation.x += th;
+      const land = u > 0.9 ? (u - 0.9) / 0.1 : 0; sy *= 1 + 0.12 * Math.sin(Math.min(1, u / 0.15) * Math.PI) - 0.2 * Math.sin(land * Math.PI); sxz *= 1 + 0.12 * Math.sin(land * Math.PI);
     }
     // squash & stretch around the scaled model (keeps the feet on the ground)
     this.innerScale = this.innerScale || sc; I.scale.set(this.innerScale * sxz, this.innerScale * sy, this.innerScale * sxz);
