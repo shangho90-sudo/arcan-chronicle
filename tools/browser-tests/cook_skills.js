@@ -41,6 +41,7 @@ const cfg = (SKILL) => { const WIDE = ['ball', 'soup', 'pepper', 'flour', 'skewe
     G.sheet.bag.add('f_lunch', 5); G.sheet.recalc(); G.dev.full(); G.input.block = true;
     await G.player.attachBody(); G.player.body.place(G.player.pos); G.player.body.play('idle', 1, true);
     G.skillFx.cook.load();
+    { const R = G.render.r, o = R.render.bind(R); R.render = (sc, c) => { if (!window.__noDraw) o(sc, c); }; }   // frames that are not photographed run the whole game step but skip the GPU draw (SwiftShader is the slow part)
     const p = G.player; let spot = null; const cx = p.pos.x, cz = p.pos.z;
     for (let r = 0; r <= 16 && !spot; r++) for (let k = 0; k < Math.max(1, r * 6) && !spot; k++) { const a = k / Math.max(1, r * 6) * 6.283, c = { x: cx + Math.cos(a) * r, z: cz + Math.sin(a) * r }; let ok = true;
       for (let x = -7; x <= 7 && ok; x += 0.75) for (let z = -7; z <= 7 && ok; z += 0.75) if (x * x + z * z <= 49 && G.zone.geo.blocked(c.x + x, c.z + z, 0.35)) ok = false; if (ok) spot = c; }
@@ -96,9 +97,9 @@ const cfg = (SKILL) => { const WIDE = ['ball', 'soup', 'pepper', 'flour', 'skewe
   if (typeof info === 'string') { console.log(SKILL, info); continue; }
   const frames = [], total = Math.round(DUR * FPS); let dc = 0;
   for (let i = 0; i < total; i++) {
-    const shot = MARKS.some(m => i === Math.round(m * FPS));
-    const c = await ev(([i, fps, dist, skill]) => {
-      window.__t = i / fps; const p = G.player, f = window.__f, m = window.__ds[0], L = window.__log;
+    const shot = process.env.SHOTS !== '0' && MARKS.some(m => i === Math.round(m * FPS));   // SHOTS=0: numbers only (fast)
+    const c = await ev(([i, fps, dist, skill, shot]) => {
+      window.__t = i / fps; window.__noDraw = !shot; const p = G.player, f = window.__f, m = window.__ds[0], L = window.__log;
       if (window.__eatAt === i) { p.potionCd = 0; L.ate = p.useItem(window.__eatId); }
       G.step(1 / fps, true);
       window.__ds.forEach((q, qi) => { if (q.__hp == null) q.__hp = window.__hp; if (!q.removed && q.hp < q.__hp) { L.dmg.push({ t: +window.__t.toFixed(3), a: Math.round(q.__hp - q.hp), dead: !!q.dead, i: qi }); q.__hp = q.hp; } });
@@ -111,15 +112,16 @@ const cfg = (SKILL) => { const WIDE = ['ball', 'soup', 'pepper', 'flour', 'skewe
       L.lock.push(+(p.skills.lock || 0).toFixed(3));
       const cp = G.render.cam.position, fu = G.render.focusU, rel = { x: cp.x - fu.x, y: cp.y - fu.y, z: cp.z + fu.z }; if (!window.__c0) window.__c0 = rel;
       L.cam.push(+Math.hypot(rel.x - window.__c0.x, rel.y - window.__c0.y, rel.z - window.__c0.z).toFixed(4));
-      const s = G.render.toScreen({ x: p.pos.x + f.x * dist * 0.62, y: p.pos.y + 1.1, z: p.pos.z + f.z * dist * 0.62 });
+      const fc = skill === 'pepper' || skill === 'flour' ? 0.8 : 0.62, s = G.render.toScreen({ x: p.pos.x + f.x * dist * fc, y: p.pos.y + 1.1, z: p.pos.z + f.z * dist * fc });
       return [s.x, s.y, G.render.r ? G.render.r.info.render.calls : -1];
-    }, [i, FPS, DIST, SKILL]);
+    }, [i, FPS, DIST, SKILL, shot]);
     const fn = `${dirOut}/${String(i).padStart(3, '0')}.png`;
     if (shot) await pg.screenshot({ path: fn, clip: { x: Math.max(0, Math.min(VW - CW, Math.round(c[0] - CW / 2))), y: Math.max(0, Math.min(VH - CH, Math.round(c[1] - CH / 2))), width: CW, height: CH }, timeout: 300000 });
     frames.push(shot ? fn : null); dc = Math.max(dc, c[2]);
   }
   // the rest of the effect's life without drawing (flour 6 s, board 5 s): nothing may be left over
-  const late = await ev(() => { const a = { slowAt2s: window.__ds.filter(q => !q.removed && q.status && q.status.has('slow')).length, guard: G.player.status.has('frontguard') }; for (let i = 0; i < 270; i++) G.step(1 / 30, false); a.liveAfter9s = G.skillFx.cook.live.length; a.areas = G.player.skills2.areas ? G.player.skills2.areas.length : -1; a.guardAfter = G.player.status.has('frontguard'); return a; });
+  await ev(() => { window.__noDraw = false; });
+  const late = await ev(() => { const a = { slowAt2s: window.__ds.filter(q => !q.removed && q.status && q.status.has('slow')).length, guard: G.player.status.has('frontguard') }; window.__noDraw = true; for (let i = 0; i < 270; i++) G.step(1 / 30, true); window.__noDraw = false; a.liveAfter9s = G.skillFx.cook.live.length; a.areas = G.player.skills2.areas ? G.player.skills2.areas.length : -1; a.guardAfter = G.player.status.has('frontguard'); return a; });
   const res = await ev(([id]) => { const L = window.__log, m = window.__ds[0], p = G.player; const rng = a => a.length ? [a[0], a[a.length - 1], a.length] : null;
     const camMax = Math.max(...L.cam), last = L.cam.length - 1 - [...L.cam].reverse().findIndex(v => v > 0.002);
     return { ate: L.ate, fx: L.fx, sfx: L.sfx, dmg: L.dmg, tossFrames: L.toss || 0, slowed: window.__ds.filter(q => !q.removed && q.status && q.status.has('slow')).length, statuses: window.__ds.map(q => q.removed ? 'gone' : q.status.list.map(x => x.def.id).join('+')), buffs: p.status.list.map(x => x.def.id).join('+'), food: G.sheet.bag.count('f_lunch'), hits: L.dmg.length, total: L.dmg.reduce((s, d) => s + (d.a || 0), 0), nums: L.num.length, freezePlayer: rng(L.freezeP), freezeTarget: rng(L.freezeT), globalHitStop: rng(L.gstop),

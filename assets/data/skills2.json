@@ -2990,6 +2990,7 @@
 "coef": 1.5,
 "launch": 0.8,
 "vsImmune": 1.6,
+"oneHit": true,
 "sfx": "ck_flip",
 "fx": {
 "cook": "flip"

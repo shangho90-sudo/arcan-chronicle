@@ -182,8 +182,9 @@ S(J, 1, 0, '식칼과 프라이팬', 1, 'ck1_a1', '식칼 썰기', 'attack', '�
 S(J, 1, 0, '식칼과 프라이팬', 2, 'ck1_a2', '팬 강타', 'attack', '공중에 커다란 프라이팬을 불러내 적 하나를 내리찍는다. 맞은 적은 3초 동안 기절한다(보스 제외).', weapon='knife', target='enemy', range=1.8, mp=10, cd=6, anim='ck_pan',
   ops=[dict(op='fx', cook='pan', at=-0.30, fall=0.30), hit('single', 2.3, oneHit=True, stOnHit=True, st=[st('stun', 3)], sfx='heavy', fx=dict(cook='pan'))], fx=dict(color=0xffc070))
 # 2026-11-13 남은 스킬 연출(수치 그대로): 이름 그대로의 큰 주방 도구가 나타남 — js/cookfx.js. fx op의 at = -(동작의 타격 시각: attack 0.25, throw 0.167).
+# 뒤집기: 레벨 추가타는 한 방에 합침(oneHit, 총 피해 같음) — 한 번 퍼 올려 한 바퀴 뒤집으므로(예전엔 Lv3부터 2~3번 나눠 맞으며 공중에서 다시 띄워짐).
 S(J, 1, 0, '식칼과 프라이팬', 3, 'ck1_a3', '뒤집기', 'attack', '큰 뒤집개로 적 하나를 부침개처럼 퍼 올려 뒤집는다. 일반 적은 잠시 떠서 움직이지 못하고, 띄울 수 없는 적에게는 추가 피해.', weapon='knife', target='enemy', range=1.8, mp=12, cd=8, anim='attack',
-  ops=[dict(op='fx', cook='flip', at=-0.25), hit('single', 1.5, launch=0.8, vsImmune=1.6, sfx='ck_flip', fx=dict(cook='flip'))], fx=dict(color=0xffd27a))
+  ops=[dict(op='fx', cook='flip', at=-0.25), hit('single', 1.5, launch=0.8, vsImmune=1.6, oneHit=True, sfx='ck_flip', fx=dict(cook='flip'))], fx=dict(color=0xffd27a))
 S(J, 1, 0, '식칼과 프라이팬', 4, 'ck1_a4', '도마 방어', 'support', '커다란 도마를 방패처럼 세워 정면에서 받는 피해를 줄인다.', target='self', mp=10, cd=14, anim='cast', sfxAt='op', ops=[buff('frontguard', 5, 0.5, cook='board', noAura=True)])
 S(J, 1, 0, '식칼과 프라이팬', 5, 'ck1_a5', '손질 숙련', 'passive', '식칼 공격 속도와 식재료 획득량이 증가한다.', mods=[dict(stat='atkSpeed', mul=0.05, mulLv=0.02)], flags=dict(ingredientDrop=[0.1, 0.05]))
 # 미트볼 던지기: 미트볼 2~6개(Lv마다 +1)가 0.09 s 간격으로 조금씩 벌어져 포물선으로 날아가 같은 대상에 차례로 떨어짐. 하나하나가 예전처럼 반경 1.2 m 작은 범위 피해.

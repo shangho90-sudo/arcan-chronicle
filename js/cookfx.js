@@ -34,8 +34,8 @@ export const COOK = {
   splat: { life: 0.42, ring: 0.85, flash: 1.3, bits: 5, bitsLite: 2 },
   flip: { stop: 0.06, kick: [0.09, 0.1], h: 1.5, ring: 1.8, flash: 1.3 },
   board: { w: 1.0, fwd: 0.62, marks: 6, push: 0.1, spark: 1.4 },
-  soup: { ladle: 1.15, wave: 0.34, lift: 0.55, drops: 9, dropsLite: 4, steam: 6, steamLite: 2, kick: [0.05, 0.08], a: 0.95 },
-  pepper: { h: 2.1, size: 1.25, puffs: 5, puffsLite: 2, a: 0.42 },
+  soup: { ladle: 1.15, wave: 0.16, lift: 0.55, drops: 9, dropsLite: 4, steam: 6, steamLite: 2, kick: [0.05, 0.08], a: 0.95 },
+  pepper: { h: 2.3, back: 0.9, size: 1.3, puffs: 5, puffsLite: 2, a: 0.42 },
   flour: { size: 0.95, burst: 8, burstLite: 4, haze: 0.2, ring: 0.5, wisps: 5, wispsLite: 2 },
   skewer: { stop: 0.05, kick: [0.07, 0.09], y: 0.85, flash: 1.3, line: 1.6 },
   eat: { y: 2.25, size: 0.62, bites: 3, gap: 0.2 },
@@ -453,7 +453,7 @@ export class CookFx {
       // drops fly out inside the real cone and land inside it; steam rises where the soup fell
       const n = low ? K.dropsLite : K.drops, h = ang * Math.PI / 360, drops = [];
       const de = this._fx('soupdrops', 0.5, (q, dt) => { for (const d of drops) { d.v.y -= 9 * dt; d.m.position.addScaledVector(d.v, dt); if (d.m.position.y < p0.y + 0.05) { d.m.position.y = p0.y + 0.05; d.v.set(0, 0, 0); d.m.scale.multiplyScalar(0.8); } else { _a.copy(d.v).normalize(); d.m.quaternion.setFromUnitVectors(UP, _a); } d.m.material.uniforms.uA.value = 1 - smooth(0.7, 1, q.t / q.life); } });
-      for (let i = 0; i < n; i++) { const a = rnd(-h, h) * 0.85, dist = r * rnd(0.45, 0.95), T = rnd(0.2, 0.32), dir = f.clone().applyAxisAngle(UP, a), m = this.solid(de, this.geo.cook_drop, { spec: 0.9, rim: COOK.col.soupHi });
+      for (let i = 0; i < n; i++) { const a = rnd(-h, h) * 0.85, dist = r * rnd(0.45, 0.95), T = rnd(0.1, 0.18), dir = f.clone().applyAxisAngle(UP, a), m = this.solid(de, this.geo.cook_drop, { spec: 0.9, rim: COOK.col.soupHi });
         m.scale.setScalar(rnd(0.06, 0.11)); m.position.copy(ld.position); const dy = p0.y + 0.05 - ld.position.y, to = p0.clone().addScaledVector(dir, dist);
         drops.push({ m, v: new THREE.Vector3((to.x - ld.position.x) / T, dy / T + 4.5 * T, (to.z - ld.position.z) / T) }); }
       const ns = low ? K.steamLite : K.steam;
@@ -467,10 +467,12 @@ export class CookFx {
   pepper(pc, o = {}) {
     if (!this._ok() || !(this.tri.tripo_pepper || this.geo.cook_shaker)) return null;
     const K = COOK.pepper, lead = Math.max(0.08, o.lead || 0.17), r = o.r || 2.2, aim = o.aim || pc.pos, g0 = P3({ x: aim.x, y: o.ground ?? (pc.pos.y || 0), z: aim.z }), low = lite(); let shook = -1;
+    // the shaker hangs a little toward the cook (straight above the aim point it covered the targets standing behind it on screen)
+    const back = new THREE.Vector3(pc.pos.x - aim.x, 0, -(pc.pos.z - aim.z)); if (back.lengthSq() < 1e-4) back.set(0, 0, 1); back.normalize();
     const e = this._fx('pepper', lead + 0.9, (e) => {
       // upside down above the aim point; two sharp shakes: the first one lands exactly on the damage tick
       const t = e.t - lead, s1 = Math.exp(-Math.pow(t / 0.05, 2)), s2 = Math.exp(-Math.pow((t - 0.2) / 0.05, 2)), out = smooth(0.42, 0.62, t);
-      sh.position.copy(g0); sh.position.y = g0.y + K.h - 0.32 * (s1 + s2) + 0.5 * out; sh.position.x += 0.04 * Math.sin(e.t * 50) * (s1 + s2);
+      sh.position.copy(g0).addScaledVector(back, K.back); sh.position.y = g0.y + K.h - 0.32 * (s1 + s2) + 0.5 * out; sh.position.x += 0.04 * Math.sin(e.t * 50) * (s1 + s2);
       sh.rotation.set(Math.PI - 0.5 + 0.35 * (s1 + s2), e.t * 1.2, 0.25); sh.scale.setScalar(K.size * (0.6 + 0.4 * easeOut(e.t / 0.1)));
       sh.material.uniforms.uA.value = smooth(0, 0.06, e.t) * (1 - out);
       if (shook >= 0) { const k = (e.t - shook) / 0.6; sp.material.uniforms.uP.value = k * 1.2; sp.material.uniforms.uA.value = 0.85 * smooth(0, 0.08, e.t - shook) * (1 - smooth(0.45, 1, k)); this._flat(sp, r * (0.55 + 0.45 * easeOut(k * 2)), 0.06);
@@ -530,22 +532,24 @@ export class CookFx {
   skewer(pc, o = {}) {
     if (!this._ok() || !(this.tri.tripo_kebab || this.geo.cook_skewer)) return null;
     const K = COOK.skewer, I = COOK.intensity, lead = Math.max(0.1, o.lead || 0.25), len = o.len || 3.5, f = this._f3(o.facing || { x: 0, z: 1 }), p0 = P3(pc.pos); let hitAt = -1;
-    const right = new THREE.Vector3().crossVectors(f, UP).normalize();
+    const right = new THREE.Vector3().crossVectors(f, UP).normalize(); let spin = 0;
     const e = this._fx('skewer', lead + 0.42, (e) => {
       // pulled back beside the cook, then the thrust: the tip is at the far end of the real line exactly at `lead`
       const k = e.t / lead, pull = k < 0.6 ? -0.35 * easeOut(k / 0.6) : -0.35 + 1.35 * Math.pow(clamp01((k - 0.6) / 0.4), 2.2);
-      const ext = hitAt < 0 ? Math.min(1, pull) : 1 - 0.55 * smooth(0.08, 0.3, e.t - hitAt), tip = 0.2 + (len - 0.2) * Math.max(-0.3, ext);
+      // after a hit it stays run through (a small jolt per hit, Lv 2마다 추가타 = the same skewer twists again) and pulls out 0.16 s after the LAST hit
+      const dh = e.t - hitAt, ext = hitAt < 0 ? Math.min(1, pull) : 1 - 0.07 * Math.sin(clamp01(dh / 0.1) * Math.PI) - 0.55 * smooth(0.16, 0.36, dh), tip = 0.2 + (len - 0.2) * Math.max(-0.3, ext);
       sk.position.copy(p0).addScaledVector(f, tip - len).addScaledVector(right, 0.28 * (1 - clamp01(ext))); sk.position.y = p0.y + K.y;
-      _mx.makeBasis(f, UP, _c.crossVectors(f, UP)); sk.quaternion.setFromRotationMatrix(_mx); sk.rotateX(e.t * (hitAt < 0 ? 9 : 2)); sk.scale.setScalar(len);
-      sk.material.uniforms.uA.value = smooth(0, 0.07, e.t) * (hitAt < 0 ? 1 : 1 - smooth(0.12, 0.32, e.t - hitAt));
+      _mx.makeBasis(f, UP, _c.crossVectors(f, UP)); sk.quaternion.setFromRotationMatrix(_mx); sk.rotateX(e.t * (hitAt < 0 ? 9 : 2) + spin); sk.scale.setScalar(len);
+      sk.material.uniforms.uA.value = smooth(0, 0.07, e.t) * (hitAt < 0 ? 1 : 1 - smooth(0.2, 0.38, dh));
       if (hitAt >= 0) { const q = (e.t - hitAt) / 0.2; ln.material.uniforms.uA.value = I * K.line * (1 - smooth(0.1, 1, q)); ln.scale.set(len * (0.85 + 0.15 * easeOut(q)), 0.5 * (1 - 0.5 * q), 1); }
       else if (e.t > lead + 0.1) hitAt = e.t;
     });
     const sk = this.prop(e, 'tripo_kebab', 'cook_skewer', { spec: 1.0, rim: COOK.col.steelB }); sk.renderOrder = 6;
     const ln = this.spr(e, 2, 0xffffff, COOK.col.steelB, 5); ln.position.copy(p0).addScaledVector(f, len * 0.5).setY(p0.y + K.y); this._alignLine(ln, f);
     e.hit = (ok) => {
-      if (e.dead || hitAt >= 0) return; hitAt = e.t;
-      for (const t of ok || []) { const g = P3(t.pos); this._pop(g, { r: 0, y: Math.min(K.y, cookTop(t) * 0.8), size: 0.7, flash: K.flash, w: COOK.col.steel });
+      if (e.dead) return; const again = hitAt >= 0; if (again && !(ok && ok.length)) return;
+      hitAt = e.t; e.life = Math.max(e.life, e.t + 0.42); spin += again ? 1.6 : 0;
+      for (const t of ok || []) { const g = P3(t.pos); this._pop(g, { r: 0, y: Math.min(K.y, cookTop(t) * 0.8), size: again ? 0.55 : 0.7, flash: K.flash * (again ? 0.8 : 1), w: COOK.col.steel });
         this._bits(g.clone().setY(g.y + Math.min(K.y, cookTop(t) * 0.8)), lite() ? 1 : 3, { size: [0.08, 0.13], speed: [1.2, 2.4], up: [1.4, 2.6], ground: g.y, life: 0.45 }); }
     };
     return e;
