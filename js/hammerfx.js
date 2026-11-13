@@ -11,6 +11,8 @@ const HAMMER = {
   dust: { n: 5, lo: 3, col: [0.84, 0.76, 0.66] },
   chips: { n: 6, lo: 3 },
 };
+// own random stream: the effect must not consume the game's Math.random (miss / crit rolls stay the same as without it)
+let _seed = 1234567; const rnd = () => (_seed = (_seed * 1664525 + 1013904223) >>> 0) / 4294967296;
 const RING_FS = `uniform float uT; uniform float uO; uniform vec3 uCol; varying vec2 vUv;
 void main(){ vec2 p = vUv * 2.0 - 1.0; float r = length(p); float w = 0.16 * (1.0 - uT) + 0.04;
   float band = smoothstep(1.0, 1.0 - w, r) * smoothstep(1.0 - 2.4 * w, 1.0 - w, r);
@@ -48,9 +50,9 @@ export class HammerFx {
     const P = T(pos); e.g.position.copy(P); e.ground = ground - pos.y;
     e.ring.position.set(0, e.ground + 0.04, 0);
     const nD = this.low ? HAMMER.dust.lo : HAMMER.dust.n, nC = this.low ? HAMMER.chips.lo : HAMMER.chips.n;
-    e.dust.forEach((d, i) => { d.visible = i < nD; const a = (i / nD) * 6.283 + Math.random(); d.userData.v = [Math.cos(a) * 0.9, 0.25 + Math.random() * 0.3, Math.sin(a) * 0.9]; d.position.set(0, e.ground + 0.12, 0); });
-    e.chips.forEach((c, i) => { c.visible = i < nC; const a = Math.atan2(-dir.z, dir.x) + (Math.random() - 0.5) * 2.4;   // spray away from the blow (three z = -unity z)
-      c.userData.v = [Math.cos(a) * (1.4 + Math.random()), 1.6 + Math.random() * 1.4, Math.sin(a) * (1.4 + Math.random())]; c.position.set(0, 0, 0); c.rotation.set(Math.random() * 3, Math.random() * 3, 0); });
+    e.dust.forEach((d, i) => { d.visible = i < nD; const a = (i / nD) * 6.283 + rnd(); d.userData.v = [Math.cos(a) * 0.9, 0.25 + rnd() * 0.3, Math.sin(a) * 0.9]; d.position.set(0, e.ground + 0.12, 0); });
+    e.chips.forEach((c, i) => { c.visible = i < nC; const a = Math.atan2(-dir.z, dir.x) + (rnd() - 0.5) * 2.4;   // spray away from the blow (three z = -unity z)
+      c.userData.v = [Math.cos(a) * (1.4 + rnd()), 1.6 + rnd() * 1.4, Math.sin(a) * (1.4 + rnd())]; c.position.set(0, 0, 0); c.rotation.set(rnd() * 3, rnd() * 3, 0); });
     this.live.push(e); this.update(0);
   }
   update(dt) {

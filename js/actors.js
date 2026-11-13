@@ -117,7 +117,6 @@ export const Resolver = {
 // ======================================================================================= skills
 /** 직업별 기본공격 모양 (tools/anim/swings.py <prefix>_combo_1..5: C5와 같은 시각·판정·이동, 상체 자세만 다름). 몸 모델의
  *  직업 계열(body.job = 1차 직업 sheet) -> 접두사; 그 동작이 없으면 공용 combo_N */
-const HAMMER_STOP = 0.045, HAMMER_STOP_BIG = 0.07;
 function hammerImpact(pc, t, f, big, dd) {
   if (dd && dd.missed) return;
   const bp = pc.body.bladePoints && pc.body.bladePoints(), head = bp ? bp[1] : null, ty = t.pos.y || 0;
@@ -127,9 +126,10 @@ function hammerImpact(pc, t, f, big, dd) {
   if (d > r + 0.35) { const k = (r + 0.1) / (d || 1); hp = { x: t.pos.x + dx * k, y: hp.y, z: t.pos.z + dz * k }; }
   hp.y = Math.max(ty + 0.12, Math.min(ty + 1.3, hp.y));
   G.hammerFx.hit(hp, { dir: f, big, ground: ty });
-  // hit-stop on the TARGET only: freezing the player's body delayed its combo root motion / reach and shifted strikes 4-5
-  // by 4 frames (measured with tools/browser-tests/gfxref.js) - the basic attack timing must stay exactly the same
-  const st = big ? HAMMER_STOP_BIG : HAMMER_STOP; if (!t.dead) t.freezeT = Math.max(t.freezeT || 0, st);
+  // no freezeT for the basic attack: freezing the player delayed the combo root motion, freezing the target delayed its
+  // knock-back (actors.js: the push starts after the freeze) - both moved strikes 4-5 by 4 frames on the phone (auto
+  // lock-on walks back into reach). Measured with tools/browser-tests/gfxref.js; the timing must stay exactly the same.
+  // The weight comes from the squash (visual only) + the effect + one small camera kick on the 5th.
   if (t.body && t.body.punch) t.body.punch(t.pos.x - pc.pos.x, t.pos.z - pc.pos.z, big ? 0.18 : 0.12);
   if (big && G.render && G.render.kick) G.render.kick(f.x, f.z, 0.07, 0.1);
 }
@@ -207,7 +207,7 @@ export class SkillRunner {
         const fx3 = G.skillFx && !a.atTarget && a.shape === "cone" && (a.fx === "slash" || a.fx === "hit" || a.fx === "wind");
         const SF = G.swingFx && G.swingFx.ready ? G.swingFx : null;
         // 망치 기본공격(bs_combo_*, action.impact 'hammer'): 실제 망치 머리에서 작은 섬광·고리·먼지·조각 (js/hammerfx.js) + 짧은
-        // 대상만 짧은 국소 히트스톱(freezeT, 전역 G.hitStop 아님 — 공격 타이밍 그대로) — 5타만 카메라 kick 한 번. 판정·피해는 그대로.
+        // 히트스톱(freezeT)은 쓰지 않음 — 공격·밀림 타이밍 그대로, 대상 눌림(그림만) — 5타만 카메라 kick 한 번. 판정·피해는 그대로.
         const HA = G.hammerFx && pc.body && pc.body.sh && pc.body.sh.actions[pc.body.action], hammer = HA && HA.impact === 'hammer' && !a.atTarget ? HA : null;
         for (const t of ts) {
           const dd = Resolver.damage(pc, t, a.coef * bmul, a.power, a.knockback); t.takeDamage(dd);

@@ -160,7 +160,7 @@
 - 카메라: `CAM.ortho` 4.75 → 4.4, 휴대폰 `minWidth` 8.5 → 7.6 m(캐릭터가 화면에서 약 8%/12% 커짐). `artPitch`·피치·거리는 그대로.
 - 대기 숨쉬기: `model.js` `apply`(idle일 때 가슴·어깨·머리·왼팔의 작은 움직임, 걸으면 사라짐).
 - 직업별 기본공격 모양: `actors.js` `JOB_COMBO`(직업 계열 → 접두사, 지금 `blacksmith: 'bs'`, `hairdresser: 'hd'` 자리만) + `comboName` — `<접두사>_combo_N` 동작이 있으면 그것, 없으면 공용 `combo_N`. 대장장이 `bs_combo_1..5`는 `swings.py` `BS_POSE`(C5와 **같은 키 시각·타격 프레임·adv·step·lift**, 상체 자세만: 올려 들 때 뒤로 젖히며 무게를 올리고 잠깐 멈춤 → 늦게 가속 → 타격 때 앞발로 주저앉음 → 짧고 무거운 마무리; 생성기가 hitTimes·lock·chainClose·adv가 공용과 같은지 assert). 잔상은 망치 머리 쪽만(`trailBase` 0.72)·따뜻한 색·짧게.
-- 망치 타격 이펙트: `js/hammerfx.js`(`G.hammerFx.hit(pos, {dir, big, ground})`, 조절값 `HAMMER`): 실제 망치 머리(`bladePoints`) 위치에 작은 섬광 0.07초 + 땅 위 얇은 고리 + 먼지 5 + 돌·불티 조각 6(저사양 3·3), 0.34초에 모두 사라짐, 풀 재사용. 동작 필드 `impact: 'hammer'`가 있는 기본공격이 맞았을 때만(`actors.js` `hammerImpact`, MISS는 없음). 히트스톱은 **대상만** `freezeT` 0.045초(5타 0.07초) + 눌림 `punch`, 5타만 카메라 `kick` 한 번 — 플레이어 몸까지 멈추면 콤보 이동이 늦어져 4·5타가 4프레임 밀렸음(측정), 그래서 대상만.
+- 망치 타격 이펙트: `js/hammerfx.js`(`G.hammerFx.hit(pos, {dir, big, ground})`, 조절값 `HAMMER`): 실제 망치 머리(`bladePoints`) 위치에 작은 섬광 0.07초 + 땅 위 얇은 고리 + 먼지 5 + 돌·불티 조각 6(저사양 3·3), 0.34초에 모두 사라짐, 풀 재사용. 동작 필드 `impact: 'hammer'`가 있는 기본공격이 맞았을 때만(`actors.js` `hammerImpact`, MISS는 없음). `freezeT` 히트스톱은 **쓰지 않음**(플레이어를 멈추면 콤보 이동이, 대상을 멈추면 밀림이 늦어져 휴대폰 자동 록온에서 4·5타가 4프레임 밀렸음 — `gfxref.js`로 측정) — 무게감은 대상 눌림 `punch`(그림만)·이펙트·5타 카메라 `kick` 한 번. 이펙트 난수는 자기 것(`rnd`)만 써서 게임의 `Math.random`(명중·치명 굴림)을 건드리지 않음.
 - 망치 모양: `items3d.js` `BUILD.hammer`(굵은 자루·둥근 원통 머리·양쪽 넓은 타격면·가운데 띠·자루 끝 손잡이).
 
 ## 칼 휘두르기 (`js/model.js`, `tools/anim/swings.py`)
