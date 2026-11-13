@@ -38,7 +38,7 @@ export const COOK = {
   pepper: { h: 2.3, back: 0.9, size: 1.3, puffs: 5, puffsLite: 2, a: 0.42 },
   flour: { size: 0.95, burst: 8, burstLite: 4, haze: 0.2, ring: 0.5, wisps: 5, wispsLite: 2 },
   skewer: { stop: 0.05, kick: [0.07, 0.09], y: 0.85, flash: 1.3, line: 1.6 },
-  eat: { y: 2.25, size: 0.62, bites: 3, gap: 0.2 },
+  eat: { y: 2.55, size: 0.85, bites: 3, gap: 0.2 },
   col: { soup: 0xff9a2a, soupB: 0xd8560a, soupHi: 0xffe08a, pepper1: 0x4a3626, pepper2: 0x9a8468, flour1: 0xffffff, flour2: 0xe6dcc8, wood: 0xe0b070, steel: 0xeaf4ff, steelB: 0xa8cfff, gold: 0xffd27a, goldB: 0xff9a2a, warm: 0xfff0d0, sauce: 0xff6a2a, sauceB: 0xb83210, dust1: 0xd8c8a8, dust2: 0x7a6a58, steam1: 0xfff4e6, steam2: 0xb89880 },
 };
 
@@ -564,12 +564,12 @@ export class CookFx {
   /** food appears over the head, tips toward the camera and is eaten in bites (each bite: smaller + crumbs + munch) */
   eat(pc, o = {}) {
     if (!this._ok()) return null;
-    const K = COOK.eat, kind = o.kind || 'meal', bites = kind === 'snack' ? 2 : K.bites, size = K.size * (kind === 'meal' ? 1.35 : kind === 'snack' ? 0.8 : 1), t0 = 0.26, low = lite(); let done = 0;
+    const K = COOK.eat, kind = o.kind || 'meal', bites = kind === 'snack' ? 2 : K.bites, size = K.size * (kind === 'meal' ? 1.3 : kind === 'snack' ? 0.95 : 1), t0 = 0.26, low = lite(); let done = 0;
     const e = this._fx('eat', t0 + bites * K.gap + 0.3, (e) => {
       if (pc.dead) { e.t = e.life; return; }
       const p = P3(pc.pos), nb = Math.max(0, Math.min(bites, Math.floor((e.t - t0) / K.gap) + 1)), sc = size * (0.3 + 0.7 * easeOut(e.t / 0.16)) * (1 - 0.26 * Math.min(nb, bites - 1)) * (nb >= bites ? Math.max(0, 1 - (e.t - t0 - (bites - 1) * K.gap) / 0.12) : 1);
       const down = smooth(t0 - 0.1, t0 + bites * K.gap, e.t);
-      fd.position.set(p.x, p.y + K.y - 0.55 * down + 0.05 * Math.sin(e.t * 9), p.z); fd.quaternion.copy(this.camQ); fd.rotateX(-0.95); if (fd.userData.flatFix) fd.rotateX(-Math.PI / 2); fd.rotateY(Math.sin(e.t * 5) * 0.12);
+      fd.position.set(p.x, p.y + K.y - 0.55 * down + 0.05 * Math.sin(e.t * 9), p.z); fd.quaternion.copy(this.camQ); fd.rotateX(0.95); if (fd.userData.flatFix) fd.rotateX(-Math.PI / 2); fd.rotateY(Math.sin(e.t * 5) * 0.12);
       fd.scale.setScalar(Math.max(0.001, sc)); fd.material.uniforms.uA.value = smooth(0, 0.06, e.t);
       gl.quaternion.copy(this.camQ); gl.position.copy(fd.position); gl.scale.setScalar(size * 2.4); gl.material.uniforms.uA.value = COOK.intensity * 0.4 * (1 - smooth(0, 0.3, e.t));
       while (done < nb) { done++; this._bits(fd.position.clone(), low ? 2 : 4, { geo: this.geo.cook_chip_c, tint: kind === 'soup' ? COOK.col.soup : kind === 'snack' ? 0xc88a48 : 0xfff0c8, size: [0.03, 0.055], speed: [0.6, 1.5], up: [0.8, 1.8], ground: p.y, life: 0.4 }); this.sfx('ck_eat');
@@ -586,7 +586,7 @@ export class CookFx {
     const kind = o.kind || 'lunch', size = COOK.eat.size * 1.15;
     const e = this._fx('made', 1.1, (e) => {
       const p = P3(pc.pos), k = e.t / e.life;
-      fd.position.set(p.x, p.y + COOK.eat.y + 0.12 * easeOut(k * 2), p.z); fd.quaternion.copy(this.camQ); fd.rotateX(-0.95); if (fd.userData.flatFix) fd.rotateX(-Math.PI / 2); fd.rotateY(e.t * 1.6);
+      fd.position.set(p.x, p.y + COOK.eat.y + 0.12 * easeOut(k * 2), p.z); fd.quaternion.copy(this.camQ); fd.rotateX(0.95); if (fd.userData.flatFix) fd.rotateX(-Math.PI / 2); fd.rotateY(e.t * 1.6);
       fd.scale.setScalar(size * (0.3 + 0.7 * easeOut(e.t / 0.2) + 0.12 * Math.sin(Math.min(1, e.t / 0.3) * Math.PI))); fd.material.uniforms.uA.value = smooth(0, 0.06, e.t) * (1 - smooth(0.75, 1, k));
       st.quaternion.copy(this.camQ); st.rotateZ(e.t * 2); st.position.copy(fd.position); st.scale.setScalar(size * 2.6 * (0.6 + 0.4 * easeOut(e.t / 0.25))); st.material.uniforms.uA.value = COOK.intensity * 0.9 * (1 - smooth(0.1, 0.6, k));
     });
