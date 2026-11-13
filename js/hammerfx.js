@@ -7,7 +7,7 @@ import { THREE, T } from './render.js';
 const HAMMER = {
   life: 0.34,                 // s, 전체
   flash: { size: 0.55, big: 0.8, dur: 0.07, col: [1.25, 1.1, 0.85] },
-  ring: { r0: 0.15, r1: 0.85, big: 1.15, dur: 0.24, col: [1.0, 0.86, 0.62] },
+  ring: { r0: 0.2, r1: 0.8, big: 1.1, dur: 0.22, col: [0.9, 0.74, 0.5] },
   dust: { n: 5, lo: 3, col: [0.84, 0.76, 0.66] },
   chips: { n: 6, lo: 3 },
 };

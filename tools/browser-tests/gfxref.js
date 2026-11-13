@@ -12,7 +12,7 @@ const SPOT = (process.env.SPOT || '-6.2,-6.6').split(',').map(Number), DIR = +(p
 const ZONE = process.env.ZONE || '';
 (async () => {
   fs.mkdirSync(OUT, { recursive: true });
-  const b = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+  const b = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', ...(process.env.BARGS ? process.env.BARGS.split(' ') : [])] });   // BARGS='--single-process' = less memory on a shared machine
   const pg = await (await b.newContext({ viewport: { width: VW, height: VH }, hasTouch: TOUCH, isMobile: TOUCH })).newPage(); const errs = [];
   pg.on('pageerror', e => errs.push('PAGEERR ' + e.message)); pg.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
   const ev = (f, a) => pg.evaluate(f, a);

@@ -125,7 +125,7 @@ export class CreatureBody {
     this.inner.rotation.y = d.fwd != null ? -d.fwd : 0;              // model forward -> local +z
     this.pivot = new THREE.Group(); this.pivot.add(this.inner);         // attack lunge / hit recoil / death tilt
     this.root = new THREE.Group(); this.root.add(this.pivot);
-    this.mats = []; this.model.traverse(o => { if (o.isMesh) { o.material = o.material.clone(); o.material.emissive = new THREE.Color(0xfff0e4); o.material.emissiveIntensity = 0; this.mats.push(o.material); } });
+    this.mats = []; this.model.traverse(o => { if (o.isMesh) { o.material = o.material.clone(); o.material.emissive = new THREE.Color(0xffd6c2); o.material.emissiveIntensity = 0; this.mats.push(o.material); } });
     if (this.cfg.yaw) this.inner.rotation.y += this.cfg.yaw * DEG;     // extra yaw for unrigged models whose front is not +z
     // optional recolour for variants sharing a model: desaturate the texture towards cfg.tint (amount cfg.recolor, default 0.7)
     if (this.cfg.tint) {
@@ -167,7 +167,7 @@ export class CreatureBody {
     if (!a.loop && f >= n) this.finished = true;
     const u = a.loop ? (f % n) / n : Math.min(1, f / n);
     if (this.flashT > 0) this.flashT -= dt;
-    { const k = this.flashT > 0 ? 0.42 * Math.min(1, this.flashT / 0.1) : 0; for (const m of this.mats) m.emissiveIntensity = k; }   // 피격 번쩍임: 짧게 줄어듦(하얗게 날아가 반투명해 보이던 0.55 고정 대신)
+    { const k = this.flashT > 0 ? 0.26 * Math.min(1, this.flashT / 0.1) : 0; for (const m of this.mats) m.emissiveIntensity = k; }   // 피격 번쩍임: 짧게 줄어듦(하얗게 날아가 반투명해 보이던 0.55 고정 대신)
     let dy = this.targetYaw - this.yaw; dy = Math.atan2(Math.sin(dy), Math.cos(dy)); this.yaw += dy * Math.min(1, dt * 12);
     this.root.rotation.y = this.yaw;
     // skeletal walk cycle; idle = slow breathing on the paused pose

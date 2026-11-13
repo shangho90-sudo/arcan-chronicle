@@ -151,6 +151,18 @@
 ## 직업 모델 (2026-11-07)
 - 전직하면 모습이 바뀌는 직업은 `model.js` `JOB_MODELS`(지금은 약사 `pharmacist_m`/`_f`, 대장장이 `blacksmith_m`/`_f`, 예술가 `artist_m`/`_f`, 요리사 `cook_m`/`_f`, 미용사 `hairdresser_m`/`_f` — 1차 직업 5개 모두). 모델은 반드시 같은 67뼈 휴머노이드 뼈대 GLB를 `python3 tools/models/glb_to_model.py <in.glb> <이름>`로 변환. 변신 연출은 `rewardfx.js` `JobChangeFx`(빛기둥·고치·날개·나팔·`Audio.chime('fanfare')`), 확인 `tools/browser-tests/jobchange.js`(`JOB=`·`GENDER=`).
 
+## 그래픽 방향·기준 장면 (2026-11-13, 밝고 귀여운 카툰 3D — 사용자 요청 '씰M 느낌')
+- 기준 장면 = 대장장이 + 멧돼지(`mon_boar`) + 아르칸 분수 광장 + 기본공격 5단. 같은 카메라·위치·해상도 전/후 캡처와 성능 수치는 `tools/browser-tests/gfxref.js`(`TAG= SIZE=1280x720|390x844t GENDER= JOB= ZOOMS=1,2.2 PERF=1 URL=`; 결과 `/tmp/gfx/<TAG>_<size>_<g>_z<zoom>_{idle,run1,run2,atk1..5}.png`·`_strip_z*.png`·`.json` — 공격 피해 시각 `dmg_z*`가 전/후 같아야 함). 다른 작업과 포트가 겹치지 않게 서버 포트를 확인할 것(2026-11-13 8805를 다른 작업이 쓰고 있어 첫 '전' 캡처가 다른 커밋이었음).
+- 비율: `model.js` `PROPORTION`(플레이어만, 뼈 관절 기준 배율 — 남 머리 1.15·손 1.16·발 1.1, 여 머리 1.05·손 1.14·발 1.08; `worldOf`에서 스키닝 행렬에만 곱함, 메시·뼈대·동작·판정 그대로). 원래 남 약 4등신·여 약 3.3등신 → 남 약 3.5등신. 손 배율은 쥔 무기에도 곱해짐.
+- 외곽선: `render.js` `OUTLINE`/`addOutline`(뒷면 껍데기를 화면 공간에서 법선 방향으로 밀어 냄 — 화면 높이 720 px 기준 1.5 px, 짙은 보라 `0x2e2236`, 검정 아님). 플레이어·NPC 몸(`ModelBody`), 플레이어 무기의 큰 부분, 몬스터(`CreatureBody`)에만. 껍데기는 원본 지오메트리·뼈대를 공유(`userData.outline`, dispose에서 건너뜀) — 메시당 draw call +1. 외곽선을 끄려면 `OUTLINE.px = 0`.
+- 재질: `paintMat`은 그대로 쓰되 아래쪽 차폐를 약하게(턱 밑 얼룩 방지), 플레이어 림은 차갑고 약하게(0.34 → 0.22). 접촉 그림자 원판은 옅게(실시간 그림자와 겹쳐 발밑이 두 번 어두워지지 않게). 무기·아이템 금속(`items3d.js` `METAL`)은 금속도 0.3~0.35(환경맵이 없어 높은 금속도는 그늘에서 거의 검게, 플라스틱처럼 보였음). 피격 번쩍임은 고정 0.55 → 0.1초 안에 줄어드는 0.42(몬스터가 하얗게 날아가 반투명해 보이던 문제).
+- 마을 조명(`zones.json` town `sun`·`shade`·`post`): 햇빛을 덜 노랗게, 그늘(하늘빛)을 푸른 보라로, 색보정 `warmth` 0.5(햇빛·paintMat·색보정이 모두 따뜻하게 겹쳐 누렇던 것), 채도·대비 조금 낮춤. 광장 바닥은 `town3d.js` `groundVary`(세계 좌표 저주파 색 얼룩 — 4.2 m 반복 완화, 텍스처 추가 없음).
+- 카메라: `CAM.ortho` 4.75 → 4.4, 휴대폰 `minWidth` 8.5 → 7.6 m(캐릭터가 화면에서 약 8%/12% 커짐). `artPitch`·피치·거리는 그대로.
+- 대기 숨쉬기: `model.js` `apply`(idle일 때 가슴·어깨·머리·왼팔의 작은 움직임, 걸으면 사라짐).
+- 직업별 기본공격 모양: `actors.js` `JOB_COMBO`(직업 계열 → 접두사, 지금 `blacksmith: 'bs'`, `hairdresser: 'hd'` 자리만) + `comboName` — `<접두사>_combo_N` 동작이 있으면 그것, 없으면 공용 `combo_N`. 대장장이 `bs_combo_1..5`는 `swings.py` `BS_POSE`(C5와 **같은 키 시각·타격 프레임·adv·step·lift**, 상체 자세만: 올려 들 때 뒤로 젖히며 무게를 올리고 잠깐 멈춤 → 늦게 가속 → 타격 때 앞발로 주저앉음 → 짧고 무거운 마무리; 생성기가 hitTimes·lock·chainClose·adv가 공용과 같은지 assert). 잔상은 망치 머리 쪽만(`trailBase` 0.72)·따뜻한 색·짧게.
+- 망치 타격 이펙트: `js/hammerfx.js`(`G.hammerFx.hit(pos, {dir, big, ground})`, 조절값 `HAMMER`): 실제 망치 머리(`bladePoints`) 위치에 작은 섬광 0.07초 + 땅 위 얇은 고리 + 먼지 5 + 돌·불티 조각 6(저사양 3·3), 0.34초에 모두 사라짐, 풀 재사용. 동작 필드 `impact: 'hammer'`가 있는 기본공격이 맞았을 때만(`actors.js` `hammerImpact`, MISS는 없음). 히트스톱은 **대상만** `freezeT` 0.045초(5타 0.07초) + 눌림 `punch`, 5타만 카메라 `kick` 한 번 — 플레이어 몸까지 멈추면 콤보 이동이 늦어져 4·5타가 4프레임 밀렸음(측정), 그래서 대상만.
+- 망치 모양: `items3d.js` `BUILD.hammer`(굵은 자루·둥근 원통 머리·양쪽 넓은 타격면·가운데 띠·자루 끝 손잡이).
+
 ## 칼 휘두르기 (`js/model.js`, `tools/anim/swings.py`)
 - 공격 동작은 시간 키(`keys`, 초) + 구간 이징(`e`) + 칼 팔 IK(`hand`/`blade`/`elbow`) + 발 고정(`step`, `plant`)으로 정의합니다. actions.json의 `attack`/`attack2`는 `python3 tools/anim/swings.py`로 생성하세요(직접 편집 금지).
 - 기본 검술 스킬 동작(`nv_yeon_<타수>`, `nv_biyeon`)도 `swings.py`의 `combo()`(타격 묶음 `ST` + `spin`/`ov`)로 생성. 일격참 `nv_ilgyeok`은 연타가 아닌 한 번의 찌르기(`IL_KEYS`, 2026-11-09) + '살' 섬광(`js/salfx.js`). 여러 번 때리는 스킬은 `<anim>_<타수>` 동작이 있으면 그 동작의 `hitTimes`(타격 시각)·`hitFx`(타별 베기 효과)·`lunges`(전진)·`recover`를 씀(`skillrt.js` `cast`/`release`/`opHit`). 몸 회전은 `spins`(`model.js` `apply`). 확인 `tools/browser-tests/skill_film.js`(`SKILL= LV= ZOOM=`).

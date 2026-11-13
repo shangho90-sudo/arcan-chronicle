@@ -662,12 +662,12 @@ class Game {
       }
     }
     this.fx.update(dt > 0 ? dt : (this.inWorld ? 0 : rdt), this.render.cam);
+    if (this.hammerFx) try { this.hammerFx.low = !!((this.input && this.input.mobile) || (this.settings && this.settings.graphicsFx === false)); this.hammerFx.update(rdt); } catch (e) { console.warn('hammer fx', e); this.hammerFx.clear(); }   // ages with the simulation (also in draw-less test steps)
     if (!draw) return;
     this.ui.tick(rdt);
     if (this.skillFx) try { this.skillFx.update(rdt); } catch (e) { console.warn('skillfx update', e); this.skillFx = null; }
     if (this.reward) try { this.reward.update(rdt); } catch (e) { console.warn('reward fx', e); this.reward.clear(); }
     if (this.swingFx) try { this.swingFx.update(rdt * (this.hitStopT > 0 ? 0.25 : 1), this.render.cam); } catch (e) { console.warn('swing fx', e); this.swingFx.clear(); }
-    if (this.hammerFx) try { this.hammerFx.low = !!((this.input && this.input.mobile) || (this.settings && this.settings.graphicsFx === false)); this.hammerFx.update(rdt); } catch (e) { console.warn('hammer fx', e); this.hammerFx.clear(); }
     this.render.render(rdt);
   }
 }
