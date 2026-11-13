@@ -12,12 +12,12 @@ const LIST = (process.env.SKILLS || process.env.SKILL || 'chop').split(','), LV 
 const SCENE = process.env.SCENE || 'hit', DIR = +(process.env.DIR || 90), FPS = +(process.env.FPS || 60), G_ = process.env.GENDER || 'm';
 const SIZE = process.env.SIZE || '1100x760', TOUCH = SIZE.endsWith('t'), [VW, VH] = SIZE.replace('t', '').split('x').map(Number);
 const FX = process.env.FX !== '0', TAG = process.env.TAG || 'after', OUT = process.env.OUT || '/tmp/cook', ZOOM = +(process.env.ZOOM || 1.4);
-const M2 = { flip: '0.05,0.15,0.22,0.25,0.28,0.33,0.40,0.50,0.62,0.76,0.90,1.05,1.2,1.4', board: '0.05,0.25,0.32,0.38,0.50,0.80,0.82,0.86,0.95,1.40,1.42,1.5,3.0,5.0,5.4,5.9', soup: '0.03,0.10,0.15,0.17,0.20,0.24,0.30,0.38,0.48,0.60,0.75,0.95', pepper: '0.03,0.10,0.15,0.17,0.20,0.26,0.34,0.40,0.50,0.62,0.80,1.0',
-  flour: '0.03,0.10,0.15,0.18,0.22,0.30,0.42,0.60,0.90,1.5,3.0,5.0,6.0,6.4,6.8,7.2', skewer: '0.05,0.12,0.18,0.22,0.25,0.27,0.30,0.34,0.40,0.48,0.58,0.70', meal: '0.10,0.25,0.31,0.36,0.45,0.56,0.66,0.76,0.86,0.96,1.1,1.3', snack: '0.10,0.25,0.31,0.36,0.45,0.56,0.66,0.76,0.86,0.96,1.1,1.3',
+const M2 = { flip: '0.05,0.15,0.22,0.25,0.28,0.33,0.40,0.50,0.62,0.76,0.90,1.05,1.2,1.4', board: '0.05,0.25,0.32,0.38,0.50,0.80,0.82,0.86,0.95,1.40,1.42,1.5,2.0,2.05,2.5,2.6', soup: '0.03,0.10,0.15,0.17,0.20,0.24,0.30,0.38,0.48,0.60,0.75,0.95', pepper: '0.03,0.10,0.15,0.17,0.20,0.26,0.34,0.40,0.50,0.62,0.80,1.0',
+  flour: '0.03,0.10,0.15,0.18,0.22,0.30,0.42,0.60,0.90,1.3,1.8,2.2', skewer: '0.05,0.12,0.18,0.22,0.25,0.27,0.30,0.34,0.40,0.48,0.58,0.70', meal: '0.10,0.25,0.31,0.36,0.45,0.56,0.66,0.76,0.86,0.96,1.1,1.3', snack: '0.10,0.25,0.31,0.36,0.45,0.56,0.66,0.76,0.86,0.96,1.1,1.3',
   pan: '0.05,0.15,0.22,0.27,0.30,0.32,0.36,0.45,0.60,0.80,1.2,2.0', chop: '0.05,0.15,0.20,0.22,0.25,0.30,0.34,0.40,0.46,0.52,0.58,0.64,0.70,0.80,0.95,1.2', ball: '0.10,0.18,0.25,0.32,0.40,0.48,0.56,0.64,0.72,0.80,0.90,1.0,1.15,1.3' };
 const cfg = (SKILL) => { const WIDE = ['ball', 'soup', 'pepper', 'flour', 'skewer'].includes(SKILL);
   return { SKILL, ID: SK[SKILL], DIST: SKILL === 'ball' ? 5 : SKILL === 'pepper' || SKILL === 'flour' ? 4 : SKILL === 'soup' || SKILL === 'skewer' ? 2.2 : 1.5, CW: +(process.env.CW || Math.min(VW, WIDE ? 640 : 460)), CH: +(process.env.CH || Math.min(VH, 440)),
-    DUR: +(process.env.DUR || (SCENE === 'stun' ? 4.2 : SKILL === 'ball' ? 1.9 : SKILL === 'flour' ? 7.4 : SKILL === 'board' ? 6.2 : 1.6)), MARKS: (process.env.MARKS || M2[SKILL]).split(',').map(Number) }; };
+    DUR: +(process.env.DUR || (SCENE === 'stun' ? 4.2 : SKILL === 'ball' ? 1.9 : SKILL === 'flour' ? 2.3 : SKILL === 'board' ? 2.7 : 1.6)), MARKS: (process.env.MARKS || M2[SKILL]).split(',').map(Number).filter((m, i) => !process.env.FEW || i % 2 === 1) }; };   // FEW=1: every other frame mark (faster)
 (async () => {
   fs.mkdirSync(OUT, { recursive: true });
   const b = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
@@ -114,13 +114,15 @@ const cfg = (SKILL) => { const WIDE = ['ball', 'soup', 'pepper', 'flour', 'skewe
     if (shot) await pg.screenshot({ path: fn, clip: { x: Math.max(0, Math.min(VW - CW, Math.round(c[0] - CW / 2))), y: Math.max(0, Math.min(VH - CH, Math.round(c[1] - CH / 2))), width: CW, height: CH }, timeout: 300000 });
     frames.push(shot ? fn : null); dc = Math.max(dc, c[2]);
   }
+  // the rest of the effect's life without drawing (flour 6 s, board 5 s): nothing may be left over
+  const late = await ev(() => { const a = { slowAt2s: window.__ds.filter(q => !q.removed && q.status && q.status.has('slow')).length, guard: G.player.status.has('frontguard') }; for (let i = 0; i < 270; i++) G.step(1 / 30, false); a.liveAfter9s = G.skillFx.cook.live.length; a.areas = G.player.skills2.areas ? G.player.skills2.areas.length : -1; a.guardAfter = G.player.status.has('frontguard'); return a; });
   const res = await ev(([id]) => { const L = window.__log, m = window.__ds[0], p = G.player; const rng = a => a.length ? [a[0], a[a.length - 1], a.length] : null;
     const camMax = Math.max(...L.cam), last = L.cam.length - 1 - [...L.cam].reverse().findIndex(v => v > 0.002);
     return { fx: L.fx, sfx: L.sfx, dmg: L.dmg, tossFrames: L.toss || 0, slowed: window.__ds.filter(q => !q.removed && q.status && q.status.has('slow')).length, statuses: window.__ds.map(q => q.removed ? 'gone' : q.status.list.map(x => x.def.id).join('+')), buffs: p.status.list.map(x => x.def.id).join('+'), food: G.sheet.bag.count('f_lunch'), hits: L.dmg.length, total: L.dmg.reduce((s, d) => s + (d.a || 0), 0), nums: L.num.length, freezePlayer: rng(L.freezeP), freezeTarget: rng(L.freezeT), globalHitStop: rng(L.gstop),
       stun: rng(L.stun), act: L.act, lockEndFrame: L.lock.findIndex((v, i) => i > 3 && v <= 0), camMax: +camMax.toFixed(4), camLastFrame: camMax > 0.002 ? last : -1,
       targetMoved: m && !m.removed ? +Math.hypot(m.pos.x - window.__p0.x, m.pos.z - window.__p0.z).toFixed(3) : null, spUsed: +(window.__sp0 - p.sp).toFixed(1), cdLen: p.skills2.cdLen && p.skills2.cdLen[id],
       live: G.skillFx.cook.live.length, things: p.skills2.things.length, pending: p.skills2.pending.length }; }, [ID]);
-  res.info = info; res.drawCallsMax = dc; res.errors = errs.slice(0, 8);
+  res.info = info; res.late = late; res.drawCallsMax = dc; res.errors = errs.slice(0, 8);
   const pick = MARKS.map(m => frames[Math.round(m * FPS)] || null);
   fs.writeFileSync('/tmp/_cookstrip.py', `from PIL import Image, ImageDraw\nfr=${JSON.stringify(pick.map(f => f || ''))}\nlab=${JSON.stringify(MARKS)}\nims=[Image.open(f) if f else None for f in fr]\nw,h=next(i for i in ims if i).size\nims=[i or Image.new('RGB',(w,h),(0,0,0)) for i in ims]\nn=len(ims); cols=(n+1)//2 if n>7 else n; rows=(n+cols-1)//cols\nsh=Image.new('RGB',(w*cols,(h+22)*rows),(20,20,28))\nd=ImageDraw.Draw(sh)\nfor i,(im,l) in enumerate(zip(ims,lab)):\n  x=(i%cols)*w; y=(i//cols)*(h+22)\n  sh.paste(im,(x,y+22)); d.text((x+6,y+4),('t %.3fs'%l),fill=(255,255,255))\nsh.save('${OUT}/${name}.png')`);
   try { execSync('python3 /tmp/_cookstrip.py'); } catch (e) { console.log('strip failed', e.message); }

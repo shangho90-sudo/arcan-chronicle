@@ -3207,6 +3207,7 @@
 "fx": {
 "color": 16751146
 },
+"sfx": "swing",
 "status": {
 "data": true,
 "impl": true,
@@ -3327,6 +3328,7 @@
 "fx": {
 "color": 16777215
 },
+"sfx": "throw",
 "status": {
 "data": true,
 "impl": true,
@@ -3380,6 +3382,7 @@
 "fx": {
 "color": 15267071
 },
+"sfx": "swing",
 "status": {
 "data": true,
 "impl": true,

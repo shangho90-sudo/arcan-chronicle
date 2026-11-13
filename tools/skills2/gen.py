@@ -189,13 +189,13 @@ S(J, 1, 0, '식칼과 프라이팬', 5, 'ck1_a5', '손질 숙련', 'passive', '�
 # 미트볼 던지기: 미트볼 2~6개(Lv마다 +1)가 0.09 s 간격으로 조금씩 벌어져 포물선으로 날아가 같은 대상에 차례로 떨어짐. 하나하나가 예전처럼 반경 1.2 m 작은 범위 피해.
 S(J, 1, 1, '간단한 요리 공격', 1, 'ck1_b1', '미트볼 던지기', 'attack', '미트볼 여러 개를 연달아 던진다. 하나하나가 부딪힌 자리에 작은 범위 피해를 준다. 처음엔 2개, 스킬 레벨이 오를 때마다 1개씩 늘어 최대 6개.', target='enemy', range=7, mp=10, cd=4, anim='throw',
   ops=[proj('normal', 1.7, count=2, countPerLv=1, split=True, gap=0.09, r=1.2, speed=12, arc=0.9, spread=0.32, cook='meatball', burst='none', sfx='hit', sfxOnHit=True)], fx=dict(color=0xb06a3a))
-S(J, 1, 1, '간단한 요리 공격', 2, 'ck1_b2', '뜨거운 국물', 'attack', '큰 국자로 펄펄 끓는 국물을 전방 부채꼴로 끼얹어 피해와 화상을 준다.', range=3.2, mp=12, cd=6, anim='throw',
+S(J, 1, 1, '간단한 요리 공격', 2, 'ck1_b2', '뜨거운 국물', 'attack', '큰 국자로 펄펄 끓는 국물을 전방 부채꼴로 끼얹어 피해와 화상을 준다.', range=3.2, mp=12, cd=6, anim='throw', sfx='swing',
   ops=[dict(op='fx', cook='soup', at=-0.167), hit('cone', 1.5, r=3.2, ang=60, elem='fire', st=[st('burn', 3, 0.12)], sfx='ck_soup', fx=dict(cook='soup'))], fx=dict(color=0xff9a2a))
 S(J, 1, 1, '간단한 요리 공격', 3, 'ck1_b3', '후추 뿌리기', 'attack', '큰 후추통을 흔들어 후춧가루를 뿌린다. 범위 피해와 함께 재채기하는 적의 공격력을 낮춘다.', target='ground', range=5, mp=12, cd=8, anim='throw',
   sfx='ck_pepper', ops=[dict(op='fx', cook='pepper', at=-0.167), hit('circle', 1.2, r=2.2, atAim=True, st=[st('atkdown', 5, 0.2)], fx=dict(cook='pepper'))], fx=dict(color=0x9a8468))
-S(J, 1, 1, '간단한 요리 공격', 4, 'ck1_b4', '밀가루 구름', 'support', '밀가루 포대를 터뜨려 적을 둔화시키는 밀가루 구름을 깔아 둔다.', target='ground', range=6, mp=14, cd=12, anim='throw',
+S(J, 1, 1, '간단한 요리 공격', 4, 'ck1_b4', '밀가루 구름', 'support', '밀가루 포대를 터뜨려 적을 둔화시키는 밀가루 구름을 깔아 둔다.', target='ground', range=6, mp=14, cd=12, anim='throw', sfx='throw',
   ops=[dict(op='fx', cook='sack', at=-0.167), area('slow', 2.6, 6, tick=0.5, st=[st('slow', 1.0, 0.4)], fx='none', cook='flour')], fx=dict(color=0xffffff))
-S(J, 1, 1, '간단한 요리 공격', 5, 'ck1_b5', '꼬치 찌르기', 'attack', '커다란 꼬치로 가까운 직선상의 적을 한꺼번에 꿰뚫는다.', range=3.5, mp=10, cd=5, anim='attack',
+S(J, 1, 1, '간단한 요리 공격', 5, 'ck1_b5', '꼬치 찌르기', 'attack', '커다란 꼬치로 가까운 직선상의 적을 한꺼번에 꿰뚫는다.', range=3.5, mp=10, cd=5, anim='attack', sfx='swing',
   ops=[dict(op='fx', cook='skewer', at=-0.25), hit('line', 1.9, len=3.5, w=1.0, sfx='ck_skewer', fx=dict(cook='skewer'))], fx=dict(color=0xe8f4ff))
 S(J, 1, 2, '식사와 기초 조리', 1, 'ck1_c1', '간단한 도시락', 'craft', '비전투용 HP 회복 음식을 만든다.')
 S(J, 1, 2, '식사와 기초 조리', 2, 'ck1_c2', '따뜻한 수프', 'craft', '지속 HP 회복 음식을 만든다.')
