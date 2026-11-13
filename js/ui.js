@@ -193,8 +193,11 @@ export class UI {
     if (!G.settings.damageNumbers) return;
     const e = $("div", "dmg dmg-" + kind, this.floatLayer);
     e.innerHTML = (kind === "crit" ? '<i class="dmg-burst"></i><b class="dmg-tag">CRITICAL</b>' : kind === "heal" ? '<i class="dmg-heal-glow"></i>' : "") + '<span>' + amount + '</span>';
-    const side = Math.random() < 0.5 ? -1 : 1, heal = kind === "heal";
-    this.floats.push({ e, dmg: kind, pos: { x: pos.x + (Math.random() - 0.5) * (heal ? 0.15 : 0.35), y: pos.y + (kind === "taken" ? 1.5 : heal ? 2.0 : 1.25), z: pos.z + (Math.random() - 0.5) * 0.2 }, t: 0,
+    let side = Math.random() < 0.5 ? -1 : 1; const heal = kind === "heal";
+    // rapid hits on the same spot (연타·여러 발): each new number starts a step higher and on the other side, so they fan out instead of piling up
+    let lift = 0; const now = (this.fclock || 0) * 1000, ds = this._dmgStack || (this._dmgStack = { t: 0, x: 0, z: 0, n: 0 });
+    if (!heal && kind !== "taken") { if (now - ds.t < 380 && Math.hypot(pos.x - ds.x, pos.z - ds.z) < 0.8) { ds.n = (ds.n + 1) % 5; lift = ds.n * 0.3; side = ds.n % 2 ? 1 : -1; } else ds.n = 0; ds.t = now; ds.x = pos.x; ds.z = pos.z; }
+    this.floats.push({ e, dmg: kind, pos: { x: pos.x + (Math.random() - 0.5) * (heal ? 0.15 : 0.35) + (lift ? side * 0.22 : 0), y: pos.y + (kind === "taken" ? 1.5 : heal ? 2.0 : 1.25) + lift, z: pos.z + (Math.random() - 0.5) * 0.2 }, t: 0,
       scale: 1, vx: heal ? side * 6 : side * (kind === "crit" ? 18 : 30 + Math.random() * 20), life: kind === "crit" ? 1.15 : heal ? 1.15 : 0.85 });
   }
   tick(dt) {

@@ -34,8 +34,8 @@ export const COOK = {
   splat: { life: 0.42, ring: 0.85, flash: 1.3, bits: 5, bitsLite: 2 },
   flip: { stop: 0.06, kick: [0.09, 0.1], h: 1.5, ring: 1.8, flash: 1.3 },
   board: { w: 1.0, fwd: 0.62, marks: 6, push: 0.1, spark: 1.4 },
-  soup: { ladle: 1.15, wave: 0.3, drops: 9, dropsLite: 4, steam: 6, steamLite: 2, kick: [0.05, 0.08], a: 0.8 },
-  pepper: { h: 2.3, size: 1.0, puffs: 5, puffsLite: 2, a: 0.34 },
+  soup: { ladle: 1.15, wave: 0.34, lift: 0.55, drops: 9, dropsLite: 4, steam: 6, steamLite: 2, kick: [0.05, 0.08], a: 0.95 },
+  pepper: { h: 2.1, size: 1.25, puffs: 5, puffsLite: 2, a: 0.42 },
   flour: { size: 0.95, burst: 8, burstLite: 4, haze: 0.2, ring: 0.5, wisps: 5, wispsLite: 2 },
   skewer: { stop: 0.05, kick: [0.07, 0.09], y: 0.85, flash: 1.3, line: 1.6 },
   eat: { y: 2.25, size: 0.62, bites: 3, gap: 0.2 },
@@ -93,7 +93,7 @@ void main(){
   else if (uK < 4.5) { a = pow(clamp(1. - r, 0., 1.), 1.4); core = clamp(.5 + p.y * .5, 0., 1.); gl_FragColor = vec4(mix(uB, uW, core), a * uA); return; }
   else if (uK < 5.5) {   // soup fan (uv.x across the cone 0..1, uv.y radius 0..1, uP = wave front): crest bright, thin trail behind, scalloped edge
     float u = vUv.x, v = vUv.y, sc = .035 * sin(u * 38.) + .02 * sin(u * 91. + 1.7), fr = uP + sc;
-    float body = smoothstep(fr, fr - .05, v) * (.28 + .72 * smoothstep(fr - .42, fr - .02, v)) * smoothstep(.0, .14, v);
+    float body = smoothstep(fr, fr - .05, v) * (.45 + .55 * smoothstep(fr - .6, fr - .02, v)) * smoothstep(.0, .12, v);
     float side = smoothstep(0., .1, u) * smoothstep(1., .9, u), st = .75 + .25 * sin(u * 60. + v * 9.);
     core = smoothstep(fr - .13, fr - .02, v); gl_FragColor = vec4(mix(uB, uW, core * st), body * side * uA); return; }
   else if (uK < 6.5) {   // pepper specks: dark grains scattered over a disc (uP scrolls them down / outward a little)
@@ -442,7 +442,8 @@ export class CookFx {
       ld.scale.setScalar(L / 1.5 * 1.25); ld.material.uniforms.uA.value = smooth(0, 0.05, e.t) * (1 - smooth(lead + 0.12, lead + 0.34, e.t));
       if (thrown >= 0) {
         const t = e.t - thrown, kk = clamp01(t / K.wave);
-        fn.material.uniforms.uP.value = 0.12 + 0.92 * easeOut(kk); fn.material.uniforms.uA.value = K.a * (1 - smooth(K.wave * 0.75, K.wave + 0.22, t));
+        fn.material.uniforms.uP.value = 0.12 + 0.92 * easeOut(kk); fn.material.uniforms.uA.value = K.a * (1 - smooth(K.wave * 0.9, K.wave + 0.3, t));
+        fn.position.y = p0.y + 0.07 + K.lift * (1 - kk) * (1 - kk);   // the sheet leaves the ladle at waist height and falls flat as it spreads
       } else if (e.t > lead + 0.1) thrown = e.t;
     });
     const ld = this.solid(e, this.geo.cook_ladle, { rim: COOK.col.steelB, spec: 1.1 }); ld.renderOrder = 6;
@@ -482,7 +483,7 @@ export class CookFx {
       if (e.dead || shook >= 0) return; shook = e.t;
       // grains fall from the shaker: a few dark bits + a low thin dust inside the real radius
       this._bits(sh.position.clone(), low ? 3 : 7, { geo: this.geo.cook_chip_c, tint: COOK.col.pepper1, size: [0.025, 0.045], speed: [0.4, r * 0.9], up: [-1.5, 0.5], ground: g0.y, life: 0.5 });
-      this._puffs(g0, low ? K.puffsLite : K.puffs, r * 0.9, { c1: COOK.col.dust1, c2: COOK.col.pepper2, a: K.a, life: 0.6, rise: 0.35 });
+      this._puffs(g0, low ? K.puffsLite : K.puffs, r * 0.9, { c1: 0xb8a888, c2: 0x5a4a3a, a: K.a, life: 0.6, rise: 0.35 });
       for (const t of ok || []) { const g = P3(t.pos); this._puffs(g.clone().setY(g.y + cookTop(t) * 0.8), 1, 0.4, { c1: COOK.col.dust1, c2: COOK.col.pepper2, a: 0.4, life: 0.35, rise: 0.3 }); }
     };
     return e;
