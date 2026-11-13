@@ -554,6 +554,24 @@ function loadGLB(file) {
   glbCache.set(file, p); return p;
 }
 
+// large flagstone courtyard (2026-11-13): breaks the 4.2 m texture repeat with soft world-space colour patches (a few cool
+// grey-violet stones, a few warmer ones, slightly worn / darker toward the walls of the patch) and pulls the plaza a touch
+// down in value so the characters (outlined, saturated) stand out. Colour only - no extra texture, one material.
+function groundVary(m) {
+  m.onBeforeCompile = sh => {
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 vGW;').replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvGW = (modelMatrix * vec4(transformed, 1.0)).xz;');
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>
+varying vec2 vGW;
+float gvH(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float gvN(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(gvH(i), gvH(i + vec2(1, 0)), f.x), mix(gvH(i + vec2(0, 1)), gvH(i + vec2(1, 1)), f.x), f.y); }`).replace('#include <map_fragment>', `#include <map_fragment>
+  { float a = gvN(vGW * 0.07), b = gvN(vGW * 0.23 + 7.3), c = gvN(vGW * 0.6 + 3.1);
+    vec3 cool = vec3(0.88, 0.89, 0.97), warm = vec3(1.04, 1.0, 0.93);
+    diffuseColor.rgb *= mix(cool, warm, smoothstep(0.25, 0.75, a * 0.65 + b * 0.35)) * (0.93 + 0.07 * c); }`);
+  };
+  m.customProgramCacheKey = () => 'groundVary'; return m;
+}
+
 // ---------------------------------------------------------------- build the whole town
 /** returns { root, fadeGroups:[{name, occ, meshes}], smoke:[[x,y,z]], update(dt) } */
 export async function buildTown3D(spec, renderer) {
@@ -568,7 +586,7 @@ export async function buildTown3D(spec, renderer) {
   const [x0, z0, x1, z1] = spec.ground.inner;
   const outer = spec.ground.outer || [-120, -120, 120, 120], MW = outer[2] - outer[0], MD = outer[3] - outer[1], MCX = (outer[0] + outer[2]) / 2, MCZ = (outer[1] + outer[3]) / 2;
   const meadow = new THREE.Mesh(puv(new THREE.PlaneGeometry(MW, MD).rotateX(-Math.PI / 2).translate(MCX, 0, -MCZ), TILE.grass), M('grass')); meadow.position.y = -0.04; meadow.receiveShadow = true; root.add(meadow);
-  const court = new THREE.Mesh(puv(new THREE.PlaneGeometry(x1 - x0, z1 - z0).rotateX(-Math.PI / 2).translate((x0 + x1) / 2, 0, -(z0 + z1) / 2), TILE.pave), M('pave'));
+  const court = new THREE.Mesh(puv(new THREE.PlaneGeometry(x1 - x0, z1 - z0).rotateX(-Math.PI / 2).translate((x0 + x1) / 2, 0, -(z0 + z1) / 2), TILE.pave), groundVary(M('pave').clone()));
   court.receiveShadow = true; root.add(court);
   const roadM = decalMat('cobble'), grassM = decalMat('grass');
   if (!spec.gates) { const gateRoad = new THREE.Mesh(soft([[spec.gate.pos[0], spec.gate.pos[1] - 12], [spec.gate.pos[0], spec.gate.pos[1] - 1]], 5.2, 1.2), roadM); gateRoad.position.y = -0.02; root.add(gateRoad); }

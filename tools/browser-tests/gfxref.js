@@ -1,7 +1,7 @@
 // 그래픽 기준 장면(대장장이 + 몬스터 1마리 + 아르칸 분수 광장 + 기본공격)을 같은 카메라·위치·해상도로 찍어 전/후 비교.
 // 실제 게임 경로: 새 게임 → 대장장이 전직(G.dev.job) → 분수 남서쪽에 세우고, 앞에 멧돼지 허수아비. G.step(1/60)으로 한 프레임씩.
 // Usage: TAG=before|after SIZE=1280x720|390x844t GENDER=m|f JOB=blacksmith ZOOMS=1,2.2 PERF=1
-//        URL=http://localhost:8805/index.html OUT=/tmp/gfx NODE_PATH=$(npm root -g) node tools/browser-tests/gfxref.js
+//        URL=http://localhost:8817/index.html OUT=/tmp/gfx NODE_PATH=$(npm root -g) node tools/browser-tests/gfxref.js
 //   -> OUT/<TAG>_<size>_<gender>_z<zoom>_{idle,run1,run2,atk1..5}.png, OUT/<TAG>_<size>_<gender>_strip_z<zoom>.png,
 //      OUT/<TAG>_<size>_<gender>.json (프레임 시간 ms·draw call·삼각형·텍스처/지오메트리 수, 공격 타격 시각)
 const { chromium } = require('playwright'); const fs = require('fs'); const { execSync } = require('child_process');
@@ -16,7 +16,7 @@ const ZONE = process.env.ZONE || '';
   const pg = await (await b.newContext({ viewport: { width: VW, height: VH }, hasTouch: TOUCH, isMobile: TOUCH })).newPage(); const errs = [];
   pg.on('pageerror', e => errs.push('PAGEERR ' + e.message)); pg.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
   const ev = (f, a) => pg.evaluate(f, a);
-  await pg.goto(process.env.URL || 'http://localhost:8805/index.html');
+  await pg.goto(process.env.URL || 'http://localhost:8817/index.html');
   const click = async t => { await pg.waitForFunction(t => [...document.querySelectorAll('button,[aria-label]')].some(b => (b.getAttribute('aria-label') || b.textContent || '').trim() === t), t, { timeout: 300000 }); await ev(t => [...document.querySelectorAll('button,[aria-label]')].find(b => (b.getAttribute('aria-label') || b.textContent || '').trim() === t).click(), t); await pg.waitForTimeout(400); };
   await ev(() => localStorage.clear()); await pg.reload(); await click('새 게임'); await click('모험 시작');
   await pg.waitForSelector('.prologue.on', { timeout: 60000 }).then(() => click('건너뛰기')).catch(() => {});

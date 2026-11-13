@@ -127,7 +127,9 @@ function hammerImpact(pc, t, f, big, dd) {
   if (d > r + 0.35) { const k = (r + 0.1) / (d || 1); hp = { x: t.pos.x + dx * k, y: hp.y, z: t.pos.z + dz * k }; }
   hp.y = Math.max(ty + 0.12, Math.min(ty + 1.3, hp.y));
   G.hammerFx.hit(hp, { dir: f, big, ground: ty });
-  const st = big ? HAMMER_STOP_BIG : HAMMER_STOP; pc.freezeT = Math.max(pc.freezeT || 0, st); if (!t.dead) t.freezeT = Math.max(t.freezeT || 0, st);
+  // hit-stop on the TARGET only: freezing the player's body delayed its combo root motion / reach and shifted strikes 4-5
+  // by 4 frames (measured with tools/browser-tests/gfxref.js) - the basic attack timing must stay exactly the same
+  const st = big ? HAMMER_STOP_BIG : HAMMER_STOP; if (!t.dead) t.freezeT = Math.max(t.freezeT || 0, st);
   if (t.body && t.body.punch) t.body.punch(t.pos.x - pc.pos.x, t.pos.z - pc.pos.z, big ? 0.18 : 0.12);
   if (big && G.render && G.render.kick) G.render.kick(f.x, f.z, 0.07, 0.1);
 }
@@ -205,7 +207,7 @@ export class SkillRunner {
         const fx3 = G.skillFx && !a.atTarget && a.shape === "cone" && (a.fx === "slash" || a.fx === "hit" || a.fx === "wind");
         const SF = G.swingFx && G.swingFx.ready ? G.swingFx : null;
         // 망치 기본공격(bs_combo_*, action.impact 'hammer'): 실제 망치 머리에서 작은 섬광·고리·먼지·조각 (js/hammerfx.js) + 짧은
-        // 국소 히트스톱(시전자·대상 freezeT, 전역 G.hitStop 아님) — 5타만 카메라 kick 한 번. 판정·피해는 그대로.
+        // 대상만 짧은 국소 히트스톱(freezeT, 전역 G.hitStop 아님 — 공격 타이밍 그대로) — 5타만 카메라 kick 한 번. 판정·피해는 그대로.
         const HA = G.hammerFx && pc.body && pc.body.sh && pc.body.sh.actions[pc.body.action], hammer = HA && HA.impact === 'hammer' && !a.atTarget ? HA : null;
         for (const t of ts) {
           const dd = Resolver.damage(pc, t, a.coef * bmul, a.power, a.knockback); t.takeDamage(dd);
