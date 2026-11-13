@@ -369,7 +369,7 @@ export class CookFx {
       if (hitAt < 0) {   // slide in low under the target: the blade is fully under it exactly at `lead`
         const k = clamp01(e.t / lead); back = (1 - easeOut(k)) * (1.0 + rad); a = smooth(0, 0.06, e.t); rot = 0.1 * (1 - k);
         if (e.t > lead + 0.15) hitAt = e.t;   // the hit never came: flip the air and leave
-      } else { const k = e.t - hitAt; rot = -1.15 * easeOut(k / 0.11) + 0.25 * smooth(0.11, 0.3, k); y = 0.07 + 0.55 * easeOut(k / 0.11) * (okT ? 1 : 0.6); a = 1 - smooth(0.16, 0.36, k);
+      } else { const k = e.t - hitAt; rot = -0.85 * easeOut(k / 0.1) + 0.2 * smooth(0.1, 0.3, k); y = 0.07 + 0.5 * easeOut(k / 0.1) * (okT ? 1 : 0.6); a = (1 - 0.35 * smooth(0, 0.06, k)) * (1 - smooth(0.08, 0.24, k));   // the scoop stands up in front of the target: see-through at once, gone by 0.24 s so the tossed body reads
         if (tossed && !landed && k >= launch * 0.92) { landed = true; if (okT && !okT.removed) { const g = P3(okT.pos); this._puffs(g, lite() ? 2 : 4, okT.radius || 0.5, { a: 0.34, life: 0.38 }); this._pop(g, { r: (okT.radius || 0.5) + 0.2, y: 0.12, size: 0.4, flash: 0.5, ring: 0.9, life: 0.22 }); } }
         if (k > 0.36 && (!tossed || landed)) e.t = e.life; }
       // blade (-x of the mesh) under the target, handle back toward the cook; the scoop turns about the handle side
@@ -471,10 +471,10 @@ export class CookFx {
     const back = new THREE.Vector3(pc.pos.x - aim.x, 0, -(pc.pos.z - aim.z)); if (back.lengthSq() < 1e-4) back.set(0, 0, 1); back.normalize();
     const e = this._fx('pepper', lead + 0.9, (e) => {
       // upside down above the aim point; two sharp shakes: the first one lands exactly on the damage tick
-      const t = e.t - lead, s1 = Math.exp(-Math.pow(t / 0.05, 2)), s2 = Math.exp(-Math.pow((t - 0.2) / 0.05, 2)), out = smooth(0.42, 0.62, t);
+      const t = e.t - lead, s1 = Math.exp(-Math.pow(t / 0.05, 2)), s2 = Math.exp(-Math.pow((t - 0.2) / 0.05, 2)), out = smooth(0.3, 0.46, t);
       sh.position.copy(g0).addScaledVector(back, K.back); sh.position.y = g0.y + K.h - 0.32 * (s1 + s2) + 0.5 * out; sh.position.x += 0.04 * Math.sin(e.t * 50) * (s1 + s2);
       sh.rotation.set(Math.PI - 0.5 + 0.35 * (s1 + s2), e.t * 1.2, 0.25); sh.scale.setScalar(K.size * (0.6 + 0.4 * easeOut(e.t / 0.1)));
-      sh.material.uniforms.uA.value = smooth(0, 0.06, e.t) * (1 - out);
+      sh.material.uniforms.uA.value = smooth(0, 0.06, e.t) * (1 - out) * (1 - 0.3 * smooth(0.04, 0.12, t));   // after the shake it thins out so the targets under it read
       if (shook >= 0) { const k = (e.t - shook) / 0.6; sp.material.uniforms.uP.value = k * 1.2; sp.material.uniforms.uA.value = 0.85 * smooth(0, 0.08, e.t - shook) * (1 - smooth(0.45, 1, k)); this._flat(sp, r * (0.55 + 0.45 * easeOut(k * 2)), 0.06);
         this._flat(rg, r * (0.6 + 0.4 * easeOut(k * 2.4)), 0.07); rg.material.uniforms.uA.value = COOK.intensity * 0.9 * (1 - smooth(0.2, 0.8, k)); }
       else if (e.t > lead + 0.1) shook = e.t;
@@ -511,7 +511,7 @@ export class CookFx {
     const K = COOK.flour, r = o.r || 2.6, dur = o.dur || 6, g0 = P3(pos), low = lite(), I = COOK.intensity; let ended = -1;
     if (o.pre && o.pre.land) o.pre.land();
     // one white burst when the sack lands (fast, gone in 0.5 s), then only a low thin layer + a thin rim: enemies and telegraphs stay visible
-    this._puffs(g0.clone().setY(g0.y + 0.1), low ? K.burstLite : K.burst, r * 0.8, { c1: COOK.col.flour1, c2: COOK.col.flour2, a: 0.5, life: 0.5, rise: 0.45 });
+    this._puffs(g0.clone().setY(g0.y + 0.1), low ? K.burstLite : K.burst, r * 0.8, { c1: COOK.col.flour1, c2: COOK.col.flour2, a: 0.72, life: 0.55, rise: 0.6 });
     this._bits(g0.clone().setY(g0.y + 0.3), low ? 2 : 5, { geo: this.geo.cook_chip_c, tint: 0xfff8ea, size: [0.04, 0.07], speed: [1.0, 2.4], up: [1.5, 3.0], ground: g0.y, life: 0.5 });
     this.sfx('ck_flour');
     const wisps = [];
@@ -519,7 +519,7 @@ export class CookFx {
       const fade = ended >= 0 ? 1 - clamp01((e.t - ended) / 0.45) : smooth(0, 0.3, e.t) * (1 - smooth(dur - 0.6, dur, e.t));
       hz.material.uniforms.uP.value = e.t; hz.material.uniforms.uA.value = K.haze * fade;
       rg.material.uniforms.uA.value = I * K.ring * fade * (0.8 + 0.2 * Math.sin(e.t * 3));
-      for (const w of wisps) { const a = w.a0 + e.t * w.sp; w.m.quaternion.copy(this.camQ); w.m.position.set(g0.x + Math.cos(a) * w.rr, g0.y + 0.22 + 0.06 * Math.sin(e.t * 1.3 + w.a0), g0.z + Math.sin(a) * w.rr); w.m.scale.setScalar(w.s); w.m.material.uniforms.uA.value = 0.16 * fade; }
+      for (const w of wisps) { const a = w.a0 + e.t * w.sp; w.m.quaternion.copy(this.camQ); w.m.position.set(g0.x + Math.cos(a) * w.rr, g0.y + 0.22 + 0.06 * Math.sin(e.t * 1.3 + w.a0), g0.z + Math.sin(a) * w.rr); w.m.scale.setScalar(w.s); w.m.material.uniforms.uA.value = 0.2 * fade; }
     });
     const hz = this.blend(e, 7, this.quad, COOK.col.flour1, COOK.col.flour2, 2), rg = this.spr(e, 1, COOK.col.flour1, COOK.col.flour2, 3);
     hz.position.copy(g0); this._flat(hz, r, 0.05); rg.position.copy(g0); this._flat(rg, r, 0.06);
