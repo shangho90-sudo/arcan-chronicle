@@ -35,7 +35,7 @@ export const HAIR = {
   snip: { len: 1.7, open: 0.62, close: 0.07, life: 0.26, line: 3.0, flash: 1.6, strands: 4, strandsLite: 2 },
   shears: { len: 1.3, open: 0.6, appear: 0.1, leave: 0.2, bite: 0.6 },
   trim: { y: 1.15, life: 0.38, line: 4.6, strands: 9, strandsLite: 4 },
-  step: { gap: 0.12, first: 0.12, ys: [1.32, 0.88, 0.46], ws: [1.25, 1.75, 2.25], line: 3.0, ghosts: [0.0, 0.055, 0.11], ghostLife: 0.3, ghostA: 0.5, locks: 3, locksLite: 1 },
+  step: { gap: 0.12, first: 0.12, ys: [1.32, 0.88, 0.46], ws: [1.25, 1.75, 2.25], line: 3.0, ghosts: [0.0, 0.055, 0.11], ghostLife: 0.3, ghostA: 0.42, locks: 3, locksLite: 1 },
   end: { line: 4.2, plane: 0.7, flash: 1.5, tips: 7, tipsLite: 3, bonusFlash: 2.6, rays: 6 },
   comb: { size: 0.42, spin: 26, tilt: 0.5 },
   dryer: { size: 0.62, up: 1.12, fwd: 0.85, rate: 46, rateLite: 18, life: 0.24, appear: 0.09, fade: 0.18 },
@@ -453,6 +453,9 @@ export class HairFx {
         T.a += dt; if (on && T.a > (low ? 0.07 : 0.035) && blown < (low ? HAIR.gust.leavesLite : HAIR.gust.leaves)) { T.a = 0; blown++; this._blown(noz, fw, rt, half, r, gy); }
       } else if (mode === 'hot') {
         const H = HAIR.hot; T.a += dt; T.b += dt; T.c += dt;
+        // the hot stream itself: one long soft warm band along the cone axis (0.25 r .. 0.9 r), brighter on every DoT tick
+        if (hs) { const L = r * 0.65; hs.position.copy(noz).addScaledVector(fw, 0.25 * r + L * 0.5).setY(noz.y - 0.25); this._alignLine(hs, fw); hs.scale.set(L, Math.min(1.1, r * Math.sin(half) * 0.9), 1);
+          hs.material.uniforms.uA.value = I * a * (0.55 + 0.6 * Math.max(0, kick)) * (0.85 + 0.15 * Math.sin(e.t * 23)); }
         if (on && T.a > (low ? H.curlLite : H.curl)) { T.a = 0; this._rise(inCone(noz, rnd(-half, half) * 0.8, rnd(0.4, 0.85) * r, gy + rnd(0.2, 0.9)), 'curl', gy); }
         if (on && T.b > (low ? H.emberLite : H.ember)) { T.b = 0; this._rise(inCone(noz, rnd(-half, half) * 0.85, rnd(0.25, 0.9) * r, noz.y + rnd(-0.6, 0.1)), 'ember', gy); }
         if (on && T.c > (low ? H.hazeLite : H.haze)) { T.c = 0; this._rise(inCone(noz, rnd(-half, half) * 0.6, rnd(0.35, 0.7) * r, gy + rnd(0.4, 1.0)), 'haze', gy, r * Math.sin(half)); }
@@ -465,6 +468,7 @@ export class HairFx {
     let blown = 0;
     const tint = HAIR.dryerTint[mode] || 0xffffff;
     const dr = this.model(e, 'tripo_dryer', 'hair_dryer', { rim: cb, spec: 0.8, tint, desat: 0.85 }), gl = this.spr(e, 0, cw, cb, 4); if (dr) dr.renderOrder = 6;
+    const hs = mode === 'hot' ? this.spr(e, 5, C.hot, C.hotB, 3) : null;
     const nz = mode === 'gust' ? null : this.spr(e, mode === 'cold' ? 1 : 0, mode === 'cold' ? 0xffffff : C.ember, cb, 7);
     if (mode === 'gust') { for (let i = 0; i < (low ? HAIR.gust.swirlsLite : HAIR.gust.swirls) && this.geo.hair_swirl; i++) { const m = this._m(e, 'spr', this.geo.hair_swirl, 5), u = m.material.uniforms; u.uK.value = 5; u.uW.value.setHex(C.white); u.uB.value.setHex(i % 2 ? C.mintG : 0xc8d8ff); u.uA.value = 0;
         swirls.push({ m, d: lead + i * 0.07, th: (i - ((low ? HAIR.gust.swirlsLite : HAIR.gust.swirls) - 1) / 2) * half * 0.55, sg: i % 2 ? -1 : 1, ph: i * 2.1 }); }
