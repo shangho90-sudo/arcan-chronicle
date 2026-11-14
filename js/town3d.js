@@ -169,7 +169,7 @@ function doorAt(k, x, z, w = 1.3, h = 2.35, key = 'planks') {
   k.box(0.36, h + 0.2, 0.46, 'basestone', { x: x - w / 2 - 0.18, y: (h + 0.2) / 2 + 0.35, z: z + 0.16 });
   k.box(0.36, h + 0.2, 0.46, 'basestone', { x: x + w / 2 + 0.18, y: (h + 0.2) / 2 + 0.35, z: z + 0.16 });
   k.box(w + 0.72, 0.46, 0.5, 'basestone', { x, y: h + 0.58, z: z + 0.17 });
-  k.box(0.34, 0.56, 0.56, 'cream', { x, y: h + 0.62, z: z + 0.2 });
+  k.box(0.3, 0.52, 0.52, 'basestone', { x, y: h + 0.6, z: z + 0.18 });   // keystone
   for (const yy of [0.9, 2.0]) k.box(w * 0.8, 0.07, 0.04, 'iron', { x, y: yy + 0.35, z: z + 0.1 });
   k.sphere(0.06, 'gold', { x: x + w * 0.32, y: 1.4, z: z + 0.14 }, 6);
   k.box(w + 0.8, 0.18, 0.7, 'basestone', { x, y: 0.26, z: z + 0.42 });                  // step
@@ -605,11 +605,11 @@ function windCloth(f) {
 }
 
 // fountain water (2026-11-14): the Tripo angel fountain's water is only painted into its texture, so it stood still. A thin
-// transparent ring on the lower basin surface (measured from the model: flat level y = 0.044, r = 0.24..0.385 of the
-// model's unit size) adds restrained motion - soft concentric ripples where the upper tier spills (8 points), slow
+// transparent ring on the basin water (measured from the model: flat level y = 0.066, r = 0.095..0.21 of the model's
+// unit size) adds restrained motion - soft concentric ripples where the upper tier spills (8 points), slow
 // drifting light streaks and a few sparkles. Highlights only (no colour fill), so the painted water and stone stay.
 function fountainWater(md) {
-  const k = md.scale, r0 = 0.243 * k, r1 = 0.383 * k, y = 0.0445 * k + 0.02;
+  const k = md.scale, r0 = 0.105 * k, r1 = 0.2 * k, y = 0.0665 * k + 0.015;   // basin water level (the 0.044 level first tried was the outer steps)
   const g = new THREE.RingGeometry(r0, r1, 96, 3); g.rotateX(-Math.PI / 2);
   const m = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uT: WIND, uR: { value: new THREE.Vector2(r0, r1) } },
     vertexShader: 'varying vec2 vP; void main(){ vP = position.xz; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
@@ -874,7 +874,7 @@ export async function buildTown3D(spec, renderer) {
   return {
     root, fade, smoke, spray: spec.models.some(m => m.id === 'fountain') ? [[0, 3.2, 0]] : [],
     update(dt) { t += dt; WIND.value = t;
-      for (const f of flags) { const u = f.userData; if (u.rotY === undefined) { u.rotY = f.rotation.y; windCloth(f); }   // keep the authored facing (banners are turned 90 deg)
+      for (const f of flags) { const u = f.userData; if (u.rotY === undefined) { u.rotY = 0; windCloth(f); }   // facing 0 as it always rendered (the authored 90 deg on banners was overwritten from the start and would show them edge-on)
         f.rotation.y = u.rotY + Math.sin(t * 1.3 + u.ph) * 0.1 + Math.sin(t * 2.9 + u.ph * 2.3) * 0.04; } },
   };
 }
