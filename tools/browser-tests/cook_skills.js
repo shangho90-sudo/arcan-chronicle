@@ -1,6 +1,7 @@
 // 요리사 1차 스킬(식칼 썰기·팬 강타·미트볼 던지기 + 2026-11-13 뒤집기 flip·도마 방어 board·뜨거운 국물 soup·후추 뿌리기 pepper·밀가루 구름 flour·꼬치 찌르기 skewer·든든한 한 끼 meal·간식 시간 snack)을 실제 스킬 경로(skills2.cast → 동작 → 피해 →
 // js/cookfx.js)로 시전하고 화면 띠와 수치를 남김. G.step(1/FPS) 한 프레임씩, Math.random 고정.
 // SCENE=moving (대상이 옆으로 2.4 m/s 걸어감)·repeat (0.7초에 다시 시전, 미트볼 두 묶음이 겹침)도 있음 — 미트볼 던지기 확인용
+// DET=1 난수 0.5 고정(전/후 총 피해 비교), PLATES=1 이름표·체력 막대를 숨기지 않음, ZOOM=1 = 게임 카메라 거리
 // Usage: SKILL=chop|pan|ball|flip|board|soup|pepper|flour|skewer|meal|snack|lunch|bowl(제작 완성 연출 + 1.2초에 먹기) LV=1..5 SCENE=hit|whiff|kill|stun|miss|boss(뒤집기: 띄울 수 없는 적) GENDER=m|f SIZE=1100x760|390x844t FX=1|0 TAG=after DIR=90
 //        SEED=12345(Math.random 씨앗 — MISS가 나오면 바꿈) DUR=초
 //        URL=http://localhost:8797/index.html OUT=/tmp/cook node tools/browser-tests/cook_skills.js
@@ -33,9 +34,9 @@ const cfg = (SKILL) => { const WIDE = ['ball', 'soup', 'pepper', 'flour', 'skewe
   await pg.waitForSelector('.prologue.on', { timeout: 60000 }).then(() => click('건너뛰기')).catch(() => {});
   await pg.waitForFunction(() => window.G && G.inWorld && G.player && !G.loading && G.player.body && G.player.body.md, null, { timeout: 300000 });
   await pg.waitForFunction(() => G.skillFx && G.skillFx.cook, null, { timeout: 120000 });
-  await ev(async ([z, g, ids, lv]) => {
+  await ev(async ([z, g, ids, lv, plates]) => {
     G.frame = () => {}; const c = G.render.cam; c.zoom = z; c.updateProjectionMatrix();
-    document.querySelectorAll('.hud,.controls,.toasts,.qhud,.qh-reopen,.plates').forEach(e => e.style.display = 'none');
+    document.querySelectorAll('.hud,.controls,.toasts,.qhud,.qh-reopen' + (plates ? '' : ',.plates')).forEach(e => e.style.display = 'none');
     if (G.reward) { G.reward.jobChange = sw => sw && sw(); G.reward.levelUp = () => {}; }
     G.dev.level(20); G.sheet.p.gender = g; G.dev.job('cook'); G.sheet.bag.add('w_knife_1', 1); G.sheet.p.weapon = 'w_knife_1';
     const bk = G.sheet.book; bk.sk.points += 99; for (const id of ids) for (let i = 0; i < lv; i++) if (!bk.learnBlock(id)) bk.learn(id);
@@ -47,7 +48,7 @@ const cfg = (SKILL) => { const WIDE = ['ball', 'soup', 'pepper', 'flour', 'skewe
     for (let r = 0; r <= 16 && !spot; r++) for (let k = 0; k < Math.max(1, r * 6) && !spot; k++) { const a = k / Math.max(1, r * 6) * 6.283, c = { x: cx + Math.cos(a) * r, z: cz + Math.sin(a) * r }; let ok = true;
       for (let x = -7; x <= 7 && ok; x += 0.75) for (let z = -7; z <= 7 && ok; z += 0.75) if (x * x + z * z <= 49 && G.zone.geo.blocked(c.x + x, c.z + z, 0.35)) ok = false; if (ok) spot = c; }
     window.__spot = spot || { x: cx, z: cz };
-  }, [ZOOM, G_, LIST.map(k => SK[k]), LV]);
+  }, [ZOOM, G_, LIST.map(k => SK[k]), LV, !!process.env.PLATES]);   // PLATES=1: keep the monster name / HP plates (does a prop or a message cover them?)
   await pg.waitForFunction(() => G.skillFx.cook.ready && G.player.body && G.player.body.md, null, { timeout: 120000 });
   await pg.waitForTimeout(1500);
   for (const SKILL of LIST) { const { ID, DIST, CW, CH, DUR, MARKS } = cfg(SKILL); errs.length = 0;
@@ -64,8 +65,9 @@ const cfg = (SKILL) => { const WIDE = ['ball', 'soup', 'pepper', 'flour', 'skewe
     window.__ds = spots.map(s => { const m = G.dev.dummies(scene === 'boss' ? 'mon_golem' : 'mon_boar', 1, 0.01, s)[0]; m.teleport(s); m.__spot = s; return m; });
   }, [DIR, DIST, SKILL, SCENE]);
   await pg.waitForFunction(() => window.__ds.every(m => m.body), null, { timeout: 120000 });
-  const info = await ev(([scene, fps, id, dist, sd, skill]) => {
+  const info = await ev(([scene, fps, id, dist, sd, skill, det]) => {
     let seed = +sd || 12345; Math.random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+    if (det) Math.random = () => 0.5;   // DET=1: every roll 0.5 (명중·치명·피해 폭 고정) — 코드 버전 사이 총 피해·타격 시각 비교용
     const p = G.player, f = window.__f, m = window.__ds[0];
     for (const q of window.__ds) { if (scene !== 'stun') q.thinkStep = () => {}; q.teleport(q.__spot); q.setFacing(-f.x, -f.z); q.body.place(q.pos); }
     if (p.body.setArmed) { p.body.setArmed(true); p.calmT = 0; }
@@ -96,7 +98,7 @@ const cfg = (SKILL) => { const WIDE = ['ball', 'soup', 'pepper', 'flour', 'skewe
     if (scene === 'whiff') for (const q of window.__ds) { q.dead = true; q.remove(); }
     if (scene === 'miss') Math.random = () => 0.0001;   // every accuracy roll fails -> MISS (명중 판정)   // these skills need a target to start: a whiff = the target is gone before the hit
     return { hp: window.__hp, atk: p.stat('atk'), def: m.stat('def'), lv: p.skills2.lvl(id), mult: p.skills2.mult(d || { id, type: 'attack' }), desc: d && d.desc, cd: d && d.cd, mp: d && d.mp };
-  }, [SCENE, FPS, ID, DIST, +(process.env.SEED || 12345), SKILL]);
+  }, [SCENE, FPS, ID, DIST, +(process.env.SEED || 12345), SKILL, !!process.env.DET]);
   if (typeof info === 'string') { console.log(SKILL, info); continue; }
   const frames = [], total = Math.round(DUR * FPS); let dc = 0;
   for (let i = 0; i < total; i++) {

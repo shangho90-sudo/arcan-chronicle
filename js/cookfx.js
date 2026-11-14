@@ -27,17 +27,19 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 export const COOK = {
   intensity: 1.0,
-  knife: { len: 1.25, hover: 0.85, dip: 0.22, yaw: 0.6, appear: 0.1, leave: 0.22, rock: 0.22, slide: 0.16, flash: 1.5, line: 2.6, lineW: 0.62, lineLife: 0.18, chips: 4, chipsLite: 2, chip: [0.15, 0.24] },
-  pan: { height: 3.0, rest: 0.56, rMin: 0.85, rMax: 1.5, pad: 0.4, appear: 0.12, dropPart: 0.42, stay: 0.05, fade: 0.17, lift: 0.9, seeThrough: 0.5, ring: 2.0, ringLife: 0.28, flash: 1.0, flashT: 0.06, stars: 5, starsLite: 3 },
-  stun: { n: 3, r: 0.42, lift: 0.28, size: 0.24, spin: 5.0 },
+  // 2026-11-15 사용자 요청 '이펙트 크기 2배'(식칼 썰기·팬 강타·뜨거운 국물·후추 뿌리기): `vis` = 그림 배율(판정·시각·수치는 그대로). 길이·크기 값은 이미 2배로 적었고
+  // (len·hover·dip·slide·lineW·chip / pan.lift·stun / ladle·lift / size·back·shake; 팬 반지름은 R × vis), 코드 안 상수(섬광·조각 속도·김·방울)는 vis를 곱함. 높이(pan.height·pepper.h·soup.pivot)는 큰 소품이 땅에 박히지 않게 올림.
+  knife: { vis: 2, len: 2.5, hover: 1.5, dip: 0.36, yaw: 0.6, appear: 0.1, leave: 0.22, rock: 0.22, slide: 0.32, flash: 1.5, line: 2.6, lineW: 1.24, lineLife: 0.18, chips: 4, chipsLite: 2, chip: [0.3, 0.48] },
+  pan: { vis: 2, height: 3.8, rest: 0.56, rMin: 0.85, rMax: 1.5, pad: 0.4, appear: 0.12, dropPart: 0.42, stay: 0.05, fade: 0.17, lift: 1.2, seeThrough: 0.5, ring: 2.0, ringLife: 0.28, flash: 1.0, flashT: 0.06, stars: 5, starsLite: 3 },
+  stun: { n: 3, r: 0.84, lift: 0.5, size: 0.48, spin: 5.0 },   // 팬 강타의 별도 2배(2026-11-15)
   ball: { r: 0.2, spin: 11 },
   // 미트볼 던지기 (2026-11-14 소울 스트라이크식, 경로·시각은 js/meatball.js): 공 반지름·마지막 공 배율·회전, 꼬리 길이(점 수)·굵기, 소스 방울 간격, 타격 섬광·줄·고리
   volley: { r: 0.15, lastMul: 1.2, spin: 13, trail: 9, trailLite: 6, trailW: 0.1, drip: 0.06, dripLite: 0.15, flash: 0.62, flashLast: 1.0, streak: 0.95, streakLast: 1.35, drops: 4, dropsLite: 2, dropsLast: 9, dropsLastLite: 4, crumbs: 2, crumbsLast: 4, ring: 1.4, a: 1.0 },
   splat: { life: 0.42, ring: 0.85, flash: 1.3, bits: 5, bitsLite: 2 },
   flip: { stop: 0.06, kick: [0.09, 0.1], h: 1.5, ring: 1.8, flash: 1.3 },
   board: { w: 1.0, fwd: 0.62, marks: 6, push: 0.1, spark: 1.4 },
-  soup: { ladle: 1.15, wave: 0.16, lift: 0.55, drops: 9, dropsLite: 4, steam: 6, steamLite: 2, kick: [0.05, 0.08], a: 0.95 },
-  pepper: { h: 2.3, back: 0.9, size: 1.3, puffs: 5, puffsLite: 2, a: 0.42 },
+  soup: { vis: 2, ladle: 2.3, pivot: 2.9, wave: 0.16, lift: 1.1, drops: 9, dropsLite: 4, steam: 6, steamLite: 2, kick: [0.05, 0.08], a: 0.95 },
+  pepper: { vis: 2, h: 3.6, shake: 0.64, back: 1.8, size: 2.6, puffs: 5, puffsLite: 2, a: 0.42 },
   flour: { size: 0.95, burst: 8, burstLite: 4, haze: 0.2, ring: 0.5, wisps: 5, wispsLite: 2 },
   skewer: { stop: 0.05, kick: [0.07, 0.09], y: 0.85, flash: 1.3, line: 1.6 },
   eat: { y: 2.55, size: 0.85, bites: 3, gap: 0.2 },
@@ -244,11 +246,11 @@ export class CookFx {
       // slice line along the blade + a small flash on the cut, both gone in ~0.16 s; chips fly out of the cut
       const dirL = _a.copy(self.camR).applyAxisAngle(UP, K.yaw).clone(), len = K.len * (last ? 1.15 : 0.9), lf = self._fx('slice', K.lineLife + (last ? 0.06 : 0), (x) => {
         const k = x.t / x.life; ln.material.uniforms.uA.value = I * K.line * (1 - smooth(0.15, 1, k)); ln.scale.set(len * (0.7 + 0.5 * easeOut(k)), K.lineW * (last ? 1.25 : 1), 1);
-        fl.quaternion.copy(self.camQ); fl.scale.setScalar((last ? 0.8 : 0.55) * (0.6 + 0.6 * easeOut(k))); fl.material.uniforms.uA.value = I * K.flash * (1 - smooth(0.05, 0.7, k));
+        fl.quaternion.copy(self.camQ); fl.scale.setScalar((last ? 0.8 : 0.55) * K.vis * (0.6 + 0.6 * easeOut(k))); fl.material.uniforms.uA.value = I * K.flash * (1 - smooth(0.05, 0.7, k));
       });
       const ln = self.spr(lf, 2, 0xffffff, COOK.col.steelB, 7), fl = self.spr(lf, 3, 0xffffff, COOK.col.steel, 7);
       lf.g.position.copy(at); self._alignLine(ln, dirL);
-      self._bits(at, (lite() ? K.chipsLite : K.chips) + (last && !lite() ? 2 : 0), { ground: anchor.y, life: 0.55, size: K.chip, speed: [1.5, 2.8], up: [2.0, 3.4] });
+      self._bits(at, (lite() ? K.chipsLite : K.chips) + (last && !lite() ? 2 : 0), { ground: anchor.y, life: 0.55, size: K.chip, speed: [1.5 * K.vis, 2.8 * K.vis], up: [2.0 * Math.SQRT2, 3.4 * Math.SQRT2] });   // 2배 크기 = 2배 멀리 (높이 2배 = 속도 √2배)
     };
     e.miss = () => { if (ended < 0) ended = e.t; e.life = Math.min(e.life, e.t + K.leave); };
     return e;
@@ -262,7 +264,7 @@ export class CookFx {
     const K = COOK.pan, I = COOK.intensity, fall = Math.max(0.12, o.fall || 0.3), f = o.facing || { x: 0, z: 1 };
     let tgt = o.tgt || null, landed = -1, hitT = null;
     const anchor = tgt ? P3(tgt.pos) : P3({ x: pc.pos.x + f.x * 1.4, y: pc.pos.y || 0, z: pc.pos.z + f.z * 1.4 });
-    let top = tgt ? cookTop(tgt) : 0.25; const R = Math.max(K.rMin, Math.min(K.rMax, (tgt ? tgt.radius || 0.5 : 0.5) + K.pad));
+    let top = tgt ? cookTop(tgt) : 0.25; const R = K.vis * Math.max(K.rMin, Math.min(K.rMax, (tgt ? tgt.radius || 0.5 : 0.5) + K.pad));   // 그림 반지름 = 예전의 vis배
     // handle points back to the caster (it is the cook's pan)
     const hd = _a.set(pc.pos.x, 0, -pc.pos.z).sub(_b.set(anchor.x, 0, anchor.z)); if (hd.lengthSq() < 1e-4) hd.set(-f.x, 0, f.z); hd.normalize(); const yaw = Math.atan2(-hd.z, hd.x);
     const dropAt = fall * (1 - K.dropPart), hd0 = hd.clone();
@@ -272,7 +274,7 @@ export class CookFx {
       if (landed < 0) {   // appear (scale in with a wobble), hang, then the fast drop: lowest exactly at `fall`
         const d = clamp01((e.t - dropAt) / (fall - dropAt)); y = top * K.rest + (K.height - top * K.rest) * (1 - d * d * d); a = smooth(0, K.appear, e.t); tilt = 0.32 * (1 - smooth(0, 0.8, d)) + 0.06 * Math.sin(e.t * 30) * (1 - d);
         if (e.t > fall + 0.12) { landed = e.t; hitT = null; }   // the hit never came (cast interrupted): just fade
-      } else { const k = e.t - landed; y = (hitT ? top * K.rest : 0.06) + K.lift * easeOut(Math.max(0, k - K.stay * 0.5) / (K.stay + K.fade)) * (hitT ? 1 : 0.4); sq = 1 + 0.12 * Math.max(0, 1 - k / 0.08); a = (1 - (1 - K.seeThrough) * smooth(0, K.stay, k)) * (1 - smooth(K.stay, K.stay + K.fade, k)); tilt = -0.25 * easeOut(k / (K.stay + K.fade)); if (k > K.stay + K.fade) e.t = e.life; }
+      } else { const k = e.t - landed; y = (hitT ? top * K.rest : 0.06) + K.lift * easeOut(Math.max(0, k - K.stay * 0.5) / (K.stay + K.fade)) * (hitT ? 1 : 0.4); sq = 1 + 0.12 * Math.max(0, 1 - k / 0.08); a = (1 - (1 - K.seeThrough) * smooth(0, K.stay, k)) * (1 - smooth(K.stay, K.stay + K.fade, k)); tilt = -Math.min(0.25, Math.max(0, y - 0.04) / R) * easeOut(k / (K.stay + K.fade)); if (k > K.stay + K.fade) e.t = e.life; }
       pn.position.copy(anchor).setY(anchor.y + y); pn.rotation.set(0, yaw, tilt, 'YXZ'); pn.scale.set(R * sq, R / sq * (landed < 0 ? 0.5 + 0.5 * easeOut(e.t / K.appear) : 1), R * sq);
       const u = pn.material.uniforms; u.uA.value = a; u.uGlow.value = landed < 0 ? 0.35 * (1 - smooth(0, K.appear * 1.5, e.t)) : 0;
       // soft warm glow where it appears + a growing shadow-ish target ring on the ground (thin, the pan's own size)
@@ -293,7 +295,7 @@ export class CookFx {
       const rg = this.spr(fx, 1, 0xfff6dc, COOK.col.gold, 3), fl = this.spr(fx, 3, 0xffffff, COOK.col.warm, 7); rg.material.uniforms.uP.value = 1;
       fx.g.position.copy(g0); fl.position.set(hd0.x * R * 0.85, top * K.rest + 0.05, hd0.z * R * 0.85);
       this._puffs(g0, low ? 3 : 6, R, { a: 0.42, life: 0.42 });
-      if (this.geo.cook_star) this._bits(hp, low ? K.starsLite : K.stars, { geo: this.geo.cook_star, size: [0.07, 0.11], speed: [1.6, 2.6], up: [2.2, 3.4], ground: anchor.y, life: 0.55 });
+      if (this.geo.cook_star) this._bits(hp, low ? K.starsLite : K.stars, { geo: this.geo.cook_star, size: [0.07 * K.vis, 0.11 * K.vis], speed: [1.6 * K.vis, 2.6 * K.vis], up: [2.2 * Math.SQRT2, 3.4 * Math.SQRT2], ground: anchor.y, life: 0.55 });
     };
     return e;
   }
@@ -520,7 +522,7 @@ export class CookFx {
   soup(pc, o = {}) {
     if (!this._ok() || !this.geo.cook_ladle) return null;
     const K = COOK.soup, I = COOK.intensity, lead = Math.max(0.08, o.lead || 0.17), f = this._f3(o.facing || { x: 0, z: 1 }), r = o.r || 3.2, ang = o.ang || 60, low = lite();
-    const p0 = P3(pc.pos), right = new THREE.Vector3().crossVectors(f, UP).normalize(), piv = p0.clone().addScaledVector(right, 0.35).setY(p0.y + 1.75); let thrown = -1;
+    const p0 = P3(pc.pos), right = new THREE.Vector3().crossVectors(f, UP).normalize(), piv = p0.clone().addScaledVector(right, 0.35 * K.vis).setY(p0.y + K.pivot); let thrown = -1;
     const e = this._fx('soup', lead + 0.75, (e) => {
       // the ladle swings from low behind the cook up and over to the front; the soup leaves it at `lead`
       const k = e.t / lead, a = -1.0 + (k < 1 ? 1.75 * k * k : 1.75 + 0.5 * easeOut((e.t - lead) / 0.2)), L = K.ladle;
@@ -535,18 +537,18 @@ export class CookFx {
       } else if (e.t > lead + 0.1) thrown = e.t;
     });
     const ld = this.solid(e, this.geo.cook_ladle, { rim: COOK.col.steelB, spec: 1.1 }); ld.renderOrder = 6;
-    const fn = this.blend(e, 5, this.fan(ang), COOK.col.soupHi, COOK.col.soup, 2); fn.position.copy(p0).setY(p0.y + 0.07); fn.rotation.set(0, Math.atan2(-f.z, f.x), 0); fn.scale.set(r, 1, r);
+    const fn = this.blend(e, 5, this.fan(ang), COOK.col.soupHi, COOK.col.soup, 2); fn.position.copy(p0).setY(p0.y + 0.07); fn.rotation.set(0, Math.atan2(-f.z, f.x), 0); fn.scale.set(r * K.vis, 1, r * K.vis);   // 2026-11-15: 그림은 실제 부채꼴의 2배 반지름(판정 r 그대로)
     e.hit = (ok) => {
       if (e.dead || thrown >= 0) return; thrown = e.t;
       // drops fly out inside the real cone and land inside it; steam rises where the soup fell
-      const n = low ? K.dropsLite : K.drops, h = ang * Math.PI / 360, drops = [];
-      const de = this._fx('soupdrops', 0.5, (q, dt) => { for (const d of drops) { d.v.y -= 9 * dt; d.m.position.addScaledVector(d.v, dt); if (d.m.position.y < p0.y + 0.05) { d.m.position.y = p0.y + 0.05; d.v.set(0, 0, 0); d.m.scale.multiplyScalar(0.8); } else { _a.copy(d.v).normalize(); d.m.quaternion.setFromUnitVectors(UP, _a); } d.m.material.uniforms.uA.value = 1 - smooth(0.7, 1, q.t / q.life); } });
-      for (let i = 0; i < n; i++) { const a = rnd(-h, h) * 0.85, dist = r * rnd(0.45, 0.95), T = rnd(0.1, 0.18), dir = f.clone().applyAxisAngle(UP, a), m = this.solid(de, this.geo.cook_drop, { spec: 0.9, rim: COOK.col.soupHi });
-        m.scale.setScalar(rnd(0.06, 0.11)); m.position.copy(ld.position); const dy = p0.y + 0.05 - ld.position.y, to = p0.clone().addScaledVector(dir, dist);
+      const n = low ? K.dropsLite : K.drops, h = ang * Math.PI / 360, drops = [], V = K.vis, rv = r * V;
+      const de = this._fx('soupdrops', 0.5, (q, dt) => { for (const d of drops) { d.v.y -= 9 * dt; d.m.position.addScaledVector(d.v, dt); if (d.m.position.y < p0.y + 0.05 * V) { d.m.position.y = p0.y + 0.05 * V; d.v.set(0, 0, 0); d.m.scale.multiplyScalar(0.8); } else { _a.copy(d.v).normalize(); d.m.quaternion.setFromUnitVectors(UP, _a); } d.m.material.uniforms.uA.value = 1 - smooth(0.7, 1, q.t / q.life); } });
+      for (let i = 0; i < n; i++) { const a = rnd(-h, h) * 0.85, dist = rv * rnd(0.45, 0.95), T = rnd(0.1, 0.18), dir = f.clone().applyAxisAngle(UP, a), m = this.solid(de, this.geo.cook_drop, { spec: 0.9, rim: COOK.col.soupHi });
+        m.scale.setScalar(rnd(0.06, 0.11) * V); m.position.copy(ld.position); const dy = p0.y + 0.05 * V - ld.position.y, to = p0.clone().addScaledVector(dir, dist);
         drops.push({ m, v: new THREE.Vector3((to.x - ld.position.x) / T, dy / T + 4.5 * T, (to.z - ld.position.z) / T) }); }
       const ns = low ? K.steamLite : K.steam;
-      for (let i = 0; i < ns; i++) { const a = rnd(-h, h) * 0.8, at = p0.clone().addScaledVector(f.clone().applyAxisAngle(UP, a), r * rnd(0.4, 0.9)); this._puffs(at.setY(p0.y + 0.15), 1, 0.5, { c1: COOK.col.steam1, c2: COOK.col.steam2, a: 0.26, life: rnd(0.5, 0.75), rise: 0.9 }); }
-      for (const t of ok || []) { const g = P3(t.pos); this._pop(g, { r: 0, y: cookTop(t) * 0.55, size: 0.55, flash: 1.0, w: COOK.col.soupHi }); this._bits(g.clone().setY(g.y + cookTop(t) * 0.55), low ? 1 : 3, { geo: this.geo.cook_drop, size: [0.035, 0.06], speed: [1.0, 2.0], up: [1.2, 2.4], ground: g.y, life: 0.4 }); }
+      for (let i = 0; i < ns; i++) { const a = rnd(-h, h) * 0.8, at = p0.clone().addScaledVector(f.clone().applyAxisAngle(UP, a), rv * rnd(0.4, 0.9)); this._puffs(at.setY(p0.y + 0.15 * V), 1, 0.5 * V, { c1: COOK.col.steam1, c2: COOK.col.steam2, a: 0.26, life: rnd(0.5, 0.75), rise: 0.9 * V }); }
+      for (const t of ok || []) { const g = P3(t.pos); this._pop(g, { r: 0, y: cookTop(t) * 0.55, size: 0.55 * V, flash: 1.0, w: COOK.col.soupHi }); this._bits(g.clone().setY(g.y + cookTop(t) * 0.55), low ? 1 : 3, { geo: this.geo.cook_drop, size: [0.035 * V, 0.06 * V], speed: [1.0 * V, 2.0 * V], up: [1.2 * Math.SQRT2, 2.4 * Math.SQRT2], ground: g.y, life: 0.4 }); }
     };
     return e;
   }
@@ -560,11 +562,11 @@ export class CookFx {
     const e = this._fx('pepper', lead + 0.9, (e) => {
       // upside down above the aim point; two sharp shakes: the first one lands exactly on the damage tick
       const t = e.t - lead, s1 = Math.exp(-Math.pow(t / 0.05, 2)), s2 = Math.exp(-Math.pow((t - 0.2) / 0.05, 2)), out = smooth(0.3, 0.46, t);
-      sh.position.copy(g0).addScaledVector(back, K.back); sh.position.y = g0.y + K.h - 0.32 * (s1 + s2) + 0.5 * out; sh.position.x += 0.04 * Math.sin(e.t * 50) * (s1 + s2);
+      sh.position.copy(g0).addScaledVector(back, K.back); sh.position.y = g0.y + K.h - K.shake * (s1 + s2) + 0.5 * K.vis * out; sh.position.x += 0.04 * K.vis * Math.sin(e.t * 50) * (s1 + s2);
       sh.rotation.set(Math.PI - 0.5 + 0.35 * (s1 + s2), e.t * 1.2, 0.25); sh.scale.setScalar(K.size * (0.6 + 0.4 * easeOut(e.t / 0.1)));
       sh.material.uniforms.uA.value = smooth(0, 0.06, e.t) * (1 - out) * (1 - 0.3 * smooth(0.04, 0.12, t));   // after the shake it thins out so the targets under it read
-      if (shook >= 0) { const k = (e.t - shook) / 0.6; sp.material.uniforms.uP.value = k * 1.2; sp.material.uniforms.uA.value = 0.85 * smooth(0, 0.08, e.t - shook) * (1 - smooth(0.45, 1, k)); this._flat(sp, r * (0.55 + 0.45 * easeOut(k * 2)), 0.06);
-        this._flat(rg, r * (0.6 + 0.4 * easeOut(k * 2.4)), 0.07); rg.material.uniforms.uA.value = COOK.intensity * 0.9 * (1 - smooth(0.2, 0.8, k)); }
+      if (shook >= 0) { const k = (e.t - shook) / 0.6; sp.material.uniforms.uP.value = k * 1.2; sp.material.uniforms.uA.value = 0.85 * smooth(0, 0.08, e.t - shook) * (1 - smooth(0.45, 1, k)); this._flat(sp, r * K.vis * (0.55 + 0.45 * easeOut(k * 2)), 0.06);   // 2026-11-15: 그림은 실제 반경의 2배(판정 r 그대로)
+        this._flat(rg, r * K.vis * (0.6 + 0.4 * easeOut(k * 2.4)), 0.07); rg.material.uniforms.uA.value = COOK.intensity * 0.9 * (1 - smooth(0.2, 0.8, k)); }
       else if (e.t > lead + 0.1) shook = e.t;
     });
     const sh = this.prop(e, 'tripo_pepper', 'cook_shaker', { spec: 0.4 }); sh.renderOrder = 6;
@@ -572,9 +574,9 @@ export class CookFx {
     e.hit = (ok) => {
       if (e.dead || shook >= 0) return; shook = e.t;
       // grains fall from the shaker: a few dark bits + a low thin dust inside the real radius
-      this._bits(sh.position.clone(), low ? 3 : 7, { geo: this.geo.cook_chip_c, tint: COOK.col.pepper1, size: [0.025, 0.045], speed: [0.4, r * 0.9], up: [-1.5, 0.5], ground: g0.y, life: 0.5 });
-      this._puffs(g0, low ? K.puffsLite : K.puffs, r * 0.9, { c1: 0xb8a888, c2: 0x5a4a3a, a: K.a, life: 0.6, rise: 0.35 });
-      for (const t of ok || []) { const g = P3(t.pos); this._puffs(g.clone().setY(g.y + cookTop(t) * 0.8), 1, 0.4, { c1: COOK.col.dust1, c2: COOK.col.pepper2, a: 0.4, life: 0.35, rise: 0.3 }); }
+      this._bits(sh.position.clone(), low ? 3 : 7, { geo: this.geo.cook_chip_c, tint: COOK.col.pepper1, size: [0.025 * K.vis, 0.045 * K.vis], speed: [0.4 * K.vis, r * 0.9 * K.vis], up: [-1.5, 0.5], ground: g0.y, life: 0.5 });
+      this._puffs(g0, low ? K.puffsLite : K.puffs, r * 0.9 * K.vis, { c1: 0xb8a888, c2: 0x5a4a3a, a: K.a, life: 0.6, rise: 0.35 });
+      for (const t of ok || []) { const g = P3(t.pos); this._puffs(g.clone().setY(g.y + cookTop(t) * 0.8), 1, 0.4 * K.vis, { c1: COOK.col.dust1, c2: COOK.col.pepper2, a: 0.4, life: 0.35, rise: 0.3 * K.vis }); }
     };
     return e;
   }
@@ -714,11 +716,26 @@ export function cookImpact(G, pc, op, ctx, ts, ok, f) {
     for (const t of ok) { if (!t.dead) t.freezeT = Math.max(t.freezeT || 0, C.skewer.stop); if (t.body && t.body.punch) t.body.punch(f.x, f.z, 0.2); }
     kick(C.skewer.kick);
   } else if (kind === 'soup') {
-    for (const t of ok) if (t.body && t.body.punch) t.body.punch(t.pos.x - pc.pos.x, t.pos.z - pc.pos.z, 0.16);
+    ok.forEach((t, i) => { if (t.body && t.body.punch) t.body.punch(t.pos.x - pc.pos.x, t.pos.z - pc.pos.z, 0.16); if (i < SHOUT.soup.max) cookShout(G, t, 'soup', { i }); });
     kick(C.soup.kick);
   } else if (kind === 'pepper') {
-    ok.forEach((t, i) => { if (t.dead) return; if (t.body && t.body.punch) t.body.punch(0, 0.01, 0.3); if (i < 4) G.ui.floatText(t.pos, '에취!', '#e8d8b0', 0.8, 1.5); });
+    ok.forEach((t, i) => { if (t.dead) return; if (t.body && t.body.punch) t.body.punch(0, 0.01, 0.3); if (i < SHOUT.pepper.max) cookShout(G, t, 'pepper', { i }); });
   }
+}
+
+/** 타격감 문구(2026-11-15): 실제로 맞은 대상(MISS 아님)에만, ui.js impactText(주아체 팝·흔들림, 피해 숫자 반대쪽 옆·위, 같은 대상 0.15초에 하나, 화면에 최대 6개).
+ *  식칼 썰기는 타마다 '썰!'/'싹둑!' 번갈아 마지막 타 '썰썰썰!'(마지막은 늘 뜸), 팬 강타 '쾅!' + 기절이 걸리면 '기절!', 뜨거운 국물 '치익!'/'앗뜨거!'(대상 2개까지), 후추 '에취!'(3개까지). */
+export const SHOUT = {
+  chop: { words: ['썰!', '싹둑!'], last: '썰썰썰!', col: '#eaf7ff', edge: '#16385a', size: 1.0, lastSize: 1.18 },
+  pan: { word: '쾅!', col: '#ffd23a', edge: '#5a2200', size: 1.3 },
+  stun: { word: '기절!', col: '#fff27a', edge: '#4a3600', size: 0.85 },
+  soup: { words: ['치익!', '앗뜨거!'], col: '#ff8a2e', edge: '#4a0e00', size: 1.0, max: 2 },
+  pepper: { word: '에취!', col: '#f4e2b8', edge: '#3a2614', size: 1.0, max: 3 },
+};
+export function cookShout(G, t, kind, o = {}) {
+  const S = SHOUT[kind]; if (!S || !t || !G.ui || !G.ui.impactText) return;
+  const last = !!o.last, text = kind === 'chop' ? (last ? S.last : S.words[(o.h || 0) % 2]) : S.words ? S.words[(o.i || 0) % S.words.length] : S.word;
+  G.ui.impactText({ x: t.pos.x, y: t.pos.y || 0, z: t.pos.z }, text, { key: t, col: S.col, edge: S.edge, size: last ? S.lastSize : S.size, top: cookTop(t), force: last || o.force });
 }
 /** 뒤집기로 띄울 수 있는 대상(보스·무거운 몬스터 제외 — skillrt의 launch 규칙과 같음) */
 export const cookCanToss = (t) => !!t && !t.dead && !t.isBoss && !(t.def && t.def.ai === 'heavy');

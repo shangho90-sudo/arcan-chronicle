@@ -188,6 +188,21 @@ export class UI {
     }
     this.floats.push({ e, pos: { x: pos.x + (Math.random() - 0.5) * 0.5, y: pos.y + h, z: pos.z + (Math.random() - 0.5) * 0.3 }, t: 0, scale });
   }
+  /** 타격감 문구(2026-11-15, 요리사 '썰!'·'쾅!'·'치익!'·'에취!'): 머리 위 옆에서 튀어나와 짧게 흔들리고 0.7초에 사라짐(주아체 `.float.imp`).
+   *  피해 숫자를 가리지 않게 — 방금 그 자리에 뜬 숫자(damageText _dmgStack)의 반대쪽 옆·위, 같은 자리에 잇따르면 한 칸씩 위로; 숫자가 늘 위에 그려짐(CSS z-index).
+   *  o: key(대상 — 같은 대상은 gap 0.15초 안에 하나만, force면 무시), col·edge(글자·테두리 색), size, top(발에서 머리 위까지 m), max(화면에 동시에, 기본 6). 난수 없음(게임 Math.random을 건드리지 않음). */
+  impactText(pos, text, o = {}) {
+    const now = this.fclock || 0, key = o.key || null, W = this._impW || (this._impW = new WeakMap());
+    if (key && !o.force) { const t0 = W.get(key); if (t0 != null && now - t0 < (o.gap ?? 0.15)) return; }
+    if (key) W.set(key, now);
+    const live = this.floats.filter(f => f.imp);
+    while (live.length >= (o.max || 6)) { const f = live.shift(); f.e.remove(); this.floats.splice(this.floats.indexOf(f), 1); }
+    const ds = this._dmgStack; let side = (this._impSide = -(this._impSide || 1));
+    if (ds && ds.side && now * 1000 - ds.t < 400 && Math.hypot(pos.x - ds.x, pos.z - ds.z) < 0.8) side = -ds.side;
+    const n = live.filter(f => now - f.born < 0.45 && Math.hypot(f.pos.x - pos.x, f.pos.z - pos.z) < 0.8).length;
+    const e = $("div", "float imp", this.floatLayer); e.textContent = text; e.style.color = o.col || "#fff"; if (o.edge) e.style.setProperty("--edge", o.edge);
+    this.floats.push({ e, imp: 1, born: now, side, n: Math.min(n, 3), pos: { x: pos.x, y: (pos.y || 0) + (o.top ?? 1.2) + 0.2, z: pos.z }, t: 0, scale: o.size || 1, life: o.life || 0.72 });
+  }
   /** damage numbers with impact: kind = 'hit' (player hits a monster), 'crit', 'taken' (player is hit), 'dot' */
   damageText(pos, amount, kind) {
     if (!G.settings.damageNumbers) return;
@@ -196,7 +211,7 @@ export class UI {
     let side = Math.random() < 0.5 ? -1 : 1; const heal = kind === "heal";
     // rapid hits on the same spot (연타·여러 발): each new number starts a step higher and on the other side, so they fan out instead of piling up
     let lift = 0; const now = (this.fclock || 0) * 1000, ds = this._dmgStack || (this._dmgStack = { t: 0, x: 0, z: 0, n: 0 });
-    if (!heal && kind !== "taken") { if (now - ds.t < 380 && Math.hypot(pos.x - ds.x, pos.z - ds.z) < 0.8) { ds.n = (ds.n + 1) % 5; lift = ds.n * 0.3; side = ds.n % 2 ? 1 : -1; } else ds.n = 0; ds.t = now; ds.x = pos.x; ds.z = pos.z; }
+    if (!heal && kind !== "taken") { if (now - ds.t < 380 && Math.hypot(pos.x - ds.x, pos.z - ds.z) < 0.8) { ds.n = (ds.n + 1) % 5; lift = ds.n * 0.3; side = ds.n % 2 ? 1 : -1; } else ds.n = 0; ds.t = now; ds.x = pos.x; ds.z = pos.z; ds.side = side; }   // side: impactText goes to the other side
     this.floats.push({ e, dmg: kind, pos: { x: pos.x + (Math.random() - 0.5) * (heal ? 0.15 : 0.35) + (lift ? side * 0.22 : 0), y: pos.y + (kind === "taken" ? 1.5 : heal ? 2.0 : 1.25) + lift, z: pos.z + (Math.random() - 0.5) * 0.2 }, t: 0,
       scale: 1, vx: heal ? side * 6 : side * (kind === "crit" ? 18 : 30 + Math.random() * 20), life: kind === "crit" ? 1.15 : heal ? 1.15 : 0.85 });
   }
@@ -216,6 +231,17 @@ export class UI {
         const shake = f.dmg === "crit" && t < 0.25 ? (Math.random() - 0.5) * 6 : 0;
         f.e.style.transform = `translate(${s.x + dx + shake}px,${s.y + hop}px) translate(-50%,-50%) scale(${pop})`;
         f.e.style.opacity = k > 0.7 ? 1 - (k - 0.7) / 0.3 : 1;
+        continue;
+      }
+      if (f.imp) {                                     // 타격감 문구: pop 0.35 -> 1.45 -> 1, a short shake + tilt toward its side, drifts up, fades
+        const t = f.t, k = t / f.life;
+        if (k >= 1) { f.e.remove(); this.floats.splice(this.floats.indexOf(f), 1); continue; }
+        const s = G.render.toScreen(f.pos), ph = innerWidth < 600 ? 0.72 : 1;
+        const pop = t < 0.06 ? 0.35 + t / 0.06 * 1.1 : t < 0.15 ? 1.45 - (t - 0.06) / 0.09 * 0.55 : t < 0.22 ? 0.9 + (t - 0.15) / 0.07 * 0.1 : 1;
+        const sh = t < 0.24 ? Math.sin(t * 95 + f.n * 1.7) * (1 - t / 0.24) : 0;
+        const dx = f.side * (64 + 12 * Math.min(1, t / 0.3)) * ph + sh * 4, dy = -(16 + f.n * 28) * ph - k * 18;
+        f.e.style.transform = `translate(${s.x + dx}px,${s.y + dy}px) translate(-50%,-50%) rotate(${-f.side * 8 + sh * 7}deg) scale(${f.scale * pop})`;
+        f.e.style.opacity = k > 0.62 ? 1 - (k - 0.62) / 0.38 : 1;
         continue;
       }
       if (f.t < 0) continue;                           // staggered label: not shown yet
