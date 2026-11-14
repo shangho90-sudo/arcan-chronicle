@@ -193,6 +193,35 @@ export function discoverTown(data, p, zoneId) {
   if (p.towns.includes(zoneId)) return false;
   p.towns.push(zoneId); return true;
 }
+// ======================================================================================= 메인 퀘스트 입장 조건 (2026-11-15)
+// zones.json 의 zone.unlock = 그 지역을 여는 메인 단계 id (tools/quests/gates.py → world.py --write). 그 단계의 선행
+// 퀘스트(prereq)를 모두 마쳤거나 단계를 이미 받았으면 열림. 저장 데이터는 늘지 않음(퀘스트 상태에서 계산).
+const CIRCLED = { "①": 1, "②": 0, "③": 1, "④": 0, "⑤": 0 };     // 일·이·삼·사·오 → 받침 있음?
+/** 받침 있으면 a(을/이), 없으면 b(를/가) */
+export function josa(word, a, b) {
+  const w = String(word || "").replace(/\s*\([^)]*\)\s*$/, "").trim(), ch = w.slice(-1);
+  if (ch in CIRCLED) return CIRCLED[ch] ? a : b;
+  const c = ch.charCodeAt(0);
+  if (c >= 0xac00 && c <= 0xd7a3) return (c - 0xac00) % 28 ? a : b;
+  if (/[0-9]/.test(ch)) return "013678".includes(ch) ? a : b;
+  return a;
+}
+/** "6장 안개 속 감시자 ①" → { ch: "6장", title: "안개 속 감시자 ①" } */
+export function questTitle(q) { const m = /^(\d+장)\s+(.*)$/.exec(q && q.name || ""); return m ? { ch: m[1], title: m[2] } : { ch: "", title: (q && q.name) || "" }; }
+const qDone = (p, id) => (p.quests || []).some(x => x.id === id && x.state === "completed");
+/** 들어갈 수 없으면 { step, quest, text, short }, 들어갈 수 있으면 null */
+export function zoneLock(data, p, zoneId) {
+  const z = data.zones[zoneId], sid = z && z.unlock; if (!sid || !p) return null;
+  const q = data.quests[sid]; if (!q) return null;
+  if ((p.quests || []).some(x => x.id === sid) || (q.prereq || []).every(id => qDone(p, id))) return null;
+  const { ch, title } = questTitle(q);
+  const need = `메인 퀘스트 ${ch ? ch + " " : ""}「${title}」`;
+  const side = (q.prereq || []).filter(id => !qDone(p, id)).map(id => data.quests[id]).filter(o => o && questCategory(o) !== "main");
+  const text = `${need}${josa(title, "을", "를")} 진행해야 들어갈 수 있습니다` + (side.length ? ` (먼저 「${side[0].name}」 완료)` : "");
+  return { step: sid, quest: q, text, short: `${ch || "메인"} 「${title}」 필요` };
+}
+export const zoneOpen = (data, p, zoneId) => !zoneLock(data, p, zoneId);
+
 /** 워프할 수 없는 까닭(없으면 "") */
 export function warpBlock(data, p, from, to) {
   const a = data.zones[from], b = data.zones[to];
@@ -200,6 +229,7 @@ export function warpBlock(data, p, from, to) {
   if (!b || b.kind !== "town") return "갈 수 없는 곳입니다";
   if (from === to) return "지금 있는 마을입니다";
   if (!townsKnown(data, p).includes(to)) return "아직 가 보지 않은 곳입니다";
+  { const L = zoneLock(data, p, to); if (L) return L.text; }
   if ((p.gold | 0) < warpPrice(data, from, to)) return "골드가 부족합니다";
   return "";
 }

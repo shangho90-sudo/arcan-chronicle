@@ -7,6 +7,13 @@ const THEME = {
 import { CAM } from './render.js';
 import { npcMapKind, drawMapIcon } from './mapicons.js';
 const PPM = 3;   // background pixels per metre
+/** 작은 자물쇠(닫힌 포털) */
+function lockGlyph(ctx, x, y, r, dpr) {
+  ctx.save(); ctx.lineWidth = Math.max(1, r * 0.32); ctx.strokeStyle = '#20242e';
+  ctx.beginPath(); ctx.arc(x, y - r * 0.15, r * 0.48, Math.PI, 0); ctx.stroke();
+  ctx.fillStyle = '#20242e'; ctx.fillRect(x - r * 0.7, y - r * 0.15, r * 1.4, r * 1.0);
+  ctx.restore();
+}
 
 export class Minimap {
   constructor(canvas) { this.c = canvas; this.ctx = canvas.getContext('2d'); this.zoneId = null; this.bg = null; this.k = 3.4; this.n = 0; }
@@ -99,10 +106,11 @@ export class Minimap {
     };
     // portals
     for (const pt of z.def.portals || []) {
-      const q = to(pt.pos[0], pt.pos[1]), r = 5 * dpr * u;
+      const q = to(pt.pos[0], pt.pos[1]), r = 5 * dpr * u, locked = G.lockOf && G.lockOf(pt.targetZone);      // 메인 퀘스트로 아직 닫힌 곳 = 회색 + 자물쇠
       ctx.beginPath(); ctx.moveTo(q.x, q.y - r); ctx.lineTo(q.x + r, q.y); ctx.lineTo(q.x, q.y + r); ctx.lineTo(q.x - r, q.y); ctx.closePath();
-      ctx.fillStyle = '#62d8ff'; ctx.fill(); ctx.lineWidth = 1.2 * dpr; ctx.strokeStyle = '#0b3550'; ctx.stroke();
-      label(q, pt.label || (G.data.zones[pt.targetZone] || {}).name, 9, '#bff0ff');
+      ctx.fillStyle = locked ? '#8a90a0' : '#62d8ff'; ctx.fill(); ctx.lineWidth = 1.2 * dpr; ctx.strokeStyle = locked ? '#20242e' : '#0b3550'; ctx.stroke();
+      if (locked) lockGlyph(ctx, q.x, q.y - r * 0.05, r * 0.62, dpr);
+      label(q, (locked ? '🔒 ' : '') + (pt.label || (G.data.zones[pt.targetZone] || {}).name), 9, locked ? '#c8ccd8' : '#bff0ff');
     }
     // 큰 건물 이름 (왕궁·길드 회관 등, 지역 전체 지도에서만)
     for (const m of (z.def.town3d && z.def.town3d.models) || []) if (m.name && m.size && m.size[0] >= 12) label(to(m.pos[0], m.pos[1]), m.name, -8, /palace/.test(m.id) ? '#ffe9a8' : '#e8ecf8');
@@ -113,12 +121,28 @@ export class Minimap {
     }
     // npcs: plain gold dot, or a green "?" badge when they have a quest to give or to hand in (G.questState)
     //       상점·전직 NPC는 종류 아이콘(js/mapicons.js); 퀘스트가 있으면 아이콘 오른쪽 위에 작은 "?"를 겹침
-    const qn = [], ic = [];
+    // 메인 퀘스트 NPC(2026-11-15): 금테 주홍 원판에 "!"/"?" (G.mainState) — 서브 퀘스트의 초록 "?"보다 앞에 그림
+    const qn = [], ic = [], mq = [];
     for (const n of z.npcs || []) {
-      const st = G.questState ? G.questState(n.def.id) : '', q = to(n.pos.x, n.pos.z), kind = npcMapKind(n.def), quest = st === 'ready' || st === 'avail';
-      if (kind) ic.push([q, n, kind, quest]);
+      const st = G.questState ? G.questState(n.def.id) : '', ms = G.mainState ? G.mainState(n.def.id) : '', q = to(n.pos.x, n.pos.z), kind = npcMapKind(n.def);
+      const main = ms === 'ready' || ms === 'talk' || ms === 'avail', quest = main ? 'main' : (st === 'ready' || st === 'avail');
+      if (kind) ic.push([q, n, kind, quest, ms]);
+      else if (main) mq.push([q, n, ms]);
       else if (quest) qn.push([q, n, 1]); else { dot(q, 3.2, '#ffe07a', '#5a3a08'); label(q, n.def.name, 6, '#ffe9b0'); }
     }
+    this.mainNpcs = [...mq.map(([, n]) => n.def.id), ...ic.filter(e => e[3] === 'main').map(e => e[1].def.id)];   // 확인용(tools/browser-tests/gates.js)
+    const mbadge = (x, y, r, ch) => {
+      ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283);
+      const g = ctx.createRadialGradient(x - r * 0.3, y - r * 0.35, r * 0.1, x, y, r); g.addColorStop(0, '#fff1c8'); g.addColorStop(0.45, '#ff9a3a'); g.addColorStop(1, '#c8321a');
+      ctx.fillStyle = g; ctx.fill(); ctx.lineWidth = 2.2 * dpr; ctx.strokeStyle = '#ffd23a'; ctx.stroke(); ctx.lineWidth = 1.2 * dpr; ctx.strokeStyle = '#3a0c06'; ctx.beginPath(); ctx.arc(x, y, r + 1.4 * dpr, 0, 6.283); ctx.stroke();
+      // 작은 금관
+      const w = r * 0.9, top = y - r - r * 0.62;
+      ctx.beginPath(); ctx.moveTo(x - w, y - r * 0.82); ctx.lineTo(x - w, top); ctx.lineTo(x - w * 0.45, top + r * 0.32); ctx.lineTo(x, top - r * 0.12); ctx.lineTo(x + w * 0.45, top + r * 0.32); ctx.lineTo(x + w, top); ctx.lineTo(x + w, y - r * 0.82); ctx.closePath();
+      ctx.fillStyle = '#ffd23a'; ctx.fill(); ctx.lineWidth = 1 * dpr; ctx.strokeStyle = '#3a0c06'; ctx.stroke();
+      ctx.font = `bold ${Math.round(r * 1.45)}px Jua, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.lineWidth = 2.2 * dpr; ctx.strokeStyle = '#3a0c06'; ctx.strokeText(ch, x, y + r * 0.06); ctx.fillStyle = '#ffffff'; ctx.fillText(ch, x, y + r * 0.06);
+    };
+    const mch = ms => ms === 'avail' ? '!' : '?';
     const qbadge = (x, y, r) => {
       ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283);
       const g = ctx.createRadialGradient(x - r * 0.3, y - r * 0.35, r * 0.1, x, y, r); g.addColorStop(0, '#d8ffe0'); g.addColorStop(0.45, '#4fd36a'); g.addColorStop(1, '#16803a');
@@ -134,12 +158,13 @@ export class Minimap {
       const m = (need - d) / 2 / d; A.x -= dx * m; A.y -= dy * m; B.x += dx * m; B.y += dy * m;
     }
     this.icons = ic.map(([q, n, kind]) => ({ id: n.def.id, kind, x: q.x, y: q.y, r: ri }));      // 확인용(tools/browser-tests/mapicons.js)
-    for (const [q, n, kind, quest] of ic) {
+    for (const [q, n, kind, quest, ms] of ic) {
       drawMapIcon(ctx, kind, q.x, q.y, ri);
-      if (quest) qbadge(q.x + ri * 0.75, q.y - ri * 0.75, ri * 0.62);
+      if (quest === 'main') mbadge(q.x + ri * 0.75, q.y - ri * 0.75, ri * 0.62, mch(ms)); else if (quest) qbadge(q.x + ri * 0.75, q.y - ri * 0.75, ri * 0.62);
     }
-    for (const [q, n, , quest] of ic) label(q, n.def.name, 12, quest ? '#b8ffc8' : '#ffe9b0');      // 이름은 아이콘을 다 그린 뒤에(옆 아이콘에 가리지 않게)
+    for (const [q, n, , quest] of ic) label(q, n.def.name, 12, quest === 'main' ? '#ffd08a' : quest ? '#b8ffc8' : '#ffe9b0');      // 이름은 아이콘을 다 그린 뒤에(옆 아이콘에 가리지 않게)
     for (const [q, n] of qn) { qbadge(q.x, q.y, (full ? 9 : 6.2) * dpr); label(q, n.def.name, 11, '#b8ffc8'); }
+    for (const [q, n, ms] of mq) { mbadge(q.x, q.y, (full ? 9.5 : 6.6) * dpr, mch(ms)); label(q, n.def.name, 11, '#ffd08a'); }
     // player arrow
     const P = p.pos, c = to(P.x, P.z);
     const f = p.facing || { x: 0, z: 1 }, fx = f.x * ex.x + f.z * ez.x, fy = f.x * ex.y + f.z * ez.y, fl = Math.hypot(fx, fy) || 1, ux = fx / fl, uy = fy / fl, s = 7 * dpr * u;

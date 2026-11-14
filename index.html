@@ -103,6 +103,9 @@ small { font-size:.8em; }
 .plate .mark b.m-active { display:inline-block; font-family:Georgia, "Times New Roman", serif; font-size:54px; font-weight:900; line-height:1; -webkit-text-stroke:2.5px #3a2006; paint-order:stroke fill;
   text-shadow:0 3px 0 #2a1604, 0 0 14px rgba(255,200,60,.85), 0 0 28px rgba(255,170,40,.55); animation:qmbob 1.4s ease-in-out infinite; transform-origin:50% 100%; }
 .plate .mark b.m-active { font-size:40px; color:#d8d0c8; text-shadow:0 2px 0 #222; animation:none; }
+/* 메인 퀘스트 NPC (2026-11-15): 금관을 쓴 주홍 "!"/"?" + 붉은 금빛 후광 — 서브 퀘스트(노랑 "!"·초록 "?")와 구분 */
+.plate .mark b.qmark.qmain { filter:drop-shadow(0 0 7px rgba(255,150,50,.95)) drop-shadow(0 0 18px rgba(255,70,40,.6)); }
+.plate .mark b.m-active.qmain { color:#ffc85a; -webkit-text-stroke:2px #3a0c06; text-shadow:0 2px 0 #3a0c06, 0 0 10px rgba(255,140,40,.7); }
 /* NPC names 3x (13 -> 39 px), thick dark outline so they read over any ground; phones 2x */
 @font-face { font-family:Jua; src:url(assets/fonts/Jua.woff2) format('woff2'); font-display:swap; }   /* 주아체, OFL (assets/fonts/Jua-OFL.txt) */
 .plate.npc .pname { font-family:Jua, sans-serif; font-size:20px; font-weight:400; letter-spacing:.5px; -webkit-text-stroke:3px #1a1008; paint-order:stroke fill; text-shadow:0 3px 4px rgba(0,0,0,.55); }
@@ -325,9 +328,11 @@ small { font-size:.8em; }
 .amname { display:flex; flex-direction:column; min-width:0; font-family:Jua,sans-serif; font-size:16px; color:#3a2a10; line-height:1.15; }
 .amname small { font-family:inherit; font-size:13px; color:#8a6a3a; } .amitem.boss .amname { color:#a02818; }
 .amq { font-style:normal; display:inline-flex; width:17px; height:17px; border-radius:50%; background:#2f9e44; color:#fff; font-size:12px; align-items:center; justify-content:center; vertical-align:2px; }
+.amq.main { background:radial-gradient(circle at 35% 30%, #fff1c8, #ff9a3a 45%, #c8321a); box-shadow:0 0 0 1.5px #ffd23a; }
 .lg { flex:none; display:inline-grid; place-items:center; width:16px; height:16px; border-radius:50%; font-style:normal; }
 .lg.me { width:0; height:0; border-radius:0; border:8px solid transparent; border-bottom:14px solid #fff; border-top:0; filter:drop-shadow(0 0 1px #1a2a4a) drop-shadow(0 0 1px #1a2a4a); }
 .lg.q { width:20px; height:20px; color:#fff; font-size:14px; font-weight:800; background:radial-gradient(circle at 35% 30%, #d8ffe0, #4fd36a 45%, #16803a); box-shadow:0 0 0 1.5px #0a3a18; }
+.lg.main { width:20px; height:20px; color:#fff; font-size:14px; font-weight:800; background:radial-gradient(circle at 35% 30%, #fff1c8, #ff9a3a 45%, #c8321a); box-shadow:0 0 0 2px #ffd23a, 0 0 0 3.5px #3a0c06; }
 .lg.npc { background:#ffe07a; box-shadow:0 0 0 1.5px #5a3a08; } .lg.warp { width:13px; height:13px; border-radius:2px; transform:rotate(45deg); background:#62d8ff; box-shadow:0 0 0 1.5px #0b3550; }
 .lg.ic { width:22px; height:22px; border-radius:0; } .amkind { flex:none; width:21px; height:21px; margin-left:-24px; margin-right:-6px; align-self:flex-end; position:relative; }
 .lg.mon { width:11px; height:11px; background:#ff5a4a; box-shadow:0 0 0 1.5px #4a0a06; } .lg.boss { background:#c06bff; box-shadow:0 0 0 1.5px #2a0838; }
@@ -988,6 +993,12 @@ small { font-size:.8em; }
 .wmlinks { margin-top:4px; font-size:15px; color:#e6d6ae; } .wmlinks span { color:#c9b080; } .wmlinks b { color:#fff1c8; font-weight:700; }
 .wminfoart { position:absolute; right:10px; bottom:0; width:220px; height:70px; pointer-events:none; } .wminfoart svg { width:100%; height:100%; }
 .wmlv { display:inline-block; margin-left:8px; padding:1px 10px; border-radius:12px; background:rgba(232,196,106,.14); border:1px solid #c9a24a; font-size:13px; color:#ffe6a0; }
+/* 메인 퀘스트 입장 조건·목적지 (2026-11-15) */
+.wmnode.locked > circle, .wmnode.locked > g:not(.wmlock):not([transform^="translate"]) { filter:grayscale(.85) brightness(.62); }
+.wmnode.locked .wmlabel { fill:#5a5650; }
+.wmgoal { fill:none; stroke:#ff9a3a; stroke-width:3; animation:wmpulse 1.4s ease-in-out infinite; }
+.wmgoaltxt { margin-top:4px; font-size:15px; color:#ffc070; font-weight:700; } .wmlocktxt { margin-top:4px; font-size:15px; color:#d8dce8; }
+.wmlegend i.lg2, .wmlegend i.lk { width:auto; height:auto; font-style:normal; color:#ffc84a; font-size:14px; margin-left:10px; } .wmlegend i.lk { filter:grayscale(.3); }
 .wmlv.here { background:linear-gradient(#8a5a14, #5a3a0a); color:#fff2c0; }
 .window.phone.worldmap { padding:84px 12px 14px; } .window.phone .wmlogo { display:none; }
 .window.phone .wmbox { height:56vh; } .window.phone .wmcorner { width:54px; height:54px; left:14px; top:12px; } .window.phone .wminfoart { opacity:.4; }

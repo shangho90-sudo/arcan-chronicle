@@ -16,7 +16,7 @@ const $ = (tag, cls, parent, html) => { const e = document.createElement(tag); i
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const SCROLL = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h10a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V6" fill="#e9dcbc" stroke="#6a4a1a" stroke-width="1.4"/><path d="M5 6a2 2 0 1 1 4 0v12" fill="none" stroke="#6a4a1a" stroke-width="1.4"/><path d="M10 9h6M10 12h6M10 15h4" stroke="#8a6a2a" stroke-width="1.3" stroke-linecap="round"/></svg>';
 const CHECK = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const CAT = c => `<em class="qh-cat ${c === 'sub' ? 'sub' : 'main'}">${c === 'sub' ? '서브' : '메인'}</em>`;
+const CAT = c => `<em class="qh-cat ${c === 'sub' ? 'sub' : 'main'}">${c === 'sub' ? '서브' : '★ 메인'}</em>`;
 const npcName = id => { const n = G.data.npcs[id]; return n ? `${n.title} ${n.name}` : id; };
 
 /** the goals to show, most relevant first: [{ key, title, rows:[{text, done, prog}], hint, ready }] */
@@ -39,6 +39,25 @@ function questGoals() {
     else { const o = q.objectives.find((o, i) => ql.current(q, i) < o.count);
       if (o) hint = o.type === 'talk' ? talkHint(o.target) : o.type === 'kill' ? (mobile ? '공격 버튼으로 공격' : '몬스터를 클릭하거나 Space 키로 공격') : o.type === 'collect' ? '몬스터를 처치하면 재료를 얻습니다' : o.type === 'level' ? '몬스터를 처치해 경험치를 모으세요' : o.type === 'job' ? '직업 마스터에게 말을 걸어 전직' : o.type === 'equip' ? `가방(${mobile ? '가방 버튼' : 'I 키'})에서 장비 장착` : ''; }
     out.push({ key: q.id, cat: questCategory(q), title: q.name, rows, hint, ready: st === QS.Completable });
+  }
+  // 2026-11-15: 메인 퀘스트 길잡이 — 갈 곳(다른 지역이면 '갈 곳: …'), 진행 중인 메인이 없으면 다음 메인 단계를 받는 법
+  const here = G.zone && G.zone.def.id, zname = id => (G.data.zones[id] || {}).name || id;
+  const targets = G.mainTargets ? G.mainTargets() : [];
+  for (const g of out) {
+    const t = targets.find(t => t.quest.id === g.key);
+    if (t && t.zone && t.zone !== here) g.hint = `갈 곳: ${zname(t.zone)} (세계 지도 M)` + (g.hint ? ' · ' + g.hint : '');
+  }
+  if (!out.some(g => g.cat === 'main') && G.data.world && G.data.world.main) {
+    for (const id of G.data.world.main.order) {
+      const q = G.data.quests[id]; if (!q) continue; const st = ql.stateOf(q);
+      if (st === QS.Completed || st === QS.Active || st === QS.Completable) continue;
+      const S = G.data.world.main.steps[id] || {}, pre = (q.prereq || []).filter(p => !ql.isCompleted(p)).map(p => G.data.quests[p]).filter(Boolean);
+      if (pre.some(p => questCategory(p) === 'main')) continue;            // 앞 메인 단계가 남아 있음
+      const text = st === QS.Available ? `${npcName(q.giver)}에게 퀘스트 받기` : pre.length ? `먼저 「${pre[0].name}」 완료하기` : `Lv ${q.minLevel}이 되면 ${npcName(q.giver)}에게서 받기`;
+      out.unshift({ key: 'next_' + id, cat: 'main', title: '다음: ' + q.name, rows: [{ text, done: false, prog: st === QS.Available ? '' : '준비 중' }],
+        hint: st === QS.Available ? (S.gz && S.gz !== here ? `갈 곳: ${zname(S.gz)} (세계 지도 M) · ` : '') + talkHint(q.giver) : '' });
+      break;
+    }
   }
   // story (메인) goals first, then side (서브) goals; order inside each group is kept
   return out.filter(g => g.cat === 'main').concat(out.filter(g => g.cat !== 'main'));

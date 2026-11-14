@@ -37,6 +37,9 @@ eq(payWarp(d, p, 'town', 'kairion_capital'), '아직 가 보지 않은 곳입니
 eq(discoverTown(d, p, 'forest'), false, '필드는 기록 안 함'); eq(discoverTown(d, p, 'kairion_capital'), true, '처음 들어가면 기록'); eq(discoverTown(d, p, 'kairion_capital'), false, '두 번째는 그대로');
 eq(townsKnown(d, p), ['town', 'kairion_capital']);
 eq(warpBlock(d, p, 'town', 'town'), '지금 있는 마을입니다'); eq(warpBlock(d, p, 'forest', 'town'), '워프 안내인은 마을에서만 만날 수 있습니다'); eq(warpBlock(d, p, 'town', 'forest'), '갈 수 없는 곳입니다');
+// 2026-11-15 메인 퀘스트 입장 조건: 카이리온은 1장(선행 q2_merchant 완료)부터 — 가 본 마을이어도 닫혀 있으면 막힘 (tests/gates.test.mjs)
+ok(/^메인 퀘스트 1장 「가을의 납품」을 진행해야 들어갈 수 있습니다/.test(warpBlock(d, p, 'town', 'kairion_capital')), '메인 퀘스트로 닫힌 마을은 막힘');
+p.quests = [{ id: 'q1_start', state: 'completed', counts: [1] }, { id: 'q2_merchant', state: 'completed', counts: [1] }];
 const fare = warpPrice(d, 'town', 'kairion_capital'); eq(payWarp(d, p, 'town', 'kairion_capital'), '', '가 본 마을은 이동'); eq(p.gold, 1000 - fare, '삯만큼 줄어듦');
 p.gold = fare - 1; eq(payWarp(d, p, 'kairion_capital', 'town'), '골드가 부족합니다'); eq(p.gold, fare - 1, '부족하면 그대로');
 p.gold = fare; eq(payWarp(d, p, 'kairion_capital', 'town'), ''); eq(p.gold, 0, '딱 맞으면 이동');

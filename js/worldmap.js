@@ -16,7 +16,11 @@ const CASTLE = `<path d="M-14,10 V-3 H-10 V-8 H-6.5 V-3 H-3 V-11 H3 V-3 H6.5 V-8
 <path d="M-2.6,10 V4.5 a2.6,2.6 0 0 1 5.2,0 V10 Z" fill="#3a2208"/><path d="M0,-11 V-18 L6,-15.5 L0,-13" fill="#c8402e" stroke="#3a2208" stroke-width="1"/>
 <path d="M-10,-8 h3.5 M6.5,-8 h3.5 M-3,-11 h6" stroke="#fff3c0" stroke-width="1" opacity=".7"/>`;
 
-export function worldMapSvg(data, here) {
+const LOCK = `<g class="wmlock"><circle r="7.5" fill="#20242e" stroke="#c9ccd6" stroke-width="1.4"/><path d="M-3,-0.5 V-2.6 a3,3 0 0 1 6,0 V-0.5" fill="none" stroke="#e8ebf2" stroke-width="1.5"/><rect x="-3.8" y="-0.8" width="7.6" height="5.2" rx="1" fill="#e8ebf2"/></g>`;
+const STAR = `<path d="M0,-10 L2.9,-3.4 L10,-3.1 L4.5,1.5 L6.3,8.5 L0,4.6 L-6.3,8.5 L-4.5,1.5 L-10,-3.1 L-2.9,-3.4 Z" fill="url(#wmgold)" stroke="#5a1406" stroke-width="1.6" stroke-linejoin="round"/>`;
+/** opts.locked: Set(메인 퀘스트로 아직 닫힌 지역) / opts.goal: Map(지역 → 메인 단계 이름) — 금별 목적지 */
+export function worldMapSvg(data, here, opts = {}) {
+  const locked = opts.locked || new Set(), goal = opts.goal || new Map();
   const W = data.world || { regions: [], links: [], size: [1000, 760] }, [SW, SH] = W.size || [1000, 760];
   const Z = Object.values(data.zones).filter(z => z.map), at = id => data.zones[id] && data.zones[id].map;
   const vb = [-PAD[0], -PAD[1], SW + 2 * PAD[0], SH + 2 * PAD[1]];
@@ -36,11 +40,15 @@ export function worldMapSvg(data, here) {
   // places
   for (const z of Z) {
     const [x, y] = z.map, cur = z.id === here, town = z.kind === 'town', col = BIOME_COL[biomeOf(z)];
-    s += `<g class="wmnode${cur ? ' here' : ''}${town ? ' town' : ''}" data-z="${z.id}" transform="translate(${x} ${y})">`;
+    const lk = locked.has(z.id) && !cur, gl = goal.has(z.id);
+    s += `<g class="wmnode${cur ? ' here' : ''}${town ? ' town' : ''}${lk ? ' locked' : ''}${gl ? ' goal' : ''}" data-z="${z.id}" transform="translate(${x} ${y})">`;
+    if (gl) s += `<circle r="24" class="wmgoal"/>`;
     if (cur) s += `<circle r="30" fill="url(#wmhalo)"/><circle r="20" class="wmpulse"/>`;
     if (town) s += `<g transform="scale(1.15)">${CASTLE}</g>`;
     else s += `<circle r="11" fill="#2a1a0c"/><circle r="9" fill="${col}" stroke="#fffaf0" stroke-width="2"/><circle r="9" fill="url(#wmgem)"/>`;
     if (cur) s += `<path d="M0,${town ? -26 : -20} l-7,-11 h14 Z" fill="url(#wmgold)" stroke="#3a2208" stroke-width="1.6"/>`;
+    if (lk) s += `<g transform="translate(${town ? 13 : 9} ${town ? -12 : -9})">${LOCK}</g>`;
+    if (gl) s += `<g transform="translate(${town ? -15 : -11} ${town ? -16 : -12})">${STAR}</g>`;
     s += `<rect x="-34" y="-30" width="68" height="62" fill="transparent"/>`;
     s += `<text class="wmlabel${town ? ' town' : ''}${cur ? ' cur' : ''}" y="${town ? 29 : 26}" text-anchor="middle">${esc(z.name)}</text></g>`;
   }
@@ -108,10 +116,13 @@ export function showWorldMap(ui) {
   const cp = document.createElement('div'); cp.className = 'wmcorner'; cp.innerHTML = COMPASS; wnd.appendChild(cp);
   const top = document.createElement('div'); top.className = 'wmtop'; b.appendChild(top);
   top.innerHTML = `<span class="wmhere"><i class="dia">◆</i> 현재 위치 <b>${esc(cur ? cur.name : '')}</b></span><span class="wmsep"></span>` +
-    `<span class="wmlegend"><i class="lt"></i>마을 <i class="lf"></i>필드 <i class="lh"></i>현재 위치</span>`;
+    `<span class="wmlegend"><i class="lt"></i>마을 <i class="lf"></i>필드 <i class="lh"></i>현재 위치 <i class="lg2">★</i>메인 목적지 <i class="lk">🔒</i>아직 못 감</span>`;
   const zb = document.createElement('span'); zb.className = 'wmzoom'; top.appendChild(zb);
   const box = document.createElement('div'); box.className = 'wmbox'; b.appendChild(box);
-  const inner = document.createElement('div'); inner.className = 'wminner'; inner.innerHTML = worldMapSvg(D, here); box.appendChild(inner);
+  // 메인 퀘스트(2026-11-15): 닫힌 지역은 흐리게 + 자물쇠, 지금 메인 단계가 보내는 곳은 금별
+  const locked = new Set(Object.keys(D.zones).filter(id => D.zones[id].map && G.lockOf && G.lockOf(id)));
+  const goal = new Map(); for (const t of (G.mainTargets ? G.mainTargets() : [])) if (t.zone && !goal.has(t.zone)) goal.set(t.zone, t.quest);
+  const inner = document.createElement('div'); inner.className = 'wminner'; inner.innerHTML = worldMapSvg(D, here, { locked, goal }); box.appendChild(inner);
   const info = document.createElement('div'); info.className = 'wminfo'; b.appendChild(info);
   const txt = document.createElement('div'); txt.className = 'wminfotxt'; info.appendChild(txt);
   const sk = document.createElement('div'); sk.className = 'wminfoart'; sk.innerHTML = SKYLINE; info.appendChild(sk);
@@ -135,7 +146,9 @@ export function showWorldMap(ui) {
     const kind = z.kind === 'town' ? '마을' : '필드 · ' + (BIOME_KR[biomeOf(z)] || '');
     const lv = z.level && z.kind !== 'town' ? `<span class="wmlv">권장 Lv ${z.level[0]}~${z.level[1]}</span>` : '';
     txt.innerHTML = `<div class="wmname"><b>${esc(z.name)}</b> <small>${esc(kind)}${reg ? ' · ' + esc(reg.name) : ''}</small> ${lv}${id === here ? ' <span class="wmlv here">현재 위치</span>' : ''}</div>` +
-      `<div class="wmlinks"><span>이어진 곳 :</span> ${links.map(l => `<b>${esc(l.name)}</b>`).join(', ') || '없음'}</div>`;
+      `<div class="wmlinks"><span>이어진 곳 :</span> ${links.map(l => `<b>${esc(l.name)}</b>`).join(', ') || '없음'}</div>` +
+      (goal.has(id) ? `<div class="wmgoaltxt">★ 메인 퀘스트 목적지 — ${esc(goal.get(id).name)}</div>` : '') +
+      (locked.has(id) ? `<div class="wmlocktxt">🔒 ${esc(G.lockOf(id).text)}</div>` : '');
     for (const n of inner.querySelectorAll('.wmnode')) n.classList.toggle('sel', n.dataset.z === id);
     if (selId !== id) { selId = id; relayout(); }
   };

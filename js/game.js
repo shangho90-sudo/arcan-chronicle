@@ -1,5 +1,5 @@
 // Game orchestrator + zone runtime. Port of Boot/ArcanGame.cs and World/ZoneRuntime.cs.
-import { GameData, SaveStore, SAVE_SLOTS, saveSlotKey, CharacterSheet, QuestLog, QS, ZoneGeometry, NavGrid, newProfile, DEG, clamp, HitShape, levelGapExp, monsterAtLevel, discoverTown, payWarp, warpPrice } from './core.js';
+import { GameData, SaveStore, SAVE_SLOTS, saveSlotKey, CharacterSheet, QuestLog, QS, ZoneGeometry, NavGrid, newProfile, DEG, clamp, HitShape, levelGapExp, monsterAtLevel, discoverTown, payWarp, warpPrice, zoneLock, questCategory } from './core.js';
 import { Renderer, Fx, TelegraphView, TG_TIME, loadSheet, preloadTextures, THREE, T } from './render.js';
 import { Player, Monster, Boss, Npc, Loot, bindGame as bindActors } from './actors.js';
 import { Input, Audio } from './io.js';
@@ -19,12 +19,16 @@ async function fetchJson(p) { const r = await fetch(p); if (!r.ok) throw new Err
 
 // ======================================================================================= telegraph
 /** quest mark over an NPC: a fat outlined "!" / "?" drawn as SVG (fonts differ per device), gold or green gradient */
-const QMARK = (ch, c0, c1, c2, ink) => {
-  const id = 'qm' + (ch === '!' ? 'a' : 'r');
+const QMARK = (ch, c0, c1, c2, ink, crown) => {
+  const id = 'qm' + (ch === '!' ? 'a' : 'r') + (crown ? 'm' : '');
   const shape = ch === '!'
     ? '<path d="M9 6 Q9 2 13 2 L23 2 Q27 2 27 6 L24.5 44 Q24.2 48 21 48 L15 48 Q11.8 48 11.5 44 Z"/><circle cx="18" cy="60" r="7.5"/>'
     : '<path d="M5 22 Q5 3 19 3 Q33 3 33 18 Q33 27 25 31 Q22.5 33 22.5 37 L22.5 44 L13.5 44 L13.5 35 Q13.5 27 20 23.5 Q24 21 24 17.5 Q24 12 19 12 Q14 12 14 19 Z"/><circle cx="18" cy="58" r="7.5"/>';
-  return `<b class="qmark"><svg viewBox="-4 -4 46 76" width="40" height="66"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c0}"/><stop offset=".45" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs>`
+  // 메인 퀘스트(crown): 글자 위에 금관 + 붉은 보석 (2026-11-15) — 서브 퀘스트 표시는 그대로
+  const cr = crown ? `<g stroke="${ink}" stroke-width="2.4" stroke-linejoin="round"><path d="M2 -3 L4 -24 L11.5 -13 L18 -29 L24.5 -13 L32 -24 L34 -3 Z" fill="url(#qmcrown)"/>`
+    + `<circle cx="18" cy="-10" r="3.4" fill="#e8283c"/><circle cx="4" cy="-24" r="2.4" fill="#fff3b0"/><circle cx="18" cy="-29" r="2.6" fill="#fff3b0"/><circle cx="32" cy="-24" r="2.4" fill="#fff3b0"/></g>` : '';
+  return `<b class="qmark${crown ? ' qmain' : ''}"><svg viewBox="${crown ? '-4 -34 46 106' : '-4 -4 46 76'}" width="40" height="${crown ? 92 : 66}"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c0}"/><stop offset=".45" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient>`
+    + (crown ? `<linearGradient id="qmcrown" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffbe0"/><stop offset=".5" stop-color="#ffd23a"/><stop offset="1" stop-color="#c47a08"/></linearGradient>` : '') + `</defs>` + cr
     + `<g fill="${ink}" stroke="${ink}" stroke-width="6" stroke-linejoin="round" transform="translate(0 2.5)">${shape}</g>`
     + `<g fill="url(#${id})" stroke="${ink}" stroke-width="2.5" stroke-linejoin="round">${shape}</g>`
     + `<path d="M13.5 6 L17 6 L15.8 30" stroke="#fff" stroke-opacity=".55" stroke-width="2.4" fill="none" stroke-linecap="round" ${ch === '!' ? '' : 'display="none"'}/></svg></b>`;
@@ -219,7 +223,8 @@ class Zone {
     for (const pt of this.def.portals || []) {
       if (Math.hypot(p.pos.x - pt.pos[0], p.pos.z - pt.pos[1]) > pt.radius) continue;
       inAny = true; if (!this.portalArmed) continue;
-      if (p.sheet.p.level < pt.minLevel) { G.ui.toast("레벨 " + pt.minLevel + " 이상 입장 가능"); this.portalArmed = false; continue; }
+      // 2026-11-15: 레벨 문 대신 메인 퀘스트 진행 문 (core.js zoneLock) — 막히면 이동하지 않고 까닭만
+      const L = G.lockOf(pt.targetZone); if (L) { G.ui.toast(L.text); G.audio.sfx("ui"); this.portalArmed = false; continue; }
       G.travel(pt.targetZone, pt.targetSpawn); return;
     }
     if (!inAny) this.portalArmed = true;
@@ -482,6 +487,13 @@ class Game {
     await this.fadeTo(1, 0.25);
     if (this.player) this.player.skills2.clearTemp(); if (this.skillFx) this.skillFx.clear();
     if (this.player && this.zone) this.zone.removeActor(this.player);
+    // 메인 퀘스트로 아직 열리지 않은 곳(예전 저장·귀환·부활)은 아르칸 마을 시작 지점으로 (2026-11-15)
+    const lock = this.lockOf(zoneId), P0 = this.profile;
+    if (lock) {
+      zoneId = this.data.levels.startZone; spawnId = this.data.levels.startSpawn; usePos = false;
+      if (P0 && this.lockOf(P0.returnZone)) { P0.returnZone = zoneId; P0.returnSpawn = spawnId; }
+      setTimeout(() => { if (session === this.session) this.ui.toast("아직 들어갈 수 없는 곳이라 아르칸 마을로 옮겼습니다 — " + lock.text); }, 900);
+    }
     await this.buildZone(zoneId);
     if (session !== this.session) return;
     const z = this.zone, def = z.def, P = this.profile, cfg = this.data.config;
@@ -519,8 +531,44 @@ class Game {
     }
     return ready ? "ready" : avail ? "avail" : active ? "active" : "";
   }
+  /** 메인 퀘스트만 본 상태: "ready"(완료하러) / "talk"(대화 목표) / "avail"(받을 것) / "active"(진행 중, 여기서 완료) / "" */
+  mainState(npcId) {
+    const Q = this.quests; if (!Q) return "";
+    let r = "";
+    for (const q of this.data.questList) {
+      if (questCategory(q) !== "main") continue;
+      const st = Q.stateOf(q), turnIn = q.turnIn || q.giver;
+      if (st === QS.Completable && turnIn === npcId) return "ready";
+      if (st === QS.Active) {
+        const pr = Q.find(q.id);
+        if (q.objectives.some((o, i) => o.type === "talk" && o.target === npcId && Q.current(q, i, pr) < o.count)) r = "talk";
+        else if (turnIn === npcId && !r) r = "active";
+      } else if (st === QS.Available && q.giver === npcId && r !== "talk") r = "avail";
+    }
+    return r;
+  }
+  /** 지금 진행할 메인 단계와 갈 곳: [{ quest, zone }] (세계 지도 목적지 — zones.json world.main.steps) */
+  mainTargets() {
+    const Q = this.quests, M = this.data.world && this.data.world.main; if (!Q || !M) return [];
+    const out = [];
+    for (const id of M.order) {
+      const q = this.data.quests[id], S = M.steps[id]; if (!q || !S) continue;
+      const st = Q.stateOf(q); if (st === QS.Completed || st === QS.Locked) continue;
+      let zone = S.gz;
+      if (st === QS.Completable) zone = S.tz;
+      else if (st === QS.Active) { const pr = Q.find(id), i = q.objectives.findIndex((o, k) => Q.current(q, k, pr) < o.count); zone = (i >= 0 && S.oz[i]) || S.tz; }
+      out.push({ quest: q, zone }); if (out.length >= 2) break;
+    }
+    return out;
+  }
+  /** 메인 퀘스트 입장 조건: 들어갈 수 없으면 { text, … } */
+  lockOf(zoneId) { return this.profile ? zoneLock(this.data, this.profile, zoneId) : null; }
   questMark(npcId) {
+    const ms = this.mainState(npcId);
+    if (ms === "ready" || ms === "talk") return QMARK('?', '#fff6d8', '#ff9a3a', '#c8321a', '#3a0c06', true);
+    if (ms === "avail") return QMARK('!', '#fff6d8', '#ff9a3a', '#c8321a', '#3a0c06', true);
     const st = this.questState(npcId);
+    if (ms === "active" && st !== "ready" && st !== "avail") return '<b class="m-active qmain">…</b>';
     return st === "ready" ? QMARK('?', '#eafff0', '#7ee09a', '#23884a', '#0c3a1c') : st === "avail" ? QMARK('!', '#fff7c4', '#ffd23a', '#d9790c', '#3a2006') : st === "active" ? '<b class="m-active">…</b>' : "";
   }
   interact(npc) {

@@ -62154,7 +62154,7 @@
      "radius": 1.8,
      "targetZone": "mist_valley",
      "targetSpawn": "from_forest",
-     "minLevel": 10
+     "minLevel": 0
     },
     {
      "id": "to_grove",
@@ -68760,7 +68760,8 @@
      ],
      "radius": 6.0,
      "count": 3,
-     "spread": 5.0
+     "spread": 5.0,
+     "level": 9
     }
    ],
    "boss": {
@@ -68813,11 +68814,12 @@
     510
    ],
    "level": [
-    10,
-    10
+    8,
+    11
    ],
    "region": "kairion",
-   "oriented": 180
+   "oriented": 180,
+   "unlock": "q7_boss"
   },
   {
    "id": "mist_valley",
@@ -90309,7 +90311,7 @@
      "radius": 1.8,
      "targetZone": "frost_highland",
      "targetSpawn": "from_valley",
-     "minLevel": 22
+     "minLevel": 0
     },
     {
      "id": "to_baltern_pass",
@@ -90578,7 +90580,8 @@
      ],
      "radius": 13.0,
      "count": 7,
-     "spread": 6.0
+     "spread": 6.0,
+     "level": 8
     },
     {
      "monster": "mon_mist_fox",
@@ -90588,7 +90591,8 @@
      ],
      "radius": 12.0,
      "count": 7,
-     "spread": 6.0
+     "spread": 6.0,
+     "level": 8
     },
     {
      "monster": "mon_fog_toad",
@@ -90598,7 +90602,8 @@
      ],
      "radius": 12.0,
      "count": 7,
-     "spread": 6.0
+     "spread": 6.0,
+     "level": 9
     },
     {
      "monster": "mon_fog_toad",
@@ -90608,7 +90613,8 @@
      ],
      "radius": 12.0,
      "count": 7,
-     "spread": 6.0
+     "spread": 6.0,
+     "level": 9
     },
     {
      "monster": "mon_bog_boar",
@@ -90618,7 +90624,8 @@
      ],
      "radius": 13.0,
      "count": 5,
-     "spread": 6.0
+     "spread": 6.0,
+     "level": 10
     },
     {
      "monster": "mon_bog_boar",
@@ -90628,7 +90635,8 @@
      ],
      "radius": 12.0,
      "count": 5,
-     "spread": 6.0
+     "spread": 6.0,
+     "level": 10
     },
     {
      "monster": "mon_mist_wolf",
@@ -90638,7 +90646,8 @@
      ],
      "radius": 12.0,
      "count": 5,
-     "spread": 6.0
+     "spread": 6.0,
+     "level": 11
     },
     {
      "monster": "mon_mist_wolf",
@@ -90648,7 +90657,8 @@
      ],
      "radius": 12.0,
      "count": 5,
-     "spread": 6.0
+     "spread": 6.0,
+     "level": 11
     },
     {
      "monster": "mon_mist_bear",
@@ -90658,7 +90668,8 @@
      ],
      "radius": 12.0,
      "count": 1,
-     "spread": 6.0
+     "spread": 6.0,
+     "level": 12
     },
     {
      "monster": "mon_panda",
@@ -90668,7 +90679,8 @@
      ],
      "radius": 12.0,
      "count": 5,
-     "spread": 6.0
+     "spread": 6.0,
+     "level": 10
     }
    ],
    "boss": {
@@ -90707,11 +90719,12 @@
     430
    ],
    "level": [
-    11,
-    22
+    8,
+    11
    ],
    "region": "kairion",
-   "oriented": 90
+   "oriented": 90,
+   "unlock": "mq06a"
   },
   {
    "id": "frost_highland",
@@ -111069,7 +111082,7 @@
      "radius": 1.8,
      "targetZone": "dragon_ruins",
      "targetSpawn": "from_highland",
-     "minLevel": 36
+     "minLevel": 0
     }
    ],
    "heights": [
@@ -111282,7 +111295,8 @@
      ],
      "radius": 13.0,
      "count": 7,
-     "spread": 6.0
+     "spread": 6.0,
+     "level": 30
     },
     {
      "monster": "mon_frost_wolf",
@@ -111292,7 +111306,8 @@
      ],
      "radius": 12.0,
      "count": 7,
-     "spread": 6.0
+     "spread": 6.0,
+     "level": 30
     },
     {
      "monster": "mon_ice_fox",
@@ -111302,7 +111317,8 @@
      ],
      "radius": 12.0,
      "count": 7,
-     "spread": 6.0
+     "spread": 6.0,
+     "level": 31
     },
     {
      "monster": "mon_ice_fox",
@@ -111312,7 +111328,8 @@
      ],
      "radius": 12.0,
      "count": 5,
-     "spread": 6.0
+     "spread": 6.0,
+     "level": 31
     },
     {
      "monster": "mon_frost_ram",
@@ -111322,7 +111339,8 @@
      ],
      "radius": 12.0,
      "count": 5,
-     "spread": 6.0
+     "spread": 6.0,
+     "level": 32
     },
     {
      "monster": "mon_frost_ram",
@@ -111332,7 +111350,8 @@
      ],
      "radius": 12.0,
      "count": 5,
-     "spread": 6.0
+     "spread": 6.0,
+     "level": 32
     },
     {
      "monster": "mon_snow_bear",
@@ -111342,7 +111361,8 @@
      ],
      "radius": 12.0,
      "count": 4,
-     "spread": 6.0
+     "spread": 6.0,
+     "level": 33
     },
     {
      "monster": "mon_snow_bear",
@@ -111352,7 +111372,8 @@
      ],
      "radius": 12.0,
      "count": 4,
-     "spread": 6.0
+     "spread": 6.0,
+     "level": 33
     },
     {
      "monster": "mon_ram_king",
@@ -111362,7 +111383,8 @@
      ],
      "radius": 12.0,
      "count": 1,
-     "spread": 6.0
+     "spread": 6.0,
+     "level": 34
     }
    ],
    "boss": {
@@ -111406,11 +111428,12 @@
     345
    ],
    "level": [
-    23,
-    36
+    30,
+    33
    ],
    "region": "kairion",
-   "oriented": 0
+   "oriented": 0,
+   "unlock": "mq22a"
   },
   {
    "id": "dragon_ruins",
@@ -131267,7 +131290,8 @@
     50
    ],
    "region": "kairion",
-   "oriented": 0
+   "oriented": 0,
+   "unlock": "mq29b"
   },
   {
    "id": "kairion_capital",
@@ -131283,7 +131307,8 @@
     50
    ],
    "region": "kairion",
-   "biome": "town"
+   "biome": "town",
+   "unlock": "mq01a"
   },
   {
    "id": "baltern",
@@ -131295,11 +131320,12 @@
     420
    ],
    "level": [
-    6,
+    8,
     14
    ],
    "region": "baltern",
-   "biome": "town"
+   "biome": "town",
+   "unlock": "mq07a"
   },
   {
    "id": "lumiere",
@@ -131311,11 +131337,12 @@
     120
    ],
    "level": [
-    12,
+    15,
     20
    ],
    "region": "lumiere",
-   "biome": "town"
+   "biome": "town",
+   "unlock": "mq12a"
   },
   {
    "id": "gravel",
@@ -131327,11 +131354,12 @@
     620
    ],
    "level": [
-    16,
-    26
+    17,
+    23
    ],
    "region": "gravel",
-   "biome": "town"
+   "biome": "town",
+   "unlock": "mq13a"
   },
   {
    "id": "silvern",
@@ -131344,10 +131372,11 @@
    ],
    "level": [
     14,
-    22
+    27
    ],
    "region": "silvern",
-   "biome": "town"
+   "biome": "town",
+   "unlock": "mq17a"
   },
   {
    "id": "marseon",
@@ -131359,11 +131388,12 @@
     380
    ],
    "level": [
-    28,
-    36
+    33,
+    37
    ],
    "region": "marseon",
-   "biome": "town"
+   "biome": "town",
+   "unlock": "mq25b"
   },
   {
    "id": "baltazar",
@@ -131375,11 +131405,12 @@
     280
    ],
    "level": [
-    33,
-    44
+    34,
+    43
    ],
    "region": "baltazar",
-   "biome": "town"
+   "biome": "town",
+   "unlock": "mq27a"
   },
   {
    "id": "kreutz_fort",
@@ -131391,11 +131422,12 @@
     90
    ],
    "level": [
-    36,
-    46
+    40,
+    47
    ],
    "region": "kreutz",
-   "biome": "town"
+   "biome": "town",
+   "unlock": "mq33b"
   },
   {
    "id": "capital_road",
@@ -131408,7 +131440,7 @@
    ],
    "level": [
     2,
-    6
+    5
    ],
    "region": "kairion",
    "biome": "meadow"
@@ -131424,10 +131456,11 @@
    ],
    "level": [
     3,
-    7
+    6
    ],
    "region": "kairion",
-   "biome": "woods"
+   "biome": "woods",
+   "unlock": "mq02a"
   },
   {
    "id": "kairion_hills",
@@ -131439,11 +131472,12 @@
     420
    ],
    "level": [
-    5,
+    6,
     9
    ],
    "region": "kairion",
-   "biome": "meadow"
+   "biome": "meadow",
+   "unlock": "mq03b"
   },
   {
    "id": "capital_plain",
@@ -131456,10 +131490,11 @@
    ],
    "level": [
     24,
-    30
+    27
    ],
    "region": "kairion",
-   "biome": "meadow"
+   "biome": "meadow",
+   "unlock": "mq18a"
   },
   {
    "id": "broken_bridge",
@@ -131471,11 +131506,12 @@
     325
    ],
    "level": [
-    26,
+    28,
     31
    ],
    "region": "kairion",
-   "biome": "river"
+   "biome": "river",
+   "unlock": "mq21a"
   },
   {
    "id": "baltern_pass",
@@ -131487,11 +131523,12 @@
     440
    ],
    "level": [
-    6,
-    9
+    8,
+    11
    ],
    "region": "baltern",
-   "biome": "stone"
+   "biome": "stone",
+   "unlock": "mq06a"
   },
   {
    "id": "baltern_cliffs",
@@ -131503,11 +131540,12 @@
     340
    ],
    "level": [
-    8,
-    11
+    11,
+    14
    ],
    "region": "baltern",
-   "biome": "stone"
+   "biome": "stone",
+   "unlock": "mq09a"
   },
   {
    "id": "baltern_quarry",
@@ -131519,11 +131557,12 @@
     510
    ],
    "level": [
-    9,
-    12
+    10,
+    13
    ],
    "region": "baltern",
-   "biome": "canyon"
+   "biome": "canyon",
+   "unlock": "mq08a"
   },
   {
    "id": "blue_forest_edge",
@@ -131535,11 +131574,12 @@
     320
    ],
    "level": [
-    10,
-    13
+    11,
+    14
    ],
    "region": "lumiere",
-   "biome": "blue"
+   "biome": "blue",
+   "unlock": "mq09a"
   },
   {
    "id": "blue_forest",
@@ -131551,11 +131591,12 @@
     245
    ],
    "level": [
-    12,
-    15
+    13,
+    16
    ],
    "region": "lumiere",
-   "biome": "blue"
+   "biome": "blue",
+   "unlock": "mq10a"
   },
   {
    "id": "blue_forest_heart",
@@ -131567,11 +131608,12 @@
     185
    ],
    "level": [
-    14,
-    17
+    15,
+    18
    ],
    "region": "lumiere",
-   "biome": "blue"
+   "biome": "blue",
+   "unlock": "mq11a"
   },
   {
    "id": "lumiere_hills",
@@ -131583,11 +131625,12 @@
     135
    ],
    "level": [
-    13,
-    16
+    17,
+    20
    ],
    "region": "lumiere",
-   "biome": "meadow"
+   "biome": "meadow",
+   "unlock": "mq12b"
   },
   {
    "id": "lumiere_ruins_field",
@@ -131603,7 +131646,8 @@
     33
    ],
    "region": "lumiere",
-   "biome": "ash"
+   "biome": "ash",
+   "unlock": "mq23a"
   },
   {
    "id": "gravel_border",
@@ -131615,11 +131659,12 @@
     555
    ],
    "level": [
-    16,
-    19
+    17,
+    20
    ],
    "region": "gravel",
-   "biome": "highland"
+   "biome": "highland",
+   "unlock": "mq13a"
   },
   {
    "id": "lost_villages",
@@ -131635,7 +131680,8 @@
     21
    ],
    "region": "gravel",
-   "biome": "ash"
+   "biome": "ash",
+   "unlock": "mq13b"
   },
   {
    "id": "zirat_outskirts",
@@ -131651,7 +131697,8 @@
     23
    ],
    "region": "zirat",
-   "biome": "ash"
+   "biome": "ash",
+   "unlock": "mq14a"
   },
   {
    "id": "zirat_wastes",
@@ -131663,11 +131710,12 @@
     735
    ],
    "level": [
-    40,
-    44
+    46,
+    49
    ],
    "region": "zirat",
-   "biome": "ash"
+   "biome": "ash",
+   "unlock": "mq36b"
   },
   {
    "id": "zirat_abyss_rim",
@@ -131679,11 +131727,12 @@
     745
    ],
    "level": [
-    45,
-    50
+    46,
+    49
    ],
    "region": "zirat",
-   "biome": "abyss"
+   "biome": "abyss",
+   "unlock": "mq37a"
   },
   {
    "id": "abyss_bridge",
@@ -131695,11 +131744,12 @@
     735
    ],
    "level": [
-    47,
+    48,
     50
    ],
    "region": "zirat",
-   "biome": "abyss"
+   "biome": "abyss",
+   "unlock": "mq38a"
   },
   {
    "id": "silvern_fields",
@@ -131715,7 +131765,8 @@
     17
    ],
    "region": "silvern",
-   "biome": "meadow"
+   "biome": "meadow",
+   "unlock": "mq13b"
   },
   {
    "id": "silvern_woods",
@@ -131727,11 +131778,12 @@
     565
    ],
    "level": [
-    15,
-    18
+    24,
+    27
    ],
    "region": "silvern",
-   "biome": "woods"
+   "biome": "woods",
+   "unlock": "mq17a"
   },
   {
    "id": "silvern_marsh",
@@ -131743,11 +131795,12 @@
     700
    ],
    "level": [
-    17,
-    20
+    24,
+    27
    ],
    "region": "silvern",
-   "biome": "marsh"
+   "biome": "marsh",
+   "unlock": "mq17b"
   },
   {
    "id": "berg_canyon",
@@ -131759,11 +131812,12 @@
     585
    ],
    "level": [
-    19,
-    22
+    21,
+    24
    ],
    "region": "berg",
-   "biome": "canyon"
+   "biome": "canyon",
+   "unlock": "mq15a"
   },
   {
    "id": "berg_highland",
@@ -131775,11 +131829,12 @@
     620
    ],
    "level": [
-    21,
-    24
+    23,
+    26
    ],
    "region": "berg",
-   "biome": "highland"
+   "biome": "highland",
+   "unlock": "mq16b"
   },
   {
    "id": "berg_burned",
@@ -131791,11 +131846,12 @@
     560
    ],
    "level": [
-    22,
-    25
+    23,
+    26
    ],
    "region": "berg",
-   "biome": "ash"
+   "biome": "ash",
+   "unlock": "mq16b"
   },
   {
    "id": "trade_road",
@@ -131807,11 +131863,12 @@
     400
    ],
    "level": [
-    28,
-    31
+    33,
+    36
    ],
    "region": "marseon",
-   "biome": "meadow"
+   "biome": "meadow",
+   "unlock": "mq25a"
   },
   {
    "id": "marseon_outskirts",
@@ -131823,11 +131880,12 @@
     455
    ],
    "level": [
-    29,
-    32
+    33,
+    36
    ],
    "region": "marseon",
-   "biome": "river"
+   "biome": "river",
+   "unlock": "mq26a"
   },
   {
    "id": "crimson_forest",
@@ -131839,11 +131897,12 @@
     515
    ],
    "level": [
-    32,
-    35
+    35,
+    38
    ],
    "region": "marseon",
-   "biome": "crimson"
+   "biome": "crimson",
+   "unlock": "mq27b"
   },
   {
    "id": "crimson_heart",
@@ -131855,11 +131914,12 @@
     580
    ],
    "level": [
-    34,
-    37
+    37,
+    40
    ],
    "region": "marseon",
-   "biome": "crimson"
+   "biome": "crimson",
+   "unlock": "mq28a"
   },
   {
    "id": "baltazar_mines",
@@ -131871,11 +131931,12 @@
     335
    ],
    "level": [
-    33,
-    36
+    34,
+    37
    ],
    "region": "baltazar",
-   "biome": "stone"
+   "biome": "stone",
+   "unlock": "mq27a"
   },
   {
    "id": "royal_tomb",
@@ -131891,7 +131952,8 @@
     43
    ],
    "region": "baltazar",
-   "biome": "highland"
+   "biome": "highland",
+   "unlock": "mq31a"
   },
   {
    "id": "north_canyon",
@@ -131903,11 +131965,12 @@
     190
    ],
    "level": [
-    36,
-    39
+    38,
+    41
    ],
    "region": "baltazar",
-   "biome": "canyon"
+   "biome": "canyon",
+   "unlock": "mq30a"
   },
   {
    "id": "kreutz_front",
@@ -131919,11 +131982,12 @@
     130
    ],
    "level": [
-    37,
-    40
+    40,
+    43
    ],
    "region": "kreutz",
-   "biome": "frost"
+   "biome": "frost",
+   "unlock": "mq30b"
   },
   {
    "id": "kreutz_snowfield",
@@ -131935,11 +131999,12 @@
     75
    ],
    "level": [
-    39,
-    42
+    44,
+    47
    ],
    "region": "kreutz",
-   "biome": "frost"
+   "biome": "frost",
+   "unlock": "mq33b"
   },
   {
    "id": "frozen_lake",
@@ -131955,7 +132020,8 @@
     46
    ],
    "region": "kreutz",
-   "biome": "frost"
+   "biome": "frost",
+   "unlock": "mq33b"
   }
  ],
  "world": {
@@ -132214,6 +132280,719 @@
   "size": [
    1000,
    760
-  ]
+  ],
+  "main": {
+   "order": [
+    "q1_start",
+    "q2_merchant",
+    "mq01a",
+    "mq02a",
+    "mq02b",
+    "mq02c",
+    "mq03a",
+    "mq03b",
+    "mq04a",
+    "mq04b",
+    "mq05a",
+    "q7_boss",
+    "mq06a",
+    "mq06b",
+    "mq07a",
+    "mq07b",
+    "q_job1",
+    "mq07c",
+    "mq08a",
+    "mq08b",
+    "mq09a",
+    "mq09b",
+    "mq10a",
+    "mq10b",
+    "mq11a",
+    "mq11b",
+    "mq12a",
+    "mq12b",
+    "mq13a",
+    "mq13b",
+    "mq13c",
+    "mq14a",
+    "mq14b",
+    "mq15a",
+    "mq15b",
+    "mq16a",
+    "mq16b",
+    "mq16c",
+    "mq17a",
+    "mq17b",
+    "mq17c",
+    "mq18a",
+    "mq18b",
+    "mq19a",
+    "mq19b",
+    "mq20a",
+    "mq20b",
+    "mq21a",
+    "mq21b",
+    "mq22a",
+    "mq23a",
+    "mq23b",
+    "mq23c",
+    "mq24a",
+    "mq25a",
+    "mq25b",
+    "mq26a",
+    "mq26b",
+    "mq27a",
+    "mq27b",
+    "mq27c",
+    "mq28a",
+    "mq29a",
+    "mq29b",
+    "mq30a",
+    "mq30b",
+    "mq31a",
+    "mq32a",
+    "mq32b",
+    "mq33a",
+    "mq33b",
+    "mq34a",
+    "mq34b",
+    "mq35a",
+    "mq36a",
+    "mq36b",
+    "mq37a",
+    "mq37b",
+    "mq38a",
+    "mq38b",
+    "mq39a",
+    "mq40a",
+    "mq40b"
+   ],
+   "steps": {
+    "q1_start": {
+     "gz": "town",
+     "tz": "town",
+     "oz": [
+      "town"
+     ]
+    },
+    "q2_merchant": {
+     "gz": "town",
+     "tz": "town",
+     "oz": [
+      "town"
+     ]
+    },
+    "mq01a": {
+     "gz": "town",
+     "tz": "kairion_capital",
+     "oz": [
+      "capital_road",
+      "capital_road"
+     ]
+    },
+    "mq02a": {
+     "gz": "kairion_capital",
+     "tz": "kairion_capital",
+     "oz": [
+      "kairion_hunt"
+     ]
+    },
+    "mq02b": {
+     "gz": "kairion_hunt",
+     "tz": "kairion_hunt",
+     "oz": [
+      "kairion_hunt",
+      "kairion_hunt"
+     ]
+    },
+    "mq02c": {
+     "gz": "kairion_hunt",
+     "tz": "kairion_hunt",
+     "oz": [
+      "kairion_hunt"
+     ]
+    },
+    "mq03a": {
+     "gz": "kairion_hunt",
+     "tz": "kairion_hunt",
+     "oz": [
+      "kairion_capital",
+      "kairion_capital"
+     ]
+    },
+    "mq03b": {
+     "gz": "kairion_capital",
+     "tz": "kairion_hills",
+     "oz": [
+      "kairion_hills"
+     ]
+    },
+    "mq04a": {
+     "gz": "kairion_hills",
+     "tz": "kairion_hills",
+     "oz": [
+      "kairion_hills"
+     ]
+    },
+    "mq04b": {
+     "gz": "kairion_hills",
+     "tz": "kairion_hills",
+     "oz": [
+      "kairion_hills",
+      "kairion_hills"
+     ]
+    },
+    "mq05a": {
+     "gz": "kairion_hills",
+     "tz": "town",
+     "oz": [
+      "forest",
+      "forest"
+     ]
+    },
+    "q7_boss": {
+     "gz": "town",
+     "tz": "town",
+     "oz": [
+      "mushroom_grove"
+     ]
+    },
+    "mq06a": {
+     "gz": "town",
+     "tz": "baltern_pass",
+     "oz": [
+      "baltern_pass",
+      "baltern_pass"
+     ]
+    },
+    "mq06b": {
+     "gz": "baltern_pass",
+     "tz": "baltern_pass",
+     "oz": [
+      "baltern_pass"
+     ]
+    },
+    "mq07a": {
+     "gz": "baltern_pass",
+     "tz": "baltern_pass",
+     "oz": [
+      "baltern"
+     ]
+    },
+    "mq07b": {
+     "gz": "baltern",
+     "tz": "baltern",
+     "oz": [
+      "baltern_pass"
+     ]
+    },
+    "q_job1": {
+     "gz": "town",
+     "tz": "town",
+     "oz": [
+      "kairion_capital"
+     ]
+    },
+    "mq07c": {
+     "gz": "baltern",
+     "tz": "baltern",
+     "oz": [
+      "kairion_capital"
+     ]
+    },
+    "mq08a": {
+     "gz": "baltern",
+     "tz": "baltern",
+     "oz": [
+      "baltern_quarry",
+      "baltern_quarry"
+     ]
+    },
+    "mq08b": {
+     "gz": "baltern",
+     "tz": "baltern",
+     "oz": [
+      "baltern_quarry"
+     ]
+    },
+    "mq09a": {
+     "gz": "baltern",
+     "tz": "blue_forest_edge",
+     "oz": [
+      "blue_forest_edge",
+      "blue_forest_edge",
+      "blue_forest_edge"
+     ]
+    },
+    "mq09b": {
+     "gz": "blue_forest_edge",
+     "tz": "blue_forest_edge",
+     "oz": [
+      "blue_forest_edge"
+     ]
+    },
+    "mq10a": {
+     "gz": "blue_forest_edge",
+     "tz": "blue_forest",
+     "oz": [
+      "blue_forest",
+      "blue_forest"
+     ]
+    },
+    "mq10b": {
+     "gz": "blue_forest",
+     "tz": "blue_forest",
+     "oz": [
+      "blue_forest"
+     ]
+    },
+    "mq11a": {
+     "gz": "blue_forest",
+     "tz": "blue_forest_heart",
+     "oz": [
+      "blue_forest_heart"
+     ]
+    },
+    "mq11b": {
+     "gz": "blue_forest_heart",
+     "tz": "blue_forest_heart",
+     "oz": [
+      "blue_forest_heart"
+     ]
+    },
+    "mq12a": {
+     "gz": "blue_forest_heart",
+     "tz": "blue_forest_heart",
+     "oz": [
+      "lumiere"
+     ]
+    },
+    "mq12b": {
+     "gz": "lumiere",
+     "tz": "lumiere",
+     "oz": [
+      "lumiere_hills",
+      "lumiere_hills"
+     ]
+    },
+    "mq13a": {
+     "gz": "lumiere",
+     "tz": "lumiere",
+     "oz": [
+      "gravel"
+     ]
+    },
+    "mq13b": {
+     "gz": "gravel",
+     "tz": "gravel",
+     "oz": [
+      "lost_villages",
+      "lost_villages"
+     ]
+    },
+    "mq13c": {
+     "gz": "gravel",
+     "tz": "gravel",
+     "oz": [
+      "lost_villages"
+     ]
+    },
+    "mq14a": {
+     "gz": "gravel",
+     "tz": "zirat_outskirts",
+     "oz": [
+      "zirat_outskirts",
+      "zirat_outskirts"
+     ]
+    },
+    "mq14b": {
+     "gz": "zirat_outskirts",
+     "tz": "gravel",
+     "oz": [
+      "zirat_outskirts"
+     ]
+    },
+    "mq15a": {
+     "gz": "gravel",
+     "tz": "berg_canyon",
+     "oz": [
+      "berg_canyon",
+      "berg_canyon"
+     ]
+    },
+    "mq15b": {
+     "gz": "berg_canyon",
+     "tz": "berg_canyon",
+     "oz": [
+      "berg_canyon"
+     ]
+    },
+    "mq16a": {
+     "gz": "berg_canyon",
+     "tz": "berg_canyon",
+     "oz": [
+      "gravel"
+     ]
+    },
+    "mq16b": {
+     "gz": "gravel",
+     "tz": "berg_burned",
+     "oz": [
+      "berg_burned",
+      "berg_burned"
+     ]
+    },
+    "mq16c": {
+     "gz": "berg_burned",
+     "tz": "berg_burned",
+     "oz": [
+      "berg_burned"
+     ]
+    },
+    "mq17a": {
+     "gz": "berg_burned",
+     "tz": "berg_burned",
+     "oz": [
+      "silvern"
+     ]
+    },
+    "mq17b": {
+     "gz": "silvern",
+     "tz": "silvern",
+     "oz": [
+      "silvern_marsh",
+      "silvern_marsh"
+     ]
+    },
+    "mq17c": {
+     "gz": "silvern",
+     "tz": "silvern",
+     "oz": [
+      "baltern"
+     ]
+    },
+    "mq18a": {
+     "gz": "baltern",
+     "tz": "capital_plain",
+     "oz": [
+      "capital_plain",
+      "capital_plain"
+     ]
+    },
+    "mq18b": {
+     "gz": "capital_plain",
+     "tz": "capital_plain",
+     "oz": [
+      "capital_plain"
+     ]
+    },
+    "mq19a": {
+     "gz": "capital_plain",
+     "tz": "capital_plain",
+     "oz": [
+      "capital_plain",
+      "capital_plain"
+     ]
+    },
+    "mq19b": {
+     "gz": "capital_plain",
+     "tz": "capital_plain",
+     "oz": [
+      "capital_plain"
+     ]
+    },
+    "mq20a": {
+     "gz": "capital_plain",
+     "tz": "capital_plain",
+     "oz": [
+      "capital_plain"
+     ]
+    },
+    "mq20b": {
+     "gz": "capital_plain",
+     "tz": "capital_plain",
+     "oz": [
+      "capital_plain"
+     ]
+    },
+    "mq21a": {
+     "gz": "capital_plain",
+     "tz": "broken_bridge",
+     "oz": [
+      "broken_bridge",
+      "broken_bridge"
+     ]
+    },
+    "mq21b": {
+     "gz": "broken_bridge",
+     "tz": "broken_bridge",
+     "oz": [
+      "broken_bridge"
+     ]
+    },
+    "mq22a": {
+     "gz": "broken_bridge",
+     "tz": "town",
+     "oz": [
+      "kairion_capital",
+      null
+     ]
+    },
+    "mq23a": {
+     "gz": "town",
+     "tz": "town",
+     "oz": [
+      "lumiere_ruins_field",
+      "lumiere_ruins_field"
+     ]
+    },
+    "mq23b": {
+     "gz": "lumiere_ruins_field",
+     "tz": "lumiere_ruins_field",
+     "oz": [
+      "lumiere_ruins_field",
+      "lumiere_ruins_field"
+     ]
+    },
+    "mq23c": {
+     "gz": "lumiere_ruins_field",
+     "tz": "lumiere_ruins_field",
+     "oz": [
+      "lumiere_ruins_field"
+     ]
+    },
+    "mq24a": {
+     "gz": "lumiere_ruins_field",
+     "tz": "lumiere_ruins_field",
+     "oz": [
+      "lumiere_ruins_field"
+     ]
+    },
+    "mq25a": {
+     "gz": "lumiere_ruins_field",
+     "tz": "trade_road",
+     "oz": [
+      "trade_road",
+      "lumiere_ruins_field"
+     ]
+    },
+    "mq25b": {
+     "gz": "trade_road",
+     "tz": "marseon",
+     "oz": [
+      "trade_road"
+     ]
+    },
+    "mq26a": {
+     "gz": "marseon",
+     "tz": "marseon",
+     "oz": [
+      "marseon_outskirts"
+     ]
+    },
+    "mq26b": {
+     "gz": "marseon",
+     "tz": "marseon",
+     "oz": [
+      "marseon_outskirts"
+     ]
+    },
+    "mq27a": {
+     "gz": "marseon",
+     "tz": "marseon",
+     "oz": [
+      "baltazar"
+     ]
+    },
+    "mq27b": {
+     "gz": "baltazar",
+     "tz": "crimson_forest",
+     "oz": [
+      "crimson_forest",
+      "crimson_forest",
+      "crimson_forest"
+     ]
+    },
+    "mq27c": {
+     "gz": "crimson_forest",
+     "tz": "crimson_forest",
+     "oz": [
+      "crimson_forest"
+     ]
+    },
+    "mq28a": {
+     "gz": "crimson_forest",
+     "tz": "crimson_heart",
+     "oz": [
+      "crimson_heart",
+      "crimson_heart"
+     ]
+    },
+    "mq29a": {
+     "gz": "crimson_heart",
+     "tz": "baltazar",
+     "oz": [
+      "baltazar_mines"
+     ]
+    },
+    "mq29b": {
+     "gz": "baltazar",
+     "tz": "baltazar",
+     "oz": [
+      "baltazar_mines",
+      null
+     ]
+    },
+    "mq30a": {
+     "gz": "baltazar",
+     "tz": "north_canyon",
+     "oz": [
+      "north_canyon",
+      "north_canyon"
+     ]
+    },
+    "mq30b": {
+     "gz": "north_canyon",
+     "tz": "north_canyon",
+     "oz": [
+      "north_canyon",
+      "kreutz_front"
+     ]
+    },
+    "mq31a": {
+     "gz": "north_canyon",
+     "tz": "baltazar",
+     "oz": [
+      "royal_tomb",
+      "royal_tomb"
+     ]
+    },
+    "mq32a": {
+     "gz": "baltazar",
+     "tz": "royal_tomb",
+     "oz": [
+      "royal_tomb"
+     ]
+    },
+    "mq32b": {
+     "gz": "royal_tomb",
+     "tz": "royal_tomb",
+     "oz": [
+      "royal_tomb"
+     ]
+    },
+    "mq33a": {
+     "gz": "royal_tomb",
+     "tz": "royal_tomb",
+     "oz": [
+      "baltazar"
+     ]
+    },
+    "mq33b": {
+     "gz": "baltazar",
+     "tz": "baltazar",
+     "oz": [
+      "kreutz_snowfield",
+      "kreutz_snowfield"
+     ]
+    },
+    "mq34a": {
+     "gz": "baltazar",
+     "tz": "baltazar",
+     "oz": [
+      "capital_plain"
+     ]
+    },
+    "mq34b": {
+     "gz": "capital_plain",
+     "tz": "capital_plain",
+     "oz": [
+      "capital_plain",
+      "capital_plain",
+      "capital_plain"
+     ]
+    },
+    "mq35a": {
+     "gz": "capital_plain",
+     "tz": "kairion_capital",
+     "oz": [
+      "capital_plain",
+      "capital_plain"
+     ]
+    },
+    "mq36a": {
+     "gz": "kairion_capital",
+     "tz": "kairion_capital",
+     "oz": [
+      "gravel"
+     ]
+    },
+    "mq36b": {
+     "gz": "gravel",
+     "tz": "zirat_wastes",
+     "oz": [
+      "zirat_wastes",
+      "zirat_wastes",
+      "zirat_wastes"
+     ]
+    },
+    "mq37a": {
+     "gz": "zirat_wastes",
+     "tz": "zirat_abyss_rim",
+     "oz": [
+      "zirat_abyss_rim",
+      "zirat_abyss_rim"
+     ]
+    },
+    "mq37b": {
+     "gz": "zirat_abyss_rim",
+     "tz": "zirat_abyss_rim",
+     "oz": [
+      "zirat_abyss_rim"
+     ]
+    },
+    "mq38a": {
+     "gz": "zirat_abyss_rim",
+     "tz": "abyss_bridge",
+     "oz": [
+      "abyss_bridge",
+      "zirat_abyss_rim"
+     ]
+    },
+    "mq38b": {
+     "gz": "abyss_bridge",
+     "tz": "abyss_bridge",
+     "oz": [
+      "abyss_bridge"
+     ]
+    },
+    "mq39a": {
+     "gz": "abyss_bridge",
+     "tz": "abyss_bridge",
+     "oz": [
+      "abyss_bridge"
+     ]
+    },
+    "mq40a": {
+     "gz": "abyss_bridge",
+     "tz": "abyss_bridge",
+     "oz": [
+      "abyss_bridge"
+     ]
+    },
+    "mq40b": {
+     "gz": "abyss_bridge",
+     "tz": "abyss_bridge",
+     "oz": [
+      "town"
+     ]
+    }
+   },
+   "band": [
+    "dragon_ruins",
+    "frozen_lake",
+    "silvern_fields"
+   ]
+  }
  }
 }

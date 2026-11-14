@@ -751,6 +751,40 @@ def link_existing(zones, M):
             Z['props'] = [p for p in Z['props'] if p['type'] in ('signpost', 'wall', 'ruin') or not near(p, 7.5)]
             Z['patches'].append(dict(tex='dirt', shape='path', pos=[round(ex, 2), round(ez, 2), round(sx, 2), round(sz, 2), round(sx - dx * 8, 2), round(sz - dz * 8, 2)], radius=0, width=3.6))
 
+# ======================================================================== 메인 퀘스트 입장 조건·권장 레벨 (2026-11-15)
+RELEVEL_EXISTING = []      # main_gates가 채움: 레벨이 바뀐 손으로 만든 필드
+def main_gates(zones, known):
+    """tools/quests/gates.py: 지역마다 여는 메인 단계 + 필드 권장 레벨. FIELDS / EXISTING / TOWNS 의 level 을 바꿈."""
+    sys.path.insert(0, D('tools', 'quests')); import gates
+    graph = {}
+    for a, b in LINKS: graph.setdefault(a, set()).add(b); graph.setdefault(b, set()).add(a)
+    for Z in zones['zones']:
+        for p in Z.get('portals', []): graph.setdefault(Z['id'], set()).add(p['targetZone'])
+    monz = {}
+    for f in FIELDS:
+        for mid, c in list(f['mons']) + NEW_MONS.get(f['id'], []):
+            if mid in known: monz.setdefault(mid, set()).add(f['id'])
+    for Z in zones['zones']:
+        for c in Z.get('monsters', []): monz.setdefault(c['monster'], set()).add(Z['id'])
+    old = {f['id']: list(f['level']) for f in FIELDS}; old.update({k: list(v['level']) for k, v in EXISTING.items()}); old.update({t['id']: list(t['level']) for t in TOWNS})
+    kinds = {k: 'field' for k in old}; kinds['town'] = 'town'
+    for t in TOWNS: kinds[t['id']] = 'town'
+    G = gates.compute(graph, monz, old, kinds)
+    gates.print_table(G, old, kinds, {k: name_of(k) for k in old})
+    for f in FIELDS: f['level'] = tuple(G['level'][f['id']])
+    for zid, info in EXISTING.items():
+        if kinds[zid] == 'field' and list(info['level']) != G['level'][zid]:
+            info['level'] = tuple(G['level'][zid]); RELEVEL_EXISTING.append(zid)
+            Z = next(z for z in zones['zones'] if z['id'] == zid); Z['level'] = list(info['level'])
+        if zid == 'forest' or kinds[zid] != 'field': continue
+        for p in next(z for z in zones['zones'] if z['id'] == zid).get('portals', []): p['minLevel'] = 0   # 레벨 문 대신 메인 퀘스트 문
+    for p in next(z for z in zones['zones'] if z['id'] == 'forest').get('portals', []): p['minLevel'] = 0
+    for t in TOWNS:                          # 마을의 '주변 권장 레벨' = 이웃 필드 범위 (왕도는 1~50 그대로)
+        if t['id'] == 'kairion_capital': continue
+        ns = [G['level'][n] for n in neighbours(t['id']) if kinds.get(n) == 'field']
+        if ns: t['level'] = (min(a for a, b in ns), max(b for a, b in ns))
+    return G
+
 # ======================================================================== main
 if __name__ == '__main__':
     if '--music-only' in sys.argv:
@@ -766,12 +800,21 @@ if __name__ == '__main__':
     mons['monsters'] += make_variants(mons['monsters'])
     known = {m['id'] for m in mons['monsters']}
     MONS_KNOWN = mons['monsters']
+    G = main_gates(zones, known)          # 메인 퀘스트 입장 조건 + 권장 레벨 (tools/quests/gates.py)
+    if '--gates' in sys.argv: sys.exit(0)
     for zid, adds in NEW_MONS_EXISTING.items():   # hand-made fields: new camps at their story level
         Z = next(z for z in zones['zones'] if z['id'] == zid); lo, hi = Z.get('level', [1, 50])
         Z['monsters'] = [m for m in Z['monsters'] if not m.get('added')]
         nat = {m['id']: m['level'] for m in mons['monsters']}
         for mid, cnt, pos in adds:
             if mid in known: Z['monsters'].append(dict(monster=mid, pos=list(pos), radius=14.0, count=cnt, spread=6.0, level=max(lo, min(hi, nat[mid])), added=True))
+    # 2026-11-15: 손으로 만든 필드도 메인 퀘스트가 처음 보내는 때의 레벨로 (숲은 그대로 — 처음 필드)
+    nat = {m['id']: m['level'] for m in mons['monsters']}
+    for zid in RELEVEL_EXISTING:
+        Z = next(z for z in zones['zones'] if z['id'] == zid); lo, hi = Z['level']
+        normal = sorted({c['monster'] for c in Z['monsters'] if c.get('count', 1) > 1}, key=lambda i: (nat.get(i, 0), i))
+        lv = {mid: (round(lo + (hi - lo) * k / max(1, len(normal) - 1)) if len(normal) > 1 else (lo + hi) // 2) for k, mid in enumerate(normal)}
+        for c in Z['monsters']: c['level'] = min(50, hi + 1) if c.get('count', 1) == 1 else lv[c['monster']]
     out = {}
     for t in TOWNS: out[t['id']] = gen_town(t, M)
     for f in FIELDS:
@@ -790,7 +833,10 @@ if __name__ == '__main__':
         Z['mesh'] = build_mesh(Z)
         stubs.append(dict(id=zid, name=Z['name'], kind=Z['kind'], file='world/%s.json' % zid, map=Z['map'], level=Z['level'], region=Z['region'], biome=Z.get('biome', 'town')))
     zones['zones'] += stubs
-    zones['world'] = dict(regions=REGIONS, links=[list(l) for l in LINKS], size=[1000, 760])
+    for Z in zones['zones']:
+        Z.pop('unlock', None)
+        if G['unlock'].get(Z['id']): Z['unlock'] = G['unlock'][Z['id']]
+    zones['world'] = dict(regions=REGIONS, links=[list(l) for l in LINKS], size=[1000, 760], main=dict(order=G['order'], steps=G['steps'], band=sorted(z for z in G['unlock'] if z not in G['referenced'])))
     npcs = json.load(open(D('assets', 'data', 'npcs.json')))
     npcs['npcs'] = [n for n in npcs['npcs'] if not n.get('world')] + world_npcs()
     cre = creatures_js(open(D('js', 'creature.js')).read())
