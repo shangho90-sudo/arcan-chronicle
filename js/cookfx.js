@@ -392,11 +392,11 @@ export class CookFx {
       balls.push({ i, last, m, rib, pts: [], state: 'wait', ax: new THREE.Vector3(rnd(-1, 1), rnd(-0.4, 0.4), rnd(-1, 1)).normalize(), sp: K.spin * rnd(0.8, 1.2) * (rnd(0, 1) < 0.5 ? -1 : 1), dt: 0, fade: 1, gy: ground });
     }
     const H = {
-      toss(pan) { const g = P3(pan); self._pop(g.clone().setY(0), { r: 0, y: g.y, size: 0.42, flash: 1.1, life: 0.14, w: COOK.col.warm }); },
+      toss(at) { const g = P3(at); self._pop(g.clone().setY(0), { r: 0, y: g.y, size: 0.55, flash: 1.0, life: 0.16, w: COOK.col.warm }); },   // the burst behind the back
       ball(i, pos, st) {
         const b = balls[i]; if (!b || b.state === 'over' || b.state === 'gone') return;
         const p = P3(pos); b.m.position.copy(p); b.m.visible = true;
-        const grow = st.phase === 'hover' ? 0.55 + 0.45 * easeOut(Math.min(1, st.k * 1.4)) : 1; b.m.scale.setScalar(K.r * (b.last ? K.lastMul : 1) * grow);
+        const grow = st.phase === 'hover' ? 0.55 + 0.45 * easeOut(Math.min(1, st.k * 1.4)) : 0.45 + 0.55 * easeOut(Math.min(1, st.k * 7));   // fly: pops out of the burst behind the back b.m.scale.setScalar(K.r * (b.last ? K.lastMul : 1) * grow);
         if (st.phase === 'fly') { b.state = 'fly'; b.pts.unshift(p.clone()); if (b.pts.length > NT) b.pts.length = NT; self._ribbonSet(b.rib, b.pts, K.trailW * (b.last ? 1.2 : 1)); b.rib.material.uniforms.uA.value = I * K.a * Math.min(1, b.pts.length / 3); }
         else b.state = 'hover';
       },

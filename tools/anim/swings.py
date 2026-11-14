@@ -500,18 +500,18 @@ CK_PAN = action('ck_pan', [
     key(0.68, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
 ], 0.30, 0.46, None, fadeIn=0.06, fadeOut=0.16)
 
-# 미트볼 던지기 (ck1_b1, anim ck_toss, 2026-11-14): 살짝 웅크리며 왼손 프라이팬을 아래 뒤로 당겼다가(준비 0.15 s) 0.16 s에 팬을 위로
-# 튕김 — 그 순간 미트볼 5개가 팬에서 튀어 올라 앞 공중에 부채꼴로 벌어짐(js/meatball.js, js/cookfx.js volley). 팬을 든 채 잠깐 버틴 뒤 복귀.
+# 미트볼 던지기 (ck1_b1, anim ck_toss, 2026-11-14 / 2026-11-15 팬 없이): 살짝 웅크리며 빈 왼손을 앞 아래로 모았다가(0.10 s) 0.16 s에
+# 어깨 뒤로 휙 튕기며 몸을 살짝 젖힘 — 그 순간 미트볼 5개가 등 뒤에서 터져 나와 퍼지며 곧바로 날아감(js/meatball.js, js/cookfx.js volley).
 # 오른손 식칼은 거의 그대로, 칼 잔상 없음. tossT = 튕기는 순간(= hitT, skillrt가 op를 여기에 맞춤).
 CK_TOSS = action('ck_toss', [
     key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
-    key(0.08, 'o', twist=-8, lean=9, sink=0.12, hand=[-34, -42, 0.68], blade=[-12, 16], elbow=[-0.7, -1, -0.2], armL=[-26, 22]),
-    key(0.13, 's', twist=-10, lean=11, sink=0.15, hand=[-36, -44, 0.68], blade=[-12, 14], elbow=[-0.7, -1, -0.2], armL=[-34, 24], squint=True),
-    key(0.16, 'i', twist=-2, lean=2, sink=0.08, hand=[-32, -40, 0.70], blade=[-10, 18], elbow=[-0.7, -1, -0.2], armL=[60, 28], squint=True),
-    key(0.21, 'o', twist=6, lean=-8, sink=0.0, hand=[-28, -36, 0.72], blade=[-8, 22], elbow=[-0.7, -1, -0.2], armL=[128, 32]),
-    key(0.36, 's', twist=4, lean=-5, sink=0.02, hand=[-28, -38, 0.72], blade=[-8, 22], elbow=[-0.7, -1, -0.2], armL=[112, 30]),
-    key(0.58, 's', hand=[-30, -40, 0.70], blade=[-10, 20], armL=[12, 18]),
-], 0.16, 0.40, None, fadeIn=0.05, fadeOut=0.16)
+    key(0.07, 'o', twist=6, lean=10, sink=0.12, hand=[-34, -42, 0.68], blade=[-12, 16], elbow=[-0.7, -1, -0.2], armL=[34, 10]),
+    key(0.11, 's', twist=8, lean=12, sink=0.14, hand=[-36, -44, 0.68], blade=[-12, 14], elbow=[-0.7, -1, -0.2], armL=[40, 8], squint=True),
+    key(0.16, 'i', twist=-6, lean=-4, sink=0.05, hand=[-32, -40, 0.70], blade=[-10, 18], elbow=[-0.7, -1, -0.2], armL=[150, 30], squint=True),
+    key(0.21, 'o', twist=-10, lean=-10, sink=0.0, hand=[-28, -36, 0.72], blade=[-8, 22], elbow=[-0.7, -1, -0.2], armL=[178, 36]),
+    key(0.34, 's', twist=-6, lean=-6, sink=0.02, hand=[-28, -38, 0.72], blade=[-8, 22], elbow=[-0.7, -1, -0.2], armL=[120, 30]),
+    key(0.54, 's', hand=[-30, -40, 0.70], blade=[-10, 20], armL=[12, 18]),
+], 0.16, 0.38, None, fadeIn=0.05, fadeOut=0.16)
 CK_TOSS.update(tossT=0.16)
 
 # ------------------------------------------------------------------------------------------------ 대장장이 1차 (2026-11-13)

@@ -187,10 +187,10 @@ S(J, 1, 0, '식칼과 프라이팬', 3, 'ck1_a3', '뒤집기', 'attack', '큰 �
   ops=[dict(op='fx', cook='flip', at=-0.25), hit('single', 1.5, launch=0.8, vsImmune=1.6, oneHit=True, sfx='ck_flip', fx=dict(cook='flip'))], fx=dict(color=0xffd27a))
 S(J, 1, 0, '식칼과 프라이팬', 4, 'ck1_a4', '도마 방어', 'support', '커다란 도마를 방패처럼 세워 정면에서 받는 피해를 줄인다.', target='self', mp=10, cd=14, anim='cast', sfxAt='op', ops=[buff('frontguard', 5, 0.5, cook='board', noAura=True)])
 S(J, 1, 0, '식칼과 프라이팬', 5, 'ck1_a5', '손질 숙련', 'passive', '식칼 공격 속도와 식재료 획득량이 증가한다.', mods=[dict(stat='atkSpeed', mul=0.05, mulLv=0.02)], flags=dict(ingredientDrop=[0.1, 0.05]))
-# 미트볼 던지기 (2026-11-14 소울 스트라이크식): 프라이팬을 튕겨(동작 ck_toss) 미트볼 5개를 앞 공중에 부채꼴로 띄우고, 서로 다른 곡선으로 한 적에게
+# 미트볼 던지기 (2026-11-14 소울 스트라이크식, 11-15 등 뒤에서 바로): 빈 손을 어깨 뒤로 튕기면(동작 ck_toss) 미트볼 5개가 등 뒤에서 퍼지며 곧바로 서로 다른 곡선으로 한 적에게
 # 차례로 맞힘(js/meatball.js CUSTOM meatball_volley, 그림 js/cookfx.js volley). 단일 대상(주변 범위 피해 없음). 총 계수 = 1.7 x (1 + 0.06 x floor((Lv-1)/2))
 # (예전 2~6개 split 총합과 같음) — 15/15/15/15/40 %로 나눔. 예전: 2~6개(Lv마다 +1), 하나하나 반경 1.2 m 작은 범위 피해.
-S(J, 1, 1, '간단한 요리 공격', 1, 'ck1_b1', '미트볼 던지기', 'attack', '프라이팬을 튕겨 미트볼 다섯 개를 띄운 뒤, 서로 다른 곡선으로 한 적에게 차례로 날려 맞힌다. 마지막 한 방이 가장 세다.', target='enemy', range=7, mp=10, cd=4, anim='ck_toss', recover=0.4, sfxAt='op',
+S(J, 1, 1, '간단한 요리 공격', 1, 'ck1_b1', '미트볼 던지기', 'attack', '등 뒤에서 미트볼 다섯 개가 퍼져 나와 서로 다른 곡선으로 한 적에게 차례로 날아가 맞힌다. 마지막 한 방이 가장 세다.', target='enemy', range=7, mp=10, cd=4, anim='ck_toss', recover=0.38, sfxAt='op',
   ops=[custom('meatball_volley', coef=1.7, lvBonus=0.06, n=5, w=[0.15, 0.15, 0.15, 0.15, 0.40])], fx=dict(color=0xb06a3a))
 S(J, 1, 1, '간단한 요리 공격', 2, 'ck1_b2', '뜨거운 국물', 'attack', '큰 국자로 펄펄 끓는 국물을 전방 부채꼴로 끼얹어 피해와 화상을 준다.', range=3.2, mp=12, cd=6, anim='throw', sfx='swing',
   ops=[dict(op='fx', cook='soup', at=-0.167), hit('cone', 1.5, r=3.2, ang=60, elem='fire', st=[st('burn', 3, 0.12)], sfx='ck_soup', fx=dict(cook='soup'))], fx=dict(color=0xff9a2a))

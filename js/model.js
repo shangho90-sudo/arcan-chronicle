@@ -88,7 +88,8 @@ if (typeof window !== 'undefined') { window.REST_TILT = REST_TILT; window.RUN_TI
 const FLINCH = 0.24;
 // 기본공격(콤보 동작) 칼 잔상: 색 0.55배·칼날 바깥쪽 45%만 — 흰 부채꼴이 몬스터 얼굴과 직업 이펙트를 덮던 것(2026-11-14). 스킬 잔상은 그대로
 const BASIC_TRAIL = 0.55;   // s, 피격 반응 길이 (ModelBody.flinch)
-const OFF = { cook: 'pan', hairdresser: 'dryer', artist: 'palette' };
+const OFF = { hairdresser: 'dryer', artist: 'palette' };   // 요리사는 2026-11-15부터 왼손에 아무것도 들지 않음(프라이팬이 몸과 겹쳐 보임) — 대신 왼손을 편다(EMPTY_L)
+const EMPTY_L = { cook: true };
 
 let actionsPromise = null;
 const modelCache = new Map();
@@ -837,6 +838,9 @@ export class ModelBody {
     if (!md.cfg.npc && this.armW < 0.999) {                                 // empty right hand: fingers open up from the grip fist
       const k = 1 - this.armW;
       for (const fg of ['Index', 'Middle', 'Ring', 'Pinky']) { Q['Right_' + fg + 'Proximal'] = rz(60 - 38 * k); Q['Right_' + fg + 'Intermediate'] = rz(70 - 44 * k); }
+    }
+    if (!md.cfg.npc && EMPTY_L[this.job] && !this.propKind.L) {           // 요리사 빈 왼손: 주먹 대신 살짝 굽혀 편 손가락
+      for (const fg of ['Index', 'Middle', 'Ring', 'Pinky']) { Q['Left_' + fg + 'Proximal'] = rz(-22); Q['Left_' + fg + 'Intermediate'] = rz(-26); }
     }
     // swings: feet stay planted in a fighting stance while the pelvis twists and sinks (knees solved by IK)
     if (!md.cfg.npc && md.leg && p.plant > 0.01 && p.step) Q = blendBones(Q, this.plantLegs(p, Q, bodyY), Math.min(1, p.plant));
