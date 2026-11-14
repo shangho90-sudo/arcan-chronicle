@@ -62,6 +62,7 @@ const SEC = +(process.env.SEC || (SCENE === 'repeat' ? 2.2 : SCENE === 'sheathed
     window.__ds = spots.map(([d, s]) => { const m = G.dev.dummies('mon_boar', 1, 0.01, at(d, s))[0]; m.teleport(at(d, s)); m.thinkStep = () => {}; return m; });
   }, [DIR, SCENE, THROW, PUSH]);
   await pg.waitForFunction(() => window.__ds.every(m => m.body), null, { timeout: 120000 });
+  if (process.env.CAMLOCK) await ev(() => { window.__camLock = true; });
   const info = await ev(([scene, fps, skill, thr, focus]) => {
     let seed = 12345; Math.random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
     const p = G.player, f = window.__f, ds = window.__ds, m = ds[0];
@@ -71,6 +72,7 @@ const SEC = +(process.env.SEC || (SCENE === 'repeat' ? 2.2 : SCENE === 'sheathed
     for (let i = 0; i < 12; i++) G.step(1 / fps, false);
     p.teleport(window.__spot); p.setFacing(f.x, f.z); for (const d of ds) d.knock = { x: 0, z: 0 };
     G.render.setFocus({ x: p.pos.x + f.x * focus, y: 0, z: p.pos.z + f.z * focus }, true);
+    if (window.__camLock) { const cx = p.pos.x + f.x * focus, cz = p.pos.z + f.z * focus; window.__cb0 = G.camBounds; G.camBounds = [cx, cz, cx, cz]; }   // CAMLOCK=1: the camera stays on the focus point (close-up of a thrown flask's landing)
     if (scene === 'kill') { m.hp = 5; }
     const L = window.__log = { fx: [], sfx: [], dmg: [], num: [], freezeP: [], freezeT: [], gstop: [], cam: [], lock: [], casts: [], proj: null, arm: [] };
     window.__t = 0; window.__p0 = ds.map(d => ({ ...d.pos })); window.__hp = ds.map(d => d.hp);
@@ -122,6 +124,18 @@ const SEC = +(process.env.SEC || (SCENE === 'repeat' ? 2.2 : SCENE === 'sheathed
       spUsed: +(window.__sp0 - p.sp).toFixed(1), cdLen: p.skills2.cdLen, armedSeries: L.arm.join('').replace(/(.)\1+/g, (s, c) => c + 'x' + s.length + ' '),
       live: G.skillFx.pharm.live.length, armed: p.body.armed }; });
   res.drawCallsMax = dc; res.fps = FPS; res.info = info;
+  if (process.env.STRESS) {   // STRESS=n: n more casts back to back (cooldown / SP reset), then renderer memory, programs, JS heap, live effects, and the draw time during one cast
+    res.stress = await ev(async ([n, skill, thr]) => {
+      const R = G.render.r, snap = () => ({ geo: R.info.memory.geometries, tex: R.info.memory.textures, prog: (R.info.programs || []).length, heap: performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576) : null, live: G.skillFx.pharm.live.length, kit: G.skillFx.pharm.kit.stats ? Object.values(G.skillFx.pharm.kit.stats()).reduce((a, b) => a + b, 0) : null });
+      for (let i = 0; i < 90; i++) { G.step(1 / 60, false); G.skillFx.update(1 / 60); }
+      G.step(1 / 60, true); const before = snap(), p = G.player, times = [];
+      for (let k = 0; k < n; k++) { p.skills2.cd = {}; G.dev.full(); p.skills.lock = 0; p.skills2.cast(skill, window.__at(thr ? 5 : 1.6));
+        for (let i = 0; i < 150; i++) { const draw = i % 10 === 0; const t0 = performance.now(); if (draw) G.step(1 / 60, true); else { G.step(1 / 60, false); G.skillFx.update(1 / 60); } if (draw && k === n - 1) times.push(performance.now() - t0); } }
+      for (let i = 0; i < 400; i++) { G.step(1 / 60, false); G.skillFx.update(1 / 60); }
+      G.step(1 / 60, true); const after = snap();
+      return { before, after, drawMsLastCast: times.map(x => Math.round(x)), calls: R.info.render.calls };
+    }, [+process.env.STRESS, SKILL, THROW]);
+  }
   const fxHit = res.fx.find(x => ['smash', 'push', 'sweep', 'burst'].includes(x.k));
   const ref = process.env.REF ? +process.env.REF : THROW && res.proj ? res.proj.t : res.dmg.length ? res.dmg[0].t : fxHit ? fxHit.t : 0.3; res.refT = ref;
   const hitFrame = Math.round(ref * FPS);

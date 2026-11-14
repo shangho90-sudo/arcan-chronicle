@@ -14,9 +14,9 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 export const FLASK = {
   size: { held: 0.42, fly: 0.62, fall: 0.8 },        // 약병 높이 m (손 / 날아갈 때 / 약병폭격)
   trail: { span: 0.13, width: 0.16, a: 0.55 },        // 짧은 꼬리: 지난 0.13 s 경로만, 순간이동(1.5 m 넘게 뜀)이면 끊음
-  flash: { t: 0.075, a: 2.2, size: 0.55 },            // 중심 섬광: 아주 짧게(흰색·옅은 노랑), 반지름 = r × size
-  wave: { t: 0.2, a: 0.9 },                           // 바닥 충격파 (실제 범위 표시와 다르게 얇고 들쭉날쭉, 0.2 s)
-  stain: { a: 0.62, grow: 0.12 },                     // 액체 얼룩
+  flash: { t: 0.06, a: 1.8, size: 0.3 },            // 중심 섬광: 아주 짧게(흰색·옅은 노랑), 반지름 = r × size
+  wave: { t: 0.2, a: 0.6 },                           // 바닥 충격파 (실제 범위 표시와 다르게 얇고 들쭉날쭉, 0.2 s)
+  stain: { a: 0.52, grow: 0.12 },                     // 액체 얼룩
   cap: 1,                                             // 입자 수 배율 (저사양 0.5)
   // 원소별 색: liq = 액체 몸통, deep = 그늘 쪽 색, hot = 반응 핵·하이라이트, cloud / shade = 구름 밝은 면·그늘, accent = 포인트 한 가지
   pal: {
@@ -72,9 +72,9 @@ void main(){
     c = mix(col * uDeepK, col, band) + col * fr * .45 + vec3(1., .98, .9) * spec * .85 + col * vP.y;
   } else if (uMode < 2.5) {                                           // ice: faceted, pale, bright facets toward the light, cold rim
     float band = smoothstep(.0, .1, d) * .5 + smoothstep(.55, .62, d) * .5;
-    c = mix(col * vec3(.45, .62, .95), mix(col, vec3(1.), .55), band) + vec3(.8, .95, 1.) * fr * .7 + vec3(1.) * spec + col * vP.y;
+    c = mix(col * vec3(.5, .72, 1.05), mix(col, vec3(1.), .6), band) + vec3(.75, .95, 1.) * fr * .8 + vec3(1.) * spec + col * vP.y;
   } else if (uMode < 3.5) {                                           // spark: hot core, coloured edge (additive)
-    c = mix(col, vec3(1., .97, .85), ndv * ndv) * (1.2 + vP.y); gl_FragColor = vec4(c * a, 1.); return;
+    c = mix(col, vec3(1., .97, .85), ndv * ndv * .6) * (.75 + vP.y); gl_FragColor = vec4(c * a, 1.); return;
   } else {                                                            // bubble: clear centre, coloured rim, one glint
     c = col * (.6 + .9 * fr) + vec3(1.) * spec * 1.4; a *= .12 + .78 * fr + spec;
   }
@@ -110,9 +110,9 @@ void main(){
   float heat = vP.y;
   vec3 c;
   if (heat > .01) {                                                                    // flame: bright core (faces the eye) -> yellow -> orange -> red rim
-    float k = pow(ndv, .8) * (.75 + .25 * d) + heat * .25;
-    c = mix(uRim, uMid, smoothstep(.15, .45, k)); c = mix(c, uHot, smoothstep(.55, .85, k)) * (1. + .6 * heat);
-    c += uHot * edge * .5;
+    float k = heat * (.3 + .7 * pow(ndv, 1.6)) + .08 * d;
+    c = mix(uRim, uMid, smoothstep(.18, .45, k)); c = mix(c, uHot, smoothstep(.6, .88, k)); c = mix(c, vec3(1., .98, .9), smoothstep(.9, 1., k) * .6) * (.95 + .35 * heat);
+    c += uMid * edge * .4;
   } else {                                                                             // puffy cloud: two tone bands + soft rim light
     float band = smoothstep(-.15, -.05, d) * .55 + smoothstep(.38, .48, d) * .45;
     c = mix(vC * uShadeK, vC, band) + vC * pow(1. - ndv, 3.) * .35 + vC * edge * .25;
@@ -142,12 +142,12 @@ void main(){
     vec3 c = mix(uDeep, uCol, .55 + .45 * rim) + uHi * gloss * .45;
     gl_FragColor = vec4(c, m * uA * (.75 + .25 * rim));
   } else if (uMode < 1.5) {                                                             // shock wave: thin uneven pale line racing outward (additive)
-    float w = .035 + .05 * vn(vec3(cos(an) * 3., sin(an) * 3., uSeed));
+    float w = .016 + .026 * vn(vec3(cos(an) * 3., sin(an) * 3., uSeed));
     float line = exp(-pow((r - uFront) / w, 2.)), wake = smoothstep(uFront - .35, uFront, r) * (1. - smoothstep(uFront - .02, uFront, r)) * .25;
     gl_FragColor = vec4((uHi * line + uCol * (line * .6 + wake)) * uA, 1.);
   } else if (uMode < 2.5) {                                                             // landing mark: soft shadow growing as the flask nears + thin dashed ring at the REAL radius
     float sh = (1. - smoothstep(0., uGrow * .34, r)) * .55;
-    float ring = exp(-pow((r - .97) / .018, 2.)) * step(.5, fract(an * 6.3662 + uT * .35));
+    float ring = exp(-pow((r - .97) / .016, 2.));
     if (sh + ring < .01) discard;
     gl_FragColor = vec4(mix(vec3(.08, .05, .1), uCol, ring), (sh + ring * uRing) * uA);
   } else if (uMode < 3.5) {                                                             // small alchemy glyph: circle + triangle + 3 dots (additive)
@@ -165,7 +165,7 @@ void main(){
 const FLASH_FS = `uniform float uA, uSeed; uniform vec3 uW, uC; varying vec2 vUv;
 ${NOISE}
 void main(){ vec2 q = vUv * 2. - 1.; float r = length(q), an = atan(q.y, q.x);
-  float core = exp(-r * r * 22.), glow = exp(-r * r * 6.) * .45;
+  float core = exp(-r * r * 26.), glow = exp(-r * r * 9.) * .22;
   float ray = pow(vn(vec3(cos(an) * 3.5, sin(an) * 3.5, uSeed)), 3.) * exp(-r * 3.2) * (1. - smoothstep(.6, .95, r)) * 1.4;
   float k = (core + glow + ray) * (1. - smoothstep(.85, 1., r));
   gl_FragColor = vec4(mix(uC, uW, clamp(core * 1.4, 0., 1.)) * k * uA, 1.); }`;
@@ -221,14 +221,14 @@ class Batch {
       if (p.age < 0) continue;
       const u = clamp01(p.age / p.life);
       // orientation: 'vel' = +Y along the motion (drops / sparks stretch), 'cam' = billboard, else own quaternion spun about an axis
-      if (p.orient === 'vel') { _v.set(p.vx, p.vy, p.vz); const sp = _v.length(); if (sp > 1e-3) _q.setFromUnitVectors(_y, _v.multiplyScalar(1 / sp)); else _q.copy(p.q || _q.identity()); p.sp = sp; }
+      if (p.orient === 'vel') { _v.set(p.vx, p.vy, p.vz); const sp = _v.length(); if (p.landed) _q.identity(); else if (sp > 1e-3) _q.setFromUnitVectors(_y, _v.multiplyScalar(1 / sp)); else _q.copy(p.q || _q.identity()); p.sp = sp; }
       else if (p.orient === 'cam') _q.copy(camQ);
       else { if (p.w) { p.q.multiply(_qa.setFromAxisAngle(p.ax, p.w * dt_)); } _q.copy(p.q); }
       const grow = p.grow ? easeOut(p.age / p.grow) : 1, out = p.shrink ? 1 - smooth(1 - p.shrink, 1, u) : 1, k0 = Math.max(1e-4, grow * out * (p.sk ? p.sk(u, p) : 1));
-      _s.set(p.sx * k0, p.sy * k0 * (p.stretch && p.sp ? 1 + p.sp * p.stretch : 1), p.sz * k0);
+      _s.set(p.sx * k0 * (p.landed ? 1.35 : 1), p.sy * k0 * (p.landed ? 0.4 : p.stretch && p.sp ? 1 + p.sp * p.stretch : 1), p.sz * k0 * (p.landed ? 1.35 : 1));   // landed drops flatten into a small blob
       _p.set(p.x, p.y, p.z); _m4.compose(_p, _q, _s); _m4.toArray(M.instanceMatrix.array, k * 16);
       const a = p.a * (p.fadeIn ? smooth(0, p.fadeIn, p.age) : 1) * (p.fade ? 1 - smooth(1 - p.fade, 1, u) : 1);
-      aP[k * 4] = a; aP[k * 4 + 1] = p.glow || 0; aP[k * 4 + 2] = p.seed || 0; aP[k * 4 + 3] = p.erode ? smooth(p.erode[0], p.erode[1], u) * 1.05 : 0;
+      aP[k * 4] = a; aP[k * 4 + 1] = p.glF ? p.glF(u) : (p.glow || 0); aP[k * 4 + 2] = p.seed || 0; aP[k * 4 + 3] = p.erode ? smooth(p.erode[0], p.erode[1], u) * 1.05 : 0;
       _c.setHex(p.col); ic[k * 3] = _c.r; ic[k * 3 + 1] = _c.g; ic[k * 3 + 2] = _c.b; k++;
     }
     M.count = k; M.visible = k > 0;
@@ -250,7 +250,7 @@ export class FlaskKit {
       const inst = (mode, o = {}) => { const m = new THREE.ShaderMaterial({ uniforms: U({ uMode: mode, uDeepK: new THREE.Color(o.deep ?? 0x8a6aa0) }), vertexShader: INST_VS, fragmentShader: INST_FS,
         transparent: true, depthWrite: !!o.dw, blending: o.add ? THREE.AdditiveBlending : THREE.NormalBlending, side: o.ds ? THREE.DoubleSide : THREE.FrontSide }); m.userData.order = o.order || 5; return m; };
       this.blobU = { uT: { value: 0 } };
-      const blob = (o) => { const m = new THREE.ShaderMaterial({ uniforms: { ...this.blobU, ...U({ uAmp: o.amp, uFreq: o.freq, uShadeK: new THREE.Color(0x8a7aa8), uHot: new THREE.Color(0xfffbe0), uMid: new THREE.Color(0xffb020), uRim: new THREE.Color(0xe83a10), uSoft: o.soft }) },
+      const blob = (o) => { const m = new THREE.ShaderMaterial({ uniforms: { ...this.blobU, ...U({ uAmp: o.amp, uFreq: o.freq, uShadeK: new THREE.Color(0x8a7aa8), uHot: new THREE.Color(0xffe85a), uMid: new THREE.Color(0xff8a1c), uRim: new THREE.Color(0xc8280c), uSoft: o.soft }) },
         vertexShader: BLOB_VS, fragmentShader: BLOB_FS, transparent: true, depthWrite: false }); m.userData.order = o.order; return m; };
       const liq = inst(1, { dw: true, order: 4, deep: 0x7a5a98 });       // liquid drops / petals / strands: opaque toon, vanish by shrinking (no sorting trouble)
       const B = this.B, R = this.root, cap = (n) => Math.max(8, Math.round(n));
@@ -266,7 +266,7 @@ export class FlaskKit {
       B.iceB = new Batch('iceB', this.geo.ice_b, inst(2, { dw: true, order: 4 }), cap(60), R);
       B.spark = new Batch('spark', this.geo.spark, inst(3, { add: true, order: 8 }), cap(200), R);
       B.cloud = new Batch('cloud', this.geo.blob, blob({ amp: 0.42, freq: 1.6, soft: 0.42, order: 6 }), cap(110), R);
-      B.flame = new Batch('flame', this.geo.flame, blob({ amp: 0.22, freq: 2.4, soft: 0.25, order: 7 }), cap(70), R);
+      B.flame = new Batch('flame', this.geo.blob, blob({ amp: 0.4, freq: 2.2, soft: 0.22, order: 7 }), cap(100), R);   // fire = morphing puffs (no cones)
       B.core = new Batch('core', this.geo.blob, blob({ amp: 0.3, freq: 2.0, soft: 0.3, order: 8 }), cap(24), R);
       this.batches = Object.values(B);
       this.ready = true;
@@ -411,14 +411,14 @@ Object.assign(FlaskKit.prototype, {
     const wv = this.disc(e, 1, true, 3); wv.position.set(c.x, gy + 0.05, c.z); wv.quaternion.copy(gq); wv.scale.setScalar(r * 0.98); wv.material.uniforms.uCol.value.setHex(pal.liq); wv.material.uniforms.uHi.value.setHex(0xfff8e0);
     // ---- centre: very short white / pale-yellow flash + small bright reaction core
     const fl = this.flashQuad(e, pal); fl.position.set(c.x, y0, c.z);
-    this.P('core', { x: c.x, y: y0, z: c.z, sx: r * 0.2 * S, sy: r * 0.2 * S, sz: r * 0.2 * S, grow: 0.035, life: big ? 0.22 : 0.16, glow: 1, col: pal.hot, erode: [0.25, 1], q: new THREE.Quaternion() });
+    this.P('core', { x: c.x, y: y0, z: c.z, sx: r * (fire ? 0.2 : 0.13) * S, sy: r * (fire ? 0.2 : 0.13) * S, sz: r * (fire ? 0.2 : 0.13) * S, grow: 0.03, life: fire ? (big ? 0.22 : 0.16) : 0.1, glow: fire ? 1 : 0, col: pal.hot, erode: [0.25, 1], q: new THREE.Quaternion() });
     // ---- outer: glass shards (fast, heavy, bounce once, stay inside the radius)
     for (let i = 0, N = n(fire ? 6 : 8); i < N; i++) { const a = rnd(0, 6.283), hs = r * 3 * rnd(0.45, 0.9), s = rnd(0.07, 0.15) * Math.min(1.3, S);
       this.P(i % 2 ? 'shardA' : 'shardB', { x: c.x, y: y0, z: c.z, vx: Math.cos(a) * hs, vz: Math.sin(a) * hs, vy: rnd(2.4, 4.6), g: 16, drag: 3, gy: gy + 0.03, bounce: 0.28, life: rnd(0.5, 0.8), q: this.q(this.randAx(), rnd(0, 6)), ax: this.randAx(), w: rnd(10, 22), sx: s, sy: s, sz: s, col: 0xdff4ff, a: 1, shrink: 0.3 }); }
     // ---- middle: radial liquid streaks — uneven angle, length, thickness and curvature (never a regular star)
-    const nStr = n(fire ? 4 : acid ? 6 : 7), sb = ['strandA', 'strandB', 'strandC'];
-    for (let i = 0; i < nStr; i++) { const a = (i + rnd(-0.38, 0.38)) / nStr * 6.283, L = r * rnd(0.32, 0.78) * Math.min(1.25, S), th = (acid ? 1.6 : 1) * rnd(0.55, 1.35) * Math.min(1.25, S), yy = y0 - 0.12, life = acid ? rnd(0.38, 0.55) : rnd(0.22, 0.34);
-      this.P(sb[Math.floor(rnd(0, 2.999))], { x: c.x, y: yy, z: c.z, q: this.qDir(a, rnd(0.08, 0.5), rnd(0, 6.283)), col: pal.liq, life, L, th, y0: yy,
+    const nStr = fire ? 0 : n(acid ? 6 : 7), sb = ['strandA', 'strandB', 'strandC'];
+    for (let i = 0; i < nStr; i++) { const a = (i + rnd(-0.38, 0.38)) / nStr * 6.283, L = r * rnd(0.2, 0.5) * Math.min(1.25, S), th = (acid ? 1.15 : 0.8) * rnd(0.6, 1.3) * Math.min(1.25, S), yy = y0 - 0.12, life = acid ? rnd(0.38, 0.55) : rnd(0.22, 0.34);
+      this.P(sb[Math.floor(rnd(0, 2.999))], { x: c.x, y: yy, z: c.z, q: this.qDir(a, rnd(0.15, 0.95), rnd(0, 6.283)), col: pal.liq, life, L, th, y0: yy,
         fn: (p, dt, u) => { const g = easeOut(p.age / 0.07); p.sx = p.L * (0.2 + 0.8 * g) * (1 + 0.12 * u); p.sy = p.sz = p.th * Math.pow(1 - u, acid ? 0.45 : 0.7); p.y = p.y0 - u * u * (acid ? 0.35 : 0.2); } }); }
     // ---- big drops on parabolas (land inside the radius); acid drops are fatter, slower and stay a moment as sticky blobs
     for (let i = 0, N = n(acid ? 12 : fire ? 5 : 9); i < N; i++) { const a = rnd(0, 6.283), vy = acid ? rnd(1.6, 3.2) : rnd(2.6, 4.8), Tf = (vy + Math.sqrt(vy * vy + 2 * G9 * 0.3)) / G9, hs = Math.min(r * rnd(0.9, 2.4), r * rnd(0.55, 0.95) / Tf), s = (acid ? rnd(0.09, 0.16) : rnd(0.06, 0.12)) * Math.min(1.3, S), stay = acid ? rnd(0.4, 0.9) : 0.12;
@@ -428,39 +428,39 @@ Object.assign(FlaskKit.prototype, {
       this.P('petal', { x: c.x + Math.cos(a) * rr, y: gy + 0.02, z: c.z + Math.sin(a) * rr, q: this.qDir(a, rnd(-0.15, 0.2)), col: pal.liq, life, L,
         fn: (p, dt, u) => { const g = easeOut(p.age / gT), k = p.L * g * (1 - smooth(0.45, 1, u)); p.sx = k; p.sy = k * (1 - 0.4 * smooth(0.4, 1, u)); p.sz = k; } }); }
     // ---- reaction clouds: puffy masses that swell then dissolve fast (never one opaque ball on the centre: they sit off-centre and rise)
-    const nCl = fire ? n(2) : ice ? n(2) : acid ? 0 : n(big ? 6 : rain ? 4 : 4);
-    for (let i = 0; i < nCl; i++) { const a = rnd(0, 6.283), rr = r * rnd(0.12, 0.38), s = r * rnd(0.26, 0.4) * S, d = fire ? rnd(0.08, 0.16) : rnd(0, 0.06);
-      this.P('cloud', { x: c.x + Math.cos(a) * rr, y: gy + rnd(0.5, 0.95), z: c.z - Math.sin(a) * rr, vy: rnd(0.5, 1.0), vx: Math.cos(a) * 0.4, vz: -Math.sin(a) * 0.4, drag: 1.5, q: this.q(this.randAx(), rnd(0, 6)), sx: s, sy: s * 0.9, sz: s,
-        grow: 0.13, sk: (u) => 1 + 0.35 * u, erode: [0.3, 1], a: fire ? 0.6 : ice ? 0.55 : 0.8, col: fire ? pal.cloud : pal.cloud, life: rnd(0.75, 1.05) * (big ? 1.2 : 1), delay: d }); }
+    const nCl = fire ? n(2) : ice ? 0 : acid ? 0 : n(big ? 5 : 3);
+    for (let i = 0; i < nCl; i++) { const a = rnd(0, 6.283), rr = r * rnd(0.15, 0.42), s = r * rnd(0.18, 0.28) * S, d = fire ? rnd(0.08, 0.16) : rnd(0, 0.06);
+      this.P('cloud', { x: c.x + Math.cos(a) * rr, y: gy + (fire ? rnd(0.6, 1.0) : rnd(1.0, 1.4)), z: c.z - Math.sin(a) * rr, vy: rnd(0.7, 1.3), vx: Math.cos(a) * 0.4, vz: -Math.sin(a) * 0.4, drag: 1.5, q: this.q(this.randAx(), rnd(0, 6)), sx: s, sy: s * 0.9, sz: s,
+        grow: 0.13, sk: (u) => 1 + 0.35 * u, erode: [0.3, 1], a: fire ? 0.5 : 0.5, col: pal.cloud, life: rnd(0.75, 1.05) * (big ? 1.2 : 1), delay: d }); }
     // ---- low vapour hugging the ground, spreading out slowly (acid = toxic mist, ice = cold flow) — thin, never hides who stands in it
-    for (let i = 0, N = n(acid ? 5 : ice ? 5 : rain ? 3 : 2); i < N; i++) { const a = rnd(0, 6.283), s = r * rnd(0.22, 0.32), sp = rnd(0.7, 1.4);
+    for (let i = 0, N = n(acid ? 5 : ice ? 5 : rain ? 3 : 2); i < N; i++) { const a = rnd(0, 6.283), s = r * rnd(0.18, 0.26), sp = rnd(0.7, 1.4);
       this.P('cloud', { x: c.x + Math.cos(a) * r * 0.15, y: gy + 0.1, z: c.z - Math.sin(a) * r * 0.15, vx: Math.cos(a) * sp, vz: -Math.sin(a) * sp, drag: 2.2, q: this.q(_y, rnd(0, 6)), sx: s, sy: s * 0.32, sz: s,
-        grow: 0.2, sk: (u) => 1 + 0.7 * u, erode: [0.35, 1], a: acid ? 0.42 : 0.4, col: ice ? 0xf2fbff : pal.cloud, life: (acid ? Math.min(2.6, 1 + hold * 0.5) : rnd(0.9, 1.3)), delay: rnd(0.03, 0.1) }); }
+        grow: 0.2, sk: (u) => 1 + 0.6 * u, erode: [0.3, 1], a: acid ? 0.32 : 0.24, col: ice ? 0xf2fbff : pal.cloud, life: (acid ? Math.min(2.6, 1 + hold * 0.5) : rnd(0.9, 1.3)), delay: rnd(0.03, 0.1) }); }
     // ---- bubbles of different sizes popping out of the puddle (acid / poison); during the linger only a few
     if (acid || poison) for (let i = 0, N = n(acid ? 6 + Math.round(hold * 3) : 4); i < N; i++) { const a = rnd(0, 6.283), rr = Math.sqrt(rnd(0, 1)) * r * 0.65, s = rnd(0.05, 0.13) * (rnd(0, 1) < 0.2 ? 1.7 : 1);
       this.P('bubble', { x: c.x + Math.cos(a) * rr, y: gy + 0.06, z: c.z - Math.sin(a) * rr, vy: rnd(0.05, 0.25), sx: s, sy: s, sz: s, col: pal.liq, a: 0.95, q: new THREE.Quaternion(), life: rnd(0.35, 0.8), delay: rnd(0.08, Math.max(0.3, hold)),
         sk: (u) => u < 0.82 ? 0.35 + 0.65 * u / 0.82 : 1.35 * (1 - smooth(0.82, 1, u)) + 0.01 }); }
     // ---- fire: curling flame masses (bright core -> orange -> red rim, eaten by noise) + fast light embers + a little dark smoke
     if (fire) {
-      for (let i = 0, N = n(big ? 8 : 6); i < N; i++) { const a = rnd(0, 6.283), rr = r * rnd(0, 0.45), w = r * rnd(0.32, 0.5) * Math.min(1.25, S), h = r * rnd(0.65, 1.05) * Math.min(1.25, S);
-        this.P('flame', { x: c.x + Math.cos(a) * rr, y: gy + 0.02, z: c.z - Math.sin(a) * rr, vy: rnd(0.5, 1.1), q: this.qDir(rnd(0, 6.283), rnd(-0.18, 0.18)), ax: _y.clone(), w: rnd(3, 7) * (rnd(0, 1) < 0.5 ? -1 : 1),
-          sx: w, sy: h, sz: w, grow: rnd(0.05, 0.09), sk: (u) => 1 - 0.3 * u, glow: rnd(0.75, 1), erode: [0.15, 1], a: 1, col: 0xffffff, life: rnd(0.32, 0.55), delay: rnd(0, 0.07) }); }
+      for (let i = 0, N = n(big ? 12 : 9); i < N; i++) { const a = (i + rnd(-0.3, 0.3)) / N * 6.283, rr = r * rnd(0.22, 0.55), sz = r * rnd(0.09, 0.17) * Math.min(1.25, S), out = rnd(0.2, 0.8), l = rnd(0.3, 0.5);
+        this.P('flame', { x: c.x + Math.cos(a) * rr, y: gy + rnd(0.12, 0.45), z: c.z + Math.sin(a) * rr, vx: Math.cos(a) * out, vz: Math.sin(a) * out, vy: rnd(1.4, 2.8), drag: 1.6, dragY: true,
+          q: this.q(this.randAx(), rnd(0, 6)), ax: _y.clone(), w: rnd(3, 6) * (i % 2 ? 1 : -1), sx: sz, sy: sz * 1.35, sz, grow: rnd(0.04, 0.07), sk: (u) => 1 + 0.45 * u, glF: (u) => 1 - 0.8 * u, erode: [0.25, 1], a: 0.88, col: 0xffffff, life: l, delay: rnd(0, 0.09) }); }   // ring of puffs around the impact (the target in the middle stays readable)
       for (let i = 0, N = n(16); i < N; i++) { const a = rnd(0, 6.283), hs = rnd(1, 3.6), s = rnd(0.03, 0.05);
-        this.P('spark', { x: c.x, y: y0, z: c.z, vx: Math.cos(a) * hs, vz: -Math.sin(a) * hs, vy: rnd(2.5, 6), g: 3, drag: 2.6, dragY: true, orient: 'vel', stretch: 0.1, sx: s, sy: s * 2.2, sz: s, col: pal.accent, glow: 0.4, a: 1, fade: 0.5, life: rnd(0.3, 0.65), delay: rnd(0, 0.1) }); }
+        this.P('spark', { x: c.x, y: y0, z: c.z, vx: Math.cos(a) * hs, vz: -Math.sin(a) * hs, vy: rnd(2.5, 6), g: 3, drag: 2.6, dragY: true, orient: 'vel', stretch: 0.06, sx: s * 0.6, sy: s * 1.6, sz: s * 0.6, col: pal.accent, glow: 0.1, a: 1, fade: 0.5, life: rnd(0.3, 0.65), delay: rnd(0, 0.1) }); }
     }
     // ---- ice: quick crystallisation (angular crystals snap up out of the splash), small shards flung fast, cold condensation sparkles
     if (ice) {
-      for (let i = 0, N = n(big ? 8 : 6); i < N; i++) { const a = rnd(0, 6.283), rr = i === 0 ? 0 : r * rnd(0.18, 0.62), s = r * (i === 0 ? 0.5 : rnd(0.22, 0.4)) * Math.min(1.25, S), lf = hold + rnd(0.2, 0.45);
-        this.P(i % 2 ? 'iceB' : 'iceA', { x: c.x + Math.cos(a) * rr, y: gy - 0.04, z: c.z - Math.sin(a) * rr, q: this.qDir(rnd(0, 6.283), 0).multiply(_qa.setFromAxisAngle(new THREE.Vector3(Math.cos(a), 0, -Math.sin(a)).cross(_y).normalize(), rr ? -rnd(0.2, 0.5) : 0)),
-          sx: s, sy: s, sz: s, grow: rnd(0.05, 0.09), shrink: 0.35 / lf, glow: 0.12, a: 1, col: 0xd8f4ff, life: lf, delay: rnd(0, 0.06) + rr * 0.05 }); }
-      for (let i = 0, N = n(7); i < N; i++) { const a = rnd(0, 6.283), hs = r * 3.2 * rnd(0.4, 0.9), s = rnd(0.06, 0.11);
+      for (let i = 0, N = n(big ? 9 : 7); i < N; i++) { const a = (i + rnd(-0.3, 0.3)) / N * 6.283, rr = r * rnd(0.3, 0.72), s = r * rnd(0.2, 0.34) * Math.min(1.25, S), lf = hold + rnd(0.2, 0.45), tilt = rnd(0.12, 0.32);
+        const q = this.qDir(rnd(0, 6.283), 0); q.premultiply(_qa.setFromAxisAngle(new THREE.Vector3(-Math.sin(a), 0, Math.cos(a)), -tilt));
+        this.P(i % 2 ? 'iceB' : 'iceA', { x: c.x + Math.cos(a) * rr, y: gy - 0.03, z: c.z + Math.sin(a) * rr, q, sx: s, sy: s * rnd(0.9, 1.25), sz: s, grow: rnd(0.05, 0.08), shrink: 0.35 / lf, glow: 0.18, a: 1, col: 0xcff0ff, life: lf, delay: rnd(0, 0.05) + rr * 0.04 }); }
+      for (let i = 0, N = n(5); i < N; i++) { const a = rnd(0, 6.283), hs = r * 3.2 * rnd(0.4, 0.9), s = rnd(0.045, 0.075);
         this.P('iceB', { x: c.x, y: y0, z: c.z, vx: Math.cos(a) * hs, vz: -Math.sin(a) * hs, vy: rnd(2, 4), g: 15, drag: 3.2, gy: gy, q: this.q(this.randAx(), rnd(0, 6)), ax: this.randAx(), w: rnd(8, 16), sx: s, sy: s * 1.6, sz: s, glow: 0.2, a: 1, col: 0xeafaff, life: rnd(0.45, 0.7), shrink: 0.3 }); }
       for (let i = 0, N = n(8); i < N; i++) { const a = rnd(0, 6.283), rr = r * rnd(0.1, 0.8), s = rnd(0.025, 0.04);
         this.P('spark', { x: c.x + Math.cos(a) * rr, y: gy + rnd(0.3, 1.0), z: c.z - Math.sin(a) * rr, vy: -rnd(0.2, 0.5), orient: 'cam', sx: s, sy: s, sz: s, col: 0xe8fbff, glow: 0.3, a: 1, fade: 0.6, life: rnd(0.4, 0.8), delay: rnd(0.05, 0.3) }); }
     }
     // ---- 약병폭격: a couple of tiny secondary pops inside the cloud (visual only — small, dim, no flash, no sound: they never read as extra hits)
     if (rain && !this.o.low()) for (let i = 0, N = big ? 3 : 1 + (rnd(0, 1) < 0.5 ? 1 : 0); i < N; i++) { const a = rnd(0, 6.283), rr = r * rnd(0.25, 0.5), s = r * rnd(0.06, 0.09);
-      this.P('core', { x: c.x + Math.cos(a) * rr, y: gy + rnd(0.5, 0.9), z: c.z - Math.sin(a) * rr, sx: s, sy: s, sz: s, grow: 0.03, life: 0.12, glow: 0.6, col: pal.accent, erode: [0.2, 1], q: new THREE.Quaternion(), delay: rnd(0.1, 0.24) }); }
+      this.P('core', { x: c.x + Math.cos(a) * rr, y: gy + rnd(0.5, 0.9), z: c.z - Math.sin(a) * rr, sx: s, sy: s, sz: s, grow: 0.03, life: 0.12, glow: fire ? 0.6 : 0, col: pal.accent, erode: [0.2, 1], q: new THREE.Quaternion(), delay: rnd(0.1, 0.24) }); }
     // ---- poison / rain accent: a few pink motes
     if (poison) for (let i = 0, N = n(6); i < N; i++) { const a = rnd(0, 6.283), hs = rnd(0.6, 2), s = rnd(0.03, 0.05);
       this.P('spark', { x: c.x, y: y0 + 0.1, z: c.z, vx: Math.cos(a) * hs, vz: -Math.sin(a) * hs, vy: rnd(1.5, 3), g: 2, drag: 2.5, dragY: true, orient: 'cam', sx: s, sy: s, sz: s, col: pal.accent, glow: 0.3, a: 1, fade: 0.5, life: rnd(0.35, 0.6), delay: rnd(0.02, 0.12) }); }
@@ -468,3 +468,46 @@ Object.assign(FlaskKit.prototype, {
   },
 });
 const _v2 = new THREE.Vector3();
+
+// ------------------------------------------------------------------------------------------------ heal / buff (회복진 맥동, 주사·보호막 모으기)
+Object.assign(FlaskKit.prototype, {
+  /** 광역 회복진: called on the REAL heal tick for the one healed — a soft mint liquid band flows INWARD across the circle, liquid droplets
+   *  wrap the healed body in short curves and rise, a little gold sparkle. Brightest right at the tick, gone in ~0.7 s */
+  healPulse(tgt, centre, r) {
+    const O = this.o, pal = PAL.heal, c = P3(centre);
+    const e = O._fx('fheal', 0.7, (e) => { const t = e.t, u = wv.material.uniforms; u.uFront.value = 0.98 - 0.85 * easeOut(t / 0.6); u.uA.value = 0.85 * (1 - smooth(0.25, 0.7, t)); u.uT.value = t; });
+    const wv = this.disc(e, 4, true, 3); wv.position.set(c.x, c.y + 0.06, c.z); wv.quaternion.copy(this.groundQ(centre, r)); wv.scale.setScalar(r); wv.material.uniforms.uCol.value.setHex(pal.liq); wv.material.uniforms.uHi.value.setHex(pal.accent);
+    if (!tgt || !tgt.pos) return e;
+    const N = this._n(7);
+    for (let i = 0; i < N; i++) { const a0 = i / N * 6.283 + rnd(-0.3, 0.3), w = rnd(4, 6) * (i % 2 ? 1 : -1), s = rnd(0.05, 0.085), h0 = rnd(0.1, 0.5), h1 = rnd(1.4, 2.0);
+      this.P('drop', { col: i % 3 === 0 ? 0xbffff0 : pal.liq, life: rnd(0.55, 0.75), glow: 0.25, sx: s, sy: s * 1.3, sz: s, q: new THREE.Quaternion(), delay: i * 0.025,
+        fn: (p, dt, u) => { const a = a0 + w * p.age, rr = 0.62 - 0.22 * u, P = tgt.pos; p.x = P.x + Math.cos(a) * rr; p.z = -P.z + Math.sin(a) * rr; p.y = (P.y || 0) + h0 + (h1 - h0) * easeOut(u);
+          p.q.setFromUnitVectors(_y, _v2.set(-Math.sin(a) * w * rr, (h1 - h0) / p.life * 1.5, Math.cos(a) * w * rr).normalize()); const k = Math.sin(Math.PI * Math.min(1, u * 1.15)); p.sx = p.sz = s * k; p.sy = s * 1.6 * k; } }); }
+    for (let i = 0, M = this._n(5); i < M; i++) { const a = rnd(0, 6.283), rr = rnd(0.2, 0.6), s = rnd(0.03, 0.05), P = tgt.pos;
+      this.P('spark', { x: P.x + Math.cos(a) * rr, y: (P.y || 0) + rnd(0.6, 1.5), z: -P.z + Math.sin(a) * rr, vy: rnd(0.5, 1), orient: 'cam', sx: s, sy: s, sz: s, col: i % 2 ? pal.accent : 0xdffff4, glow: 0.2, fade: 0.6, life: rnd(0.45, 0.7), delay: rnd(0.05, 0.2) }); }
+    return e;
+  },
+  /** 아드레날린 주사 / 약 보호막: liquid droplets gather from around the caster into one point (arrive at T s = the activation), one
+   *  concentrated flash there, then a few rise along the body in a spiral; a small alchemy glyph turns at the feet for ~0.7 s */
+  gather(pc, o = {}) {
+    const O = this.o, pal = PAL[o.pal] || PAL.heal, T = o.T ?? 0.5, at = o.at || (() => new THREE.Vector3(pc.pos.x, (pc.pos.y || 0) + 1.1, -pc.pos.z));
+    const e = O._fx('fgather', T + 0.9, (e) => { const t = e.t, P = P3(pc.pos);
+      gy.position.set(P.x, P.y + 0.05, P.z); const gu = gy.material.uniforms; gu.uT.value = t * 0.8; gu.uA.value = 0.9 * smooth(0, 0.15, t) * (1 - smooth(T + 0.25, T + 0.7, t)) * (1 + 0.8 * Math.exp(-Math.pow((t - T) / 0.06, 2)));
+      gy.scale.setScalar(0.95 + 0.1 * easeOut(t / 0.3));
+      const ft = t - T; fl.visible = ft > -0.01 && ft < 0.12; if (fl.visible) { fl.position.copy(at()); fl.quaternion.copy(O.camQ); fl.scale.setScalar(0.9 * (0.7 + 0.5 * easeOut(ft / 0.05))); fl.material.uniforms.uA.value = 1.8 * smooth(-0.01, 0.01, ft) * (1 - smooth(0.02, 0.12, ft)); }
+      if (pc.dead) e.t = e.life; });
+    const gy = this.disc(e, 3, true, 3); gy.material.uniforms.uCol.value.setHex(pal.liq); gy.material.uniforms.uHi.value.setHex(pal.accent);
+    const fl = this.flashQuad(e, pal); fl.material.uniforms.uC.value.setHex(pal.liq); fl.visible = false;
+    const N = this._n(10), tmp = new THREE.Vector3();
+    for (let i = 0; i < N; i++) { const a = i / N * 6.283 + rnd(-0.25, 0.25), R0 = rnd(1.1, 1.7), h = rnd(0.2, 1.5), d0 = rnd(0, Math.max(0.05, T * 0.35)), s = rnd(0.06, 0.1), w = rnd(4.5, 6.5) * (i % 2 ? 1 : -1), up = rnd(1.0, 1.6), rise = i % 3 === 0;
+      this.P('drop', { col: i % 4 === 0 ? pal.hot : pal.liq, glow: 0.3, life: (T - d0) + (rise ? 0.6 : 0.04), delay: d0, q: new THREE.Quaternion(), sx: s, sy: s, sz: s,
+        fn: (p, dt, u) => { const P = P3(pc.pos), tg = at(), k = Math.min(1, p.age / (T - d0));
+          if (k < 1) { const e2 = k * k * (3 - 2 * k), aa = a + 1.2 * e2 * (i % 2 ? 1 : -1); tmp.set(P.x + Math.cos(aa) * R0, P.y + h, P.z + Math.sin(aa) * R0).lerp(tg, e2); p.q.setFromUnitVectors(_y, _v2.copy(tg).sub(tmp).normalize()); p.x = tmp.x; p.y = tmp.y; p.z = tmp.z; p.sx = p.sz = s; p.sy = s * 1.5; }
+          else { const r2 = p.age - (T - d0), aa = a + w * r2, rr = 0.48; p.x = P.x + Math.cos(aa) * rr; p.z = P.z + Math.sin(aa) * rr; p.y = tg.y - 0.4 + up * easeOut(r2 / 0.6); const f = 1 - smooth(0.3, 0.6, r2); p.sx = p.sz = s * 0.8 * f; p.sy = s * 1.4 * f; } } }); }
+    return e;
+  },
+  /** one droplet rising along the body now and then while a buff lasts (the concise loop) */
+  riseOne(pc, pal) { const P = P3(pc.pos), a = rnd(0, 6.283), w = rnd(4, 6), s = 0.05, y0 = P.y + 0.3;
+    this.P('drop', { col: (PAL[pal] || PAL.heal).liq, glow: 0.3, life: 0.7, sx: s, sy: s, sz: s, q: new THREE.Quaternion(),
+      fn: (p, dt, u) => { const Q = P3(pc.pos), aa = a + w * p.age; p.x = Q.x + Math.cos(aa) * 0.45; p.z = Q.z + Math.sin(aa) * 0.45; p.y = Q.y + 0.3 + 1.6 * u; const k = Math.sin(Math.PI * u); p.sx = p.sz = s * k; p.sy = s * 1.5 * k; } }); },
+});

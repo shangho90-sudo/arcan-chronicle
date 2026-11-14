@@ -75,7 +75,7 @@ export const PHARM = {
   shatter: { k: 0.58, maxR: 2.6, lift: 0.38, thick: 0.62, tilt: 0.24, up: 0.14, hang: 0.24, fall: 0.26, rest: 1.15, life: 1.75, glow: 0.9 },   // R = min(r * k, maxR)
   burst: { ring: 0.26, core: 0.24, puffA: 0.82, puffLife: 1.35, coreA: 2.0, flareA: 1.6, ringA: 2.4, hazeA: 0.55, frost: 0.5, puddle: 0.6 },   // frost / puddle = lingering alpha
   buff: { flash: 1.4, loop: 0.34 },
-  shield: { rx: 1.25, ry: 1.7, fill: 0.07, line: 0.34, flow: 0.6, rim: 0.6, hexN: 7.0 },
+  shield: { show: 2.0, rx: 1.25, ry: 1.7, fill: 0.07, line: 0.34, flow: 0.6, rim: 0.6, hexN: 7.0 },
   circle: { tex: 1.0, ribbon: 0.8, pulse: 1.2 },
 };
 export const ELEM_COL = { fire: PHARM.pal.fire.b, ice: PHARM.pal.ice.b, poison: PHARM.pal.poison.b, acid: PHARM.pal.acid.b };
@@ -770,9 +770,15 @@ export class PharmFx {
     });
     const sy = this.solid(e, this.geo.pharm_syringe, { rim: 0xffe0c0, em: 0xff7030, glow: 0.15, spec: 1.2 }); sy.scale.setScalar(0.42);
     const ring = this.ring(e, pal, 0.2), ribs = [], rays = [], arrows = [];
+    if (this.kit.ready) {   // 2026-11-14: 주황 액체 방울이 팔의 주사 자리로 모였다가(T0 = 주사 순간) 몸을 따라 오름 + 발밑 작은 연금술 문양; 지속 중에는 가끔 한 방울만
+      const at = () => { const f = pc.facing || { x: 0, z: 1 }, fx = f.x, fz = -f.z, n = Math.hypot(fx, fz) || 1, P = P3(pc.pos); return new THREE.Vector3(P.x + (fz / n) * 0.42 + fx / n * 0.08, P.y + 1.32, P.z - (fx / n) * 0.42 + fz / n * 0.08); };
+      this.kit.gather(pc, { pal: 'adren', T: T0, at }); let next = T0 + 1.2;
+      const up0 = e.update; e.update = (e, dt) => { up0(e, dt); if (e.t > next && e.t < e.life - 1 && !pc.dead) { next = e.t + 1.1; this.kit.riseOne(pc, 'adren'); } };
+    }
+    const kitOn = this.kit.ready;
     for (let i = 0; i < (low ? 1 : 2); i++) { const m = this.rib(e, pal); m.userData = { rr: 0.78 - i * 0.24, y: 0.12 + i * 0.3, a: i * 3.1, tx: i ? -0.12 : 0.1 }; ribs.push(m); }
-    for (let i = 0, n = low ? 2 : 5; i < n; i++) { const m = this.spr(e, 'streak', pal), a = Math.random() * 6.283, rr = rnd(0.35, 0.7); m.userData = { x: Math.cos(a) * rr, z: Math.sin(a) * rr, w: rnd(0.1, 0.18), h: rnd(1.0, 1.9), t0: i * 0.04, life: rnd(0.3, 0.45) }; rays.push(m); }
-    for (let i = 0, n = low ? 2 : 4; i < n; i++) { const m = this.spr(e, 'arrow', pal, 6), a = (i / n + 0.1) * 6.283, rr = rnd(0.45, 0.7);
+    for (let i = 0, n = kitOn ? 0 : low ? 2 : 5; i < n; i++) { const m = this.spr(e, 'streak', pal), a = Math.random() * 6.283, rr = rnd(0.35, 0.7); m.userData = { x: Math.cos(a) * rr, z: Math.sin(a) * rr, w: rnd(0.1, 0.18), h: rnd(1.0, 1.9), t0: i * 0.04, life: rnd(0.3, 0.45) }; rays.push(m); }
+    for (let i = 0, n = kitOn ? 0 : low ? 2 : 4; i < n; i++) { const m = this.spr(e, 'arrow', pal, 6), a = (i / n + 0.1) * 6.283, rr = rnd(0.45, 0.7);
       m.userData = { x: Math.cos(a) * rr, z: Math.sin(a) * rr, s: rnd(0.3, 0.42), t0: i * 0.07, life: rnd(0.45, 0.6), period: 2.4, ph: i / n, duty: 0.3 }; arrows.push(m); }
     return e;
   }
@@ -780,7 +786,7 @@ export class PharmFx {
   // ------------------------------------------------------------------ ⑧ 약 보호막
   shield(pc, o = {}) {
     if (!this._ok() || !pc) return null;
-    const dur = o.dur || 8, Sh = PHARM.shield, pal = PHARM.pal.shield, I = PHARM.intensity, low = lite();
+    const Sh = PHARM.shield, dur = Math.min(o.dur || 8, Sh.show), pal = PHARM.pal.shield, I = PHARM.intensity, low = lite();   // 2026-11-14 사용자 요청: 그림은 2초만(보호막·면역 자체는 원래 시간 그대로 — pc.shield / immune 상태)
     let gone = -1, last = pc.shield || 0, hitT = 9;
     const e = this._fx('shield', dur, (e, dt) => {
       if (pc.dead) { e.t = e.life; return; }
@@ -802,6 +808,7 @@ export class PharmFx {
     const dome = this._m(e, 'dome', this.geo.pharm_dome, 6), tint = this._m(e, 'domeT', this.geo.pharm_dome, 5); this._pal(dome, pal); this._pal(tint, pal);
     for (const u of [dome.material.uniforms, tint.material.uniforms]) { u.uFill.value = Sh.fill; u.uLine.value = Sh.line; u.uFlow.value = Sh.flow; u.uRim.value = Sh.rim; u.uHexN.value = Sh.hexN; u.uHit.value = 0; }
     const ring = this.ring(e, pal, 0.15), motes = [];
+    if (this.kit.ready) this.kit.gather(pc, { pal: 'shield', T: 0.2, at: () => P3(pc.pos).setY((pc.pos.y || 0) + 1.0) });   // 2026-11-14: 푸른 액체 방울이 몸으로 모여 보호막이 됨
     for (let i = 0, n = low ? 3 : 7; i < n; i++) { const m = this.spr(e, 'star', pal, 7); m.userData = { a: Math.random() * 6.283, ph: Math.random(), sp: rnd(0.25, 0.45), s: rnd(0.12, 0.22) }; motes.push(m); }
     return e;
   }
@@ -827,7 +834,7 @@ export class PharmFx {
     for (let i = 0, n = low ? 2 : 3; i < n; i++) { const m = this.rib(e, pal, 4); m.material.uniforms.uCut.value = 0; m.userData = { rr: [0.93, 0.6, 0.78][i], y: 0.10 + i * 0.05, a: i * 2.2, w: [0.9, -1.3, 1.6][i], tx: 0 }; ribs.push(m); }
     for (let i = 0, n = low ? 4 : 8; i < n; i++) { const m = this.spr(e, 'plus', pal, 6), a = Math.random() * 6.283, rr = Math.sqrt(Math.random()) * r * 0.85; m.userData = { x: Math.cos(a) * rr, z: Math.sin(a) * rr, ph: Math.random(), sp: rnd(0.28, 0.42), s: rnd(0.26, 0.4) }; plus.push(m); }
     for (let i = 0, n = low ? 5 : 14; i < n; i++) { const m = this.spr(e, 'glow', pal, 5), a = Math.random() * 6.283, rr = Math.sqrt(Math.random()) * r * 0.92; m.userData = { x: Math.cos(a) * rr, z: Math.sin(a) * rr, ph: Math.random(), sp: rnd(0.3, 0.55), s: rnd(0.10, 0.2) }; motes.push(m); }
-    e.pulse = () => { pulseT = e.t; }; e.end = () => { if (e.endAt == null) { e.endAt = e.t; e.life = e.t + 0.6; } };
+    e.pulse = (tgt) => { pulseT = e.t; if (this.kit.ready) this.kit.healPulse(tgt, pos, r); }; e.end = () => { if (e.endAt == null) { e.endAt = e.t; e.life = e.t + 0.6; } };
     return e;
   }
 

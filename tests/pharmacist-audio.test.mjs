@@ -68,6 +68,16 @@ for (const [id, sound, count] of [['ph1_a3','ph_spin',5],['ph1_a6','ph_slam',1],
 { assert.ok(actions.ph_pitch.stow); assert.equal(actions.ph_pitch.hitT, 0.24); assert.equal(actions.ph_pitch.throwT, 0.24);
   for (const id of ['ph1_b1','ph1_b2','ph1_b4','ph1_b6']) assert.equal(skills.find(s => s.id === id).anim, 'ph_pitch', id);
   assert.equal(actions.throw.frames, 5, 'the shared throw of the other jobs is untouched'); }
+// 약병 연출 개편 (2026-11-14): 화염·냉각·부식 약병은 착탄 때 원소별 유리 깨짐 소리 한 번(피해 순간 = 폭발 순간), 수치·판정은 그대로
+{ const want = { ph1_b1: ['ph_glass_fire', 1.6, 1.6, 'fire', 12, 5], ph1_b2: ['ph_glass_ice', 1.4, 1.8, 'ice', 12, 6], ph1_b4: ['ph_glass_acid', 0.8, 1.8, 'acid', 14, 8] };
+  for (const [id, [snd, coef, r, elem, mp, cd]] of Object.entries(want)) { const d = skills.find(s => s.id === id), op = d.ops[0];
+    assert.equal(op.op, 'proj'); assert.equal(op.kind, 'lob'); assert.equal(op.coef, coef, id); assert.equal(op.r, r, id); assert.equal(op.elem, elem); assert.equal(d.mp, mp); assert.equal(d.cd, cd);
+    assert.equal(skillSound(d, op), snd, id + ' impact sound'); assert.equal(skillSound(d), 'throw', id + ' the throw itself'); }
+  const b6 = skills.find(s => s.id === 'ph1_b6').ops[0]; assert.equal(b6.n, 10); assert.equal(b6.coef, 0.6); assert.equal(b6.blast, 1.5); assert.equal(b6.gap, 0.2);
+  // 약 보호막: 그림은 2초만(사용자 요청), 보호막·면역 시간은 8초 그대로
+  const c7 = skills.find(s => s.id === 'ph1_c7'); assert.equal(c7.ops.find(o => o.op === 'shield').dur, 8); assert.equal(c7.ops.find(o => o.op === 'buff').dur, 8);
+  assert.match(read('../js/pharmfx.js'), /shield: \{ show: 2\.0,/, 'shield visual shows 2 s');
+  assert.match(read('../js/pharmfx.js'), /dur = Math\.min\(o\.dur \|\| 8, Sh\.show\)/); }
 for(const [id,name] of [['ph1_c6','ph_adrenaline'],['ph1_c7','ph_shield'],['ph1_c8','ph_heal']]) {
   const d=skills.find(s=>s.id===id);assert.equal(skillSound(d),name);assert.equal(d.sfxAt,'strike');
 }

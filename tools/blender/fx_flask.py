@@ -159,8 +159,8 @@ def strand(kind):
         if kind == 'a': path, w = bez((0, 0, 0), (0.35, 0.18, 0), (0.7, 0.28, 0.0), (1.0, 0.12, 0), 14), 0.06
         elif kind == 'b': path, w = bez((0, 0, 0), (0.3, 0.12, 0.16), (0.65, 0.0, -0.18), (1.0, 0.06, 0.02), 14), 0.05
         else: path, w = bez((0, 0, 0), (0.33, 0.06, 0), (0.66, 0.06, 0.02), (1.0, 0.0, 0), 12), 0.085
-        def rad(u): return w * (0.35 + 1.1 * math.sin(math.pi * min(1, u * 1.15)) ** 0.7) * (1 - 0.65 * u) + 0.012
-        tube(bm, col, path, rad, 7)
+        def rad(u): return w * (0.3 + 0.75 * u ** 0.9) + w * 0.9 * math.exp(-((u - 0.93) / 0.07) ** 2) + 0.01   # thin at the splash, a round liquid head at the far end
+        tube(bm, col, path, rad, 10)
     return b
 
 def flame(bm, col, uvl):
