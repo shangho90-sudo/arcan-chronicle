@@ -565,7 +565,7 @@ export class ModelBody {
     this.root = new THREE.Group();
     this.mat = new THREE.MeshLambertMaterial({ map: md.texture, emissive: 0xffffff, emissiveIntensity: 0 });
     // 2026-11-13: rim cooler and weaker (the warm rim on a warm plaza did not separate); the outline hull does that now
-    paintMat(this.mat, md.cfg.npc ? { rim: [1.0, 0.86, 0.62], rimK: 0.3, sat: 1.1 } : { rim: [0.9, 0.92, 1.0], rimK: 0.22, sat: 1.1, skin: true });
+    paintMat(this.mat, md.cfg.npc ? { rim: [1.0, 0.9, 0.74], rimK: 0.16, sat: 1.08, soft: true } : { rim: [0.92, 0.94, 1.0], rimK: 0.14, sat: 1.08, soft: true });   // soft volume, weak rim (2026-11-14)
     this.mesh = new THREE.SkinnedMesh(md.geometry, this.mat);
     this.mesh.castShadow = true; this.mesh.frustumCulled = false;
     this.mesh.scale.setScalar(md.scale);

@@ -750,6 +750,10 @@ export class TelegraphView {
 // rim. o = { rim: [r,g,b], rimK, sat } — the player gets a warm, slightly stronger rim so it reads over the floor.
 export function paintMat(m, o = {}) {
   const rim = o.rim || [0.75, 0.62, 1.0], rk = (o.rimK ?? 0.22).toFixed(3), sat = (o.sat ?? 1.08).toFixed(3);
+  // o.soft (characters, 2026-11-14): wide band transitions (soft cartoon volume instead of hard toon edges), the darkest
+  // shade lifted a little, lighter occlusion underneath - only the player / NPC bodies use it (monsters, landmarks keep theirs)
+  const soft = !!o.soft, B = soft ? ['-.32, .32', '.2, .8', '.6', '.4'] : ['-.08, .08', '.42, .55', '.55', '.45'];
+  const shade = soft ? 'vec3(.88, .86, 1.0), vec3(1.03, 1.0, .96)' : 'vec3(.80, .78, 1.0), vec3(1.05, 1.0, .94)', occ = soft ? 'vec3(.94, .88, .9)' : 'vec3(.9, .82, .84)';
   if (m.isMeshStandardMaterial) { m.roughness = Math.max(m.roughness ?? 1, 0.85); m.metalness = 0; }
   const prev = m.onBeforeCompile, key = m.customProgramCacheKey ? m.customProgramCacheKey() : '';
   m.onBeforeCompile = (sh, r) => {
@@ -759,33 +763,39 @@ export function paintMat(m, o = {}) {
   vec3 wN = normalize((vec4(vN, 0.) * viewMatrix).xyz);
   float band = .5;
   #if NUM_DIR_LIGHTS > 0
-    float nl = dot(vN, directionalLights[0].direction); band = smoothstep(-.08, .08, nl) * .55 + smoothstep(.42, .55, nl) * .45;
+    float nl = dot(vN, directionalLights[0].direction); band = smoothstep(${B[0]}, nl) * ${B[2]} + smoothstep(${B[1]}, nl) * ${B[3]};
   #endif
   float L = dot(outgoingLight, vec3(.299, .587, .114));
-  outgoingLight *= mix(vec3(.80, .78, 1.0), vec3(1.05, 1.0, .94), band);                 // cool violet shade, warm light
-  outgoingLight *= mix(vec3(.9, .82, .84), vec3(1.), smoothstep(-.75, .1, wN.y));         // warm occlusion underneath (softer 2026-11-13: no dark blotch under chins)
+  outgoingLight *= mix(${shade}, band);                 // cool violet shade, warm light
+  outgoingLight *= mix(${occ}, vec3(1.), smoothstep(-.75, .1, wN.y));         // warm occlusion underneath (softer 2026-11-13: no dark blotch under chins)
   outgoingLight = mix(vec3(dot(outgoingLight, vec3(.299, .587, .114))), outgoingLight, ${sat});
   float fr = pow(1. - clamp(dot(vN, vV), 0., 1.), 3.);
   outgoingLight += vec3(${rim.map(v => v.toFixed(3)).join(', ')}) * fr * ${rk} * (.4 + .6 * smoothstep(-.2, .6, wN.y));
 }
 #include <opaque_fragment>`);
   };
-  m.customProgramCacheKey = () => key + '|paint' + rk + sat + rim.join(',');
+  m.customProgramCacheKey = () => key + '|paint' + rk + sat + rim.join(',') + (soft ? 's' : '');
   m.needsUpdate = true; return m;
 }
 
-// ---------------------------------------------------------------- thin toon outline (inverted hull, 2026-11-13)
-// A back-face copy of the mesh pushed out along its normals IN SCREEN SPACE (constant ~px width at any zoom / distance),
-// drawn in a dark warm violet (not black): separates characters / monsters from the bright plaza by value without a
-// full-screen edge filter. Shares the geometry (and skeleton for skinned meshes): +1 draw call per outlined mesh, no
-// new textures. OUTLINE.px = width in CSS px at 720 px screen height (scales with the screen); 0 turns it off.
-export const OUTLINE = { px: 1.5, color: 0x2e2236, alpha: 1 };
+// ---------------------------------------------------------------- thin toon outline (inverted hull, 2026-11-13; 2026-11-14 softened)
+// A back-face copy of the mesh pushed out along its normals in screen space. 2026-11-14 (사용자: '스티커처럼 보임'): the
+// first version (1.5 px, one near-black violet for everything) drew a dark line round every hair strand, glove and fold
+// and clumped into a dark blob at play size. Now:
+//  - colour = the mesh's OWN texture / colour darkened (OUTLINE.k), so the edge reads as a darker shade of the local
+//    material (dark brown hair edge, dark teal jacket edge), never a black ink line;
+//  - width OUTLINE.px (0.6 px at 720 px screen height, 60% thinner) scaled by how big the object is on screen: below
+//    OUTLINE.small (NDC per metre) it shrinks to OUTLINE.minK of that - at the real game camera a character's edge is
+//    sub-pixel, so nothing clumps; only close-ups (portrait-like zoom) get a visible soft edge.
+// Shares the geometry (and skeleton for skinned meshes): +1 draw call per outlined mesh, no new textures. px 0 = off.
+export const OUTLINE = { px: 0.6, k: 0.5, small: [0.25, 0.65], minK: 0.2 };
 const _outlineMats = new Map();
-export function outlineMat(skinned, px = OUTLINE.px, color = OUTLINE.color) {
-  const key = (skinned ? 's' : 'm') + px + '|' + color;
+export function outlineMat(skinned, src, px = OUTLINE.px) {
+  const map = src && src.map || null, col = src && src.color ? src.color.clone() : new THREE.Color(0.55, 0.42, 0.34);
+  const key = (skinned ? 's' : 'm') + px + '|' + (map ? map.uuid : col.getHexString());
   if (_outlineMats.has(key)) return _outlineMats.get(key);
-  const m = new THREE.MeshBasicMaterial({ color, side: THREE.BackSide, fog: false });
-  const w = (px / 360).toFixed(5);   // NDC units: 2 / 720 per px
+  const k = OUTLINE.k, m = new THREE.MeshBasicMaterial({ map, color: map ? new THREE.Color(k, k * 0.9, k * 0.86) : col.multiplyScalar(k), side: THREE.BackSide, fog: false });
+  const w = (px / 360).toFixed(5), s0 = OUTLINE.small[0].toFixed(3), s1 = OUTLINE.small[1].toFixed(3), mk = OUTLINE.minK.toFixed(3);   // NDC units: 2 / 720 per px
   m.onBeforeCompile = sh => {
     sh.vertexShader = sh.vertexShader.replace('#include <project_vertex>', `#include <project_vertex>
   {
@@ -796,18 +806,21 @@ export function outlineMat(skinned, px = OUTLINE.px, color = OUTLINE.color) {
   #endif
     vec4 cN = projectionMatrix * modelViewMatrix * vec4(oN, 0.0);
     vec2 d = cN.xy; float l = length(d);
-    if (l > 1e-5) gl_Position.xy += d / l * ${w} * gl_Position.w;
+    float npm = projectionMatrix[1][1] / max(gl_Position.w, 1e-3);          // NDC height of one metre at this depth
+    float sz = mix(${mk}, 1.0, smoothstep(${s0}, ${s1}, npm));
+    if (l > 1e-5) gl_Position.xy += d / l * ${w} * sz * gl_Position.w;
   }`);
   };
-  m.customProgramCacheKey = () => 'outline' + key;
+  m.customProgramCacheKey = () => 'outline2' + key;
   _outlineMats.set(key, m); return m;
 }
-/** add an outline hull to a mesh (Mesh or SkinnedMesh); returns the hull (child of the same parent, same transform) */
+/** add an outline hull to a mesh (Mesh or SkinnedMesh); returns the hull (child of the mesh, identity transform) */
 export function addOutline(mesh, px = OUTLINE.px) {
   if (!px || !mesh || !mesh.geometry || !mesh.geometry.attributes.normal) return null;
+  const src = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
   let o;
-  if (mesh.isSkinnedMesh) { o = new THREE.SkinnedMesh(mesh.geometry, outlineMat(true, px)); o.bind(mesh.skeleton, mesh.bindMatrix); o.bindMode = mesh.bindMode; }
-  else o = new THREE.Mesh(mesh.geometry, outlineMat(false, px));
+  if (mesh.isSkinnedMesh) { o = new THREE.SkinnedMesh(mesh.geometry, outlineMat(true, src, px)); o.bind(mesh.skeleton, mesh.bindMatrix); o.bindMode = mesh.bindMode; }
+  else o = new THREE.Mesh(mesh.geometry, outlineMat(false, src, px));
   // child of the mesh with an identity transform: follows it everywhere (a skinned hull in 'attached' mode lands on the
   // same bones whatever its own transform is)
   o.castShadow = false; o.receiveShadow = false; o.frustumCulled = mesh.frustumCulled; o.userData.outline = true; o.renderOrder = mesh.renderOrder;
