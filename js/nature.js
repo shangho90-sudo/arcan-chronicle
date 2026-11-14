@@ -590,7 +590,7 @@ export async function buildNature(zone, renderer) {
     const lf = (x, z) => 0.5 + 0.25 * Math.sin(x * 0.21 + Math.sin(z * 0.13) * 2.0) + 0.25 * Math.sin(z * 0.17 - x * 0.07);
     for (let k = 0; k < area * 0.3 * (NV.grass ?? 1); k++) {
       const x = x0 + fr() * (x1 - x0), z = z0 + fr() * (z1 - z0), r = maskAt(x, z)[0];
-      if (r < 0.1 || r > 0.36 || lf(x, z) < 0.5 || fr() > 0.6) continue;
+      if (r < 0.1 || r > 0.36 || lf(x, z) < 0.45 || fr() > 0.7) continue;
       if (onPlat(x, z) || inWater(x, z, 0.6) || camps.some(c => Math.hypot(x - c[0], z - c[1]) < c[2] * 0.3 + 1.5)) continue;
       const pal = PAL[Math.floor(fr() * PAL.length)], n = 3 + Math.floor(fr() * 4);
       for (let j = 0; j < n; j++) {

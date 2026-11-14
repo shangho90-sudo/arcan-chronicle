@@ -446,11 +446,11 @@ def gen_town2(t, exits, extra_npcs=()):
                 u = (i + 0.5 + er.uniform(-0.15, 0.15)) * 4.0 / L; s = 1 if (i + ne) % 2 else -1; off = w / 2 + er.uniform(0.75, 1.0)
                 x, z = a[0] + (b[0] - a[0]) * u + nx * s * off, a[1] + (b[1] - a[1]) * u + nz * s * off
                 if not ok(x, z, 0.45, road=0.2) or any(math.hypot(x - dx, z - dz) < 2.6 for dx, dz in doors): continue
-                green = 'grass_short' if 'grass_short' not in flowers else 'clover'
-                blprops.append(dict(model=green, pos=[round(x, 2), round(z, 2)], rot=round(er.uniform(0, 360), 1), scale=round(er.uniform(0.85, 1.05), 2)))
+                green = er.choice(['shrub_a', 'shrub_b']) if 'grass_short' not in flowers else 'grass_short'   # a low leafy mound so the clump reads as planted, not weeds
+                blprops.append(dict(model=green, pos=[round(x, 2), round(z, 2)], rot=round(er.uniform(0, 360), 1), scale=round(er.uniform(0.36, 0.46) if green != 'grass_short' else 1.0, 2)))
                 for j in range(er.randint(3, 4)):
                     blprops.append(dict(model=er.choice(flowers), pos=[round(x + er.uniform(-0.45, 0.45) * abs(nz) + er.uniform(-0.2, 0.2), 2), round(z + er.uniform(-0.45, 0.45) * abs(nx) + er.uniform(-0.2, 0.2), 2)],
-                                        rot=round(er.uniform(0, 360), 1), scale=round(er.uniform(0.6, 0.82), 2)))
+                                        rot=round(er.uniform(0, 360), 1), scale=round(er.uniform(0.72, 0.92), 2)))
                 ne += 1
     # ------------------------------------------------------------------ roads for the renderer
     roads = [dict(kind='ring', pos=[0, 0], r0=5.2, r1=RP - 1.7)]
