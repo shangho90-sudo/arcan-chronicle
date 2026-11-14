@@ -573,7 +573,84 @@ BS_KICK = action('bs_kick', [
     key(0.40, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
 ], 0.10, 0.32, None, fadeIn=0.04, fadeOut=0.12)
 
-SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL] + BS_ACTS + [DRAW, SHEATHE, PH_SPIN, PH_SLAM, PH_SMASH, PH_PITCH, PH_SWEEP, CK_CHOP, CK_PAN, BS_CALL, BS_THRUST, BS_SLAM, BS_FLURRY, BS_SWEEP, BS_KICK]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
+# ------------------------------------------------------------------------------------------------ 미용사 1차 (2026-11-13)
+# 큰 가위(예전의 3배)를 두 손으로 잡고 '싹뚝' 자름: pose.grip2 = 왼손도 가위 고리를 잡음(js/model.js 왼팔 IK), pose.snip = 가위가
+# 벌어진 정도(0 닫힘 .. 1 활짝). 기본공격 5단 콤보 hd_combo_1..5는 C5와 똑같은 시간표(타격·연계·전진·발 디딤·배율)에 자세만 바꿈
+# — 벌리고 → 내밀고 → 타격 순간에 닫음. 1 가로 싹뚝, 2 올려 자르기, 3 낮고 넓게, 4 길게 찔러 자르기, 5 머리 위에서 크게 내리 자르기.
+def HP(az, el, reach, baz, bel, snip, twist=0, lean=0, sink=0.05, sq=False, **kw):
+    d = dict(twist=twist, lean=lean, sink=sink, hand=[az, el, reach], blade=[baz, bel], elbow=[-0.7, -1, -0.15], armL=[20, 30], grip2=1, snip=snip, squint=sq); d.update(kw); return d
+HD_GUARD = HP(16, -36, 0.60, 6, 14, 0.12, sink=0.03)
+HD_POSES = [
+    HP(16, -36, 0.60, 6, 14, 0.12, sink=0.05),
+    # 1 가로 싹뚝: 가슴 앞에서 벌리며 당겼다가 앞으로 내밀며 닫음
+    HP(4, -22, 0.52, -6, 10, 1.0, twist=-16, lean=-4, sink=0.07), HP(10, -16, 0.86, 0, 2, 1.0, twist=-4, lean=6, sink=0.08, sq=True),
+    HP(14, -14, 1.0, 2, -2, 0.0, twist=8, lean=13, sink=0.10, sq=True), HP(16, -16, 0.98, 4, -4, 0.0, twist=10, lean=14, sink=0.10), HP(18, -24, 0.80, 8, 4, 0.2, twist=6, lean=8, sink=0.08),
+    # 2 올려 자르기: 낮게 벌려 아래에서 위로 들어 올리며 닫음
+    HP(22, -48, 0.60, 10, -30, 1.0, twist=14, lean=10, sink=0.14), HP(18, -26, 0.88, 6, 6, 1.0, twist=6, lean=8, sink=0.10, sq=True),
+    HP(12, -2, 1.0, 2, 30, 0.0, twist=-6, lean=4, sink=0.05, sq=True), HP(10, 6, 0.96, 0, 40, 0.0, twist=-10, lean=0, sink=0.04), HP(4, -8, 0.78, -8, 26, 0.25, twist=-14, lean=0, sink=0.07),
+    # 3 낮고 넓게: 오른쪽으로 크게 틀어 활짝 벌린 뒤 가슴 높이로 쓸며 닫음
+    HP(-34, -18, 0.66, -60, 0, 1.0, twist=-40, lean=-2, sink=0.12), HP(-6, -18, 0.92, -22, -2, 1.0, twist=-12, lean=6, sink=0.12, sq=True),
+    HP(18, -18, 1.0, 10, -4, 0.0, twist=22, lean=12, sink=0.12, sq=True), HP(30, -20, 0.94, 30, -6, 0.0, twist=34, lean=12, sink=0.12), HP(22, -26, 0.74, 18, 2, 0.2, twist=20, lean=6, sink=0.12),
+    # 4 길게 찔러 자르기: 허리로 당겨 모았다가 발을 내디디며 곧게 뻗고 끝에서 닫음
+    HP(6, -30, 0.44, 0, 0, 0.55, twist=-30, lean=-2, sink=0.16), HP(4, -30, 0.40, 0, 0, 1.0, twist=-36, lean=0, sink=0.18, sq=True),
+    HP(10, -18, 0.84, 0, -2, 1.0, twist=-10, lean=10, sink=0.20, sq=True), HP(14, -10, 1.03, 0, -4, 0.0, twist=12, lean=20, sink=0.22, sq=True),
+    HP(14, -12, 1.03, 0, -6, 0.0, twist=14, lean=22, sink=0.23), HP(10, -10, 0.80, -4, 30, 0.3, twist=2, lean=10, sink=0.18),
+    # 5 크게 내리 자르기: 머리 위로 들어 활짝 벌리고 버텼다가 무게를 실어 내리며 닫음
+    HP(6, 50, 0.80, 0, 78, 0.9, twist=-14, lean=-10, sink=0.08), HP(4, 58, 0.84, 0, 86, 1.0, twist=-18, lean=-14, sink=0.10),
+    HP(10, 22, 0.98, 2, 30, 1.0, twist=-4, lean=8, sink=0.16, sq=True), HP(14, -22, 1.0, 4, -30, 0.0, twist=10, lean=24, sink=0.25, sq=True),
+    HP(16, -32, 0.94, 6, -44, 0.0, twist=14, lean=28, sink=0.28), HP(16, -32, 0.90, 6, -40, 0.0, twist=12, lean=22, sink=0.24),
+    # recovery
+    HP(16, -36, 0.74, 8, -6, 0.1, twist=6, lean=8, sink=0.10), HP(16, -36, 0.62, 6, 10, 0.12, sink=0.05), HP(16, -36, 0.60, 6, 14, 0.12, sink=0.0),
+]
+assert len(HD_POSES) == len(C5), (len(HD_POSES), len(C5))
+HD5 = [(x[0], x[1], x[2], x[3], x[4], HD_POSES[i]) for i, x in enumerate(C5)]
+def hd_mk(x, dt, da):
+    t, e, adv, step, lift, pose = x
+    return ck(round(t - dt, 4), e, round(adv - da, 3), [step[0] - da, step[1] - da], lift, **pose)
+def hd_strike(i):
+    """hd_combo_<i+1>: same cut / hit / lock / chain / atk numbers as combo_<i+1> (c5_strike), two-hand shears poses"""
+    t0, t1 = C5_CUT[i], C5_CUT[i + 1]; a0 = next(x for x in HD5 if abs(x[0] - t0) < 1e-6)[2]
+    ks = [hd_mk(x, t0, a0) for x in HD5 if t0 - 1e-6 <= x[0] <= t1 + 1e-6]
+    if i == 4: ks += [hd_mk(x, t0, a0) for x in HD5 if x[0] > t1 + 1e-6]
+    else:
+        end = ks[-1][1]; ad = end['adv']; T = ks[-1][0]; L, R = end['step']
+        mvR, mvL = abs(R - ad) > 0.02, abs(L - ad) > 0.02; R1, L1 = (ad if mvR else R), (ad if mvL else L)
+        ks += [ck(round(T + 0.09, 4), 's', ad, [L, (R + R1) / 2], [0, 0.05 if mvR else 0], **PZ(HD_GUARD, sink=0.06, lean=4)),
+               ck(round(T + 0.17, 4), 's', ad, [(L + L1) / 2, R1], [0.04 if mvL else 0, 0], **PZ(HD_GUARD, sink=0.04)),
+               ck(round(T + 0.25, 4), 's', ad, [L1, R1], [0, 0], **PZ(HD_GUARD, sink=0.02)),
+               ck(round(T + 0.32, 4), 's', ad, [L1, R1], [0, 0], **PZ(HD_GUARD))]
+    h = C5_HIT[i] - t0; base = C5_ACTS[i]
+    a = action('hd_combo_%d' % (i + 1), ks, round(h, 4), base['lock'], None, fadeIn=0.05, fadeOut=0.14)
+    a.update(hitTimes=[round(h, 4)], chainOpen=base['chainOpen'], chainClose=base['chainClose'], atk=base['atk'], adv=base['adv'], combo=i + 1, snipFx=dict(n=i + 1, big=i == 4))
+    assert all(x < y for x, y in zip(a['keys'], a['keys'][1:])), a['keys']
+    return a
+HD_ACTS = [hd_strike(i) for i in range(5)]
+# 스킬 동작 (타격 시각·잠금은 예전에 쓰던 'attack' 동작과 같음: 0.25 s / 0.40 s — 수치 변화 없음)
+def hk(t, e=None, **kw): return key(t, e, **kw)
+# hd_snip: 한 번 크게 '싹뚝' (가위 연격·끝단 자르기) — 벌려 당김 0.15 s → 내밀며 0.25 s에 닫음 → 버팀 → 복귀
+HD_SNIP = action('hd_snip', [
+    hk(0.00, **HD_GUARD),
+    hk(0.11, 'o', **HP(4, -18, 0.50, -4, 14, 1.0, twist=-18, lean=-6, sink=0.07)),
+    hk(0.16, 's', **HP(2, -16, 0.48, -6, 16, 1.0, twist=-22, lean=-8, sink=0.08, sq=True)),
+    hk(0.225, 'i', **HP(10, -14, 0.90, 0, 2, 1.0, twist=-2, lean=8, sink=0.09, sq=True)),
+    hk(0.25, None, **HP(14, -12, 1.0, 2, -2, 0.0, twist=10, lean=15, sink=0.11, sq=True)),
+    hk(0.33, 'o', **HP(16, -14, 0.98, 4, -4, 0.0, twist=12, lean=16, sink=0.11)),
+    hk(0.44, 's', **HP(16, -30, 0.74, 6, 6, 0.1, twist=6, lean=6, sink=0.06)),
+    hk(0.55, 's', **HD_GUARD),
+], 0.25, 0.40, None, fadeIn=0.07, fadeOut=0.16)
+# hd_trim: 앞머리 정리 — 오른쪽으로 틀어 활짝 벌리고 이마 높이로 가로로 쓸며 닫음(0.25 s)
+HD_TRIM = action('hd_trim', [
+    hk(0.00, **HD_GUARD),
+    hk(0.12, 'o', **HP(-36, -6, 0.68, -64, 8, 1.0, twist=-42, lean=-2, sink=0.10)),
+    hk(0.17, 's', **HP(-40, -4, 0.66, -70, 8, 1.0, twist=-46, lean=-3, sink=0.11, sq=True)),
+    hk(0.225, 'i', **HP(-6, -6, 0.94, -22, 4, 0.9, twist=-12, lean=6, sink=0.11, sq=True)),
+    hk(0.25, None, **HP(18, -8, 1.0, 12, 2, 0.0, twist=22, lean=12, sink=0.12, sq=True)),
+    hk(0.33, 'o', **HP(32, -10, 0.94, 34, 0, 0.0, twist=36, lean=12, sink=0.12)),
+    hk(0.44, 's', **HP(22, -28, 0.76, 18, 4, 0.1, twist=16, lean=6, sink=0.07)),
+    hk(0.55, 's', **HD_GUARD),
+], 0.25, 0.40, None, fadeIn=0.07, fadeOut=0.16)
+
+SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL] + BS_ACTS + [DRAW, SHEATHE, PH_SPIN, PH_SLAM, PH_SMASH, PH_PITCH, PH_SWEEP, CK_CHOP, CK_PAN, BS_CALL, BS_THRUST, BS_SLAM, BS_FLURRY, BS_SWEEP, BS_KICK] + HD_ACTS + [HD_SNIP, HD_TRIM]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
 
 acts = json.load(open(P))
 names = {'attack', 'attack2'} | {x['name'] for x in SKILL_ACTS}

@@ -304,27 +304,29 @@ S(J, 2, 2, '제작·수리·개조', 5, 'en_c5', '오버클럭', 'support', '기
 
 # ======================================================================= 미용사 (hairdresser)
 J, C = 'hairdresser', 0xff7ab0
-S(J, 1, 0, '가위 기술', 1, 'hd1_a1', '가위 연격', 'attack', '빠르게 세 번 자른다.', weapon='scissors', target='enemy', range=1.8, mp=8, cd=4, anim='attack',
-  ops=[hit('single', 0.75, hits=3, gap=0.1, fx=dict(slash='scissor_snip', burst='hit_slash'))])
-S(J, 1, 0, '가위 기술', 2, 'hd1_a2', '앞머리 정리', 'attack', '짧고 빠른 전방 범위 공격.', weapon='scissors', range=2.2, mp=8, cd=4, anim='attack',
-  ops=[hit('cone', 1.4, r=2.2, ang=90, fx=dict(slash='arc'))])
-S(J, 1, 0, '가위 기술', 3, 'hd1_a3', '끝단 자르기', 'attack', '체력이 낮은 적에게 추가 피해.', weapon='scissors', target='enemy', range=1.8, mp=10, cd=6, anim='attack',
-  ops=[hit('single', 1.6, vsLowHp=dict(pct=0.35, mul=1.8), fx=dict(slash='scissor_snip', burst='hit_slash'))])
-S(J, 1, 0, '가위 기술', 4, 'hd1_a4', '스텝 커트', 'attack', '옆으로 짧게 이동하며 벤다. 무적 시간 없음.', weapon='scissors', range=2.0, mp=10, cd=6, anim='dash',
-  ops=[dash(2.2, side=True, invuln=False, hit=hit('cone', 1.3, r=2.8, ang=150, fx=dict(slash='arc')))])
+# 2026-11-13 연출 개편 (수치·판정은 그대로): 이펙트 js/hairfx.js (fx op `hair`, hit op fx.hair), 동작 hd_snip / hd_trim (tools/anim/swings.py,
+# 타격 0.25 s = 예전 'attack'과 같음), 명중 소리 hd_snip(맞았을 때만), 전역 히트스톱·무작위 흔들림 대신 시전자·대상만 짧게 멈춤.
+S(J, 1, 0, '가위 기술', 1, 'hd1_a1', '가위 연격', 'attack', '허공에 나타난 큰 가위가 적 하나를 빠르게 세 번 싹뚝 자른다.', weapon='scissors', target='enemy', range=1.8, mp=8, cd=4, anim='hd_snip',
+  ops=[dict(op='fx', hair='shears', at=-0.25, gap=0.1), hit('single', 0.75, hits=3, gap=0.1, sfx='hd_snip', fx=dict(hair='snip'))])
+S(J, 1, 0, '가위 기술', 2, 'hd1_a2', '앞머리 정리', 'attack', '큰 가위를 가로로 쓸어 앞머리를 다듬듯 전방을 한 줄로 자른다. 짧고 빠른 전방 범위 공격.', weapon='scissors', range=2.2, mp=8, cd=4, anim='hd_trim',
+  ops=[hit('cone', 1.4, r=2.2, ang=90, sfx='hd_snip', fx=dict(hair='trim'))])
+S(J, 1, 0, '가위 기술', 3, 'hd1_a3', '끝단 자르기', 'attack', '황금빛 큰 가위로 끝단을 잘라 낸다. 체력이 낮은 적에게 추가 피해.', weapon='scissors', target='enemy', range=1.8, mp=10, cd=6, anim='hd_snip',
+  ops=[dict(op='fx', hair='shears', gold=True, at=-0.25, gap=0.12), hit('single', 1.6, vsLowHp=dict(pct=0.35, mul=1.8), sfx='hd_snip', fx=dict(hair='snip', heavy=True))])
+S(J, 1, 0, '가위 기술', 4, 'hd1_a4', '스텝 커트', 'attack', '옆으로 짧게 이동하며 층층이 벤다. 무적 시간 없음.', weapon='scissors', range=2.0, mp=10, cd=6, anim='dash',
+  ops=[dash(2.2, side=True, invuln=False, hit=hit('cone', 1.3, r=2.8, ang=150, sfx='hd_snip', fx=dict(hair='step')))])
 S(J, 1, 0, '가위 기술', 5, 'hd1_a5', '섬세한 손놀림', 'passive', '가위 공격 속도와 치명타 확률이 증가한다.', mods=[dict(stat='atkSpeed', mul=0.04, mulLv=0.02), dict(stat='crit', add=0.03, addLv=0.015)])
-S(J, 1, 1, '빗과 드라이', 1, 'hd1_b1', '빗 투척', 'attack', '빗을 직선으로 던진다.', target='enemy', range=8, mp=8, cd=3, anim='throw', ops=[proj('normal', 1.6, speed=16, fx='comb', burst='hit_pierce')])
-S(J, 1, 1, '빗과 드라이', 2, 'hd1_b2', '드라이 돌풍', 'attack', '전방에 바람 피해와 밀치기.', range=3.6, mp=12, cd=7, anim='cast',
-  ops=[hit('cone', 1.3, r=3.6, ang=60, knock=2.5, fx=dict(slash='wind_cone'))])
-S(J, 1, 1, '빗과 드라이', 3, 'hd1_b3', '온풍 드라이', 'attack', '근거리에 지속 공격. 이동하면 중단된다.', range=3.0, mp=14, cd=8, anim='cast',
-  ops=[channel(2.0, 0.25, [hit('cone', 0.35, r=3.0, ang=50, elem='fire', fx=dict(slash='wind_cone'))], breakOnMove=True)])
-S(J, 1, 1, '빗과 드라이', 4, 'hd1_b4', '냉풍 드라이', 'attack', '냉기 피해와 둔화.', range=3.4, mp=12, cd=7, anim='cast',
-  ops=[hit('cone', 1.4, r=3.4, ang=60, elem='ice', st=[st('slow', 3, 0.35)], fx=dict(slash='wind_cone'))])
-S(J, 1, 1, '빗과 드라이', 5, 'hd1_b5', '헤어롤 덫', 'summon', '밟은 적을 잠시 속박하는 헤어롤 덫.', target='ground', range=6, mp=12, cd=10, anim='throw',
-  ops=[summon('hair_roller', ai='trap', life=15, hp=0.2, trigger=1.0, onTrigger=dict(r=1.2, coef=0.8, st=[st('root', 1.5)], burst='dust'), limit=3, machine=True)])
-S(J, 1, 2, '스타일링과 관리', 1, 'hd1_c1', '산뜻한 스타일링', 'support', '이동 속도를 높인다.', target='self', mp=10, cd=16, anim='cast', ops=[buff('haste', 8, 0.25)])
-S(J, 1, 2, '스타일링과 관리', 2, 'hd1_c2', '헤어 코팅', 'support', '작은 보호막을 두른다.', target='self', mp=12, cd=14, anim='cast', ops=[shield(30, 0.9, 6)])
-S(J, 1, 2, '스타일링과 관리', 3, 'hd1_c3', '기분 전환', 'support', '둔화를 없애고 잠시 둔화 저항을 얻는다.', target='self', mp=10, cd=14, anim='cast', ops=[cleanse(9, ['slow']), buff('slowres', 5, 1)])
+S(J, 1, 1, '빗과 드라이', 1, 'hd1_b1', '빗 투척', 'attack', '빙글빙글 도는 빗을 직선으로 던진다.', target='enemy', range=8, mp=8, cd=3, anim='throw', ops=[proj('normal', 1.6, speed=16, fx='comb', burst='hit_pierce', hairProj=True)])
+S(J, 1, 1, '빗과 드라이', 2, 'hd1_b2', '드라이 돌풍', 'attack', '큰 드라이어의 센 바람으로 전방에 피해를 주고 밀쳐 낸다.', range=3.6, mp=12, cd=7, anim='cast', sfx='hd_dryer',
+  ops=[dict(op='fx', hair='dryer', mode='gust', r=3.6, ang=60, at=-1), hit('cone', 1.3, r=3.6, ang=60, knock=2.5, fx=dict(hair='dry'))])
+S(J, 1, 1, '빗과 드라이', 3, 'hd1_b3', '온풍 드라이', 'attack', '뜨거운 드라이어 바람으로 근거리에 지속 공격. 이동하면 중단된다.', range=3.0, mp=14, cd=8, anim='cast', sfx='hd_dryer',
+  ops=[dict(op='fx', hair='dryer', mode='hot', r=3.0, ang=50, dur=2.0, at=-1), channel(2.0, 0.25, [hit('cone', 0.35, r=3.0, ang=50, elem='fire', fx=dict(hair='dry'))], breakOnMove=True)])
+S(J, 1, 1, '빗과 드라이', 4, 'hd1_b4', '냉풍 드라이', 'attack', '차가운 드라이어 바람으로 냉기 피해와 둔화.', range=3.4, mp=12, cd=7, anim='cast', sfx='hd_dryer',
+  ops=[dict(op='fx', hair='dryer', mode='cold', r=3.4, ang=60, at=-1), hit('cone', 1.4, r=3.4, ang=60, elem='ice', st=[st('slow', 3, 0.35)], fx=dict(hair='dry'))])
+S(J, 1, 1, '빗과 드라이', 5, 'hd1_b5', '헤어롤 덫', 'summon', '밟은 적을 머리카락으로 감아 잠시 속박하는 헤어롤 덫.', target='ground', range=6, mp=12, cd=10, anim='throw',
+  ops=[summon('hair_roller', ai='trap', life=15, hp=0.2, trigger=1.0, onTrigger=dict(r=1.2, coef=0.8, st=[st('root', 1.5)], burst='dust', hair='trap'), limit=3, machine=True)])
+S(J, 1, 2, '스타일링과 관리', 1, 'hd1_c1', '산뜻한 스타일링', 'support', '이동 속도를 높인다.', target='self', mp=10, cd=16, anim='cast', sfx='hd_style', ops=[dict(op='fx', hair='style', kind='haste'), buff('haste', 8, 0.25)])
+S(J, 1, 2, '스타일링과 관리', 2, 'hd1_c2', '헤어 코팅', 'support', '윤기 나는 코팅으로 작은 보호막을 두른다.', target='self', mp=12, cd=14, anim='cast', sfx='hd_style', ops=[dict(op='fx', hair='style', kind='coat'), shield(30, 0.9, 6)])
+S(J, 1, 2, '스타일링과 관리', 3, 'hd1_c3', '기분 전환', 'support', '둔화를 없애고 잠시 둔화 저항을 얻는다.', target='self', mp=10, cd=14, anim='cast', sfx='hd_style', ops=[dict(op='fx', hair='style', kind='fresh'), cleanse(9, ['slow']), buff('slowres', 5, 1)])
 S(J, 1, 2, '스타일링과 관리', 4, 'hd1_c4', '염색약 배합', 'craft', '외형 색을 바꾸는 염색약을 만든다.')
 S(J, 1, 2, '스타일링과 관리', 5, 'hd1_c5', '깔끔한 마무리', 'passive', '적을 처치하면 이동 속도가 증가한다. 중첩되지 않고 시간만 갱신.', flags=dict(killHaste=[0.15, 0.03]))
 

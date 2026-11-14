@@ -7,6 +7,7 @@ import { skillSound } from './sfx.js';
 import { cookImpact, cookCanToss } from './cookfx.js';
 import { salImpact } from './salfx.js';
 import { yeonImpact, LEAD as YEON_LEAD } from './yeonfx.js';
+const HAIR_STOP = [0.035, 0.06], HAIR_KICK = [0.09, 0.1], hairMid = t => Math.min(1.2, 0.45 + (t.radius || 0.5) * 0.6);   // 미용사: local hit-stop [light, heavy] (s), camera kick [m, s] on the heavy snip, cut height on a target (= js/hairfx.js hairMid)
 const PAN_STOP = 0.07, PAN_KICK = [0.13, 0.11];     // 요리사 팬 강타: local hit-stop (s), camera kick [m, s]
 const PUSH_STOP = 0.05, PUSH_KICK = [0.09, 0.1];   // 밀어내기: local hit-stop (s), camera kick [m, s]
 const SMASH_STOP = 0.06, SMASH_KICK = [0.11, 0.1];   // 유봉강타: local hit-stop (s, caster + target visuals only), camera kick [m, s]
@@ -34,6 +35,7 @@ export const FX = {
   pharm(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.pharm) return G.skillFx.pharm[kind](a, o); } catch (e) { console.warn('fx pharm', e); } return null; },   // 약사 1차 소품 (js/pharmfx.js)
   cook(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.cook) return G.skillFx.cook[kind](a, o); } catch (e) { console.warn('fx cook', e); } return null; },   // 요리사 1차: 허공 식칼·큰 프라이팬·미트볼 (js/cookfx.js)
   smith(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.smith) return G.skillFx.smith[kind](a, o); } catch (e) { console.warn('fx smith', e); } return null; },   // 대장장이 1차 (js/smithfx.js)
+  hair(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.hair) return G.skillFx.hair[kind](a, o); } catch (e) { console.warn('fx hair', e); } return null; },   // 미용사 1차: 큰 가위·빗·드라이어·헤어롤 (js/hairfx.js)
   bash(kind, pos, dir, o = {}) { try { if (G.skillFx && G.skillFx.bash) return G.skillFx.bash[kind](pos, dir, o); } catch (e) { console.warn('fx bash', e); } },   // 배쉬 (js/bashfx.js)
   beam(kind, a, b, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.beam(kind, a, b, o); } catch (e) { console.warn('fx', kind, e); } },
   projectile(kind, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.projectile(kind, o) || NOOP; } catch (e) { console.warn('fx', kind, e); } return NOOP; },
@@ -294,7 +296,7 @@ export class SkillEngine {
     const r = CombatMath.compute(this.power(ctx), c, def, pc.stat('crit'), critDmg, t.stat('dmgReduce'));
     const kdir = { x: t.pos.x - pc.pos.x, z: t.pos.z - pc.pos.z };
     const knock = op.knock && !(t.isBoss) && !(t.def && t.def.ai === 'heavy') ? op.knock * 0.4 : 0;
-    const quietFx = !!(op.quiet || (op.fx && (op.fx.pharm === 'smash' || op.fx.pharm === 'push' || (op.fx.cook && op.fx.cook !== 'chop'))));   // own local hit-stop + camera kick, never the global ones (quiet: 대장장이)
+    const quietFx = !!(op.quiet || (op.fx && (op.fx.pharm === 'smash' || op.fx.pharm === 'push' || (op.fx.cook && op.fx.cook !== 'chop') || op.fx.hair))) || !!(op.hairProj || op.hair === 'trap');   // 미용사 빗·헤어롤 덫·fx.hair도 전역 히트스톱 없이   // own local hit-stop + camera kick, never the global ones (quiet: 대장장이)
     const hd = { source: pc, amount: r.amount, crit: r.crit, kdir, knockback: knock, localStop: quietFx ? 'quiet' : !!(op.fx && (op.fx.bash || op.fx.cook)) };   // 식칼 썰기: a critical chop no longer stops the whole game (the chops keep their rhythm)
     if (op.derived) hd.derived = true;
     t.takeDamage(hd); ctx.missed = !!hd.missed;
@@ -389,7 +391,14 @@ export class SkillEngine {
         const c = op.atAim ? ctx.aim : pc.pos;
         FX.telegraph(c, op.r || op.w || 2, op.dur, { color: 0xffb040, shape: op.shape, dir: ctx.facing, length: op.len, width: op.w }); return;
       }
-      case 'fx': if (op.cook) {   // 요리사 (js/cookfx.js): 'knife' hovers over the target and chops on every damage tick, 'pan' appears overhead and lands after `fall` s
+      case 'fx': if (op.hair) {   // 미용사 (js/hairfx.js): 'shears' = 허공의 큰 가위가 타마다 닫힘, 'dryer' = 큰 드라이어가 부채꼴 안으로 바람을 뿜음, 'style' = 스타일링 연출
+          const a = pc.body && pc.body.sh && pc.body.sh.actions[ctx.act], lead = a && a.fps ? Math.max(0, Math.min(0.35, a.hitFrame / a.fps)) : 0.25;
+          if (op.hair === 'shears') { const tg = ctx.tgt && !ctx.tgt.dead ? ctx.tgt : this.targetFor(d), hop = d.ops.find(o => o.op === 'hit');
+            ctx.hairFx = FX.hair('shears', pc, { tgt: tg || null, facing: ctx.facing, n: hop ? (hop.hits || 1) + Math.floor((ctx.L - 1) / 2) : 1, gap: op.gap || 0.1, first: lead, gold: !!op.gold }); }
+          else if (op.hair === 'dryer') ctx.hairFx = FX.hair('dryer', pc, { mode: op.mode, r: op.r, ang: op.ang, lead: Math.max(0, lead - 0.06), dur: lead + (op.dur || 0.34), f: ctx.facing });
+          else FX.hair(op.hair, pc, { kind: op.kind });
+          return; }
+        if (op.cook) {   // 요리사 (js/cookfx.js): 'knife' hovers over the target and chops on every damage tick, 'pan' appears overhead and lands after `fall` s
           const tg = ctx.tgt && !ctx.tgt.dead ? ctx.tgt : this.targetFor(d), hop = d.ops.find(o => o.op === 'hit');
           ctx.cookFx = FX.cook(op.cook, pc, { tgt: tg || null, facing: ctx.facing, n: hop ? (hop.hits || 1) + Math.floor((hop.hitsPerLv || 0) * (ctx.L - 1)) : 1, gap: op.gap || (hop && hop.gap) || 0.12, first: -(op.at || 0), fall: op.fall || 0.3,
             lead: -(op.at || 0), aim: ctx.aim, ground: pc.zone.geo.ground(ctx.aim.x, ctx.aim.z).y, r: hop && hop.r, ang: hop && hop.ang, len: hop && hop.len, launch: hop && hop.launch, canToss: cookCanToss }); return; }   // lead·aim·r·ang·len: 뒤집개·국자·후추통·포대·꼬치 (2026-11-13)
@@ -499,6 +508,7 @@ export class SkillEngine {
           if (op.fx.burst) { if (op.shape === 'circle') FX.burst(op.fx.burst, op.fwd ? fxp : pc.pos, { color: col, radius: op.fx.burstR || op.r }); else for (const t of ts.length ? ts : [{ pos: fxp }]) FX.burst(op.fx.burst, t.pos, { color: col, radius: 0.8 }); }
           if (op.shake && G.render.addShake) G.render.addShake(op.shake[0], op.shake[1]);
         }
+        const hairHit = [], hairAll = ts.length;
         let consumed = 0;
         if (op.consume) for (const t of ts) consumed = Math.max(consumed, takeMarks(t, op.consume.type === 'phrase' ? 'phrase' : op.consume.type));
         if (op.consume && op.consume.type === 'phrase') { consumed = Math.floor(this.res.phrase); this.res.phrase = 0; }
@@ -510,11 +520,24 @@ export class SkillEngine {
           if (op.falloff) { const dd = pc.dist(t) / (op.r || 5); coef *= 1 + op.falloff * (1 - clamp01(dd)) - op.falloff * 0.5; }
           if (op.consume) coef *= 1 + consumed * op.consume.mulPer;
           if (op.coef > 0) this.dmg(t, coef, ctx, { ...op, centerHit: t === centre });
+          if (!ctx.missed || !(op.coef > 0)) hairHit.push(t);   // really damaged (not a MISS) — 미용사 이펙트·소리는 이 대상들에게만
           if (!(op.stOnHit && ctx.missed)) this.onHit(t, op, ctx);   // stOnHit (팬 강타): a MISS applies nothing
           if (cookOk && !(op.coef > 0 && ctx.missed)) cookOk.push(t);
           if (op.centerStack && t === centre) { t._cstack = (t._cstack || 0) + 1; if (t._cstack >= op.centerStack.n) { applyStatus(t, op.centerStack.st, pc); t._cstack = 0; } }
           if (op.react) this.react(t, op.react, ctx);
           if (op.extendHerb) for (const a of this.areas) if (a.op.herb && Math.hypot(a.c.x - t.pos.x, a.c.z - t.pos.z) < a.r + 2) a.extend(op.extendHerb, op.extendCap || 4);
+        }
+        if (op.fx && op.fx.hair) {   // 미용사 (after the damage, so a MISS reads as a miss): every bright layer on THIS damage tick, on the enemies really hit; local hit-stop on caster + those targets only
+            const ts = hairHit; const hp = ts.map(t => ({ x: t.pos.x, y: t.pos.y || 0, z: t.pos.z, mid: hairMid(t) })), k = ctx.hairFx, last = h === hits_ - 1, t0 = ts[0];
+            if (op.fx.hair === 'snip') { const bonus = !!(t0 && op.vsLowHp && t0.hp / t0.maxHp <= op.vsLowHp.pct);
+              if (k && k.strike) { if (t0) k.strike(t0, h, last, bonus); else if (!hairAll) k.miss(); /* a MISS: the shears still close, no flash; nothing left to cut: they leave */ } else if (t0) FX.hair('snip', { x: t0.pos.x, y: (t0.pos.y || 0) + hairMid(t0), z: t0.pos.z }, { big: bonus }); }
+            else if (op.fx.hair === 'trim') FX.hair('trim', pc, { f, r: op.r, ang: op.ang, hits: hp });
+            else if (op.fx.hair === 'step') FX.hair('step', pc, { f, from: ctx.dashFrom, r: op.r, hits: hp });
+            else if (op.fx.hair === 'dry' && k && k.pulse) k.pulse(hp);
+            const heavy = op.fx.heavy || (op.fx.hair === 'snip' && last), stop = op.fx.hair === 'dry' ? 0 : heavy ? HAIR_STOP[1] : HAIR_STOP[0];
+            if (ts.length && stop) pc.freezeT = Math.max(pc.freezeT || 0, stop);
+            for (const t of ts) { if (stop) t.freezeT = Math.max(t.freezeT || 0, stop); if (t.body && t.body.punch) t.body.punch(t.pos.x - pc.pos.x, t.pos.z - pc.pos.z, heavy ? 0.2 : 0.12); }
+            if (ts.length && heavy && G.render.kick && !G.reduceFlash) G.render.kick(f.x, f.z, HAIR_KICK[0], HAIR_KICK[1]);
         }
         if (op.fx && op.fx.cook === 'pan') {    // 팬 강타 (after the damage, so a MISS reads as a miss): the giant pan lands now; local hit-stop on these two only, squash, one camera kick, stars while stunned
           const t = ts[0], ok = t && !ctx.missed, k = ctx.cookFx; if (k && k.land) k.land(ok ? t : null);
@@ -534,7 +557,7 @@ export class SkillEngine {
         if (op.extendHerb) for (const a of this.areas) if (a.op.herb && this.shapeOf(op, ctx).overlaps(a.c.x, a.c.z, a.r)) a.extend(op.extendHerb, op.extendCap || 4);
         if (op.link && ts.length > 1) for (let i = 1; i < ts.length; i++) FX.beam('thread_link', ts[i - 1].pos, ts[i].pos, { duration: 2 });
         if (op.swingSfx) G.audio.sfx(op.swingSfx);
-        if (ts.length && !(op.stOnHit && ctx.missed) && !(cookOk && !cookOk.length)) G.audio.sfx(skillSound(d, op));
+        if (ts.length && !(op.stOnHit && ctx.missed) && !(cookOk && !cookOk.length) && !(op.fx && op.fx.hair && !hairHit.length)) G.audio.sfx(skillSound(d, op));
       };
       const ht_ = ctx.combo && op.hitsPerLv && ctx.combo.hitTimes ? ctx.combo.hitTimes[h] - ctx.combo.hitTimes[0] : h * (op.gap || 0.15);
       if (h === 0) run(); else this.pending.push({ time: this.clock + ht_, op: { op: '_run', run }, ctx });
@@ -584,6 +607,7 @@ export class SkillEngine {
   blast(c, op, ctx) {
     const pc = this.pc, r = op.r || 1.5, ts = this.targets(HitShape.circle(c.x, c.z, r));
     if (op.burst !== 'none') FX.burst(op.burst || 'explosion_fire', c, { radius: op.burstR || r, color: ctx.d.fx && ctx.d.fx.color });   // 'none': the skill draws its own (약사 pharmfx)
+    if (op.hair === 'trap') for (const t of ts) { const rs = (op.st || []).find(x => x.id === 'root'); FX.hair('trap', t, { dur: rs ? rs.dur : 1.5 }); }   // 헤어롤 덫: 머리카락이 감아 죔 (js/hairfx.js)
     if (op.cook) FX.cook('splat', { x: c.x, y: pc.zone.geo.ground(c.x, c.z).y, z: c.z }, { r, hit: ts.length > 0, top: ts[0] ? ts[0].radius : 0 });   // 미트볼: small splat (js/cookfx.js)
     if (op.pharm) FX.pharm(op.pharm, { x: c.x, y: pc.zone.geo.ground(c.x, c.z).y, z: c.z }, { elem: op.elem, r, linger: op.linger });   // linger: 바닥 서리·웅덩이가 상태이상 시간만큼 옅게 남음
     if (op.shake && G.render.addShake && !G.reduceFlash) G.render.addShake(op.shake[0], op.shake[1]);
@@ -593,6 +617,7 @@ export class SkillEngine {
       // core: own centre bonus inside coreR (천근쇄약: +50 % within 1.5 m), 정확한 투척(약병 전용) 중심 보너스와는 겹치지 않음
       const core = op.core && Math.hypot(t.pos.x - c.x, t.pos.z - c.z) <= (op.coreR || r * 0.35) ? 1 + op.core : 1;
       this.dmg(t, op.coef * core, ctx, { ...op, centerHit: centre && cb > 0 && !op.core, centerBonus: 0 });
+      if (op.hair === 'trap' && !ctx.missed) { t.freezeT = Math.max(t.freezeT || 0, HAIR_STOP[0]); if (t.body && t.body.punch) t.body.punch(t.pos.x - c.x, t.pos.z - c.z, 0.12); }   // 헤어롤 덫: 감아 죄는 순간 맞은 적만 짧게 멈춤
       this.onHit(t, op, ctx);
       if (op.react) this.react(t, op.react, ctx);
     }
@@ -624,7 +649,7 @@ export class SkillEngine {
     const pc = this.pc, f = ctx.facing;
     let dir = op.side ? { x: -f.z, z: f.x } : f; if (op.side && Math.random() < 0.5) dir = { x: f.z, z: -f.x };
     const dist = op.dist, sgn = Math.sign(dist) || 1;
-    const start = { ...pc.pos };
+    const start = { ...pc.pos }; ctx.dashFrom = start;
     pc.startDash({ x: dir.x * sgn, z: dir.z * sgn }, Math.abs(dist), 14, !!op.invuln);
     if (op.hit) this.pending.push({ time: this.clock + 0.12, op: op.hit, ctx });
     if (op.path) { const p = op.path, end = { x: start.x + dir.x * dist, z: start.z + dir.z * dist }, mid = { x: (start.x + end.x) / 2, z: (start.z + end.z) / 2 };
@@ -655,7 +680,7 @@ export class SkillEngine {
   tickChannel(dt) {
     const c = this.channel, pc = this.pc, op = c.op;
     const moved = Math.hypot(pc.pos.x - c.start.x, pc.pos.z - c.start.z) > 0.25, hurt = (pc._hits || 0) > c.hits;      // dots do not interrupt
-    if (pc.dead || pc.stunned || (op.breakOnMove && moved) || (op.breakOnHit && hurt)) { this.channel = null; pc.skills.lock = 0; G.ui.toast(hurt ? '피격되어 집중이 끊겼습니다' : '이동하여 중단되었습니다'); return; }
+    if (pc.dead || pc.stunned || (op.breakOnMove && moved) || (op.breakOnHit && hurt)) { if (c.ctx.hairFx && c.ctx.hairFx.stop) c.ctx.hairFx.stop(); this.channel = null; pc.skills.lock = 0; G.ui.toast(hurt ? '피격되어 집중이 끊겼습니다' : '이동하여 중단되었습니다'); return; }
     c.t -= dt; c.tick -= dt;
     if (c.tick <= 0) { c.tick += op.tick; for (const o of op.ops) this.exec(o, c.ctx); }
     if (c.t <= 0) { this.channel = null; pc.skills.lock = 0; }
@@ -704,7 +729,7 @@ class SkillProj {
     if (op.arc) { if (this.target || ctx.tgt) this.range = m + 0.4; this.arcLen = Math.max(0.6, Math.min(m, this.range)); this.arcH = op.arc * (0.75 + 0.5 * ((idx * 0.37) % 1)) * Math.min(1, m / 4); }   // thrown in an arc (drawn only: the hit test stays on the ground line)
     // 비연참: the centre crescent of the fan IS this projectile (js/biyeonfx.js); falls back to the generic wave until loaded
     const held = op.pharmProj && ctx.heldFlask && !ctx.heldFlask.dead ? ctx.heldFlask : null; if (held) { held.dead = true; held.fx.release && held.fx.release(); }   // the flask that was in the hand flies on
-    this.fx = (held && held.fx) || (op.biyeon && FX.biyeon('proj', this.pos, this.dir, { groundY: pc.pos.y || 0 })) || (op.pharmProj && FX.pharm('proj', this.pos, { elem: op.elem })) || (op.cook && FX.cook('proj', this.pos, { kind: op.cook })) || FX.projectile(op.fx || 'capsule', { color: ctx.d.fx && ctx.d.fx.color });
+    this.fx = (held && held.fx) || (op.biyeon && FX.biyeon('proj', this.pos, this.dir, { groundY: pc.pos.y || 0 })) || (op.pharmProj && FX.pharm('proj', this.pos, { elem: op.elem })) || (op.cook && FX.cook('proj', this.pos, { kind: op.cook })) || (op.hairProj && FX.hair('proj', this.pos, {})) || FX.projectile(op.fx || 'capsule', { color: ctx.d.fx && ctx.d.fx.color });
     this.fx.set(this.pos, { x: this.dir.x, y: 0, z: this.dir.z });
   }
   update(dt) {
@@ -744,6 +769,7 @@ class SkillProj {
         if (op.tri) { const m = marks(c); m.tri.add(op.tri); m.triT = 3; }
         if (op.stackSlow) { const s = c.status.list.find(x => x.def.id === 'slow'); if (s) s.value = Math.min(0.6, s.value + 0.06); }
         if (op.biyeon) { const ip = biyeonImpact(c, this.dir); if (this.fx.hit) this.fx.hit(ip); FX.biyeon('hit', ip, this.dir); }   // only the enemy really damaged
+        else if (op.hairProj) { FX.hair('combHit', { x: c.pos.x, y: (c.pos.y || 0) + hairMid(c), z: c.pos.z }, { hit: true, dir: this.dir }); c.freezeT = Math.max(c.freezeT || 0, HAIR_STOP[0]); if (c.body && c.body.punch) c.body.punch(this.dir.x, this.dir.z, 0.14); }   // 빗 투척: 빗살 자국 + 맞은 적만 짧게 멈춤
         else FX.burst(op.burst || 'hit_pierce', c.pos, { radius: 0.6 });
         if (op.chain) this.eng.chain(c, op.chain, this.ctx);
         if (!op.pierce && op.kind !== 'boomerang') return this.done();

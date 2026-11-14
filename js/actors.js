@@ -179,7 +179,7 @@ export class SkillRunner {
     let extra = 0;
     for (const a of s.actions) {
       if (a.type === "projectile") { this.pending.push({ time: this.clock + ht + a.delay, a, s, aim, facing, origin: o }); extra += Math.hypot(aim.x - o.x, aim.z - o.z) / Math.max(1, a.speed); continue; }
-      for (let h = 0; h < Math.max(1, a.hits); h++) this.pending.push({ time: this.clock + ht + a.delay + extra + h * a.interval, a, s, aim, facing, origin: o, cm: cmb && cmb.atk, cn: cmb && cmb.combo });
+      for (let h = 0; h < Math.max(1, a.hits); h++) this.pending.push({ time: this.clock + ht + a.delay + extra + h * a.interval, a, s, aim, facing, origin: o, cm: cmb && cmb.atk, cn: cmb && cmb.combo, snip: cmb && cmb.snipFx });
     }
     pc.path = [];
     return null;
@@ -213,9 +213,13 @@ export class SkillRunner {
         // 망치 기본공격(bs_combo_*, action.impact 'hammer'): 실제 망치 머리에서 작은 섬광·고리·먼지·조각 (js/hammerfx.js) + 짧은
         // 히트스톱(freezeT)은 쓰지 않음 — 공격·밀림 타이밍 그대로, 대상 눌림(그림만) — 5타만 카메라 kick 한 번. 판정·피해는 그대로.
         const HA = G.hammerFx && pc.body && pc.body.sh && pc.body.sh.actions[pc.body.action], hammer = HA && HA.impact === 'hammer' && !a.atTarget ? HA : null;
+        let landed = false; const snip = !hammer && p.snip && G.skillFx && G.skillFx.hair ? p.snip : null;   // 미용사 기본공격: 두 줄이 가위처럼 오므라드는 '싹뚝' (js/hairfx.js), 맞은 적마다
         for (const t of ts) {
-          const dd = Resolver.damage(pc, t, a.coef * bmul, a.power, a.knockback); t.takeDamage(dd);
+          const dd = Resolver.damage(pc, t, a.coef * bmul, a.power, a.knockback); if (snip) dd.localStop = "quiet"; t.takeDamage(dd);
           if (hammer) hammerImpact(pc, t, p.facing, hammer.combo === 5, dd);
+          // 미용사: no freezeT on the basic combo either (same reason as the hammer: it shifts strikes 4-5) — squash + effect + kick on the 5th
+          else if (snip) { if (!dd.missed) { landed = true; G.skillFx.hair.snip({ x: t.pos.x, y: (t.pos.y || 0) + Math.min(1.2, 0.45 + (t.radius || 0.5) * 0.6), z: t.pos.z }, { size: snip.big ? 1.25 : 0.9, big: snip.big, ground: t.pos.y || 0 });
+              if (t.body && t.body.punch) t.body.punch(p.facing.x, p.facing.z, snip.big ? 0.2 : 0.12); } }
           else if (SF && !a.atTarget) { if (!dd.crit) SF.hit(t.pos, { scale: a.fx === "hit" ? 1.15 : 1 }); }
           else if (fx3) G.skillFx.burst(a.fx === "hit" ? "hit_blunt" : "hit_slash", { x: t.pos.x, y: t.pos.y, z: t.pos.z }, { radius: 0.5, grade: 1 });
           else G.fx.play(a.fx === "hit" ? "hit" : (["paint_burst", "potion_splash"].includes(a.fx) ? a.fx : "hit"), { x: t.pos.x, y: t.pos.y + 0.6, z: t.pos.z }, a.fx === "hit" ? 1.2 : 1);
@@ -224,12 +228,15 @@ export class SkillRunner {
         const fp = a.atTarget ? { x: p.aim.x, y: p.aim.y + 0.3, z: p.aim.z } : { x: pc.pos.x + p.facing.x * reach, y: pc.pos.y + 0.7, z: pc.pos.z + p.facing.z * reach };
         const trail = pc.body && pc.body.md && pc.body.sh.actions[pc.body.action] && pc.body.sh.actions[pc.body.action].trail;
         // melee swing: Tripo crescent sweeping the same way as the swing (forehand / backhand)
+        if (snip && !ts.length) G.skillFx.hair.snip({ x: pc.pos.x + p.facing.x * 1.25, y: (pc.pos.y || 0) + 0.9, z: pc.pos.z + p.facing.z * 1.25 }, { size: 0.8, hit: false });   // 허공: 옅은 두 줄만
         if (SF && !cm && !a.atTarget && (a.shape === "cone" || a.shape === "rect")) SF.slash(pc.pos, p.facing, pc.body && pc.body.action === "attack2" ? -1 : 1, { radius: Math.max(1.0, (a.radius || a.length || 1.5) * 0.85) });
-        if (fx3 && !trail) { this.swing = ((this.swing || 0) + 1) % 3;
+        if (snip) { /* 미용사: the X snip above is the whole effect (no sword crescent) */ }
+        else if (fx3 && !trail) { this.swing = ((this.swing || 0) + 1) % 3;
           G.skillFx.slash("blade", pc.pos, p.facing, { radius: a.radius * 1.05, angle: Math.max(110, a.angle + 20), mirror: this.swing === 1, tilt: [0.18, -0.22, 0.42][this.swing], grade: 3 }); }
         // combo strikes: only the thin blade trail of the real sword (no sprite crescent / big sword wave)
         else if (!(cm && a.fx === "slash") && ["slash", "wind", "paint_burst", "potion_splash", "ring"].includes(a.fx)) G.fx.play(a.fx, fp, a.fxScale, a.fx === "ring");
-        if (ts.length) { G.audio.sfx(a.sfx || "hit"); pc.onHitLanded(a0.coef >= 1.5); }
+        if (ts.length && snip) { if (landed) G.audio.sfx("hd_snip"); if (landed && snip.big && G.render.kick && !G.reduceFlash) G.render.kick(p.facing.x, p.facing.z, 0.08, 0.1); }
+        else if (ts.length) { G.audio.sfx(a.sfx || "hit"); pc.onHitLanded(a0.coef >= 1.5); }
         else if (a.atTarget && a.sfx) G.audio.sfx(a.sfx);
         if (smith) smith.basicLanded(ts, sh, p.facing, emp);   // 낙인 타수 · 모루 충격파 · (강화 타격) 리벳 발사 / 충격 방출
         break;

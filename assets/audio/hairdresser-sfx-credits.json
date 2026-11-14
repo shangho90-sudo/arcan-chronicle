@@ -1,0 +1,10 @@
+{
+  "provider": "synthesized (tools/audio/hair_sfx.py, numpy + scipy, fixed seed)",
+  "generatedOn": "2026-11-13",
+  "note": "Runway credits were 0, so these were synthesized in the repository. Replace the files under the same names if generated versions are made later.",
+  "assets": [
+    { "file": "sfx_hd_snip.mp3", "use": "미용사 큰 가위 '싹뚝' — 기본공격과 가위 스킬의 실제 명중 순간", "duration": 0.26 },
+    { "file": "sfx_hd_dryer.mp3", "use": "드라이 돌풍·온풍 드라이·냉풍 드라이 시전(드라이어 바람)", "duration": 0.7 },
+    { "file": "sfx_hd_style.mp3", "use": "산뜻한 스타일링·헤어 코팅·기분 전환 시전(반짝이)", "duration": 0.6 }
+  ]
+}

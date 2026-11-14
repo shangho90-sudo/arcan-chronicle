@@ -170,7 +170,7 @@ function npcIdle(t, look) {
     Head: mul(ry(Math.max(-35, Math.min(35, look)) + sw * 3), rx(Math.sin(t * 0.9) * 2)),
   };
 }
-const NUM = ['bob', 'lean', 'twist', 'legL', 'legR', 'wOff', 'offOff', 'fall', 'sink', 'tuck', 'adv', 'toBack'];   // toBack = 0..1 the sword hand goes to the grip on the back (draw / sheathe)
+const NUM = ['bob', 'lean', 'twist', 'legL', 'legR', 'wOff', 'offOff', 'fall', 'sink', 'tuck', 'adv', 'toBack', 'grip2', 'snip'];   // grip2 = 0..1 the LEFT hand also holds the weapon (미용사 큰 가위), snip = 0..1 how far the shears are open   // toBack = 0..1 the sword hand goes to the grip on the back (draw / sheathe)
 // weapon-swing keys (see SWING below): hand = [azimuth, elevation, reach] of the sword hand around the right shoulder,
 // blade = [azimuth, elevation] of the blade, elbow = pole the elbow points at, step = [left, right] foot offsets (m)
 const VEC = ['hand', 'blade', 'elbow', 'step', 'lift'];   // lift = [left, right] ankle lift (m), adv = root travel (m) of a combo strike
@@ -214,6 +214,44 @@ function makeProp(kind) {
   }
   g.traverse(o => { if (o.isMesh) o.castShadow = true; });
   return g;
+}
+
+// ---------------------------------------------------------------- 미용사 큰 가위 (2026-11-13): 예전 가위의 3배, 두 손으로 잡음
+// Two halves on one pivot (blade forward +z, ring handle behind); the right hand holds the ring of half +1, the left hand
+// (pose.grip2, left-arm IK in apply) the ring of half -1; pose.snip opens them (SHEARS.open rad each). Lengths in prop
+// metres (the hand holder scales by 1.3): pivot -> tip 0.50, pivot -> ring 0.22, about 3x the old 0.27 m scissors.
+export const SHEARS = { blade: 0.50, pivot: 0.22, ringX: 0.062, ringR: 0.062, open: 0.5, rest: 0.035 };
+const SHEAR_TIER = [null, { ring: 0xe65a8c, blade: 0xe4eaf4, pin: 0xf4c860 }, { ring: 0xf0b848, blade: 0xeef2fa, pin: 0xfff0b0 }, { ring: 0x9a6cf0, blade: 0xf2f0ff, pin: 0x7ad8ff }];
+/** ring centre of half s (+1 right hand / -1 left hand) relative to the pivot, at open amount k (0..1) */
+function shearRing(s, k) { const S = SHEARS, a = s * (S.rest + S.open * k), x = s * S.ringX, z = -S.pivot; return _v(x * Math.cos(a) + z * Math.sin(a), 0, -x * Math.sin(a) + z * Math.cos(a)); }
+function makeShears(tier) {
+  const S = SHEARS, T = SHEAR_TIER[tier] || SHEAR_TIER[1], g = new THREE.Group(), inner = new THREE.Group(); g.add(inner);
+  const M = (c, o = {}) => new THREE.MeshLambertMaterial({ color: c, emissive: c, emissiveIntensity: o.e ?? 0.18 });   // no env map in this renderer: lit silver, a little self-light so the blades never go black
+  const halves = [];
+  for (const s of [1, -1]) {
+    const h = new THREE.Group();
+    // blade: flat tapered plate, cutting edge towards the other half, a thin bright bevel on the edge
+    const sh = new THREE.Shape(); sh.moveTo(-0.006, -0.03); sh.lineTo(0.058, 0.0); sh.lineTo(0.050, S.blade * 0.62); sh.lineTo(0.004, S.blade); sh.lineTo(-0.010, S.blade * 0.86); sh.lineTo(-0.012, 0.02); sh.closePath();
+    const bg = new THREE.ExtrudeGeometry(sh, { depth: 0.012, bevelEnabled: true, bevelThickness: 0.002, bevelSize: 0.002, bevelSegments: 1 });
+    bg.rotateX(Math.PI / 2); bg.scale(-s, 1, 1);
+    const bm = M(T.blade, { r: 0.22, m: 0.85 }); bm.side = THREE.DoubleSide; const blade = new THREE.Mesh(bg, bm); blade.position.set(s * 0.004, s * 0.006, 0); h.add(blade);
+    // shank from the pivot out to the ring + the ring handle (flat torus)
+    const shank = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.016, S.pivot - S.ringR * 0.7), M(T.blade, { r: 0.3, m: 0.8 }));
+    const ang = Math.atan2(s * S.ringX, -(S.pivot - S.ringR * 0.7)); shank.position.set(s * S.ringX * 0.5, s * 0.006, -(S.pivot - S.ringR * 0.7) * 0.5); shank.rotation.y = Math.atan2(s * S.ringX, (S.pivot - S.ringR * 0.7)) * -1; h.add(shank); void ang;
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(S.ringR, 0.02, 8, 20), M(T.ring, { e: 0.25 })); ring.rotation.x = Math.PI / 2; ring.position.set(s * S.ringX, s * 0.006, -S.pivot); h.add(ring);
+    inner.add(h); halves.push(h);
+  }
+  const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.036, 10), M(T.pin, { r: 0.3, m: 0.9 })); inner.add(pin);
+  g.traverse(o => { if (o.isMesh) o.castShadow = true; });
+  g.userData.shears = { inner, halves, k: -1 };
+  setShears(g, 0);
+  return g;
+}
+/** open amount k: halves turn about the pivot, and the whole thing shifts so the right-hand ring stays at the grip origin */
+function setShears(g, k) {
+  const d = g.userData.shears; if (!d || Math.abs(d.k - k) < 1e-4) return; d.k = k;
+  const S = SHEARS; d.halves[0].rotation.y = S.rest + S.open * k; d.halves[1].rotation.y = -(S.rest + S.open * k);
+  d.inner.position.copy(shearRing(1, k)).multiplyScalar(-1);
 }
 
 // ---------------------------------------------------------------- procedural locomotion (feet planted, real knee / ankle motion)
@@ -332,6 +370,13 @@ const rotOnly = m => _m().extractRotation(m);
 
 // ---- sword arm: two-bone IK so the weapon hand follows a designed arc and the blade stays fixed in the grip
 /** bind-pose arm chain in model units (mesh-local: x = model left, y up, z forward) */
+/** left arm (two-hand grip): same shape as armChain, cached separately */
+function armChainL(md) {
+  if (md._armL) return md._armL;
+  const P = n => md.bones[md.byName[n]].t.clone();
+  const S = P('Left_UpperArm'), E = P('Left_LowerArm'), W = P('Left_Hand');
+  return (md._armL = { S, E, W, L1: S.distanceTo(E), L2: E.distanceTo(W), hand: _v().subVectors(P('Left_MiddleProximal'), W).normalize() });
+}
 function armChain(md) {
   if (md._arm) return md._arm;
   const P = n => md.bones[md.byName[n]].t.clone();
@@ -791,6 +836,20 @@ export class ModelBody {
       const Rpi = Rp.clone().invert(), ik = { Right_UpperArm: mul(Rpi, r.Rua), Right_LowerArm: mul(r.Rua.clone().invert(), r.Rla), Right_Hand: mul(r.Rla.clone().invert(), r.Rh) };
       Q = blendBones(Q, ik, this.swingW); W = this.worldOf(Q);
     }
+    // 미용사 큰 가위: the left hand takes the other ring (pose.grip2) — left arm IK to the ring's place on the weapon the
+    // right hand already carries; pose.snip opens the shears (both rings move apart, so both hands open and shut them)
+    const shearsOn = !md.cfg.npc && this.job === 'hairdresser' && !p.held;
+    this.snipK = shearsOn ? Math.max(0, Math.min(1, p.snip || 0)) * this.armW : 0;
+    this.gripW = shearsOn && this.swingW > 0.01 && (p.grip2 || 0) > 0.01 && this.armW > 0.5 && md.byName.Left_UpperArm !== undefined ? Math.min(1, p.grip2) * this.swingW : 0;
+    if (this.gripW > 0.01) {
+      const hiR = md.byName.Right_Hand, gm = this.gripM('R', W, 0), k = this.snipK;
+      const T = shearRing(-1, k).sub(shearRing(1, k)).applyMatrix4(gm), ax = _v(0, 0, 1).transformDirection(gm);
+      const c = armChainL(md), sh = md.byName.Left_Shoulder, dSh = mul(_m().copy(W[sh]), md.bones[sh].inv);
+      const Rp = rotOnly(dSh), Sn = c.S.clone().applyMatrix4(dSh), r = solveArm(c, Sn, T, _v(0.7, -1, -0.3).normalize(), ax);
+      const Rpi = Rp.clone().invert(), ik = { Left_UpperArm: mul(Rpi, r.Rua), Left_LowerArm: mul(r.Rua.clone().invert(), r.Rla), Left_Hand: mul(r.Rla.clone().invert(), r.Rh) };
+      for (const fg of ['Index', 'Middle', 'Ring', 'Pinky']) { ik['Left_' + fg + 'Proximal'] = rz(-60); ik['Left_' + fg + 'Intermediate'] = rz(-70); }
+      Q = blendBones(Q, ik, this.gripW); W = this.worldOf(Q); void hiR;
+    }
     for (let i = 0; i < md.bones.length; i++) {
       const b = md.bones[i], bone = this.bones[i];
       bone.matrix.copy(b.parent < 0 ? W[i] : mul(_m().copy(W[b.parent]).invert(), W[i]));
@@ -814,10 +873,12 @@ export class ModelBody {
     this.W = W;
     // stow actions (약사 약병 투구 ph_pitch): the weapon stays on the back for the whole motion and the thrown item sits in the
     // empty right hand (prop slot H) until the release key; other actions with `held` swap the weapon for the item as before
-    const stow = !!(ca && ca.stow) && !md.cfg.npc, wkind = wid && isWeaponModel(wid) ? 'item:' + wid : this.weapon;
+    // 미용사는 언제나 큰 가위를 듦(가위를 안 찼으면 1단계 모양)
+    const sw = shearsOn ? /^w_scissors_(\d)/.exec(wid || '') : null;
+    const stow = !!(ca && ca.stow) && !md.cfg.npc, wkind = shearsOn ? 'shears:' + (sw ? sw[1] : 1) : wid && isWeaponModel(wid) ? 'item:' + wid : this.weapon;
     if (stow) { const w0 = this.weaponId ? this.weaponId() : null; this.updateProp('R', w0 && isWeaponModel(w0) ? 'item:' + w0 : this.weapon, 0); this.updateProp('H', p.held || null, (p.wOff - 90) * (1 - (this.swingW || 0))); }
     else { this.updateProp('R', p.held || wkind, (p.wOff - 90) * (1 - (this.swingW || 0))); if (this.props.H) this.updateProp('H', null, 0); }
-    this.updateProp('L', p.held && !stow ? null : this.armW > 0.5 ? this.off : null, p.offOff - 90);
+    this.updateProp('L', p.held && !stow ? null : this.armW > 0.5 && !(this.gripW > 0.4) ? this.off : null, p.offOff - 90);
   }
   worldOf(Q) {
     const md = this.md, W = new Array(md.bones.length), S = this.bscale || (this.bscale = boneScales(md));
@@ -869,6 +930,12 @@ export class ModelBody {
     const M = _m().makeBasis(X, Y, dir).setPosition(grip).multiply(_m().makeScale(1.3 / s, 1.3 / s, 1.3 / s));
     return (md._back = { bone: uc, grip, dir, M });
   }
+  /** hand grip matrix (mesh space) of a held item: at the palm in bind space, item axis forward (+z) tilted by the pose, authored in metres */
+  gripM(side, W, tilt) {
+    const md = this.md, hi = md.byName[(side === 'L' ? 'Left' : 'Right') + '_Hand'], b = md.bones[hi], along = side === 'L' ? 1 : -1, s = md.scale;   // R and H (held item while the weapon is stowed) = right hand
+    const bindM = mul(_m().makeTranslation(b.t.x + along * 0.027 / s, b.t.y - 0.01, b.t.z + 0.01), rx(-(tilt || 0)), _m().makeScale(1.3 / s, 1.3 / s, 1.3 / s));
+    return mul(_m().copy(W[hi]), b.inv, bindM);
+  }
   updateProp(side, kind, tilt) {
     if (this.propKind[side] !== kind) {
       if (this.props[side]) { this.props[side].parent.remove(this.props[side]); this.props[side] = null; }
@@ -876,17 +943,16 @@ export class ModelBody {
       if (kind) {
         const hi = this.md.byName[(side === 'L' ? 'Left' : 'Right') + '_Hand'];
         // held in mesh space: the matrix is the hand grip (or, for the right weapon, the back holder / a glide between them)
-        const holder = new THREE.Group(); holder.matrixAutoUpdate = false; holder.add(kind.startsWith('item:') ? itemModel(kind.slice(5)) : makeProp(kind));
+        const holder = new THREE.Group(); holder.matrixAutoUpdate = false; holder.add(kind.startsWith('item:') ? itemModel(kind.slice(5)) : kind.startsWith('shears:') ? makeShears(+kind.slice(7)) : makeProp(kind));
         // the player's weapon gets the same thin outline as the body (only its big parts: handle, head - small trims / gems skip it)
         if (side === 'R' && !this.md.cfg.npc) { const ms = []; holder.traverse(o => { if (o.isMesh && o.geometry) { o.geometry.computeBoundingSphere(); if (o.geometry.boundingSphere.radius > 0.06) ms.push(o); } }); for (const o of ms) addOutline(o); }
         this.mesh.add(holder); this.props[side] = holder; holder.userData.hi = hi;
       }
     }
     const h = this.props[side]; if (!h) return;
-    const md = this.md, hi = h.userData.hi, b = md.bones[hi], along = side === 'L' ? 1 : -1, s = md.scale, W = this.W;
-    // grip at the palm in bind space, item axis forward (+z) tilted by the pose, authored in metres
-    const bindM = mul(_m().makeTranslation(b.t.x + along * 0.027 / s, b.t.y - 0.01, b.t.z + 0.01), rx(-(tilt || 0)), _m().makeScale(1.3 / s, 1.3 / s, 1.3 / s));
-    const inHand = mul(_m().copy(W[hi]), b.inv, bindM);
+    const md = this.md, W = this.W;
+    if (h.children[0] && h.children[0].userData.shears) setShears(h.children[0], this.snipK || 0);
+    const inHand = this.gripM(side, W, tilt);
     const a = side === 'R' && !md.cfg.npc ? this.armW : 1;
     if (a >= 0.999) h.matrix.copy(inHand);
     else {

@@ -5967,7 +5967,7 @@
 "idx": 1,
 "name": "가위 연격",
 "type": "attack",
-"desc": "빠르게 세 번 자른다.",
+"desc": "허공에 나타난 큰 가위가 적 하나를 빠르게 세 번 싹뚝 자른다.",
 "maxLv": 5,
 "unlock": 10,
 "prereq": [],
@@ -5978,17 +5978,23 @@
 "cd": 4,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "attack",
+"anim": "hd_snip",
 "ops": [
+{
+"op": "fx",
+"hair": "shears",
+"at": -0.25,
+"gap": 0.1
+},
 {
 "op": "hit",
 "shape": "single",
 "coef": 0.75,
 "hits": 3,
 "gap": 0.1,
+"sfx": "hd_snip",
 "fx": {
-"slash": "scissor_snip",
-"burst": "hit_slash"
+"hair": "snip"
 }
 }
 ],
@@ -6013,7 +6019,7 @@
 "idx": 2,
 "name": "앞머리 정리",
 "type": "attack",
-"desc": "짧고 빠른 전방 범위 공격.",
+"desc": "큰 가위를 가로로 쓸어 앞머리를 다듬듯 전방을 한 줄로 자른다. 짧고 빠른 전방 범위 공격.",
 "maxLv": 5,
 "unlock": 12,
 "prereq": [],
@@ -6024,7 +6030,7 @@
 "cd": 4,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "attack",
+"anim": "hd_trim",
 "ops": [
 {
 "op": "hit",
@@ -6032,8 +6038,9 @@
 "coef": 1.4,
 "r": 2.2,
 "ang": 90,
+"sfx": "hd_snip",
 "fx": {
-"slash": "arc"
+"hair": "trim"
 }
 }
 ],
@@ -6058,7 +6065,7 @@
 "idx": 3,
 "name": "끝단 자르기",
 "type": "attack",
-"desc": "체력이 낮은 적에게 추가 피해.",
+"desc": "황금빛 큰 가위로 끝단을 잘라 낸다. 체력이 낮은 적에게 추가 피해.",
 "maxLv": 5,
 "unlock": 15,
 "prereq": [],
@@ -6069,8 +6076,15 @@
 "cd": 6,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "attack",
+"anim": "hd_snip",
 "ops": [
+{
+"op": "fx",
+"hair": "shears",
+"gold": true,
+"at": -0.25,
+"gap": 0.12
+},
 {
 "op": "hit",
 "shape": "single",
@@ -6079,9 +6093,10 @@
 "pct": 0.35,
 "mul": 1.8
 },
+"sfx": "hd_snip",
 "fx": {
-"slash": "scissor_snip",
-"burst": "hit_slash"
+"hair": "snip",
+"heavy": true
 }
 }
 ],
@@ -6106,7 +6121,7 @@
 "idx": 4,
 "name": "스텝 커트",
 "type": "attack",
-"desc": "옆으로 짧게 이동하며 벤다. 무적 시간 없음.",
+"desc": "옆으로 짧게 이동하며 층층이 벤다. 무적 시간 없음.",
 "maxLv": 5,
 "unlock": 18,
 "prereq": [],
@@ -6130,8 +6145,9 @@
 "coef": 1.3,
 "r": 2.8,
 "ang": 150,
+"sfx": "hd_snip",
 "fx": {
-"slash": "arc"
+"hair": "step"
 }
 }
 }
@@ -6202,7 +6218,7 @@
 "idx": 1,
 "name": "빗 투척",
 "type": "attack",
-"desc": "빗을 직선으로 던진다.",
+"desc": "빙글빙글 도는 빗을 직선으로 던진다.",
 "maxLv": 5,
 "unlock": 10,
 "prereq": [],
@@ -6221,7 +6237,8 @@
 "coef": 1.6,
 "speed": 16,
 "fx": "comb",
-"burst": "hit_pierce"
+"burst": "hit_pierce",
+"hairProj": true
 }
 ],
 "mods": [],
@@ -6245,7 +6262,7 @@
 "idx": 2,
 "name": "드라이 돌풍",
 "type": "attack",
-"desc": "전방에 바람 피해와 밀치기.",
+"desc": "큰 드라이어의 센 바람으로 전방에 피해를 주고 밀쳐 낸다.",
 "maxLv": 5,
 "unlock": 12,
 "prereq": [],
@@ -6259,6 +6276,14 @@
 "anim": "cast",
 "ops": [
 {
+"op": "fx",
+"hair": "dryer",
+"mode": "gust",
+"r": 3.6,
+"ang": 60,
+"at": -1
+},
+{
 "op": "hit",
 "shape": "cone",
 "coef": 1.3,
@@ -6266,13 +6291,14 @@
 "ang": 60,
 "knock": 2.5,
 "fx": {
-"slash": "wind_cone"
+"hair": "dry"
 }
 }
 ],
 "mods": [],
 "flags": {},
 "fx": {},
+"sfx": "hd_dryer",
 "status": {
 "data": true,
 "impl": true,
@@ -6291,7 +6317,7 @@
 "idx": 3,
 "name": "온풍 드라이",
 "type": "attack",
-"desc": "근거리에 지속 공격. 이동하면 중단된다.",
+"desc": "뜨거운 드라이어 바람으로 근거리에 지속 공격. 이동하면 중단된다.",
 "maxLv": 5,
 "unlock": 15,
 "prereq": [],
@@ -6305,6 +6331,15 @@
 "anim": "cast",
 "ops": [
 {
+"op": "fx",
+"hair": "dryer",
+"mode": "hot",
+"r": 3.0,
+"ang": 50,
+"dur": 2.0,
+"at": -1
+},
+{
 "op": "channel",
 "dur": 2.0,
 "tick": 0.25,
@@ -6317,7 +6352,7 @@
 "ang": 50,
 "elem": "fire",
 "fx": {
-"slash": "wind_cone"
+"hair": "dry"
 }
 }
 ],
@@ -6327,6 +6362,7 @@
 "mods": [],
 "flags": {},
 "fx": {},
+"sfx": "hd_dryer",
 "status": {
 "data": true,
 "impl": true,
@@ -6345,7 +6381,7 @@
 "idx": 4,
 "name": "냉풍 드라이",
 "type": "attack",
-"desc": "냉기 피해와 둔화.",
+"desc": "차가운 드라이어 바람으로 냉기 피해와 둔화.",
 "maxLv": 5,
 "unlock": 18,
 "prereq": [],
@@ -6358,6 +6394,14 @@
 "recover": 0.35,
 "anim": "cast",
 "ops": [
+{
+"op": "fx",
+"hair": "dryer",
+"mode": "cold",
+"r": 3.4,
+"ang": 60,
+"at": -1
+},
 {
 "op": "hit",
 "shape": "cone",
@@ -6374,13 +6418,14 @@
 }
 ],
 "fx": {
-"slash": "wind_cone"
+"hair": "dry"
 }
 }
 ],
 "mods": [],
 "flags": {},
 "fx": {},
+"sfx": "hd_dryer",
 "status": {
 "data": true,
 "impl": true,
@@ -6399,7 +6444,7 @@
 "idx": 5,
 "name": "헤어롤 덫",
 "type": "summon",
-"desc": "밟은 적을 잠시 속박하는 헤어롤 덫.",
+"desc": "밟은 적을 머리카락으로 감아 잠시 속박하는 헤어롤 덫.",
 "maxLv": 5,
 "unlock": 20,
 "prereq": [],
@@ -6430,7 +6475,8 @@
 "ch": 1.0
 }
 ],
-"burst": "dust"
+"burst": "dust",
+"hair": "trap"
 },
 "limit": 3,
 "machine": true
@@ -6471,6 +6517,11 @@
 "anim": "cast",
 "ops": [
 {
+"op": "fx",
+"hair": "style",
+"kind": "haste"
+},
+{
 "op": "buff",
 "id": "haste",
 "dur": 8,
@@ -6481,6 +6532,7 @@
 "mods": [],
 "flags": {},
 "fx": {},
+"sfx": "hd_style",
 "status": {
 "data": true,
 "impl": true,
@@ -6499,7 +6551,7 @@
 "idx": 2,
 "name": "헤어 코팅",
 "type": "support",
-"desc": "작은 보호막을 두른다.",
+"desc": "윤기 나는 코팅으로 작은 보호막을 두른다.",
 "maxLv": 5,
 "unlock": 12,
 "prereq": [],
@@ -6513,6 +6565,11 @@
 "anim": "cast",
 "ops": [
 {
+"op": "fx",
+"hair": "style",
+"kind": "coat"
+},
+{
 "op": "shield",
 "base": 30,
 "coef": 0.9,
@@ -6522,6 +6579,7 @@
 "mods": [],
 "flags": {},
 "fx": {},
+"sfx": "hd_style",
 "status": {
 "data": true,
 "impl": true,
@@ -6554,6 +6612,11 @@
 "anim": "cast",
 "ops": [
 {
+"op": "fx",
+"hair": "style",
+"kind": "fresh"
+},
+{
 "op": "cleanse",
 "n": 9,
 "ids": [
@@ -6571,6 +6634,7 @@
 "mods": [],
 "flags": {},
 "fx": {},
+"sfx": "hd_style",
 "status": {
 "data": true,
 "impl": true,
