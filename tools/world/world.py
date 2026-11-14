@@ -109,7 +109,7 @@ for _t in TOWNS:
     _t['W'] = round(_t['W'] * _k); _t['D'] = round(_t['D'] * _k); _t['houses'] = round(_t['houses'] * (2.6 if _k > 2 else 2.0))
 JOB_MASTERS = ['master_pharmacist', 'master_cook', 'master_blacksmith', 'master_hairdresser', 'master_artist']   # 전직 NPC는 모두 카이리온 왕도 장인 길드 회관 앞
 ARCAN = dict(id='town', name='아르칸 마을', region='kairion', W=50, D=41, wallH=7.0, keep=(18, 12, 15), houses=14, banner='blue',
-             centre=dict(id='fountain', file='town_arcan_fountain', pos=[0.0, 0.0], h=180, scale=11.12, size=[11.12, 11.12, 6.41], name='여신의 분수'),   # 2026-11-14 Blender 절차 모델(tools/blender/town_fountain.py), 예전 Tripo angel_fountain과 같은 지름·충돌 원
+             centre=dict(id='fountain', file='town_arcan_fountain', pos=[0.0, 0.0], h=180, scale=11.12, size=[11.12, 11.12, 6.48], name='여신의 분수'),   # 2026-11-14 Blender 절차 모델(tools/blender/town_fountain.py), 예전 Tripo angel_fountain과 같은 지름·충돌 원
              fixed_models=[dict(id='smithy', file='medieval_blacksmith_shop', scale=10.5, size=[10.3047, 7.0098, 6.15195], name='마을 대장간'),
                            dict(id='pharmacy', file='fantasy_cottage', scale=11.5, size=[11.27575, 9.3449, 10.2074], name='약초 약국')],
              named_houses=[('general', 'general', '모아의 잡화·물약점'), ('arms', 'arms', '단오의 무기 상점'), ('bakery', 'bakery', '화덕 빵집'), ('dress', 'dress', '라벤더 의상실')],

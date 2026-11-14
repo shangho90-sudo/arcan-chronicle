@@ -559,7 +559,7 @@ function loadGLB(file) {
       for (const t of [m.map, m.normalMap, m.roughnessMap, m.metalnessMap]) if (t) { t.anisotropy = ANISO; t.needsUpdate = true; }
       m.envMapIntensity = 0;
       // 랜드마크(town_*)는 앞면이 남쪽(카메라 쪽)이라 해를 등져 늘 그늘 — 기본색을 조금 스스로 밝혀 그늘에서도 색이 읽히게 (전역 블룸·노출은 그대로)
-      if (file.startsWith('town_') && m.map && !m.emissiveMap) { m.emissive = new THREE.Color(0xffffff); m.emissiveMap = m.map; m.emissiveIntensity = 0.2; }
+      if (file.startsWith('town_') && m.map && !m.emissiveMap) { m.emissive = new THREE.Color(0xffffff); m.emissiveMap = m.map; m.emissiveIntensity = file === 'town_arcan_fountain' ? 0.06 : 0.2; }   // the fountain sits in the open sun: pale stone + 0.2 washed out
     });
     return gltf.scene;
   })();
@@ -650,8 +650,9 @@ void main(){
   float rip = 0.0;
   if (land > 0.0) { for (int i = 0; i < 3; i++) { float ph = fract(uT * 0.45 + float(i) / 3.0); rip += smoothstep(0.05, 0.0, abs(R - land - ph * 0.8)) * (1.0 - ph) * 0.45; }
     rip += smoothstep(0.22, 0.0, abs(R - land)) * 0.18; }               // soft foam band where the curtain lands
-  else { vec2 q = P - vec2(0.62, 0.32); float d = length(q); for (int i = 0; i < 2; i++) { float ph = fract(uT * 0.6 + float(i) * 0.5); rip += smoothstep(0.04, 0.0, abs(d - ph * 0.5)) * (1.0 - ph) * 0.6; } }
-  vec2 g = floor(vec2(a * 18.0, R * 3.0)); float sp = step(0.988, h(g + floor(uT * 1.5))) * 0.35;
+  else { for (int i = 0; i < 2; i++) { float ph = fract(uT * 0.5 + float(i) * 0.5); rip += smoothstep(0.04, 0.0, abs(R - 0.38 - ph * 0.4)) * (1.0 - ph) * 0.45; } }   // top bowl: soft rings off the statue base
+  vec2 gp = P * 2.2, gi = floor(gp); float tw = floor(uT * 1.5);                 // a few tiny round glints (not cells)
+  float sp = step(0.93, h(gi + tw)) * smoothstep(0.12, 0.0, length(fract(gp) - 0.5 - (vec2(h(gi + 3.1), h(gi + 7.7)) - 0.5) * 0.6)) * 0.5;
   c += vec3(0.75, 0.88, 0.95) * (streak + rip + sp);
   gl_FragColor = vec4(pow(c, vec3(2.2)), 0.9 + 0.08 * smoothstep(0.6, 1.0, r));
 }` });

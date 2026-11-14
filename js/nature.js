@@ -586,12 +586,12 @@ export async function buildNature(zone, renderer) {
   // clumps, not confetti. Kept off the dirt (every blossom re-checked), away from monster camps (combat space), water and
   // platforms. Decoration only - no collision, same merged plant meshes as the grass.
   {
-    const fr = mulberry((def.nature && def.nature.seed || 1) * 7 + 11), PAL = [[4, 5], [5, 6], [4, 10], [6, 10], [7, 4]];
+    const fr = mulberry((def.nature && def.nature.seed || 1) * 7 + 11), PAL = [[5, 6], [10, 6], [5, 10], [6, 10, 4], [10, 5]];   // yellow / mixed / pink first - white alone read as litter
     const lf = (x, z) => 0.5 + 0.25 * Math.sin(x * 0.21 + Math.sin(z * 0.13) * 2.0) + 0.25 * Math.sin(z * 0.17 - x * 0.07);
-    for (let k = 0; k < area * 0.16 * (NV.grass ?? 1); k++) {
+    for (let k = 0; k < area * 0.3 * (NV.grass ?? 1); k++) {
       const x = x0 + fr() * (x1 - x0), z = z0 + fr() * (z1 - z0), r = maskAt(x, z)[0];
-      if (r < 0.1 || r > 0.36 || lf(x, z) < 0.58 || fr() > 0.55) continue;
-      if (onPlat(x, z) || inWater(x, z, 0.6) || camps.some(c => Math.hypot(x - c[0], z - c[1]) < c[2] * 0.6 + 2)) continue;
+      if (r < 0.1 || r > 0.36 || lf(x, z) < 0.5 || fr() > 0.6) continue;
+      if (onPlat(x, z) || inWater(x, z, 0.6) || camps.some(c => Math.hypot(x - c[0], z - c[1]) < c[2] * 0.3 + 1.5)) continue;
       const pal = PAL[Math.floor(fr() * PAL.length)], n = 3 + Math.floor(fr() * 4);
       for (let j = 0; j < n; j++) {
         const a = fr() * 6.283, d = 0.12 + fr() * 0.42, fx = x + Math.cos(a) * d, fz = z + Math.sin(a) * d;

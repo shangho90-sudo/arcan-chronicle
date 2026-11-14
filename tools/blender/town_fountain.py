@@ -37,14 +37,41 @@ def gold(S=256):
     return noise(im.filter(ImageFilter.GaussianBlur(1.5)), 0.05, seed=9)
 def water(S=128):
     im = Image.new('RGB', (S, S), (96, 178, 214)); return im
-TEXS = {'marble': (blocks((222, 210, 190), (178, 166, 150), 3, 3, 1), 1.6),         # 수반 벽·접시
-        'step': (blocks((206, 196, 182), (164, 154, 142), 2, 2, 2), 1.8),            # 계단
+TEXS = {'marble': (blocks((222, 202, 178), (162, 140, 118), 3, 3, 1), 1.6),         # 수반 벽·접시
+        'step': (blocks((214, 192, 168), (150, 128, 108), 2, 2, 2), 1.8),            # 계단
         'trim': (plain((140, 166, 190), 3, 0.04), 1.0),                               # 푸른 회색 판(장식)
-        'statue': (plain((232, 224, 210), 4, 0.025), 1.0),                            # 여신상
+        'statue': (plain((236, 224, 206), 4, 0.025), 1.0),                            # 여신상
         'floor': (plain((92, 150, 170), 5, 0.05), 2.0),                               # 수반 바닥(물 아래)
         'gold': (gold(), 1.2), 'water': (water(), 1.0), 'fall': (water(), 1.0),
-        'leaf': (plain((96, 160, 84), 6, 0.08), 0.6), 'bloom': (plain((246, 150, 190), 7, 0.04), 0.6), 'bloom2': (plain((255, 236, 150), 8, 0.04), 0.6)}
+        'leaf': (plain((92, 158, 80), 6, 0.14), 0.35), 'bloom': (plain((246, 150, 190), 7, 0.04), 0.6), 'bloom2': (plain((255, 236, 150), 8, 0.04), 0.6), 'bloom3': (plain((250, 250, 244), 9, 0.03), 0.6)}
 STATUE = 1.45
+# 2026-11-14: 가까이서 보니 절차 여신상(구·원뿔)은 예전 Tripo 천사상(날개·옷 주름·지팡이)보다 훨씬 밋밋해서, 예전 모델에서 천사상만
+# 잘라(가운데 반지름 0.17·높이 0.168 위, 정규화 단위 — 예전 윗접시·각진 물막은 버림) 줄여(약 9천 삼각형) 새 접시 위 받침에 얹음. 원본이 없거나 PROC_STATUE=1이면 절차 여신상.
+ANGEL = os.path.join(OUT, 'angel_fountain.glb'); ANGEL_OK = os.path.exists(ANGEL) and not os.environ.get('PROC_STATUE')
+ANGEL_H = 2.9; ANGEL_Z0 = 3.58
+def angel_statue():
+    before = set(bpy.data.objects); bpy.ops.import_scene.gltf(filepath=ANGEL)
+    obs = [o for o in bpy.data.objects if o not in before and o.type == 'MESH']; ob = obs[0]
+    ob.data.transform(ob.matrix_world); ob.parent = None; ob.matrix_world = Matrix.Identity(4)
+    for o in [o for o in bpy.data.objects if o not in before and o is not ob]: bpy.data.objects.remove(o)
+    bm = bmesh.new(); bm.from_mesh(ob.data)
+    zs = [v.co.z for v in bm.verts]; z0, z1 = min(zs), max(zs); H = z1 - z0
+    u = H / 0.5034                                                                                       # 정규화 단위(원본 높이 0.5034)
+    keep = lambda v: v.co.z > z0 + 0.168 * u and math.hypot(v.co.x, v.co.y) < (0.05 if v.co.z < z0 + 0.235 * u else 0.17) * u   # 아래쪽은 상 받침만(옛 윗접시 테·물막 제외)
+    bmesh.ops.delete(bm, geom=[f for f in bm.faces if not all(keep(v) for v in f.verts)], context='FACES')
+    bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context='VERTS')
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=H * 1e-4)
+    bm.to_mesh(ob.data); bm.free()
+    zs = [v.co.z for v in ob.data.vertices]; zb, zt = min(zs), max(zs); k = ANGEL_H / (zt - zb)
+    ob.data.transform(Matrix.Translation((0, 0, ANGEL_Z0)) @ Matrix.Scale(k, 4) @ Matrix.Translation((0, 0, -zb)))
+    bpy.context.view_layer.objects.active = ob; m = ob.modifiers.new('dec', 'DECIMATE'); m.ratio = min(1.0, 9000 / max(1, len(ob.data.polygons)))
+    bpy.ops.object.modifier_apply(modifier='dec')
+    ca = ob.data.color_attributes.new('Col', 'FLOAT_COLOR', 'CORNER') if 'Col' not in ob.data.color_attributes else ob.data.color_attributes['Col']
+    for d in ca.data: d.color = (1, 1, 1, 1)
+    for m in ob.data.materials:                                                                           # 원본 텍스처(2048) → 1024 (잘라 낸 상만 쓰므로)
+        for n in m.node_tree.nodes:
+            if n.type == 'TEX_IMAGE' and n.image and n.image.size[0] > 1024: n.image.scale(1024, 1024)
+    return ob
 MATNAME = {'water': 'M_fnt_water', 'fall': 'M_fnt_fall'}
 MATS = {}
 def mat(key):
@@ -168,12 +195,15 @@ def build():
         a = (i + 0.5) / 8 * 2 * math.pi; x, y = 4.78 * math.cos(a), 4.78 * math.sin(a)
         lathe('marble', [(0.0, 0.34), (0.17, 0.34), (0.17, 0.41), (0.13, 0.46), (0.12, 0.84), (0.16, 0.9), (0.16, 0.96), (0.0, 0.96)], seg=12, centre=(x, y), grad=(0.34, 0.96, 0.84, 1.02))
         sphere('gold', (x, y, 1.06), (0.1, 0.1, 0.1), seg=10, rings=6); lathe('gold', [(0.0, 1.12), (0.04, 1.12), (0.0, 1.26)], seg=8, centre=(x, y))
-    for i in range(4):
-        a = i / 4 * 2 * math.pi + math.pi / 4 + math.pi / 8; x, y = 4.8 * math.cos(a), 4.8 * math.sin(a)
-        lathe('trim', [(0.0, 0.34), (0.2, 0.34), (0.26, 0.56), (0.28, 0.6), (0.0, 0.6)], seg=12, centre=(x, y))
-        sphere('leaf', (x, y, 0.64), (0.27, 0.27, 0.16), seg=10, rings=6)
-        for k in range(5):
-            b = k / 5 * 2 * math.pi + i; sphere('bloom' if k % 2 else 'bloom2', (x + 0.15 * math.cos(b), y + 0.15 * math.sin(b), 0.76), (0.07, 0.07, 0.06), seg=6, rings=4)
+    rr = random.Random(5)
+    for i in range(8):                                                                                     # 기둥 사이 꽃 덤불 8개(예전 분수의 화단 느낌)
+        a = i / 8 * 2 * math.pi; ca, sa = math.cos(a), math.sin(a); tx, ty = -sa, ca
+        for k, (t, rad) in enumerate(((-0.42, 0.26), (0.0, 0.33), (0.42, 0.26))):
+            x, y = 4.78 * ca + tx * t, 4.78 * sa + ty * t
+            sphere('leaf', (x, y, 0.42 + rad * 0.5), (rad, rad, rad * 0.78), seg=14, rings=9, grad=(0.34, 0.9, 0.66, 1.1))
+        for k in range(7):
+            t = rr.uniform(-0.6, 0.6); x, y = 4.78 * ca + tx * t + ca * rr.uniform(-0.12, 0.12), 4.78 * sa + ty * t + sa * rr.uniform(-0.12, 0.12)
+            sphere(('bloom', 'bloom2', 'bloom3')[k % 3], (x, y, 0.72 + rr.uniform(-0.06, 0.08)), (0.075, 0.075, 0.06), seg=6, rings=4)
     # 가운데 기둥 → 큰 접시(꽃잎 10장 가장자리)
     lathe('marble', [(0.0, 0.52), (1.05, 0.52), (1.05, 0.7), (0.92, 0.86), (0.62, 1.02), (0.48, 1.25), (0.42, 1.55), (0.46, 1.75), (0.58, 1.88),
                      (0.85, 1.98), (1.3, 2.08), (1.62, 2.16), (1.76, 2.24), (1.78, 2.33), (1.71, 2.38), (1.56, 2.38), (1.5, 2.31)],
@@ -185,9 +215,13 @@ def build():
                      (0.94, 3.35), (0.82, 3.35), (0.78, 3.29)], seg=48, lobes=8, amp=0.08, lobe_z=(3.1, 3.4), grad=(2.29, 3.35, 0.84, 1.02))
     lathe('gold', [(0.29, 2.7), (0.33, 2.73), (0.33, 2.8), (0.29, 2.83)], seg=28)
     disc('water', 0.8, 3.28, seg=40, lobes=8, amp=0.08)
+    # 접시에서 떨어지는 물막(가장자리 → 아래 수면)
+    lathe('fall', [(1.77, 2.35), (1.9, 2.15), (2.02, 1.75), (2.1, 1.35), (2.14, 1.09)], seg=60, lobes=10, amp=0.07, uv='fall')
+    lathe('fall', [(0.98, 3.33), (1.08, 3.15), (1.17, 2.8), (1.22, 2.32)], seg=44, lobes=8, amp=0.08, uv='fall')
     # 여신상 받침 + 여신(큰 머리, 날개, 앞머리·올림머리, 항아리를 기울여 붓는 모습) — 앞면 -Y, 받침 위에서 STATUE배
     Z0 = 3.6
-    lathe('marble', [(0.0, 3.27), (0.36, 3.27), (0.38, 3.36), (0.29, 3.42), (0.26, 3.55), (0.33, Z0 - 0.02), (0.34, Z0), (0.0, Z0)], seg=28)
+    lathe('marble', [(0.0, 3.27), (0.36, 3.27), (0.38, 3.36), (0.29, 3.42), (0.26, 3.55), (0.33, Z0 - 0.02), (0.34, Z0)] + ([(0.4, Z0 + 0.1), (0.41, Z0 + 0.16), (0.0, Z0 + 0.16)] if ANGEL_OK else [(0.0, Z0)]), seg=28)   # 천사상의 잘린 옷자락을 받침 속에 묻음
+    if ANGEL_OK: return                                                                                    # 여신상 = 예전 Tripo 천사상(main에서 잘라 붙임)
     S0 = len(PARTS); dz = Z0 - 4.08
     lathe('statue', [(0.0, 4.08), (0.4, 4.08), (0.39, 4.22), (0.33, 4.55), (0.25, 4.88), (0.2, 5.02), (0.22, 5.14), (0.25, 5.28),
                      (0.23, 5.38), (0.15, 5.45), (0.08, 5.5), (0.07, 5.56), (0.0, 5.58)], seg=28, lobes=9, amp=0.06, lobe_z=(4.08, 4.9),
@@ -220,14 +254,12 @@ def build():
         t = i / 8; p = mouth.lerp(land, t); p.z = mouth.z + (land.z - mouth.z) * t * t; p.x = mouth.x + (land.x - mouth.x) * math.sqrt(t)
         pts.append(tuple(p)); rad.append(0.045 + 0.03 * t)
     tube('fall', pts, rad, ring=8, uv='fall', smooth=True)
-    # 접시에서 떨어지는 물막(가장자리 → 아래 수면)
-    lathe('fall', [(1.77, 2.35), (1.9, 2.15), (2.02, 1.75), (2.1, 1.35), (2.14, 1.09)], seg=60, lobes=10, amp=0.07, uv='fall')
-    lathe('fall', [(0.98, 3.33), (1.08, 3.15), (1.17, 2.8), (1.22, 2.32)], seg=44, lobes=8, amp=0.08, uv='fall')
 
 if __name__ == '__main__':
     bpy.ops.wm.read_factory_settings(use_empty=True); build()
     obs = []
     for me in PARTS: o = bpy.data.objects.new(me.name, me); bpy.context.scene.collection.objects.link(o); obs.append(o)
+    if ANGEL_OK: obs.append(angel_statue())
     for o in obs: o.select_set(True)
     bpy.context.view_layer.objects.active = obs[0]; bpy.ops.object.join(); ob = bpy.context.view_layer.objects.active
     vs = [v.co for v in ob.data.vertices]; lo = Vector((min(v.x for v in vs), min(v.y for v in vs), min(v.z for v in vs))); hi = Vector((max(v.x for v in vs), max(v.y for v in vs), max(v.z for v in vs)))
