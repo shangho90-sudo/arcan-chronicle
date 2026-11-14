@@ -204,7 +204,7 @@ export class UI {
     if (o.from) { const a = G.render.toScreen({ x: pos.x, y: pos.y || 0, z: pos.z }), b = G.render.toScreen({ x: o.from.x, y: o.from.y || 0, z: o.from.z }); if (Math.abs(a.x - b.x) > 8) side = a.x > b.x ? 1 : -1; }   // away from the caster (the cook stands right next to the target)
     const n = live.filter(f => now - f.born < 0.45 && Math.hypot(f.pos.x - pos.x, f.pos.z - pos.z) < 0.8).length;
     const e = $("div", "float imp", this.floatLayer); e.textContent = text; e.style.color = o.col || "#fff"; if (o.edge) e.style.setProperty("--edge", o.edge);
-    this.floats.push({ e, imp: 1, born: now, side, n: Math.min(n, 2), pos: { x: pos.x, y: (pos.y || 0) + (o.top ?? 1.2) * 0.62, z: pos.z }, r: o.r ?? 0.5, t: 0, scale: o.size || 1, life: o.life || 0.72 });
+    this.floats.push({ e, imp: 1, born: now, side, n: Math.min(n, 2), pos: { x: pos.x, y: (pos.y || 0) + (o.top ?? 1.2) * (innerWidth < 600 ? 0.42 : 0.62), z: pos.z }, r: o.r ?? 0.5, t: 0, scale: o.size || 1, life: o.life || 0.72 });
     e.style.transformOrigin = side > 0 ? "0 50%" : "100% 50%";
   }
   /** damage numbers with impact: kind = 'hit' (player hits a monster), 'crit', 'taken' (player is hit), 'dot' */
@@ -243,7 +243,7 @@ export class UI {
         const s = G.render.toScreen(f.pos), s1 = G.render.toScreen({ x: f.pos.x + 1, y: f.pos.y, z: f.pos.z }), ppm = Math.hypot(s1.x - s.x, s1.y - s.y), ph = innerWidth < 600 ? 0.72 : 1;
         const pop = t < 0.06 ? 0.35 + t / 0.06 * 1.1 : t < 0.15 ? 1.45 - (t - 0.06) / 0.09 * 0.55 : t < 0.22 ? 0.9 + (t - 0.15) / 0.07 * 0.1 : 1;
         const sh = t < 0.24 ? Math.sin(t * 95 + f.n * 1.7) * (1 - t / 0.24) : 0;
-        const dx = f.side * (f.r * ppm + (10 + 12 * Math.min(1, t / 0.3)) * ph) + sh * 4, dy = (f.n * 31 - 4) * ph - k * 16;   // inner edge just outside the body
+        const dx = f.side * (Math.max(f.r * ppm, 26 * ph) + (10 + 12 * Math.min(1, t / 0.3)) * ph) + sh * 4, dy = (f.n * 31 - 4) * ph - k * 16;   // inner edge just outside the body
         f.e.style.transform = `translate(${s.x + dx}px,${s.y + dy}px) translate(${f.side > 0 ? 0 : -100}%,-50%) rotate(${-f.side * 8 + sh * 7}deg) scale(${f.scale * pop})`;
         f.e.style.opacity = k > 0.62 ? 1 - (k - 0.62) / 0.38 : 1;
         continue;

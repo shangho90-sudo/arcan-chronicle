@@ -716,21 +716,21 @@ export function cookImpact(G, pc, op, ctx, ts, ok, f) {
     for (const t of ok) { if (!t.dead) t.freezeT = Math.max(t.freezeT || 0, C.skewer.stop); if (t.body && t.body.punch) t.body.punch(f.x, f.z, 0.2); }
     kick(C.skewer.kick);
   } else if (kind === 'soup') {
-    ok.forEach((t, i) => { if (t.body && t.body.punch) t.body.punch(t.pos.x - pc.pos.x, t.pos.z - pc.pos.z, 0.16); if (i < SHOUT.soup.max) cookShout(G, t, 'soup', { i, from: pc.pos }); });
+    ok.forEach((t, i) => { if (t.body && t.body.punch) t.body.punch(t.pos.x - pc.pos.x, t.pos.z - pc.pos.z, 0.16); if (i < (lite() ? SHOUT.soup.maxLite : SHOUT.soup.max)) cookShout(G, t, 'soup', { i, from: pc.pos }); });
     kick(C.soup.kick);
   } else if (kind === 'pepper') {
-    ok.forEach((t, i) => { if (t.dead) return; if (t.body && t.body.punch) t.body.punch(0, 0.01, 0.3); if (i < SHOUT.pepper.max) cookShout(G, t, 'pepper', { i, from: pc.pos }); });
+    ok.forEach((t, i) => { if (t.dead) return; if (t.body && t.body.punch) t.body.punch(0, 0.01, 0.3); if (i < (lite() ? SHOUT.pepper.maxLite : SHOUT.pepper.max)) cookShout(G, t, 'pepper', { i, from: pc.pos }); });
   }
 }
 
 /** 타격감 문구(2026-11-15): 실제로 맞은 대상(MISS 아님)에만, ui.js impactText(주아체 팝·흔들림, 피해 숫자 반대쪽 옆·위, 같은 대상 0.15초에 하나, 화면에 최대 6개).
- *  식칼 썰기는 뜬 문구마다 '썰!'/'싹둑!' 번갈아(0.15초 묶음 때문에 타 번호가 아니라 그 대상에 실제로 뜬 순서) 마지막 타 '썰썰썰!'(마지막은 늘 뜸), 팬 강타 '쾅!' + 기절이 걸리면 '기절!', 뜨거운 국물 '치익!'/'앗뜨거!'(대상 2개까지), 후추 '에취!'(3개까지). */
+ *  식칼 썰기는 뜬 문구마다 '썰!'/'싹둑!' 번갈아(0.15초 묶음 때문에 타 번호가 아니라 그 대상에 실제로 뜬 순서) 마지막 타 '썰썰썰!'(마지막은 늘 뜸), 팬 강타 '쾅!' + 기절이 걸리면 '기절!', 뜨거운 국물 '치익!'/'앗뜨거!'(대상 2개까지, 휴대폰·그래픽 효과 끔 1개), 후추 '에취!'(3개까지, 같은 조건 2개). */
 export const SHOUT = {
   chop: { words: ['썰!', '싹둑!'], last: '썰썰썰!', col: '#eaf7ff', edge: '#16385a', size: 1.0, lastSize: 1.18 },
   pan: { word: '쾅!', col: '#ffd23a', edge: '#5a2200', size: 1.3 },
   stun: { word: '기절!', col: '#fff27a', edge: '#4a3600', size: 0.85 },
-  soup: { words: ['치익!', '앗뜨거!'], col: '#ff8a2e', edge: '#4a0e00', size: 1.0, max: 2 },
-  pepper: { word: '에취!', col: '#f4e2b8', edge: '#3a2614', size: 1.0, max: 3 },
+  soup: { words: ['치익!', '앗뜨거!'], col: '#ff8a2e', edge: '#4a0e00', size: 1.0, max: 2, maxLite: 1 },
+  pepper: { word: '에취!', col: '#f4e2b8', edge: '#3a2614', size: 1.0, max: 3, maxLite: 2 },
 };
 export function cookShout(G, t, kind, o = {}) {
   const S = SHOUT[kind]; if (!S || !t || !G.ui || !G.ui.impactText) return;
