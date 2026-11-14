@@ -811,7 +811,7 @@ export function outlineMat(skinned, src, px = OUTLINE.px) {
     if (l > 1e-5) gl_Position.xy += d / l * ${w} * sz * gl_Position.w;
   }`);
   };
-  m.customProgramCacheKey = () => 'outline2' + key;
+  const pk = 'outline2' + (skinned ? 's' : 'm') + px + (map ? 't' : 'c'); m.customProgramCacheKey = () => pk;   // one program per kind, not per texture
   _outlineMats.set(key, m); return m;
 }
 /** add an outline hull to a mesh (Mesh or SkinnedMesh); returns the hull (child of the mesh, identity transform) */
