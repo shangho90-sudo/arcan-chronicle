@@ -43,7 +43,8 @@ TEXS = {'marble': (blocks((222, 202, 178), (162, 140, 118), 3, 3, 1), 1.6),     
         'statue': (plain((236, 224, 206), 4, 0.025), 1.0),                            # 여신상
         'floor': (plain((92, 150, 170), 5, 0.05), 2.0),                               # 수반 바닥(물 아래)
         'gold': (gold(), 1.2), 'water': (water(), 1.0), 'fall': (water(), 1.0),
-        'leaf': (plain((92, 158, 80), 6, 0.14), 0.35), 'bloom': (plain((246, 150, 190), 7, 0.04), 0.6), 'bloom2': (plain((255, 236, 150), 8, 0.04), 0.6), 'bloom3': (plain((250, 250, 244), 9, 0.03), 0.6)}
+        'leaf': (plain((92, 158, 80), 6, 0.14), 0.35), 'bloom': (plain((246, 150, 190), 7, 0.04), 0.6), 'bloom2': (plain((255, 236, 150), 8, 0.04), 0.6), 'bloom3': (plain((250, 250, 244), 9, 0.03), 0.6),
+        'bloom4': (plain((226, 64, 88), 10, 0.04), 0.6), 'pad': (plain((84, 150, 78), 11, 0.1), 0.4)}
 STATUE = 1.45
 # 2026-11-14: 가까이서 보니 절차 여신상(구·원뿔)은 예전 Tripo 천사상(날개·옷 주름·지팡이)보다 훨씬 밋밋해서, 예전 모델에서 천사상만
 # 잘라(가운데 반지름 0.17·높이 0.168 위, 정규화 단위 — 예전 윗접시·각진 물막은 버림) 줄여(약 9천 삼각형) 새 접시 위 받침에 얹음. 원본이 없거나 PROC_STATUE=1이면 절차 여신상.
@@ -190,20 +191,59 @@ def build():
         sphere('marble', (3.53 * math.cos(a), 3.53 * math.sin(a), 1.31), (0.18, 0.18, 0.12), seg=12, rings=6, grad=(1.25, 1.45, 0.92, 1.04))
         sphere('gold', (3.53 * math.cos(a), 3.53 * math.sin(a), 1.44), (0.065, 0.065, 0.065), seg=8, rings=5)
     disc('water', 3.2, 1.08, seg=72)                                                                     # 수반 수면
-    # 둘째 계단 위 낮은 기둥 8개(금 꼭지) + 그 사이 둥근 꽃 화분 4개 — 둥근 실루엣에 리듬, 무릎 높이 이하라 가리지 않음
+    # 2026-11-15 '분수 화려하게' (사용자): 예전 분수처럼 둘째 계단에 네모 돌 받침 + 금 백합 꼭지 8개, 그 사이 돌 화단 8개(분홍·빨강·흰·노랑 꽃
+    # 가득), 수반 테에 금 구슬 줄·금 테두리·물결 무늬 돌기, 테 위 금 조개 주둥이 8개에서 안쪽으로 물줄기, 수면에 연잎·꽃잎.
+    # 모두 충돌 원(r 5.3) 안 — 걷는 길·NPC 자리는 그대로.
     for i in range(8):
-        a = (i + 0.5) / 8 * 2 * math.pi; x, y = 4.78 * math.cos(a), 4.78 * math.sin(a)
-        lathe('marble', [(0.0, 0.34), (0.17, 0.34), (0.17, 0.41), (0.13, 0.46), (0.12, 0.84), (0.16, 0.9), (0.16, 0.96), (0.0, 0.96)], seg=12, centre=(x, y), grad=(0.34, 0.96, 0.84, 1.02))
-        sphere('gold', (x, y, 1.06), (0.1, 0.1, 0.1), seg=10, rings=6); lathe('gold', [(0.0, 1.12), (0.04, 1.12), (0.0, 1.26)], seg=8, centre=(x, y))
+        a = (i + 0.5) / 8 * 2 * math.pi; x, y = 4.8 * math.cos(a), 4.8 * math.sin(a); R = Matrix.Rotation(a, 3, 'Z')
+        for (w, h, z0) in ((0.42, 0.1, 0.34), (0.34, 0.5, 0.44), (0.42, 0.08, 0.94)):                    # 받침: 아랫단·몸통·윗단
+            bm = bmesh.new(); bmesh.ops.create_cube(bm, size=1.0); bmesh.ops.scale(bm, vec=(w, w, h), verts=bm.verts)
+            bmesh.ops.rotate(bm, verts=bm.verts, cent=(0, 0, 0), matrix=R); bmesh.ops.translate(bm, vec=(x, y, z0 + h / 2), verts=bm.verts); finish(bm, 'marble', smooth=False, grad=(0.34, 1.02, 0.82, 1.02))
+        bm = bmesh.new(); bmesh.ops.create_cube(bm, size=1.0); bmesh.ops.scale(bm, vec=(0.02, 0.22, 0.3), verts=bm.verts)        # 받침 앞 푸른 판
+        bmesh.ops.translate(bm, vec=(0.175, 0, 0.69), verts=bm.verts); bmesh.ops.rotate(bm, verts=bm.verts, cent=(0, 0, 0), matrix=R); bmesh.ops.translate(bm, vec=(x, y, 0), verts=bm.verts); finish(bm, 'trim', smooth=False)
+        lathe('gold', [(0.0, 1.02), (0.09, 1.02), (0.06, 1.08), (0.1, 1.16), (0.07, 1.24), (0.0, 1.26)], seg=10, centre=(x, y))   # 금 백합 꼭지
+        for k in range(3):
+            b = a + (k - 1) * 0.9; sphere('gold', (x + 0.07 * math.cos(b) * (k != 1), y + 0.07 * math.sin(b) * (k != 1), 1.33 + 0.06 * (k == 1)), (0.035, 0.035, 0.09), seg=6, rings=4)
     rr = random.Random(5)
-    for i in range(8):                                                                                     # 기둥 사이 꽃 덤불 8개(예전 분수의 화단 느낌)
-        a = i / 8 * 2 * math.pi; ca, sa = math.cos(a), math.sin(a); tx, ty = -sa, ca
-        for k, (t, rad) in enumerate(((-0.42, 0.26), (0.0, 0.33), (0.42, 0.26))):
-            x, y = 4.78 * ca + tx * t, 4.78 * sa + ty * t
-            sphere('leaf', (x, y, 0.42 + rad * 0.5), (rad, rad, rad * 0.78), seg=14, rings=9, grad=(0.34, 0.9, 0.66, 1.1))
-        for k in range(7):
-            t = rr.uniform(-0.6, 0.6); x, y = 4.78 * ca + tx * t + ca * rr.uniform(-0.12, 0.12), 4.78 * sa + ty * t + sa * rr.uniform(-0.12, 0.12)
-            sphere(('bloom', 'bloom2', 'bloom3')[k % 3], (x, y, 0.72 + rr.uniform(-0.06, 0.08)), (0.075, 0.075, 0.06), seg=6, rings=4)
+    for i in range(8):                                                                                     # 돌 화단 8개 + 꽃 가득
+        a = i / 8 * 2 * math.pi; span = 2 * math.pi / 8 * 0.5; c0 = 4.8
+        lathe('step', [(c0 - 0.36, 0.34), (c0 - 0.38, 0.62), (c0 - 0.3, 0.64), (c0 - 0.3, 0.56), (c0 + 0.3, 0.56), (c0 + 0.3, 0.64), (c0 + 0.38, 0.62), (c0 + 0.36, 0.34)],
+              seg=8, a0=a - span / 2, a1=a + span / 2, closed=False, grad=(0.34, 0.64, 0.82, 1.0))
+        for k in range(4):
+            t = (k - 1.5) / 1.5 * 0.55; b = a + t / c0; rad = 0.28 if k in (1, 2) else 0.23
+            sphere('leaf', (c0 * math.cos(b), c0 * math.sin(b), 0.62 + rad * 0.35), (rad, rad, rad * 0.72), seg=12, rings=8, grad=(0.5, 0.95, 0.66, 1.1))
+        for k in range(14):
+            b = a + rr.uniform(-0.5, 0.5) * span; r0 = c0 + rr.uniform(-0.22, 0.22)
+            sphere(('bloom', 'bloom4', 'bloom3', 'bloom', 'bloom2')[k % 5], (r0 * math.cos(b), r0 * math.sin(b), 0.8 + rr.uniform(-0.05, 0.1)), (0.085, 0.085, 0.07), seg=6, rings=4)
+    # 수반 테 장식: 바깥 모서리 물결 돌기 32개, 테 위 금 구슬 줄
+    for i in range(32):
+        a = (i + 0.25) / 32 * 2 * math.pi
+        sphere('marble', (3.86 * math.cos(a), 3.86 * math.sin(a), 1.17), (0.07, 0.07, 0.06), seg=8, rings=5, grad=(1.1, 1.24, 0.9, 1.04))
+    for i in range(48):
+        a = i / 48 * 2 * math.pi; sphere('gold', (3.66 * math.cos(a), 3.66 * math.sin(a), 1.315), (0.03, 0.03, 0.025), seg=6, rings=4)
+    lathe('gold', [(3.3, 1.285), (3.33, 1.3), (3.36, 1.3), (3.39, 1.285)], seg=72)                       # 테 안쪽 금선
+    # 테 위 금 조개 주둥이 8개 → 안쪽으로 물줄기 아치
+    for i in range(8):
+        a = (i + 0.5) / 8 * 2 * math.pi; ca, sa = math.cos(a), math.sin(a)
+        for k in range(5):
+            b = a + (k - 2) * 0.05; sphere('gold', (3.42 * math.cos(b), 3.42 * math.sin(b), 1.38 + 0.05 * (1 - abs(k - 2) / 2)), (0.05, 0.05, 0.1), seg=6, rings=4)
+        p0 = Vector((3.3 * ca, 3.3 * sa, 1.42)); p1 = Vector((2.55 * ca, 2.55 * sa, 1.08)); pts = []; rad = []
+        for k in range(9):
+            t = k / 8; q = p0.lerp(p1, t); q.z = p0.z + (p1.z - p0.z) * t * t - 0.0 + 0.32 * t * (1 - t) * 0 + 0.28 * math.sin(math.pi * t) * (1 - t) ; pts.append(tuple(q)); rad.append(0.035 + 0.015 * t)
+        tube('fall', pts, rad, ring=6, uv='fall', smooth=True)
+    # 수면 연잎 6장(갈라진 원판) + 분홍 연꽃 3송이 + 꽃잎
+    for i, (a, r, s0) in enumerate(((0.4, 2.85, 0.32), (1.5, 2.9, 0.26), (2.5, 2.75, 0.3), (3.6, 2.9, 0.28), (4.6, 2.8, 0.33), (5.6, 2.95, 0.25))):
+        bm = bmesh.new(); c = bm.verts.new((0, 0, 0)); ring = [bm.verts.new((s0 * math.cos(t), s0 * math.sin(t), 0)) for t in [0.35 + k / 14 * (2 * math.pi - 0.5) for k in range(15)]]
+        for k in range(14): bm.faces.new((c, ring[k], ring[k + 1]))
+        bmesh.ops.rotate(bm, verts=bm.verts, cent=(0, 0, 0), matrix=Matrix.Rotation(a * 2.3, 3, 'Z')); bmesh.ops.translate(bm, vec=(r * math.cos(a), r * math.sin(a), 1.095), verts=bm.verts)
+        finish(bm, 'pad', shade=0.95, smooth=False)
+        if i % 2 == 0:
+            for k in range(6):
+                b = k / 6 * 2 * math.pi; sphere('bloom', (r * math.cos(a) + 0.07 * math.cos(b), r * math.sin(a) + 0.07 * math.sin(b), 1.15), (0.06, 0.03, 0.035), seg=6, rings=4, rot=Matrix.Rotation(b, 3, 'Z') @ Matrix.Rotation(0.6, 3, 'Y'))
+            sphere('bloom2', (r * math.cos(a), r * math.sin(a), 1.16), (0.035, 0.035, 0.03), seg=6, rings=4)
+    for i in range(10):
+        a = rr.uniform(0, 2 * math.pi); r = rr.uniform(2.3, 3.1)
+        sphere('bloom', (r * math.cos(a), r * math.sin(a), 1.09), (0.04, 0.025, 0.006), seg=6, rings=3, rot=Matrix.Rotation(rr.uniform(0, 6.3), 3, 'Z'))
     # 가운데 기둥 → 큰 접시(꽃잎 10장 가장자리)
     lathe('marble', [(0.0, 0.52), (1.05, 0.52), (1.05, 0.7), (0.92, 0.86), (0.62, 1.02), (0.48, 1.25), (0.42, 1.55), (0.46, 1.75), (0.58, 1.88),
                      (0.85, 1.98), (1.3, 2.08), (1.62, 2.16), (1.76, 2.24), (1.78, 2.33), (1.71, 2.38), (1.56, 2.38), (1.5, 2.31)],

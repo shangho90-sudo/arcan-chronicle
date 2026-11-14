@@ -452,6 +452,11 @@ def gen_town2(t, exits, extra_npcs=()):
                     blprops.append(dict(model=er.choice(flowers), pos=[round(x + er.uniform(-0.45, 0.45) * abs(nz) + er.uniform(-0.2, 0.2), 2), round(z + er.uniform(-0.45, 0.45) * abs(nx) + er.uniform(-0.2, 0.2), 2)],
                                         rot=round(er.uniform(0, 360), 1), scale=round(er.uniform(0.72, 0.92), 2)))
                 ne += 1
+    # 아르칸 여신의 분수: 바깥 계단 대각선에 푸른 문장 깃발(2026-11-15 '분수 화려하게') — 분수 충돌 원(r 5.3) 안이라 길·NPC 자리는 그대로
+    if centre and centre.get('id') == 'fountain':
+        for k in (0, 1, 3):                        # 뒤·양옆 3곳만 (카메라 쪽 앞자리는 비워 수반을 가리지 않게), 깃발 면은 모두 카메라 쪽(-135°)
+            ang = math.pi / 4 + k * math.pi / 2; bx, bz = 5.05 * math.cos(ang), 5.05 * math.sin(ang)
+            blprops.append(dict(model='town_banner', pos=[round(bx, 2), round(bz, 2)], rot=-135.0, scale=0.82))
     # ------------------------------------------------------------------ roads for the renderer
     roads = [dict(kind='ring', pos=[0, 0], r0=5.2, r1=RP - 1.7)]
     for pts, w, kind in streets: roads.append(dict(kind=kind, pts=[[round(x, 2), round(z, 2)] for x, z in pts], w=w))

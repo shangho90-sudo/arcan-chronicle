@@ -649,7 +649,9 @@ void main(){
   float streak = smoothstep(0.86, 1.0, sin(R * 4.2 - uT * 0.9 + sin(a * 3.0 + uT * 0.3) * 1.3)) * 0.12;
   float rip = 0.0;
   if (land > 0.0) { for (int i = 0; i < 3; i++) { float ph = fract(uT * 0.45 + float(i) / 3.0); rip += smoothstep(0.05, 0.0, abs(R - land - ph * 0.8)) * (1.0 - ph) * 0.45; }
-    rip += smoothstep(0.22, 0.0, abs(R - land)) * 0.18; }               // soft foam band where the curtain lands
+    rip += smoothstep(0.22, 0.0, abs(R - land)) * 0.18;               // soft foam band where the curtain lands
+    if (y < 1.7) for (int i = 0; i < 8; i++) { float aa = (float(i) + 0.5) * 0.7854; vec2 c = vec2(cos(aa), -sin(aa)) * 2.55;   // the 8 shell-spout arcs (model y = -three z)
+      float d = length(P - c), ph = fract(uT * 0.7 + float(i) * 0.37); rip += smoothstep(0.035, 0.0, abs(d - ph * 0.45)) * (1.0 - ph) * 0.5 + smoothstep(0.12, 0.0, d) * 0.25; } }
   else { for (int i = 0; i < 2; i++) { float ph = fract(uT * 0.5 + float(i) * 0.5); rip += smoothstep(0.04, 0.0, abs(R - 0.38 - ph * 0.4)) * (1.0 - ph) * 0.45; } }   // top bowl: soft rings off the statue base
   vec2 gp = P * 2.2, gi = floor(gp); float tw = floor(uT * 1.5);                 // a few tiny round glints (not cells)
   float sp = step(0.93, h(gi + tw)) * smoothstep(0.12, 0.0, length(fract(gp) - 0.5 - (vec2(h(gi + 3.1), h(gi + 7.7)) - 0.5) * 0.6)) * 0.5;

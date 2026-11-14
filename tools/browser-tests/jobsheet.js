@@ -43,7 +43,7 @@ const WEAPON = { blacksmith: 'w_hammer_1', pharmacist: 'w_pestle_1', cook: 'w_kn
     const shots = [], dmg = [];
     await ev(() => { let seed = 777; Math.random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
       const p = G.player, f = window.__f, m = window.__d; p.teleport(window.__spot); p.setFacing(f.x, f.z); p.body.place(p.pos); p.skills.comboN = 0;
-      m.setFacing(-f.x, -f.z); m.body.place(m.pos); p.body.setArmed && p.body.setArmed(true); p.calmT = 0; p.target = m;
+      m.setFacing(-f.x, -f.z); m.body.place(m.pos); p.body.setArmed && p.body.setArmed(true); p.calmT = 0; p.target = null;   // no target yet: with a target the player starts swinging and the 'idle' shot was a combo frame (2026-11-15)
       for (let i = 0; i < 60; i++) G.step(1 / 60, false);
       G.render.setFocus({ x: p.pos.x + f.x * 0.7, y: 0, z: p.pos.z + f.z * 0.7 }, true); window.__hp = m.hp; });
     const shot = async () => { const c = await ev(() => { G.render.render(0); const p = G.player, f = window.__f; return G.render.toScreen({ x: p.pos.x + f.x * 0.7, y: 0.85, z: p.pos.z + f.z * 0.7 }); });
@@ -58,6 +58,7 @@ const WEAPON = { blacksmith: 'w_hammer_1', pharmacist: 'w_pestle_1', cook: 'w_kn
       await ev(() => { G.input.stick = { x: 0, y: 0 }; const p = G.player, f = window.__f, m = window.__d; p.teleport(window.__spot); p.setFacing(f.x, f.z); p.body.place(p.pos); p.skills.comboN = 0; p.target = m;
         for (let i = 0; i < 40; i++) G.step(1 / 60, false); G.render.setFocus({ x: p.pos.x + f.x * 0.7, y: 0, z: p.pos.z + f.z * 0.7 }, true); window.__hp = m.hp; });
     }
+    await ev(() => { G.player.target = window.__d; });
     let n = 0, last = -99;
     for (let i = 0; i < 200 && n < 5; i++) {
       const hit = await ev(i => { G.input.hold('attack', true); G.step(1 / 60, false); const m = window.__d; if (m.hp < window.__hp) { window.__hp = m.hp; return +(i / 60).toFixed(3); } return null; }, i);

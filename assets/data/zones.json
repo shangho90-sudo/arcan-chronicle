@@ -8497,6 +8497,33 @@
       ],
       "rot": 19.5,
       "scale": 0.81
+     },
+     {
+      "model": "town_banner",
+      "pos": [
+       3.57,
+       3.57
+      ],
+      "rot": -135.0,
+      "scale": 0.82
+     },
+     {
+      "model": "town_banner",
+      "pos": [
+       -3.57,
+       3.57
+      ],
+      "rot": -135.0,
+      "scale": 0.82
+     },
+     {
+      "model": "town_banner",
+      "pos": [
+       3.57,
+       -3.57
+      ],
+      "rot": -135.0,
+      "scale": 0.82
      }
     ],
     "palette": {},

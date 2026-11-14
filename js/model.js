@@ -78,6 +78,13 @@ const XFER = 0.1;   // s the weapon glides between the back holder and the hand 
 const WEAPON = { novice: 'sword', pharmacist: 'pestle', cook: 'knife', blacksmith: 'hammer', hairdresser: 'scissors', artist: 'brush' };
 // 대기·걷기에서 무기를 쥔 각도 더하기(도, 휘두르는 동안은 0): 큰 망치 머리가 얼굴 옆에 서 있던 것(2026-11-14) → 앞으로 숙여 듦
 const REST_TILT = { hammer: -55 };
+// 2026-11-14 user: carried-weapon tilt while running (deg, scaled by the gait weight): with the running elbow bent ~95 deg
+// a long weapon stood straight up (artist brush) - lower it into a diagonal carry. Strikes are untouched (swingW = 1).
+const RUN_TILT = { brush: 55 };   // brush: resting back over the shoulder like a carried pole
+// left-hand tool (요리사 프라이팬 등): extra tilt (deg, about the hand's side axis) and roll (deg, about the handle) - the pan held up
+// in the combat stance showed its thin edge to the camera as a dark horizontal 'blade' behind the head (2026-11-15 user)
+const OFF_TILT = {}, OFF_ROLL = { pan: 90 };   // pan: show the round face, not the edge
+if (typeof window !== 'undefined') { window.REST_TILT = REST_TILT; window.RUN_TILT = RUN_TILT; window.OFF_TILT = OFF_TILT; window.OFF_ROLL = OFF_ROLL; }   // tuning from the console / probes
 const FLINCH = 0.24;
 // 기본공격(콤보 동작) 칼 잔상: 색 0.55배·칼날 바깥쪽 45%만 — 흰 부채꼴이 몬스터 얼굴과 직업 이펙트를 덮던 것(2026-11-14). 스킬 잔상은 그대로
 const BASIC_TRAIL = 0.55;   // s, 피격 반응 길이 (ModelBody.flinch)
@@ -918,8 +925,8 @@ export class ModelBody {
     const sw = shearsOn ? /^w_scissors_(\d)/.exec(wid || '') : null;
     const stow = !!(ca && ca.stow) && !md.cfg.npc, wkind = shearsOn ? 'shears:' + (sw ? sw[1] : 1) : wid && isWeaponModel(wid) ? 'item:' + wid : this.weapon;
     if (stow) { const w0 = this.weaponId ? this.weaponId() : null; this.updateProp('R', w0 && isWeaponModel(w0) ? 'item:' + w0 : this.weapon, 0); this.updateProp('H', p.held || null, (p.wOff - 90) * (1 - (this.swingW || 0))); }
-    else { this.updateProp('R', p.held || wkind, (p.wOff - 90 + (p.held ? 0 : REST_TILT[this.weapon] || 0)) * (1 - (this.swingW || 0))); if (this.props.H) this.updateProp('H', null, 0); }
-    this.updateProp('L', p.held && !stow ? null : this.armW > 0.5 && !(this.gripW > 0.4) && !(this.offGripW > 0.3) ? this.off : null, p.offOff - 90);
+    else { this.updateProp('R', p.held || wkind, (p.wOff - 90 + (p.held ? 0 : (REST_TILT[this.weapon] || 0) + (RUN_TILT[this.weapon] || 0) * Math.min(1, this.gaitW || 0))) * (1 - (this.swingW || 0))); if (this.props.H) this.updateProp('H', null, 0); }
+    this.updateProp('L', p.held && !stow ? null : this.armW > 0.5 && !(this.gripW > 0.4) && !(this.offGripW > 0.3) ? this.off : null, p.offOff - 90 + (OFF_TILT[this.off] || 0));
   }
   worldOf(Q) {
     const md = this.md, W = new Array(md.bones.length), S = this.bscale || (this.bscale = boneScales(md));
@@ -998,7 +1005,8 @@ export class ModelBody {
     const h = this.props[side]; if (!h) return;
     const md = this.md, W = this.W;
     if (h.children[0] && h.children[0].userData.shears) setShears(h.children[0], this.snipK || 0);
-    const inHand = this.gripM(side, W, tilt);
+    let inHand = this.gripM(side, W, tilt);
+    if (side === 'L' && OFF_ROLL[this.propKind.L]) inHand = mul(inHand, rz(OFF_ROLL[this.propKind.L]));
     const a = side === 'R' && !md.cfg.npc ? this.armW : 1;
     if (a >= 0.999) h.matrix.copy(inHand);
     else {
