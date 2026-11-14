@@ -493,7 +493,7 @@ Object.assign(FlaskKit.prototype, {
     const O = this.o, pal = PAL[o.pal] || PAL.heal, T = o.T ?? 0.5, at = o.at || (() => new THREE.Vector3(pc.pos.x, (pc.pos.y || 0) + 1.1, -pc.pos.z));
     const e = O._fx('fgather', T + 0.9, (e) => { const t = e.t, P = P3(pc.pos);
       gy.position.set(P.x, P.y + 0.05, P.z); const gu = gy.material.uniforms; gu.uT.value = t * 0.8; gu.uA.value = 0.9 * smooth(0, 0.15, t) * (1 - smooth(T + 0.25, T + 0.7, t)) * (1 + 0.8 * Math.exp(-Math.pow((t - T) / 0.06, 2)));
-      gy.scale.setScalar(0.95 + 0.1 * easeOut(t / 0.3));
+      gy.scale.setScalar(0.68 + 0.08 * easeOut(t / 0.3));   // small glyph: just around the feet
       const ft = t - T; fl.visible = ft > -0.01 && ft < 0.12; if (fl.visible) { fl.position.copy(at()); fl.quaternion.copy(O.camQ); fl.scale.setScalar(0.9 * (0.7 + 0.5 * easeOut(ft / 0.05))); fl.material.uniforms.uA.value = 1.8 * smooth(-0.01, 0.01, ft) * (1 - smooth(0.02, 0.12, ft)); }
       if (pc.dead) e.t = e.life; });
     const gy = this.disc(e, 3, true, 3); gy.material.uniforms.uCol.value.setHex(pal.liq); gy.material.uniforms.uHi.value.setHex(pal.accent);

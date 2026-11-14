@@ -30,6 +30,7 @@ const SEC = +(process.env.SEC || (SCENE === 'repeat' ? 2.2 : SCENE === 'sheathed
   await pg.waitForSelector('.prologue.on', { timeout: 60000 }).then(() => click('건너뛰기')).catch(() => {});
   await pg.waitForFunction(() => window.G && G.inWorld && G.player && !G.loading && G.player.body && G.player.body.md, null, { timeout: 300000 });
   await pg.waitForFunction(() => G.skillFx && G.skillFx.pharm, null, { timeout: 120000 });
+  if (process.env.ZONE) { await ev(z => G.loadZone(z, null, false), process.env.ZONE); await pg.waitForFunction(() => !G.loading && G.zone && G.player && G.player.body, null, { timeout: 300000 }); await pg.waitForTimeout(3000); }   // ZONE=mushroom_grove: a dark ground
   await ev(async ([z, g, wall]) => {
     G.frame = () => {}; const c = G.render.cam; c.zoom = z; c.updateProjectionMatrix();
     document.querySelectorAll('.hud,.controls,.toasts,.qhud,.qh-reopen,.plates').forEach(e => e.style.display = 'none');
@@ -126,7 +127,7 @@ const SEC = +(process.env.SEC || (SCENE === 'repeat' ? 2.2 : SCENE === 'sheathed
   res.drawCallsMax = dc; res.fps = FPS; res.info = info;
   if (process.env.STRESS) {   // STRESS=n: n more casts back to back (cooldown / SP reset), then renderer memory, programs, JS heap, live effects, and the draw time during one cast
     res.stress = await ev(async ([n, skill, thr]) => {
-      const R = G.render.r, snap = () => ({ geo: R.info.memory.geometries, tex: R.info.memory.textures, prog: (R.info.programs || []).length, heap: performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576) : null, live: G.skillFx.pharm.live.length, kit: G.skillFx.pharm.kit.stats ? Object.values(G.skillFx.pharm.kit.stats()).reduce((a, b) => a + b, 0) : null });
+      const R = G.render.r, snap = () => ({ geo: R.info.memory.geometries, tex: R.info.memory.textures, prog: (R.info.programs || []).length, heap: performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576) : null, live: G.skillFx.pharm.live.length, kit: G.skillFx.pharm.kit && G.skillFx.pharm.kit.stats ? Object.values(G.skillFx.pharm.kit.stats()).reduce((a, b) => a + b, 0) : null });
       for (let i = 0; i < 90; i++) { G.step(1 / 60, false); G.skillFx.update(1 / 60); }
       G.step(1 / 60, true); const before = snap(), p = G.player, times = [];
       for (let k = 0; k < n; k++) { p.skills2.cd = {}; G.dev.full(); p.skills.lock = 0; p.skills2.cast(skill, window.__at(thr ? 5 : 1.6));

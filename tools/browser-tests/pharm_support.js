@@ -28,7 +28,7 @@ const CW = +(process.env.CW || Math.min(VW, 420)), CH = +(process.env.CH || Math
     G.dev.level(20); G.sheet.p.gender = g; G.dev.job('pharmacist'); G.dev.learnAll('pharmacist'); G.sheet.recalc(); G.dev.full(); G.input.block = true;
     await G.player.attachBody(); G.player.body.place(G.player.pos); G.player.body.play('idle', 1, true); G.skillFx.pharm.load();
   }, [ZOOM, G_]);
-  await pg.waitForFunction(() => G.skillFx.pharm.ready && G.skillFx.pharm.kit.ready, null, { timeout: 120000 });
+  await pg.waitForFunction(() => G.skillFx.pharm.ready && (!G.skillFx.pharm.kit || G.skillFx.pharm.kit.ready), null, { timeout: 120000 });
   await pg.waitForTimeout(1000);
   const name = `${TAG}_${SKILL}_${G_}_${SIZE}_fx${FX ? 1 : 0}`, dirOut = `${OUT}/${name}`; fs.rmSync(dirOut, { recursive: true, force: true }); fs.mkdirSync(dirOut, { recursive: true });
   await ev(([skill]) => { let seed = 777; Math.random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
@@ -53,7 +53,7 @@ const CW = +(process.env.CW || Math.min(VW, 420)), CH = +(process.env.CH || Math
   const res = await ev(() => { const L = window.__L, st = L.st; const lastFx = L.shieldFx.lastIndexOf(1);
     return { err: window.__err, pulses: L.pulses, heals: L.heals, hit3: L.hit3, shieldFxGoneAt: lastFx >= 0 ? +((lastFx + 1) * 0.1).toFixed(2) : null,
       shieldEndsAt: (st.find(x => x[1] <= 0 && x[0] > 0.5) || [null])[0], immuneEndsAt: (st.find(x => !x[2] && x[0] > 0.5) || [null])[0], hasteEndsAt: (st.find(x => !x[3] && x[0] > 0.5) || [null])[0],
-      st: st.filter((x, i) => i % 5 === 0), live: G.skillFx.pharm.live.length, kit: G.skillFx.pharm.kit.stats() }; });
+      st: st.filter((x, i) => i % 5 === 0), live: G.skillFx.pharm.live.length, kit: G.skillFx.pharm.kit ? G.skillFx.pharm.kit.stats() : null }; });
   if (shots.length) { fs.writeFileSync('/tmp/_pss.py', `from PIL import Image, ImageDraw\nfr=${JSON.stringify(shots)}\nlab=${JSON.stringify(MARKS)}\nims=[Image.open(f) for f in fr]\nw,h=ims[0].size\ncols=min(5,len(ims)); rows=(len(ims)+cols-1)//cols\nsh=Image.new('RGB',(w*cols,(h+22)*rows),(20,20,28)); d=ImageDraw.Draw(sh)\nfor i,(im,l) in enumerate(zip(ims,lab)):\n  x=(i%cols)*w; y=(i//cols)*(h+22); sh.paste(im,(x,y+22)); d.text((x+6,y+4),'%.2fs'%l,fill=(255,255,255))\nsh.save('${OUT}/${name}.png')`); execSync('python3 /tmp/_pss.py'); }
   res.errors = errs.slice(0, 8); console.log(name, JSON.stringify(res)); fs.writeFileSync(`${OUT}/${name}.json`, JSON.stringify(res, null, 1));
   await b.close();
