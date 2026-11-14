@@ -1,5 +1,6 @@
 // 요리사 1차 스킬(식칼 썰기·팬 강타·미트볼 던지기 + 2026-11-13 뒤집기 flip·도마 방어 board·뜨거운 국물 soup·후추 뿌리기 pepper·밀가루 구름 flour·꼬치 찌르기 skewer·든든한 한 끼 meal·간식 시간 snack)을 실제 스킬 경로(skills2.cast → 동작 → 피해 →
 // js/cookfx.js)로 시전하고 화면 띠와 수치를 남김. G.step(1/FPS) 한 프레임씩, Math.random 고정.
+// SCENE=moving (대상이 옆으로 2.4 m/s 걸어감)·repeat (0.7초에 다시 시전, 미트볼 두 묶음이 겹침)도 있음 — 미트볼 던지기 확인용
 // Usage: SKILL=chop|pan|ball|flip|board|soup|pepper|flour|skewer|meal|snack|lunch|bowl(제작 완성 연출 + 1.2초에 먹기) LV=1..5 SCENE=hit|whiff|kill|stun|miss|boss(뒤집기: 띄울 수 없는 적) GENDER=m|f SIZE=1100x760|390x844t FX=1|0 TAG=after DIR=90
 //        SEED=12345(Math.random 씨앗 — MISS가 나오면 바꿈) DUR=초
 //        URL=http://localhost:8797/index.html OUT=/tmp/cook node tools/browser-tests/cook_skills.js
@@ -15,7 +16,7 @@ const FX = process.env.FX !== '0', TAG = process.env.TAG || 'after', OUT = proce
 const M2 = { flip: '0.05,0.15,0.22,0.25,0.28,0.33,0.40,0.50,0.62,0.76,0.90,1.05,1.2,1.4', board: '0.05,0.25,0.32,0.38,0.50,0.80,0.82,0.86,0.95,1.40,1.42,1.5,2.0,2.05,2.5,2.6', soup: '0.03,0.10,0.15,0.17,0.20,0.24,0.30,0.38,0.48,0.60,0.75,0.95', pepper: '0.03,0.10,0.15,0.17,0.20,0.26,0.34,0.40,0.50,0.62,0.80,1.0',
   flour: '0.03,0.10,0.15,0.18,0.22,0.30,0.42,0.60,0.90,1.3,1.8,2.2', skewer: '0.05,0.12,0.18,0.22,0.25,0.27,0.30,0.34,0.40,0.48,0.58,0.70', meal: '0.10,0.25,0.31,0.36,0.45,0.56,0.66,0.76,0.86,0.96,1.1,1.3', snack: '0.10,0.25,0.31,0.36,0.45,0.56,0.66,0.76,0.86,0.96,1.1,1.3',
   lunch: '0.05,0.15,0.30,0.50,0.80,1.25,1.40,1.55,1.66,1.76,1.90,2.1', bowl: '0.05,0.15,0.30,0.50,0.80,1.25,1.40,1.55,1.66,1.76,1.90,2.1',
-  pan: '0.05,0.15,0.22,0.27,0.30,0.32,0.36,0.45,0.60,0.80,1.2,2.0', chop: '0.05,0.15,0.20,0.22,0.25,0.30,0.34,0.40,0.46,0.52,0.58,0.64,0.70,0.80,0.95,1.2', ball: '0.10,0.18,0.25,0.32,0.40,0.48,0.56,0.64,0.72,0.80,0.90,1.0,1.15,1.3' };
+  pan: '0.05,0.15,0.22,0.27,0.30,0.32,0.36,0.45,0.60,0.80,1.2,2.0', chop: '0.05,0.15,0.20,0.22,0.25,0.30,0.34,0.40,0.46,0.52,0.58,0.64,0.70,0.80,0.95,1.2', ball: '0.08,0.14,0.18,0.24,0.32,0.40,0.47,0.55,0.62,0.65,0.70,0.765,0.82,0.88,0.94,0.995,1.08,1.165,1.22,1.35' };
 const cfg = (SKILL) => { const WIDE = ['ball', 'soup', 'pepper', 'flour', 'skewer'].includes(SKILL);
   return { SKILL, ID: SK[SKILL], DIST: SKILL === 'ball' ? 5 : SKILL === 'pepper' || SKILL === 'flour' ? 4 : SKILL === 'soup' || SKILL === 'skewer' ? 2.2 : 1.5, CW: +(process.env.CW || Math.min(VW, WIDE ? 640 : 460)), CH: +(process.env.CH || Math.min(VH, 440)),
     DUR: +(process.env.DUR || (SCENE === 'stun' ? 4.2 : SKILL === 'ball' ? 1.9 : SKILL === 'flour' ? 2.3 : SKILL === 'board' ? 2.7 : SKILL === 'lunch' || SKILL === 'bowl' ? 2.3 : SKILL === 'pan' ? 2.1 : 1.6)), MARKS: (process.env.MARKS || M2[SKILL]).split(',').map(Number).filter((m, i) => !process.env.FEW || i % 2 === 1) }; };   // FEW=1: every other frame mark (faster)
@@ -73,15 +74,17 @@ const cfg = (SKILL) => { const WIDE = ['ball', 'soup', 'pepper', 'flour', 'skewe
     G.render.setFocus({ x: p.pos.x + f.x * dist * 0.6, y: 0, z: p.pos.z + f.z * dist * 0.6 }, true);
     const d = G.data.skill ? G.data.skill(id) : G.data.skills2.find(s => s.id === id);
     const L = window.__log = { fx: [], sfx: [], dmg: [], num: [], freezeP: [], freezeT: [], gstop: [], cam: [], lock: [], stun: [], act: [] };
-    window.__t = 0; window.__p0 = { ...m.pos }; window.__hp = m.hp;
+    window.__t = 0; window.__p0 = { ...m.pos }; window.__hp = m.hp; window.__scene = scene; window.__id = id;
     const S = G.skillFx.cook;
-    for (const k of ['knife', 'pan', 'stun', 'proj', 'splat', 'flip', 'board', 'soup', 'pepper', 'sack', 'flour', 'skewer', 'eat', 'made']) if (S[k] && !S['__w' + k]) { S['__w' + k] = true; const o = S[k].bind(S); S[k] = (a, opt) => { window.__log.fx.push({ k, t: +window.__t.toFixed(3), hit: opt && opt.hit }); const h = o(a, opt);
+    for (const k of ['volley', 'knife', 'pan', 'stun', 'proj', 'splat', 'flip', 'board', 'soup', 'pepper', 'sack', 'flour', 'skewer', 'eat', 'made']) if (S[k] && !S['__w' + k]) { S['__w' + k] = true; const o = S[k].bind(S); S[k] = (a, opt) => { window.__log.fx.push({ k, t: +window.__t.toFixed(3), hit: opt && opt.hit }); const h = o(a, opt);
       if (h && h.strike) { const s0 = h.strike, m0 = h.miss; h.strike = (...x) => { window.__log.fx.push({ k: 'strike', t: +window.__t.toFixed(3) }); return s0(...x); }; h.miss = (...x) => { window.__log.fx.push({ k: 'miss', t: +window.__t.toFixed(3) }); return m0(...x); }; }
       if (h && h.hit) { const h0 = h.hit; h.hit = (ok, ...x) => { window.__log.fx.push({ k: k + '.hit', t: +window.__t.toFixed(3), n: ok ? ok.length : 0 }); return h0(ok, ...x); }; }
+      if (h && h.fizzle) { const z0 = h.fizzle, l0 = h.launch; h.fizzle = (i, ...x) => { window.__log.fx.push({ k: 'fizzle', i, t: +window.__t.toFixed(3) }); return z0(i, ...x); }; h.launch = (i) => { window.__log.fx.push({ k: 'launch', i, t: +window.__t.toFixed(3) }); return l0(i); };
+        const v0 = h.hit; h.hit = (i, pos, dir, last, ok) => { window.__log.fx.push({ k: 'ball.hit', i, t: +window.__t.toFixed(3), ok, last, dir: [dir.x, dir.y, dir.z].map(v => +v.toFixed(2)) }); return v0(i, pos, dir, last, ok); }; }
       if (h && h.block) { const b0 = h.block; h.block = (...x) => { window.__log.fx.push({ k: 'block', t: +window.__t.toFixed(3) }); return b0(...x); }; }
       if (h && h.land) { const l0 = h.land; h.land = (t) => { window.__log.fx.push({ k: 'land', t: +window.__t.toFixed(3), hit: !!t }); return l0(t); }; }
       return h; }; }
-    if (!G.audio.__w) { G.audio.__w = true; const os = G.audio.sfx.bind(G.audio); G.audio.sfx = (n) => { window.__log.sfx.push({ n, t: +window.__t.toFixed(3) }); return os(n); };
+    if (!G.audio.__w) { G.audio.__w = true; const os = G.audio.sfx.bind(G.audio); G.audio.sfx = (n, o) => { window.__log.sfx.push({ n, t: +window.__t.toFixed(3), r: o && o.rate }); return os(n, o); };
       const od = G.ui.damageText.bind(G.ui); G.ui.damageText = (...a) => { window.__log.num.push({ t: +window.__t.toFixed(3), v: a[1] }); return od(...a); }; }
     p.target = m; window.__sp0 = p.sp;
     if (scene === 'kill') for (const q of window.__ds) q.hp = q.__hp = Math.max(2, Math.round(p.stat('atk') * 0.5));   // dies on the first or second tick; the rest must not crash or linger
@@ -101,6 +104,8 @@ const cfg = (SKILL) => { const WIDE = ['ball', 'soup', 'pepper', 'flour', 'skewe
     const c = await ev(([i, fps, dist, skill, shot]) => {
       window.__t = i / fps; window.__noDraw = !shot; const p = G.player, f = window.__f, m = window.__ds[0], L = window.__log;
       if (window.__eatAt === i) { p.potionCd = 0; L.ate = p.useItem(window.__eatId); }
+      if (window.__scene === 'moving' && m && !m.dead && i > 20) { m.teleport({ x: m.pos.x - f.z * 2.4 / fps, z: m.pos.z + f.x * 2.4 / fps }); }   // walks sideways across the volley at 2.4 m/s
+      if (window.__scene === 'repeat' && i === Math.round(0.7 * fps)) { p.skills2.cd = {}; p.skills.lock = 0; p.sp = p.maxSp; L.recast = p.skills2.cast(window.__id, window.__at(dist)) || 'ok'; }
       G.step(1 / fps, true);
       window.__ds.forEach((q, qi) => { if (q.__hp == null) q.__hp = window.__hp; if (!q.removed && q.hp < q.__hp) { L.dmg.push({ t: +window.__t.toFixed(3), a: Math.round(q.__hp - q.hp), dead: !!q.dead, i: qi }); q.__hp = q.hp; } });
       if (skill === 'board' && [48, 84, 120].includes(i)) { const h0 = p.hp; p.takeDamage({ source: m, amount: 40, noMiss: true }); L.dmg.push({ t: +window.__t.toFixed(3), taken: Math.round(h0 - p.hp), of: 40 }); }
@@ -124,7 +129,7 @@ const cfg = (SKILL) => { const WIDE = ['ball', 'soup', 'pepper', 'flour', 'skewe
   const late = await ev(() => { const a = { slowAt2s: window.__ds.filter(q => !q.removed && q.status && q.status.has('slow')).length, guard: G.player.status.has('frontguard') }; window.__noDraw = true; for (let i = 0; i < 270; i++) G.step(1 / 30, true); window.__noDraw = false; a.liveAfter9s = G.skillFx.cook.live.length; a.areas = G.player.skills2.areas ? G.player.skills2.areas.length : -1; a.guardAfter = G.player.status.has('frontguard'); return a; });
   const res = await ev(([id]) => { const L = window.__log, m = window.__ds[0], p = G.player; const rng = a => a.length ? [a[0], a[a.length - 1], a.length] : null;
     const camMax = Math.max(...L.cam), last = L.cam.length - 1 - [...L.cam].reverse().findIndex(v => v > 0.002);
-    return { ate: L.ate, fx: L.fx, sfx: L.sfx, dmg: L.dmg, tossFrames: L.toss || 0, slowed: window.__ds.filter(q => !q.removed && q.status && q.status.has('slow')).length, statuses: window.__ds.map(q => q.removed ? 'gone' : q.status.list.map(x => x.def.id).join('+')), buffs: p.status.list.map(x => x.def.id).join('+'), food: G.sheet.bag.count('f_lunch'), hits: L.dmg.length, total: L.dmg.reduce((s, d) => s + (d.a || 0), 0), nums: L.num.length, freezePlayer: rng(L.freezeP), freezeTarget: rng(L.freezeT), globalHitStop: rng(L.gstop),
+    return { recast: L.recast, ate: L.ate, fx: L.fx, sfx: L.sfx, dmg: L.dmg, tossFrames: L.toss || 0, slowed: window.__ds.filter(q => !q.removed && q.status && q.status.has('slow')).length, statuses: window.__ds.map(q => q.removed ? 'gone' : q.status.list.map(x => x.def.id).join('+')), buffs: p.status.list.map(x => x.def.id).join('+'), food: G.sheet.bag.count('f_lunch'), hits: L.dmg.length, total: L.dmg.reduce((s, d) => s + (d.a || 0), 0), nums: L.num.length, freezePlayer: rng(L.freezeP), freezeTarget: rng(L.freezeT), globalHitStop: rng(L.gstop),
       stun: rng(L.stun), act: L.act, lockEndFrame: L.lock.findIndex((v, i) => i > 3 && v <= 0), camMax: +camMax.toFixed(4), camLastFrame: camMax > 0.002 ? last : -1,
       targetMoved: m && !m.removed ? +Math.hypot(m.pos.x - window.__p0.x, m.pos.z - window.__p0.z).toFixed(3) : null, spUsed: +(window.__sp0 - p.sp).toFixed(1), cdLen: p.skills2.cdLen && p.skills2.cdLen[id],
       live: G.skillFx.cook.live.length, things: p.skills2.things.length, pending: p.skills2.pending.length }; }, [ID]);

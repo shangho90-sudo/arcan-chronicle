@@ -31,6 +31,8 @@ export const COOK = {
   pan: { height: 3.0, rest: 0.56, rMin: 0.85, rMax: 1.5, pad: 0.4, appear: 0.12, dropPart: 0.42, stay: 0.05, fade: 0.17, lift: 0.9, seeThrough: 0.5, ring: 2.0, ringLife: 0.28, flash: 1.0, flashT: 0.06, stars: 5, starsLite: 3 },
   stun: { n: 3, r: 0.42, lift: 0.28, size: 0.24, spin: 5.0 },
   ball: { r: 0.2, spin: 11 },
+  // 미트볼 던지기 (2026-11-14 소울 스트라이크식, 경로·시각은 js/meatball.js): 공 반지름·마지막 공 배율·회전, 꼬리 길이(점 수)·굵기, 소스 방울 간격, 타격 섬광·줄·고리
+  volley: { r: 0.15, lastMul: 1.2, spin: 13, trail: 9, trailLite: 6, trailW: 0.1, drip: 0.06, dripLite: 0.15, flash: 0.62, flashLast: 1.0, streak: 0.95, streakLast: 1.35, drops: 4, dropsLite: 2, dropsLast: 9, dropsLastLite: 4, crumbs: 2, crumbsLast: 4, ring: 1.4, a: 1.0 },
   splat: { life: 0.42, ring: 0.85, flash: 1.3, bits: 5, bitsLite: 2 },
   flip: { stop: 0.06, kick: [0.09, 0.1], h: 1.5, ring: 1.8, flash: 1.3 },
   board: { w: 1.0, fwd: 0.62, marks: 6, push: 0.1, spark: 1.4 },
@@ -106,6 +108,10 @@ void main(){
   gl_FragColor = vec4(mix(uB, uW, clamp(core, 0., 1.)) * (a * uA), 1.);
 }`;
 const ADD = { transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide };
+// 미트볼 꼬리: CPU에서 만드는 얇은 띠(점마다 카메라를 향한 두 정점). aT = 0 머리 .. 1 꼬리, 머리는 선명한 금빛·꼬리는 가늘고 투명한 주황
+const RIB_VS = `attribute float aT; varying float vT; varying float vS; attribute float aS; void main(){ vT = aT; vS = aS; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`;
+const RIB_FS = `uniform vec3 uW, uB; uniform float uA; varying float vT; varying float vS;
+void main(){ float edge = 1. - abs(vS); float a = pow(1. - vT, 1.6) * smoothstep(0., .55, edge); vec3 c = mix(uW, uB, smoothstep(0., .5, vT)); gl_FragColor = vec4(c * a * uA * (1. + .6 * smoothstep(.6, 1., edge) * (1. - vT)), 1.); }`;
 
 const _a = new THREE.Vector3(), _b = new THREE.Vector3(), _c = new THREE.Vector3(), _q = new THREE.Quaternion(), _q2 = new THREE.Quaternion(), _mx = new THREE.Matrix4();
 
@@ -336,6 +342,88 @@ export class CookFx {
     this._bits(at, low ? K.bitsLite : K.bits, { geo: this.geo.cook_meatball, size: [0.04, 0.075], speed: [1.0, 2.2], up: [1.4, 2.6], ground: g0.y, life: 0.45 });
     this._puffs(g0.clone().setY(g0.y + y * 0.6), low ? 1 : 3, r * 0.5, { c1: COOK.col.steam1, c2: COOK.col.steam2, a: 0.3, life: 0.45, rise: 0.5 });
     return e;
+  }
+
+  // ------------------------------------------------------------------ 미트볼 던지기 (소울 스트라이크식 연속 명중)
+  /** a ribbon (own geometry, pooled): n points */
+  _ribbon(e, n) {
+    const p = this.pool.rib || (this.pool.rib = []); let m = p.find(x => x.userData.n === n); if (m) p.splice(p.indexOf(m), 1);
+    if (!m) {
+      const g = new THREE.BufferGeometry(), pos = new Float32Array(n * 2 * 3), at = new Float32Array(n * 2), as = new Float32Array(n * 2), idx = [];
+      for (let i = 0; i < n; i++) { at[i * 2] = at[i * 2 + 1] = i / (n - 1); as[i * 2] = -1; as[i * 2 + 1] = 1; if (i < n - 1) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); } }
+      g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('aT', new THREE.BufferAttribute(at, 1)); g.setAttribute('aS', new THREE.BufferAttribute(as, 1)); g.setIndex(idx);
+      m = new THREE.Mesh(g, new THREE.ShaderMaterial({ uniforms: { uW: { value: new THREE.Color(COOK.col.gold) }, uB: { value: new THREE.Color(COOK.col.goldB) }, uA: { value: 0 } }, vertexShader: RIB_VS, fragmentShader: RIB_FS, ...ADD }));
+      m.frustumCulled = false; m.userData.kind = 'rib'; m.userData.n = n;
+    }
+    m.visible = true; m.renderOrder = 5; m.material.uniforms.uA.value = 0; e.items.push(m); e.g.add(m); return m;
+  }
+  /** lay the ribbon along pts (three coords, head first), width w tapering to the tail */
+  _ribbonSet(m, pts, w) {
+    const a = m.geometry.attributes.position, n = m.userData.n;
+    for (let i = 0; i < n; i++) {
+      const p = pts[Math.min(i, pts.length - 1)], q = pts[Math.min(i + 1, pts.length - 1)], r = pts[Math.max(0, Math.min(i, pts.length) - 1)];
+      _a.copy(r).sub(q); if (_a.lengthSq() < 1e-8) _a.set(1, 0, 0); _b.crossVectors(_a, this.toCam); if (_b.lengthSq() < 1e-8) _b.set(0, 1, 0); _b.normalize().multiplyScalar(w * (1 - 0.8 * i / (n - 1)));
+      a.setXYZ(i * 2, p.x - _b.x, p.y - _b.y, p.z - _b.z); a.setXYZ(i * 2 + 1, p.x + _b.x, p.y + _b.y, p.z + _b.z);
+    }
+    a.needsUpdate = true;
+  }
+  /** the volley (js/meatball.js drives every position, in game coords): handle {toss(pan), ball(i, pos, {phase, k}), launch(i), hit(i, pos, dir, last, ok), fizzle(i, pos), end()} */
+  volley(pc, o = {}) {
+    if (!this._ok() || !this.geo.cook_meatball) return null;
+    const K = COOK.volley, I = COOK.intensity, n = o.n || 5, low = lite(), NT = low ? K.trailLite : K.trail, self = this;
+    const balls = [];
+    const e = this._fx('volley', 4, (e, dt) => {
+      for (const b of balls) {
+        if (b.state === 'gone') continue;
+        if (b.state === 'over') { b.fade -= dt / 0.1; b.rib.material.uniforms.uA.value = I * K.a * Math.max(0, b.fade); b.m.visible = false; if (b.fade <= 0) { b.state = 'gone'; b.rib.visible = false; } continue; }
+        b.m.quaternion.setFromAxisAngle(b.ax, e.t * b.sp);
+        if (b.state === 'fly') {   // sauce drops falling off the ball now and then
+          b.dt -= dt; if (b.dt <= 0) { b.dt = low ? K.dripLite : K.drip; self._bits(b.m.position.clone(), 1, { geo: self.geo.cook_drop, tint: 0xc8502a, size: [0.025, 0.04], speed: [0.1, 0.5], up: [0.1, 0.6], ground: b.gy, life: 0.32 }); }
+        }
+      }
+      if (ended && balls.every(b => b.state === 'gone')) e.t = e.life; else e.life = e.t + 4;
+    });
+    let ended = false;
+    const ground = (pc.pos.y || 0);
+    for (let i = 0; i < n; i++) {
+      const last = i === (o.last ?? n - 1), m = this.solid(e, this.geo.cook_meatball, { rim: 0xffb070, spec: 0.85 }); m.renderOrder = 6; m.visible = false;
+      m.scale.setScalar(K.r * (last ? K.lastMul : 1)); m.material.uniforms.uA.value = 1;
+      const rib = this._ribbon(e, NT);
+      balls.push({ i, last, m, rib, pts: [], state: 'wait', ax: new THREE.Vector3(rnd(-1, 1), rnd(-0.4, 0.4), rnd(-1, 1)).normalize(), sp: K.spin * rnd(0.8, 1.2) * (rnd(0, 1) < 0.5 ? -1 : 1), dt: 0, fade: 1, gy: ground });
+    }
+    const H = {
+      toss(pan) { const g = P3(pan); self._pop(g.clone().setY(0), { r: 0, y: g.y, size: 0.42, flash: 1.1, life: 0.14, w: COOK.col.warm }); },
+      ball(i, pos, st) {
+        const b = balls[i]; if (!b || b.state === 'over' || b.state === 'gone') return;
+        const p = P3(pos); b.m.position.copy(p); b.m.visible = true;
+        const grow = st.phase === 'hover' ? 0.55 + 0.45 * easeOut(Math.min(1, st.k * 1.4)) : 1; b.m.scale.setScalar(K.r * (b.last ? K.lastMul : 1) * grow);
+        if (st.phase === 'fly') { b.state = 'fly'; b.pts.unshift(p.clone()); if (b.pts.length > NT) b.pts.length = NT; self._ribbonSet(b.rib, b.pts, K.trailW * (b.last ? 1.2 : 1)); b.rib.material.uniforms.uA.value = I * K.a * Math.min(1, b.pts.length / 3); }
+        else b.state = 'hover';
+      },
+      launch(i) { const b = balls[i]; if (b) b.pts.length = 0; },
+      hit(i, pos, dir, last, ok) {
+        const b = balls[i]; if (!b) return; b.state = 'over'; b.m.visible = false;
+        const p = P3(pos), d = new THREE.Vector3(dir.x, dir.y, -dir.z).normalize(), gy = b.gy;
+        if (!ok) { self._puffs(p, low ? 1 : 2, 0.4, { c1: COOK.col.steam1, c2: COOK.col.steam2, a: 0.28, life: 0.3, rise: 0.3 }); return; }
+        const life = last ? 0.22 : 0.14, len = last ? K.streakLast : K.streak;
+        const fx = self._fx('ballhit', life + 0.04, (x) => {
+          const k = clamp01(x.t / life);
+          fl.quaternion.copy(self.camQ); fl.scale.setScalar((last ? K.flashLast : K.flash) * (0.6 + 0.6 * easeOut(k * 2))); fl.material.uniforms.uA.value = I * 1.3 * (1 - smooth(0.05, 0.75, k));
+          ln.scale.set(len * (0.75 + 0.35 * easeOut(k)), last ? 0.6 : 0.42, 1); ln.material.uniforms.uA.value = I * 1.8 * (1 - smooth(0.1, 1, k));
+          if (rg) { rg.quaternion.copy(self.camQ); rg.scale.setScalar(K.ring * (0.35 + 0.65 * easeOut(k))); rg.material.uniforms.uA.value = I * 1.4 * (1 - smooth(0.2, 1, k)); }
+        });
+        fx.g.position.copy(p);
+        const fl = self.spr(fx, 3, 0xffffff, COOK.col.gold, 7), ln = self.spr(fx, 2, 0xfff2d0, COOK.col.sauce, 7), rg = last ? self.spr(fx, 1, COOK.col.warm, COOK.col.sauce, 7) : null;
+        ln.position.copy(d).multiplyScalar(-len * 0.32); self._alignLine(ln, d);   // the streak lies along the incoming path, just behind the contact
+        const nd = last ? (low ? K.dropsLastLite : K.dropsLast) : (low ? K.dropsLite : K.drops);
+        self._bits(p.clone(), nd, { geo: self.geo.cook_drop, tint: 0xd04a22, size: [0.03, 0.055], speed: [1.0, last ? 2.6 : 1.9], up: [0.8, last ? 2.6 : 1.8], ground: gy, life: 0.42 });
+        self._bits(p.clone(), last ? K.crumbsLast : K.crumbs, { geo: self.geo.cook_meatball, tint: 0xb07050, size: [0.03, 0.05], speed: [0.8, 1.8], up: [1.0, 2.0], ground: gy, life: 0.42 });
+      },
+      fizzle(i, pos) { const b = balls[i]; if (!b || b.state === 'over' || b.state === 'gone') return; b.state = 'over'; b.m.visible = false; self._puffs(P3(pos), low ? 1 : 2, 0.35, { c1: COOK.col.steam1, c2: COOK.col.steam2, a: 0.25, life: 0.3, rise: 0.3 }); },
+      end() { ended = true; for (const b of balls) if (b.state !== 'over' && b.state !== 'gone') { b.state = 'over'; b.m.visible = false; } },
+      dispose() { H.end(); },
+    };
+    e.h = H; return H;
   }
 
   // ------------------------------------------------------------------ small shared pieces (2026-11-13)

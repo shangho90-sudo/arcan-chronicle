@@ -500,6 +500,20 @@ CK_PAN = action('ck_pan', [
     key(0.68, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
 ], 0.30, 0.46, None, fadeIn=0.06, fadeOut=0.16)
 
+# 미트볼 던지기 (ck1_b1, anim ck_toss, 2026-11-14): 살짝 웅크리며 왼손 프라이팬을 아래 뒤로 당겼다가(준비 0.15 s) 0.16 s에 팬을 위로
+# 튕김 — 그 순간 미트볼 5개가 팬에서 튀어 올라 앞 공중에 부채꼴로 벌어짐(js/meatball.js, js/cookfx.js volley). 팬을 든 채 잠깐 버틴 뒤 복귀.
+# 오른손 식칼은 거의 그대로, 칼 잔상 없음. tossT = 튕기는 순간(= hitT, skillrt가 op를 여기에 맞춤).
+CK_TOSS = action('ck_toss', [
+    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
+    key(0.08, 'o', twist=-8, lean=9, sink=0.12, hand=[-34, -42, 0.68], blade=[-12, 16], elbow=[-0.7, -1, -0.2], armL=[-26, 22]),
+    key(0.13, 's', twist=-10, lean=11, sink=0.15, hand=[-36, -44, 0.68], blade=[-12, 14], elbow=[-0.7, -1, -0.2], armL=[-34, 24], squint=True),
+    key(0.16, 'i', twist=-2, lean=2, sink=0.08, hand=[-32, -40, 0.70], blade=[-10, 18], elbow=[-0.7, -1, -0.2], armL=[60, 28], squint=True),
+    key(0.21, 'o', twist=6, lean=-8, sink=0.0, hand=[-28, -36, 0.72], blade=[-8, 22], elbow=[-0.7, -1, -0.2], armL=[128, 32]),
+    key(0.36, 's', twist=4, lean=-5, sink=0.02, hand=[-28, -38, 0.72], blade=[-8, 22], elbow=[-0.7, -1, -0.2], armL=[112, 30]),
+    key(0.58, 's', hand=[-30, -40, 0.70], blade=[-10, 20], armL=[12, 18]),
+], 0.16, 0.40, None, fadeIn=0.05, fadeOut=0.16)
+CK_TOSS.update(tossT=0.16)
+
 # ------------------------------------------------------------------------------------------------ 대장장이 1차 (2026-11-13)
 # bs_call (모루 떨구기): 왼손을 높이 들어 하늘의 모루를 부르고 0.34 s에 망치를 내리그음 — 모루는 그 직후 떨어짐(js/smith.js). 잔상 없음.
 BS_CALL = action('bs_call', [
@@ -650,7 +664,7 @@ HD_TRIM = action('hd_trim', [
     hk(0.55, 's', **HD_GUARD),
 ], 0.25, 0.40, None, fadeIn=0.07, fadeOut=0.16)
 
-SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL] + BS_ACTS + [DRAW, SHEATHE, PH_SPIN, PH_SLAM, PH_SMASH, PH_PITCH, PH_SWEEP, CK_CHOP, CK_PAN, BS_CALL, BS_THRUST, BS_SLAM, BS_FLURRY, BS_SWEEP, BS_KICK] + HD_ACTS + [HD_SNIP, HD_TRIM]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
+SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL] + BS_ACTS + [DRAW, SHEATHE, PH_SPIN, PH_SLAM, PH_SMASH, PH_PITCH, PH_SWEEP, CK_CHOP, CK_PAN, CK_TOSS, BS_CALL, BS_THRUST, BS_SLAM, BS_FLURRY, BS_SWEEP, BS_KICK] + HD_ACTS + [HD_SNIP, HD_TRIM]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
 # ------------------------------------------------------------------------------------------------ 예술가 1차 (2026-11-13)
 # 큰 붓(2배)을 두 손으로 잡고 허공에 그림을 그리듯 휘두름. offGrip = 왼손이 잡는 자리(오른손 그립에서 붓 축을 따라 m, js/model.js
 # apply가 왼팔을 그 점에 IK로 붙임 — 다른 직업의 양손 무기도 같은 필드를 쓰면 됨). paint = [시작, 끝] 붓끝이 물감 획을 남기는 구간

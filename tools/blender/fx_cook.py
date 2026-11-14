@@ -86,20 +86,30 @@ def pan(bm, col, uvl):
     (xe, ye, we) = hx[-1]; quad(bm, col, [(xe, ye - 0.03, -we), (xe, ye + 0.03, -we), (xe, ye + 0.03, we), (xe, ye - 0.03, we)], WOOD_LO)
 
 def meatball(bm, col, uvl):
+    # 2026-11-14 (미트볼 던지기 개편): 겉이 구워진 울퉁불퉁한 고기 + 위쪽 붉은 갈색 소스. 큰 덩이 26 + 잔 돌기 70, 구운 얼룩(짙은 갈색),
+    # 소스는 위쪽 55 %에 흘러내린 가장자리(물결)로 덮임 — 윤기는 셰이더 하이라이트(js/cookfx.js volley spec)
     rng = random.Random(7)
-    bmesh.ops.create_icosphere(bm, subdivisions=3, radius=1.0)
-    bumps = [(rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(0.25, 0.5)) for _ in range(22)]
-    for v in bm.verts:
-        x, y, z = v.co; d = 0.0
-        for (bx, by, bz, br) in bumps:
+    bmesh.ops.create_icosphere(bm, subdivisions=4, radius=1.0)
+    big = [(rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(0.25, 0.5)) for _ in range(26)]
+    small = [(rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(0.06, 0.13)) for _ in range(70)]
+    sear = [(rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(0.15, 0.3)) for _ in range(12)]
+    def field(x, y, z, pts, h):
+        d = 0.0
+        for (bx, by, bz, br) in pts:
             m = math.sqrt(bx * bx + by * by + bz * bz) or 1; q = (x * bx + y * by + z * bz) / m
-            if q > 1 - br: d += 0.1 * (q - (1 - br)) / br
-        v.co = (x * (0.93 + d), y * (0.93 + d), z * (0.93 + d))
+            if q > 1 - br: d += h * (q - (1 - br)) / br
+        return d
+    for v in bm.verts:
+        x, y, z = v.co; d = field(x, y, z, big, 0.1) + field(x, y, z, small, 0.045); r = 0.92 + d
+        v.co = (x * r, y * r, z * r * 0.94)
     for f in bm.faces:
         for l in f.loops:
-            x, y, z = l.vert.co; r = math.sqrt(x * x + y * y + z * z); k = (r - 0.93) / 0.2; up = max(0.0, z)      # Blender z = game y
-            base = (0.36 + 0.22 * k, 0.17 + 0.10 * k, 0.07 + 0.04 * k)
-            sauce = (0.78, 0.20, 0.08); s = max(0.0, min(1.0, (up - 0.45) / 0.35)) * 0.75
+            x, y, z = l.vert.co; rr = math.sqrt(x * x + y * y + z * z) or 1; nx, ny, nz = x / rr, y / rr, z / rr; k = max(0.0, min(1.0, (rr - 0.88) / 0.2))
+            sr = min(1.0, field(nx, ny, nz, sear, 1.0))
+            base = (0.42 + 0.20 * k, 0.21 + 0.10 * k, 0.09 + 0.05 * k)                       # browned meat, bumps catch more colour
+            base = tuple(base[i] * (1 - 0.55 * sr) for i in range(3))                         # seared dark patches
+            edge = 0.42 + 0.08 * math.sin(math.atan2(ny, nx) * 5) + 0.05 * math.sin(math.atan2(ny, nx) * 11)
+            sauce = (0.62 + 0.12 * k, 0.13 + 0.04 * k, 0.05); s = max(0.0, min(1.0, (nz - (0.05 - edge * 0.3)) / 0.22)) * 0.85
             l[col] = tuple(base[i] * (1 - s) + sauce[i] * s for i in range(3)) + (1,)
 
 def chip_a(bm, col, uvl):   # carrot coin

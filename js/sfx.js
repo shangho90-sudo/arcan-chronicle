@@ -23,7 +23,7 @@ export const SFX_NAMES = ['levelup', 'jobchange', 'dialog', 'warp', 'hit', 'heav
   'ph_spin', 'ph_slam', 'ph_smash_swing', 'ph_smash_hit', 'ph_push_hit', 'ph_flask', 'ph_shield', 'ph_adrenaline', 'ph_heal',
   'bs_swing', 'bs_hit', 'bs_hit_heavy', 'bs_anvil', 'bs_anvil_ring', 'bs_tongs', 'bs_quench', 'bs_steam', 'bs_steam3',   // 대장장이 1차 (tools/audio/smith_sfx.py)
   'bs_wall', 'bs_block', 'bs_rivet', 'bs_rivet_pop', 'bs_rivet_shot', 'bs_forge', 'bs_break',
-  'ck_flip', 'ck_board', 'ck_soup', 'ck_pepper', 'ck_flour', 'ck_skewer', 'ck_eat',
+  'ck_flip', 'ck_board', 'ck_soup', 'ck_pepper', 'ck_flour', 'ck_skewer', 'ck_eat', 'ck_ball_toss', 'ck_ball_fly', 'ck_ball_hit', 'ck_ball_fin',
   'hd_snip', 'hd_dryer', 'hd_style',
   'nv_sal_cast', 'nv_sal_hit', 'nv_yeon_cast', 'nv_yeon_hit',
   'nv_biyeon_cast', 'nv_biyeon_hit', 'nv_bash_cast', 'nv_bash_hit',

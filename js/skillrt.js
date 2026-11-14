@@ -5,6 +5,8 @@ import { THREE, T } from './render.js';
 import { HitShape, CombatMath, clamp, clamp01 } from './core.js';
 import { skillSound } from './sfx.js';
 import { cookImpact, cookCanToss } from './cookfx.js';
+// 미트볼 던지기 ck1_b1: 5개가 서로 다른 곡선으로 한 적에게 차례로 (CUSTOM.meatball_volley)
+import { meatballVolley } from './meatball.js';
 import { salImpact } from './salfx.js';
 import { yeonImpact, LEAD as YEON_LEAD } from './yeonfx.js';
 const HAIR_STOP = [0.035, 0.06], HAIR_KICK = [0.09, 0.1], hairMid = t => Math.min(1.2, 0.45 + (t.radius || 0.5) * 0.6);   // 미용사: local hit-stop [light, heavy] (s), camera kick [m, s] on the heavy snip, cut height on a target (= js/hairfx.js hairMid)
@@ -303,7 +305,11 @@ export class SkillEngine {
     if (this.melodyBoostT > 0 && ctx.d.job === 'musician') c *= 1.1;
     let def = t.stat('def'); if (op.armorPen) def *= 1 - op.armorPen;
     let critDmg = pc.stat('critDmg'); if (t.status.has('spotlit')) critDmg += 0.5;
-    const r = CombatMath.compute(this.power(ctx), c, def, pc.stat('crit'), critDmg, t.stat('dmgReduce'));
+    let r;
+    if (op.volley) {   // 미트볼 던지기 (js/meatball.js): the volley's total is rolled once (crit + spread), each ball gets its share w[vi], the last one takes the rounding rest
+      const V = op.volley; if (V.total == null) { const r0 = CombatMath.compute(this.power(ctx), c, def, pc.stat('crit'), critDmg, t.stat('dmgReduce')); V.total = r0.amount; V.crit = r0.crit; }
+      const lastBall = op.vi === V.w.length - 1, a = lastBall ? Math.max(1, V.total - V.given) : Math.max(1, Math.round(V.total * V.w[op.vi])); V.given += a; r = { amount: a, crit: V.crit };
+    } else r = CombatMath.compute(this.power(ctx), c, def, pc.stat('crit'), critDmg, t.stat('dmgReduce'));
     const kdir = { x: t.pos.x - pc.pos.x, z: t.pos.z - pc.pos.z };
     const knock = op.knock && !(t.isBoss) && !(t.def && t.def.ai === 'heavy') ? op.knock * 0.4 : 0;
     const quietFx = !!(op.quiet || (op.fx && (op.fx.pharm === 'smash' || op.fx.pharm === 'push' || (op.fx.cook && op.fx.cook !== 'chop') || op.fx.hair))) || !!(op.hairProj || op.hair === 'trap');   // 미용사 빗·헤어롤 덫·fx.hair도 전역 히트스톱 없이   // own local hit-stop + camera kick, never the global ones (quiet: 대장장이)
@@ -984,6 +990,7 @@ export class Summon {
 
 // ------------------------------------------------------------------ unique mechanics
 export const CUSTOM = {
+  meatball_volley(eng, op, ctx) { meatballVolley(eng, op, ctx, G); },   // 요리사 미트볼 던지기 (js/meatball.js + js/cookfx.js volley)
   // 대장장이 1차 (js/smith.js): 모루 떨구기 · 집게 낚아채기 · 급랭 담금질 · 접이식 철벽 · 즉석 리벳
   smith_anvil(eng, op, ctx) { eng.smith.smith_anvil(op, ctx); }, smith_tongs(eng, op, ctx) { eng.smith.smith_tongs(op, ctx); }, smith_quench(eng, op, ctx) { eng.smith.smith_quench(op, ctx); },
   smith_wall(eng, op, ctx) { eng.smith.smith_wall(op, ctx); }, smith_rivets(eng, op, ctx) { eng.smith.smith_rivets(op, ctx); },

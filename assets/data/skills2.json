@@ -3110,7 +3110,7 @@
 "idx": 1,
 "name": "미트볼 던지기",
 "type": "attack",
-"desc": "미트볼 여러 개를 연달아 던진다. 하나하나가 부딪힌 자리에 작은 범위 피해를 준다. 처음엔 2개, 스킬 레벨이 오를 때마다 1개씩 늘어 최대 6개.",
+"desc": "프라이팬을 튕겨 미트볼 다섯 개를 띄운 뒤, 서로 다른 곡선으로 한 적에게 차례로 날려 맞힌다. 마지막 한 방이 가장 세다.",
 "maxLv": 5,
 "unlock": 10,
 "prereq": [],
@@ -3120,25 +3120,22 @@
 "mp": 10,
 "cd": 4,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "throw",
+"recover": 0.4,
+"anim": "ck_toss",
 "ops": [
 {
-"op": "proj",
-"kind": "normal",
+"op": "custom",
+"fn": "meatball_volley",
 "coef": 1.7,
-"count": 2,
-"countPerLv": 1,
-"split": true,
-"gap": 0.09,
-"r": 1.2,
-"speed": 12,
-"arc": 0.9,
-"spread": 0.32,
-"cook": "meatball",
-"burst": "none",
-"sfx": "hit",
-"sfxOnHit": true
+"lvBonus": 0.06,
+"n": 5,
+"w": [
+0.15,
+0.15,
+0.15,
+0.15,
+0.4
+]
 }
 ],
 "mods": [],
@@ -3146,6 +3143,7 @@
 "fx": {
 "color": 11561530
 },
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,

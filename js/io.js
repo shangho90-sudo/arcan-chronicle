@@ -119,18 +119,18 @@ export class Audio {
     }).catch(() => { this.buffers.delete(name); return null; });
     this.buffers.set(name, p); return p;
   }
-  async sfx(name) {
+  async sfx(name, o) {   // o (optional): rate = pitch multiplier, gap = ms before the same sound may play again (미트볼 연타 — ck_ball_* 음량은 5연타가 쌓여 커지지 않게 낮춤)
     if (!this.audible || !name || this.sfxVol <= 0) return;
     const reward = SFX_REWARDS.has(name), event = SFX_EVENTS.has(name), now = performance.now();
-    const gap = name === 'jobchange' ? 1500 : reward ? (name === 'levelup' ? 1200 : 120) : name === 'dialog' ? 90 : name === 'warp' ? 600 : 65;
+    const gap = name === 'jobchange' ? 1500 : reward ? (name === 'levelup' ? 1200 : 120) : name === 'dialog' ? 90 : name === 'warp' ? 600 : o && o.gap ? o.gap : 65;
     if (now - (this.last.get(name) ?? -Infinity) < gap) return; this.last.set(name, now);
     const b = await this.buf("sfx_" + name);
     if (!b || !this.audible || this.sfxVol <= 0 || performance.now() - now > (event ? 2000 : 300)) return;
     // Reserve separate voices for rewards, so a large battle cannot hide a level-up.
     if ([...this.voices].filter(v => v.reward === reward).length >= (reward ? 4 : 12)) return;
     const s = this.ctx.createBufferSource(), g = this.ctx.createGain();
-    s.buffer = b; s.playbackRate.value = reward || event ? 1 : 0.96 + Math.random() * 0.08;
-    g.gain.value = name.startsWith('bs_') ? (BS_GAIN[name] ?? 0.4) : name === 'ph_flask' ? 0.18 : name === 'ph_spin' ? 0.22 : name === 'ph_slam' ? 0.5 : name === 'ph_smash_hit' ? 0.5 : name === 'ph_push_hit' ? 0.46 : name === 'ph_smash_swing' ? 0.3 : name === 'dialog' ? 0.24 : name === 'warp' ? 0.58 : reward ? 0.65 : 0.38; s.connect(g); g.connect(this.gSfx);
+    s.buffer = b; s.playbackRate.value = (reward || event ? 1 : 0.96 + Math.random() * 0.08) * (o && o.rate || 1);
+    g.gain.value = name.startsWith('ck_ball_') ? ({ ck_ball_toss: 0.3, ck_ball_fly: 0.14, ck_ball_hit: 0.3, ck_ball_fin: 0.44 }[name] ?? 0.3) : name.startsWith('bs_') ? (BS_GAIN[name] ?? 0.4) : name === 'ph_flask' ? 0.18 : name === 'ph_spin' ? 0.22 : name === 'ph_slam' ? 0.5 : name === 'ph_smash_hit' ? 0.5 : name === 'ph_push_hit' ? 0.46 : name === 'ph_smash_swing' ? 0.3 : name === 'dialog' ? 0.24 : name === 'warp' ? 0.58 : reward ? 0.65 : 0.38; s.connect(g); g.connect(this.gSfx);
     const voice = { s, reward }; this.voices.add(voice);
     s.onended = () => { this.voices.delete(voice); s.disconnect(); g.disconnect(); }; s.start();
   }

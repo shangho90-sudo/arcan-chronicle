@@ -10,6 +10,11 @@ Runway 크레딧이 0이라 생성형 대신 직접 합성했다(시드 고정 �
   ck_flour   밀가루 포대가 터짐: 부드러운 '퍽' + 낮은 쿵
   ck_skewer  꼬치 찌르기 명중: 짧은 쇠 긁힘 + 푹
   ck_eat     한 입: 바삭 씹는 소리
+  (2026-11-14 미트볼 던지기, `python3 tools/audio/cook_sfx.py ball`로 이 넷만 — 시드가 따로라 위 7개는 그대로)
+  ck_ball_toss  팬을 튕김: 짧은 쇠 '챙'(무쇠 팬의 비조화 배음) + 작은 휙
+  ck_ball_fly   미트볼이 날아감: 가볍고 짧은 '슉'
+  ck_ball_hit   한 알 명중: 짧고 축축한 '팍' (게임이 재생 속도로 음높이를 조금씩 올림)
+  ck_ball_fin   마지막 한 방: 낮고 무거운 '퍽!' + 소스 튀는 소리
 """
 import os, sys
 import numpy as np
@@ -67,5 +72,34 @@ def eat():
     x = bp(g, 700, 4200) + lp(g, 500) * 0.5
     return norm(x, d, t, 0.02)
 
+rb = np.random.default_rng(1114)
+NB = lambda t: rb.standard_normal(len(t))
+def ball_toss():
+    d = 0.42; t = T(d); x = np.zeros(len(t))
+    for fq, dc, g in ((610, 0.16, 0.8), (1475, 0.11, 0.6), (2390, 0.08, 0.45), (3870, 0.05, 0.3), (5210, 0.03, 0.18)): x += np.sin(2 * np.pi * fq * t + rb.uniform(0, 6.28)) * np.exp(-t / dc) * g
+    x *= np.minimum(1, t / 0.002); x += hp(NB(t), 2500) * np.exp(-t / 0.006) * 0.9
+    x += bp(NB(t), 700, 3000) * np.exp(-((t - 0.09) / 0.05) ** 2) * 0.25
+    return norm(np.tanh(x * 1.2), d, t, 0.06)
+def ball_fly():
+    d = 0.2; t = T(d); env = np.sin(np.pi * np.clip(t / 0.18, 0, 1)) ** 2
+    x = bp(NB(t), 1400, 5200) * env * 0.9 + bp(NB(t), 500, 1300) * env * 0.35
+    return norm(x, d, t, 0.03)
+def ball_hit():
+    d = 0.17; t = T(d); x = bp(NB(t), 800, 4200) * np.exp(-t / 0.012) * 1.5
+    x += np.sin(2 * np.pi * (180 + 90 * np.exp(-t / 0.02)) * t) * np.exp(-t / 0.03) * 0.9
+    x += lp(NB(t), 1400) * np.exp(-np.maximum(0, t - 0.01) / 0.03) * (t > 0.01) * 0.5     # wet squelch
+    return norm(np.tanh(x * 1.3), d, t, 0.03)
+def ball_fin():
+    d = 0.42; t = T(d); x = bp(NB(t), 300, 2600) * np.exp(-t / 0.03) * 1.5
+    x += np.sin(2 * np.pi * (62 + 50 * np.exp(-t / 0.03)) * t) * np.exp(-t / 0.1) * 1.3
+    x += lp(NB(t), 900) * np.exp(-t / 0.05) * 0.8
+    g = np.zeros(len(t))
+    for k in range(14):
+        at = rb.uniform(0.02, 0.22); L = int(SR * rb.uniform(0.003, 0.008)); place(g, rb.standard_normal(L) * np.exp(-np.arange(L) / (L * 0.3)), at, rb.uniform(0.3, 0.8) * np.exp(-at / 0.12))
+    return norm(np.tanh((x + bp(g, 900, 5000) * 0.5) * 1.2), d, t, 0.08)
+
 if __name__ == '__main__':
+    if sys.argv[1:] == ['ball']:
+        for name, fn in (('ball_toss', ball_toss), ('ball_fly', ball_fly), ('ball_hit', ball_hit), ('ball_fin', ball_fin)): S.save('sfx_ck_' + name, fn())
+        sys.exit(0)
     for name, fn in (('flip', flip), ('board', board), ('soup', soup), ('pepper', pepper), ('flour', flour), ('skewer', skewer), ('eat', eat)): S.save('sfx_ck_' + name, fn())
