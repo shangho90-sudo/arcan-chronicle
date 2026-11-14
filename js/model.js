@@ -225,6 +225,7 @@ function makeProp(kind) {
 // Two halves on one pivot (blade forward +z, ring handle behind); the right hand holds the ring of half +1, the left hand
 // (pose.grip2, left-arm IK in apply) the ring of half -1; pose.snip opens them (SHEARS.open rad each). Lengths in prop
 // metres (the hand holder scales by 1.3): pivot -> tip 0.50, pivot -> ring 0.22, about 3x the old 0.27 m scissors.
+export const SHEARS_BACK_ROLL = 90;   // deg, see updateProp (back holder only - the in-hand grip is unchanged)
 export const SHEARS = { blade: 0.50, pivot: 0.22, ringX: 0.062, ringR: 0.062, open: 0.5, rest: 0.035 };
 const SHEAR_TIER = [null, { ring: 0xe65a8c, blade: 0xe4eaf4, pin: 0xf4c860 }, { ring: 0xf0b848, blade: 0xeef2fa, pin: 0xfff0b0 }, { ring: 0x9a6cf0, blade: 0xf2f0ff, pin: 0x7ad8ff }];
 /** ring centre of half s (+1 right hand / -1 left hand) relative to the pivot, at open amount k (0..1) */
@@ -984,7 +985,10 @@ export class ModelBody {
     const a = side === 'R' && !md.cfg.npc ? this.armW : 1;
     if (a >= 0.999) h.matrix.copy(inHand);
     else {
-      const bm = this.backMount(), onBack = mul(_m().copy(W[bm.bone]), md.bones[bm.bone].inv, bm.M);
+      const bm = this.backMount(); let onBack = mul(_m().copy(W[bm.bone]), md.bones[bm.bone].inv, bm.M);
+      // 미용사 큰 가위 (2026-11-14): the blades are flat in the prop's x-z plane, so on the back holder they stood out edge-on
+      // across the body. Turn them 90 deg about their own long axis (z): same diagonal, flat face (both blades + rings) on the back
+      if (h.children[0] && h.children[0].userData.shears) onBack = mul(onBack, rz(SHEARS_BACK_ROLL));
       if (a <= 0.001) h.matrix.copy(onBack);
       else {                                                                 // glide hand <-> back (position lerp, rotation slerp)
         const p0 = _v(), p1 = _v(), q0 = new THREE.Quaternion(), q1 = new THREE.Quaternion(), s0 = _v(), s1 = _v();
