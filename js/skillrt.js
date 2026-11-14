@@ -11,6 +11,8 @@ const HAIR_STOP = [0.035, 0.06], HAIR_KICK = [0.09, 0.1], hairMid = t => Math.mi
 const PAN_STOP = 0.07, PAN_KICK = [0.13, 0.11];     // 요리사 팬 강타: local hit-stop (s), camera kick [m, s]
 const PUSH_STOP = 0.05, PUSH_KICK = [0.09, 0.1];   // 밀어내기: local hit-stop (s), camera kick [m, s]
 const SMASH_STOP = 0.06, SMASH_KICK = [0.11, 0.1];   // 유봉강타: local hit-stop (s, caster + target visuals only), camera kick [m, s]
+const ART_FEEL = { sweep: [0.05, 0.16, 1], discord: [0.05, 0.16, 1], wave: [0.03, 0.12, 0], mark: [0, 0.1, 0], blob: [0.04, 0.14, 0], note: [0.02, 0.08, 0] };   // 예술가: [local hit-stop s, punch s, camera kick?]
+const ART_KICK = [0.1, 0.1];
 import { biyeonImpact } from './biyeonfx.js';
 import { bashImpact, BASH } from './bashfx.js';
 // 대장장이 1차: 가열·모루·집게·낙인·철벽·리벳 규칙 (js/smith.js)
@@ -33,6 +35,7 @@ export const FX = {
   sal(kind, pos, dir, o = {}) { try { if (G.skillFx && G.skillFx.sal) return G.skillFx.sal[kind](pos, dir, o); } catch (e) { console.warn('fx sal', e); } },   // 일격참 '살' (js/salfx.js)
   biyeon(kind, pos, dir, o = {}) { try { if (G.skillFx && G.skillFx.biyeon) return G.skillFx.biyeon[kind](pos, dir, o); } catch (e) { console.warn('fx biyeon', e); } return null; },   // 비연참 '비연파' (js/biyeonfx.js)
   pharm(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.pharm) return G.skillFx.pharm[kind](a, o); } catch (e) { console.warn('fx pharm', e); } return null; },   // 약사 1차 소품 (js/pharmfx.js)
+  art(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.art) return G.skillFx.art[kind](a, o); } catch (e) { console.warn('fx art', e); } return null; },   // 예술가 1차: 물감·음표·액자·전구 (js/artfx.js)
   cook(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.cook) return G.skillFx.cook[kind](a, o); } catch (e) { console.warn('fx cook', e); } return null; },   // 요리사 1차: 허공 식칼·큰 프라이팬·미트볼 (js/cookfx.js)
   smith(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.smith) return G.skillFx.smith[kind](a, o); } catch (e) { console.warn('fx smith', e); } return null; },   // 대장장이 1차 (js/smithfx.js)
   hair(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.hair) return G.skillFx.hair[kind](a, o); } catch (e) { console.warn('fx hair', e); } return null; },   // 미용사 1차: 큰 가위·빗·드라이어·헤어롤 (js/hairfx.js)
@@ -45,6 +48,13 @@ export const FX = {
   telegraph(pos, r, dur, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.telegraph(pos, r, dur, o); } catch (e) { console.warn('fx tele', e); } },
 };
 
+/** 예술가 타격감: local hit-stop on the caster (if given) and the targets only (never G.hitStop), a squash on each target, at most one camera kick */
+function artFeel(pc, ts, f, kind) {
+  const k = ART_FEEL[kind]; if (!k || !ts.length) return;
+  if (k[0] > 0) { if (pc) pc.freezeT = Math.max(pc.freezeT || 0, k[0]); for (const t of ts) if (!t.dead) t.freezeT = Math.max(t.freezeT || 0, k[0]); }
+  for (const t of ts) if (t.body && t.body.punch) t.body.punch(t.pos.x - (pc ? pc.pos.x : t.pos.x - f.x), t.pos.z - (pc ? pc.pos.z : t.pos.z - f.z), k[1]);
+  if (k[2] && G.render.kick && !G.reduceFlash) G.render.kick(f.x, f.z, ART_KICK[0], ART_KICK[1]);
+}
 // ------------------------------------------------------------------ statuses with boss / immunity rules
 const CC = new Set(['freeze', 'root', 'stagger', 'stun']);
 const ELEMENTAL = new Set(['burn', 'poison', 'slow', 'freeze']);   // 속성 상태이상 (속성 저항 elemRes가 지속 시간을 줄임)
@@ -398,6 +408,11 @@ export class SkillEngine {
           else if (op.hair === 'dryer') ctx.hairFx = FX.hair('dryer', pc, { mode: op.mode, r: op.r, ang: op.ang, lead: Math.max(0, lead - 0.06), dur: lead + (op.dur || 0.34), f: ctx.facing });
           else FX.hair(op.hair, pc, { kind: op.kind });
           return; }
+        if (op.art) {   // 예술가 (js/artfx.js): buffs drawn as what their names say, while the status really lasts
+          if (op.art === 'march') { const s0 = pc.status.list.find(x => x.def.id === 'haste'); FX.art('march', pc, { dur: s0 ? s0.remaining : 8 }); }
+          else if (op.art === 'inspire') { const ch = this.channel; FX.art('inspire', pc, { dur: ch ? ch.op.dur : 2, tick: ch ? ch.op.tick : 0.5, alive: () => this.channel === ch && !!ch }); }
+          else if (op.art === 'improv') { const s0 = pc.status.list.find(x => x.def.id === 'inspired'); FX.art('improv', pc, { dur: s0 ? s0.remaining : 10 }); }
+          return; }
         if (op.cook) {   // 요리사 (js/cookfx.js): 'knife' hovers over the target and chops on every damage tick, 'pan' appears overhead and lands after `fall` s
           const tg = ctx.tgt && !ctx.tgt.dead ? ctx.tgt : this.targetFor(d), hop = d.ops.find(o => o.op === 'hit');
           ctx.cookFx = FX.cook(op.cook, pc, { tgt: tg || null, facing: ctx.facing, n: hop ? (hop.hits || 1) + Math.floor((hop.hitsPerLv || 0) * (ctx.L - 1)) : 1, gap: op.gap || (hop && hop.gap) || 0.12, first: -(op.at || 0), fall: op.fall || 0.3,
@@ -510,6 +525,7 @@ export class SkillEngine {
         }
         const hairHit = [], hairAll = ts.length;
         let consumed = 0;
+        const landed = [];
         if (op.consume) for (const t of ts) consumed = Math.max(consumed, takeMarks(t, op.consume.type === 'phrase' ? 'phrase' : op.consume.type));
         if (op.consume && op.consume.type === 'phrase') { consumed = Math.floor(this.res.phrase); this.res.phrase = 0; }
         // centre bonus (cone): the target nearest the axis gets the bonus
@@ -521,6 +537,7 @@ export class SkillEngine {
           if (op.consume) coef *= 1 + consumed * op.consume.mulPer;
           if (op.coef > 0) this.dmg(t, coef, ctx, { ...op, centerHit: t === centre });
           if (!ctx.missed || !(op.coef > 0)) hairHit.push(t);   // really damaged (not a MISS) — 미용사 이펙트·소리는 이 대상들에게만
+          if (!(op.coef > 0 && ctx.missed)) landed.push(t);
           if (!(op.stOnHit && ctx.missed)) this.onHit(t, op, ctx);   // stOnHit (팬 강타): a MISS applies nothing
           if (cookOk && !(op.coef > 0 && ctx.missed)) cookOk.push(t);
           if (op.centerStack && t === centre) { t._cstack = (t._cstack || 0) + 1; if (t._cstack >= op.centerStack.n) { applyStatus(t, op.centerStack.st, pc); t._cstack = 0; } }
@@ -554,6 +571,14 @@ export class SkillEngine {
           if (t0) this.smith.impact(t0, f, heavy);
         }
         if (cookOk) cookImpact(G, pc, op, ctx, ts, cookOk, f);   // 뒤집기·뜨거운 국물·후추 뿌리기·꼬치 찌르기: the prop lands its blow now; local freeze / punch / toss / one kick only on a real hit
+        if (op.fx && op.fx.art) {   // 예술가 (after the damage so a MISS gets no splash): the named shape on the real area + paint / notes on each target really hit
+          const k = op.fx.art, hitTs = landed.filter(t => !t.dead || k !== 'mark');
+          if (k === 'sweep') FX.art('sweep', pc, { f, r: op.r * this.ampMul(ctx), ang: op.ang, hits: hitTs });
+          else if (k === 'wave') FX.art('wave', pc, { f, r: op.r * this.ampMul(ctx), ang: op.ang, hits: hitTs });
+          else if (k === 'discord') FX.art('discord', pc, { r: op.r * this.ampMul(ctx), hits: hitTs });
+          else if (k === 'mark') for (const t of landed) if (!t.dead && t.status.has('painted')) FX.art('mark', t, { dur: 8 });
+          artFeel(pc, hitTs, f, k);
+        }
         if (op.extendHerb) for (const a of this.areas) if (a.op.herb && this.shapeOf(op, ctx).overlaps(a.c.x, a.c.z, a.r)) a.extend(op.extendHerb, op.extendCap || 4);
         if (op.link && ts.length > 1) for (let i = 1; i < ts.length; i++) FX.beam('thread_link', ts[i - 1].pos, ts[i].pos, { duration: 2 });
         if (op.swingSfx) G.audio.sfx(op.swingSfx);
@@ -669,6 +694,7 @@ export class SkillEngine {
       if (same.length >= (op.limit || 1)) same[0].vanish(false);
       const alive = this.summons.filter(s => !s.dead);
       if (alive.length >= 8) alive[0].vanish(false);
+      if (op.art) FX.art('canvas', p, { f: ctx.facing });   // 작은 걸작: a gold-framed canvas pops up and the painted creature jumps out of it
       const s = new Summon(this, op, ctx, p); this.summons.push(s); pc.zone.actors.push(s);
     }
   }
@@ -715,7 +741,7 @@ export class SkillEngine {
 // ------------------------------------------------------------------ projectile
 class SkillProj {
   constructor(eng, op, ctx, speedMul, idx = 0, cnt = 1) {
-    this.eng = eng; this.op = op; this.ctx = ctx; const pc = eng.pc;
+    this.eng = eng; this.op = op; this.ctx = ctx; const pc = eng.pc; this.idx = idx;
     this.pos = { x: pc.pos.x + ctx.facing.x * 0.4, y: pc.pos.y + 1.0, z: pc.pos.z + ctx.facing.z * 0.4 };
     this.speed = (op.speed || 12) * speedMul; this.range = op.range || eng.range(ctx.d) + 1; this.trav = 0; this.hit = new Set(); this.back = false; this.t = 0;
     this.target = ctx.tgt && !ctx.tgt.dead ? ctx.tgt : null;
@@ -729,7 +755,7 @@ class SkillProj {
     if (op.arc) { if (this.target || ctx.tgt) this.range = m + 0.4; this.arcLen = Math.max(0.6, Math.min(m, this.range)); this.arcH = op.arc * (0.75 + 0.5 * ((idx * 0.37) % 1)) * Math.min(1, m / 4); }   // thrown in an arc (drawn only: the hit test stays on the ground line)
     // 비연참: the centre crescent of the fan IS this projectile (js/biyeonfx.js); falls back to the generic wave until loaded
     const held = op.pharmProj && ctx.heldFlask && !ctx.heldFlask.dead ? ctx.heldFlask : null; if (held) { held.dead = true; held.fx.release && held.fx.release(); }   // the flask that was in the hand flies on
-    this.fx = (held && held.fx) || (op.biyeon && FX.biyeon('proj', this.pos, this.dir, { groundY: pc.pos.y || 0 })) || (op.pharmProj && FX.pharm('proj', this.pos, { elem: op.elem })) || (op.cook && FX.cook('proj', this.pos, { kind: op.cook })) || (op.hairProj && FX.hair('proj', this.pos, {})) || FX.projectile(op.fx || 'capsule', { color: ctx.d.fx && ctx.d.fx.color });
+    this.fx = (held && held.fx) || (op.biyeon && FX.biyeon('proj', this.pos, this.dir, { groundY: pc.pos.y || 0 })) || (op.pharmProj && FX.pharm('proj', this.pos, { elem: op.elem })) || (op.cook && FX.cook('proj', this.pos, { kind: op.cook })) || (op.hairProj && FX.hair('proj', this.pos, {})) || (op.art && FX.art('proj', this.pos, { kind: op.art, idx })) || FX.projectile(op.fx || 'capsule', { color: ctx.d.fx && ctx.d.fx.color });
     this.fx.set(this.pos, { x: this.dir.x, y: 0, z: this.dir.z });
   }
   update(dt) {
@@ -770,6 +796,7 @@ class SkillProj {
         if (op.stackSlow) { const s = c.status.list.find(x => x.def.id === 'slow'); if (s) s.value = Math.min(0.6, s.value + 0.06); }
         if (op.biyeon) { const ip = biyeonImpact(c, this.dir); if (this.fx.hit) this.fx.hit(ip); FX.biyeon('hit', ip, this.dir); }   // only the enemy really damaged
         else if (op.hairProj) { FX.hair('combHit', { x: c.pos.x, y: (c.pos.y || 0) + hairMid(c), z: c.pos.z }, { hit: true, dir: this.dir }); c.freezeT = Math.max(c.freezeT || 0, HAIR_STOP[0]); if (c.body && c.body.punch) c.body.punch(this.dir.x, this.dir.z, 0.14); }   // 빗 투척: 빗살 자국 + 맞은 적만 짧게 멈춤
+        else if (op.art) { if (!this.ctx.missed) { FX.art('projHit', c, { kind: op.art, idx: this.idx, dir: this.dir }); artFeel(null, [c], this.dir, op.art); } }   // 예술가: paint splat / sharp note burst only on a real hit
         else FX.burst(op.burst || 'hit_pierce', c.pos, { radius: 0.6 });
         if (op.chain) this.eng.chain(c, op.chain, this.ctx);
         if (!op.pierce && op.kind !== 'boomerang') return this.done();
@@ -790,6 +817,7 @@ class SkillArea {
     if (op.music) this.stopMusic = G.audio.skillBed(op.music);
     if (op.pharm) this.pfx = FX.pharm(op.pharm, { x: pos.x, y: pos.y, z: pos.z }, { r, dur });   // 광역 회복진 (js/pharmfx.js)
     if (op.cook) this.pfx = FX.cook(op.cook, { x: pos.x, y: eng.pc.zone.geo.ground(pos.x, pos.z).y, z: pos.z }, { r, dur, pre: ctx.cookFx });   // 밀가루 구름 (js/cookfx.js)
+    if (op.art) this.pfx = FX.art(op.art, { x: pos.x, y: pos.y, z: pos.z }, { r, dur });         // 잉크 웅덩이 (js/artfx.js pool)
     if (op.prop) { this.prop = FX.summon(op.prop, {}); this.prop.position.copy(T(pos)); G.render.scene.add(this.prop); }
   }
   extend(sec, cap) { if (this.extended >= cap) return; const k = Math.min(sec, cap - this.extended); this.extended += k; this.life += k; this.fx.pulse(); }
@@ -808,6 +836,7 @@ class SkillArea {
     }
     if (op.kind === 'ward') return;
     const ts = eng.targets(HitShape.circle(c.x, c.z, this.r));
+    if (op.art && this.pfx && this.pfx.pulse && ts.length) this.pfx.pulse(ts);   // 잉크 웅덩이: one ripple + ink on the enemies standing in it, on the damage tick
     for (const t of ts) {
       if (op.coef) eng.dmg(t, op.coef * (1 + this.empower), this.ctx, { pull: op.pull, pullTo: c });
       for (const s of op.st || []) applyStatus(t, s, pc, this.ctx.mult);
@@ -829,10 +858,10 @@ export class Summon {
     this.life = (op.life || 10) * (1 + 0.05 * (ctx.L - 1)); this.cd = 0.4; this.t = 0; this.empower = 0; this.invuln = 0; this.knock = { x: 0, z: 0 };
     this.status = { list: [], has: () => false, apply: () => { }, remove: () => { }, flag: () => 0, bonus: () => 0, slow: 1 };
     this.facing = { ...ctx.facing };
-    this.view = FX.summon(op.kind, {}); this.view.position.copy(T(this.pos)); G.render.scene.add(this.view);
+    this.view = (op.art && FX.art('critter')) || FX.summon(op.kind, {}); this.view.position.copy(T(this.pos)); G.render.scene.add(this.view);
     this.bar = null;
     if (op.ai === 'wall') this.makeWall(op);
-    FX.burst(this.machine ? 'sparks' : 'root_burst', this.pos, { radius: 1 });
+    if (!op.art) FX.burst(this.machine ? 'sparks' : 'root_burst', this.pos, { radius: 1 });   // 예술가 작은 걸작: its own canvas pop (artfx canvas), no roots
   }
   get maxHp() { return this.maxHpV; }
   stat(s) { const pc = this.eng.pc; if (s === 'def') return pc.stat('def') * 0.6; if (s === 'dmgReduce') return 0; if (s === 'moveSpeed') return 4.2; return pc.stat(s); }
@@ -905,7 +934,7 @@ export class Summon {
       case 'chase_melee': case 'taunt_melee': {
         const t = this.enemyNear(9);
         if (!t) { if (this.dist(pc) > 3) this.moveTowards(pc.pos, dt, 5); break; }
-        if (this.dist(t) > (o.range || 1.6) + t.radius) this.moveTowards(t.pos, dt, 5.2); else if (this.cd <= 0) { this.cd = rate; this.face(t.pos); this.hitTarget(t, o.coef); FX.slash('arc', t.pos, this.facing, { radius: 1.2 }); }
+        if (this.dist(t) > (o.range || 1.6) + t.radius) this.moveTowards(t.pos, dt, 5.2); else if (this.cd <= 0) { this.cd = rate; this.face(t.pos); this.hitTarget(t, o.coef); if (o.art) FX.art('splash', t, { col: [0xf03a44, 0xffd22e, 0x2f7cf6][(this._n = (this._n || 0) + 1) % 3] }); else FX.slash('arc', t.pos, this.facing, { radius: 1.2 }); }
         break;
       }
       case 'mine': case 'trap': {

@@ -651,6 +651,134 @@ HD_TRIM = action('hd_trim', [
 ], 0.25, 0.40, None, fadeIn=0.07, fadeOut=0.16)
 
 SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL] + BS_ACTS + [DRAW, SHEATHE, PH_SPIN, PH_SLAM, PH_SMASH, PH_PITCH, PH_SWEEP, CK_CHOP, CK_PAN, BS_CALL, BS_THRUST, BS_SLAM, BS_FLURRY, BS_SWEEP, BS_KICK] + HD_ACTS + [HD_SNIP, HD_TRIM]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
+# ------------------------------------------------------------------------------------------------ 예술가 1차 (2026-11-13)
+# 큰 붓(2배)을 두 손으로 잡고 허공에 그림을 그리듯 휘두름. offGrip = 왼손이 잡는 자리(오른손 그립에서 붓 축을 따라 m, js/model.js
+# apply가 왼팔을 그 점에 IK로 붙임 — 다른 직업의 양손 무기도 같은 필드를 쓰면 됨). paint = [시작, 끝] 붓끝이 물감 획을 남기는 구간
+# (js/artfx.js stroke; 칼 잔상 trail은 쓰지 않음).
+# 기본공격 5단(ar_combo_1..5): 시간·전진(adv)·발(step/lift)·타격 시각·lock·chainClose·atk 배율은 combo_1..5(C5)와 완전히 같고
+# 상체만 다름 — 1 사선 내려긋기(\) 2 올려긋기(/) 3 가로 긋기(—) 4 앞으로 콕 찍기(·) 5 머리 위에서 두 손으로 크게 내려긋기(|).
+AR_OFFGRIP = 0.17
+AG = dict(hand=[-18, -30, 0.62], blade=[10, 35], elbow=[-0.7, -1, -0.2], armL=[20, 30])
+AE = [-0.6, -1, -0.3]
+AR_P = [
+    PZ(AG, sink=0.05),
+    dict(twist=-26, lean=-4, sink=0.07, hand=[-48, 38, 0.72], blade=[-60, 70], elbow=[-0.5, -0.6, -0.8]),
+    dict(twist=-8, lean=4, sink=0.07, hand=[-22, 20, 0.86], blade=[-20, 30], elbow=AE, squint=True),
+    dict(twist=14, lean=10, sink=0.08, hand=[6, -8, 0.95], blade=[14, -16], elbow=AE, squint=True),
+    dict(twist=26, lean=12, sink=0.09, hand=[30, -30, 0.84], blade=[50, -40], elbow=[-0.2, -1, 0.1]),
+    dict(twist=28, lean=10, sink=0.10, hand=[34, -32, 0.80], blade=[58, -38], elbow=[-0.2, -1, 0.1]),
+    dict(twist=30, lean=6, sink=0.12, hand=[38, -36, 0.74], blade=[70, -44], elbow=[-0.1, -1, 0.2]),
+    dict(twist=8, lean=6, sink=0.09, hand=[14, -12, 0.90], blade=[24, -10], elbow=AE, squint=True),
+    dict(twist=-12, lean=2, sink=0.05, hand=[-14, 14, 0.96], blade=[-18, 26], elbow=AE, squint=True),
+    dict(twist=-26, lean=-2, sink=0.05, hand=[-40, 38, 0.84], blade=[-50, 60], elbow=[-0.5, -0.6, -0.8]),
+    dict(twist=-32, lean=0, sink=0.09, hand=[-50, 30, 0.78], blade=[-80, 40], elbow=[-0.5, -0.6, -0.8]),
+    dict(twist=-44, lean=2, sink=0.10, hand=[-56, 6, 0.74], blade=[-96, 4], elbow=[-0.5, -0.8, -0.8]),
+    dict(twist=-18, lean=6, sink=0.10, hand=[-30, 4, 0.90], blade=[-48, 2], elbow=AE, squint=True),
+    dict(twist=12, lean=8, sink=0.10, hand=[2, 0, 0.98], blade=[6, -2], elbow=AE, squint=True),
+    dict(twist=38, lean=8, sink=0.10, hand=[36, -4, 0.86], blade=[70, -6], elbow=[-0.1, -1, 0.2]),
+    dict(twist=24, lean=4, sink=0.12, hand=[20, -18, 0.68], blade=[36, 2], elbow=[-0.2, -1, -0.2]),
+    dict(twist=-30, lean=-2, sink=0.16, hand=[-40, -10, 0.50], blade=[-4, 4], elbow=[-0.5, -0.4, -1]),
+    dict(twist=-34, lean=0, sink=0.18, hand=[-44, -12, 0.46], blade=[-4, 4], elbow=[-0.5, -0.4, -1], squint=True),
+    dict(twist=-10, lean=10, sink=0.20, hand=[-16, -4, 0.82], blade=[-2, 0], elbow=[-0.6, -0.6, -0.6], squint=True),
+    dict(twist=10, lean=18, sink=0.22, hand=[0, 0, 1.0], blade=[0, -4], elbow=[-0.5, -0.8, -0.2], squint=True),
+    dict(twist=12, lean=20, sink=0.23, hand=[2, -2, 1.0], blade=[0, -6], elbow=[-0.5, -0.8, -0.2]),
+    dict(twist=2, lean=10, sink=0.18, hand=[-20, 14, 0.76], blade=[-20, 50], elbow=[-0.6, -0.6, -0.6]),
+    dict(twist=-8, lean=-12, sink=0.06, hand=[-14, 62, 0.82], blade=[0, 86], elbow=[-0.7, -0.3, -0.8]),
+    dict(twist=-10, lean=-14, sink=0.08, hand=[-12, 68, 0.80], blade=[0, 112], elbow=[-0.7, -0.3, -0.8]),
+    dict(twist=-4, lean=6, sink=0.16, hand=[-8, 40, 0.95], blade=[0, 50], elbow=[-0.7, -0.6, -0.6], squint=True),
+    dict(twist=4, lean=24, sink=0.26, hand=[0, -22, 1.0], blade=[0, -40], elbow=AE, squint=True),
+    dict(twist=6, lean=28, sink=0.30, hand=[2, -40, 0.90], blade=[0, -58], elbow=AE),
+    dict(twist=6, lean=22, sink=0.25, hand=[2, -38, 0.88], blade=[0, -52], elbow=AE),
+    dict(twist=4, lean=8, sink=0.10, hand=[-8, -34, 0.72], blade=[6, 0], elbow=[-0.7, -1, -0.2]),
+    PZ(AG, sink=0.05),
+    PZ(AG),
+]
+assert len(AR_P) == len(C5)
+AR5 = [(x[0], x[1], x[2], x[3], x[4], dict(AR_P[i], armL=AR_P[i].get('armL', [20, 30]))) for i, x in enumerate(C5)]
+def ar_strike(i):
+    """ar_combo_<i+1>: same sections, root travel, hit time, lock and chain window as combo_<i+1>; only the upper body differs"""
+    t0, t1 = C5_CUT[i], C5_CUT[i + 1]; a0 = next(x for x in AR5 if abs(x[0] - t0) < 1e-6)[2]
+    ks = [c5_mk(x, t0, a0) for x in AR5 if t0 - 1e-6 <= x[0] <= t1 + 1e-6]
+    if i == 4: ks += [c5_mk(x, t0, a0) for x in AR5 if x[0] > t1 + 1e-6]
+    else:
+        end = ks[-1][1]; ad = end['adv']; T = ks[-1][0]; L, R = end['step']
+        mvR, mvL = abs(R - ad) > 0.02, abs(L - ad) > 0.02; R1, L1 = (ad if mvR else R), (ad if mvL else L)
+        mid = dict(twist=6, lean=5, sink=0.06, hand=[-6, -34, 0.70], blade=[8, 6], elbow=[-0.7, -1, -0.2], armL=[20, 30])
+        ks += [ck(round(T + 0.09, 4), 's', ad, [L, (R + R1) / 2], [0, 0.05 if mvR else 0], **mid),
+               ck(round(T + 0.17, 4), 's', ad, [(L + L1) / 2, R1], [0.04 if mvL else 0, 0], **PZ(AG, sink=0.04)),
+               ck(round(T + 0.25, 4), 's', ad, [L1, R1], [0, 0], **PZ(AG, sink=0.02)),
+               ck(round(T + 0.32, 4), 's', ad, [L1, R1], [0, 0], **PZ(AG))]
+    h = C5_HIT[i] - t0; ref = C5_ACTS[i]
+    a = action('ar_combo_%d' % (i + 1), ks, round(h, 4), ref['lock'], None, fadeIn=0.05, fadeOut=0.14)
+    a.update(hitTimes=[round(h, 4)], chainOpen=ref['chainOpen'], chainClose=ref['chainClose'], atk=ref['atk'], adv=ref['adv'], combo=i + 1, mark=ref['mark'],
+             offGrip=AR_OFFGRIP, paint=[round(h - (0.085 if i == 4 else 0.07), 3), round(h + (0.055 if i != 3 else 0.02), 3)])
+    assert a['keys'] == ref['keys'], (a['keys'], ref['keys'])
+    return a
+AR_ACTS = [ar_strike(i) for i in range(5)]
+# 붓 휘두르기 (ar1_a2, anim ar_sweep): 두 손으로 붓을 오른쪽 뒤로 당겼다가 가슴 높이에서 왼쪽으로 크게 가로로 긋는다. 타격 0.25 s
+# (예전 attack 동작과 같은 타격 시각 -> 스킬 시간 그대로).
+AR_SWEEP = action('ar_sweep', [
+    key(0.00, **AG),
+    key(0.12, 'o', twist=-42, lean=-2, sink=0.08, hand=[-58, 8, 0.72], blade=[-100, 10], elbow=[-0.5, -0.8, -0.8]),
+    key(0.17, 's', twist=-48, lean=-3, sink=0.10, hand=[-62, 10, 0.70], blade=[-108, 12], elbow=[-0.5, -0.8, -0.8]),
+    key(0.215, 'i', twist=-16, lean=6, sink=0.10, hand=[-30, 4, 0.92], blade=[-46, 2], elbow=AE, squint=True),
+    key(0.25, None, twist=14, lean=10, sink=0.11, hand=[4, 0, 1.0], blade=[8, -2], elbow=AE, squint=True),
+    key(0.33, 'o', twist=44, lean=10, sink=0.11, hand=[40, -4, 0.86], blade=[82, -8], elbow=[-0.1, -1, 0.2]),
+    key(0.44, 's', twist=20, lean=5, sink=0.06, hand=[14, -24, 0.70], blade=[30, 6], elbow=[-0.4, -1, -0.1]),
+    key(0.58, 's', **AG),
+], hitT=0.25, lock=0.40, trail=None, fadeIn=0.08, fadeOut=0.16)
+AR_SWEEP.update(offGrip=AR_OFFGRIP, paint=[0.19, 0.33])
+# 붓 튕기기 (ar_flick: 물감 탄환 ar1_a1 · 잉크 웅덩이 ar1_a3): 붓을 어깨 위로 젖혔다가 앞으로 튕겨 물감을 날린다. 타격 0.1667 s = 예전 throw.
+AR_FLICK = action('ar_flick', [
+    key(0.00, **AG),
+    key(0.09, 'o', twist=-18, lean=-6, sink=0.04, hand=[-30, 46, 0.66], blade=[-20, 100], elbow=[-0.6, -0.4, -0.8]),
+    key(0.13, 'i', twist=-6, lean=2, sink=0.05, hand=[-16, 30, 0.86], blade=[-8, 52], elbow=AE, squint=True),
+    key(0.1667, None, twist=10, lean=12, sink=0.07, hand=[-2, 6, 1.0], blade=[0, -6], elbow=AE, squint=True),
+    key(0.24, 'o', twist=14, lean=14, sink=0.08, hand=[2, -8, 0.96], blade=[2, -24], elbow=AE),
+    key(0.34, 's', twist=6, lean=6, sink=0.04, hand=[-10, -26, 0.72], blade=[6, 10], elbow=[-0.7, -1, -0.2]),
+    key(0.44, 's', **AG),
+], hitT=0.1667, lock=0.34, trail=None, fadeIn=0.06, fadeOut=0.14)
+AR_FLICK.update(offGrip=AR_OFFGRIP, paint=[0.125, 0.19])
+# 콕 찍기 (ar_dab: 색칠 표식 ar1_a4 · 작은 걸작 ar1_c3): 붓을 당겼다가 앞의 허공에 콕 찍어 그린다. 타격 0.30 s = 예전 cast.
+AR_DAB = action('ar_dab', [
+    key(0.00, **AG),
+    key(0.14, 'o', twist=-24, lean=-2, sink=0.08, hand=[-36, -4, 0.52], blade=[-6, 10], elbow=[-0.5, -0.4, -1]),
+    key(0.22, 's', twist=-28, lean=-2, sink=0.10, hand=[-40, -6, 0.48], blade=[-6, 10], elbow=[-0.5, -0.4, -1]),
+    key(0.27, 'i', twist=-6, lean=8, sink=0.10, hand=[-14, 2, 0.84], blade=[-2, 4], elbow=[-0.6, -0.6, -0.6], squint=True),
+    key(0.30, None, twist=8, lean=14, sink=0.11, hand=[0, 4, 1.0], blade=[0, 0], elbow=[-0.5, -0.8, -0.2], squint=True),
+    key(0.40, 'o', twist=10, lean=14, sink=0.11, hand=[2, 6, 0.98], blade=[4, 8], elbow=[-0.5, -0.8, -0.2]),
+    key(0.50, 's', twist=4, lean=6, sink=0.05, hand=[-10, -22, 0.72], blade=[6, 20], elbow=[-0.7, -1, -0.2]),
+    key(0.60, 's', **AG),
+], hitT=0.30, lock=0.46, trail=None, fadeIn=0.07, fadeOut=0.15)
+AR_DAB.update(offGrip=AR_OFFGRIP, paint=[0.265, 0.32])
+# 지휘 (ar_baton: 음파 파동 ar1_b1 · 작은 불협화음 ar1_b3 · 가벼운 행진곡 ar1_b4): 붓을 지휘봉처럼 높이 들었다가 박자를 내려 긋는다. 타격 0.30 s = 예전 cast.
+AR_BATON = action('ar_baton', [
+    key(0.00, **AG),
+    key(0.13, 'o', twist=-10, lean=-8, sink=0.02, hand=[-20, 56, 0.80], blade=[-10, 80], elbow=[-0.7, -0.3, -0.8]),
+    key(0.22, 's', twist=-12, lean=-10, sink=0.03, hand=[-22, 62, 0.82], blade=[-14, 96], elbow=[-0.7, -0.3, -0.8]),
+    key(0.27, 'i', twist=-2, lean=4, sink=0.07, hand=[-10, 30, 0.94], blade=[-4, 40], elbow=AE, squint=True),
+    key(0.30, None, twist=8, lean=12, sink=0.10, hand=[0, 0, 1.0], blade=[2, -8], elbow=AE, squint=True),
+    key(0.38, 'o', twist=14, lean=10, sink=0.09, hand=[16, -6, 0.94], blade=[30, 6], elbow=[-0.3, -1, 0]),
+    key(0.50, 's', twist=4, lean=4, sink=0.04, hand=[-8, -20, 0.74], blade=[4, 30], elbow=[-0.7, -1, -0.2]),
+    key(0.60, 's', **AG),
+], hitT=0.30, lock=0.46, trail=None, fadeIn=0.07, fadeOut=0.15)
+AR_BATON.update(offGrip=AR_OFFGRIP)
+# 스타카토 (ar1_b2, anim ar_stac): 붓끝으로 짧게 세 번 톡톡톡 찍는 지휘(음표 세 발 0.1667 / 0.2667 / 0.3667 s). 첫 타격 0.1667 s = 예전 throw.
+AR_STAC = action('ar_stac', [
+    key(0.00, **AG),
+    key(0.10, 'o', twist=-8, lean=-4, sink=0.04, hand=[-18, 34, 0.70], blade=[-8, 70], elbow=[-0.7, -0.4, -0.7]),
+    key(0.1667, 'i', twist=4, lean=8, sink=0.06, hand=[-4, 8, 0.98], blade=[0, 0], elbow=AE, squint=True),
+    key(0.215, 'o', twist=0, lean=4, sink=0.05, hand=[-10, 22, 0.84], blade=[-4, 40], elbow=AE),
+    key(0.2667, 'i', twist=6, lean=9, sink=0.06, hand=[2, 6, 0.99], blade=[6, -2], elbow=AE, squint=True),
+    key(0.315, 'o', twist=2, lean=5, sink=0.05, hand=[-6, 22, 0.84], blade=[0, 40], elbow=AE),
+    key(0.3667, 'i', twist=8, lean=11, sink=0.07, hand=[0, 2, 1.0], blade=[-4, -6], elbow=AE, squint=True),
+    key(0.46, 'o', twist=6, lean=8, sink=0.05, hand=[-4, -10, 0.86], blade=[2, 10], elbow=AE),
+    key(0.58, 's', **AG),
+], hitT=0.1667, lock=0.44, trail=None, fadeIn=0.06, fadeOut=0.14)
+AR_STAC.update(offGrip=AR_OFFGRIP)
+AR_ALL = AR_ACTS + [AR_SWEEP, AR_FLICK, AR_DAB, AR_BATON, AR_STAC]
+
+SKILL_ACTS += AR_ALL   # 예술가 1차 (양손 붓)
 
 acts = json.load(open(P))
 names = {'attack', 'attack2'} | {x['name'] for x in SKILL_ACTS}

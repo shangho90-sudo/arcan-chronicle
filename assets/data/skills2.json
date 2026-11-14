@@ -7473,7 +7473,7 @@
 "cd": 2.5,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "throw",
+"anim": "ar_flick",
 "ops": [
 {
 "op": "proj",
@@ -7482,7 +7482,8 @@
 "speed": 15,
 "fx": "paint_blue",
 "burst": "explosion_ink",
-"paint": true
+"paint": true,
+"art": "blob"
 }
 ],
 "mods": [],
@@ -7520,7 +7521,7 @@
 "cd": 4,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "attack",
+"anim": "ar_sweep",
 "ops": [
 {
 "op": "hit",
@@ -7529,7 +7530,7 @@
 "r": 2.4,
 "ang": 100,
 "fx": {
-"slash": "brush_stroke"
+"art": "sweep"
 }
 }
 ],
@@ -7568,7 +7569,7 @@
 "cd": 9,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "throw",
+"anim": "ar_flick",
 "ops": [
 {
 "op": "area",
@@ -7585,7 +7586,8 @@
 "ch": 1.0
 }
 ],
-"fx": "ink_pool"
+"fx": "none",
+"art": "pool"
 }
 ],
 "mods": [],
@@ -7623,7 +7625,7 @@
 "cd": 8,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "cast",
+"anim": "ar_dab",
 "ops": [
 {
 "op": "hit",
@@ -7638,7 +7640,7 @@
 }
 ],
 "fx": {
-"burst": "explosion_ink"
+"art": "mark"
 }
 }
 ],
@@ -7720,7 +7722,7 @@
 "cd": 5,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "cast",
+"anim": "ar_baton",
 "ops": [
 {
 "op": "hit",
@@ -7730,7 +7732,7 @@
 "ang": 60,
 "elem": "sound",
 "fx": {
-"slash": "sound_cone"
+"art": "wave"
 }
 }
 ],
@@ -7769,7 +7771,7 @@
 "cd": 4,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "throw",
+"anim": "ar_stac",
 "ops": [
 {
 "op": "proj",
@@ -7780,7 +7782,8 @@
 "speed": 16,
 "elem": "sound",
 "fx": "note",
-"burst": "explosion_note"
+"burst": "explosion_note",
+"art": "note"
 }
 ],
 "mods": [],
@@ -7818,7 +7821,7 @@
 "cd": 8,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "cast",
+"anim": "ar_baton",
 "ops": [
 {
 "op": "hit",
@@ -7835,7 +7838,7 @@
 }
 ],
 "fx": {
-"burst": "explosion_note"
+"art": "discord"
 }
 }
 ],
@@ -7874,14 +7877,19 @@
 "cd": 16,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "cast",
+"anim": "ar_baton",
 "ops": [
 {
 "op": "buff",
 "id": "haste",
 "dur": 8,
 "val": 0.2,
-"target": "self"
+"target": "self",
+"noAura": true
+},
+{
+"op": "fx",
+"art": "march"
 }
 ],
 "mods": [],
@@ -7972,6 +7980,10 @@
 ],
 "breakOnHit": true,
 "breakOnMove": true
+},
+{
+"op": "fx",
+"art": "inspire"
 }
 ],
 "mods": [],
@@ -8006,14 +8018,19 @@
 "cd": 12,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "cast",
+"anim": "ar_dab",
 "ops": [
 {
 "op": "buff",
 "id": "inspired",
 "dur": 10,
 "val": 0.4,
-"target": "self"
+"target": "self",
+"noAura": true
+},
+{
+"op": "fx",
+"art": "improv"
 }
 ],
 "mods": [],
@@ -8048,7 +8065,7 @@
 "cd": 14,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "cast",
+"anim": "ar_dab",
 "ops": [
 {
 "op": "summon",
@@ -8060,7 +8077,8 @@
 "rate": 1.0,
 "range": 1.6,
 "limit": 1,
-"living": true
+"living": true,
+"art": true
 }
 ],
 "mods": [],

@@ -36,6 +36,7 @@ function shape(pts, depth, bevel = 0.006) {
   const g = new THREE.ExtrudeGeometry(s, { depth, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 2 }); g.translate(0, 0, -depth / 2); return g;
 }
 /** item axis is +z: build along +y then tip forward */
+export const BRUSH_SCALE = 2;   // 예술가 붓: 손에 든 크기가 예전의 2배 (js/model.js makeProp의 임시 붓도 같은 값)
 function alongZ(g) { const w = G(); g.rotation.x = R; w.add(g); return w; }
 
 const TIER = [null, { blade: 'iron', trim: 'bronze', gem: null }, { blade: 'steel', trim: 'silver', gem: 0x5ab4ff }, { blade: 'silver', trim: 'gold', gem: 0xff5a8c }];
@@ -93,6 +94,9 @@ const BUILD = {
     add(g, cone(0.02, 0.08, 12), M(tip, { r: 0.6 }), 0, 0.32, 0, Math.PI);
     add(g, sph(0.021, 12), M(tip, { r: 0.6 }), 0, 0.29, 0, 0, 0, 0, [1, 1.2, 1]);
     if (T.gem) add(g, sph(0.014, 8), GEM(T.gem), 0, -0.045);
+    // 큰 붓 (2026-11-13): 손에 든 크기가 예전의 2배 (가방 아이콘·떨어진 모습은 크기를 다시 맞추므로 그대로), 붓털은 조금 더 통통하게
+    add(g, sph(0.027, 12), M(tip, { r: 0.6 }), 0, 0.3, 0, 0, 0, 0, [1, 1.5, 1]);
+    g.scale.setScalar(BRUSH_SCALE);
     return alongZ(g);
   },
   armor(t) {               // tunic / leather vest / mushroom cape on a small stand

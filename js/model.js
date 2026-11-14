@@ -3,7 +3,7 @@
 // so actors.js keeps working; animation comes from the game's pose table, applied to the skeleton and
 // interpolated every frame, and the body turns smoothly to any angle.
 import { THREE, T, tex, paintMat, contactShadowTex, addOutline } from './render.js';
-import { itemModel, isWeaponModel } from './items3d.js';
+import { itemModel, isWeaponModel, BRUSH_SCALE } from './items3d.js';
 
 const DEG = Math.PI / 180;
 export const PLAYER_MODELS = {
@@ -206,7 +206,7 @@ function makeProp(kind) {
     case 'knife': cyl(0.017, 0.1, 0x5a3c28, 0, 0, 0, R); box(0.012, 0.06, 0.18, 0xd6dee8, 0, 0.012, 0.15); break;
     case 'hammer': cyl(0.02, 0.36, 0x80583a, 0, 0, 0.12, R); box(0.09, 0.09, 0.17, 0x7c808c, 0, 0, 0.3).rotation.y = R; break;
     case 'scissors': box(0.012, 0.022, 0.2, 0xdce2ec, 0.016, 0, 0.13).rotation.y = 0.15; box(0.012, 0.022, 0.2, 0xc8cedc, -0.016, 0, 0.13).rotation.y = -0.15; sph(0.03, 0xe65a8c, 0.03, 0, 0); sph(0.03, 0xe65a8c, -0.03, 0, 0); break;
-    case 'brush': cyl(0.015, 0.3, 0x825032, 0, 0, 0.1, R); sph(0.04, 0x3cc8c8, 0, 0, 0.29, 1, 1, 1.8); break;
+    case 'brush': cyl(0.015, 0.3, 0x825032, 0, 0, 0.1, R); sph(0.04, 0x3cc8c8, 0, 0, 0.29, 1, 1, 1.8); g.children.forEach(m => { m.position.multiplyScalar(BRUSH_SCALE); m.scale.multiplyScalar(BRUSH_SCALE); }); break;   // 예술가 붓 2배 (2026-11-13)
     case 'pan': cyl(0.015, 0.12, 0x3c3232, 0, 0, 0.04, R); cyl(0.1, 0.02, 0x464650, 0, 0, 0.18); break;
     case 'dryer': box(0.04, 0.12, 0.04, 0xf096be, 0, -0.04, 0); cyl(0.04, 0.16, 0xf096be, 0, 0.03, 0.06, R); break;
     case 'palette': sph(0.1, 0xc8a06e, 0, 0, 0.06, 1, 0.18, 0.8); sph(0.018, 0xe65050, 0.03, 0.02, 0.04); sph(0.018, 0x50a0e6, -0.02, 0.02, 0.08); sph(0.018, 0xf0d246, 0.03, 0.02, 0.1); break;
@@ -850,6 +850,18 @@ export class ModelBody {
       for (const fg of ['Index', 'Middle', 'Ring', 'Pinky']) { ik['Left_' + fg + 'Proximal'] = rz(-60); ik['Left_' + fg + 'Intermediate'] = rz(-70); }
       Q = blendBones(Q, ik, this.gripW); W = this.worldOf(Q); void hiR;
     }
+    // two-handed weapons (action.offGrip = where the left hand holds, m along the weapon from the right-hand grip; swings.py):
+    // the left arm is solved onto that point of the weapon the right hand carries (예술가 큰 붓, 2026-11-13)
+    const A2 = this.sh.actions[this.action]; this.offGripW = 0;
+    if (A2 && A2.offGrip && this.swingW > 0.01 && this.armW > 0.5 && md.byName.Left_UpperArm !== undefined && md.byName.Left_MiddleProximal !== undefined) {
+      const hi = md.byName.Right_Hand, hb = md.bones[hi], s = md.scale, tilt = (p.wOff - 90) * (1 - this.swingW);
+      const inHand = mul(_m().copy(W[hi]), hb.inv, _m().makeTranslation(hb.t.x - 0.027 / s, hb.t.y - 0.01, hb.t.z + 0.01), rx(-tilt), _m().makeScale(1.3 / s, 1.3 / s, 1.3 / s));
+      const T2 = _v(0, 0, A2.offGrip).applyMatrix4(inHand), ax = _v(0, 0, 1).transformDirection(inHand);
+      const c2 = armChainL(md), shL = md.byName.Left_Shoulder, dShL = mul(_m().copy(W[shL]), md.bones[shL].inv), SnL = c2.S.clone().applyMatrix4(dShL);
+      const r2 = solveArm(c2, SnL, T2, _v(0.6, -1, -0.35).normalize(), ax), RpL = rotOnly(dShL).clone().invert();
+      Q = blendBones(Q, { Left_UpperArm: mul(RpL, r2.Rua), Left_LowerArm: mul(r2.Rua.clone().invert(), r2.Rla), Left_Hand: mul(r2.Rla.clone().invert(), r2.Rh) }, this.swingW);
+      W = this.worldOf(Q); this.offGripW = this.swingW;
+    }
     for (let i = 0; i < md.bones.length; i++) {
       const b = md.bones[i], bone = this.bones[i];
       bone.matrix.copy(b.parent < 0 ? W[i] : mul(_m().copy(W[b.parent]).invert(), W[i]));
@@ -878,7 +890,7 @@ export class ModelBody {
     const stow = !!(ca && ca.stow) && !md.cfg.npc, wkind = shearsOn ? 'shears:' + (sw ? sw[1] : 1) : wid && isWeaponModel(wid) ? 'item:' + wid : this.weapon;
     if (stow) { const w0 = this.weaponId ? this.weaponId() : null; this.updateProp('R', w0 && isWeaponModel(w0) ? 'item:' + w0 : this.weapon, 0); this.updateProp('H', p.held || null, (p.wOff - 90) * (1 - (this.swingW || 0))); }
     else { this.updateProp('R', p.held || wkind, (p.wOff - 90) * (1 - (this.swingW || 0))); if (this.props.H) this.updateProp('H', null, 0); }
-    this.updateProp('L', p.held && !stow ? null : this.armW > 0.5 && !(this.gripW > 0.4) ? this.off : null, p.offOff - 90);
+    this.updateProp('L', p.held && !stow ? null : this.armW > 0.5 && !(this.gripW > 0.4) && !(this.offGripW > 0.3) ? this.off : null, p.offOff - 90);
   }
   worldOf(Q) {
     const md = this.md, W = new Array(md.bones.length), S = this.bscale || (this.bscale = boneScales(md));

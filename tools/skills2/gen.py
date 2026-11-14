@@ -360,28 +360,30 @@ S(J, 2, 2, '의상과 마법 자수', 5, 'ds_c5', '완벽한 피팅', 'passive',
 
 # ======================================================================= 예술가 (artist)
 J, C = 'artist', 0x50c8c8
-S(J, 1, 0, '기초 회화', 1, 'ar1_a1', '물감 탄환', 'attack', '작은 물감 투사체를 쏜다.', target='enemy', range=8, mp=6, cd=2.5, anim='throw', tags=['paint'],
-  ops=[proj('normal', 1.5, speed=15, fx='paint_blue', burst='explosion_ink', paint=True)])
-S(J, 1, 0, '기초 회화', 2, 'ar1_a2', '붓 휘두르기', 'attack', '근거리 부채꼴 붓질.', weapon='brush', range=2.4, mp=8, cd=4, anim='attack', tags=['paint'],
-  ops=[hit('cone', 1.5, r=2.4, ang=100, fx=dict(slash='brush_stroke'))])
-S(J, 1, 0, '기초 회화', 3, 'ar1_a3', '잉크 웅덩이', 'attack', '지속 피해와 둔화를 주는 잉크 웅덩이.', target='ground', range=7, mp=14, cd=9, anim='throw', tags=['paint'],
-  ops=[area('dmg', 2.4, 6, tick=1.0, coef=0.35, st=[st('slow', 1.2, 0.3)], fx='ink_pool')])
-S(J, 1, 0, '기초 회화', 4, 'ar1_a4', '색칠 표식', 'support', '대상에 표식을 남겨 다음 물감 공격을 강화한다.', target='enemy', range=8, mp=8, cd=8, anim='cast', tags=['paint'],
-  ops=[hit('single', 0.0, st=[st('painted', 8, 0.6)], fx=dict(burst='explosion_ink'))])
+# 2026-11-13 예술가 1차 연출 개편 — 수치(계수·기력·재사용·사거리·대상·상태이상·개수)는 그대로, 동작은 양손 붓(ar_flick/ar_sweep/ar_dab/ar_baton/ar_stac,
+# 타격 시각은 예전 throw 0.1667 s·attack 0.25 s·cast 0.30 s와 같음), 이펙트는 js/artfx.js (op/fx의 art = 종류).
+S(J, 1, 0, '기초 회화', 1, 'ar1_a1', '물감 탄환', 'attack', '작은 물감 투사체를 쏜다.', target='enemy', range=8, mp=6, cd=2.5, anim='ar_flick', tags=['paint'],
+  ops=[proj('normal', 1.5, speed=15, fx='paint_blue', burst='explosion_ink', paint=True, art='blob')])
+S(J, 1, 0, '기초 회화', 2, 'ar1_a2', '붓 휘두르기', 'attack', '근거리 부채꼴 붓질.', weapon='brush', range=2.4, mp=8, cd=4, anim='ar_sweep', tags=['paint'],
+  ops=[hit('cone', 1.5, r=2.4, ang=100, fx=dict(art='sweep'))])
+S(J, 1, 0, '기초 회화', 3, 'ar1_a3', '잉크 웅덩이', 'attack', '지속 피해와 둔화를 주는 잉크 웅덩이.', target='ground', range=7, mp=14, cd=9, anim='ar_flick', tags=['paint'],
+  ops=[area('dmg', 2.4, 6, tick=1.0, coef=0.35, st=[st('slow', 1.2, 0.3)], fx='none', art='pool')])
+S(J, 1, 0, '기초 회화', 4, 'ar1_a4', '색칠 표식', 'support', '대상에 표식을 남겨 다음 물감 공격을 강화한다.', target='enemy', range=8, mp=8, cd=8, anim='ar_dab', tags=['paint'],
+  ops=[hit('single', 0.0, st=[st('painted', 8, 0.6)], fx=dict(art='mark'))])
 S(J, 1, 0, '기초 회화', 5, 'ar1_a5', '붓끝 숙련', 'passive', '물감 사거리와 투사체 속도가 증가한다.', flags=dict(paintRange=[1.0, 0.5], projSpeed=[0.1, 0.05]))
-S(J, 1, 1, '기초 음악', 1, 'ar1_b1', '음파 파동', 'attack', '전방의 여러 적에게 음파를 보낸다.', range=4.5, mp=10, cd=5, anim='cast', tags=['music'],
-  ops=[hit('cone', 1.4, r=4.5, ang=60, elem='sound', fx=dict(slash='sound_cone'))])
-S(J, 1, 1, '기초 음악', 2, 'ar1_b2', '스타카토', 'attack', '빠른 음표 세 발.', target='enemy', range=8, mp=10, cd=4, anim='throw', tags=['music'],
-  ops=[proj('normal', 0.7, count=3, gap=0.1, speed=16, elem='sound', fx='note', burst='explosion_note')])
-S(J, 1, 1, '기초 음악', 3, 'ar1_b3', '작은 불협화음', 'attack', '근거리 피해와 일반 적의 동작을 끊는다.', target='self', range=2.6, mp=12, cd=8, anim='cast', tags=['music'],
-  ops=[hit('circle', 1.3, r=2.6, elem='sound', st=[st('stagger', 0.8)], fx=dict(burst='explosion_note'))])
-S(J, 1, 1, '기초 음악', 4, 'ar1_b4', '가벼운 행진곡', 'support', '이동 속도를 높인다.', target='self', mp=10, cd=16, anim='cast', tags=['music'], ops=[buff('haste', 8, 0.2)])
+S(J, 1, 1, '기초 음악', 1, 'ar1_b1', '음파 파동', 'attack', '전방의 여러 적에게 음파를 보낸다.', range=4.5, mp=10, cd=5, anim='ar_baton', tags=['music'],
+  ops=[hit('cone', 1.4, r=4.5, ang=60, elem='sound', fx=dict(art='wave'))])
+S(J, 1, 1, '기초 음악', 2, 'ar1_b2', '스타카토', 'attack', '빠른 음표 세 발.', target='enemy', range=8, mp=10, cd=4, anim='ar_stac', tags=['music'],
+  ops=[proj('normal', 0.7, count=3, gap=0.1, speed=16, elem='sound', fx='note', burst='explosion_note', art='note')])
+S(J, 1, 1, '기초 음악', 3, 'ar1_b3', '작은 불협화음', 'attack', '근거리 피해와 일반 적의 동작을 끊는다.', target='self', range=2.6, mp=12, cd=8, anim='ar_baton', tags=['music'],
+  ops=[hit('circle', 1.3, r=2.6, elem='sound', st=[st('stagger', 0.8)], fx=dict(art='discord'))])
+S(J, 1, 1, '기초 음악', 4, 'ar1_b4', '가벼운 행진곡', 'support', '이동 속도를 높인다.', target='self', mp=10, cd=16, anim='ar_baton', tags=['music'], ops=[buff('haste', 8, 0.2, noAura=True), dict(op='fx', art='march')])
 S(J, 1, 1, '기초 음악', 5, 'ar1_b5', '박자 감각', 'passive', '음악 스킬을 쓴 뒤 다음 기본 공격이 빨라진다.', flags=dict(beatHaste=[0.3, 0.1]))
 S(J, 1, 2, '영감과 창작', 1, 'ar1_c1', '영감 충전', 'support', '짧게 집중해 기력(MP)을 회복한다. 피격 시 중단.', target='self', mp=0, cd=18, anim='cast',
-  ops=[channel(2.0, 0.5, [dict(op='mp', pct=0.05)], breakOnHit=True, breakOnMove=True)])
-S(J, 1, 2, '영감과 창작', 2, 'ar1_c2', '즉흥 창작', 'support', '다음 회화·음악 공격의 피해와 범위를 늘린다.', target='self', mp=12, cd=12, anim='cast', ops=[buff('inspired', 10, 0.4)])
-S(J, 1, 2, '영감과 창작', 3, 'ar1_c3', '작은 걸작', 'summon', '그림 생명체가 잠시 나타나 공격한다.', target='ground', range=5, mp=18, cd=14, anim='cast', tags=['paint'],
-  ops=[summon('masterpiece', ai='chase_melee', life=10, hp=0.6, coef=0.8, rate=1.0, range=1.6, limit=1, living=True)])
+  ops=[channel(2.0, 0.5, [dict(op='mp', pct=0.05)], breakOnHit=True, breakOnMove=True), dict(op='fx', art='inspire')])
+S(J, 1, 2, '영감과 창작', 2, 'ar1_c2', '즉흥 창작', 'support', '다음 회화·음악 공격의 피해와 범위를 늘린다.', target='self', mp=12, cd=12, anim='ar_dab', ops=[buff('inspired', 10, 0.4, noAura=True), dict(op='fx', art='improv')])
+S(J, 1, 2, '영감과 창작', 3, 'ar1_c3', '작은 걸작', 'summon', '그림 생명체가 잠시 나타나 공격한다.', target='ground', range=5, mp=18, cd=14, anim='ar_dab', tags=['paint'],
+  ops=[summon('masterpiece', ai='chase_melee', life=10, hp=0.6, coef=0.8, rate=1.0, range=1.6, limit=1, living=True, art=True)])
 S(J, 1, 2, '영감과 창작', 4, 'ar1_c4', '예술 부적 제작', 'craft', '공격·방어·기력 강화 부적을 만든다.')
 S(J, 1, 2, '영감과 창작', 5, 'ar1_c5', '창작의 흐름', 'passive', '회화와 음악을 번갈아 쓰면 다음 스킬의 기력 소모가 줄어든다.', flags=dict(flow=[0.2, 0.06]))
 
