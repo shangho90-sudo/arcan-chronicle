@@ -308,7 +308,7 @@ export class SkillEngine {
     let r;
     if (op.volley) {   // 미트볼 던지기 (js/meatball.js): the volley's total is rolled once (crit + spread), each ball gets its share w[vi], the last one takes the rounding rest
       const V = op.volley; if (V.total == null) { const r0 = CombatMath.compute(this.power(ctx), c, def, pc.stat('crit'), critDmg, t.stat('dmgReduce')); V.total = r0.amount; V.crit = r0.crit; }
-      const lastBall = op.vi === V.w.length - 1, a = lastBall ? Math.max(1, V.total - V.given) : Math.max(1, Math.round(V.total * V.w[op.vi])); V.given += a; r = { amount: a, crit: V.crit };
+      const lastBall = op.vi === V.w.length - 1, a = lastBall ? Math.max(1, V.total - V.given) : Math.max(1, Math.round(V.total * V.w[op.vi])); V.given += a; r = { amount: a, crit: V.crit && lastBall };   // a critical volley shows CRITICAL once, on the heavy last ball (five big numbers hid the target)
     } else r = CombatMath.compute(this.power(ctx), c, def, pc.stat('crit'), critDmg, t.stat('dmgReduce'));
     const kdir = { x: t.pos.x - pc.pos.x, z: t.pos.z - pc.pos.z };
     const knock = op.knock && !(t.isBoss) && !(t.def && t.def.ai === 'heavy') ? op.knock * 0.4 : 0;
