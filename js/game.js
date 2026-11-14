@@ -492,12 +492,12 @@ class Game {
     if (lock) {
       zoneId = this.data.levels.startZone; spawnId = this.data.levels.startSpawn; usePos = false;
       if (P0 && this.lockOf(P0.returnZone)) { P0.returnZone = zoneId; P0.returnSpawn = spawnId; }
-      setTimeout(() => { if (session === this.session) this.ui.toast("아직 들어갈 수 없는 곳이라 아르칸 마을로 옮겼습니다 — " + lock.text); }, 900);
     }
     await this.buildZone(zoneId);
     if (session !== this.session) return;
     const z = this.zone, def = z.def, P = this.profile, cfg = this.data.config;
     P.zone = zoneId; if (def.kind === "town") { P.returnZone = zoneId; P.returnSpawn = def.respawnSpawn; }
+    if (lock) setTimeout(() => { if (session === this.session) this.ui.toast("아직 들어갈 수 없는 곳이라 아르칸 마을로 옮겼습니다 — " + lock.text); }, 1200);
     if (discoverTown(this.data, P, zoneId)) setTimeout(() => { if (session === this.session) this.ui.toast(`새 마을 발견: ${def.name} — 이제 워프 안내인이 이곳으로 보내 줄 수 있어요`); }, 1200);
     let pos, yaw;
     if (usePos && P.hasPos && !z.geo.blocked(P.posX, P.posZ, cfg.playerRadius)) {
@@ -541,7 +541,8 @@ class Game {
       if (st === QS.Completable && turnIn === npcId) return "ready";
       if (st === QS.Active) {
         const pr = Q.find(q.id);
-        if (q.objectives.some((o, i) => o.type === "talk" && o.target === npcId && Q.current(q, i, pr) < o.count)) r = "talk";
+        const jm = (this.data.npcs[npcId] || {}).role === "jobmaster";       // 전직 목표 = 전직 마스터에게 가기
+        if (q.objectives.some((o, i) => (o.type === "talk" && o.target === npcId || o.type === "job" && jm) && Q.current(q, i, pr) < o.count)) r = "talk";
         else if (turnIn === npcId && !r) r = "active";
       } else if (st === QS.Available && q.giver === npcId && r !== "talk") r = "avail";
     }

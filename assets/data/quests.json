@@ -1092,7 +1092,7 @@
    "category": "main",
    "giver": "kerin",
    "turnIn": "kerin",
-   "summary": "아르칸 마을 마스터에게 1차 전직하기",
+   "summary": "카이리온 왕도 길드 회관 마스터에게 1차 전직하기",
    "prereq": [
     "mq07b"
    ],
@@ -1102,7 +1102,7 @@
      "type": "job",
      "target": "any",
      "count": 1,
-     "text": "아르칸 마을 마스터에게 1차 전직하기"
+     "text": "카이리온 왕도 길드 회관 마스터에게 1차 전직하기"
     }
    ],
    "reward": {
@@ -1116,7 +1116,7 @@
     ]
    },
    "consumeCollected": true,
-   "offerText": "<b class='gold'>케린</b> 칼만 휘두르는 녀석은 오래 못 간다. 네 손에 맞는 일을 찾아라. 아르칸 마을에 마스터들이 있다지?",
+   "offerText": "<b class='gold'>케린</b> 칼만 휘두르는 녀석은 오래 못 간다. 네 손에 맞는 일을 찾아라. 카이리온 왕도 길드 회관에 마스터들이 모여 있다지?",
    "progressText": "<b class='gold'>케린</b> 약국·식당·대장간·의상실·화방. 마스터를 찾아가 '직업 상담'을 해라.",
    "completeText": "<b class='gold'>케린</b> 좋은 손이 됐군. 그 손으로 사람을 살릴 수도, 벨 수도 있다.",
    "story": true
@@ -2359,7 +2359,7 @@
    "category": "main",
    "giver": "astel",
    "turnIn": "elder",
-   "summary": "아르칸 마을 마스터의 2차 전직 시험 통과 · 아스텔의 오른팔에 쓸 회복 물약 5개",
+   "summary": "카이리온 왕도 길드 회관 마스터의 2차 전직 시험 통과 · 아스텔의 오른팔에 쓸 회복 물약 5개",
    "prereq": [
     "mq21b"
    ],
@@ -2369,7 +2369,7 @@
      "type": "job",
      "target": "tier2",
      "count": 1,
-     "text": "아르칸 마을 마스터의 2차 전직 시험 통과"
+     "text": "카이리온 왕도 길드 회관 마스터의 2차 전직 시험 통과"
     },
     {
      "type": "collect",

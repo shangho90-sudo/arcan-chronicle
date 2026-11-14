@@ -8,7 +8,7 @@
 ## 기본
 - 빌드 없음. `python3 -m http.server 8765` 후 `http://localhost:8765/index.html`.
 - three.js r160을 로컬 import map(`index.html`, `vendor/three-r160/`)으로 불러옵니다. CDN 장애 시 0% 멈춤을 방지하기 위해 동일 버전과 LICENSE를 저장소에 포함합니다. npm 의존성 없음. 새 라이브러리 추가 금지(필요하면 먼저 사용자에게 확인).
-- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs && node tests/gear.test.mjs && node tests/warp.test.mjs && node tests/pharmacist-audio.test.mjs && node tests/smith.test.mjs` (현재 core 495 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 638 통과).
+- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs && node tests/gear.test.mjs && node tests/warp.test.mjs && node tests/pharmacist-audio.test.mjs && node tests/smith.test.mjs && node tests/gates.test.mjs` (현재 core 495 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 638 통과; gates 706 통과).
 - 테스트하지 않은 것을 "검증됨"이라고 보고하지 말 것.
 
 ## 데이터 우선
@@ -74,7 +74,7 @@
 - 마을 생성(2026-11-12 리뉴얼, 아래 "마을 리뉴얼" 절): `tools/world/towns.py` `gen_town2`가 9곳 모두(아르칸 포함)의 `town3d` 사양과 충돌 `blockPolys`·`props`를 만듦. 예전 생성기는 `world.py` `gen_town_v1`(안 씀).
 - 세계 지도: `js/worldmap.js`(M 키 / 메뉴 '지도'), 확대·축소, 장소를 누르면 권장 레벨·이어진 곳. 남색+금색 창(로고·나침반·범례·아래 정보 막대, CSS는 `index.html` "세계 지도 (js/worldmap.js, navy + gold chart)" 블록, 휴대폰은 로고 숨김). 배경 그림 `assets/ui/worldmap_bg.jpg`와 글꼴 `assets/fonts/ArcanSerif.woff`(Noto Serif CJK KR Bold 부분 집합, OFL)는 `python3 tools/world/paint_map.py`로 생성 — 세계 데이터(`world.py --write`)를 바꾸면 다시 실행. `paint_map.py`의 `OX, OY`와 `worldmap.js`의 `PAD`는 같아야 함. 글자 배치는 `layoutLabels`(화면 크기 고정·겹치면 자리 옮김/숨김, 확대할 때마다 다시). 확인 `tools/browser-tests/worldshots.js`(SIZE=390x844t 휴대폰)·`mapshot.js`(지역 이름이 흐려졌는지 출력).
 - 새 몬스터 17종: Tripo 초안(`tools/monsters/tripo_new.py`, 키는 `~/.tripo/key`) → Blender 정리(`tools/monsters/blender_new.py`: 조각 제거, 9천 삼각형으로 줄이기, 바닥 맞춤, 기본색만 1024 px + 손그림 느낌 처리, 무광) → `assets/creatures/w_<name>.glb.json`. 능력치는 `world.py` `SPECIES`(공격 방식별 기존 몬스터 + 레벨 곡선 보간). 화면 확인 `tools/browser-tests/monstershots.js`.
-- 몬스터 2차 묶음(`world.py` `SPECIES2`/`NEW_MONS`, Tripo `tools/monsters/tripo_more.py`): 모델이 있는 종만 들어감. 생성 필드의 무리는 필드 레벨 범위에 맞춘 `level`을 가짐(`core.js` `monsterAtLevel`).
+- 몬스터 2차 묶음(`world.py` `SPECIES2`/`NEW_MONS`, Tripo `tools/monsters/tripo_more.py`): 모델이 있는 종만 들어감. 생성 필드의 무리는 필드 레벨 범위에 맞춘 `level`을 가짐(`core.js` `monsterAtLevel`). 필드 레벨 범위 자체는 2026-11-15부터 메인 퀘스트 순서로 정함(`FIELDS`의 값은 원래 값, 아래 "메인 퀘스트 입장 조건" 절).
 - 지형 마스크(`nature.js` `paintMask`)는 길을 날카롭게 그린 뒤 한 번만 흐림 — 선분마다 blur 필터를 걸면 소프트웨어 GL에서 몇 분 걸림.
 
 ## 마을 리뉴얼 (2026-11-12, 9곳 모두)
@@ -89,6 +89,15 @@
 - NPC가 카메라에 가려지지 않게: `tools/world/visible.py`(가리는 물체·판정) — `towns.py` 마지막 단계가 가려진 NPC를 옮기거나 가리는 나무를 치우고, `story.py` `spot_near`도 피함. 확인 `python3 tools/world/check_visible.py`(0 hidden이어야 함). 새 큰 장식을 더하면 `visible.occluders`에도 넣을 것.
 - 다시 만들기 순서: `python3 tools/world/world.py --write` → `python3 tools/quests/story.py --write` → `python3 tools/gear/gear.py --write` → `node tools/forest/check_nav.mjs all`(마을 포함 49곳 모두 0 fail — 예전 아르칸 boss_gate 실패는 없어짐) → `python3 tools/world/check_warps.py`. 화면 확인 `tools/browser-tests/townshots.js`(`ZONES= SHOTS=over,plaza,gates,lm,market,park,map,perf SIZE=390x844t`).
 - 예전 저장: 마을 안 위치가 새 건물 속이면 시작 지점으로 돌아감(`game.js`, 저장 형식은 그대로 v4).
+
+## 메인 퀘스트 입장 조건·필드 레벨·메인 NPC 표시 (2026-11-15)
+- 지역(마을·필드)은 **메인 퀘스트 진행으로만** 열림(레벨 조건 없음 — 포털 `minLevel`은 모두 0, `game.js` `updatePortals`는 더 이상 레벨을 보지 않음). 처음부터 열린 곳: 아르칸·속삭이는 숲·왕도 가는 길. 카이리온은 1장(`mq01a`, 선행 = 마을 상인 모아 `q2_merchant`)부터라 Lv10 전직(길드 회관)보다 먼저 열림.
+- 표는 생성물: `tools/quests/gates.py`(`story.py`의 `QUESTS`에서 단계마다 쓰는 지역 = 주는/완료 NPC 자리·대화·보스·줍기·방문 목표·목표 몬스터가 사는 곳·전직 목표, 예전 메인 `q1_start`·`q2_merchant`·`q_job1`·`q7_boss`는 `LEGACY`)를 `world.py`가 불러 씀 → `zones.json` 각 존 `unlock`(여는 메인 단계 id)·`world.main`(`order`, 단계별 갈 곳 `steps{gz,tz,oz}`, 레벨대로 연 곳 `band`). **규칙**: 지역을 처음 쓰는 메인 단계의 선행 퀘스트를 모두 마치면(= 그 단계를 받을 수 있게 되면) 열림; 닫힌 곳으로 가는 길목은 포털 그래프 최단 길로 같이 엶; 메인이 안 쓰는 곳(실베른 들판·용의 유적·얼어붙은 호수)은 열린 이웃이 있고 예상 레벨이 원래 최저 레벨 이상인 첫 단계. 표 보기 `python3 tools/world/world.py --gates`(쓰지 않음). 손으로 `unlock`을 고치지 말 것 — 퀘스트를 바꾸면 `world.py --write` → `story.py --write` → `gear.py --write` 순서(전과 같음).
+- **필드 권장 레벨**: 메인이 쓰는 필드 = 여는 단계의 예상 레벨(메인 단계 `minLevel`의 누적 최댓값) ~ +3, 몬스터 무리 레벨은 그 범위에 고르게(정예 = 최고 + 1). 손으로 만든 필드(골짜기·군락지·서리 고원)는 `world.py` `RELEVEL_EXISTING`이 무리 `level`을 다시 씀(숲은 그대로, 용의 유적은 원래 값). 마을의 '주변 권장 레벨' = 이웃 필드 범위(왕도 제외). 이야기 보스 레벨(`story.py` `BOSSES`)은 원래 단계 레벨이라 그대로. Lv10 이하 선공 없음 규칙 그대로.
+- 런타임 `core.js` `zoneLock(data, profile, zoneId)`(→ `{step, text, short}` 또는 null, 문구 "메인 퀘스트 6장 「안개 속 감시자 ①」을 진행해야 들어갈 수 있습니다", 선행에 서브가 있으면 "(먼저 「…」 완료)"; 조사 `josa`), `warpBlock`이 같은 문구로 막음. 막는 곳: 필드·마을 포털(이동 안 함 + 토스트), 워프 안내인 목록(`showTownWarp`: 닫힌 마을 `data-lock`·이동 단추 없음), 그 밖의 모든 이동(`loadZone` 첫 줄 — 귀환·부활·불러오기·워프): 닫힌 곳이면 아르칸 시작 지점으로, 귀환 마을이 닫혀 있으면 그것도 아르칸. 저장 형식은 그대로 v4(퀘스트 상태에서 계산, 새 필드 없음) — 예전 저장이 닫힌 곳에 있으면 그대로 아르칸으로 옮겨짐(가 본 마을로 미루어 열어 주지 않음).
+- 표시: 미니맵·지역 지도의 닫힌 포털은 회색 + 자물쇠, 세계 지도는 닫힌 곳 흐리게 + 자물쇠·정보 막대에 조건, 지금 메인 단계가 보내는 곳은 금별(`G.mainTargets()`).
+- **메인 퀘스트 NPC**: `game.js` `mainState(npc)`(메인만 본 상태: `ready` 완료 / `talk` 대화 목표·전직 목표면 전직 마스터 / `avail` 받기 / `active` 진행 중) → 머리 위 금관 + 주홍 "!"/"?"(`QMARK(…, crown)`, CSS `.qmark.qmain`; 서브는 예전 노랑 "!"·초록 "?"), 미니맵·지역 지도 금테 주홍 원판 + 작은 금관(`minimap.js` `mbadge`, 확인용 `G.ui.minimap.mainNpcs`), 지역 지도 범례 '메인 퀘스트'·목록 `.amq.main`, 퀘스트 창 '★ 메인' + '갈 곳: …(세계 지도 M)', 진행 중인 메인이 없으면 '다음: …'(받는 법·필요 레벨·먼저 할 서브).
+- 확인: `tests/gates.test.mjs`(메인 83단계를 차례로 받으며 단계가 쓰는 지역·NPC·목표 몬스터·전직 시험 사냥터가 열린 길로 닿는지, 선행 전엔 닫힘, 카이리온·문구·워프·예전 저장, 필드 레벨이 메인 순서대로 줄지 않고 예상 레벨 ±1·무리 레벨 범위; 받은 뒤 나중 단계에서 열리는 서브 목표는 '참고'로 출력), 브라우저 `tools/browser-tests/gates.js`(`URL= SIZES=1280x720,390x844t`).
 
 ## 마을 간 워프·필드 워프 방향 (2026-11-12)
 - 워프 안내인: 마을마다 한 명(`world.py` `WARP_KEEPERS`, 자리 힌트 `WARP_HINT` = 광장 앞쪽, npcs.json `role: "warp"`, 모델 `NPC_MODELS.warp_keeper` = 약사 메시 + `recolor.py` 색). 대화 → "마을 이동" → `ui.js` `showTownWarp`(장식 창 `townwarp`, CSS `index.html` "마을 이동 창") → `game.js` `townWarp`(삯 → 섬광 `.warpflash` → 그 마을 안내인 앞 `warp` spawn, `warp_spawn`).

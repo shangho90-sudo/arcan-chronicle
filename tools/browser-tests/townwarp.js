@@ -30,7 +30,7 @@ const fails = []; const ok = (c, m) => { console.log((c ? '  ok   ' : '  FAIL ')
     ok(await ev(() => G.townWarp('kairion_capital') === false && G.zone.def.id === 'town'), '안 가 본 마을은 직접 불러도 막힘');
     await ev(() => G.ui.close());
     // 걸어서(여기서는 존 이동으로) 카이리온 왕도에 들어감 → 발견
-    await ev(() => { G.profile.gold = 500; G.loadZone('kairion_capital', 'from_capital_road'); }); await inZone('kairion_capital'); await pg.waitForTimeout(1600);
+    await ev(() => { G.profile.gold = 500; G.profile.quests = ['q1_start', 'q2_merchant'].map(id => ({ id, state: 'completed', counts: [1] })); G.loadZone('kairion_capital', 'from_capital_road'); });   // 2026-11-15: 카이리온은 메인 1장부터 await inZone('kairion_capital'); await pg.waitForTimeout(1600);
     ok(JSON.stringify(await ev(() => G.profile.towns)) === '["town","kairion_capital"]', '카이리온에 들어가면 둘 다 열림');
     ok(await ev(() => [...document.querySelectorAll('.toast, .toasts *')].some(t => /새 마을 발견/.test(t.textContent))), '"새 마을 발견" 알림');
     const k2 = await keeper(); ok(k2 && k2.id === 'warp_kairion_capital', '왕도 워프 안내인 ' + JSON.stringify(k2)); await pg.waitForTimeout(5000); await shot('3_keeper_kairion');
