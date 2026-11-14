@@ -70,7 +70,8 @@ const ZONE = process.env.ZONE || '';
     for (let i = 0; i < 7; i++) await ev(() => { G.step(1 / 60, false); const p = G.player; G.render.setFocus({ x: p.pos.x, y: 0, z: p.pos.z }, true); });
     list.push(await shot(`${pre}_run2.png`));
     await reset();
-    await ev(() => { window.__t = 0; window.__hp = window.__d.hp; window.__dmg = []; G.player.target = window.__d; });
+    await ev(() => { window.__t = 0; window.__hp = window.__d.hp; window.__dmg = []; window.__ex = []; G.player.target = window.__d;
+      const R = G.player.skills; if (!R.__wrapped) { R.__wrapped = true; const ox = R.exec.bind(R); R.exec = q => { if (q.a.type === 'damage' && window.__ex) window.__ex.push(+window.__t.toFixed(3)); return ox(q); }; } });   // strike times (hit or MISS)
     let n = 0, last = -99;
     for (let i = 0; i < 200 && n < 5; i++) {
       const hit = await ev(([i]) => { G.input.hold('attack', true); window.__t = i / 60; G.step(1 / 60, false); const m = window.__d; if (m.hp < window.__hp) { window.__dmg.push(+window.__t.toFixed(3)); window.__hp = m.hp; return true; } return false; }, [i]);
@@ -78,6 +79,7 @@ const ZONE = process.env.ZONE || '';
       if (last >= 0 && i === last + 2) { n++; list.push(await shot(`${pre}_atk${n}.png`)); }
     }
     res['dmg_z' + Z] = await ev(() => window.__dmg);
+    res['strikes_z' + Z] = await ev(() => window.__ex);
     await ev(() => G.input.hold('attack', false));
     strips[Z] = list;
     const out = `${OUT}/${base}_strip_z${Z}.png`;
