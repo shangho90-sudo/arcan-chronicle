@@ -34,7 +34,7 @@ const MARKS = (process.env.MARKS || (SKILL === 'basic' ? '0.10,0.17,0.20,0.24,0.
   await pg.waitForSelector('.prologue.on', { timeout: 60000 }).then(() => click('건너뛰기')).catch(() => {});
   await pg.waitForFunction(() => window.G && G.inWorld && G.player && !G.loading && G.player.body && G.player.body.md, null, { timeout: 300000 });
   await pg.waitForFunction(() => G.skillFx && G.skillFx.hair, null, { timeout: 120000 });
-  await ev(async ([z, g, id, lv]) => {
+  await ev(async ([z, g, det]) => {
     G.frame = () => {}; const c = G.render.cam; c.zoom = z; c.updateProjectionMatrix();
     document.querySelectorAll('.hud,.controls,.toasts,.qhud,.qh-reopen,.plates').forEach(e => e.style.display = 'none');
     if (G.reward) { G.reward.jobChange = sw => sw && sw(); G.reward.levelUp = () => {}; }
@@ -47,8 +47,8 @@ const MARKS = (process.env.MARKS || (SKILL === 'basic' ? '0.10,0.17,0.20,0.24,0.
     for (let r = 0; r <= 16 && !spot; r++) for (let k = 0; k < Math.max(1, r * 6) && !spot; k++) { const a = k / Math.max(1, r * 6) * 6.283, c = { x: cx + Math.cos(a) * r, z: cz + Math.sin(a) * r }; let ok = true;
       for (let x = -7; x <= 7 && ok; x += 0.75) for (let z = -7; z <= 7 && ok; z += 0.75) if (x * x + z * z <= 49 && G.zone.geo.blocked(c.x + x, c.z + z, 0.35)) ok = false; if (ok) spot = c; }
     window.__spot = spot || { x: cx, z: cz };
-    window.__rand0 = Math.random;
-  }, [ZOOM, G_]);
+    window.__rand0 = Math.random; window.__det = !!det;
+  }, [ZOOM, G_, process.env.DET === '1']);
   await pg.waitForFunction(() => G.skillFx.hair.ready && G.player.body && G.player.body.md, null, { timeout: 120000 });
   await pg.waitForTimeout(1500);
   for (const [SKILL, LV_, SCENE] of RUNS) {
@@ -67,7 +67,8 @@ const MARKS = (process.env.MARKS || (SKILL === 'basic' ? '0.10,0.17,0.20,0.24,0.
   }, [DIR, DIST]);
   await pg.waitForFunction(() => window.__ds.every(m => m.body), null, { timeout: 120000 });
   const info = await ev(([scene, fps, id, dist, sd]) => {
-    let seed = +sd || 12345; Math.random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return 0.06 + 0.94 * seed / 4294967296; };   // never below the miss chance: SCENE=miss tests a MISS on purpose
+    let seed = +sd || 12345; Math.random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return 0.06 + 0.94 * seed / 4294967296; };   // DET=1: every roll 0.5 (no crit / miss, mid variance) — compares damage totals between code versions whose effects draw different numbers of random values
+    if (window.__det) Math.random = () => 0.5;   // never below the miss chance: SCENE=miss tests a MISS on purpose
     const p = G.player, f = window.__f, m = window.__ds[0];
     m.thinkStep = () => {};
     m.teleport(m.pos); m.setFacing(-f.x, -f.z); m.body.place(m.pos);
@@ -79,7 +80,7 @@ const MARKS = (process.env.MARKS || (SKILL === 'basic' ? '0.10,0.17,0.20,0.24,0.
     const L = window.__log = { fx: [], sfx: [], dmg: [], num: [], freezeP: [], freezeT: [], gstop: [], cam: [], lock: [], stun: [], act: [] };
     window.__t = 0; window.__p0 = { ...m.pos }; window.__hp = m.hp;
     const S = G.skillFx.hair; window.__log = L;
-    for (const k of ['snip', 'shears', 'trim', 'step', 'proj', 'combHit', 'dryer', 'trap', 'style']) if (!S['__w' + k]) { S['__w' + k] = true; const o = S[k].bind(S); S[k] = (a, opt) => { const L = window.__log; L.fx.push({ k, t: +window.__t.toFixed(3), hit: opt && opt.hit }); const h = o(a, opt);
+    for (const k of ['snip', 'shears', 'end', 'trim', 'step', 'proj', 'combHit', 'dryer', 'trap', 'style'].filter(k => S[k])) if (!S['__w' + k]) { S['__w' + k] = true; const o = S[k].bind(S); S[k] = (a, opt) => { const L = window.__log; L.fx.push({ k, t: +window.__t.toFixed(3), hit: opt && opt.hit }); const h = o(a, opt);
       if (h && h.strike) { const s0 = h.strike, m0 = h.miss; h.strike = (...x) => { L.fx.push({ k: 'strike', t: +window.__t.toFixed(3) }); return s0(...x); }; h.miss = (...x) => { L.fx.push({ k: 'miss', t: +window.__t.toFixed(3) }); return m0(...x); }; }
       if (h && h.pulse) { const l0 = h.pulse; h.pulse = (t) => { L.fx.push({ k: 'pulse', t: +window.__t.toFixed(3), n: t ? t.length : 0 }); return l0(t); }; }
       return h; }; }
@@ -98,7 +99,7 @@ const MARKS = (process.env.MARKS || (SKILL === 'basic' ? '0.10,0.17,0.20,0.24,0.
   if (typeof info === 'string') { console.log(info); continue; }
   const frames = [], total = Math.round(DUR * FPS); let dc = 0;
   for (let i = 0; i < total; i++) {
-    const shot = MARKS.some(m => i === Math.round(m * FPS));
+    const shot = process.env.NOSHOT !== '1' && MARKS.some(m => i === Math.round(m * FPS));
     const c = await ev(([i, fps, dist, shot]) => {
       window.__t = i / fps; const p = G.player, f = window.__f, m = window.__ds[0], L = window.__log;
       if (window.__basic && !window.__drew && p.weaponReady && !p.weaponReady()) { window.__drew = true; p.combat(1.6); L.fx.push({ k: 'draw', t: +window.__t.toFixed(3) }); }   // 칼을 멘 채 누름: 빠른 꺼내기 뒤 휘두름(Player.basic과 같음)
@@ -127,7 +128,7 @@ const MARKS = (process.env.MARKS || (SKILL === 'basic' ? '0.10,0.17,0.20,0.24,0.
   res.info = info; res.drawCallsMax = dc; res.errors = errs.slice(0, 8);
   const pick = MARKS.map(m => frames[Math.round(m * FPS)] || null);
   fs.writeFileSync('/tmp/_hairstrip.py', `from PIL import Image, ImageDraw\nfr=${JSON.stringify(pick.map(f => f || ''))}\nlab=${JSON.stringify(MARKS)}\nims=[Image.open(f) if f else None for f in fr]\nw,h=next(i for i in ims if i).size\nims=[i or Image.new('RGB',(w,h),(0,0,0)) for i in ims]\nn=len(ims); cols=(n+1)//2 if n>7 else n; rows=(n+cols-1)//cols\nsh=Image.new('RGB',(w*cols,(h+22)*rows),(20,20,28))\nd=ImageDraw.Draw(sh)\nfor i,(im,l) in enumerate(zip(ims,lab)):\n  x=(i%cols)*w; y=(i//cols)*(h+22)\n  sh.paste(im,(x,y+22)); d.text((x+6,y+4),('t %.3fs'%l),fill=(255,255,255))\nsh.save('${OUT}/${name}.png')`);
-  try { execSync('python3 /tmp/_hairstrip.py'); } catch (e) { console.log('strip failed', e.message); }
+  if (process.env.NOSHOT !== '1') try { execSync('python3 /tmp/_hairstrip.py'); } catch (e) { console.log('strip failed', e.message); }
   console.log(name, JSON.stringify(res)); console.log('strip', `${OUT}/${name}.png`);
   fs.writeFileSync(`${OUT}/${name}.json`, JSON.stringify(res, null, 1));
   if (process.env.KEEP !== '1') fs.rmSync(dirOut, { recursive: true, force: true });   // raw frames: only the strip is kept

@@ -687,7 +687,8 @@ export class SkillEngine {
     let dir = op.side ? { x: -f.z, z: f.x } : f; if (op.side && Math.random() < 0.5) dir = { x: f.z, z: -f.x };
     const dist = op.dist, sgn = Math.sign(dist) || 1;
     const start = { ...pc.pos }; ctx.dashFrom = start;
-    pc.startDash({ x: dir.x * sgn, z: dir.z * sgn }, Math.abs(dist), 14, !!op.invuln, op.anim || 'dash', !!op.face);   // anim/face: 스텝 커트 = 두 손 동작 hd_step, 대상 쪽을 본 채 옆으로
+    pc.startDash({ x: dir.x * sgn, z: dir.z * sgn }, Math.abs(dist), 14, !!op.invuln, op.anim || 'dash', !!op.face);
+    if (op.face && ctx.aim) { const ex = start.x + dir.x * dist - ctx.aim.x, ez = start.z + dir.z * dist - ctx.aim.z; if (ex * ex + ez * ez > 0.04) pc.body.setFacing && pc.body.setFacing(-ex, -ez); }   // 그림만: 옆으로 뛰며 몸을 대상(조준점) 쪽으로 돌림 — 판정은 시전 방향 ctx.facing 그대로   // anim/face: 스텝 커트 = 두 손 동작 hd_step, 대상 쪽을 본 채 옆으로
     if (op.hit) this.pending.push({ time: this.clock + 0.12, op: op.hit, ctx });
     if (op.path) { const p = op.path, end = { x: start.x + dir.x * dist, z: start.z + dir.z * dist }, mid = { x: (start.x + end.x) / 2, z: (start.z + end.z) / 2 };
       this.pending.push({ time: this.clock + 0.18, op: { op: '_run', run: () => {

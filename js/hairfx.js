@@ -36,13 +36,13 @@ export const HAIR = {
   shears: { len: 1.3, open: 0.6, appear: 0.1, leave: 0.2, bite: 0.6 },
   trim: { y: 1.15, life: 0.38, line: 4.6, strands: 9, strandsLite: 4 },
   step: { gap: 0.12, first: 0.12, ys: [1.32, 0.88, 0.46], ws: [1.25, 1.75, 2.25], line: 3.0, ghosts: [0.0, 0.055, 0.11], ghostLife: 0.3, ghostA: 0.5, locks: 3, locksLite: 1 },
-  end: { line: 3.4, plane: 1.6, flash: 1.5, tips: 7, tipsLite: 3, bonusFlash: 2.6, rays: 6 },
+  end: { line: 4.2, plane: 0.7, flash: 1.5, tips: 7, tipsLite: 3, bonusFlash: 2.6, rays: 6 },
   comb: { size: 0.42, spin: 26, tilt: 0.5 },
   dryer: { size: 0.62, up: 1.12, fwd: 0.85, rate: 46, rateLite: 18, life: 0.24, appear: 0.09, fade: 0.18 },
   trap: { h: 1.25, turns: 5 },
-  dryerTint: { gust: 0xe4fff4, hot: 0xff6a3a, cold: 0x86d4ff },
+  dryerTint: { gust: 0xc4ffe6, hot: 0xff7a1e, cold: 0x86d4ff },
   gust: { swirls: 3, swirlsLite: 2, rings: 2, leaves: 10, leavesLite: 4 },
-  hot: { curl: 0.11, curlLite: 0.26, ember: 0.035, emberLite: 0.09, haze: 0.16, hazeLite: 0.4 },
+  hot: { curl: 0.09, curlLite: 0.22, ember: 0.03, emberLite: 0.08, haze: 0.12, hazeLite: 0.32 },
   cold: { mist: 0.06, mistLite: 0.16, flake: 0.05, flakeLite: 0.14, crystals: 5, crystalsLite: 3 },
   col: { white: 0xffffff, steel: 0xdfe8ff, pink: 0xff7ab0, pinkB: 0xff3f8f, violet: 0xb48cff, gold: 0xffd27a, goldB: 0xffa028, hot: 0xffc060, hotB: 0xff5a1e, ember: 0xffe080, cold: 0xe8f8ff, coldB: 0x58b8ff, ice: 0xbfe8ff, mintW: 0xeafff6, mintG: 0x7fe0c0, mint: 0xd8fff0, mintB: 0x48dca8,
     strand: [0x6a4630, 0xffd9ec, 0xb48cff, 0x3a2a3a] },
@@ -278,11 +278,11 @@ export class HairFx {
       // two blade shadows open while the real shears open (motion hd_end) and snap together exactly on the damage tick
       const pre = hitAt < 0 && missAt < 0, sinceHit = hitAt >= 0 ? t - hitAt : -1, sinceMiss = missAt >= 0 ? t - missAt : -1;
       const openK = pre ? smooth(0, 0.12, t) * (1 - smooth(first - 0.05, first, t) * 0.0) : 0, ang = 0.26 * openK;
-      const aPre = pre ? I * 0.55 * smooth(0.02, 0.14, t) : 0, aHit = sinceHit >= 0 ? I * K.line * (1 - smooth(0.04, 0.26, sinceHit)) : 0, aMiss = sinceMiss >= 0 ? 0.4 * (1 - smooth(0, 0.18, sinceMiss)) : 0;
-      for (const [m, sg] of [[b1, 1], [b2, -1]]) { m.position.copy(c); this._alignLine(m, this._scr(sg * ang, _b)); m.scale.set(W * (pre ? 0.85 + 0.15 * openK : 1.05), pre ? 0.3 : 0.42 + 0.3 * (1 - smooth(0, 0.08, sinceHit)), 1); m.material.uniforms.uA.value = pre ? aPre : (aHit || aMiss); }
+      const aPre = pre ? I * 1.1 * smooth(0.02, 0.14, t) : 0, aHit = sinceHit >= 0 ? I * K.line * (1 - smooth(0.04, 0.26, sinceHit)) : 0, aMiss = sinceMiss >= 0 ? 0.4 * (1 - smooth(0, 0.18, sinceMiss)) : 0;
+      for (const [m, sg] of [[b1, 1], [b2, -1]]) { m.position.copy(c); this._alignLine(m, this._scr(sg * ang, _b)); m.scale.set(W * (pre ? 0.85 + 0.15 * openK : 1.2), pre ? 0.22 : 0.3 + 0.25 * (1 - smooth(0, 0.08, sinceHit)), 1); m.material.uniforms.uA.value = pre ? aPre : (aHit || aMiss); }
       // the horizontal cut plane: a flat bright disc + ring at the cut height (inside the target's footprint + 0.45 m)
-      pl.position.copy(c); this._flat(pl, (rad + 0.45) * (0.7 + 0.3 * easeOut(sinceHit / 0.06)), c.y); pl.material.uniforms.uA.value = ok && sinceHit >= 0 ? I * K.plane * (1 - smooth(0.02, 0.16, sinceHit)) : 0;
-      rg.position.copy(c); this._flat(rg, (rad + 0.2) + 0.35 * easeOut(sinceHit / 0.22), c.y); rg.material.uniforms.uP.value = 0.4; rg.material.uniforms.uA.value = ok && sinceHit >= 0 ? I * 2.2 * (1 - smooth(0.05, 0.32, sinceHit)) : pre ? I * 0.45 * smooth(0.04, first, t) : 0;
+      pl.position.copy(c); this._flat(pl, (rad + 0.45) * (0.7 + 0.3 * easeOut(sinceHit / 0.06)), c.y); pl.material.uniforms.uA.value = ok && sinceHit >= 0 ? I * K.plane * (1 - smooth(0.0, 0.09, sinceHit)) : 0;
+      rg.position.copy(c); this._flat(rg, (rad + 0.2) + 0.35 * easeOut(sinceHit / 0.22), c.y); rg.material.uniforms.uP.value = 0.15; rg.material.uniforms.uA.value = ok && sinceHit >= 0 ? I * 3.2 * (1 - smooth(0.05, 0.34, sinceHit)) : pre ? I * 0.9 * smooth(0.04, first, t) : 0;
       fl.quaternion.copy(this.camQ); fl.position.copy(c); fl.scale.setScalar((bonus ? 1.5 : 0.85) * (0.6 + 0.6 * easeOut(sinceHit / 0.07)) * Math.min(1.3, 0.8 + rad * 0.4)); fl.material.uniforms.uA.value = ok && sinceHit >= 0 ? I * (bonus ? K.bonusFlash : K.flash) * (1 - smooth(0.02, 0.18, sinceHit)) : 0;
       // 마무리 (bonus only): a second, gold outer ring and short rays fanning out in the cut plane
       if (bonus && sinceHit >= 0) { const k = sinceHit; g2.position.copy(c); this._flat(g2, rad + 0.3 + 0.55 * easeOut(k / 0.26), c.y); g2.material.uniforms.uA.value = I * 2.4 * (1 - smooth(0.05, 0.4, k));
@@ -311,7 +311,7 @@ export class HairFx {
   /** cut hair tips: locks of hair burst sideways out of the cut plane, then drop and settle (three coords: c = cut centre) */
   tips(c, n, rad, o = {}) {
     if (n <= 0 || !this.geo.hair_lock) return;
-    const ps = [], gy = o.gy ?? c.y - 1, cols = o.gold ? [0xffd27a, 0xffe9b0, 0x6a4630] : HAIR.col.strand;
+    const ps = [], gy = o.gy ?? c.y - 1, cols = o.gold ? [0xffd27a, 0xffe9b0, 0xffb040] : [0xffd9ec, 0xb48cff, 0xff9ac8, 0xfff0d0];
     const e = this._fx('tips', 0.9, (e, dt) => { const k = e.t / e.life;
       for (const p of ps) { p.v.y -= 6 * dt; p.v.x *= 1 - 3 * dt; p.v.z *= 1 - 3 * dt; p.m.position.addScaledVector(p.v, dt); if (p.m.position.y < gy + 0.03) { p.m.position.y = gy + 0.03; p.v.set(0, 0, 0); p.w *= 0.9; }
         p.m.rotation.z += p.w * dt; p.m.rotation.y += p.w * 0.6 * dt; p.m.material.uniforms.uA.value = 1 - smooth(0.65, 1, k); } });
@@ -431,7 +431,7 @@ export class HairFx {
       kick -= (mode === 'hot' ? 4 : 5) * dt;
       // nozzle: 온풍 = red-hot glow that flares on every tick, 냉풍 = small cold ring, 돌풍 = a short bright puff
       const fl = mode === 'hot' ? 0.75 + 0.25 * Math.sin(e.t * 31) * Math.sin(e.t * 17) : 1;
-      gl.quaternion.copy(this.camQ); gl.position.copy(noz); gl.scale.setScalar((mode === 'hot' ? 0.75 : 0.9) + (mode === 'hot' ? 0.45 : 0.3) * Math.max(0, kick)); gl.material.uniforms.uA.value = I * (mode === 'hot' ? 1.25 * fl : 0.7) * a;
+      gl.quaternion.copy(this.camQ); gl.position.copy(noz); gl.scale.setScalar((mode === 'hot' ? 1.05 : 0.9) + (mode === 'hot' ? 0.45 : 0.3) * Math.max(0, kick)); gl.material.uniforms.uA.value = I * (mode === 'hot' ? 1.25 * fl : 0.7) * a;
       if (nz) { nz.position.copy(noz); _mx.makeBasis(rt, UP, fw); nz.quaternion.setFromRotationMatrix(_mx); nz.scale.setScalar(mode === 'cold' ? 0.42 + 0.04 * Math.sin(e.t * 9) : 0.3); nz.material.uniforms.uA.value = I * (mode === 'cold' ? 1.4 : 1.8 * fl) * a; }
       // streaks: born at the nozzle, fly out inside the real cone and die before its edge (r) — 돌풍 굵고 빠름, 온풍 넓고 느림, 냉풍 가늘고 곧음
       const rate = (low ? K.rateLite : K.rate) * (mode === 'hot' ? 0.45 : mode === 'cold' ? 0.8 : 1);
@@ -440,7 +440,7 @@ export class HairFx {
         streaks.push({ m, dir, t: 0, life: K.life * rnd(0.8, 1.15) * (mode === 'hot' ? 1.6 : 1), y: rnd(-0.45, 0.25), len: rnd(0.7, 1.3) * (mode === 'cold' ? 0.8 : 1), w: mode === 'gust' ? 1.5 : mode === 'hot' ? 1.9 : 0.55, wob: rnd(0, 6) }); this._alignLine(m, dir); }
       for (const s of streaks) { s.t += dt; const k = s.t / s.life; if (k >= 1) { s.m.material.uniforms.uA.value = 0; continue; }
         const dist = 0.3 + (r - 0.3 - s.len * 0.5) * k; s.m.position.copy(noz).addScaledVector(s.dir, dist).setY(noz.y + s.y * k + (mode === 'hot' ? 0.12 * Math.sin(s.t * 14 + s.wob) + 0.25 * k : 0)); s.m.scale.set(s.len, (0.22 + 0.5 * k) * s.w, 1);
-        s.m.material.uniforms.uA.value = I * (mode === 'hot' ? 0.75 : mode === 'cold' ? 1.6 : 1.15) * a * smooth(0, 0.15, k) * (1 - smooth(0.55, 1, k)); }
+        s.m.material.uniforms.uA.value = I * (mode === 'hot' ? 1.1 : mode === 'cold' ? 1.6 : 1.15) * a * smooth(0, 0.15, k) * (1 - smooth(0.55, 1, k)); }
       if (mode === 'gust') {
         // thick wind ribbons twisting along the cone + pressure rings travelling out (both end inside r)
         for (const w of swirls) { const k = clamp01((e.t - w.d) / 0.42); w.m.position.copy(noz).setY(noz.y - 0.15); const dir = fw.clone().multiplyScalar(Math.cos(w.th)).addScaledVector(rt, Math.sin(w.th));
@@ -448,8 +448,8 @@ export class HairFx {
           const len = (r - 0.4) * (0.35 + 0.65 * easeOut(k * 1.6)), wide = Math.min(1.25 * (r * Math.sin(half)) / 0.42 * 0.8, 3.2) * (0.5 + 0.5 * k);
           w.m.scale.set(len, Math.min(1.5, wide * 0.55), wide); w.m.material.uniforms.uA.value = on || e.t < end + 0.1 ? I * 1.25 * a * smooth(0, 0.08, k) * (1 - smooth(0.7, 1, k)) : 0; }
         for (const R of rings) { const k = clamp01((e.t - R.d) / 0.32), d = 0.4 + (r * 0.88 - 0.4) * easeOut(k), rr = Math.max(0.2, d * Math.sin(half) * 0.95);
-          R.m.position.copy(noz).addScaledVector(fw, d).setY(noz.y - 0.25 * k); _mx.makeBasis(rt, UP, fw); R.m.quaternion.setFromRotationMatrix(_mx); R.m.scale.set(rr * 2, Math.min(rr * 2, 1.5), 1);
-          R.m.material.uniforms.uA.value = e.t >= R.d && k < 1 ? I * 2.0 * (1 - smooth(0.4, 1, k)) * smooth(0, 0.08, k) : 0; }
+          R.m.position.copy(noz).addScaledVector(fw, d).setY(noz.y - 0.25 * k); _mx.makeBasis(rt, UP, fw); R.m.quaternion.setFromRotationMatrix(_mx); R.m.scale.set(rr * 2, Math.min(rr * 2, 1.2), 1);
+          R.m.material.uniforms.uA.value = e.t >= R.d && k < 1 ? I * 1.35 * (1 - smooth(0.4, 1, k)) * smooth(0, 0.08, k) : 0; }
         T.a += dt; if (on && T.a > (low ? 0.07 : 0.035) && blown < (low ? HAIR.gust.leavesLite : HAIR.gust.leaves)) { T.a = 0; blown++; this._blown(noz, fw, rt, half, r, gy); }
       } else if (mode === 'hot') {
         const H = HAIR.hot; T.a += dt; T.b += dt; T.c += dt;
@@ -501,17 +501,17 @@ export class HairFx {
   _rise(p, kind, gy, w) {
     const C = HAIR.col;
     if (kind === 'curl' && this.geo.hair_curl) { const e = this._fx('curl', 0.7, (e, dt) => { const k = e.t / e.life; m.position.y += 0.9 * dt; m.rotation.y += 7 * dt; m.scale.set(s * (1 - 0.3 * k), s * 1.6, s * (1 - 0.3 * k)); m.material.uniforms.uA.value = 0.85 * smooth(0, 0.15, k) * (1 - smooth(0.55, 1, k)); m.material.uniforms.uGlow.value = 0.5; });
-      const s = rnd(0.1, 0.16), m = this.solid(e, this.geo.hair_curl, { tint: Math.random() < 0.5 ? C.hot : C.hotB, rim: C.ember, spec: 0.3 }); m.material.depthWrite = false; m.renderOrder = 6; m.position.copy(p); return; }
+      const s = rnd(0.15, 0.22), m = this.solid(e, this.geo.hair_curl, { tint: Math.random() < 0.5 ? C.hot : C.hotB, rim: C.ember, spec: 0.3 }); m.material.depthWrite = false; m.renderOrder = 6; m.position.copy(p); return; }
     if (kind === 'ember') { const e = this._fx('ember', rnd(0.45, 0.7), (e, dt) => { const k = e.t / e.life; m.position.y += 1.1 * dt; m.position.x += Math.sin(e.t * 13 + ph) * 0.4 * dt; m.quaternion.copy(this.camQ);
-        m.scale.setScalar(0.11 * (1 - 0.5 * k)); m.material.uniforms.uA.value = HAIR.intensity * 2.4 * (0.6 + 0.4 * Math.sin(e.t * 40 + ph)) * (1 - smooth(0.5, 1, k)); });
+        m.scale.setScalar(0.17 * (1 - 0.5 * k)); m.material.uniforms.uA.value = HAIR.intensity * 2.8 * (0.6 + 0.4 * Math.sin(e.t * 40 + ph)) * (1 - smooth(0.5, 1, k)); });
       const ph = rnd(0, 6), m = this.spr(e, 0, 0xffffff, Math.random() < 0.5 ? C.hotB : C.ember, 7); m.position.copy(p); return; }
     if (kind === 'haze') { const e = this._fx('haze', 0.9, (e, dt) => { const k = e.t / e.life; m.position.y += 0.45 * dt; m.quaternion.copy(this.camQ); m.scale.set(ww * (0.8 + 0.3 * k), 0.75, 1);
-        m.material.uniforms.uP.value = e.t * 3 + ph; m.material.uniforms.uA.value = HAIR.intensity * 0.55 * smooth(0, 0.2, k) * (1 - smooth(0.5, 1, k)); });
+        m.material.uniforms.uP.value = e.t * 3 + ph; m.material.uniforms.uA.value = HAIR.intensity * 1.0 * smooth(0, 0.2, k) * (1 - smooth(0.5, 1, k)); });
       const ph = rnd(0, 6), ww = Math.min(1.6, (w || 1.2) * 0.9), m = this.spr(e, 6, C.ember, C.hotB, 3); m.position.copy(p); }
   }
   _mist(p, fw, r) {
     const e = this._fx('mist', 0.9, (e, dt) => { const k = e.t / e.life; m.position.addScaledVector(fw, 0.6 * dt); m.quaternion.copy(this.camQ); m.scale.set(s * (1 + 0.6 * k), s * 0.42 * (1 + 0.4 * k), 1);
-      m.material.uniforms.uA.value = 0.32 * smooth(0, 0.2, k) * (1 - smooth(0.45, 1, k)); });
+      m.material.uniforms.uA.value = 0.45 * smooth(0, 0.2, k) * (1 - smooth(0.45, 1, k)); });
     const s = rnd(0.7, 1.1) * Math.min(1.2, r / 3.2), m = this.puff(e, 0xf4fbff, 0xb8dcf4, 3); m.position.copy(p);
   }
   _flake(noz, dir, r, gy) {
