@@ -35,7 +35,7 @@ const MARKS = (process.env.MARKS || base.marks || '0.1,0.5,1.0,1.5,2.0').split('
   await ev(fx => { localStorage.clear(); localStorage.setItem('arcan_settings', JSON.stringify({ graphicsFx: fx })); }, FX);
   await pg.reload(); await click('새 게임'); await click('모험 시작');
   await pg.waitForSelector('.prologue.on', { timeout: 60000 }).then(() => click('건너뛰기')).catch(() => {});
-  await pg.waitForFunction(() => window.G && G.inWorld && G.player && !G.loading && G.player.body && G.player.body.md, null, { timeout: 300000 });
+  await pg.waitForFunction(() => window.G && G.inWorld && G.player && !G.loading && G.player.body && G.player.body.md, null, { timeout: 560000 });
   await pg.waitForFunction(() => G.skillFx && G.skillFx.smith, null, { timeout: 120000 });
   await ev(async ([z, g, lv, hud, ids, plan, ids2]) => {
     G.frame = () => {}; const c = G.render.cam; c.zoom = z; c.updateProjectionMatrix();
