@@ -643,17 +643,17 @@ function fountainMats(obj, scale) {
 float h(vec2 p){ return fract(sin(dot(p, vec2(41.3, 289.1))) * 43758.5); }
 void main(){
   float r = length(vU), a = atan(vU.y, vU.x); vec2 P = vL.xz * uS; float R = length(P), y = vL.y * uS;
-  float land = y < 1.5 ? 2.68 : (y < 3.0 ? 1.56 : -1.0);                 // where the falls hit this surface (m from the centre)
-  vec3 deep = vec3(0.24, 0.55, 0.66), shallow = vec3(0.52, 0.80, 0.84);
+  float land = y < 1.7 ? 2.14 : (y < 2.8 ? 1.22 : -1.0);                 // where the falls hit this surface (m from the centre)
+  vec3 deep = vec3(0.16, 0.46, 0.60), shallow = vec3(0.36, 0.68, 0.76);   // sRGB-ish, converted to linear below (the HDR target is linear)
   vec3 c = mix(deep, shallow, smoothstep(0.35, 1.0, r));
-  float streak = smoothstep(0.86, 1.0, sin(R * 4.2 - uT * 0.9 + sin(a * 3.0 + uT * 0.3) * 1.3)) * 0.16;
+  float streak = smoothstep(0.86, 1.0, sin(R * 4.2 - uT * 0.9 + sin(a * 3.0 + uT * 0.3) * 1.3)) * 0.12;
   float rip = 0.0;
-  if (land > 0.0) { for (int i = 0; i < 3; i++) { float ph = fract(uT * 0.45 + float(i) / 3.0); rip += smoothstep(0.05, 0.0, abs(R - land - ph * 0.9)) * (1.0 - ph) * 0.55; }
+  if (land > 0.0) { for (int i = 0; i < 3; i++) { float ph = fract(uT * 0.45 + float(i) / 3.0); rip += smoothstep(0.05, 0.0, abs(R - land - ph * 0.8)) * (1.0 - ph) * 0.45; }
     rip += smoothstep(0.22, 0.0, abs(R - land)) * 0.18; }               // soft foam band where the curtain lands
-  else { vec2 q = P - vec2(0.92, 0.42); float d = length(q); for (int i = 0; i < 2; i++) { float ph = fract(uT * 0.6 + float(i) * 0.5); rip += smoothstep(0.04, 0.0, abs(d - ph * 0.5)) * (1.0 - ph) * 0.6; } }
+  else { vec2 q = P - vec2(0.62, 0.32); float d = length(q); for (int i = 0; i < 2; i++) { float ph = fract(uT * 0.6 + float(i) * 0.5); rip += smoothstep(0.04, 0.0, abs(d - ph * 0.5)) * (1.0 - ph) * 0.6; } }
   vec2 g = floor(vec2(a * 18.0, R * 3.0)); float sp = step(0.988, h(g + floor(uT * 1.5))) * 0.35;
-  c += vec3(0.9, 0.97, 1.0) * (streak + rip + sp);
-  gl_FragColor = vec4(c, 0.86 + 0.1 * smoothstep(0.6, 1.0, r));
+  c += vec3(0.75, 0.88, 0.95) * (streak + rip + sp);
+  gl_FragColor = vec4(pow(c, vec3(2.2)), 0.9 + 0.08 * smoothstep(0.6, 1.0, r));
 }` });
   const fall = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide, uniforms: { uT: WIND }, vertexShader: FNT_VS,
     fragmentShader: `uniform float uT; varying vec2 vU; varying vec3 vL;
@@ -665,8 +665,8 @@ void main(){
   float a = (0.16 + 0.34 * smoothstep(0.35, 0.85, s)) * (0.75 + 0.25 * flow);
   a *= smoothstep(0.0, 0.08, v) * 0.6 + 0.4;                                          // lip
   float foam = smoothstep(0.78, 1.0, v);
-  vec3 c = mix(vec3(0.62, 0.86, 0.92), vec3(0.95, 0.99, 1.0), smoothstep(0.5, 0.9, s) * 0.6 + foam * 0.5);
-  gl_FragColor = vec4(c, clamp(a + foam * 0.25, 0.0, 0.7));
+  vec3 c = mix(vec3(0.5, 0.78, 0.88), vec3(0.9, 0.96, 1.0), smoothstep(0.5, 0.9, s) * 0.6 + foam * 0.5);
+  gl_FragColor = vec4(pow(c, vec3(2.2)), clamp(a + foam * 0.25, 0.0, 0.7));
 }` });
   obj.traverse(o => {
     if (!o.isMesh) return; const n = o.material && o.material.name;
