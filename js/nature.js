@@ -80,18 +80,27 @@ export function blMaterial(name, aniso = 4) {
       // cut-out cards: keep the painted (outward / up) normal on both faces instead of flipping it on the back face
       sh.fragmentShader = sh.fragmentShader.replace('#include <normal_fragment_begin>', '#include <normal_fragment_begin>\nnormal *= faceDirection;');
       // leaf cards are stored as 4 vertices at their centre: expand them towards the camera (size, rotation in aCard)
-      if (leaf) sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute vec2 aCard;')
+      if (leaf) { sh.uniforms.uLeafT = TG_TIME; sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute vec2 aCard;\nuniform float uLeafT;')
         .replace('#include <project_vertex>', `#include <project_vertex>
 { float isc = 1.0;
   #ifdef USE_INSTANCING
   isc = length(instanceMatrix[0].xyz);
   #endif
   isc *= length(modelMatrix[0].xyz);
-  vec2 cr = uv - 0.5; float ca = cos(aCard.y), sa = sin(aCard.y);
+  // leaves flutter (2026-11-14): each card turns and drifts a little on its own phase, under a slow gust that travels
+  // across the field (no two trees move alike; the card stays on its branch)
+  vec4 lw = modelMatrix * vec4(position, 1.0);
+  #ifdef USE_INSTANCING
+  lw = modelMatrix * instanceMatrix * vec4(position, 1.0);
+  #endif
+  float ph = lw.x * 1.37 + lw.z * 0.91 + lw.y * 2.3, gust = 0.55 + 0.45 * sin(uLeafT * 0.55 + lw.x * 0.09 + lw.z * 0.07);
+  float rot = aCard.y + gust * (0.16 * sin(uLeafT * 2.1 + ph) + 0.06 * sin(uLeafT * 4.3 + ph * 1.7));
+  vec2 cr = uv - 0.5; float ca = cos(rot), sa = sin(rot);
   mvPosition.xy += vec2(cr.x * ca - cr.y * sa, cr.x * sa + cr.y * ca) * aCard.x * isc;
-  gl_Position = projectionMatrix * mvPosition; }`);
+  mvPosition.xy += gust * vec2(sin(uLeafT * 1.3 + ph), 0.5 * sin(uLeafT * 1.9 + ph * 1.3)) * 0.035 * aCard.x * isc;
+  gl_Position = projectionMatrix * mvPosition; }`); }
     };
-    m.customProgramCacheKey = () => leaf ? 'blleaf1' : 'blcut1';
+    m.customProgramCacheKey = () => leaf ? 'blleaf2' : 'blcut1';
   }
   m.name = name; matCache.set(name, m); return m;
 }
@@ -605,10 +614,11 @@ export async function buildNature(zone, renderer) {
       sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nuniform float uTime;')
         .replace('#include <common>', '#include <common>\nattribute vec3 aRoot;')
         .replace('#include <begin_vertex>', `#include <begin_vertex>
-float sw = sin(uTime * 1.7 + aRoot.x * .7 + aRoot.y * .5) * .07 + sin(uTime * 3.1 + aRoot.x * 1.9) * .03;
+float gust = .55 + .45 * sin(uTime * .55 + aRoot.x * .09 + aRoot.y * .07);   // slow gust rolling across the field (2026-11-14)
+float sw = (sin(uTime * 1.7 + aRoot.x * .7 + aRoot.y * .5) * .07 + sin(uTime * 3.1 + aRoot.x * 1.9) * .03) * gust;
 transformed.xz += vec2(sw, sw * .4) * aRoot.z * aRoot.z;`);
     };
-    m.customProgramCacheKey = () => 'plantwind2'; return m;
+    m.customProgramCacheKey = () => 'plantwind3'; return m;
   })();
   const plantGeo = {}; await Promise.all([...new Set(PLANT)].map(async n => { MODELS[n] = MODELS[n] || { h: 1 }; plantGeo[n] = (await loadModel(n, aniso)).geo; }));   // height 1, base at 0
   // all clumps of a chunk are merged into ONE static mesh (a handful of draw calls for thousands of clumps); the wind

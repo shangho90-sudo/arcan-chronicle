@@ -134,11 +134,13 @@ const place = (obj, pos, h = 180, y = 0) => { obj.position.copy(T({ x: pos[0], y
 
 // ---------------------------------------------------------------- shared facade parts (local frame: front = +z, width along x)
 function windowAt(k, x, y, z, w = 0.95, h = 1.3, o = {}) {
-  const ft = 0.12;
+  // 2026-11-14: deeper frames (0.16 -> 0.28 m), a heavier lintel and sill - the windows read as set into the wall at the
+  // game camera instead of painted on it (big shapes over small detail)
+  const ft = 0.15, fd = 0.28;
   k.add(new THREE.PlaneGeometry(w, h), 'window', { x, y, z: z + 0.02, uv: false });
-  k.box(w + 0.24, ft, 0.16, 'wood', { x, y: y + h / 2 + ft / 2, z: z + 0.04 });
-  k.box(w + 0.34, 0.12, 0.3, o.stoneSill ? 'basestone' : 'wood', { x, y: y - h / 2 - 0.06, z: z + 0.1 });
-  k.box(ft, h, 0.16, 'wood', { x: x - w / 2 - ft / 2, y, z: z + 0.04 }); k.box(ft, h, 0.16, 'wood', { x: x + w / 2 + ft / 2, y, z: z + 0.04 });
+  k.box(w + 0.34, ft + 0.06, fd + 0.04, 'wood', { x, y: y + h / 2 + (ft + 0.06) / 2, z: z + fd / 2 });
+  k.box(w + 0.46, 0.15, fd + 0.16, o.stoneSill ? 'basestone' : 'wood', { x, y: y - h / 2 - 0.075, z: z + (fd + 0.16) / 2 });
+  k.box(ft, h, fd, 'wood', { x: x - w / 2 - ft / 2, y, z: z + fd / 2 }); k.box(ft, h, fd, 'wood', { x: x + w / 2 + ft / 2, y, z: z + fd / 2 });
   k.box(0.07, h, 0.08, 'wood', { x, y, z: z + 0.04 }); k.box(w, 0.07, 0.08, 'wood', { x, y: y + 0.1, z: z + 0.04 });
   if (o.shutters !== false) {
     const sk = o.shutterKey || 'bluewood';
@@ -158,9 +160,11 @@ function flowerBox(k, x, y, z, w, keys = ['pink', 'purple', 'white']) {
 function doorAt(k, x, z, w = 1.3, h = 2.35, key = 'planks') {
   k.box(w, h, 0.14, key, { x, y: h / 2 + 0.35, z: z + 0.02 });
   // stone surround with a pointed top
-  k.box(0.32, h + 0.2, 0.3, 'basestone', { x: x - w / 2 - 0.16, y: (h + 0.2) / 2 + 0.35, z: z + 0.08 });
-  k.box(0.32, h + 0.2, 0.3, 'basestone', { x: x + w / 2 + 0.16, y: (h + 0.2) / 2 + 0.35, z: z + 0.08 });
-  k.box(w + 0.64, 0.4, 0.32, 'basestone', { x, y: h + 0.55, z: z + 0.08 });
+  // deeper stone surround (0.3 -> 0.46 m) and a keystone: the door sits in a real recess
+  k.box(0.36, h + 0.2, 0.46, 'basestone', { x: x - w / 2 - 0.18, y: (h + 0.2) / 2 + 0.35, z: z + 0.16 });
+  k.box(0.36, h + 0.2, 0.46, 'basestone', { x: x + w / 2 + 0.18, y: (h + 0.2) / 2 + 0.35, z: z + 0.16 });
+  k.box(w + 0.72, 0.46, 0.5, 'basestone', { x, y: h + 0.58, z: z + 0.17 });
+  k.box(0.34, 0.56, 0.56, 'cream', { x, y: h + 0.62, z: z + 0.2 });
   for (const yy of [0.9, 2.0]) k.box(w * 0.8, 0.07, 0.04, 'iron', { x, y: yy + 0.35, z: z + 0.1 });
   k.sphere(0.06, 'gold', { x: x + w * 0.32, y: 1.4, z: z + 0.14 }, 6);
   k.box(w + 0.8, 0.18, 0.7, 'basestone', { x, y: 0.26, z: z + 0.42 });                  // step
@@ -239,8 +243,8 @@ function house(o) {
   const cz = jetty / 2, ry0 = top + 0.3;
   for (const s of [-1, 1]) {
     const L = Math.hypot((d + jetty) / 2 + over, ((d + jetty) / 2 + over) * Math.tan(ang));
-    k.box(w + 2 * over, 0.22, L, 'slate', { x: 0, y: ry0 + rise - Math.sin(ang) * L / 2, z: cz + s * Math.cos(ang) * L / 2, rx: s * ang });
-    k.box(w + 2 * over + 0.05, 0.12, 0.2, 'terracotta', { y: ry0 + rise - Math.sin(ang) * L + 0.02, z: cz + s * Math.cos(ang) * L });
+    k.box(w + 2 * over, 0.36, L, 'slate', { x: 0, y: ry0 + rise - Math.sin(ang) * L / 2, z: cz + s * Math.cos(ang) * L / 2, rx: s * ang });   // 0.22 -> 0.36 m (2026-11-14)
+    k.box(w + 2 * over + 0.08, 0.24, 0.3, 'terracotta', { y: ry0 + rise - Math.sin(ang) * L + 0.02, z: cz + s * Math.cos(ang) * L });
   }
   k.box(w + 2 * over + 0.1, 0.26, 0.34, 'terracotta', { y: ry0 + rise + 0.08, z: cz, rx: Math.PI / 4 });
   for (const sx of [-1, 1]) {
@@ -572,6 +576,26 @@ float gvN(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
   m.customProgramCacheKey = () => 'groundVary'; return m;
 }
 
+// cloth in the wind (2026-11-14): flags / banners ripple instead of turning as one stiff board - a travelling wave along
+// the free end (anchored at the pole / the top bar), two frequencies, per-flag phase from its world position, so no two
+// move alike. Vertex shader only (the plane's local z = its normal); one shared time uniform.
+const WIND = { value: 0 };
+function windCloth(f) {
+  const g = f.geometry; g.computeBoundingBox(); const b = g.boundingBox, w = b.max.x - b.min.x, h = b.max.y - b.min.y;
+  f.userData.ph = (f.position.x * 1.7 + f.position.z * 2.3 + (f.parent ? f.parent.position.x * 0.31 + f.parent.position.z * 0.53 : 0)) % 6.283;
+  const m = f.material; if (m.userData.wind) return; m.userData.wind = true;
+  const flag = w >= h, x0 = b.min.x.toFixed(3), L = (flag ? w : h).toFixed(3), y1 = b.max.y.toFixed(3);
+  m.onBeforeCompile = sh => {
+    sh.uniforms.uWind = WIND;
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nuniform float uWind;').replace('#include <begin_vertex>', `#include <begin_vertex>
+  { float a = ${flag ? `(position.x - ${x0}) / ${L}` : `(${y1} - position.y) / ${L}`};
+    float ph = modelMatrix[3][0] * 0.61 + modelMatrix[3][2] * 0.43;
+    float d = a * a * (sin(uWind * 3.4 - a * 6.0 + ph) * 0.09 + sin(uWind * 1.9 - a * 3.0 + ph * 1.7) * 0.05) * ${L};
+    transformed.z += d; ${flag ? 'transformed.y += a * 0.03 * sin(uWind * 2.3 + ph);' : 'transformed.x += a * 0.04 * sin(uWind * 1.6 + ph);'} }`);
+  };
+  m.customProgramCacheKey = () => 'wind' + (flag ? 'f' : 'b') + L; m.needsUpdate = true;
+}
+
 // ---------------------------------------------------------------- build the whole town
 /** returns { root, fadeGroups:[{name, occ, meshes}], smoke:[[x,y,z]], update(dt) } */
 export async function buildTown3D(spec, renderer) {
@@ -814,6 +838,8 @@ export async function buildTown3D(spec, renderer) {
   let t = 0;
   return {
     root, fade, smoke, spray: spec.models.some(m => m.id === 'fountain') ? [[0, 3.2, 0]] : [],
-    update(dt) { t += dt; for (const f of flags) f.rotation.y = Math.sin(t * 1.7 + f.position.x) * 0.25; },
+    update(dt) { t += dt; WIND.value = t;
+      for (const f of flags) { const u = f.userData; if (u.rotY === undefined) { u.rotY = f.rotation.y; windCloth(f); }   // keep the authored facing (banners are turned 90 deg)
+        f.rotation.y = u.rotY + Math.sin(t * 1.3 + u.ph) * 0.1 + Math.sin(t * 2.9 + u.ph * 2.3) * 0.04; } },
   };
 }

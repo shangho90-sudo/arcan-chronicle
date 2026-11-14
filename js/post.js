@@ -61,7 +61,7 @@ void main(){
 export class Post {
   constructor(renderer) {
     this.r = renderer; this.enabled = true;
-    this.params = { bloom: 0.65, threshold: 2.6, exposure: 1.12, warmth: 1.0, sat: 1.25, contrast: 0.32, vignette: 0.4, tilt: 0, haze: 0, hazeCol: [0.72, 0.66, 0.86] };   // tilt 0 = no top/bottom edge blur (the user asked to remove it)
+    this.params = { bloom: 0.65, threshold: 2.6, exposure: 1.12, warmth: 0.62, sat: 1.25, contrast: 0.32, vignette: 0.4, tilt: 0, haze: 0, hazeCol: [0.72, 0.66, 0.86] };   // tilt 0 = no top/bottom edge blur (the user asked to remove it); warmth 1.0 -> 0.62 (2026-11-14): the warm sun + warm grade stacked into a yellow cast in every field (town uses 0.5)
     this.defaults = { ...this.params };   // zones may override some values (zones.json "post"), restored on every zone load
     const hf = { type: THREE.HalfFloatType, depthBuffer: false };
     this.scene = new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, samples: 4 });
