@@ -8,7 +8,7 @@ const { chromium } = require('playwright'); const fs = require('fs'); const { ex
 const SIZE = process.env.SIZE || '1280x720', TOUCH = SIZE.endsWith('t'), [VW, VH] = SIZE.replace('t', '').split('x').map(Number);
 const TAG = process.env.TAG || 'after', OUT = process.env.OUT || '/tmp/gfx', G_ = process.env.GENDER || 'm', JOB = process.env.JOB || 'blacksmith';
 const ZOOMS = (process.env.ZOOMS || '1,2.2').split(',').map(Number), PERF = process.env.PERF !== '0', HUD = process.env.HUD === '1';
-const SPOT = process.env.SPOT === 'spawn' ? null : (process.env.SPOT || '-6.2,-6.6').split(',').map(Number)   // SPOT=spawn: where the zone put the player, DIR = +(process.env.DIR || 70), MON = process.env.MON || 'mon_boar';
+const SPOT = process.env.SPOT === 'spawn' ? null : (process.env.SPOT || '-6.2,-6.6').split(',').map(Number), DIR = +(process.env.DIR || 70), MON = process.env.MON || 'mon_boar';   // SPOT=spawn: where the zone put the player
 const ZONE = process.env.ZONE || '';
 (async () => {
   fs.mkdirSync(OUT, { recursive: true });
