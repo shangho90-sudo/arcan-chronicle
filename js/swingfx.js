@@ -79,7 +79,7 @@ export class SwingFx {
   hit(pos, o = {}) {
     if (!this.ready) return;
     const crit = !!o.crit, pal = crit ? PAL.crit : PAL.hit, c = g3(pos, 0.75), s = (o.scale || 1) * (crit ? 1.12 : 0.85);
-    const b = new Piece(this.scene, MESHES.burst, mat(pal.core, pal.rim), crit ? 0.22 : 0.16); b.kind = 'burst'; b.c = c; b.s = 0.95 * s; b.spin = (Math.random() - 0.5) * 6; b.roll = Math.random() * Math.PI;
+    const b = new Piece(this.scene, MESHES.burst, mat(pal.core, pal.rim), crit ? 0.22 : 0.16); b.kind = 'burst'; b.c = c; b.s = 0.42 * s;   // was 0.95: the star covered the whole monster as a pale veil and hid the skill effects (measured: tools/browser-tests/ hit frame with / without it) b.spin = (Math.random() - 0.5) * 6; b.roll = Math.random() * Math.PI;
     this.items.push(b);
     const r = new Piece(this.scene, MESHES.ring, mat([pal.core[0] * 0.7, pal.core[1] * 0.7, pal.core[2] * 0.7], pal.rim), crit ? 0.28 : 0.22); r.kind = 'ring'; r.c = g3(pos, 0.12); r.s = (crit ? 1.2 : 0.85) * (o.scale || 1);
     this.items.push(r);
@@ -103,7 +103,7 @@ export class SwingFx {
         const pop = u < 0.22 ? easeOut(u / 0.22) * 1.15 : 1.15 - 0.25 * clamp01((u - 0.22) / 0.78);
         p.mesh.position.copy(p.c); if (camera) p.mesh.quaternion.copy(camera.quaternion);
         p.mesh.rotateY(Math.PI / 2); p.mesh.rotateX(p.roll + p.spin * p.t);   // star (y-z plane) faces the camera
-        p.mesh.scale.setScalar(p.s * pop); U.uO.value = 1 - clamp01((u - 0.3) / 0.7) ** 1.5;
+        p.mesh.scale.setScalar(p.s * pop); U.uO.value = 0.8 * (1 - clamp01(u / 0.6)) ** 1.5;
       } else if (p.kind === 'ring') {
         p.mesh.position.copy(p.c); p.mesh.scale.setScalar(p.s * (0.25 + 1.0 * easeOut(u))); p.mesh.rotation.y = p.t * 2; U.uO.value = (1 - u) ** 2 * 0.8;
       } else if (p.kind === 'shard') {
