@@ -2,12 +2,12 @@
 // 1·3·5타 명중 1프레임 뒤 3장을 찍어 한 장의 표로 붙임. 피격 번쩍임·외곽선·비율·무기 크기·이펙트를 한눈에 비교.
 // Usage: TAG=before|after SIZE=1280x720 ZOOM=2.4 JOBS=novice,blacksmith,pharmacist,cook,hairdresser,artist GENDERS=m,f
 //        URL=http://localhost:8817/index.html OUT=/tmp/gfx2 BARGS='--single-process --no-zygote' NODE_PATH=$(npm root -g) node tools/browser-tests/jobsheet.js
-//   -> OUT/<TAG>_jobsheet_<size>.png (행 = 직업·성별, 열 = idle, hit1, hit3, hit5), OUT/<TAG>_jobsheet_<size>.json (타별 피해 시각)
+//   -> OUT/<TAG>_jobsheet_<size>.png (행 = 직업·성별, 열 = idle, run, hit1, hit3, hit5), OUT/<TAG>_jobsheet_<size>.json (타별 피해 시각)
 const { chromium } = require('playwright'); const fs = require('fs'); const { execSync } = require('child_process');
 const SIZE = process.env.SIZE || '1280x720', TOUCH = SIZE.endsWith('t'), [VW, VH] = SIZE.replace('t', '').split('x').map(Number);
 const TAG = process.env.TAG || 'after', OUT = process.env.OUT || '/tmp/gfx2', ZOOM = +(process.env.ZOOM || 2.4);
 const JOBS = (process.env.JOBS || 'novice,blacksmith,pharmacist,cook,hairdresser,artist').split(','), GENDERS = (process.env.GENDERS || 'm,f').split(',');
-const CW = +(process.env.CW || 300), CH = +(process.env.CH || 330);
+const CW = +(process.env.CW || 300), CH = +(process.env.CH || 330), RUN = process.env.RUN !== '0';   // RUN=0: no run column
 const WEAPON = { blacksmith: 'w_hammer_1', pharmacist: 'w_pestle_1', cook: 'w_knife_1', hairdresser: 'w_scissors_1', artist: 'w_brush_1' };
 (async () => {
   fs.mkdirSync(OUT, { recursive: true });
@@ -50,6 +50,14 @@ const WEAPON = { blacksmith: 'w_hammer_1', pharmacist: 'w_pestle_1', cook: 'w_kn
       const fn = `${OUT}/_js_${TAG}_${job}_${g}_${shots.length}.png`;
       await pg.screenshot({ path: fn, clip: { x: Math.max(0, Math.min(VW - CW, Math.round(c.x - CW / 2))), y: Math.max(0, Math.min(VH - CH, Math.round(c.y - CH / 2))), width: CW, height: CH }, timeout: 300000 }); shots.push(fn); };
     await shot();
+    if (RUN) {                                    // run column (2026-11-14): 40 frames toward screen-right, shot mid-stride, back to the spot
+      await ev(() => { G.input.stick = { x: 0.0, y: -1 }; for (let i = 0; i < 40; i++) { G.step(1 / 60, false); } const p = G.player; G.render.setFocus({ x: p.pos.x, y: 0, z: p.pos.z }, true); window.__runAt = { x: p.pos.x, z: p.pos.z }; });
+      const c = await ev(() => { G.render.render(0); const q = window.__runAt; return G.render.toScreen({ x: q.x, y: 0.85, z: q.z }); });
+      const fn = `${OUT}/_js_${TAG}_${job}_${g}_${shots.length}.png`;
+      await pg.screenshot({ path: fn, clip: { x: Math.max(0, Math.min(VW - CW, Math.round(c.x - CW / 2))), y: Math.max(0, Math.min(VH - CH, Math.round(c.y - CH / 2))), width: CW, height: CH }, timeout: 300000 }); shots.push(fn);
+      await ev(() => { G.input.stick = { x: 0, y: 0 }; const p = G.player, f = window.__f, m = window.__d; p.teleport(window.__spot); p.setFacing(f.x, f.z); p.body.place(p.pos); p.skills.comboN = 0; p.target = m;
+        for (let i = 0; i < 40; i++) G.step(1 / 60, false); G.render.setFocus({ x: p.pos.x + f.x * 0.7, y: 0, z: p.pos.z + f.z * 0.7 }, true); window.__hp = m.hp; });
+    }
     let n = 0, last = -99;
     for (let i = 0; i < 200 && n < 5; i++) {
       const hit = await ev(i => { G.input.hold('attack', true); G.step(1 / 60, false); const m = window.__d; if (m.hp < window.__hp) { window.__hp = m.hp; return +(i / 60).toFixed(3); } return null; }, i);
@@ -60,7 +68,7 @@ const WEAPON = { blacksmith: 'w_hammer_1', pharmacist: 'w_pestle_1', cook: 'w_kn
     log[job + '_' + g] = { dmg, action: await ev(() => G.player.body.action) };
     rows.push(shots); console.log(job, g, dmg.join(' '));
   }
-  fs.writeFileSync('/tmp/_jobsheet.py', `from PIL import Image, ImageDraw\nrows=${JSON.stringify(rows)}\nlab=${JSON.stringify(JOBS.flatMap(j => GENDERS.map(g => j + ' ' + g)))}\nW,H=${CW},${CH}\nsh=Image.new('RGB',(W*4+110,H*len(rows)),(20,20,28))\nd=ImageDraw.Draw(sh)\nfor r,row in enumerate(rows):\n  d.text((6,r*H+H//2),lab[r],fill=(255,255,255))\n  for c,f in enumerate(row[:4]): sh.paste(Image.open(f).convert('RGB'),(110+c*W,r*H))\nsh.save('${OUT}/${TAG}_jobsheet_${SIZE}.png')\n`);
+  fs.writeFileSync('/tmp/_jobsheet.py', `from PIL import Image, ImageDraw\nrows=${JSON.stringify(rows)}\nlab=${JSON.stringify(JOBS.flatMap(j => GENDERS.map(g => j + ' ' + g)))}\nW,H=${CW},${CH}\nNC=max(len(r) for r in rows)\nsh=Image.new('RGB',(W*NC+110,H*len(rows)),(20,20,28))\nd=ImageDraw.Draw(sh)\nfor r,row in enumerate(rows):\n  d.text((6,r*H+H//2),lab[r],fill=(255,255,255))\n  for c,f in enumerate(row): sh.paste(Image.open(f).convert('RGB'),(110+c*W,r*H))\nsh.save('${OUT}/${TAG}_jobsheet_${SIZE}.png')\n`);
   execSync('python3 /tmp/_jobsheet.py');
   fs.writeFileSync(`${OUT}/${TAG}_jobsheet_${SIZE}.json`, JSON.stringify({ log, errs }, null, 1));
   console.log('sheet', `${OUT}/${TAG}_jobsheet_${SIZE}.png`, errs.slice(0, 5)); await b.close();
