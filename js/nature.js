@@ -673,8 +673,11 @@ export async function placeBlProps(list, aniso = 4, groundY = () => 0) {
     let md; try { md = await loadModel(name, aniso, low ? '_l2' : ''); } catch (e) { console.warn('blprop', name, e); return; }
     const im = new THREE.InstancedMesh(md.geo, md.mats, items.length);
     items.forEach((p, k) => {
-      const s = (p.scale || 1) * md.xf.H; qt.setFromAxisAngle(yA, -(p.rot || 0) * DEG);
-      im.setMatrixAt(k, m4.compose(T({ x: p.pos[0], y: p.y ?? groundY(p.pos[0], p.pos[1]), z: p.pos[1] }), qt, sc.set(s, s, s)));
+      // trees (2026-11-14): mixed sizes (0.94..1.1) and a slightly rounder, fuller crown (x/z 1.08) so a row of the same
+      // model does not read as copies; visual only (the trunk footprint / collision comes from the zone data)
+      const tree = /^tree/.test(name), v0 = tree ? 0.94 + hash(k * 31 + 7) * 0.16 : 1, s = (p.scale || 1) * md.xf.H * v0, wx = tree ? 1.08 : 1;
+      qt.setFromAxisAngle(yA, -(p.rot || 0) * DEG);
+      im.setMatrixAt(k, m4.compose(T({ x: p.pos[0], y: p.y ?? groundY(p.pos[0], p.pos[1]), z: p.pos[1] }), qt, sc.set(s * wx, s, s * wx)));
       const v = 0.95 + hash(k * 17 + name.length) * 0.1; im.setColorAt(k, col.setRGB(v, v, v));
     });
     im.receiveShadow = true; im.castShadow = false; im.computeBoundingSphere(); im.name = 'bl:' + name; root.add(im);

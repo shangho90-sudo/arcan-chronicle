@@ -157,6 +157,11 @@ function flowerBox(k, x, y, z, w, keys = ['pink', 'purple', 'white']) {
     if (i % 2 === 0) k.sphere(0.09, 'green', { x: x + t * (w - 0.1) + 0.05, y: y + 0.13, z: z + 0.08 }, 5);
   }
 }
+function flowerClump(k, x, z, keys, seed) {
+  const r = mulberry(Math.round(seed * 1000) | 0);
+  for (let i = 0; i < 7; i++) { const a = r() * 6.283, d = 0.1 + r() * 0.3; k.sphere(0.13 + r() * 0.07, 'green', { x: x + Math.cos(a) * d * 0.7, y: 0.12 + r() * 0.06, z: z + Math.sin(a) * d, s: [1, 0.75, 1] }, 6); }
+  for (let i = 0; i < 6; i++) { const a = r() * 6.283, d = r() * 0.32; k.sphere(0.075 + r() * 0.035, keys[i % keys.length], { x: x + Math.cos(a) * d * 0.7, y: 0.24 + r() * 0.1, z: z + Math.sin(a) * d }, 6); }
+}
 function doorAt(k, x, z, w = 1.3, h = 2.35, key = 'planks') {
   k.box(w, h, 0.14, key, { x, y: h / 2 + 0.35, z: z + 0.02 });
   // stone surround with a pointed top
@@ -321,6 +326,9 @@ function house(o) {
     for (const a of [-0.35, 0.45]) windowAt(k, tx + Math.sin(a) * (tr + 0.02), plinth + g0 + 1.5, tz + Math.cos(a) * (tr + 0.02), 0.6, 1.0, { shutters: false, flowers: false });
   }
   decorFront(k, o.style, w, fz, doorX, shopX);
+  // flower clumps at the foot of the side walls (2026-11-14): softens where the building meets the paving; tucked against
+  // the walls just behind the front corners, below knee height - never on a walkway, no collision (part of the merged house)
+  for (const sx of [-1, 1]) flowerClump(k, sx * (w / 2 + 0.38), fz - 0.55, (st.flowers || ['pink', 'white', 'yellow']), sx * 7 + w);
   const grp = k.build();
   return { grp, height: ry0 + rise + 2.5 };
 }
@@ -596,6 +604,32 @@ function windCloth(f) {
   m.customProgramCacheKey = () => 'wind' + (flag ? 'f' : 'b') + L; m.needsUpdate = true;
 }
 
+// fountain water (2026-11-14): the Tripo angel fountain's water is only painted into its texture, so it stood still. A thin
+// transparent ring on the lower basin surface (measured from the model: flat level y = 0.044, r = 0.24..0.385 of the
+// model's unit size) adds restrained motion - soft concentric ripples where the upper tier spills (8 points), slow
+// drifting light streaks and a few sparkles. Highlights only (no colour fill), so the painted water and stone stay.
+function fountainWater(md) {
+  const k = md.scale, r0 = 0.243 * k, r1 = 0.383 * k, y = 0.0445 * k + 0.02;
+  const g = new THREE.RingGeometry(r0, r1, 96, 3); g.rotateX(-Math.PI / 2);
+  const m = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uT: WIND, uR: { value: new THREE.Vector2(r0, r1) } },
+    vertexShader: 'varying vec2 vP; void main(){ vP = position.xz; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: `uniform float uT; uniform vec2 uR; varying vec2 vP;
+float h(vec2 p){ return fract(sin(dot(p, vec2(41.3, 289.1))) * 43758.5); }
+void main(){
+  float r = length(vP), a = atan(vP.y, vP.x), edge = smoothstep(uR.x, uR.x + 0.25, r) * smoothstep(uR.y, uR.y - 0.3, r);
+  float rip = 0.0;
+  for (int i = 0; i < 8; i++) { float fi = float(i), aa = fi * 0.785 + 0.2; vec2 c = vec2(cos(aa), sin(aa)) * (uR.x + 0.35);
+    float d = length(vP - c), ph = fract(uT * 0.55 + fi * 0.37), R = ph * 1.4;
+    rip += smoothstep(0.06, 0.0, abs(d - R)) * (1.0 - ph) * 0.9; }
+  float streak = smoothstep(0.82, 1.0, sin(r * 5.0 - uT * 1.1 + sin(a * 3.0 + uT * 0.4) * 1.2)) * 0.35;
+  vec2 q = floor(vec2(a * 30.0, r * 6.0)); float sp = step(0.985, h(q + floor(uT * 2.0))) * 0.6;
+  float v = (rip + streak + sp) * edge;
+  gl_FragColor = vec4(vec3(0.86, 0.97, 1.0), clamp(v * 0.55, 0.0, 0.6));
+}` });
+  const mesh = new THREE.Mesh(g, m); mesh.position.copy(T({ x: md.pos[0], y, z: md.pos[1] })); mesh.renderOrder = 2; mesh.name = 'fountain_water';
+  return mesh;
+}
+
 // ---------------------------------------------------------------- build the whole town
 /** returns { root, fadeGroups:[{name, occ, meshes}], smoke:[[x,y,z]], update(dt) } */
 export async function buildTown3D(spec, renderer) {
@@ -718,6 +752,7 @@ export async function buildTown3D(spec, renderer) {
     const src = await loadGLB(md.file); const obj = src.clone(true);
     obj.scale.setScalar(md.scale); place(obj, md.pos, md.h); root.add(obj);
     if (md.id !== 'fountain') addFade(md.id, obj, [md.pos[0], 0, md.pos[1], md.size[0] / 2, md.size[1] / 2, md.h, md.size[2]]);
+    if (md.id === 'fountain' && md.file === 'angel_fountain') root.add(fountainWater(md));
     else addFade(md.id, obj, [md.pos[0], 0, md.pos[1], 3.0, 3.0, 0, 6.5]);       // only the statue column hides things
   }));
   const smithy = spec.models.find(m => m.id === 'smithy');
