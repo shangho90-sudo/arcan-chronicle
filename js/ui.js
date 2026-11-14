@@ -189,19 +189,23 @@ export class UI {
     this.floats.push({ e, pos: { x: pos.x + (Math.random() - 0.5) * 0.5, y: pos.y + h, z: pos.z + (Math.random() - 0.5) * 0.3 }, t: 0, scale });
   }
   /** 타격감 문구(2026-11-15, 요리사 '썰!'·'쾅!'·'치익!'·'에취!'): 머리 위 옆에서 튀어나와 짧게 흔들리고 0.7초에 사라짐(주아체 `.float.imp`).
-   *  피해 숫자를 가리지 않게 — 방금 그 자리에 뜬 숫자(damageText _dmgStack)의 반대쪽 옆·위, 같은 자리에 잇따르면 한 칸씩 위로; 숫자가 늘 위에 그려짐(CSS z-index).
-   *  o: key(대상 — 같은 대상은 gap 0.15초 안에 하나만, force면 무시), col·edge(글자·테두리 색), size, top(발에서 머리 위까지 m), max(화면에 동시에, 기본 6). 난수 없음(게임 Math.random을 건드리지 않음). */
+   *  피해 숫자·이름표를 가리지 않게 — 숫자는 머리 위에 뜨므로 문구는 몸 옆(윗몸 높이, 몸 가장자리 바깥)에, 방금 그 자리에 뜬 숫자(damageText _dmgStack)의 반대쪽;
+   *  같은 자리에 잇따르면 한 칸씩 아래로; 겹쳐도 숫자가 늘 위에 그려짐(CSS z-index).
+   *  o: from(시전자 위치 — 있으면 시전자 반대쪽 옆), key(대상 — 같은 대상은 gap 0.15초 안에 하나만, force면 무시), col·edge(글자·테두리 색), size, top(발에서 머리 위까지 m), r(대상 반지름 m), max(화면에 동시에, 기본 6). 난수 없음(게임 Math.random을 건드리지 않음). */
   impactText(pos, text, o = {}) {
     const now = this.fclock || 0, key = o.key || null, W = this._impW || (this._impW = new WeakMap());
     if (key && !o.force) { const t0 = W.get(key); if (t0 != null && now - t0 < (o.gap ?? 0.15)) return; }
     if (key) W.set(key, now);
+    if (typeof text === "function") text = text();   // chosen only when it is really shown (식칼: '썰!'/'싹둑!' alternate on the shown ones)
     const live = this.floats.filter(f => f.imp);
     while (live.length >= (o.max || 6)) { const f = live.shift(); f.e.remove(); this.floats.splice(this.floats.indexOf(f), 1); }
     const ds = this._dmgStack; let side = (this._impSide = -(this._impSide || 1));
     if (ds && ds.side && now * 1000 - ds.t < 400 && Math.hypot(pos.x - ds.x, pos.z - ds.z) < 0.8) side = -ds.side;
+    if (o.from) { const a = G.render.toScreen({ x: pos.x, y: pos.y || 0, z: pos.z }), b = G.render.toScreen({ x: o.from.x, y: o.from.y || 0, z: o.from.z }); if (Math.abs(a.x - b.x) > 8) side = a.x > b.x ? 1 : -1; }   // away from the caster (the cook stands right next to the target)
     const n = live.filter(f => now - f.born < 0.45 && Math.hypot(f.pos.x - pos.x, f.pos.z - pos.z) < 0.8).length;
     const e = $("div", "float imp", this.floatLayer); e.textContent = text; e.style.color = o.col || "#fff"; if (o.edge) e.style.setProperty("--edge", o.edge);
-    this.floats.push({ e, imp: 1, born: now, side, n: Math.min(n, 3), pos: { x: pos.x, y: (pos.y || 0) + (o.top ?? 1.2) + 0.2, z: pos.z }, t: 0, scale: o.size || 1, life: o.life || 0.72 });
+    this.floats.push({ e, imp: 1, born: now, side, n: Math.min(n, 2), pos: { x: pos.x, y: (pos.y || 0) + (o.top ?? 1.2) * 0.62, z: pos.z }, r: o.r ?? 0.5, t: 0, scale: o.size || 1, life: o.life || 0.72 });
+    e.style.transformOrigin = side > 0 ? "0 50%" : "100% 50%";
   }
   /** damage numbers with impact: kind = 'hit' (player hits a monster), 'crit', 'taken' (player is hit), 'dot' */
   damageText(pos, amount, kind) {
@@ -236,11 +240,11 @@ export class UI {
       if (f.imp) {                                     // 타격감 문구: pop 0.35 -> 1.45 -> 1, a short shake + tilt toward its side, drifts up, fades
         const t = f.t, k = t / f.life;
         if (k >= 1) { f.e.remove(); this.floats.splice(this.floats.indexOf(f), 1); continue; }
-        const s = G.render.toScreen(f.pos), ph = innerWidth < 600 ? 0.72 : 1;
+        const s = G.render.toScreen(f.pos), s1 = G.render.toScreen({ x: f.pos.x + 1, y: f.pos.y, z: f.pos.z }), ppm = Math.hypot(s1.x - s.x, s1.y - s.y), ph = innerWidth < 600 ? 0.72 : 1;
         const pop = t < 0.06 ? 0.35 + t / 0.06 * 1.1 : t < 0.15 ? 1.45 - (t - 0.06) / 0.09 * 0.55 : t < 0.22 ? 0.9 + (t - 0.15) / 0.07 * 0.1 : 1;
         const sh = t < 0.24 ? Math.sin(t * 95 + f.n * 1.7) * (1 - t / 0.24) : 0;
-        const dx = f.side * (64 + 12 * Math.min(1, t / 0.3)) * ph + sh * 4, dy = -(16 + f.n * 28) * ph - k * 18;
-        f.e.style.transform = `translate(${s.x + dx}px,${s.y + dy}px) translate(-50%,-50%) rotate(${-f.side * 8 + sh * 7}deg) scale(${f.scale * pop})`;
+        const dx = f.side * (f.r * ppm + (10 + 12 * Math.min(1, t / 0.3)) * ph) + sh * 4, dy = (f.n * 31 - 4) * ph - k * 16;   // inner edge just outside the body
+        f.e.style.transform = `translate(${s.x + dx}px,${s.y + dy}px) translate(${f.side > 0 ? 0 : -100}%,-50%) rotate(${-f.side * 8 + sh * 7}deg) scale(${f.scale * pop})`;
         f.e.style.opacity = k > 0.62 ? 1 - (k - 0.62) / 0.38 : 1;
         continue;
       }

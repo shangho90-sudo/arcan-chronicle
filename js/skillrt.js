@@ -575,10 +575,10 @@ export class SkillEngine {
             if (t.body && t.body.punch) t.body.punch(f.x, f.z, 0.22);
             if (G.render.kick && !G.reduceFlash) G.render.kick(f.x, f.z, PAN_KICK[0], PAN_KICK[1]);
             const sd = !t.dead && t.status && t.status.get && t.status.get('stun'); if (sd) FX.cook('stun', t, { dur: sd.remaining });
-            cookShout(G, t, 'pan'); if (sd) cookShout(G, t, 'stun', { force: true });   // 타격감 문구 '쾅!' (+ 기절이 걸렸을 때만 '기절!')
+            cookShout(G, t, 'pan', { from: pc.pos }); if (sd) cookShout(G, t, 'stun', { force: true, from: pc.pos });   // 타격감 문구 '쾅!' (+ 기절이 걸렸을 때만 '기절!')
           }
         }
-        if (op.fx && op.fx.cook === 'chop' && ts[0] && !ctx.missed) cookShout(G, ts[0], 'chop', { h, last: h === hits_ - 1 });   // 식칼 썰기: 실제로 썬 타에만 '썰!'/'싹둑!', 마지막 '썰썰썰!'
+        if (op.fx && op.fx.cook === 'chop' && ts[0] && !ctx.missed) cookShout(G, ts[0], 'chop', { h, last: h === hits_ - 1, from: pc.pos });   // 식칼 썰기: 실제로 썬 타에만 '썰!'/'싹둑!', 마지막 '썰썰썰!'
         if (op.fx && op.fx.smith) {   // 대장장이 타격 연출(피해 뒤 — MISS는 빗나간 것으로): 실제로 맞은 대상에만 불티·섬광, 시전자·대상만 잠깐 멈춤
           const live = ts.filter(() => !ctx.missed || ts.length > 1), t0 = [...live].sort((a, b) => pc.dist(a) - pc.dist(b))[0], heavy = op.fx.smith === 'finish' || op.fx.smith === 'brand';
           FX.smith('hit', pc, { kind: op.fx.smith, f, h, r: op.r, ang: op.ang, hits: live.map(t => ({ x: t.pos.x, y: t.pos.y || 0, z: t.pos.z, r: t.radius, heat: this.smith.heatOf(t) })) });

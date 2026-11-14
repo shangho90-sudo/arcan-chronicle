@@ -31,7 +31,7 @@ export const COOK = {
   // (len·hover·dip·slide·lineW·chip / pan.lift·stun / ladle·lift / size·back·shake; 팬 반지름은 R × vis), 코드 안 상수(섬광·조각 속도·김·방울)는 vis를 곱함. 높이(pan.height·pepper.h·soup.pivot)는 큰 소품이 땅에 박히지 않게 올림.
   knife: { vis: 2, len: 2.5, hover: 1.5, dip: 0.36, yaw: 0.6, appear: 0.1, leave: 0.22, rock: 0.22, slide: 0.32, flash: 1.5, line: 2.6, lineW: 1.24, lineLife: 0.18, chips: 4, chipsLite: 2, chip: [0.3, 0.48] },
   pan: { vis: 2, height: 3.8, rest: 0.56, rMin: 0.85, rMax: 1.5, pad: 0.4, appear: 0.12, dropPart: 0.42, stay: 0.05, fade: 0.17, lift: 1.2, seeThrough: 0.5, ring: 2.0, ringLife: 0.28, flash: 1.0, flashT: 0.06, stars: 5, starsLite: 3 },
-  stun: { n: 3, r: 0.84, lift: 0.5, size: 0.48, spin: 5.0 },   // 팬 강타의 별도 2배(2026-11-15)
+  stun: { n: 3, r: 0.63, lift: 0.42, size: 0.36, spin: 5.0 },   // 기절 별(3초 동안 머리 둘레): 2026-11-15 1.5배만 — 2배면 3초 내내 얼굴을 가림(타격 순간 튀는 별은 2배)
   ball: { r: 0.2, spin: 11 },
   // 미트볼 던지기 (2026-11-14 소울 스트라이크식, 경로·시각은 js/meatball.js): 공 반지름·마지막 공 배율·회전, 꼬리 길이(점 수)·굵기, 소스 방울 간격, 타격 섬광·줄·고리
   volley: { r: 0.15, lastMul: 1.2, spin: 13, trail: 9, trailLite: 6, trailW: 0.1, drip: 0.06, dripLite: 0.15, flash: 0.62, flashLast: 1.0, streak: 0.95, streakLast: 1.35, drops: 4, dropsLite: 2, dropsLast: 9, dropsLastLite: 4, crumbs: 2, crumbsLast: 4, ring: 1.4, a: 1.0 },
@@ -564,7 +564,7 @@ export class CookFx {
       const t = e.t - lead, s1 = Math.exp(-Math.pow(t / 0.05, 2)), s2 = Math.exp(-Math.pow((t - 0.2) / 0.05, 2)), out = smooth(0.3, 0.46, t);
       sh.position.copy(g0).addScaledVector(back, K.back); sh.position.y = g0.y + K.h - K.shake * (s1 + s2) + 0.5 * K.vis * out; sh.position.x += 0.04 * K.vis * Math.sin(e.t * 50) * (s1 + s2);
       sh.rotation.set(Math.PI - 0.5 + 0.35 * (s1 + s2), e.t * 1.2, 0.25); sh.scale.setScalar(K.size * (0.6 + 0.4 * easeOut(e.t / 0.1)));
-      sh.material.uniforms.uA.value = smooth(0, 0.06, e.t) * (1 - out) * (1 - 0.3 * smooth(0.04, 0.12, t));   // after the shake it thins out so the targets under it read
+      sh.material.uniforms.uA.value = smooth(0, 0.06, e.t) * (1 - out) * (1 - 0.5 * smooth(0.04, 0.12, t));   // 2배 후추통: 흔든 뒤 반쯤 비침   // after the shake it thins out so the targets under it read
       if (shook >= 0) { const k = (e.t - shook) / 0.6; sp.material.uniforms.uP.value = k * 1.2; sp.material.uniforms.uA.value = 0.85 * smooth(0, 0.08, e.t - shook) * (1 - smooth(0.45, 1, k)); this._flat(sp, r * K.vis * (0.55 + 0.45 * easeOut(k * 2)), 0.06);   // 2026-11-15: 그림은 실제 반경의 2배(판정 r 그대로)
         this._flat(rg, r * K.vis * (0.6 + 0.4 * easeOut(k * 2.4)), 0.07); rg.material.uniforms.uA.value = COOK.intensity * 0.9 * (1 - smooth(0.2, 0.8, k)); }
       else if (e.t > lead + 0.1) shook = e.t;
@@ -716,15 +716,15 @@ export function cookImpact(G, pc, op, ctx, ts, ok, f) {
     for (const t of ok) { if (!t.dead) t.freezeT = Math.max(t.freezeT || 0, C.skewer.stop); if (t.body && t.body.punch) t.body.punch(f.x, f.z, 0.2); }
     kick(C.skewer.kick);
   } else if (kind === 'soup') {
-    ok.forEach((t, i) => { if (t.body && t.body.punch) t.body.punch(t.pos.x - pc.pos.x, t.pos.z - pc.pos.z, 0.16); if (i < SHOUT.soup.max) cookShout(G, t, 'soup', { i }); });
+    ok.forEach((t, i) => { if (t.body && t.body.punch) t.body.punch(t.pos.x - pc.pos.x, t.pos.z - pc.pos.z, 0.16); if (i < SHOUT.soup.max) cookShout(G, t, 'soup', { i, from: pc.pos }); });
     kick(C.soup.kick);
   } else if (kind === 'pepper') {
-    ok.forEach((t, i) => { if (t.dead) return; if (t.body && t.body.punch) t.body.punch(0, 0.01, 0.3); if (i < SHOUT.pepper.max) cookShout(G, t, 'pepper', { i }); });
+    ok.forEach((t, i) => { if (t.dead) return; if (t.body && t.body.punch) t.body.punch(0, 0.01, 0.3); if (i < SHOUT.pepper.max) cookShout(G, t, 'pepper', { i, from: pc.pos }); });
   }
 }
 
 /** 타격감 문구(2026-11-15): 실제로 맞은 대상(MISS 아님)에만, ui.js impactText(주아체 팝·흔들림, 피해 숫자 반대쪽 옆·위, 같은 대상 0.15초에 하나, 화면에 최대 6개).
- *  식칼 썰기는 타마다 '썰!'/'싹둑!' 번갈아 마지막 타 '썰썰썰!'(마지막은 늘 뜸), 팬 강타 '쾅!' + 기절이 걸리면 '기절!', 뜨거운 국물 '치익!'/'앗뜨거!'(대상 2개까지), 후추 '에취!'(3개까지). */
+ *  식칼 썰기는 뜬 문구마다 '썰!'/'싹둑!' 번갈아(0.15초 묶음 때문에 타 번호가 아니라 그 대상에 실제로 뜬 순서) 마지막 타 '썰썰썰!'(마지막은 늘 뜸), 팬 강타 '쾅!' + 기절이 걸리면 '기절!', 뜨거운 국물 '치익!'/'앗뜨거!'(대상 2개까지), 후추 '에취!'(3개까지). */
 export const SHOUT = {
   chop: { words: ['썰!', '싹둑!'], last: '썰썰썰!', col: '#eaf7ff', edge: '#16385a', size: 1.0, lastSize: 1.18 },
   pan: { word: '쾅!', col: '#ffd23a', edge: '#5a2200', size: 1.3 },
@@ -734,8 +734,8 @@ export const SHOUT = {
 };
 export function cookShout(G, t, kind, o = {}) {
   const S = SHOUT[kind]; if (!S || !t || !G.ui || !G.ui.impactText) return;
-  const last = !!o.last, text = kind === 'chop' ? (last ? S.last : S.words[(o.h || 0) % 2]) : S.words ? S.words[(o.i || 0) % S.words.length] : S.word;
-  G.ui.impactText({ x: t.pos.x, y: t.pos.y || 0, z: t.pos.z }, text, { key: t, col: S.col, edge: S.edge, size: last ? S.lastSize : S.size, top: cookTop(t), force: last || o.force });
+  const last = !!o.last, text = kind === 'chop' ? (last ? S.last : () => S.words[(t._cookShoutN = (t._cookShoutN || 0) + 1) % 2 ? 0 : 1]) : S.words ? S.words[(o.i || 0) % S.words.length] : S.word;
+  G.ui.impactText({ x: t.pos.x, y: t.pos.y || 0, z: t.pos.z }, text, { key: t, col: S.col, edge: S.edge, size: last ? S.lastSize : S.size, top: cookTop(t), r: t.radius || 0.5, from: o.from, force: last || o.force });
 }
 /** 뒤집기로 띄울 수 있는 대상(보스·무거운 몬스터 제외 — skillrt의 launch 규칙과 같음) */
 export const cookCanToss = (t) => !!t && !t.dead && !t.isBoss && !(t.def && t.def.ai === 'heavy');
