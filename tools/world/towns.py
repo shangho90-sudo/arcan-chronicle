@@ -434,19 +434,21 @@ def gen_town2(t, exits, extra_npcs=()):
             a = math.radians(hs['h']); x = hs['pos'][0] + math.sin(a) * (HD / 2 + 0.7) + math.cos(a) * s * 3.4; z = hs['pos'][1] + math.cos(a) * (HD / 2 + 0.7) - math.sin(a) * s * 3.4
             if ok(x, z, 0.5, road=0.1) and rnd.random() < 0.75: bl(rnd.choice(['shrub_a', 'shrub_b', 'town_planter'] if flowers[0] != 'grass_short' else ['town_barrel', 'town_crate']), x, z, None, 0.8, 'bush', 0.7)
 
-    # small flower clumps along the street edges (2026-11-14, 그래픽 2단계): every ~5.5 m, alternate sides, just outside
+    # small flower clumps along the street edges (2026-11-14, 그래픽 2단계): every ~4 m, alternate sides, just outside
     # the kerb; only where ok() allows (not the plaza, not on other things / NPC spots, not in front of a door). Decoration
     # only (blprops, no collision), own rng and not added to `taken`, so nothing else in the town moves.
     er = rng_for('edge:' + t['id']); doors = [house_front(hs, 1.0) for hs in houses]; ne = 0
     for pts, w, _ in streets:
         for a, b in zip(pts, pts[1:]):
             L = math.hypot(b[0] - a[0], b[1] - a[1]); nx, nz = -(b[1] - a[1]) / max(L, 1e-6), (b[0] - a[0]) / max(L, 1e-6)
-            for i in range(int(L // 5.5)):
-                if er.random() < 0.35: continue
-                u = (i + 0.5 + er.uniform(-0.15, 0.15)) * 5.5 / L; s = 1 if (i + ne) % 2 else -1; off = w / 2 + er.uniform(0.75, 1.0)
+            for i in range(int(L // 4.0)):
+                if er.random() < 0.25: continue
+                u = (i + 0.5 + er.uniform(-0.15, 0.15)) * 4.0 / L; s = 1 if (i + ne) % 2 else -1; off = w / 2 + er.uniform(0.75, 1.0)
                 x, z = a[0] + (b[0] - a[0]) * u + nx * s * off, a[1] + (b[1] - a[1]) * u + nz * s * off
                 if not ok(x, z, 0.45, road=0.2) or any(math.hypot(x - dx, z - dz) < 2.6 for dx, dz in doors): continue
-                for j in range(er.randint(2, 3)):
+                green = 'grass_short' if 'grass_short' not in flowers else 'clover'
+                blprops.append(dict(model=green, pos=[round(x, 2), round(z, 2)], rot=round(er.uniform(0, 360), 1), scale=round(er.uniform(0.85, 1.05), 2)))
+                for j in range(er.randint(3, 4)):
                     blprops.append(dict(model=er.choice(flowers), pos=[round(x + er.uniform(-0.45, 0.45) * abs(nz) + er.uniform(-0.2, 0.2), 2), round(z + er.uniform(-0.45, 0.45) * abs(nx) + er.uniform(-0.2, 0.2), 2)],
                                         rot=round(er.uniform(0, 360), 1), scale=round(er.uniform(0.6, 0.82), 2)))
                 ne += 1
