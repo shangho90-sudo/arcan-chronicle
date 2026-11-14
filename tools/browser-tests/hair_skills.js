@@ -90,6 +90,7 @@ const MARKS = (process.env.MARKS || (SKILL === 'basic' ? '0.10,0.17,0.20,0.24,0.
     const shot = MARKS.some(m => i === Math.round(m * FPS));
     const c = await ev(([i, fps, dist, shot]) => {
       window.__t = i / fps; const p = G.player, f = window.__f, m = window.__ds[0], L = window.__log;
+      if (window.__basic && !window.__drew && p.weaponReady && !p.weaponReady()) { window.__drew = true; p.combat(1.6); L.fx.push({ k: 'draw', t: +window.__t.toFixed(3) }); }   // 칼을 멘 채 누름: 빠른 꺼내기 뒤 휘두름(Player.basic과 같음)
       if (window.__basic && window.__casts < 5 && !p.skills.busy && (p.body.drawReady !== false)) { const r = p.skills.tryCast(window.__basic, window.__at(dist)); if (r === null) { window.__casts++; L.fx.push({ k: 'cast' + window.__casts, t: +window.__t.toFixed(3), act: p.body.action }); } }
       G.step(1 / fps, shot || window.__allRender);   // render only the frames that are captured (SwiftShader: ~10x faster run)
       if (m && !m.removed && m.hp < window.__hp) { L.dmg.push({ t: +window.__t.toFixed(3), a: Math.round(window.__hp - m.hp), dead: !!m.dead }); window.__hp = m.hp; }
