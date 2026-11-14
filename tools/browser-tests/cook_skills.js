@@ -18,7 +18,7 @@ const M2 = { flip: '0.05,0.15,0.22,0.25,0.28,0.33,0.40,0.50,0.62,0.76,0.90,1.05,
   pan: '0.05,0.15,0.22,0.27,0.30,0.32,0.36,0.45,0.60,0.80,1.2,2.0', chop: '0.05,0.15,0.20,0.22,0.25,0.30,0.34,0.40,0.46,0.52,0.58,0.64,0.70,0.80,0.95,1.2', ball: '0.10,0.18,0.25,0.32,0.40,0.48,0.56,0.64,0.72,0.80,0.90,1.0,1.15,1.3' };
 const cfg = (SKILL) => { const WIDE = ['ball', 'soup', 'pepper', 'flour', 'skewer'].includes(SKILL);
   return { SKILL, ID: SK[SKILL], DIST: SKILL === 'ball' ? 5 : SKILL === 'pepper' || SKILL === 'flour' ? 4 : SKILL === 'soup' || SKILL === 'skewer' ? 2.2 : 1.5, CW: +(process.env.CW || Math.min(VW, WIDE ? 640 : 460)), CH: +(process.env.CH || Math.min(VH, 440)),
-    DUR: +(process.env.DUR || (SCENE === 'stun' ? 4.2 : SKILL === 'ball' ? 1.9 : SKILL === 'flour' ? 2.3 : SKILL === 'board' ? 2.7 : SKILL === 'lunch' || SKILL === 'bowl' ? 2.3 : 1.6)), MARKS: (process.env.MARKS || M2[SKILL]).split(',').map(Number).filter((m, i) => !process.env.FEW || i % 2 === 1) }; };   // FEW=1: every other frame mark (faster)
+    DUR: +(process.env.DUR || (SCENE === 'stun' ? 4.2 : SKILL === 'ball' ? 1.9 : SKILL === 'flour' ? 2.3 : SKILL === 'board' ? 2.7 : SKILL === 'lunch' || SKILL === 'bowl' ? 2.3 : SKILL === 'pan' ? 2.1 : 1.6)), MARKS: (process.env.MARKS || M2[SKILL]).split(',').map(Number).filter((m, i) => !process.env.FEW || i % 2 === 1) }; };   // FEW=1: every other frame mark (faster)
 (async () => {
   fs.mkdirSync(OUT, { recursive: true });
   const b = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
