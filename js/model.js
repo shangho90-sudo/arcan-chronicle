@@ -226,6 +226,10 @@ function makeProp(kind) {
 // (pose.grip2, left-arm IK in apply) the ring of half -1; pose.snip opens them (SHEARS.open rad each). Lengths in prop
 // metres (the hand holder scales by 1.3): pivot -> tip 0.50, pivot -> ring 0.22, about 3x the old 0.27 m scissors.
 export const SHEARS_BACK_ROLL = 90;   // deg, see updateProp (back holder only - the in-hand grip is unchanged)
+// 2026-11-14 (user): the big shears hung from the shoulder holder put the pink finger ring at the neck / in the hair.
+// They slide this far (m) down along the same diagonal so they sit on the middle of the back; the draw / sheathe hand
+// target moves with them (backGrip), so the hand still meets the ring
+export const SHEARS_BACK_DROP = 0.24;
 export const SHEARS = { blade: 0.50, pivot: 0.22, ringX: 0.062, ringR: 0.062, open: 0.5, rest: 0.035 };
 const SHEAR_TIER = [null, { ring: 0xe65a8c, blade: 0xe4eaf4, pin: 0xf4c860 }, { ring: 0xf0b848, blade: 0xeef2fa, pin: 0xfff0b0 }, { ring: 0x9a6cf0, blade: 0xf2f0ff, pin: 0x7ad8ff }];
 /** ring centre of half s (+1 right hand / -1 left hand) relative to the pivot, at open amount k (0..1) */
@@ -847,7 +851,7 @@ export class ModelBody {
       let bd = p.blade ? dirAE(p.blade[0], p.blade[1]) : _v(0, 0.3, 1);
       if (p.toBack > 0.001) {                                                // draw / sheathe: the hand goes to the grip on the back
         const bm = this.backMount(), uc = bm.bone, dUC = mul(_m().copy(W[uc]), md.bones[uc].inv), k = Math.min(1, p.toBack);
-        T.lerp(bm.grip.clone().applyMatrix4(dUC), k); bd = bd.clone().lerp(bm.dir.clone().transformDirection(dUC), k).normalize();
+        T.lerp(this.backGrip().applyMatrix4(dUC), k); bd = bd.clone().lerp(bm.dir.clone().transformDirection(dUC), k).normalize();
       }
       const r = solveArm(c, Sn, T, pole, bd);
       const Rpi = Rp.clone().invert(), ik = { Right_UpperArm: mul(Rpi, r.Rua), Right_LowerArm: mul(r.Rua.clone().invert(), r.Rla), Right_Hand: mul(r.Rla.clone().invert(), r.Rh) };
@@ -959,6 +963,11 @@ export class ModelBody {
     const M = _m().makeBasis(X, Y, dir).setPosition(grip).multiply(_m().makeScale(1.3 / s, 1.3 / s, 1.3 / s));
     return (md._back = { bone: uc, grip, dir, M });
   }
+  /** where the hand takes the stowed weapon (bind space): the holder grip, lower along the diagonal for the big shears */
+  backGrip() {
+    const bm = this.backMount(), k = this.propKind && this.propKind.R;
+    return k && k.startsWith('shears:') ? bm.grip.clone().addScaledVector(bm.dir, SHEARS_BACK_DROP / this.md.scale) : bm.grip.clone();
+  }
   /** hand grip matrix (mesh space) of a held item: at the palm in bind space, item axis forward (+z) tilted by the pose, authored in metres */
   gripM(side, W, tilt) {
     const md = this.md, hi = md.byName[(side === 'L' ? 'Left' : 'Right') + '_Hand'], b = md.bones[hi], along = side === 'L' ? 1 : -1, s = md.scale;   // R and H (held item while the weapon is stowed) = right hand
@@ -988,7 +997,7 @@ export class ModelBody {
       const bm = this.backMount(); let onBack = mul(_m().copy(W[bm.bone]), md.bones[bm.bone].inv, bm.M);
       // 미용사 큰 가위 (2026-11-14): the blades are flat in the prop's x-z plane, so on the back holder they stood out edge-on
       // across the body. Turn them 90 deg about their own long axis (z): same diagonal, flat face (both blades + rings) on the back
-      if (h.children[0] && h.children[0].userData.shears) onBack = mul(onBack, rz(SHEARS_BACK_ROLL));
+      if (h.children[0] && h.children[0].userData.shears) onBack = mul(onBack, rz(SHEARS_BACK_ROLL), _m().makeTranslation(0, 0, SHEARS_BACK_DROP / 1.3));   // prop units: M scales by 1.3
       if (a <= 0.001) h.matrix.copy(onBack);
       else {                                                                 // glide hand <-> back (position lerp, rotation slerp)
         const p0 = _v(), p1 = _v(), q0 = new THREE.Quaternion(), q1 = new THREE.Quaternion(), s0 = _v(), s1 = _v();
