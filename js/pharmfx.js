@@ -36,6 +36,7 @@
 // particles, chunks and translucent layers, the core read (ring, ribbon, flash, dome, circle) stays.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { FlaskKit } from './flaskfx.js';   // 2026-11-14 약병 연출 공용 모듈 (약병·유리·액체·반응·잔여물)
 
 // ------------------------------------------------------------------------------------------------ tunables
 export const PHARM = {
@@ -218,7 +219,9 @@ export class PharmFx {
   constructor(root) {
     this.root = root; this.live = []; this.ready = false; this.geo = {}; this.pieces = []; this.shards = []; this.loading = null; this.cells = {}; this.span = 3.6;
     this.tri = {}; this.triShards = []; this.pool = {}; this.camQ = new THREE.Quaternion(); this.yawQ = new THREE.Quaternion(); this.toCam = new THREE.Vector3(0, 0.7, 0.7); this.camR = new THREE.Vector3(1, 0, 0);
+    this.kit = new FlaskKit(this);
   }
+  low() { return lite(); }
   load() {
     if (this.loading) return this.loading;
     this.loading = (async () => {
@@ -247,6 +250,7 @@ export class PharmFx {
         const cg = await loadWrapped('assets/fx/fx_push_tripo.glb.json', {}); this.clods = [];
         cg.scene.traverse(o => { if (!o.isMesh || !o.material || !o.material.map) return; this.tri[o.name] = { geo: o.geometry, map: o.material.map }; if (/^tripo_(clod|slab)_/.test(o.name)) this.clods.push(o.name); });
       } catch (err) { console.warn('pharmfx: no Tripo soil models', err && err.message); }
+      await this.kit.load();
       this.ready = true;
     })().catch(e => console.warn('pharmfx load', e));
     return this.loading;
@@ -256,6 +260,7 @@ export class PharmFx {
 
   // ------------------------------------------------------------------ pooled meshes (kind = material type)
   _mat(kind) {
+    if (kind[0] === 'k') { const m = this.kit.mat(kind); if (m) return m; }
     const U = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, { value: v }]));
     const C = () => new THREE.Color(1, 1, 1);
     switch (kind) {
@@ -437,6 +442,7 @@ export class PharmFx {
   // ------------------------------------------------------------------ 약병 (falling flask) + ⑥ burst
   flask(pos, o = {}) {
     if (!this._ok()) return null;
+    if (this.kit.ready) return this.kit.fall(pos, o);   // 2026-11-14: js/flaskfx.js (아래는 모듈이 없을 때의 예전 연출)
     const p = P3(pos), fall = o.fall || 0.5, pal = PHARM.pal[o.elem] || PHARM.pal.poison, I = PHARM.intensity;
     const sp = (Math.random() < 0.5 ? -1 : 1) * rnd(5, 9), dx = rnd(-0.8, 0.8), dz = rnd(-0.8, 0.8), R = o.r || 1.5;
     const e = this._fx('flask', fall, (e) => {
@@ -459,6 +465,7 @@ export class PharmFx {
    *  o.r = the real blast radius (nothing is drawn outside it), o.linger = seconds the frost / puddle stays faintly (the status duration). */
   burst(pos, o = {}) {
     if (!this._ok()) return null;
+    if (this.kit.ready) return this.kit.burst(pos, o);
     const B = PHARM.burst, elem = o.elem || 'poison', pal = PHARM.pal[elem] || PHARM.pal.poison, I = PHARM.intensity, low = lite(), r = o.r || 1.5, linger = o.linger || 0;
     const life = Math.max(B.puffLife + 0.3, linger ? linger + 0.5 : 0), G9 = 9.0;
     const e = this._fx('burst', life, (e) => {
@@ -536,6 +543,7 @@ export class PharmFx {
   /** returns the projectile handle skillrt's SkillProj drives: set(pos, dir) every frame, dispose() when it lands */
   proj(pos, o = {}) {
     if (!this._ok()) return null;
+    if (this.kit.ready) return this.kit.proj(pos, o);
     const pal = PHARM.pal[o.elem] || PHARM.pal.poison, I = PHARM.intensity, last = P3(pos), vel = new THREE.Vector3(0, 1, 0), sp = (Math.random() < 0.5 ? -1 : 1) * rnd(8, 12);
     let t0 = o.held ? null : 0;   // held: in the hand (upright, no trail) until .release()
     const e = this._fx('proj', 8, (e) => {
@@ -831,9 +839,10 @@ export class PharmFx {
     for (const e of this.live) { if (e.dead) continue;   // freed from outside (a thrown flask landing) since the last frame
       e.t += dt; try { e.update(e, dt); } catch (err) { console.warn('pharmfx', e.kind, err); e.t = e.life; } if (e.t >= e.life) this._free(e); }
     this.live = this.live.filter(e => !e.dead);
+    this.kit.update(dt, this.camQ);
   }
-  _free(e) { if (e.dead) return; e.dead = true; this.root.remove(e.g);
+  _free(e) { if (e.dead) return; e.dead = true; this.root.remove(e.g); if (e.onFree) { try { e.onFree(e); } catch (err) { console.warn('pharmfx onFree', err); } }
     for (const m of e.items) { if (m.parent) m.parent.remove(m); (this.pool[m.userData.kind] || (this.pool[m.userData.kind] = [])).push(m); m.userData = { kind: m.userData.kind }; } e.items.length = 0; }
-  clear() { for (const e of this.live) this._free(e); this.live = []; }
+  clear() { for (const e of this.live) this._free(e); this.live = []; this.kit.clear(); }
 }
 const _a = new THREE.Vector3(), _b = new THREE.Vector3(), _c = new THREE.Vector3(), _mx = new THREE.Matrix4();

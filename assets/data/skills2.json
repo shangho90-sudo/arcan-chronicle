@@ -777,6 +777,7 @@
 "pharmProj": true,
 "burst": "none",
 "pharm": "burst",
+"sfx": "ph_glass_fire",
 "st": [
 {
 "id": "burn",
@@ -836,6 +837,7 @@
 "pharmProj": true,
 "burst": "none",
 "pharm": "burst",
+"sfx": "ph_glass_ice",
 "linger": 3,
 "st": [
 {
@@ -946,6 +948,7 @@
 "pharmProj": true,
 "burst": "none",
 "pharm": "burst",
+"sfx": "ph_glass_acid",
 "linger": 5,
 "st": [
 {

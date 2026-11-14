@@ -12,6 +12,7 @@ import { yeonImpact, LEAD as YEON_LEAD } from './yeonfx.js';
 const HAIR_STOP = [0.035, 0.06], HAIR_KICK = [0.09, 0.1], hairMid = t => Math.min(1.2, 0.45 + (t.radius || 0.5) * 0.6);   // 미용사: local hit-stop [light, heavy] (s), camera kick [m, s] on the heavy snip, cut height on a target (= js/hairfx.js hairMid)
 const PAN_STOP = 0.07, PAN_KICK = [0.13, 0.11];     // 요리사 팬 강타: local hit-stop (s), camera kick [m, s]
 const PUSH_STOP = 0.05, PUSH_KICK = [0.09, 0.1];   // 밀어내기: local hit-stop (s), camera kick [m, s]
+const RAIN_KICK = [0.06, 0.09];   // 약병폭격: 마지막 병이 맞혔을 때만 약한 카메라 킥 [m, s]
 const SMASH_STOP = 0.06, SMASH_KICK = [0.11, 0.1];   // 유봉강타: local hit-stop (s, caster + target visuals only), camera kick [m, s]
 const ART_FEEL = { sweep: [0.05, 0.16, 1], discord: [0.05, 0.16, 1], wave: [0.03, 0.12, 0], mark: [0, 0.1, 0], blob: [0.04, 0.14, 0], note: [0.02, 0.08, 0] };   // 예술가: [local hit-stop s, punch s, camera kick?]
 const ART_KICK = [0.1, 0.1];
@@ -312,7 +313,7 @@ export class SkillEngine {
     } else r = CombatMath.compute(this.power(ctx), c, def, pc.stat('crit'), critDmg, t.stat('dmgReduce'));
     const kdir = { x: t.pos.x - pc.pos.x, z: t.pos.z - pc.pos.z };
     const knock = op.knock && !(t.isBoss) && !(t.def && t.def.ai === 'heavy') ? op.knock * 0.4 : 0;
-    const quietFx = !!(op.quiet || (op.fx && (op.fx.pharm === 'smash' || op.fx.pharm === 'push' || (op.fx.cook && op.fx.cook !== 'chop') || op.fx.hair))) || !!(op.hairProj || op.hair === 'trap');   // 미용사 빗·헤어롤 덫·fx.hair도 전역 히트스톱 없이   // own local hit-stop + camera kick, never the global ones (quiet: 대장장이)
+    const quietFx = !!(op.quiet || op.pharm === 'burst' || (op.fx && (op.fx.pharm === 'smash' || op.fx.pharm === 'push' || (op.fx.cook && op.fx.cook !== 'chop') || op.fx.hair))) || !!(op.hairProj || op.hair === 'trap');   // 미용사 빗·헤어롤 덫·fx.hair도 전역 히트스톱 없이   // own local hit-stop + camera kick, never the global ones (quiet: 대장장이)
     const hd = { source: pc, amount: r.amount, crit: r.crit, kdir, knockback: knock, localStop: quietFx ? 'quiet' : !!(op.fx && (op.fx.bash || op.fx.cook)) };   // 식칼 썰기: a critical chop no longer stops the whole game (the chops keep their rhythm)
     if (op.derived) hd.derived = true;
     t.takeDamage(hd); ctx.missed = !!hd.missed;
@@ -640,7 +641,7 @@ export class SkillEngine {
     if (op.burst !== 'none') FX.burst(op.burst || 'explosion_fire', c, { radius: op.burstR || r, color: ctx.d.fx && ctx.d.fx.color });   // 'none': the skill draws its own (약사 pharmfx)
     if (op.hair === 'trap') for (const t of ts) { const rs = (op.st || []).find(x => x.id === 'root'); FX.hair('trap', t, { dur: rs ? rs.dur : 1.5 }); }   // 헤어롤 덫: 머리카락이 감아 죔 (js/hairfx.js)
     if (op.cook) FX.cook('splat', { x: c.x, y: pc.zone.geo.ground(c.x, c.z).y, z: c.z }, { r, hit: ts.length > 0, top: ts[0] ? ts[0].radius : 0 });   // 미트볼: small splat (js/cookfx.js)
-    if (op.pharm) FX.pharm(op.pharm, { x: c.x, y: pc.zone.geo.ground(c.x, c.z).y, z: c.z }, { elem: op.elem, r, linger: op.linger });   // linger: 바닥 서리·웅덩이가 상태이상 시간만큼 옅게 남음
+    if (op.pharm) FX.pharm(op.pharm, { x: c.x, y: pc.zone.geo.ground(c.x, c.z).y, z: c.z }, { elem: op.elem, r, linger: op.linger, rain: op.rain, big: op.big, scale: op.vscale, hit: ts.length > 0 });   // big / scale = 약병폭격 마지막 병·크기 변화(그림만, 피해는 그대로)   // linger: 바닥 서리·웅덩이가 상태이상 시간만큼 옅게 남음
     if (op.shake && G.render.addShake && !G.reduceFlash) G.render.addShake(op.shake[0], op.shake[1]);
     const cb = this.book.passive('centerBonus');
     for (const t of ts) {
@@ -1037,13 +1038,15 @@ export const CUSTOM = {
     ctx.flaskLog = [];
     for (let i = 0; i < op.n; i++) {
       const k = K[Math.floor(Math.random() * 3)], a = Math.random() * 6.283, rr = i === 0 ? 0 : Math.sqrt(Math.random()) * op.r;
-      const p = { x: c.x + Math.cos(a) * rr, z: c.z + Math.sin(a) * rr }; p.y = pc.zone.geo.ground(p.x, p.z).y;
+      const p = { x: c.x + Math.cos(a) * rr, z: c.z + Math.sin(a) * rr }, vs = 0.86 + 0.26 * ((i * 0.618 + 0.3) % 1); p.y = pc.zone.geo.ground(p.x, p.z).y;
       eng.pending.push({ time: eng.clock + i * op.gap, op: { op: '_run', run: () => {
         FX.pharm('flask', p, { elem: k.elem, fall: op.fall, r: op.blast });
         eng.pending.push({ time: eng.clock + op.fall, op: { op: '_run', run: () => {
-          const ts = eng.blast(p, { r: op.blast, coef: op.coef, burst: 'none', pharm: 'burst', st: k.st, tag: op.tag, elem: k.elem, sfx: op.sfx }, ctx);   // 얇은 링 + 밝은 중심 + 옅은 연무 (js/pharmfx.js burst)
+          const last = i === op.n - 1;
+          const ts = eng.blast(p, { r: op.blast, coef: op.coef, burst: 'none', pharm: 'burst', st: k.st, tag: op.tag, elem: k.elem, sfx: op.sfx, rain: true, big: last, vscale: vs }, ctx);   // 깨짐 -> 액체 -> 반응 구름 -> 얼룩 (js/flaskfx.js burst)
           ctx.flaskLog.push({ elem: k.elem, n: ts.length });
-          G.render.addShake && !G.reduceFlash && G.render.addShake(0.05, 0.1);
+          // 2026-11-14: 병마다 흔들던 화면(addShake)을 없애고, 마지막 병이 실제로 맞혔을 때만 약한 카메라 킥 한 번
+          if (last && ts.length && G.render.kick && !G.reduceFlash) G.render.kick(p.x - pc.pos.x, p.z - pc.pos.z, RAIN_KICK[0], RAIN_KICK[1]);
         } }, ctx });
       } }, ctx });
     }

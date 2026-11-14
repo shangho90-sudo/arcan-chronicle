@@ -72,6 +72,21 @@
         "duration": 0.85,
         "generatedOn": "2026-11-13",
         "description": "밀어내기 타격: low earth rumble 70->38 Hz + dull knock + pouring soil / gravel grains 0.04-0.5 s + 1.5-5 kHz transient + very faint bell tail (python3 tools/audio/smash_sfx.py push)"
+      },
+      {
+        "file": "sfx_ph_glass_fire.mp3",
+        "duration": 0.7,
+        "description": "화염 약병 착탄 (tools/audio/flask_sfx.py, 2026-11-14): glass crack + tinkle, liquid splash, low fire whoosh 140->900 Hz, crackles"
+      },
+      {
+        "file": "sfx_ph_glass_ice.mp3",
+        "duration": 0.7,
+        "description": "냉각 약병 착탄: glass crack + tinkle, splash, rising crystal tones 2.6-5.3 kHz (freezing), cold hiss"
+      },
+      {
+        "file": "sfx_ph_glass_acid.mp3",
+        "duration": 0.8,
+        "description": "부식 약병 착탄: glass crack, thick low splat, six bubble pops of different sizes"
       }
     ]
   }

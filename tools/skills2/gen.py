@@ -92,13 +92,13 @@ S(J, 1, 0, '유봉 전투', 4, 'ph1_a6', '천근쇄약', 'attack', '거대한 �
 S(J, 1, 0, '유봉 전투', 5, 'ph1_a5', '유봉 숙련', 'passive', '유봉 기본 공격 피해와 공격 속도가 증가한다.', weapon='pestle',
   flags=dict(basicDmg=[0.06, 0.04]), mods=[dict(stat='atkSpeed', mul=0.04, mulLv=0.02)])
 S(J, 1, 1, '기초 약병술', 1, 'ph1_b1', '화염 약병', 'attack', '약병을 던져 작은 폭발과 화상을 일으킨다.', target='ground', range=7, mp=12, cd=5, anim='ph_pitch', sfxAt='strike', sfxLead=0.02,
-  ops=[proj('lob', 1.6, r=1.6, elem='fire', fx='flask_fire', pharmProj=True, burst='none', pharm='burst', st=[st('burn', 4, 0.12)], tag='flask')], fx=dict(color=0xff7a30))
+  ops=[proj('lob', 1.6, r=1.6, elem='fire', fx='flask_fire', pharmProj=True, burst='none', pharm='burst', sfx='ph_glass_fire', st=[st('burn', 4, 0.12)], tag='flask')], fx=dict(color=0xff7a30))
 S(J, 1, 1, '기초 약병술', 2, 'ph1_b2', '냉각 약병', 'attack', '냉기 피해와 둔화를 준다.', target='ground', range=7, mp=12, cd=6, anim='ph_pitch', sfxAt='strike', sfxLead=0.02,
-  ops=[proj('lob', 1.4, r=1.8, elem='ice', fx='flask_ice', pharmProj=True, burst='none', pharm='burst', linger=3, st=[st('slow', 3, 0.35)], tag='flask')], fx=dict(color=0x7ad0ff))
+  ops=[proj('lob', 1.4, r=1.8, elem='ice', fx='flask_ice', pharmProj=True, burst='none', pharm='burst', sfx='ph_glass_ice', linger=3, st=[st('slow', 3, 0.35)], tag='flask')], fx=dict(color=0x7ad0ff))
 S(J, 1, 1, '기초 약병술', 3, 'ph1_b6', '약병폭격', 'attack', '하늘에서 약병 10개를 차례로 떨어뜨린다. 약병마다 화염(화상)·냉기(둔화)·독 중 하나가 무작위로 터진다.', target='ground', range=7, mp=22, cd=14, anim='ph_pitch',
   ops=[custom('flask_rain', n=10, gap=0.2, r=3.4, blast=1.5, coef=0.6, fall=0.5, at=0.05, tag='flask', sfx='ph_flask')], fx=dict(color=0xd080ff))
 S(J, 1, 1, '기초 약병술', 4, 'ph1_b4', '부식 약병', 'attack', '지속 피해와 방어력 감소를 남긴다.', target='ground', range=7, mp=14, cd=8, anim='ph_pitch', sfxAt='strike', sfxLead=0.02,
-  ops=[proj('lob', 0.8, r=1.8, elem='acid', fx='flask_acid', pharmProj=True, burst='none', pharm='burst', linger=5, st=[st('poison', 5, 0.15), st('defdown', 5, 0.2)], tag='flask')], fx=dict(color=0x8ad040))
+  ops=[proj('lob', 0.8, r=1.8, elem='acid', fx='flask_acid', pharmProj=True, burst='none', pharm='burst', sfx='ph_glass_acid', linger=5, st=[st('poison', 5, 0.15), st('defdown', 5, 0.2)], tag='flask')], fx=dict(color=0x8ad040))
 S(J, 1, 1, '기초 약병술', 5, 'ph1_b5', '정확한 투척', 'passive', '약병 사거리가 늘고 폭발 중심의 적이 추가 피해를 받는다.', flags=dict(throwRange=[1.0, 0.5], centerBonus=[0.15, 0.05]))
 S(J, 1, 2, '조제와 응급처치', 1, 'ph1_c1', '회복제 제작', 'craft', '약초와 빈 병으로 HP 회복제를 만든다.')
 S(J, 1, 2, '조제와 응급처치', 2, 'ph1_c7', '약 보호막', 'support', '약효로 몸을 감싸 8초 동안 최대 체력의 25%(레벨마다 +3%)만큼 피해를 막는 보호막을 만들고, 그동안 상태이상에 걸리지 않는다(걸려 있던 것도 풀림).', target='self', mp=16, cd=20, anim='cast', sfx='ph_shield', sfxAt='strike',

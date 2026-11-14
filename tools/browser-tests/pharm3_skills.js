@@ -92,11 +92,12 @@ const SEC = +(process.env.SEC || (SCENE === 'repeat' ? 2.2 : SCENE === 'sheathed
   if (typeof info === 'string') { console.log(info); await b.close(); return; }
   const frames = [], total = Math.round(SEC * FPS); let dc = null;
   for (let i = 0; i < total; i++) {
-    const c = await ev(([i, fps, skill, thr, focus]) => {
+    const want = !process.env.REF || MARKS.some(m => i === Math.round(+process.env.REF * FPS) + Math.round(m * FPS));   // REF = known reference time: only the strip frames are captured (much faster)
+    const c = await ev(([i, fps, skill, thr, focus, draw]) => {
       window.__t = i / fps; const p = G.player, f = window.__f, ds = window.__ds, m = ds[0], L = window.__log;
       if (window.__press) { window.__press = 0; const e = p.skills2 && (p.weaponStow && p.weaponStow(skill) || p.weaponReady()) ? (p.castSkill(skill, { aim: window.__aim, down: {}, held: {} }), 'cast') : (p.combat(1.6), p.pendSkill = { id: skill, t: 0.8 }, 'draw first'); L.casts.push({ t: 0, e }); }
       if (window.__chain === 1 && (p.skills.lock || 0) <= 0 && window.__t > 0.4) { window.__chain = 2; p.skills2.cd = {}; G.dev.full(); if (!thr) p.target = m; const e = p.skills2.cast(skill, thr ? window.__at(5) : { x: m.pos.x, z: m.pos.z }); L.casts.push({ t: +window.__t.toFixed(3), e }); }
-      G.step(1 / fps, true);
+      if (draw) G.step(1 / fps, true); else { G.step(1 / fps, false); try { G.skillFx.update(1 / fps); } catch (e) {} }   // FAST: frames that are not captured skip the GPU draw (effects still age)
       ds.forEach((d, k) => { if (d && !d.removed && d.hp < window.__hp[k]) { L.dmg.push({ t: +window.__t.toFixed(3), k, a: Math.round(window.__hp[k] - d.hp), dead: !!d.dead }); window.__hp[k] = d.hp; } });
       if (!L.proj) { const pr = p.skills2.things.find(t => t.from && t.flight); if (pr) { let hd = null; try { const h = p.body.handPoint && p.body.handPoint(); if (h) hd = +Math.hypot(h.x - pr.pos.x, h.y - pr.pos.y, -h.z - pr.pos.z).toFixed(3); } catch (e) { hd = 'err'; }
         L.proj = { t: +window.__t.toFixed(3), from: { x: +(pr.from.x - p.pos.x).toFixed(2), y: +(pr.from.y - (p.pos.y || 0)).toFixed(2), z: +(pr.from.z - p.pos.z).toFixed(2) }, handDist: hd, flight: +pr.flight.toFixed(3) }; } }
@@ -106,8 +107,8 @@ const SEC = +(process.env.SEC || (SCENE === 'repeat' ? 2.2 : SCENE === 'sheathed
       L.cam.push(+Math.hypot(rel.x - window.__c0.x, rel.y - window.__c0.y, rel.z - window.__c0.z).toFixed(4));
       const s = G.render.toScreen({ x: p.pos.x + f.x * focus, y: p.pos.y + 1.0, z: p.pos.z + f.z * focus });
       return [s.x, s.y, G.render.r ? G.render.r.info.render.calls : -1];
-    }, [i, FPS, SKILL, THROW, FOCUS]);
-    const fn = `${dirOut}/${String(i).padStart(3, '0')}.png`, want = !process.env.REF || MARKS.some(m => i === Math.round(+process.env.REF * FPS) + Math.round(m * FPS));   // REF = known reference time: only the strip frames are captured (much faster)
+    }, [i, FPS, SKILL, THROW, FOCUS, !process.env.FAST || (want && !process.env.NOSHOT)]);
+    const fn = `${dirOut}/${String(i).padStart(3, '0')}.png`;
     if (!process.env.NOSHOT && want) await pg.screenshot({ path: fn, clip: { x: Math.max(0, Math.min(VW - CW, Math.round(c[0] - CW / 2))), y: Math.max(0, Math.min(VH - CH, Math.round(c[1] - CH / 2))), width: CW, height: CH }, timeout: 300000 });
     frames.push(process.env.NOSHOT || !want ? null : fn); dc = Math.max(dc || 0, c[2]);
   }
