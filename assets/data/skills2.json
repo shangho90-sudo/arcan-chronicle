@@ -6066,7 +6066,7 @@
 "idx": 3,
 "name": "끝단 자르기",
 "type": "attack",
-"desc": "황금빛 큰 가위로 끝단을 잘라 낸다. 체력이 낮은 적에게 추가 피해.",
+"desc": "큰 가위를 가로로 활짝 벌렸다가 끝단을 싹뚝 잘라 낸다. 체력이 낮은 적에게 추가 피해.",
 "maxLv": 5,
 "unlock": 15,
 "prereq": [],
@@ -6077,14 +6077,12 @@
 "cd": 6,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "hd_snip",
+"anim": "hd_end",
 "ops": [
 {
 "op": "fx",
-"hair": "shears",
-"gold": true,
-"at": -0.25,
-"gap": 0.12
+"hair": "end",
+"at": -0.25
 },
 {
 "op": "hit",
@@ -6096,7 +6094,7 @@
 },
 "sfx": "hd_snip",
 "fx": {
-"hair": "snip",
+"hair": "end",
 "heavy": true
 }
 }
@@ -6132,14 +6130,22 @@
 "mp": 10,
 "cd": 6,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "dash",
+"recover": 0.1586,
+"anim": "hd_step",
 "ops": [
+{
+"op": "fx",
+"hair": "step",
+"at": -0.12
+},
 {
 "op": "dash",
 "dist": 2.2,
 "side": true,
 "invuln": false,
+"at": -0.12,
+"anim": "hd_step",
+"face": true,
 "hit": {
 "op": "hit",
 "shape": "cone",
@@ -6299,7 +6305,7 @@
 "mods": [],
 "flags": {},
 "fx": {},
-"sfx": "hd_dryer",
+"sfx": "hd_gust",
 "status": {
 "data": true,
 "impl": true,
@@ -6363,7 +6369,7 @@
 "mods": [],
 "flags": {},
 "fx": {},
-"sfx": "hd_dryer",
+"sfx": "hd_hot",
 "status": {
 "data": true,
 "impl": true,
@@ -6426,7 +6432,7 @@
 "mods": [],
 "flags": {},
 "fx": {},
-"sfx": "hd_dryer",
+"sfx": "hd_cold",
 "status": {
 "data": true,
 "impl": true,

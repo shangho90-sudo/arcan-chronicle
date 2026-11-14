@@ -514,7 +514,7 @@ export class Player extends Combatant {
   idle() {
     if (!this.body || this.skills.busy) return; if (this.body.action === "hit" && !this.body.finished) return;
     // a combo strike plays its own recovery (feet step back under the body, guard) unless the player moves or chains on
-    const A = this.body.sh && this.body.sh.actions[this.body.action]; if (A && A.combo && !this.body.finished) return;
+    const A = this.body.sh && this.body.sh.actions[this.body.action]; if (A && (A.combo || A.hold) && !this.body.finished) return;   // hold: 스킬 동작을 끝까지(스텝 커트의 세 번째 싹뚝)
     this.body.play("idle", 1);
   }
   onClick(c) {
@@ -532,14 +532,16 @@ export class Player extends Combatant {
     G.audio.sfx("dodge"); G.fx.play("smoke", { x: this.pos.x, y: this.pos.y + 0.3, z: this.pos.z }, 0.8);
   }
   startLunge(d, dist, dur) { const m = Math.hypot(d.x, d.z) || 1; this.lunge = { dir: { x: d.x / m, z: d.z / m }, dist, dur: Math.max(0.05, dur) }; this.lungeT = this.lunge.dur; }
-  startDash(d, dist, speed, inv, anim = "dash") {
+  startDash(d, dist, speed, inv, anim = "dash", keepFacing = false) {
     const m = Math.hypot(d.x, d.z) || 1; this.dashDir = { x: d.x / m, z: d.z / m }; this.dashSpeed = Math.max(1, speed); this.dashT = dist / this.dashSpeed;
     if (inv) this.invuln = Math.max(this.invuln, this.dashT + 0.1);
-    this.setFacing(this.dashDir.x, this.dashDir.z); this.path = []; this.body.play(anim, 1, true);
+    // keepFacing (스텝 커트): 옆으로 뛰는 동안에도 대상 쪽을 봄; 이미 그 동작을 재생 중이면 처음부터 다시 틀지 않음
+    if (!keepFacing) this.setFacing(this.dashDir.x, this.dashDir.z); this.path = []; this.dashAnim = anim;
+    if (!(keepFacing && this.body.action === anim)) this.body.play(anim, 1, true);
   }
   updateDash(dt) {
     const s = Math.min(this.dashT, dt); const mv = this.moveBy(this.dashDir.x * this.dashSpeed * s, this.dashDir.z * this.dashSpeed * s);
-    this.vel = { x: mv.x / dt, z: mv.z / dt }; this.dashT -= dt; if (this.dashT <= 0) { this.dashT = 0; this.body.play("idle", 1); }
+    this.vel = { x: mv.x / dt, z: mv.z / dt }; this.dashT -= dt; if (this.dashT <= 0) { this.dashT = 0; const A = this.body.sh && this.body.sh.actions[this.dashAnim]; if (A && A.hold) this.idle(); else this.body.play("idle", 1); }   // hold 동작(hd_step)은 끝까지
   }
   usePotion() {
     if (this.potionCd > 0 || this.dead) return;

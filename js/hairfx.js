@@ -8,11 +8,21 @@
 // Kinds (js/skillrt.js FX.hair(kind, a, o)); bright layers peak on the real damage tick, nothing is drawn wider than the real
 // hit shape:
 //   snip(at, {size, big, hit, roll})       두 줄이 가위처럼 오므라들며 '싹뚝' + (맞았으면) 별 섬광·머리카락. 기본공격·모든 가위 스킬의 명중 표시
-//   shears(pc, {tgt, n, gap, first, gold}) 허공의 큰 가위가 대상을 물고 타마다 닫힘. handle.strike(t, h, last) / .miss()
+//   shears(pc, {tgt, n, gap, first})       허공의 큰 가위가 대상을 물고 타마다 닫힘. handle.strike(t, h, last) / .miss()
 //   trim(pc, {f, r, ang, hits})            앞머리 정리: 이마 높이의 곧은 가로 한 줄 + 아래로 떨어지는 머리카락
-//   step(pc, {from, f, hits})              스텝 커트: 지나온 길에 계단처럼 층진 세 줄
+//   end(pc, {tgt, first})                  끝단 자르기 (2026-11-14): 누른 순간부터 대상 허리 높이에 가로 겨눔선(두 날 그림자가 벌어짐)
+//                                          -> 피해 순간 수평 절단면(납작한 빛 원판·고리 + 가로 섬광) + 잘린 머리끝 다발이 옆으로 튐.
+//                                          handle.strike(t, bonus) — bonus(체력 35% 이하라 추가 피해가 실제로 붙음)일 때만 금빛 마무리 섬광·
+//                                          방사선·바깥 고리 / .miss()
+//   step(pc, {f, r, ang})                  스텝 커트 (2026-11-14): 옆으로 뛰는 동안 캐릭터 잔상 2~3개(실제 몸 포즈를 그대로 찍은 반투명 사본)
+//                                          + 머리·가슴·무릎 높이 세 층 가로 커트(0.12 s 간격 = 피해 틱)와 층마다 떨어지는 머리카락 다발.
+//                                          handle.strike(h, hits) = h번째 피해 틱(그 층이 가장 밝음, 맞은 대상에 싹뚝)
 //   proj(pos, {}) / combHit(pos, {hit})    빗 투척: 빙글빙글 도는 빗 + 반짝이 꼬리 / 빗살 자국
-//   dryer(pc, {mode, r, ang, dur, f})      큰 드라이어가 손 앞에 떠서 부채꼴 안으로 바람 줄기를 뿜음 (gust 흰·분홍 / hot 주황 / cold 하늘색 + 눈꽃). handle.pulse(hits)
+//   dryer(pc, {mode, r, ang, dur, f})      큰 드라이어가 손 앞에 떠서 부채꼴 안으로 바람을 뿜음. handle.pulse(hits) = 피해 틱, handle.stop()
+//                                          드라이어 몸통은 모드 색으로 물들임(uDesat): gust 진주빛 민트 / hot 붉은 주황 + 빨갛게 달아오르는 노즐 / cold 얼음 하늘색.
+//                                          gust 돌풍: 굵게 감기는 바람 리본(hair_swirl) + 앞으로 퍼지는 압력 고리 + 날려 가는 잎·머리카락, 맞은 적 뒤로 밀림 자국
+//                                          hot 온풍: 아지랑이 물결(SPR 6) + 올라가는 주황 곱슬 + 깜박이는 불티, 틱마다 노즐 불빛·대상 열기 고리
+//                                          cold 냉풍: 바닥에 깔리는 옅은 서리 안개 + 눈송이(hair_flake), 맞으면 대상 둘레에 얼음 결정(hair_crystal)·서리 고리
 //   trap(t, {dur})                         헤어롤 덫 발동: 머리카락 리본이 대상을 감아 죄고 헤어롤이 머리 위에 얹힘(속박 시간 동안)
 //   style(pc, {kind, dur})                 haste 스타일링 소용돌이·반짝이 / coat 코팅 윤기 띠 / fresh 민트 바람·방울
 // Pooled meshes; cleared on zone change. Low spec (phone / 그래픽 효과 끔): fewer strands, sparkles and wind streaks — the
@@ -25,11 +35,16 @@ export const HAIR = {
   snip: { len: 1.7, open: 0.62, close: 0.07, life: 0.26, line: 3.0, flash: 1.6, strands: 4, strandsLite: 2 },
   shears: { len: 1.3, open: 0.6, appear: 0.1, leave: 0.2, bite: 0.6 },
   trim: { y: 1.15, life: 0.38, line: 4.6, strands: 9, strandsLite: 4 },
-  step: { life: 0.34, line: 2.2 },
+  step: { gap: 0.12, first: 0.12, ys: [1.32, 0.88, 0.46], ws: [1.25, 1.75, 2.25], line: 3.0, ghosts: [0.0, 0.055, 0.11], ghostLife: 0.3, ghostA: 0.5, locks: 3, locksLite: 1 },
+  end: { line: 3.4, plane: 1.6, flash: 1.5, tips: 7, tipsLite: 3, bonusFlash: 2.6, rays: 6 },
   comb: { size: 0.42, spin: 26, tilt: 0.5 },
   dryer: { size: 0.62, up: 1.12, fwd: 0.85, rate: 46, rateLite: 18, life: 0.24, appear: 0.09, fade: 0.18 },
   trap: { h: 1.25, turns: 5 },
-  col: { white: 0xffffff, steel: 0xdfe8ff, pink: 0xff7ab0, pinkB: 0xff3f8f, violet: 0xb48cff, gold: 0xffd27a, goldB: 0xffa028, hot: 0xffc060, hotB: 0xff5a1e, cold: 0xe8f8ff, coldB: 0x58b8ff, mint: 0xd8fff0, mintB: 0x48dca8,
+  dryerTint: { gust: 0xe4fff4, hot: 0xff6a3a, cold: 0x86d4ff },
+  gust: { swirls: 3, swirlsLite: 2, rings: 2, leaves: 10, leavesLite: 4 },
+  hot: { curl: 0.11, curlLite: 0.26, ember: 0.035, emberLite: 0.09, haze: 0.16, hazeLite: 0.4 },
+  cold: { mist: 0.06, mistLite: 0.16, flake: 0.05, flakeLite: 0.14, crystals: 5, crystalsLite: 3 },
+  col: { white: 0xffffff, steel: 0xdfe8ff, pink: 0xff7ab0, pinkB: 0xff3f8f, violet: 0xb48cff, gold: 0xffd27a, goldB: 0xffa028, hot: 0xffc060, hotB: 0xff5a1e, ember: 0xffe080, cold: 0xe8f8ff, coldB: 0x58b8ff, ice: 0xbfe8ff, mintW: 0xeafff6, mintG: 0x7fe0c0, mint: 0xd8fff0, mintB: 0x48dca8,
     strand: [0x6a4630, 0xffd9ec, 0xb48cff, 0x3a2a3a] },
 };
 
@@ -48,20 +63,22 @@ const SOLID_VS = `
 attribute vec3 color; varying vec3 vC, vN, vV; varying vec2 vUv;
 void main(){ vC = color; vUv = uv; vN = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(position, 1.); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }`;
 const SOLID_FS = `
-uniform vec3 uTint, uRim; uniform float uA, uGlow, uSpec, uTex; uniform sampler2D uMap;
+uniform vec3 uTint, uRim; uniform float uA, uGlow, uSpec, uTex, uDesat; uniform sampler2D uMap;
 varying vec3 vC, vN, vV; varying vec2 vUv;
 void main(){
   vec3 n = normalize(vN); if (!gl_FrontFacing) n = -n;
   vec3 L = normalize(vec3(-.4, .8, .5));
   float d = max(0., dot(n, L)), rim = pow(1. - max(0., dot(n, vV)), 2.5);
-  vec3 base = uTex > .5 ? pow(texture2D(uMap, vUv).rgb, vec3(1.)) * uTint : vC * uTint;
+  vec3 raw = uTex > .5 ? texture2D(uMap, vUv).rgb : vC; raw = mix(raw, vec3(dot(raw, vec3(.3, .59, .11))) * 1.15, uDesat);
+  vec3 base = raw * uTint;
   vec3 c = base * (.5 + .72 * d) + uRim * rim * .5;
   vec3 h = reflect(-L, n); c += vec3(1., .97, .92) * pow(max(0., dot(h, vV)), 24.) * uSpec;
   c += vec3(1., .96, .98) * uGlow;
   gl_FragColor = vec4(c, uA);
 }`;
 const FLAT_VS = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`;
-// uK: 0 soft disc, 1 thin ring (uP = inner fade), 2 slice line (thin, tapered ends), 3 four-point star flash, 4 puff (alpha blended), 5 wind streak (soft, long)
+// uK: 0 soft disc, 1 thin ring (uP = inner fade), 2 slice line (thin, tapered ends), 3 four-point star flash, 4 puff (alpha blended), 5 wind streak (soft, long),
+//     6 heat-haze ripple (wavy horizontal bands in a soft oval, uP = phase)
 const SPR_FS = `
 uniform vec3 uW, uB; uniform float uA, uK, uP; varying vec2 vUv;
 void main(){
@@ -71,7 +88,8 @@ void main(){
   else if (uK < 2.5) { float e = 1. - pow(abs(p.x), 2.4); a = clamp(e, 0., 1.) * exp(-abs(p.y) * 9.); core = clamp(e, 0., 1.) * exp(-abs(p.y) * 30.); }
   else if (uK < 3.5) { float s = exp(-abs(p.x) * 16.) * clamp(1. - abs(p.y), 0., 1.) + exp(-abs(p.y) * 16.) * clamp(1. - abs(p.x), 0., 1.); a = s + pow(clamp(1. - r, 0., 1.), 3.) * .9; core = pow(clamp(1. - r * 2.2, 0., 1.), 1.5) + s * .5; }
   else if (uK < 4.5) { a = pow(clamp(1. - r, 0., 1.), 1.4); core = clamp(.5 + p.y * .5, 0., 1.); gl_FragColor = vec4(mix(uB, uW, core), a * uA); return; }
-  else { float e = smoothstep(-1., -.2, p.x) * (1. - smoothstep(.1, 1., p.x)); a = e * exp(-abs(p.y) * 5.); core = e * exp(-abs(p.y) * 16.); }
+  else if (uK < 5.5) { float e = smoothstep(-1., -.2, p.x) * (1. - smoothstep(.1, 1., p.x)); a = e * exp(-abs(p.y) * 5.); core = e * exp(-abs(p.y) * 16.); }
+  else { float m = pow(clamp(1. - length(p * vec2(1., 1.4)), 0., 1.), 1.2); float w = sin(p.y * 15. + sin(p.x * 5. + uP * 1.7) * 1.6 - uP * 6.); a = m * smoothstep(.55, 1., w) * .9; core = m * smoothstep(.9, 1., w) * .6; }
   gl_FragColor = vec4(mix(uB, uW, clamp(core, 0., 1.)) * (a * uA), 1.);
 }`;
 const ADD = { transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide };
@@ -97,7 +115,7 @@ export class HairFx {
   _ok() { if (!this.ready) { this.load(); return false; } return true; }
   _mat(kind) {
     const U = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, { value: v }])), C = () => new THREE.Color(1, 1, 1);
-    if (kind === 'solid') return new THREE.ShaderMaterial({ uniforms: U({ uTint: C(), uRim: new THREE.Color(0xffe0f0), uA: 1, uGlow: 0, uSpec: 0.6, uTex: 0, uMap: null }), vertexShader: SOLID_VS, fragmentShader: SOLID_FS, transparent: true, depthWrite: true, side: THREE.DoubleSide });
+    if (kind === 'solid') return new THREE.ShaderMaterial({ uniforms: U({ uTint: C(), uRim: new THREE.Color(0xffe0f0), uA: 1, uGlow: 0, uSpec: 0.6, uTex: 0, uDesat: 0, uMap: null }), vertexShader: SOLID_VS, fragmentShader: SOLID_FS, transparent: true, depthWrite: true, side: THREE.DoubleSide });
     if (kind === 'puff') return new THREE.ShaderMaterial({ uniforms: U({ uW: C(), uB: C(), uA: 0, uK: 4, uP: 0 }), vertexShader: FLAT_VS, fragmentShader: SPR_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide });
     return new THREE.ShaderMaterial({ uniforms: U({ uW: C(), uB: C(), uA: 0, uK: 0, uP: 0 }), vertexShader: FLAT_VS, fragmentShader: SPR_FS, ...ADD });
   }
@@ -107,7 +125,7 @@ export class HairFx {
     m.geometry = geo; m.position.set(0, 0, 0); m.quaternion.identity(); m.scale.set(1, 1, 1); m.visible = true; m.renderOrder = order;
     e.items.push(m); e.g.add(m); return m;
   }
-  solid(e, geo, o = {}) { const m = this._m(e, 'solid', geo, 1), u = m.material.uniforms; u.uTint.value.setHex(o.tint ?? 0xffffff); u.uRim.value.setHex(o.rim ?? 0xffe0f0); u.uA.value = o.a ?? 1; u.uGlow.value = o.glow ?? 0; u.uSpec.value = o.spec ?? 0.6; u.uTex.value = o.map ? 1 : 0; u.uMap.value = o.map || null; if (!geo.attributes.color) u.uTex.value = o.map ? 1 : 0; return m; }
+  solid(e, geo, o = {}) { const m = this._m(e, 'solid', geo, 1), u = m.material.uniforms; u.uTint.value.setHex(o.tint ?? 0xffffff); u.uRim.value.setHex(o.rim ?? 0xffe0f0); u.uA.value = o.a ?? 1; u.uGlow.value = o.glow ?? 0; u.uSpec.value = o.spec ?? 0.6; u.uDesat.value = o.desat ?? 0; u.uTex.value = o.map ? 1 : 0; u.uMap.value = o.map || null; if (!geo.attributes.color) u.uTex.value = o.map ? 1 : 0; return m; }
   /** Tripo model `name` if loaded, else the procedural mesh `fallback` */
   model(e, name, fallback, o = {}) { const t = this.tri[name]; if (t) return this.solid(e, t.geo, { ...o, map: t.map }); return this.geo[fallback] ? this.solid(e, this.geo[fallback], o) : null; }
   /** additive sprite: k 0 disc / 1 ring / 2 slice line / 3 star flash / 5 wind streak */
@@ -230,9 +248,126 @@ export class HairFx {
     return e;
   }
 
-  // ------------------------------------------------------------------ 스텝 커트: 계단처럼 층진 세 줄
+  // ------------------------------------------------------------------ 잔상: 실제 몸의 지금 포즈를 그대로 찍은 반투명 사본 (스텝 커트)
+  /** a frozen copy of the body's skinned mesh in its current pose (own bones with the captured world matrices), additive tint */
+  ghost(e, body, col) {
+    const live = body && body.mesh; if (!live || !live.isSkinnedMesh || !body.bones) return null;
+    body.root.updateMatrixWorld(true);
+    const p = this.pool.ghost || (this.pool.ghost = []); let i = p.findIndex(g => g.geometry === live.geometry && g.skeleton.bones.length === body.bones.length), g = i >= 0 ? p.splice(i, 1)[0] : null;
+    if (!g) {
+      const bones = body.bones.map(() => { const b = new THREE.Bone(); b.matrixAutoUpdate = false; b.matrixWorldAutoUpdate = false; return b; });
+      g = new THREE.SkinnedMesh(live.geometry, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending }));
+      g.bind(new THREE.Skeleton(bones, live.skeleton.boneInverses), live.bindMatrix); g.frustumCulled = false; g.matrixAutoUpdate = false; g.userData.kind = 'ghost';
+    }
+    g.skeleton.bones.forEach((b, k) => b.matrixWorld.copy(body.bones[k].matrixWorld));
+    this.root.updateMatrixWorld(true); g.matrix.copy(this.root.matrixWorld).invert().multiply(live.matrixWorld); g.matrixWorldNeedsUpdate = true;
+    g.material.color.setHex(col); g.material.opacity = 0; g.visible = true; g.renderOrder = 3;
+    e.items.push(g); e.g.add(g); return g;
+  }
+
+  // ------------------------------------------------------------------ 끝단 자르기: 가로 겨눔선 -> 수평 절단면 + 머리끝 다발 (+ 마무리 섬광)
+  end(pc, o = {}) {
+    if (!this._ok()) return null;
+    const K = HAIR.end, I = HAIR.intensity, C = HAIR.col, low = lite(), first = Math.max(0.05, o.first ?? 0.25);
+    let tgt = o.tgt || null, hitAt = -1, missAt = -1, bonus = false, ok = false;
+    const f = o.facing || { x: 0, z: 1 }, anchor = tgt ? P3(tgt.pos) : P3({ x: pc.pos.x + f.x * 1.3, y: pc.pos.y || 0, z: pc.pos.z + f.z * 1.3 });
+    let mid = tgt ? hairMid(tgt) : 0.8, rad = tgt ? (tgt.radius || 0.5) : 0.5;
+    const e = this._fx('end', first + 0.75, (e) => {
+      if (tgt && !tgt.dead && !tgt.removed && hitAt < 0) { anchor.copy(P3(tgt.pos)); mid = hairMid(tgt); rad = tgt.radius || 0.5; }
+      const c = _a.set(anchor.x, anchor.y + mid, anchor.z), W = Math.min(2.6, 1.6 + rad * 1.2), t = e.t;
+      // two blade shadows open while the real shears open (motion hd_end) and snap together exactly on the damage tick
+      const pre = hitAt < 0 && missAt < 0, sinceHit = hitAt >= 0 ? t - hitAt : -1, sinceMiss = missAt >= 0 ? t - missAt : -1;
+      const openK = pre ? smooth(0, 0.12, t) * (1 - smooth(first - 0.05, first, t) * 0.0) : 0, ang = 0.26 * openK;
+      const aPre = pre ? I * 0.55 * smooth(0.02, 0.14, t) : 0, aHit = sinceHit >= 0 ? I * K.line * (1 - smooth(0.04, 0.26, sinceHit)) : 0, aMiss = sinceMiss >= 0 ? 0.4 * (1 - smooth(0, 0.18, sinceMiss)) : 0;
+      for (const [m, sg] of [[b1, 1], [b2, -1]]) { m.position.copy(c); this._alignLine(m, this._scr(sg * ang, _b)); m.scale.set(W * (pre ? 0.85 + 0.15 * openK : 1.05), pre ? 0.3 : 0.42 + 0.3 * (1 - smooth(0, 0.08, sinceHit)), 1); m.material.uniforms.uA.value = pre ? aPre : (aHit || aMiss); }
+      // the horizontal cut plane: a flat bright disc + ring at the cut height (inside the target's footprint + 0.45 m)
+      pl.position.copy(c); this._flat(pl, (rad + 0.45) * (0.7 + 0.3 * easeOut(sinceHit / 0.06)), c.y); pl.material.uniforms.uA.value = ok && sinceHit >= 0 ? I * K.plane * (1 - smooth(0.02, 0.16, sinceHit)) : 0;
+      rg.position.copy(c); this._flat(rg, (rad + 0.2) + 0.35 * easeOut(sinceHit / 0.22), c.y); rg.material.uniforms.uP.value = 0.4; rg.material.uniforms.uA.value = ok && sinceHit >= 0 ? I * 2.2 * (1 - smooth(0.05, 0.32, sinceHit)) : pre ? I * 0.45 * smooth(0.04, first, t) : 0;
+      fl.quaternion.copy(this.camQ); fl.position.copy(c); fl.scale.setScalar((bonus ? 1.5 : 0.85) * (0.6 + 0.6 * easeOut(sinceHit / 0.07)) * Math.min(1.3, 0.8 + rad * 0.4)); fl.material.uniforms.uA.value = ok && sinceHit >= 0 ? I * (bonus ? K.bonusFlash : K.flash) * (1 - smooth(0.02, 0.18, sinceHit)) : 0;
+      // 마무리 (bonus only): a second, gold outer ring and short rays fanning out in the cut plane
+      if (bonus && sinceHit >= 0) { const k = sinceHit; g2.position.copy(c); this._flat(g2, rad + 0.3 + 0.55 * easeOut(k / 0.26), c.y); g2.material.uniforms.uA.value = I * 2.4 * (1 - smooth(0.05, 0.4, k));
+        rays.forEach((m, i) => { const a = i / rays.length * Math.PI * 2 + 0.3, d = _b.set(Math.cos(a), 0, Math.sin(a)); m.position.copy(c).addScaledVector(d, rad + 0.25 + 0.35 * easeOut(k / 0.2)); this._alignLine(m, d); m.scale.set(0.7, 0.3, 1); m.material.uniforms.uA.value = I * 2.0 * (1 - smooth(0.03, 0.24, k)); }); }
+    });
+    const b1 = this.spr(e, 2, 0xffffff, C.steel, 7), b2 = this.spr(e, 2, 0xffffff, C.pinkB, 7), pl = this.spr(e, 0, 0xffffff, C.pink, 5), rg = this.spr(e, 1, 0xffffff, C.pinkB, 6), fl = this.spr(e, 3, 0xffffff, C.pink, 8);
+    let g2 = null, rays = [];
+    e.strike = (t, bn) => {
+      if (e.dead) return;
+      if (hitAt >= 0) {   // Lv3+ extra ticks: a quick horizontal re-snip on the target; the first tick that really gets the bonus replays the plane in gold
+        if (t) { anchor.copy(P3(t.pos)); mid = hairMid(t); rad = t.radius || 0.5; }
+        if (!(bn && !bonus)) { this.snip({ x: anchor.x, y: anchor.y + mid, z: -anchor.z }, { size: Math.min(1.3, 0.8 + rad * 0.4), roll: rnd(-0.1, 0.1), big: bonus, ground: anchor.y }); e.life = Math.max(e.life, e.t + 0.3); return; }
+      }
+      if (t) { tgt = t; anchor.copy(P3(t.pos)); mid = hairMid(t); rad = t.radius || 0.5; }
+      hitAt = e.t; ok = true; bonus = !!bn; e.life = e.t + 0.5;
+      const c = new THREE.Vector3(anchor.x, anchor.y + mid, anchor.z), n = low ? K.tipsLite : K.tips + (bonus ? 3 : 0);
+      if (bonus) { const u = (m, w, b) => { m.material.uniforms.uW.value.setHex(w); m.material.uniforms.uB.value.setHex(b); };
+        u(fl, 0xffffff, C.goldB); u(rg, 0xffffff, C.goldB); u(pl, 0xfff4d0, C.gold);
+        g2 = this.spr(e, 1, C.gold, C.goldB, 6); rays = Array.from({ length: low ? 4 : K.rays }, () => this.spr(e, 2, 0xffffff, C.goldB, 7));
+        this.sparkles(c, low ? 3 : 6, rad + 0.3, { y0: -0.3, y1: 0.5, life: 0.6, cols: [C.gold, C.white, C.goldB] }); }
+      this.tips(c, n, rad, { gy: anchor.y, gold: bonus });
+    };
+    e.miss = () => { if (e.dead || hitAt >= 0 || missAt >= 0) return; missAt = e.t; e.life = e.t + 0.22; };
+    return e;
+  }
+  /** cut hair tips: locks of hair burst sideways out of the cut plane, then drop and settle (three coords: c = cut centre) */
+  tips(c, n, rad, o = {}) {
+    if (n <= 0 || !this.geo.hair_lock) return;
+    const ps = [], gy = o.gy ?? c.y - 1, cols = o.gold ? [0xffd27a, 0xffe9b0, 0x6a4630] : HAIR.col.strand;
+    const e = this._fx('tips', 0.9, (e, dt) => { const k = e.t / e.life;
+      for (const p of ps) { p.v.y -= 6 * dt; p.v.x *= 1 - 3 * dt; p.v.z *= 1 - 3 * dt; p.m.position.addScaledVector(p.v, dt); if (p.m.position.y < gy + 0.03) { p.m.position.y = gy + 0.03; p.v.set(0, 0, 0); p.w *= 0.9; }
+        p.m.rotation.z += p.w * dt; p.m.rotation.y += p.w * 0.6 * dt; p.m.material.uniforms.uA.value = 1 - smooth(0.65, 1, k); } });
+    for (let i = 0; i < n; i++) { const a = (i + rnd(-0.3, 0.3)) / n * Math.PI * 2, d = new THREE.Vector3(Math.cos(a), 0, Math.sin(a)), m = this.solid(e, this.geo.hair_lock, { tint: cols[i % cols.length], spec: 0.3, rim: 0xffffff });
+      m.position.copy(c).addScaledVector(d, rad * 0.8); m.scale.setScalar(rnd(0.26, 0.38)); m.rotation.set(rnd(-0.4, 0.4), -a, -Math.PI / 2 + rnd(-0.5, 0.5));
+      ps.push({ m, v: d.multiplyScalar(rnd(1.6, 2.6)).setY(rnd(0.6, 1.4)), w: rnd(-6, 6) }); }
+  }
+
+  // ------------------------------------------------------------------ 스텝 커트: 잔상 + 층층 가로 커트(머리·가슴·무릎) + 떨어지는 머리 다발
   step(pc, o = {}) {
     if (!this._ok()) return null;
+    if (o.from) return this._stepLegacy(pc, o);
+    const K = HAIR.step, I = HAIR.intensity, C = HAIR.col, low = lite(), f = o.f || { x: 0, z: 1 }, fw = new THREE.Vector3(f.x, 0, -f.z), side = new THREE.Vector3(fw.z, 0, -fw.x);
+    const r = Math.min(2.8, o.r || 2.8), body = pc.body, ghosts = [], lines = [];
+    let ctr = null, anyHit = false;
+    const gts = low ? [K.ghosts[1]] : K.ghosts.slice();
+    const e = this._fx('step', K.first + K.gap * 2 + 0.6, (e) => {
+      const t = e.t;
+      while (gts.length && t >= gts[0]) { gts.shift(); const g = this.ghost(e, body, ghosts.length % 2 ? C.violet : C.pink); if (g) ghosts.push({ g, t0: t }); }
+      for (const G_ of ghosts) { const k = (t - G_.t0) / K.ghostLife; G_.g.material.opacity = k >= 1 ? 0 : K.ghostA * I * (1 - smooth(0, 1, k)) * smooth(0, 0.04, t - G_.t0 + 0.02); }
+      // layers: line i fires at its damage tick (strike) or, if that tick does not exist at this level, at its slot in the motion
+      const base = ctr || P3(pc.pos).addScaledVector(fw, 1.2);
+      for (const L of lines) {
+        if (L.at < 0 && t >= K.first + K.gap * L.i + 0.002) L.at = t;
+        const u = L.at >= 0 ? t - L.at : -1; if (u < 0) { L.m.material.uniforms.uA.value = 0; L.g.material.uniforms.uA.value = 0; continue; }
+        if (!L.fired) { L.fired = true; const pc0 = base.clone().addScaledVector(fw, -0.25 + 0.2 * L.i).setY(base.y + K.ys[L.i]); L.p.copy(pc0);
+          if (this.geo.hair_lock) this.layer(L.p, side, L.w, L.hit ? (low ? K.locksLite : K.locks) : 1, base.y); }
+        const a = (L.hit ? 1 : anyHit ? 0.55 : 0.45) * I;
+        L.m.position.copy(L.p); this._alignLine(L.m, side); L.m.scale.set(L.w * (0.55 + 0.45 * easeOut(u / 0.05)), 0.34, 1); L.m.material.uniforms.uA.value = a * K.line * (1 - smooth(0.05, 0.3, u));
+        L.g.position.copy(L.p); this._alignLine(L.g, side); L.g.scale.set(L.w * 1.06, 1.3, 1); L.g.material.uniforms.uA.value = a * 0.9 * (1 - smooth(0.0, 0.22, u));
+      }
+    });
+    for (let i = 0; i < 3; i++) { const w = Math.min(r * 0.85, K.ws[i]); lines.push({ i, w, at: -1, hit: false, fired: false, p: new THREE.Vector3(), m: this.spr(e, 2, 0xffffff, i === 2 ? C.violet : C.pinkB, 7), g: this.spr(e, 2, C.pink, C.violet, 6) }); }
+    e.strike = (h, hits) => {
+      if (e.dead) return; const L = lines[Math.min(2, h | 0)], hs = hits || [];
+      if (hs.length) { anyHit = true; if (!ctr) ctr = P3({ x: hs.reduce((a, q) => a + q.x, 0) / hs.length, y: hs[0].y || 0, z: hs.reduce((a, q) => a + q.z, 0) / hs.length }).addScaledVector(fw, -0.3); }
+      if (L && !L.fired) { L.at = e.t; L.hit = hs.length > 0; }
+      for (const q of hs) this.snip({ x: q.x, y: (q.y || 0) + [1.25, 0.85, 0.5][Math.min(2, h | 0)] * Math.min(1, (q.mid || 0.8) / 0.75), z: q.z }, { size: 0.75, roll: rnd(-0.15, 0.15), ground: q.y || 0 });
+      e.life = Math.max(e.life, e.t + 0.6);
+    };
+    return e;
+  }
+  /** one cut layer: a few hair locks drop from the cut line, fluttering side to side like layered hair falling (three coords) */
+  layer(p, side, w, n, gy) {
+    const ps = [];
+    const e = this._fx('layer', 1.0, (e, dt) => { const k = e.t / e.life;
+      for (const q of ps) { q.m.position.y = Math.max(gy + 0.03, q.y0 - 0.55 * e.t - 0.9 * e.t * e.t); q.m.position.addScaledVector(side, Math.cos(e.t * q.f + q.ph) * 0.5 * dt);
+        q.m.rotation.z = q.r0 + Math.sin(e.t * q.f + q.ph) * 0.6; q.m.material.uniforms.uA.value = smooth(0, 0.04, e.t) * (1 - smooth(0.7, 1, k)); } });
+    for (let i = 0; i < n; i++) { const m = this.solid(e, this.geo.hair_lock, { tint: HAIR.col.strand[(i + 1) % 4], spec: 0.3, rim: 0xffffff }), x = (n === 1 ? 0 : i / (n - 1) - 0.5) * w * 0.8 + rnd(-0.1, 0.1);
+      m.position.copy(p).addScaledVector(side, x); m.scale.setScalar(rnd(0.22, 0.3)); const r0 = Math.PI + rnd(-0.4, 0.4); m.rotation.set(0, rnd(0, 6), r0);
+      ps.push({ m, y0: p.y, f: rnd(7, 10), ph: rnd(0, 6), r0 }); }
+  }
+
+  // ------------------------------------------------------------------ 스텝 커트: 계단처럼 층진 세 줄
+  /** 예전 스텝 커트(세 줄) — runtime fallback only when no handle exists */
+  _stepLegacy(pc, o = {}) {
     const K = HAIR.step, I = HAIR.intensity, f = o.f || { x: 0, z: 1 }, a0 = P3(o.from || pc.pos), a1 = P3(pc.pos), path = _a.copy(a1).sub(a0).clone(), len = path.length() || 1, fw = new THREE.Vector3(f.x, 0, -f.z);
     const lines = [];
     const e = this._fx('step', K.life, (e) => {
@@ -277,37 +412,133 @@ export class HairFx {
     return e;
   }
 
-  // ------------------------------------------------------------------ 드라이어 (돌풍 · 온풍 · 냉풍)
+  // ------------------------------------------------------------------ 드라이어 (돌풍 · 온풍 · 냉풍) — 모드마다 다른 바람
   dryer(pc, o = {}) {
     if (!this._ok()) return null;
     const K = HAIR.dryer, I = HAIR.intensity, mode = o.mode || 'gust', r = o.r || 3.4, half = (o.ang || 60) * Math.PI / 360, dur = o.dur || 0.42, f = o.f || { x: 0, z: 1 }, low = lite();
-    const C = HAIR.col, cw = mode === 'hot' ? C.hot : mode === 'cold' ? C.cold : C.white, cb = mode === 'hot' ? C.hotB : mode === 'cold' ? C.coldB : C.pink;
-    const fw = new THREE.Vector3(f.x, 0, -f.z), rt = new THREE.Vector3(-fw.z, 0, fw.x), streaks = [], lead = o.lead || 0; let acc = 0, kick = 0, flecks = 0, stopAt = -1;
+    const C = HAIR.col, cw = mode === 'hot' ? C.hot : mode === 'cold' ? C.cold : C.mintW, cb = mode === 'hot' ? C.hotB : mode === 'cold' ? C.coldB : C.mintG;
+    const fw = new THREE.Vector3(f.x, 0, -f.z), rt = new THREE.Vector3(-fw.z, 0, fw.x), streaks = [], lead = o.lead || 0; let acc = 0, kick = 0, stopAt = -1, tick = 0;
+    const T = { a: 0, b: 0, c: 0 };   // per-mode spawn clocks
+    // a point inside the real cone: angle th (|th| < half), distance d from the nozzle's ground spot
+    const inCone = (noz, th, d, y) => noz.clone().addScaledVector(fw, Math.cos(th) * d).addScaledVector(rt, Math.sin(th) * d).setY(y);
+    const swirls = [], rings = [];
     const e = this._fx('dryer', dur + K.fade + 0.05, (e, dt) => {
       const end = stopAt >= 0 ? stopAt : dur, base = P3(pc.pos), on = e.t < end && e.t >= lead && !pc.dead, a = smooth(0, K.appear, e.t) * (1 - smooth(end, end + K.fade, e.t));
-      const noz = _a.copy(base).addScaledVector(fw, K.fwd).setY(base.y + K.up).clone();
-      if (dr) { const s = K.size * (0.6 + 0.4 * easeOut(e.t / K.appear)), back = 0.05 * Math.max(0, kick) + 0.012 * Math.sin(e.t * 70);
-        dr.position.copy(noz).addScaledVector(fw, -0.5 * K.size - back); _mx.makeBasis(fw, UP, _c.crossVectors(fw, UP)); dr.quaternion.setFromRotationMatrix(_mx); dr.scale.setScalar(s); dr.material.uniforms.uA.value = a; dr.material.uniforms.uGlow.value = 0.12 * Math.max(0, kick); }
-      kick -= 5 * dt;
-      gl.quaternion.copy(this.camQ); gl.position.copy(noz); gl.scale.setScalar(0.9 + 0.3 * Math.max(0, kick)); gl.material.uniforms.uA.value = I * 0.7 * a;
-      // wind streaks: born at the nozzle, fly out inside the real cone and die before its edge (r)
-      acc += dt * (low ? K.rateLite : K.rate);
-      while (on && acc >= 1) { acc -= 1; const th = rnd(-half, half) * 0.92, m = this.spr(e, 5, cw, cb, 5), dir = fw.clone().multiplyScalar(Math.cos(th)).addScaledVector(rt, Math.sin(th));
-        streaks.push({ m, dir, t: 0, life: K.life * rnd(0.8, 1.15), y: rnd(-0.45, 0.25), len: rnd(0.7, 1.3) }); this._alignLine(m, dir); }
+      const noz = _a.copy(base).addScaledVector(fw, K.fwd).setY(base.y + K.up).clone(), gy = base.y;
+      if (dr) { const s = K.size * (0.6 + 0.4 * easeOut(e.t / K.appear)), back = (mode === 'gust' ? 0.09 : 0.05) * Math.max(0, kick) + (mode === 'cold' ? 0.004 : 0.012) * Math.sin(e.t * 70);
+        dr.position.copy(noz).addScaledVector(fw, -0.5 * K.size - back); _mx.makeBasis(fw, UP, _c.crossVectors(fw, UP)); dr.quaternion.setFromRotationMatrix(_mx); dr.scale.setScalar(s); dr.material.uniforms.uA.value = a;
+        dr.material.uniforms.uGlow.value = mode === 'hot' ? 0.1 + 0.18 * Math.max(0, kick) : 0.12 * Math.max(0, kick); }
+      kick -= (mode === 'hot' ? 4 : 5) * dt;
+      // nozzle: 온풍 = red-hot glow that flares on every tick, 냉풍 = small cold ring, 돌풍 = a short bright puff
+      const fl = mode === 'hot' ? 0.75 + 0.25 * Math.sin(e.t * 31) * Math.sin(e.t * 17) : 1;
+      gl.quaternion.copy(this.camQ); gl.position.copy(noz); gl.scale.setScalar((mode === 'hot' ? 0.75 : 0.9) + (mode === 'hot' ? 0.45 : 0.3) * Math.max(0, kick)); gl.material.uniforms.uA.value = I * (mode === 'hot' ? 1.25 * fl : 0.7) * a;
+      if (nz) { nz.position.copy(noz); _mx.makeBasis(rt, UP, fw); nz.quaternion.setFromRotationMatrix(_mx); nz.scale.setScalar(mode === 'cold' ? 0.42 + 0.04 * Math.sin(e.t * 9) : 0.3); nz.material.uniforms.uA.value = I * (mode === 'cold' ? 1.4 : 1.8 * fl) * a; }
+      // streaks: born at the nozzle, fly out inside the real cone and die before its edge (r) — 돌풍 굵고 빠름, 온풍 넓고 느림, 냉풍 가늘고 곧음
+      const rate = (low ? K.rateLite : K.rate) * (mode === 'hot' ? 0.45 : mode === 'cold' ? 0.8 : 1);
+      acc += dt * rate;
+      while (on && acc >= 1) { acc -= 1; const th = rnd(-half, half) * 0.92, m = this.spr(e, mode === 'cold' ? 2 : 5, cw, cb, 5), dir = fw.clone().multiplyScalar(Math.cos(th)).addScaledVector(rt, Math.sin(th));
+        streaks.push({ m, dir, t: 0, life: K.life * rnd(0.8, 1.15) * (mode === 'hot' ? 1.6 : 1), y: rnd(-0.45, 0.25), len: rnd(0.7, 1.3) * (mode === 'cold' ? 0.8 : 1), w: mode === 'gust' ? 1.5 : mode === 'hot' ? 1.9 : 0.55, wob: rnd(0, 6) }); this._alignLine(m, dir); }
       for (const s of streaks) { s.t += dt; const k = s.t / s.life; if (k >= 1) { s.m.material.uniforms.uA.value = 0; continue; }
-        const dist = 0.3 + (r - 0.3 - s.len * 0.5) * k; s.m.position.copy(noz).addScaledVector(s.dir, dist).setY(noz.y + s.y * k); s.m.scale.set(s.len, 0.22 + 0.5 * k, 1); s.m.material.uniforms.uA.value = I * 1.1 * a * smooth(0, 0.15, k) * (1 - smooth(0.55, 1, k)); }
-      // 온풍: glowing embers / 냉풍: snow sparkles riding the stream (a few)
-      flecks += dt; if (on && mode !== 'gust' && flecks > (low ? 0.16 : 0.07)) { flecks = 0; const th = rnd(-half, half) * 0.85, d2 = rnd(0.25, 0.85) * r, p = noz.clone().addScaledVector(fw, Math.cos(th) * d2).addScaledVector(rt, Math.sin(th) * d2);
-        this.sparkles(p, 1, 0.1, { y0: -0.5, y1: 0.1, life: 0.4, rise: mode === 'hot' ? 0.5 : -0.2, size: mode === 'hot' ? 0.7 : 1.1, cols: mode === 'hot' ? [C.hot, C.hotB] : [C.cold, 0xffffff, C.coldB] }); }
+        const dist = 0.3 + (r - 0.3 - s.len * 0.5) * k; s.m.position.copy(noz).addScaledVector(s.dir, dist).setY(noz.y + s.y * k + (mode === 'hot' ? 0.12 * Math.sin(s.t * 14 + s.wob) + 0.25 * k : 0)); s.m.scale.set(s.len, (0.22 + 0.5 * k) * s.w, 1);
+        s.m.material.uniforms.uA.value = I * (mode === 'hot' ? 0.75 : mode === 'cold' ? 1.6 : 1.15) * a * smooth(0, 0.15, k) * (1 - smooth(0.55, 1, k)); }
+      if (mode === 'gust') {
+        // thick wind ribbons twisting along the cone + pressure rings travelling out (both end inside r)
+        for (const w of swirls) { const k = clamp01((e.t - w.d) / 0.42); w.m.position.copy(noz).setY(noz.y - 0.15); const dir = fw.clone().multiplyScalar(Math.cos(w.th)).addScaledVector(rt, Math.sin(w.th));
+          const ax = dir, upv = UP, z = _c.crossVectors(ax, upv).normalize(); _mx.makeBasis(ax, upv, z); w.m.quaternion.setFromRotationMatrix(_mx); w.m.rotateX(e.t * 16 * w.sg + w.ph);
+          const len = (r - 0.4) * (0.35 + 0.65 * easeOut(k * 1.6)), wide = Math.min(1.25 * (r * Math.sin(half)) / 0.42 * 0.8, 3.2) * (0.5 + 0.5 * k);
+          w.m.scale.set(len, Math.min(1.5, wide * 0.55), wide); w.m.material.uniforms.uA.value = on || e.t < end + 0.1 ? I * 1.25 * a * smooth(0, 0.08, k) * (1 - smooth(0.7, 1, k)) : 0; }
+        for (const R of rings) { const k = clamp01((e.t - R.d) / 0.32), d = 0.4 + (r * 0.88 - 0.4) * easeOut(k), rr = Math.max(0.2, d * Math.sin(half) * 0.95);
+          R.m.position.copy(noz).addScaledVector(fw, d).setY(noz.y - 0.25 * k); _mx.makeBasis(rt, UP, fw); R.m.quaternion.setFromRotationMatrix(_mx); R.m.scale.set(rr * 2, Math.min(rr * 2, 1.5), 1);
+          R.m.material.uniforms.uA.value = e.t >= R.d && k < 1 ? I * 2.0 * (1 - smooth(0.4, 1, k)) * smooth(0, 0.08, k) : 0; }
+        T.a += dt; if (on && T.a > (low ? 0.07 : 0.035) && blown < (low ? HAIR.gust.leavesLite : HAIR.gust.leaves)) { T.a = 0; blown++; this._blown(noz, fw, rt, half, r, gy); }
+      } else if (mode === 'hot') {
+        const H = HAIR.hot; T.a += dt; T.b += dt; T.c += dt;
+        if (on && T.a > (low ? H.curlLite : H.curl)) { T.a = 0; this._rise(inCone(noz, rnd(-half, half) * 0.8, rnd(0.4, 0.85) * r, gy + rnd(0.2, 0.9)), 'curl', gy); }
+        if (on && T.b > (low ? H.emberLite : H.ember)) { T.b = 0; this._rise(inCone(noz, rnd(-half, half) * 0.85, rnd(0.25, 0.9) * r, noz.y + rnd(-0.6, 0.1)), 'ember', gy); }
+        if (on && T.c > (low ? H.hazeLite : H.haze)) { T.c = 0; this._rise(inCone(noz, rnd(-half, half) * 0.6, rnd(0.35, 0.7) * r, gy + rnd(0.4, 1.0)), 'haze', gy, r * Math.sin(half)); }
+      } else {
+        const Q = HAIR.cold; T.a += dt; T.b += dt;
+        if (on && T.a > (low ? Q.mistLite : Q.mist)) { T.a = 0; this._mist(inCone(noz, rnd(-half, half) * 0.75, rnd(0.3, 0.75) * r, gy + 0.12), fw, r); }
+        if (on && T.b > (low ? Q.flakeLite : Q.flake)) { T.b = 0; this._flake(noz.clone(), fw.clone().multiplyScalar(Math.cos(rnd(-half, half) * 0.85)).addScaledVector(rt, Math.sin(rnd(-half, half) * 0.85)).normalize(), r, gy); }
+      }
     });
-    const dr = this.model(e, 'tripo_dryer', 'hair_dryer', { rim: cb, spec: 0.8 }), gl = this.spr(e, 0, cw, cb, 4); if (dr) dr.renderOrder = 6;
+    let blown = 0;
+    const tint = HAIR.dryerTint[mode] || 0xffffff;
+    const dr = this.model(e, 'tripo_dryer', 'hair_dryer', { rim: cb, spec: 0.8, tint, desat: 0.85 }), gl = this.spr(e, 0, cw, cb, 4); if (dr) dr.renderOrder = 6;
+    const nz = mode === 'gust' ? null : this.spr(e, mode === 'cold' ? 1 : 0, mode === 'cold' ? 0xffffff : C.ember, cb, 7);
+    if (mode === 'gust') { for (let i = 0; i < (low ? HAIR.gust.swirlsLite : HAIR.gust.swirls) && this.geo.hair_swirl; i++) { const m = this._m(e, 'spr', this.geo.hair_swirl, 5), u = m.material.uniforms; u.uK.value = 5; u.uW.value.setHex(C.white); u.uB.value.setHex(i % 2 ? C.mintG : 0xc8d8ff); u.uA.value = 0;
+        swirls.push({ m, d: lead + i * 0.07, th: (i - ((low ? HAIR.gust.swirlsLite : HAIR.gust.swirls) - 1) / 2) * half * 0.55, sg: i % 2 ? -1 : 1, ph: i * 2.1 }); }
+      for (let i = 0; i < HAIR.gust.rings; i++) rings.push({ m: this.spr(e, 1, 0xffffff, C.mintG, 6), d: lead + 0.04 + i * 0.13 }); }
     e.stop = () => { if (e.t < dur) { const cut = e.t; e.life = Math.min(e.life, cut + K.fade + 0.05); stopAt = cut; } };
-    e.pulse = (hits) => { kick = 1;
-      for (const t of hits || []) { const c = P3(t); c.y += t.mid || 0.7; const fx = this._fx('dryhit', 0.22, (x) => { const k = x.t / x.life; fl.quaternion.copy(this.camQ); fl.scale.setScalar((mode === 'cold' ? 0.8 : 0.65) * (0.6 + 0.6 * easeOut(k * 2))); fl.material.uniforms.uA.value = I * 1.2 * (1 - smooth(0.1, 0.8, k)); });
-        const fl = this.spr(fx, mode === 'cold' ? 3 : 0, cw, cb, 7); fx.g.position.copy(c);
-        if (mode === 'gust' && !low) this._puffs(P3(t), 2, 0.6, { a: 0.3, life: 0.35 }); }
+    e.pulse = (hits) => { kick = 1; tick++;
+      for (const t of hits || []) { const p = P3(t), c = p.clone(); c.y += t.mid || 0.7; const rad = t.r || 0.5;
+        if (mode === 'gust') this._shove(p, c, fw, rt, P3(pc.pos));
+        else if (mode === 'hot') this._heat(p, c, rad, tick);
+        else this._frost(p, c, rad, t.ref || null); }
     };
     return e;
+  }
+  // 돌풍: a leaf or a lock of hair caught in the stream, tumbling out and dropping before the cone's edge
+  _blown(noz, fw, rt, half, r, gy) {
+    const th = rnd(-half, half) * 0.8, dir = fw.clone().multiplyScalar(Math.cos(th)).addScaledVector(rt, Math.sin(th)), leaf = Math.random() < 0.6 && this.geo.hair_leaf, sp = rnd(6, 9), stop = rnd(0.6, 0.9) * r;
+    const e = this._fx('blown', stop / sp + 0.35, (e, dt) => { const k = e.t / e.life, d = Math.min(stop, 0.3 + sp * e.t);
+      m.position.copy(noz).addScaledVector(dir, d).setY(Math.max(gy + 0.05, noz.y + y0 + Math.sin(e.t * 9 + ph) * 0.15 - (d >= stop ? 2.5 * (e.t - stop / sp) ** 2 * 4 : 0)));
+      m.rotation.x += 14 * dt; m.rotation.y += 9 * dt; m.material.uniforms.uA.value = 1 - smooth(0.7, 1, k); });
+    const y0 = rnd(-0.6, 0.15), ph = rnd(0, 6), m = this.solid(e, leaf ? this.geo.hair_leaf : (this.geo.hair_lock || this.geo.hair_strand), { tint: leaf ? 0xffffff : HAIR.col.strand[(Math.random() * 4) | 0], spec: 0.3, rim: 0xffffff });
+    m.scale.setScalar(leaf ? rnd(0.16, 0.24) : rnd(0.18, 0.26));
+  }
+  // 돌풍 명중: the target is shoved — wind lines streak past it in the push direction, a crescent of pressure on the caster side, dust at the feet
+  _shove(p, c, fw, rt, from) {
+    const I = HAIR.intensity, dir = _a.copy(p).sub(from).setY(0); if (dir.lengthSq() < 1e-4) dir.copy(fw); dir.normalize(); const d = dir.clone(), ls = [];
+    const e = this._fx('shove', 0.36, (e) => { const k = e.t / e.life;
+      ls.forEach((L, i) => { L.m.position.copy(c).addScaledVector(d, -0.25 - 0.6 * easeOut(k) + 0.1 * i).addScaledVector(L.sd, L.off).setY(c.y + L.y); this._alignLine(L.m, d); L.m.scale.set(0.9 + 0.5 * k, 0.32, 1); L.m.material.uniforms.uA.value = I * 1.6 * (1 - smooth(0.25, 1, k)); });
+      cr.position.copy(c).addScaledVector(d, -0.45); _mx.makeBasis(new THREE.Vector3(-d.z, 0, d.x), UP, d); cr.quaternion.setFromRotationMatrix(_mx); cr.scale.set(1.3 * (0.7 + 0.5 * easeOut(k * 2)), 1.1, 1); cr.material.uniforms.uA.value = I * 2.0 * (1 - smooth(0.05, 0.6, k)); });
+    const sd = new THREE.Vector3(-d.z, 0, d.x); for (let i = 0; i < (lite() ? 2 : 4); i++) ls.push({ m: this.spr(e, 5, 0xffffff, HAIR.col.mintG, 7), sd, off: rnd(-0.35, 0.35), y: rnd(-0.35, 0.35) });
+    const cr = this.spr(e, 1, 0xffffff, HAIR.col.mintG, 6); cr.material.uniforms.uP.value = 0.2;
+    if (!lite()) this._puffs(p, 3, 0.7, { a: 0.32, life: 0.4, rise: 0.15 });
+  }
+  // 온풍 / 냉풍 small spawns (three coords)
+  _rise(p, kind, gy, w) {
+    const C = HAIR.col;
+    if (kind === 'curl' && this.geo.hair_curl) { const e = this._fx('curl', 0.7, (e, dt) => { const k = e.t / e.life; m.position.y += 0.9 * dt; m.rotation.y += 7 * dt; m.scale.set(s * (1 - 0.3 * k), s * 1.6, s * (1 - 0.3 * k)); m.material.uniforms.uA.value = 0.85 * smooth(0, 0.15, k) * (1 - smooth(0.55, 1, k)); m.material.uniforms.uGlow.value = 0.5; });
+      const s = rnd(0.1, 0.16), m = this.solid(e, this.geo.hair_curl, { tint: Math.random() < 0.5 ? C.hot : C.hotB, rim: C.ember, spec: 0.3 }); m.material.depthWrite = false; m.renderOrder = 6; m.position.copy(p); return; }
+    if (kind === 'ember') { const e = this._fx('ember', rnd(0.45, 0.7), (e, dt) => { const k = e.t / e.life; m.position.y += 1.1 * dt; m.position.x += Math.sin(e.t * 13 + ph) * 0.4 * dt; m.quaternion.copy(this.camQ);
+        m.scale.setScalar(0.11 * (1 - 0.5 * k)); m.material.uniforms.uA.value = HAIR.intensity * 2.4 * (0.6 + 0.4 * Math.sin(e.t * 40 + ph)) * (1 - smooth(0.5, 1, k)); });
+      const ph = rnd(0, 6), m = this.spr(e, 0, 0xffffff, Math.random() < 0.5 ? C.hotB : C.ember, 7); m.position.copy(p); return; }
+    if (kind === 'haze') { const e = this._fx('haze', 0.9, (e, dt) => { const k = e.t / e.life; m.position.y += 0.45 * dt; m.quaternion.copy(this.camQ); m.scale.set(ww * (0.8 + 0.3 * k), 0.75, 1);
+        m.material.uniforms.uP.value = e.t * 3 + ph; m.material.uniforms.uA.value = HAIR.intensity * 0.55 * smooth(0, 0.2, k) * (1 - smooth(0.5, 1, k)); });
+      const ph = rnd(0, 6), ww = Math.min(1.6, (w || 1.2) * 0.9), m = this.spr(e, 6, C.ember, C.hotB, 3); m.position.copy(p); }
+  }
+  _mist(p, fw, r) {
+    const e = this._fx('mist', 0.9, (e, dt) => { const k = e.t / e.life; m.position.addScaledVector(fw, 0.6 * dt); m.quaternion.copy(this.camQ); m.scale.set(s * (1 + 0.6 * k), s * 0.42 * (1 + 0.4 * k), 1);
+      m.material.uniforms.uA.value = 0.32 * smooth(0, 0.2, k) * (1 - smooth(0.45, 1, k)); });
+    const s = rnd(0.7, 1.1) * Math.min(1.2, r / 3.2), m = this.puff(e, 0xf4fbff, 0xb8dcf4, 3); m.position.copy(p);
+  }
+  _flake(noz, dir, r, gy) {
+    if (!this.geo.hair_flake) return; const sp = rnd(4, 6), stop = rnd(0.5, 0.92) * r, y0 = rnd(-0.55, 0.15), ph = rnd(0, 6);
+    const e = this._fx('flake', stop / sp + 0.25, (e, dt) => { const k = e.t / e.life, d = Math.min(stop, 0.35 + sp * e.t); m.position.copy(noz).addScaledVector(dir, d).setY(Math.max(gy + 0.1, noz.y + y0 - 0.3 * e.t + Math.sin(e.t * 8 + ph) * 0.08));
+      m.quaternion.copy(this.camQ); m.rotateZ(e.t * 5 + ph); m.scale.setScalar(s); m.material.uniforms.uA.value = smooth(0, 0.08, e.t) * (1 - smooth(0.7, 1, k)); m.material.uniforms.uGlow.value = 0.35; });
+    const s = rnd(0.07, 0.12), m = this.solid(e, this.geo.hair_flake, { tint: 0xeaf8ff, rim: 0xffffff, spec: 0.5 }); m.material.depthWrite = false; m.renderOrder = 7;
+  }
+  // 온풍 틱: a warm ring at the cut height + a soft orange glow on the target (one per damage tick)
+  _heat(p, c, rad, n) {
+    const I = HAIR.intensity, C = HAIR.col;
+    const e = this._fx('heat', 0.3, (e) => { const k = e.t / e.life; rg.position.copy(c); this._flat(rg, rad + 0.1 + 0.25 * easeOut(k), c.y - 0.2); rg.material.uniforms.uA.value = I * 1.6 * (1 - smooth(0.1, 1, k));
+      gw.quaternion.copy(this.camQ); gw.position.copy(c); gw.scale.setScalar((rad + 0.4) * 1.6); gw.material.uniforms.uA.value = I * 0.55 * (1 - smooth(0.1, 1, k)); });
+    const rg = this.spr(e, 1, C.ember, C.hotB, 6), gw = this.spr(e, 0, C.hot, C.hotB, 4);
+    if (!lite() || n % 2) for (let i = 0; i < 2; i++) this._rise(c.clone().add(new THREE.Vector3(rnd(-rad, rad), rnd(-0.2, 0.3), rnd(-rad, rad))), 'ember', p.y);
+  }
+  // 냉풍 명중: ice crystals grow round the target's feet + a frost ring and a cold star flash (the slow's frost crust, ~0.8 s)
+  _frost(p, c, rad, follow) {
+    const I = HAIR.intensity, C = HAIR.col, low = lite(), n = low ? HAIR.cold.crystalsLite : HAIR.cold.crystals, cs = [];
+    const e = this._fx('frost', 0.85, (e) => { const k = e.t / e.life, g = easeOut(e.t / 0.1), out = smooth(0.6, 1, k);
+      for (const q of cs) { q.m.position.copy(p).add(q.off); q.m.scale.setScalar(q.s * g * (1 - 0.6 * out)); q.m.material.uniforms.uA.value = 0.92 * (1 - out); q.m.material.uniforms.uGlow.value = 0.35 * (1 - smooth(0, 0.25, e.t)); }
+      rg.position.copy(p); this._flat(rg, rad + 0.15 + 0.2 * g, p.y + 0.06); rg.material.uniforms.uA.value = I * 1.8 * (1 - smooth(0.1, 0.9, k));
+      fl.quaternion.copy(this.camQ); fl.position.copy(c); fl.scale.setScalar(0.8 * (0.6 + 0.6 * easeOut(e.t / 0.08))); fl.material.uniforms.uA.value = I * 1.6 * (1 - smooth(0.02, 0.2, e.t)); });
+    for (let i = 0; i < n && this.geo.hair_crystal; i++) { const a = (i + rnd(-0.25, 0.25)) / n * Math.PI * 2, rr = rad * rnd(0.75, 1.0), m = this.solid(e, this.geo.hair_crystal, { tint: 0xffffff, rim: 0xe8f8ff, spec: 1.2 });
+      m.rotation.set(rnd(-0.25, 0.25), rnd(0, 6), rnd(-0.25, 0.25)); cs.push({ m, off: new THREE.Vector3(Math.cos(a) * rr, 0, Math.sin(a) * rr), s: rnd(0.3, 0.5) * Math.min(1.4, 0.7 + rad * 0.6) }); }
+    const rg = this.spr(e, 1, 0xffffff, C.coldB, 6), fl = this.spr(e, 3, 0xffffff, C.coldB, 8);
+    if (!low) this.sparkles(c, 3, rad + 0.2, { y0: -0.4, y1: 0.4, life: 0.5, rise: -0.2, cols: [C.cold, 0xffffff, C.ice] });
   }
 
   // ------------------------------------------------------------------ 헤어롤 덫: 감아 죔

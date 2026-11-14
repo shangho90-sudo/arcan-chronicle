@@ -3,8 +3,38 @@
   "generatedOn": "2026-11-13",
   "note": "Runway credits were 0, so these were synthesized in the repository. Replace the files under the same names if generated versions are made later.",
   "assets": [
-    { "file": "sfx_hd_snip.mp3", "use": "미용사 큰 가위 '싹뚝' — 기본공격과 가위 스킬의 실제 명중 순간", "duration": 0.26 },
-    { "file": "sfx_hd_dryer.mp3", "use": "드라이 돌풍·온풍 드라이·냉풍 드라이 시전(드라이어 바람)", "duration": 0.7 },
-    { "file": "sfx_hd_style.mp3", "use": "산뜻한 스타일링·헤어 코팅·기분 전환 시전(반짝이)", "duration": 0.6 }
+    {
+      "file": "sfx_hd_snip.mp3",
+      "use": "미용사 큰 가위 '싹뚝' — 기본공격과 가위 스킬의 실제 명중 순간",
+      "duration": 0.26
+    },
+    {
+      "file": "sfx_hd_dryer.mp3",
+      "use": "예비(예전 드라이어 공용 시전음 — 2026-11-14부터 모드별 hd_gust/hd_hot/hd_cold)",
+      "duration": 0.7
+    },
+    {
+      "file": "sfx_hd_style.mp3",
+      "use": "산뜻한 스타일링·헤어 코팅·기분 전환 시전(반짝이)",
+      "duration": 0.6
+    },
+    {
+      "file": "sfx_hd_gust.mp3",
+      "use": "드라이 돌풍 시전 — 센 돌풍 + 낮은 압력음",
+      "duration": 0.6,
+      "generatedOn": "2026-11-14"
+    },
+    {
+      "file": "sfx_hd_hot.mp3",
+      "use": "온풍 드라이 시전 — 따뜻한 바람 + 타닥이는 불티",
+      "duration": 0.9,
+      "generatedOn": "2026-11-14"
+    },
+    {
+      "file": "sfx_hd_cold.mp3",
+      "use": "냉풍 드라이 시전 — 높고 가는 바람 + 얼음 방울",
+      "duration": 0.75,
+      "generatedOn": "2026-11-14"
+    }
   ]
 }

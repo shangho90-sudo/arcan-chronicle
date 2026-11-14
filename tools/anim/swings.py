@@ -664,7 +664,37 @@ HD_TRIM = action('hd_trim', [
     hk(0.55, 's', **HD_GUARD),
 ], 0.25, 0.40, None, fadeIn=0.07, fadeOut=0.16)
 
-SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL] + BS_ACTS + [DRAW, SHEATHE, PH_SPIN, PH_SLAM, PH_SMASH, PH_PITCH, PH_SWEEP, CK_CHOP, CK_PAN, CK_TOSS, BS_CALL, BS_THRUST, BS_SLAM, BS_FLURRY, BS_SWEEP, BS_KICK] + HD_ACTS + [HD_SNIP, HD_TRIM]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
+# hd_end: 끝단 자르기 (2026-11-14) — 큰 가위를 가슴 높이에서 가로로 활짝 벌려 잠깐 겨눴다가(0.10~0.19 s) 내디디며 0.25 s에
+# '싹뚝' 닫음(날이 수평 = 가로로 자르는 면). 타격 0.25 s · 잠금 0.40 s는 hd_snip과 같음(수치 변화 없음)
+HD_END = action('hd_end', [
+    hk(0.00, **HD_GUARD),
+    hk(0.10, 'o', **HP(-6, -4, 0.62, -22, 2, 1.0, twist=-26, lean=-8, sink=0.08)),
+    hk(0.19, 's', **HP(-8, -2, 0.60, -24, 2, 1.0, twist=-30, lean=-10, sink=0.10, sq=True)),
+    hk(0.235, 'i', **HP(6, -6, 0.96, -4, 0, 1.0, twist=-6, lean=10, sink=0.12, sq=True)),
+    hk(0.25, None, **HP(12, -8, 1.02, 2, 0, 0.0, twist=8, lean=16, sink=0.14, sq=True)),
+    hk(0.34, 'o', **HP(14, -10, 1.0, 4, -2, 0.0, twist=10, lean=17, sink=0.14)),
+    hk(0.45, 's', **HP(16, -28, 0.76, 6, 6, 0.1, twist=6, lean=6, sink=0.07)),
+    hk(0.55, 's', **HD_GUARD),
+], 0.25, 0.40, None, fadeIn=0.07, fadeOut=0.16)
+# hd_step: 스텝 커트 (2026-11-14) — 예전 공용 'dash'(한 손에 가위가 매달림) 대신 두 손 동작: 옆으로 짧게 뛰며(대상 쪽을 본 채,
+# 이동은 스킬의 dash op 그대로 2.2 m) 머리 높이 → 가슴 → 무릎 높이로 세 번 층층이 '싹뚝'(0.12 · 0.24 · 0.36 s = 첫 피해 시각과
+# Lv 추가타 간격 0.12 s). 첫 타격 0.12 s 기준: 스킬 데이터의 dash op at = -0.12(이동은 누른 순간 그대로) + recover 0.1586 →
+# 행동 잠금 0.2786 s(예전 'dash' 동작: hitFrame -1 -> -1/14 + 기본 recover 0.35 와 같음)
+def sk(t, e, step, lift, **pose): return ck(t, e, 0.0, step, lift, **pose)
+HD_STEP = action('hd_step', [
+    sk(0.00, None, [0.0, 0.0], [0, 0], **HD_GUARD),
+    sk(0.06, 'o', [0.03, 0.06], [0.07, 0.05], **HP(10, 12, 0.64, 4, 44, 1.0, twist=-12, lean=-4, sink=0.06)),
+    sk(0.12, None, [0.0, 0.04], [0, 0], **HP(14, 8, 0.94, 4, 30, 0.0, twist=6, lean=8, sink=0.13, sq=True)),
+    sk(0.18, 'o', [0.0, 0.04], [0, 0], **HP(12, -14, 0.70, 4, 10, 1.0, twist=-8, lean=2, sink=0.15)),
+    sk(0.24, None, [0.0, 0.06], [0, 0], **HP(16, -18, 0.97, 6, 0, 0.0, twist=10, lean=10, sink=0.17, sq=True)),
+    sk(0.30, 'o', [0.0, 0.06], [0, 0], **HP(14, -38, 0.70, 6, -20, 1.0, twist=-4, lean=8, sink=0.21)),
+    sk(0.36, None, [0.0, 0.10], [0, 0], **HP(18, -44, 0.95, 8, -30, 0.0, twist=12, lean=17, sink=0.25, sq=True)),
+    sk(0.46, 's', [0.0, 0.05], [0, 0], **HP(16, -34, 0.72, 6, 0, 0.1, twist=6, lean=6, sink=0.10)),
+    sk(0.58, 's', [0.0, 0.0], [0, 0], **HD_GUARD),
+], 0.12, 0.2786, None, fadeIn=0.04, fadeOut=0.16)
+HD_STEP.update(hitTimes=[0.12, 0.24, 0.36], hold=True)   # hold: 잠금이 끝나도 서 있으면 세 번째 싹뚝까지 재생(actors.js idle)
+
+SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL] + BS_ACTS + [DRAW, SHEATHE, PH_SPIN, PH_SLAM, PH_SMASH, PH_PITCH, PH_SWEEP, CK_CHOP, CK_PAN, CK_TOSS, BS_CALL, BS_THRUST, BS_SLAM, BS_FLURRY, BS_SWEEP, BS_KICK] + HD_ACTS + [HD_SNIP, HD_TRIM, HD_END, HD_STEP]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
 # ------------------------------------------------------------------------------------------------ 예술가 1차 (2026-11-13)
 # 큰 붓(2배)을 두 손으로 잡고 허공에 그림을 그리듯 휘두름. offGrip = 왼손이 잡는 자리(오른손 그립에서 붓 축을 따라 m, js/model.js
 # apply가 왼팔을 그 점에 IK로 붙임 — 다른 직업의 양손 무기도 같은 필드를 쓰면 됨). paint = [시작, 끝] 붓끝이 물감 획을 남기는 구간

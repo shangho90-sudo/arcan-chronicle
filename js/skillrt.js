@@ -412,6 +412,8 @@ export class SkillEngine {
           const a = pc.body && pc.body.sh && pc.body.sh.actions[ctx.act], lead = a && a.fps ? Math.max(0, Math.min(0.35, a.hitFrame / a.fps)) : 0.25;
           if (op.hair === 'shears') { const tg = ctx.tgt && !ctx.tgt.dead ? ctx.tgt : this.targetFor(d), hop = d.ops.find(o => o.op === 'hit');
             ctx.hairFx = FX.hair('shears', pc, { tgt: tg || null, facing: ctx.facing, n: hop ? (hop.hits || 1) + Math.floor((ctx.L - 1) / 2) : 1, gap: op.gap || 0.1, first: lead, gold: !!op.gold }); }
+          else if (op.hair === 'end') { const tg = ctx.tgt && !ctx.tgt.dead ? ctx.tgt : this.targetFor(d); ctx.hairFx = FX.hair('end', pc, { tgt: tg || null, facing: ctx.facing, first: lead }); }   // 끝단 자르기: 겨눔선 -> 피해 순간 수평 절단면
+          else if (op.hair === 'step') { const dop = d.ops.find(o => o.op === 'dash'), hop = dop && dop.hit; ctx.hairFx = FX.hair('step', pc, { f: ctx.facing, r: hop ? hop.r : 2.8, ang: hop ? hop.ang : 150 }); }   // 스텝 커트: 잔상 + 층층 커트(피해 틱마다 strike)
           else if (op.hair === 'dryer') ctx.hairFx = FX.hair('dryer', pc, { mode: op.mode, r: op.r, ang: op.ang, lead: Math.max(0, lead - 0.06), dur: lead + (op.dur || 0.34), f: ctx.facing });
           else FX.hair(op.hair, pc, { kind: op.kind });
           return; }
@@ -542,6 +544,7 @@ export class SkillEngine {
           let coef = op.coef;
           if (op.falloff) { const dd = pc.dist(t) / (op.r || 5); coef *= 1 + op.falloff * (1 - clamp01(dd)) - op.falloff * 0.5; }
           if (op.consume) coef *= 1 + consumed * op.consume.mulPer;
+          if (op.vsLowHp && op.fx && op.fx.hair && t.hp / t.maxHp <= op.vsLowHp.pct) (ctx.hairLow || (ctx.hairLow = new Set())).add(t);   // 끝단 자르기: 추가 피해가 실제로 붙는 대상(맞기 전 체력) — 마무리 섬광은 이때만
           if (op.coef > 0) this.dmg(t, coef, ctx, { ...op, centerHit: t === centre });
           if (!ctx.missed || !(op.coef > 0)) hairHit.push(t);   // really damaged (not a MISS) — 미용사 이펙트·소리는 이 대상들에게만
           if (!(op.coef > 0 && ctx.missed)) landed.push(t);
@@ -552,11 +555,13 @@ export class SkillEngine {
           if (op.extendHerb) for (const a of this.areas) if (a.op.herb && Math.hypot(a.c.x - t.pos.x, a.c.z - t.pos.z) < a.r + 2) a.extend(op.extendHerb, op.extendCap || 4);
         }
         if (op.fx && op.fx.hair) {   // 미용사 (after the damage, so a MISS reads as a miss): every bright layer on THIS damage tick, on the enemies really hit; local hit-stop on caster + those targets only
-            const ts = hairHit; const hp = ts.map(t => ({ x: t.pos.x, y: t.pos.y || 0, z: t.pos.z, mid: hairMid(t) })), k = ctx.hairFx, last = h === hits_ - 1, t0 = ts[0];
+            const ts = hairHit; const hp = ts.map(t => ({ x: t.pos.x, y: t.pos.y || 0, z: t.pos.z, mid: hairMid(t), r: t.radius || 0.5 })), k = ctx.hairFx, last = h === hits_ - 1, t0 = ts[0];
             if (op.fx.hair === 'snip') { const bonus = !!(t0 && op.vsLowHp && t0.hp / t0.maxHp <= op.vsLowHp.pct);
               if (k && k.strike) { if (t0) k.strike(t0, h, last, bonus); else if (!hairAll) k.miss(); /* a MISS: the shears still close, no flash; nothing left to cut: they leave */ } else if (t0) FX.hair('snip', { x: t0.pos.x, y: (t0.pos.y || 0) + hairMid(t0), z: t0.pos.z }, { big: bonus }); }
             else if (op.fx.hair === 'trim') FX.hair('trim', pc, { f, r: op.r, ang: op.ang, hits: hp });
-            else if (op.fx.hair === 'step') FX.hair('step', pc, { f, from: ctx.dashFrom, r: op.r, hits: hp });
+            else if (op.fx.hair === 'end') { const bonus = !!(t0 && ctx.hairLow && ctx.hairLow.has(t0));
+              if (k && k.strike) { if (t0) k.strike(t0, bonus); else k.miss(); } else if (t0) FX.hair('snip', { x: t0.pos.x, y: (t0.pos.y || 0) + hairMid(t0), z: t0.pos.z }, { big: bonus }); }
+            else if (op.fx.hair === 'step') { if (k && k.strike) k.strike(h, hp); else FX.hair('step', pc, { f, from: ctx.dashFrom, r: op.r, hits: hp }); }
             else if (op.fx.hair === 'dry' && k && k.pulse) k.pulse(hp);
             const heavy = op.fx.heavy || (op.fx.hair === 'snip' && last), stop = op.fx.hair === 'dry' ? 0 : heavy ? HAIR_STOP[1] : HAIR_STOP[0];
             if (ts.length && stop) pc.freezeT = Math.max(pc.freezeT || 0, stop);
@@ -682,7 +687,7 @@ export class SkillEngine {
     let dir = op.side ? { x: -f.z, z: f.x } : f; if (op.side && Math.random() < 0.5) dir = { x: f.z, z: -f.x };
     const dist = op.dist, sgn = Math.sign(dist) || 1;
     const start = { ...pc.pos }; ctx.dashFrom = start;
-    pc.startDash({ x: dir.x * sgn, z: dir.z * sgn }, Math.abs(dist), 14, !!op.invuln);
+    pc.startDash({ x: dir.x * sgn, z: dir.z * sgn }, Math.abs(dist), 14, !!op.invuln, op.anim || 'dash', !!op.face);   // anim/face: 스텝 커트 = 두 손 동작 hd_step, 대상 쪽을 본 채 옆으로
     if (op.hit) this.pending.push({ time: this.clock + 0.12, op: op.hit, ctx });
     if (op.path) { const p = op.path, end = { x: start.x + dir.x * dist, z: start.z + dir.z * dist }, mid = { x: (start.x + end.x) / 2, z: (start.z + end.z) / 2 };
       this.pending.push({ time: this.clock + 0.18, op: { op: '_run', run: () => {

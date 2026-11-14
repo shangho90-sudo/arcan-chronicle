@@ -7,15 +7,20 @@
 //   로그: 피해 틱(시각·양), 총 피해, 이펙트 호출 시각, 소리 호출, 히트스톱(시전자·대상 freezeT, 전역 hitStopT), 카메라 흔들림 폭, 대상 이동,
 //   행동 잠금이 풀린 프레임, 남은 이펙트 수, 콘솔 오류
 const { chromium } = require('playwright'); const fs = require('fs'); const { execSync } = require('child_process');
-const SK = { snip3: 'hd1_a1', trim: 'hd1_a2', end: 'hd1_a3', step: 'hd1_a4', comb: 'hd1_b1', gust: 'hd1_b2', hot: 'hd1_b3', cold: 'hd1_b4', trap: 'hd1_b5', style: 'hd1_c1', coat: 'hd1_c2', fresh: 'hd1_c3', basic: 'basic' }, SKILL = process.env.SKILL || 'snip3', ID = SK[SKILL], LV = +(process.env.LV || 1);
-const SCENE = process.env.SCENE || 'hit', DIR = +(process.env.DIR || 90), FPS = +(process.env.FPS || 60), G_ = process.env.GENDER || 'm';
+const SK0 = { snip3: 'hd1_a1', trim: 'hd1_a2', end: 'hd1_a3', step: 'hd1_a4', comb: 'hd1_b1', gust: 'hd1_b2', hot: 'hd1_b3', cold: 'hd1_b4', trap: 'hd1_b5', style: 'hd1_c1', coat: 'hd1_c2', fresh: 'hd1_c3', basic: 'basic' }, SK = SK0;
+// RUNS=end:1:hit,end:5:kill,... = several runs in one browser (one load; the skill level is set directly per run)
+const RUNS = (process.env.RUNS || `${process.env.SKILL || 'snip3'}:${process.env.LV || 1}:${process.env.SCENE || 'hit'}`).split(',').map(r => r.split(':'));
+const DIR = +(process.env.DIR || 90), FPS = +(process.env.FPS || 60), G_ = process.env.GENDER || 'm';
 const SIZE = process.env.SIZE || '1100x760', TOUCH = SIZE.endsWith('t'), [VW, VH] = SIZE.replace('t', '').split('x').map(Number);
 const FX = process.env.FX !== '0', TAG = process.env.TAG || 'after', OUT = process.env.OUT || '/tmp/hair', ZOOM = +(process.env.ZOOM || 1.4);
-const DIST = +(process.env.DIST || (SKILL === 'comb' ? 5 : ['gust', 'hot', 'cold'].includes(SKILL) ? 2.2 : SKILL === 'trap' ? 1.6 : 1.4)), CW = +(process.env.CW || Math.min(VW, ['comb', 'gust', 'hot', 'cold'].includes(SKILL) ? 640 : 480)), CH = +(process.env.CH || Math.min(VH, 440));
+const cfg = (SKILL) => {
+const DIST = +(process.env.DIST || (SKILL === 'comb' ? 5 : ['gust', 'hot', 'cold'].includes(SKILL) ? 2.2 : SKILL === 'trap' ? 1.6 : 1.4)), CW = +(process.env.CW || Math.min(VW, ['comb', 'gust', 'hot', 'cold', 'step'].includes(SKILL) ? 640 : 480)), CH = +(process.env.CH || Math.min(VH, 440));
 const DUR = +(process.env.DUR || (SKILL === 'basic' ? 2.7 : SKILL === 'hot' ? 2.8 : SKILL === 'trap' ? 2.6 : 1.5));
 const MARKS = (process.env.MARKS || (SKILL === 'basic' ? '0.10,0.17,0.20,0.24,0.45,0.55,0.60,0.85,0.95,1.00,1.28,1.38,1.42,1.80,1.92,1.97,2.10,2.40'
   : SKILL === 'hot' ? '0.10,0.30,0.40,0.55,0.80,1.2,1.6,2.0,2.3,2.5' : SKILL === 'trap' ? '0.10,0.20,0.30,0.40,0.50,0.60,0.75,0.9,1.2,1.6,2.0,2.4'
   : ['style', 'coat', 'fresh'].includes(SKILL) ? '0.05,0.25,0.32,0.40,0.50,0.62,0.75,0.9,1.1,1.3' : '0.05,0.12,0.18,0.22,0.25,0.28,0.32,0.36,0.40,0.46,0.52,0.60,0.70,0.85,1.0,1.2')).split(',').map(Number);
+  return { DIST, CW, CH, DUR, MARKS };
+};
 (async () => {
   fs.mkdirSync(OUT, { recursive: true });
   const b = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
@@ -34,7 +39,7 @@ const MARKS = (process.env.MARKS || (SKILL === 'basic' ? '0.10,0.17,0.20,0.24,0.
     document.querySelectorAll('.hud,.controls,.toasts,.qhud,.qh-reopen,.plates').forEach(e => e.style.display = 'none');
     if (G.reward) { G.reward.jobChange = sw => sw && sw(); G.reward.levelUp = () => {}; }
     G.dev.level(20); G.sheet.p.gender = g; G.dev.job('hairdresser'); G.sheet.bag.add('w_scissors_1', 1); G.sheet.p.weapon = 'w_scissors_1';
-    const bk = G.sheet.book; bk.sk.points += 99; if (id !== 'basic') for (let i = 0; i < lv; i++) if (!bk.learnBlock(id)) bk.learn(id);
+    const bk = G.sheet.book; bk.sk.points += 99;
     G.sheet.recalc(); G.dev.full(); G.input.block = true;
     await G.player.attachBody(); G.player.body.place(G.player.pos); G.player.body.play('idle', 1, true);
     G.skillFx.hair.load();
@@ -42,9 +47,15 @@ const MARKS = (process.env.MARKS || (SKILL === 'basic' ? '0.10,0.17,0.20,0.24,0.
     for (let r = 0; r <= 16 && !spot; r++) for (let k = 0; k < Math.max(1, r * 6) && !spot; k++) { const a = k / Math.max(1, r * 6) * 6.283, c = { x: cx + Math.cos(a) * r, z: cz + Math.sin(a) * r }; let ok = true;
       for (let x = -7; x <= 7 && ok; x += 0.75) for (let z = -7; z <= 7 && ok; z += 0.75) if (x * x + z * z <= 49 && G.zone.geo.blocked(c.x + x, c.z + z, 0.35)) ok = false; if (ok) spot = c; }
     window.__spot = spot || { x: cx, z: cz };
-  }, [ZOOM, G_, ID, LV]);
+    window.__rand0 = Math.random;
+  }, [ZOOM, G_]);
   await pg.waitForFunction(() => G.skillFx.hair.ready && G.player.body && G.player.body.md, null, { timeout: 120000 });
   await pg.waitForTimeout(1500);
+  for (const [SKILL, LV_, SCENE] of RUNS) {
+  const ID = SK[SKILL], LV = +LV_, { DIST, CW, CH, DUR, MARKS } = cfg(SKILL); errs.length = 0;
+  await ev(([id, lv]) => { Math.random = window.__rand0; const bk = G.sheet.book; if (id !== 'basic') { bk.sk.learned[id] = lv; if (!bk.sk.slots.includes(id)) bk.sk.slots[0] = id; G.sheet.recalc(); }
+    const sk = G.player.skills2; sk.cd = {}; sk.pending = []; sk.channel = null; G.player.skills.lock = 0; G.player.freezeT = 0; G.player.invuln = 0; G.player.dashT = 0; window.__drew = false; window.__c0 = null;
+    document.querySelectorAll('.float,.dmg,.rwstack,.dmg-num').forEach(x => x.remove()); if (G.reward && G.reward.clear) G.reward.clear(); }, [ID, LV]);
   const name = `${TAG}_${SKILL}_lv${LV}_${SCENE}_${G_}_${SIZE}_fx${FX ? 1 : 0}`, dirOut = `${OUT}/${name}`; fs.rmSync(dirOut, { recursive: true, force: true }); fs.mkdirSync(dirOut, { recursive: true });
   await ev(([dir, dist]) => {
     const p = G.player, a = dir * Math.PI / 180, f = { x: Math.sin(a), z: Math.cos(a) };
@@ -67,13 +78,13 @@ const MARKS = (process.env.MARKS || (SKILL === 'basic' ? '0.10,0.17,0.20,0.24,0.
     const d = G.data.skill ? G.data.skill(id) : G.data.skills2.find(s => s.id === id);
     const L = window.__log = { fx: [], sfx: [], dmg: [], num: [], freezeP: [], freezeT: [], gstop: [], cam: [], lock: [], stun: [], act: [] };
     window.__t = 0; window.__p0 = { ...m.pos }; window.__hp = m.hp;
-    const S = G.skillFx.hair;
-    for (const k of ['snip', 'shears', 'trim', 'step', 'proj', 'combHit', 'dryer', 'trap', 'style']) if (!S['__w' + k]) { S['__w' + k] = true; const o = S[k].bind(S); S[k] = (a, opt) => { L.fx.push({ k, t: +window.__t.toFixed(3), hit: opt && opt.hit }); const h = o(a, opt);
+    const S = G.skillFx.hair; window.__log = L;
+    for (const k of ['snip', 'shears', 'trim', 'step', 'proj', 'combHit', 'dryer', 'trap', 'style']) if (!S['__w' + k]) { S['__w' + k] = true; const o = S[k].bind(S); S[k] = (a, opt) => { const L = window.__log; L.fx.push({ k, t: +window.__t.toFixed(3), hit: opt && opt.hit }); const h = o(a, opt);
       if (h && h.strike) { const s0 = h.strike, m0 = h.miss; h.strike = (...x) => { L.fx.push({ k: 'strike', t: +window.__t.toFixed(3) }); return s0(...x); }; h.miss = (...x) => { L.fx.push({ k: 'miss', t: +window.__t.toFixed(3) }); return m0(...x); }; }
       if (h && h.pulse) { const l0 = h.pulse; h.pulse = (t) => { L.fx.push({ k: 'pulse', t: +window.__t.toFixed(3), n: t ? t.length : 0 }); return l0(t); }; }
       return h; }; }
-    const os = G.audio.sfx.bind(G.audio); G.audio.sfx = (n) => { L.sfx.push({ n, t: +window.__t.toFixed(3) }); return os(n); };
-    const od = G.ui.damageText.bind(G.ui); G.ui.damageText = (...a) => { L.num.push({ t: +window.__t.toFixed(3), v: a[1] }); return od(...a); };
+    if (!G.audio.__w) { G.audio.__w = true; const os = G.audio.sfx.bind(G.audio); G.audio.sfx = (n) => { window.__log.sfx.push({ n, t: +window.__t.toFixed(3) }); return os(n); };
+    const od = G.ui.damageText.bind(G.ui); G.ui.damageText = (...a) => { window.__log.num.push({ t: +window.__t.toFixed(3), v: a[1] }); return od(...a); }; }
     p.target = m; window.__sp0 = p.sp;
     if (scene === 'kill') m.hp = Math.max(2, Math.round(p.stat('atk') * 0.5));   // dies on the first or second tick; the rest must not crash or linger
     window.__hp = m.hp;
@@ -84,7 +95,7 @@ const MARKS = (process.env.MARKS || (SKILL === 'basic' ? '0.10,0.17,0.20,0.24,0.
     if (scene === 'miss') Math.random = () => 0.0001; if (scene === 'whiff' && id === 'basic') { }   // every accuracy roll fails -> MISS (명중 판정)   // these skills need a target to start: a whiff = the target is gone before the hit
     return { hp: window.__hp, atk: p.stat('atk'), def: m.stat('def'), lv: id === 'basic' ? 0 : p.skills2.lvl(id), mult: p.skills2.mult(d || { id, type: 'attack' }), desc: d && d.desc, cd: d && d.cd, mp: d && d.mp };
   }, [SCENE, FPS, ID, DIST, +(process.env.SEED || 12345)]);
-  if (typeof info === 'string') { console.log(info); await b.close(); return; }
+  if (typeof info === 'string') { console.log(info); continue; }
   const frames = [], total = Math.round(DUR * FPS); let dc = 0;
   for (let i = 0; i < total; i++) {
     const shot = MARKS.some(m => i === Math.round(m * FPS));
@@ -119,5 +130,7 @@ const MARKS = (process.env.MARKS || (SKILL === 'basic' ? '0.10,0.17,0.20,0.24,0.
   try { execSync('python3 /tmp/_hairstrip.py'); } catch (e) { console.log('strip failed', e.message); }
   console.log(name, JSON.stringify(res)); console.log('strip', `${OUT}/${name}.png`);
   fs.writeFileSync(`${OUT}/${name}.json`, JSON.stringify(res, null, 1));
+  if (process.env.KEEP !== '1') fs.rmSync(dirOut, { recursive: true, force: true });   // raw frames: only the strip is kept
+  }
   await b.close();
 })();
