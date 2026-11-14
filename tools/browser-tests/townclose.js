@@ -22,7 +22,7 @@ const VIEWS = (process.env.VIEWS || 'house:37.7,-37.5,2.2;house2:-12.6,30.5,2.2;
   for (const v of VIEWS) for (let k = 0; k < 2; k++) {
     await ev(([v, k, F]) => { const c = G.render.cam; c.zoom = v.zoom; c.updateProjectionMatrix(); const p = G.player; p.teleport(G.zone.geo.nearestFree(v.x - 3, v.z - 3, 0.4));
       for (let i = 0; i < (k ? F : 30); i++) G.step(1 / 60, false); G.render.setFocus({ x: v.x, y: 0, z: v.z }, true); G.render.render(1 / 60); }, [v, k, FRAMES]);
-    await pg.screenshot({ path: `${OUT}/${TAG}_${v.n}_${k}.png`, timeout: 300000 });
+    await pg.screenshot({ path: `${OUT}/${TAG}_${SIZE}_${v.n}_${k}.png`, timeout: 300000 });
   }
   console.log(TAG, VIEWS.map(v => v.n).join(','), errs.slice(0, 3)); await b.close();
 })();

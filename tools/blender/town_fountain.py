@@ -42,7 +42,9 @@ TEXS = {'marble': (blocks((238, 230, 214), (196, 186, 170), 3, 3, 1), 1.6),     
         'trim': (plain((168, 190, 206), 3, 0.04), 1.0),                               # 푸른 회색 판(장식)
         'statue': (plain((246, 241, 230), 4, 0.025), 1.0),                            # 여신상
         'floor': (plain((92, 150, 170), 5, 0.05), 2.0),                               # 수반 바닥(물 아래)
-        'gold': (gold(), 1.2), 'water': (water(), 1.0), 'fall': (water(), 1.0)}
+        'gold': (gold(), 1.2), 'water': (water(), 1.0), 'fall': (water(), 1.0),
+        'leaf': (plain((96, 160, 84), 6, 0.08), 0.6), 'bloom': (plain((246, 150, 190), 7, 0.04), 0.6), 'bloom2': (plain((255, 236, 150), 8, 0.04), 0.6)}
+STATUE = 1.45
 MATNAME = {'water': 'M_fnt_water', 'fall': 'M_fnt_fall'}
 MATS = {}
 def mat(key):
@@ -162,6 +164,17 @@ def build():
         sphere('marble', (4.8 * math.cos(a), 4.8 * math.sin(a), 1.26), (0.2, 0.2, 0.13), seg=14, rings=6, grad=(1.2, 1.4, 0.92, 1.05))
         sphere('gold', (4.8 * math.cos(a), 4.8 * math.sin(a), 1.4), (0.07, 0.07, 0.07), seg=10, rings=6)
     disc('water', 4.45, 1.06, seg=72)                                                                    # 수반 수면
+    # 바깥 계단 위 낮은 기둥 8개(금 꼭지) + 그 사이 둥근 꽃 화분 4개 — 둥근 실루엣에 리듬, 무릎 높이 이하라 가리지 않음
+    for i in range(8):
+        a = (i + 0.5) / 8 * 2 * math.pi; x, y = 5.38 * math.cos(a), 5.38 * math.sin(a)
+        lathe('marble', [(0.0, 0.2), (0.17, 0.2), (0.17, 0.27), (0.13, 0.32), (0.12, 0.7), (0.16, 0.76), (0.16, 0.82), (0.0, 0.82)], seg=12, centre=(x, y), grad=(0.2, 0.82, 0.86, 1.04))
+        sphere('gold', (x, y, 0.92), (0.1, 0.1, 0.1), seg=10, rings=6); lathe('gold', [(0.0, 0.98), (0.04, 0.98), (0.0, 1.12)], seg=8, centre=(x, y))
+    for i in range(4):
+        a = i / 4 * 2 * math.pi + math.pi / 4 + math.pi / 8; x, y = 5.4 * math.cos(a), 5.4 * math.sin(a)
+        lathe('trim', [(0.0, 0.2), (0.2, 0.2), (0.26, 0.42), (0.28, 0.46), (0.0, 0.46)], seg=12, centre=(x, y))
+        sphere('leaf', (x, y, 0.5), (0.27, 0.27, 0.16), seg=10, rings=6)
+        for k in range(5):
+            b = k / 5 * 2 * math.pi + i; sphere('bloom' if k % 2 else 'bloom2', (x + 0.15 * math.cos(b), y + 0.15 * math.sin(b), 0.62), (0.07, 0.07, 0.06), seg=6, rings=4)
     # 가운데 기둥 → 큰 접시(꽃잎 10장 가장자리)
     lathe('marble', [(0.0, 0.43), (1.3, 0.43), (1.3, 0.62), (1.15, 0.8), (0.78, 0.98), (0.6, 1.2), (0.52, 1.55), (0.56, 1.8), (0.7, 1.98),
                      (1.0, 2.12), (1.6, 2.26), (2.1, 2.38), (2.28, 2.48), (2.3, 2.58), (2.22, 2.64), (2.05, 2.64), (1.98, 2.56)],
@@ -175,6 +188,7 @@ def build():
     disc('water', 1.08, 3.65, seg=48, lobes=8, amp=0.08)
     # 여신상 받침 + 여신(큰 머리, 날개, 항아리를 기울여 붓는 모습) — 앞면 -Y
     lathe('marble', [(0.0, 3.64), (0.44, 3.64), (0.46, 3.72), (0.36, 3.8), (0.32, 3.95), (0.4, 4.02), (0.42, 4.08), (0.0, 4.08)], seg=32)
+    S0 = len(PARTS)                                                                                       # 여신상 부품 시작 (아래에서 1.45배)
     lathe('statue', [(0.0, 4.08), (0.4, 4.08), (0.39, 4.22), (0.33, 4.55), (0.25, 4.88), (0.2, 5.02), (0.22, 5.14), (0.25, 5.28),
                      (0.23, 5.38), (0.15, 5.45), (0.08, 5.5), (0.07, 5.56), (0.0, 5.58)], seg=32, lobes=9, amp=0.06, lobe_z=(4.08, 4.9),
           grad=(4.08, 5.5, 0.84, 1.04))
@@ -183,8 +197,8 @@ def build():
     sphere('statue', (0, 0.05, 5.8), (0.235, 0.215, 0.215), seg=20, rings=12, grad=(5.6, 6.0, 0.9, 1.0))   # 머리카락(뒤로 조금)
     sphere('statue', (0, 0.17, 5.92), (0.11, 0.1, 0.1), seg=14, rings=8)                                   # 올림머리
     lathe('gold', [(0.2, 5.9), (0.215, 5.91), (0.215, 5.95), (0.2, 5.96)], seg=28, centre=(0, 0.02))       # 금 머리띠
-    for s in (-1, 1):                                                                                      # 날개(납작한 잎 모양 2겹)
-        for k, (ln, z) in enumerate(((0.55, 5.42), (0.4, 5.22))):
+    for s in (-1, 1):                                                                                      # 날개(납작한 잎 모양 3겹)
+        for k, (ln, z) in enumerate(((0.62, 5.46), (0.48, 5.26), (0.34, 5.1))):
             R = Matrix.Rotation(s * math.radians(28 + k * 18), 3, 'Y') @ Matrix.Rotation(math.radians(-14), 3, 'X')
             sphere('statue', (s * (0.3 + k * 0.05), 0.2, z), (0.1, 0.035, ln), seg=14, rings=10, rot=R, grad=(4.9, 6.0, 0.9, 1.02))
     # 팔: 왼팔은 항아리 밑, 오른팔은 항아리 목 — 항아리는 오른쪽 앞에서 바깥으로 기울어 작은 접시에 물을 부음
@@ -196,9 +210,13 @@ def build():
     for prof, key in (([(0.0, -0.17), (0.09, -0.17), (0.14, -0.08), (0.15, 0.02), (0.11, 0.1), (0.06, 0.14), (0.07, 0.2), (0.05, 0.2)], 'gold'),):
         me = lathe(key, prof, seg=20); me.transform(Matrix.Translation(jar) @ R.to_4x4())
     mouth = jar + R @ Vector((0, 0, 0.2))
+    # 여신상을 받침 위에서 1.45배 (게임 거리에서 날개·머리·항아리가 읽히게 — 예전 Tripo 천사상만큼 크게)
+    base = Vector((0, 0, 4.08)); SM = Matrix.Translation(base) @ Matrix.Scale(STATUE, 4) @ Matrix.Translation(-base)
+    for me in PARTS[S0:]: me.transform(SM)
+    mouth = base + (mouth - base) * STATUE
     # 항아리 물줄기: 입구 → 작은 접시 수면 (포물선)
     pts, rad = [], []
-    land = Vector((0.92, -0.42, 3.66))
+    land = Vector((0.9, -0.45, 3.66))
     for i in range(9):
         t = i / 8; p = mouth.lerp(land, t); p.z = mouth.z + (land.z - mouth.z) * t * t + 0.18 * t * (1 - t) * 0 ; p.x = mouth.x + (land.x - mouth.x) * math.sqrt(t)
         pts.append(tuple(p)); rad.append(0.045 + 0.03 * t)
