@@ -455,7 +455,11 @@ function gaitPose(body, ph, v, base, settle = 0) {
   const yawA = lerp(7, 9, run) * live, rollA = lerp(4, 2.5, run) * live, swayA = lerp(0.024, 0.009, run) * live;
   const sway = swayA * sl;                                                  // metres towards the model's left (+x) = over the left foot
   const lean = lerp(4, 16, run) + 2 * live;
-  Q.Hips = mul(ry(-yawA * sw), rz(rollA * sl), rx(lean * 0.3));
+  // 2026-11-14 run polish: the pelvis tips forward a little as each foot takes the weight (twice per cycle, strongest
+  // just after contact) and lifts again on push-off - reads as a soft, springy landing. Hip joints follow the pelvis in
+  // the IK below, so the planted feet stay where they are.
+  const c2 = Math.cos(4 * Math.PI * (ph - 0.06)), absorb = lerp(1.2, 3.2, run) * live * (0.5 + 0.5 * c2);
+  Q.Hips = mul(ry(-yawA * sw), rz(rollA * sl), rx(lean * 0.3 + absorb));
   const RH = rotOnly(Q.Hips), RHi = RH.clone().invert();
   for (const side of ['Left', 'Right']) {
     const c = ch[side], t = tgt[side];
@@ -470,19 +474,23 @@ function gaitPose(body, ph, v, base, settle = 0) {
     Q[side + '_Foot'] = mul(r.Rsh.clone().invert(), r.Rft);
   }
   // ---- trunk: shoulders counter-rotate the pelvis (net ~ -0.6 x pelvis yaw), spine levels the pelvic drop, lean into the run
-  Q.Spine = mul(ry(yawA * 0.8 * sw), rz(-rollA * sl * 0.55), rx(lean * 0.4));
-  Q.Chest = mul(ry(yawA * 0.8 * sw), rz(-rollA * sl * 0.3), rx(lean * 0.35));
+  Q.Spine = mul(ry(yawA * 0.8 * sw), rz(-rollA * sl * 0.55), rx(lean * 0.4 - absorb * 0.6));
+  Q.Chest = mul(ry(yawA * 0.8 * sw), rz(-rollA * sl * 0.3), rx(lean * 0.35 - absorb * 0.3));
   // head steadier than the trunk: undo most of the shoulder turn and the lean, keep a little life
-  Q.Head = mul(ry(-yawA * 0.45 * sw), rz(-rollA * sl * 0.15), rx(-lean * 0.8 + md.cfg.headPitch));
+  Q.Head = mul(ry(-yawA * 0.45 * sw), rz(-rollA * sl * 0.15), rx(-lean * 0.8 + md.cfg.headPitch - absorb * 0.1));
   // ---- arms opposite the legs; elbows bend into a pump when running; the hand holding a weapon / tool swings less
   const armA = lerp(17, 40, run) * live, armF = lerp(5, 14, run);
   for (const [side, nm, sgn] of [[-1, 'Right', 1], [1, 'Left', -1]]) {
     const held = (side < 0 ? !!body.weapon : !!body.off) && (body.armW ?? 1) > 0.5, k = held ? 0.55 : 1;
-    const f = armF + sgn * armA * k * sw, down = Math.max(0, 90 - (base[side > 0 ? 'armL' : 'armR'][1] || 12)) - 4 * run;
-    const bend = lerp(18, 88, run) + (held ? 10 : 0) + Math.max(0, f) * lerp(0.35, 0.2, run);
-    Q[nm + '_UpperArm'] = mul(rx(-f), rz(side > 0 ? -down : down));
+    // 2026-11-14 run polish: the forward stroke is longer than the back stroke and the hand swings a little in toward the
+    // body's midline (a clear, rounded cartoon pump instead of a straight pendulum); the elbow closes on the way forward
+    const ph1 = sgn * sw, fwd = Math.max(0, ph1), f = armF + armA * k * (ph1 > 0 ? ph1 * 1.12 : ph1 * 0.82);
+    const down = Math.max(0, 90 - (base[side > 0 ? 'armL' : 'armR'][1] || 12)) - 4 * run - 5 * run * fwd * k;
+    const bend = lerp(18, 88, run) + (held ? 10 : 0) + Math.max(0, f) * lerp(0.35, 0.2, run) + 8 * run * fwd * k;
+    const cross = 9 * run * fwd * k * live;                               // toward the midline on the forward stroke
+    Q[nm + '_UpperArm'] = mul(ry(side > 0 ? cross : -cross), rx(-f), rz(side > 0 ? -down : down));
     Q[nm + '_LowerArm'] = ry(side > 0 ? -bend : bend);
-    Q[nm + '_Shoulder'] = ry(sgn * side * -3.5 * sw * live);              // the shoulder girdle follows its arm a little
+    Q[nm + '_Shoulder'] = ry(sgn * side * -lerp(3.5, 6, run) * sw * live);   // the shoulder girdle follows its arm a little
   }
   dbg.sway = +sway.toFixed(3); dbg.bodyY = +bodyY.toFixed(3);
   return { Q, hipH, G, sway };

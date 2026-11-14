@@ -20,6 +20,7 @@ const DEG = Math.PI / 180;
 const MODELS = {
   tree_broad_a: { h: 5.6, trunk: true, dither: true }, tree_broad_b: { h: 5.3, trunk: true, dither: true },
   tree_forest_round: { h: 4.9, trunk: true, dither: true }, tree_forest_tall: { h: 6.5, trunk: true, dither: true },
+  tree_broad_c: { h: 5.0, trunk: true, dither: true }, tree_round_small: { h: 3.9, trunk: true, dither: true },   // 2026-11-14 wide umbrella / small round
   shrub_a: { h: 1.0 }, shrub_b: { h: 0.85 },
   rock_small: { h: 0.3 }, rock_medium: { h: 0.8, dither: true }, rock_moss: { h: 1.1, dither: true }, rock_roadside: { h: 0.5 }, rock_large: { h: 1.1, dither: true },
   grass_short: { h: 1 }, grass_tall: { h: 1 }, flower_white: { h: 1 }, flower_yellow: { h: 1 }, flower_pink: { h: 1 }, flower_mixed: { h: 1 }, fern: { h: 1 }, clover: { h: 1 },
@@ -31,7 +32,7 @@ const MODELS = {
   // older Tripo models still used for the few one-off props
   stump: { h: 0.75, old: true }, ruin: { h: 2.3, dither: true, old: true }, mushroom: { h: 1.0, old: true },
 };
-const TYPE_MODEL = { tree: ['tree_broad_a', 'tree_broad_b', 'tree_forest_round', 'tree_broad_a'], pine: ['tree_forest_tall'], shrub: ['shrub_a', 'shrub_b'], bush: ['shrub_a', 'shrub_b'],
+const TYPE_MODEL = { tree: ['tree_broad_a', 'tree_broad_b', 'tree_forest_round', 'tree_broad_a', 'tree_broad_c', 'tree_round_small'], pine: ['tree_forest_tall'], shrub: ['shrub_a', 'shrub_b'], bush: ['shrub_a', 'shrub_b'],
   rock: ['rock_medium', 'rock_moss', 'rock_roadside', 'rock_medium'], stone: ['rock_small'], stump: ['stump'], ruin: ['ruin'], mushroom: ['mush_orange', 'mush_cluster'], mushdecor: ['mush_small_purple', 'mush_small_blue', 'mush_glow_purple'], mushtree: ['mush_tree'] };
 export const MAT_TEX = {
   M_bark: { t: 'bark.jpg' }, M_foliage: { t: 'foliage.jpg' }, M_foliage_warm: { t: 'foliage_warm.jpg' }, M_foliage_cool: { t: 'foliage_cool.jpg' },
@@ -44,6 +45,13 @@ export const MAT_TEX = {
   M_cap_purple: { t: 'cap_purple.jpg' }, M_cap_blue: { t: 'cap_blue.jpg' }, M_cap_orange: { t: 'cap_orange.jpg' }, M_stem: { t: 'stem.jpg' }, M_spot: { t: 'spot.jpg' },
   M_glow_purple: { t: 'glow_purple.jpg', e: true, ec: 0xc79bff, ei: 0.55 }, M_glow_blue: { t: 'glow_blue.jpg', e: true, ec: 0x9cd2ff, ei: 0.55 }, M_red: { t: 'red.jpg' }, M_soil: { t: 'soilpot.jpg' },
 };
+// mixed tree shapes (2026-11-14): layouts that name a model (forest, town blprops) swap part of their trees for the
+// sister shape (same footprint - collision stays in the zone data), picked from the world position so it is stable
+const TREE_SWAP = { tree_broad_a: ['tree_broad_c', 0.3], tree_forest_round: ['tree_round_small', 0.3] };
+export function treeVariant(name, x, z) {
+  const w = TREE_SWAP[name]; if (!w) return name;
+  return hash(Math.round(x * 10) * 73856093 ^ Math.round(z * 10) * 19349663) < w[1] ? w[0] : name;
+}
 const CHUNK = 24;            // instancing / culling cell (m): bigger cells = fewer draw calls, the camera sees ~30 x 25 m
 
 function hash(n) { n = Math.imul(n ^ 0x9e3779b9, 0x85ebca6b); n ^= n >>> 13; n = Math.imul(n, 0xc2b2ae35); n ^= n >>> 16; return (n >>> 0) / 4294967296; }
@@ -426,7 +434,7 @@ export async function buildNature(zone, renderer) {
   const byKey = new Map();
   props.forEach((q, i) => {
     const list = TYPE_MODEL[q.type]; if (!list) return;
-    const name = q.model && MODELS[q.model] ? q.model : list[Math.floor(hash(i * 7 + 3) * list.length)];
+    const name = q.model && MODELS[q.model] ? treeVariant(q.model, q.pos[0], q.pos[1]) : list[Math.floor(hash(i * 7 + 3) * list.length)];
     const ck = name + ':' + Math.floor(q.pos[0] / CHUNK) + ':' + Math.floor(q.pos[1] / CHUNK);
     if (!byKey.has(ck)) byKey.set(ck, { name, items: [] }); byKey.get(ck).items.push([q, i]);
   });
@@ -573,6 +581,26 @@ export async function buildNature(zone, renderer) {
     cards.push([x, z, s * 1.25, s, rnd() < 0.82 ? Math.floor(rnd() * 3) : 3]);
     if (rnd() < 0.09 && g < 0.4) cards.push([x + 0.2, z + 0.1, 0.42, 0.36, rnd() < 0.65 ? 4 : rnd() < 0.8 ? 5 : 7]);   // stray daisies / buttercups
   }
+  // flower clusters along the path edges (2026-11-14): small groups of 3-6 blossoms + a tuft in the shoulder band just
+  // outside the walkable dirt (mask R 0.1..0.36), gathered in patches by a low-frequency noise so they read as planted
+  // clumps, not confetti. Kept off the dirt (every blossom re-checked), away from monster camps (combat space), water and
+  // platforms. Decoration only - no collision, same merged plant meshes as the grass.
+  {
+    const fr = mulberry((def.nature && def.nature.seed || 1) * 7 + 11), PAL = [[4, 5], [5, 6], [4, 10], [6, 10], [7, 4]];
+    const lf = (x, z) => 0.5 + 0.25 * Math.sin(x * 0.21 + Math.sin(z * 0.13) * 2.0) + 0.25 * Math.sin(z * 0.17 - x * 0.07);
+    for (let k = 0; k < area * 0.16 * (NV.grass ?? 1); k++) {
+      const x = x0 + fr() * (x1 - x0), z = z0 + fr() * (z1 - z0), r = maskAt(x, z)[0];
+      if (r < 0.1 || r > 0.36 || lf(x, z) < 0.58 || fr() > 0.55) continue;
+      if (onPlat(x, z) || inWater(x, z, 0.6) || camps.some(c => Math.hypot(x - c[0], z - c[1]) < c[2] * 0.6 + 2)) continue;
+      const pal = PAL[Math.floor(fr() * PAL.length)], n = 3 + Math.floor(fr() * 4);
+      for (let j = 0; j < n; j++) {
+        const a = fr() * 6.283, d = 0.12 + fr() * 0.42, fx = x + Math.cos(a) * d, fz = z + Math.sin(a) * d;
+        if (maskAt(fx, fz)[0] > 0.4) continue;
+        const s = 0.42 + fr() * 0.22; cards.push([fx, fz, s * 1.1, s, pal[j % pal.length]]);
+      }
+      cards.push([x + 0.15, z - 0.1, 0.62, 0.5, fr() < 0.7 ? 0 : 1]);
+    }
+  }
   // reeds and tall grass along the shores (gaps where a path meets the water), then the water itself
   if (ponds.length) {
     const wr = mulberry(517);
@@ -666,7 +694,7 @@ transformed.xz += vec2(sw, sw * .4) * aRoot.z * aRoot.z;`);
  *  One instanced mesh per model (+ low-poly shadow caster), shared materials. Used by js/town3d.js. */
 export async function placeBlProps(list, aniso = 4, groundY = () => 0) {
   const root = new THREE.Group(); root.name = 'blprops';
-  const by = new Map(); for (const p of list) { if (!by.has(p.model)) by.set(p.model, []); by.get(p.model).push(p); }
+  const by = new Map(); for (const p of list) { const n = treeVariant(p.model, p.pos[0], p.pos[1]); if (!by.has(n)) by.set(n, []); by.get(n).push(p); }
   const m4 = new THREE.Matrix4(), qt = new THREE.Quaternion(), sc = new THREE.Vector3(), yA = new THREE.Vector3(0, 1, 0), col = new THREE.Color();
   await Promise.all([...by.entries()].map(async ([name, items]) => {
     const low = (G.input && G.input.mobile) && !/^(grass|flower|clover|fern)/.test(name);   // plants have a single LOD

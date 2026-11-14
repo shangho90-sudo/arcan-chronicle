@@ -2303,16 +2303,16 @@
    "bytes": 16580
   },
   "tree_broad_a": {
-   "tris": 2746,
+   "tris": 3435,
    "materials": [
     "M_bark",
     "M_foliage",
     "M_leaf"
    ],
    "size": [
-    3.961,
-    5.91,
-    3.84
+    4.267,
+    5.958,
+    4.02
    ],
    "attrs": [
     "COLOR_0",
@@ -2321,19 +2321,19 @@
     "TEXCOORD_0",
     "TEXCOORD_1"
    ],
-   "bytes": 299064
+   "bytes": 381008
   },
   "tree_broad_a_l0": {
-   "tris": 9582,
+   "tris": 12172,
    "materials": [
     "M_bark",
     "M_foliage",
     "M_leaf"
    ],
    "size": [
-    4.005,
-    5.91,
-    3.844
+    4.305,
+    5.958,
+    4.024
    ],
    "attrs": [
     "COLOR_0",
@@ -2342,19 +2342,19 @@
     "TEXCOORD_0",
     "TEXCOORD_1"
    ],
-   "bytes": 934676
+   "bytes": 1206884
   },
   "tree_broad_a_l2": {
-   "tris": 1659,
+   "tris": 2232,
    "materials": [
     "M_bark",
     "M_foliage",
     "M_leaf"
    ],
    "size": [
-    3.961,
-    5.91,
-    3.84
+    4.267,
+    5.958,
+    4.02
    ],
    "attrs": [
     "COLOR_0",
@@ -2363,37 +2363,37 @@
     "TEXCOORD_0",
     "TEXCOORD_1"
    ],
-   "bytes": 190392
+   "bytes": 259304
   },
   "tree_broad_a_lo": {
-   "tris": 462,
+   "tris": 678,
    "materials": [
     "M_bark",
     "M_foliage"
    ],
    "size": [
-    3.876,
-    5.862,
-    3.613
+    4.232,
+    5.907,
+    3.772
    ],
    "attrs": [
     "NORMAL",
     "POSITION",
     "TEXCOORD_0"
    ],
-   "bytes": 42788
+   "bytes": 62264
   },
   "tree_broad_b": {
-   "tris": 2221,
+   "tris": 2977,
    "materials": [
     "M_bark",
     "M_foliage_warm",
     "M_leaf_warm"
    ],
    "size": [
-    4.526,
-    5.628,
-    3.049
+    4.657,
+    5.801,
+    3.182
    ],
    "attrs": [
     "COLOR_0",
@@ -2402,19 +2402,19 @@
     "TEXCOORD_0",
     "TEXCOORD_1"
    ],
-   "bytes": 246716
+   "bytes": 340972
   },
   "tree_broad_b_l0": {
-   "tris": 7458,
+   "tris": 10275,
    "materials": [
     "M_bark",
     "M_foliage_warm",
     "M_leaf_warm"
    ],
    "size": [
-    4.545,
-    5.628,
-    3.05
+    4.678,
+    5.801,
+    3.183
    ],
    "attrs": [
     "COLOR_0",
@@ -2423,19 +2423,19 @@
     "TEXCOORD_0",
     "TEXCOORD_1"
    ],
-   "bytes": 752260
+   "bytes": 1064660
   },
   "tree_broad_b_l2": {
-   "tris": 1581,
+   "tris": 2269,
    "materials": [
     "M_bark",
     "M_foliage_warm",
     "M_leaf_warm"
    ],
    "size": [
-    4.526,
-    5.628,
-    3.049
+    4.657,
+    5.801,
+    3.182
    ],
    "attrs": [
     "COLOR_0",
@@ -2444,37 +2444,37 @@
     "TEXCOORD_0",
     "TEXCOORD_1"
    ],
-   "bytes": 180432
+   "bytes": 264960
   },
   "tree_broad_b_lo": {
-   "tris": 460,
+   "tris": 650,
    "materials": [
     "M_bark",
     "M_foliage_warm"
    ],
    "size": [
-    4.37,
-    5.559,
-    2.906
+    4.494,
+    5.786,
+    3.086
    ],
    "attrs": [
     "NORMAL",
     "POSITION",
     "TEXCOORD_0"
    ],
-   "bytes": 42592
+   "bytes": 59416
   },
-  "tree_forest_round": {
-   "tris": 2463,
+  "tree_broad_c": {
+   "tris": 3701,
    "materials": [
     "M_bark",
     "M_foliage",
     "M_leaf"
    ],
    "size": [
-    3.293,
-    5.159,
-    3.148
+    5.406,
+    5.324,
+    4.93
    ],
    "attrs": [
     "COLOR_0",
@@ -2483,19 +2483,19 @@
     "TEXCOORD_0",
     "TEXCOORD_1"
    ],
-   "bytes": 253836
+   "bytes": 408612
   },
-  "tree_forest_round_l0": {
-   "tris": 8575,
+  "tree_broad_c_l0": {
+   "tris": 13154,
    "materials": [
     "M_bark",
     "M_foliage",
     "M_leaf"
    ],
    "size": [
-    3.316,
-    5.175,
-    3.149
+    5.457,
+    5.328,
+    4.944
    ],
    "attrs": [
     "COLOR_0",
@@ -2504,19 +2504,19 @@
     "TEXCOORD_0",
     "TEXCOORD_1"
    ],
-   "bytes": 796448
+   "bytes": 1327396
   },
-  "tree_forest_round_l2": {
-   "tris": 1210,
+  "tree_broad_c_l2": {
+   "tris": 2207,
    "materials": [
     "M_bark",
     "M_foliage",
     "M_leaf"
    ],
    "size": [
-    3.267,
-    5.159,
-    3.148
+    5.406,
+    5.324,
+    4.93
    ],
    "attrs": [
     "COLOR_0",
@@ -2525,25 +2525,106 @@
     "TEXCOORD_0",
     "TEXCOORD_1"
    ],
-   "bytes": 135440
+   "bytes": 254064
   },
-  "tree_forest_round_lo": {
-   "tris": 330,
+  "tree_broad_c_lo": {
+   "tris": 647,
    "materials": [
     "M_bark",
     "M_foliage"
    ],
    "size": [
-    3.298,
-    5.131,
-    3.341
+    5.099,
+    5.323,
+    4.756
    ],
    "attrs": [
     "NORMAL",
     "POSITION",
     "TEXCOORD_0"
    ],
-   "bytes": 30620
+   "bytes": 59104
+  },
+  "tree_forest_round": {
+   "tris": 2926,
+   "materials": [
+    "M_bark",
+    "M_foliage",
+    "M_leaf"
+   ],
+   "size": [
+    3.457,
+    5.236,
+    3.328
+   ],
+   "attrs": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0",
+    "TEXCOORD_1"
+   ],
+   "bytes": 307544
+  },
+  "tree_forest_round_l0": {
+   "tris": 10363,
+   "materials": [
+    "M_bark",
+    "M_foliage",
+    "M_leaf"
+   ],
+   "size": [
+    3.482,
+    5.253,
+    3.329
+   ],
+   "attrs": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0",
+    "TEXCOORD_1"
+   ],
+   "bytes": 967692
+  },
+  "tree_forest_round_l2": {
+   "tris": 1500,
+   "materials": [
+    "M_bark",
+    "M_foliage",
+    "M_leaf"
+   ],
+   "size": [
+    3.43,
+    5.236,
+    3.328
+   ],
+   "attrs": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0",
+    "TEXCOORD_1"
+   ],
+   "bytes": 171352
+  },
+  "tree_forest_round_lo": {
+   "tris": 420,
+   "materials": [
+    "M_bark",
+    "M_foliage"
+   ],
+   "size": [
+    3.537,
+    5.212,
+    3.532
+   ],
+   "attrs": [
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "bytes": 38512
   },
   "tree_forest_tall": {
    "tris": 4594,
@@ -2554,7 +2635,7 @@
    ],
    "size": [
     3.301,
-    6.996,
+    7.003,
     3.259
    ],
    "attrs": [
@@ -2564,7 +2645,7 @@
     "TEXCOORD_0",
     "TEXCOORD_1"
    ],
-   "bytes": 540812
+   "bytes": 539320
   },
   "tree_forest_tall_l0": {
    "tris": 17300,
@@ -2575,7 +2656,7 @@
    ],
    "size": [
     3.314,
-    6.996,
+    7.003,
     3.28
    ],
    "attrs": [
@@ -2585,7 +2666,7 @@
     "TEXCOORD_0",
     "TEXCOORD_1"
    ],
-   "bytes": 1863204
+   "bytes": 1860128
   },
   "tree_forest_tall_l2": {
    "tris": 3422,
@@ -2596,7 +2677,7 @@
    ],
    "size": [
     3.283,
-    6.996,
+    7.003,
     3.249
    ],
    "attrs": [
@@ -2606,7 +2687,7 @@
     "TEXCOORD_0",
     "TEXCOORD_1"
    ],
-   "bytes": 407488
+   "bytes": 406720
   },
   "tree_forest_tall_lo": {
    "tris": 819,
@@ -2616,7 +2697,7 @@
    ],
    "size": [
     3.151,
-    6.896,
+    6.898,
     2.991
    ],
    "attrs": [
@@ -2624,7 +2705,88 @@
     "POSITION",
     "TEXCOORD_0"
    ],
-   "bytes": 83064
+   "bytes": 83060
+  },
+  "tree_round_small": {
+   "tris": 1515,
+   "materials": [
+    "M_bark",
+    "M_foliage_warm",
+    "M_leaf_warm"
+   ],
+   "size": [
+    2.648,
+    3.866,
+    2.455
+   ],
+   "attrs": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0",
+    "TEXCOORD_1"
+   ],
+   "bytes": 167612
+  },
+  "tree_round_small_l0": {
+   "tris": 4757,
+   "materials": [
+    "M_bark",
+    "M_foliage_warm",
+    "M_leaf_warm"
+   ],
+   "size": [
+    2.699,
+    3.866,
+    2.455
+   ],
+   "attrs": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0",
+    "TEXCOORD_1"
+   ],
+   "bytes": 461540
+  },
+  "tree_round_small_l2": {
+   "tris": 1213,
+   "materials": [
+    "M_bark",
+    "M_foliage_warm",
+    "M_leaf_warm"
+   ],
+   "size": [
+    2.648,
+    3.866,
+    2.455
+   ],
+   "attrs": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0",
+    "TEXCOORD_1"
+   ],
+   "bytes": 136568
+  },
+  "tree_round_small_lo": {
+   "tris": 352,
+   "materials": [
+    "M_bark",
+    "M_foliage_warm"
+   ],
+   "size": [
+    2.66,
+    3.882,
+    2.39
+   ],
+   "attrs": [
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "bytes": 32848
   },
   "tree_violet": {
    "tris": 2696,

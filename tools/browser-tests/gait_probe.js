@@ -18,6 +18,7 @@ fs.mkdirSync(OUT, { recursive: true });
   await clickLabel('새 게임');
   if (await pg.locator('button', { hasText: '확인' }).count()) await pg.locator('button', { hasText: '확인' }).first().click();
   await clickLabel('모험 시작');
+  await pg.waitForSelector('.prologue.on', { timeout: 60000 }).then(() => clickLabel('건너뛰기')).catch(() => {});   // new characters see the prologue first
   await pg.waitForFunction(() => window.G && G.inWorld && G.player && G.player.body && !G.loading, null, { timeout: 300000 });
   await pg.waitForTimeout(1500);
   // stop the rAF loop; from here the probe owns time (fixed 1/60 s logic steps, no rendering)

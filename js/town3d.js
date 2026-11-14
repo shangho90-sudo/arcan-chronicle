@@ -630,6 +630,51 @@ void main(){
   return mesh;
 }
 
+// procedural goddess fountain (2026-11-14, tools/blender/town_fountain.py): its water meshes come with placeholder
+// materials named M_fnt_water (basin / bowl surfaces, uv = -1..1 from the disc centre) and M_fnt_fall (the curtains
+// that spill from the scalloped bowls and the jar stream, uv.y = 0 at the lip -> 1 at the landing). Both are swapped for
+// small shaders: the water is a soft clear teal (deeper toward the middle, lighter rim) with slow light streaks and
+// a few ripple rings where the falls land (radius picked from the surface height, model space); the falls are thin
+// translucent streaks flowing down with foam at the foot. Restrained: no fill brighter than the stone, no bloom.
+const FNT_VS = 'varying vec2 vU; varying vec3 vL; void main(){ vU = uv; vL = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }';
+function fountainMats(obj, scale) {
+  const water = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uT: WIND, uS: { value: scale } }, vertexShader: FNT_VS,
+    fragmentShader: `uniform float uT, uS; varying vec2 vU; varying vec3 vL;
+float h(vec2 p){ return fract(sin(dot(p, vec2(41.3, 289.1))) * 43758.5); }
+void main(){
+  float r = length(vU), a = atan(vU.y, vU.x); vec2 P = vL.xz * uS; float R = length(P), y = vL.y * uS;
+  float land = y < 1.5 ? 2.68 : (y < 3.0 ? 1.56 : -1.0);                 // where the falls hit this surface (m from the centre)
+  vec3 deep = vec3(0.24, 0.55, 0.66), shallow = vec3(0.52, 0.80, 0.84);
+  vec3 c = mix(deep, shallow, smoothstep(0.35, 1.0, r));
+  float streak = smoothstep(0.86, 1.0, sin(R * 4.2 - uT * 0.9 + sin(a * 3.0 + uT * 0.3) * 1.3)) * 0.16;
+  float rip = 0.0;
+  if (land > 0.0) { for (int i = 0; i < 3; i++) { float ph = fract(uT * 0.45 + float(i) / 3.0); rip += smoothstep(0.05, 0.0, abs(R - land - ph * 0.9)) * (1.0 - ph) * 0.55; }
+    rip += smoothstep(0.22, 0.0, abs(R - land)) * 0.18; }               // soft foam band where the curtain lands
+  else { vec2 q = P - vec2(0.92, 0.42); float d = length(q); for (int i = 0; i < 2; i++) { float ph = fract(uT * 0.6 + float(i) * 0.5); rip += smoothstep(0.04, 0.0, abs(d - ph * 0.5)) * (1.0 - ph) * 0.6; } }
+  vec2 g = floor(vec2(a * 18.0, R * 3.0)); float sp = step(0.988, h(g + floor(uT * 1.5))) * 0.35;
+  c += vec3(0.9, 0.97, 1.0) * (streak + rip + sp);
+  gl_FragColor = vec4(c, 0.86 + 0.1 * smoothstep(0.6, 1.0, r));
+}` });
+  const fall = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide, uniforms: { uT: WIND }, vertexShader: FNT_VS,
+    fragmentShader: `uniform float uT; varying vec2 vU; varying vec3 vL;
+float n1(float x){ float i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f); return mix(fract(sin(i * 12.9898) * 43758.5), fract(sin((i + 1.0) * 12.9898) * 43758.5), f); }
+void main(){
+  float u = vU.x * 3.0, v = vU.y;
+  float s = n1(u * 4.0) * 0.6 + n1(u * 11.0 + 3.0) * 0.4;                          // vertical streaks
+  float flow = 0.55 + 0.45 * sin((v * 6.0 - uT * 2.6) * 3.1416 + n1(u * 7.0) * 6.0);    // pulses travelling down
+  float a = (0.16 + 0.34 * smoothstep(0.35, 0.85, s)) * (0.75 + 0.25 * flow);
+  a *= smoothstep(0.0, 0.08, v) * 0.6 + 0.4;                                          // lip
+  float foam = smoothstep(0.78, 1.0, v);
+  vec3 c = mix(vec3(0.62, 0.86, 0.92), vec3(0.95, 0.99, 1.0), smoothstep(0.5, 0.9, s) * 0.6 + foam * 0.5);
+  gl_FragColor = vec4(c, clamp(a + foam * 0.25, 0.0, 0.7));
+}` });
+  obj.traverse(o => {
+    if (!o.isMesh) return; const n = o.material && o.material.name;
+    if (n === 'M_fnt_water') { o.material = water; o.castShadow = false; o.renderOrder = 2; }
+    else if (n === 'M_fnt_fall') { o.material = fall; o.castShadow = false; o.receiveShadow = false; o.renderOrder = 3; }
+  });
+}
+
 // ---------------------------------------------------------------- build the whole town
 /** returns { root, fadeGroups:[{name, occ, meshes}], smoke:[[x,y,z]], update(dt) } */
 export async function buildTown3D(spec, renderer) {
@@ -752,8 +797,11 @@ export async function buildTown3D(spec, renderer) {
     const src = await loadGLB(md.file); const obj = src.clone(true);
     obj.scale.setScalar(md.scale); place(obj, md.pos, md.h); root.add(obj);
     if (md.id !== 'fountain') addFade(md.id, obj, [md.pos[0], 0, md.pos[1], md.size[0] / 2, md.size[1] / 2, md.h, md.size[2]]);
-    if (md.id === 'fountain' && md.file === 'angel_fountain') root.add(fountainWater(md));
     else addFade(md.id, obj, [md.pos[0], 0, md.pos[1], 3.0, 3.0, 0, 6.5]);       // only the statue column hides things
+    // (2026-11-14 fix: the water line had been put between the if and its else, so every OTHER landmark got a second
+    // 3 x 3 m fade column and the fountain none)
+    if (md.id === 'fountain' && md.file === 'angel_fountain') root.add(fountainWater(md));
+    if (md.file === 'town_arcan_fountain') fountainMats(obj, md.scale);
   }));
   const smithy = spec.models.find(m => m.id === 'smithy');
   if (smithy) smoke.push([smithy.pos[0] - smithy.size[0] * 0.4, smithy.size[2] + 0.3, smithy.pos[1] + smithy.size[1] * 0.3]);

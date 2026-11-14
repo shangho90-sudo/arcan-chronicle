@@ -109,7 +109,7 @@ for _t in TOWNS:
     _t['W'] = round(_t['W'] * _k); _t['D'] = round(_t['D'] * _k); _t['houses'] = round(_t['houses'] * (2.6 if _k > 2 else 2.0))
 JOB_MASTERS = ['master_pharmacist', 'master_cook', 'master_blacksmith', 'master_hairdresser', 'master_artist']   # 전직 NPC는 모두 카이리온 왕도 장인 길드 회관 앞
 ARCAN = dict(id='town', name='아르칸 마을', region='kairion', W=50, D=41, wallH=7.0, keep=(18, 12, 15), houses=14, banner='blue',
-             centre=dict(id='fountain', file='angel_fountain', pos=[0.0, 0.0], h=180, scale=11.5, size=[11.06645, 11.2401, 5.7891], name='여신의 분수'),
+             centre=dict(id='fountain', file='town_arcan_fountain', pos=[0.0, 0.0], h=180, scale=11.14, size=[11.14, 11.14, 6.02], name='여신의 분수'),   # 2026-11-14 Blender 절차 모델(tools/blender/town_fountain.py), 예전 Tripo angel_fountain과 같은 지름·충돌 원
              fixed_models=[dict(id='smithy', file='medieval_blacksmith_shop', scale=10.5, size=[10.3047, 7.0098, 6.15195], name='마을 대장간'),
                            dict(id='pharmacy', file='fantasy_cottage', scale=11.5, size=[11.27575, 9.3449, 10.2074], name='약초 약국')],
              named_houses=[('general', 'general', '모아의 잡화·물약점'), ('arms', 'arms', '단오의 무기 상점'), ('bakery', 'bakery', '화덕 빵집'), ('dress', 'dress', '라벤더 의상실')],
@@ -142,6 +142,20 @@ BIOMES = {
     'river':    dict(ground=None, density=0.6, grass=1.1, water=1.0, river=True, mix=dict(tree=.38, shrub=.26, flowers=.2, rock=.1, stone=.06), bgm='bgm_field',
                      sun=[1.0, 0.88, 0.68, 1.4], ambient=[0.66, 0.66, 0.6], post=dict(vignette=0.22, bloom=0.15, sat=1.14, contrast=0.24, exposure=1.06), theme=['#7aa06a', '#c0b08a'], tex='grass'),
 }
+# 2026-11-14 (그래픽 2단계): 필드 빛을 아르칸 마을과 같은 방향으로 — 햇빛은 덜 노랗게(G·B를 마을 비율 쪽으로, 원래
+# 따뜻한 생물군은 조금만), 그늘(반구광 하늘색)은 푸른 보라, 땅 반사는 따뜻하게, 색보정 warmth 0.5(따뜻한 생물군 0.56),
+# 채도·비네트는 마을 이하로. BIOMES 값은 생물군의 원래 성격(기준값)이고 실제 존에는 field_light()를 거친 값이 들어감.
+WARM_BIOMES = ('crimson', 'highland', 'canyon', 'ash')
+TOWN_LIGHT = dict(sun=[1.0, 0.92, 0.8, 1.45], shade=dict(sky=[0.6, 0.63, 0.8], ground=[0.62, 0.56, 0.54]),
+                  post=dict(vignette=0.16, bloom=0.12, sat=1.14, contrast=0.26, exposure=1.02, warmth=0.5))     # = zones.json 'town' (아르칸)
+def field_light(bid, B):
+    k = 0.3 if bid in WARM_BIOMES else 0.55; r, g, b, i = B['sun']
+    sun = [r, round(g + max(0.0, 0.92 * r - g) * k, 3), round(b + max(0.0, 0.8 * r - b) * k, 3), i]
+    a = B['ambient']; top = max(a[0], a[1])
+    shade = dict(sky=[round(a[0] * 0.95, 3), round(a[1] * 1.0, 3), round(min(a[2] * 1.38, top * 1.3), 3)], ground=[round(a[0] * 0.92, 3), round(a[1] * 0.85, 3), round(a[2] * 0.9, 3)])
+    post = dict(B['post']); post['warmth'] = 0.56 if bid in WARM_BIOMES else 0.5
+    post['sat'] = min(post['sat'], 1.14); post['vignette'] = min(post['vignette'], 0.2)
+    return sun, shade, post
 # monster variants: (id, base monster, name, level, tint, recolor, elite)
 VARIANTS = [
     ('mon_rock_ram', 'mon_frost_ram', '바위뿔 산양', 8, [0.78, 0.74, 0.7], 0.4, False),
@@ -404,7 +418,7 @@ def gen_field(f, M, mon_levels):
     have = {m['id'] for m in MONS_KNOWN} if MONS_KNOWN else None
     mons_list = list(f['mons']) + [(i, c) for i, c in NEW_MONS.get(f['id'], []) if have is None or i in have]
     lo, hi = f['level']; natives = {m['id']: m['level'] for m in MONS_KNOWN} if MONS_KNOWN else {}
-    normal = sorted({mid for mid, c in mons_list if c > 1}, key=lambda i: natives.get(i, 0))
+    normal = sorted({mid for mid, c in mons_list if c > 1}, key=lambda i: (natives.get(i, 0), i))   # id로 동점 정리(예전엔 set 순서 = 실행마다 달라 레벨이 ±1 흔들림)
     camp_lv = {mid: (round(lo + (hi - lo) * k / max(1, len(normal) - 1)) if len(normal) > 1 else (lo + hi) // 2) for k, mid in enumerate(normal)}
     for mid, cnt in mons_list:
         elite = cnt == 1
@@ -465,10 +479,11 @@ def gen_field(f, M, mon_levels):
     nat = dict(style='storybook_forest', seed=seed, lod='l2', grass=B['grass'])
     for k in ('ground', 'tint', 'rockTint', 'foliage'):
         if B.get(k): nat[k] = B[k]
-    Z = dict(id=f['id'], name=f['name'], kind='field', bgm=B['bgm'], bounds=[x0, z0, x1, z1], groundTex=B['tex'], ambient=B['ambient'], sun=B['sun'],
+    sun, shade, post = field_light(f['biome'], B)
+    Z = dict(id=f['id'], name=f['name'], kind='field', bgm=B['bgm'], bounds=[x0, z0, x1, z1], groundTex=B['tex'], ambient=B['ambient'], sun=sun, shade=shade,
              spriteTint=[1.0, 1.0, 1.0], spawns=spawns, buildings=[], props=props, npcs=[], portals=portals, heights=[], patches=patches, monsters=monsters,
              boss=dict(boss='', center=[], radius=0, gate=[], gateRadius=0, bossPos=[], respawn=0), respawnZone=f['town'], respawnSpawn='revive',
-             imageArt=[], nature=nat, post=B['post'], theme=B['theme'], region=f['region'], biome=f['biome'], map=list(f['map']), level=list(f['level']))
+             imageArt=[], nature=nat, post=post, theme=B['theme'], region=f['region'], biome=f['biome'], map=list(f['map']), level=list(f['level']))
     return Z
 
 # ======================================================================== towns
@@ -636,10 +651,10 @@ def gen_town(t, M):
     g = TW.gen_town2(tt, exits, [(r[0], r[4]) for r in RESIDENTS.get(tid, [])] + [(WARP_KEEPERS[tid][0], WARP_HINT)])
     warp_spawn(g, tid)
     Z = dict(id=tid, name=t['name'], kind='town', bgm='bgm_arcan_town' if rnd.random() < 0.5 else 'bgm_town', bounds=g['bounds'],
-             groundTex='grass', ambient=[0.56, 0.53, 0.6], sun=[1.0, 0.84, 0.62, 1.5], spriteTint=[1.0, 0.98, 0.94], spawns=g['spawns'], buildings=[], props=g['props'],
+             groundTex='grass', ambient=[0.56, 0.53, 0.6], sun=list(TOWN_LIGHT['sun']), shade=json.loads(json.dumps(TOWN_LIGHT['shade'])), spriteTint=[1.0, 0.98, 0.94], spawns=g['spawns'], buildings=[], props=g['props'],
              npcs=g['npcs'], portals=g['portals'], heights=[], patches=[], monsters=[], boss=dict(boss='', center=[], radius=0, gate=[], gateRadius=0, bossPos=[], respawn=0),
              respawnZone=tid, respawnSpawn='revive', imageArt=[], blockPolys=g['blockPolys'], town3d=g['town3d'],
-             post=dict(vignette=0.2, bloom=0.14, sat=1.2, contrast=0.3, exposure=1.02), region=t['region'], map=list(t['map']), level=list(t['level']))
+             post=dict(TOWN_LIGHT['post']), region=t['region'], map=list(t['map']), level=list(t['level']))   # 2026-11-14: 아르칸과 같은 빛
     return Z
 def gen_arcan(Z, M):
     """아르칸 마을(zones.json의 손으로 만든 'town')도 같은 생성기로: 숲 워프 id(to_field / from_field)는 그대로"""

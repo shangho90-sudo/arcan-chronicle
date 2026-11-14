@@ -2,7 +2,8 @@
   * tools/blender/out/<name>.glb  -> assets/forest/bl/<name>.glb.json  (base64 wrapper: the artifact host refuses binaries)
   * shared textures tools/blender/tex/*.png -> assets/forest/bl/tex/ (opaque ones as JPEG to keep downloads small)
   * assets/forest/bl/manifest.json: per model triangle count, materials, bounding size, file size
-Usage: python3 tools/blender/wrap.py """
+Usage: python3 tools/blender/wrap.py            (모두 — tools/blender/out·tex가 전부 있어야 함)
+       python3 tools/blender/wrap.py 이름…     (그 모델의 LOD만 감싸고 manifest.json에 합침; 텍스처는 그대로 — 2026-11-14)"""
 import os, json, base64, struct, glob
 from PIL import Image
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.join(HERE, '..', '..')
@@ -44,4 +45,16 @@ def main():
     json.dump({'models': man, 'materials': used}, open(os.path.join(OUT, 'manifest.json'), 'w'), indent=1)
     print(len(man), 'models', len(used), 'materials')
 
-if __name__ == '__main__': main()
+def only(names):
+    mf = os.path.join(OUT, 'manifest.json'); M = json.load(open(mf))
+    for n in names:
+        for suf in ('_l0', '', '_l2', '_lo'):
+            g = os.path.join(HERE, 'out', n + suf + '.glb')
+            if not os.path.exists(g): raise SystemExit('missing ' + g)
+            M['models'][n + suf] = info(g)
+            if suf != '_l0': json.dump({'b64': base64.b64encode(open(g, 'rb').read()).decode()}, open(os.path.join(OUT, n + suf + '.glb.json'), 'w'))
+    M['models'] = dict(sorted(M['models'].items())); json.dump(M, open(mf, 'w'), indent=1); print('wrapped', names)
+
+if __name__ == '__main__':
+    if len(sys.argv) > 1: only(sys.argv[1:])
+    else: main()
