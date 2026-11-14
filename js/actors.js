@@ -65,7 +65,12 @@ export class Combatant {
         else if (G.skillFx) try { G.skillFx.burst('explosion_gold', { x: this.pos.x, y: this.pos.y + 0.6, z: this.pos.z }, { radius: 0.55 }); } catch (e) { }
       }
     }
-    if (!d.dot && this.body) this.body.flash(0.1);
+    if (!d.dot && this.body) {
+      this.body.flash(0.1);
+      // every direct hit on a monster gets a small squash away from the attacker (visual only) - hit readability now comes
+      // from this + the skill's own effect instead of a bright flash; a skill's own stronger punch replaces it
+      if (this.faction !== "player" && this.body.punch && !(this.body.punchT > 0) && d.source && d.source.pos) this.body.punch(this.pos.x - d.source.pos.x, this.pos.z - d.source.pos.z, 0.1);
+    }
     if (d.knockback > 0 && d.kdir) { const m = Math.hypot(d.kdir.x, d.kdir.z) || 1; this.knock = { x: d.kdir.x / m * d.knockback * 6, z: d.kdir.z / m * d.knockback * 6 }; }
     this.onDamaged(d, amount);
     if (this.yieldOnHp && this.hp <= this.minHp) this.onYield();
@@ -576,6 +581,7 @@ export class Player extends Combatant {
     if (d.dot) return;
     this.combat();
     if (!this.skills.busy && this.dashT <= 0) this.body.play("hit", 1, true);
+    if (d.source && d.source.pos && this.body.flinch) this.body.flinch(this.pos.x - d.source.pos.x, this.pos.z - d.source.pos.z, loss > this.maxHp * 0.08 ? 1.3 : 1);   // 방향 있는 짧은 피격 반응(그림만)
     if (loss > this.maxHp * 0.08) G.render.addShake(0.1, 0.15);
     G.audio.sfx("hurt");
   }

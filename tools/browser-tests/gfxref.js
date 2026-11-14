@@ -8,7 +8,7 @@ const { chromium } = require('playwright'); const fs = require('fs'); const { ex
 const SIZE = process.env.SIZE || '1280x720', TOUCH = SIZE.endsWith('t'), [VW, VH] = SIZE.replace('t', '').split('x').map(Number);
 const TAG = process.env.TAG || 'after', OUT = process.env.OUT || '/tmp/gfx', G_ = process.env.GENDER || 'm', JOB = process.env.JOB || 'blacksmith';
 const ZOOMS = (process.env.ZOOMS || '1,2.2').split(',').map(Number), PERF = process.env.PERF !== '0', HUD = process.env.HUD === '1';
-const SPOT = (process.env.SPOT || '-6.2,-6.6').split(',').map(Number), DIR = +(process.env.DIR || 70), MON = process.env.MON || 'mon_boar';
+const SPOT = process.env.SPOT === 'spawn' ? null : (process.env.SPOT || '-6.2,-6.6').split(',').map(Number)   // SPOT=spawn: where the zone put the player, DIR = +(process.env.DIR || 70), MON = process.env.MON || 'mon_boar';
 const ZONE = process.env.ZONE || '';
 (async () => {
   fs.mkdirSync(OUT, { recursive: true });
@@ -21,7 +21,7 @@ const ZONE = process.env.ZONE || '';
   await ev(() => localStorage.clear()); await pg.reload(); await click('새 게임'); await click('모험 시작');
   await pg.waitForSelector('.prologue.on', { timeout: 60000 }).then(() => click('건너뛰기')).catch(() => {});
   await pg.waitForFunction(() => window.G && G.inWorld && G.player && !G.loading && G.player.body && G.player.body.md, null, { timeout: 300000 });
-  if (ZONE) { await ev(z => G.loadZone(z, 'start'), ZONE); await pg.waitForFunction(() => !G.loading && G.player.body && G.player.body.md, null, { timeout: 300000 }); }
+  if (ZONE) { await ev(z => G.loadZone(z, null, false), ZONE); await pg.waitForFunction(() => !G.loading && G.player.body && G.player.body.md, null, { timeout: 300000 }); }
   await ev(async ([g, job, hud]) => {
     G.frame = () => {};
     if (!hud) document.querySelectorAll('.hud,.toasts,.qhud,.qh-reopen,.plates,.layer:not(.controls)').forEach(e => e.style.display = 'none');
@@ -38,11 +38,11 @@ const ZONE = process.env.ZONE || '';
   await ev(([sx, sz, dir, mon]) => {
     const p = G.player, a = dir * Math.PI / 180, f = { x: Math.sin(a), z: Math.cos(a) };
     for (const m of [...G.zone.actors]) if (m !== p && m.faction === 'monster') m.remove && m.remove();
-    const spot = G.zone.geo.nearestFree(sx, sz, 0.4); window.__spot = spot;
+    const spot = sx === null ? { x: p.pos.x, z: p.pos.z } : G.zone.geo.nearestFree(sx, sz, 0.4); window.__spot = spot;
     p.teleport(spot); p.body.place(p.pos); p.setFacing(f.x, f.z); p.target = null; p.lockOn = null; p.path = [];
     window.__f = f; const at = { x: spot.x + f.x * 1.7, z: spot.z + f.z * 1.7 };
     const m = G.dev.dummies(mon, 1, 0.01, at)[0]; m.teleport(at); m.thinkStep = () => {}; window.__d = m;
-  }, [SPOT[0], SPOT[1], DIR, MON]);
+  }, [SPOT ? SPOT[0] : null, SPOT ? SPOT[1] : null, DIR, MON]);
   await pg.waitForFunction(() => window.__d.body && window.__d.body.ready !== false, null, { timeout: 120000 });
   await pg.waitForTimeout(1500);
   const base = `${TAG}_${SIZE}_${G_}${JOB !== 'blacksmith' ? '_' + JOB : ''}${ZONE ? '_' + ZONE : ''}`, res = { errs };

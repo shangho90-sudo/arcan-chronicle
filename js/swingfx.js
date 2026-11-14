@@ -44,9 +44,11 @@ function mat(core, rim, sweep = false) {
     uniforms: { uCore: { value: new THREE.Color(...core) }, uRim: { value: new THREE.Color(...rim) }, uO: { value: 1 }, uSweep: { value: 0 }, uTail: { value: 0.6 }, uUseSweep: { value: sweep ? 1 : 0 } } });
 }
 const g3 = (p, y = 0) => new THREE.Vector3(p.x, (p.y || 0) + y, -p.z);
+// 2026-11-14: cores below the bloom threshold (2.6) - the HDR 2.2-3.2 cores bloomed into a white blob over every hit and
+// hid the job skills' own effects (reports: hairdresser / artist / cook). Smaller and shorter for the same reason.
 const PAL = {
-  hit: { core: [2.2, 2.6, 3.2], rim: [0.25, 0.6, 2.6] },
-  crit: { core: [3.2, 2.6, 1.4], rim: [2.2, 0.9, 0.25] },
+  hit: { core: [1.25, 1.45, 1.75], rim: [0.2, 0.45, 1.5] },
+  crit: { core: [1.75, 1.45, 0.85], rim: [1.3, 0.6, 0.18] },
 };
 
 class Piece {
@@ -76,12 +78,12 @@ export class SwingFx {
   /** star burst + shock ring + shards where a hit lands */
   hit(pos, o = {}) {
     if (!this.ready) return;
-    const crit = !!o.crit, pal = crit ? PAL.crit : PAL.hit, c = g3(pos, 0.75), s = (o.scale || 1) * (crit ? 1.35 : 1);
-    const b = new Piece(this.scene, MESHES.burst, mat(pal.core, pal.rim), crit ? 0.32 : 0.24); b.kind = 'burst'; b.c = c; b.s = 0.95 * s; b.spin = (Math.random() - 0.5) * 6; b.roll = Math.random() * Math.PI;
+    const crit = !!o.crit, pal = crit ? PAL.crit : PAL.hit, c = g3(pos, 0.75), s = (o.scale || 1) * (crit ? 1.12 : 0.85);
+    const b = new Piece(this.scene, MESHES.burst, mat(pal.core, pal.rim), crit ? 0.22 : 0.16); b.kind = 'burst'; b.c = c; b.s = 0.95 * s; b.spin = (Math.random() - 0.5) * 6; b.roll = Math.random() * Math.PI;
     this.items.push(b);
-    const r = new Piece(this.scene, MESHES.ring, mat([pal.core[0] * 0.7, pal.core[1] * 0.7, pal.core[2] * 0.7], pal.rim), crit ? 0.4 : 0.3); r.kind = 'ring'; r.c = g3(pos, 0.12); r.s = (crit ? 1.5 : 1.0) * (o.scale || 1);
+    const r = new Piece(this.scene, MESHES.ring, mat([pal.core[0] * 0.7, pal.core[1] * 0.7, pal.core[2] * 0.7], pal.rim), crit ? 0.28 : 0.22); r.kind = 'ring'; r.c = g3(pos, 0.12); r.s = (crit ? 1.2 : 0.85) * (o.scale || 1);
     this.items.push(r);
-    const n = crit ? 7 : 4;
+    const n = crit ? 5 : 3;
     for (let i = 0; i < n; i++) {
       const sh = new Piece(this.scene, MESHES.shard, mat(pal.core, pal.rim), 0.38 + Math.random() * 0.15); sh.kind = 'shard';
       const a = Math.random() * Math.PI * 2, up = 2 + Math.random() * 2.5, sp = 2.2 + Math.random() * 2.2;

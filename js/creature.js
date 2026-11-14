@@ -6,6 +6,9 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 
 const DEG = Math.PI / 180;
+// 피격 번쩍임(2026-11-14): 스킬 이펙트를 가리지 않게 약한 따뜻한 색만 잠깐(0.1초 안에 줄어듦). 맞았다는 표시는 눌림(punch)과 이펙트가 맡음.
+// 예전 0.55 흰색 → 0.26 → 0.15. 가열(heat)이 끝날 때도 흰색으로 돌아가지 않게 같은 색.
+const HIT_TINT = 0xffc8b0, HIT_FLASH = 0.15;
 /** per monster: model file, size (m, longest horizontal extent or height for 'h'), extra yaw (deg) */
 export const CREATURES = {
   mon_slime:  { file: 'cute_rabbit', size: 0.8, height: true, rigless: true, yaw: -90, atk: 'tackle' },
@@ -125,7 +128,7 @@ export class CreatureBody {
     this.inner.rotation.y = d.fwd != null ? -d.fwd : 0;              // model forward -> local +z
     this.pivot = new THREE.Group(); this.pivot.add(this.inner);         // attack lunge / hit recoil / death tilt
     this.root = new THREE.Group(); this.root.add(this.pivot);
-    this.mats = []; this.model.traverse(o => { if (o.isMesh) { o.material = o.material.clone(); o.material.emissive = new THREE.Color(0xffd6c2); o.material.emissiveIntensity = 0; this.mats.push(o.material); } });
+    this.mats = []; this.model.traverse(o => { if (o.isMesh) { o.material = o.material.clone(); o.material.emissive = new THREE.Color(HIT_TINT); o.material.emissiveIntensity = 0; this.mats.push(o.material); } });
     if (this.cfg.yaw) this.inner.rotation.y += this.cfg.yaw * DEG;     // extra yaw for unrigged models whose front is not +z
     // optional recolour for variants sharing a model: desaturate the texture towards cfg.tint (amount cfg.recolor, default 0.7)
     if (this.cfg.tint) {
@@ -171,8 +174,8 @@ export class CreatureBody {
     if (this.flashT > 0) this.flashT -= dt;
     // 피격 번쩍임: 짧게 줄어듦 / 가열(대장장이 1~3중첩, js/smith.js): 번쩍이지 않을 때 표면이 은은한 주황빛
     const ht = this.flashT > 0 ? 0 : (this.heat | 0);
-    if (ht !== this._heatOn) { this._heatOn = ht; for (const m of this.mats) m.emissive.setHex(ht ? 0xff6a1a : 0xffffff); }
-    { const k = this.flashT > 0 ? 0.26 * Math.min(1, this.flashT / 0.1) : ht ? 0.10 + 0.07 * ht + 0.03 * Math.sin(this.phase * 5) : 0; for (const m of this.mats) m.emissiveIntensity = k; }
+    if (ht !== this._heatOn) { this._heatOn = ht; for (const m of this.mats) m.emissive.setHex(ht ? 0xff6a1a : HIT_TINT); }
+    { const k = this.flashT > 0 ? HIT_FLASH * Math.min(1, this.flashT / 0.1) : ht ? 0.10 + 0.07 * ht + 0.03 * Math.sin(this.phase * 5) : 0; for (const m of this.mats) m.emissiveIntensity = k; }
     let dy = this.targetYaw - this.yaw; dy = Math.atan2(Math.sin(dy), Math.cos(dy)); this.yaw += dy * Math.min(1, dt * 12);
     this.root.rotation.y = this.yaw;
     // skeletal walk cycle; idle = slow breathing on the paused pose

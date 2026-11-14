@@ -76,6 +76,9 @@ function boneScales(md) {
 }
 const XFER = 0.1;   // s the weapon glides between the back holder and the hand at the grab / release
 const WEAPON = { novice: 'sword', pharmacist: 'pestle', cook: 'knife', blacksmith: 'hammer', hairdresser: 'scissors', artist: 'brush' };
+// 대기·걷기에서 무기를 쥔 각도 더하기(도, 휘두르는 동안은 0): 큰 망치 머리가 얼굴 옆에 서 있던 것(2026-11-14) → 앞으로 숙여 듦
+const REST_TILT = { hammer: -55 };
+const FLINCH = 0.24;   // s, 피격 반응 길이 (ModelBody.flinch)
 const OFF = { cook: 'pan', hairdresser: 'dryer', artist: 'palette' };
 
 let actionsPromise = null;
@@ -639,6 +642,9 @@ export class ModelBody {
   /** continuous facing from a Unity-space ground vector */
   setFacing(x, z) { if (x * x + z * z < 1e-6) return; this.targetYaw = Math.atan2(x, -z); }
   flash(d) { this.flashT = Math.max(this.flashT, d); }
+  /** short directional hit reaction (visual only, on top of any action - a swing keeps going): the upper body snaps away
+   *  from the blow and settles back in FLINCH s. (x, z) = direction FROM the attacker TO this body, game space. */
+  flinch(x, z, k = 1) { const m = Math.hypot(x, z); if (m < 1e-4) return; this.flinchT = FLINCH; this.flinchX = x / m; this.flinchZ = z / m; this.flinchK = Math.min(1.5, k); }
   /** world-locked feet for the gait: nominal = body-space foot targets from the gait cycle (or the idle footprint while
    *  settling). A foot that lands keeps its ground position and heading in world space until it lifts; a lifted foot
    *  swings from where it really left the ground to its next nominal landing spot. If a planted foot can no longer stay
@@ -710,6 +716,7 @@ export class ModelBody {
     const tp = T(p); this.root.position.copy(tp); this.shadow.position.set(tp.x, tp.y + 0.03, tp.z);
   }
   update(dt) {
+    if (this.flinchT > 0) this.flinchT -= dt;
     this.t += dt * Math.max(0, this.speed); this.life = (this.life ?? (this.md.bones.length * 0.37 + (this.md.cfg.height || 1) * 7.1) % 10) + dt;   // no Math.random: it would shift the game's miss / crit rolls
     if (this.fadeDur > 0) this.fadeT += dt;
     if (this.flashT > 0) this.flashT -= dt;
@@ -818,6 +825,13 @@ export class ModelBody {
       const hipBind = (md.leg.Left.hip + md.leg.Right.hip) / 2;
       bodyY = lerp(bodyY, gp.hipH - hipBind, w); swayX = gp.sway * w;
     } else this.feet = null;
+    // directional hit reaction: lean the spine / chest / head away from the blow (fast out, eased back), legs untouched
+    if (!md.cfg.npc && this.flinchT > 0) {
+      const u = 1 - this.flinchT / FLINCH, e = (u < 0.18 ? u / 0.18 : 1 - EASE.s((u - 0.18) / 0.82)) * (this.flinchK || 1);
+      const c = Math.cos(this.yaw), sn = Math.sin(this.yaw), fw = this.flinchX * sn - this.flinchZ * c, sd = this.flinchX * c + this.flinchZ * sn;   // blow along the body's forward / right
+      const R = (b, m) => { Q[b] = Q[b] ? mul(Q[b], m) : m; };
+      R('Spine', mul(rx(fw * 5 * e), rz(-sd * 4 * e))); R('Chest', mul(rx(fw * 6 * e), rz(-sd * 5 * e))); R('Head', mul(rx(fw * 7 * e), rz(-sd * 6 * e)));   // bind axes: +x = left, +z = forward; rx(+) leans forward, rz(+) leans right
+    }
     // world (model-space) matrix of every bone: parent's change applied to the bind matrix rotated about the joint
     let W = this.worldOf(Q);
     // sword arm by IK on top of the finished torso: the hand follows the authored arc around the (twisted) shoulder
@@ -889,7 +903,7 @@ export class ModelBody {
     const sw = shearsOn ? /^w_scissors_(\d)/.exec(wid || '') : null;
     const stow = !!(ca && ca.stow) && !md.cfg.npc, wkind = shearsOn ? 'shears:' + (sw ? sw[1] : 1) : wid && isWeaponModel(wid) ? 'item:' + wid : this.weapon;
     if (stow) { const w0 = this.weaponId ? this.weaponId() : null; this.updateProp('R', w0 && isWeaponModel(w0) ? 'item:' + w0 : this.weapon, 0); this.updateProp('H', p.held || null, (p.wOff - 90) * (1 - (this.swingW || 0))); }
-    else { this.updateProp('R', p.held || wkind, (p.wOff - 90) * (1 - (this.swingW || 0))); if (this.props.H) this.updateProp('H', null, 0); }
+    else { this.updateProp('R', p.held || wkind, (p.wOff - 90 + (p.held ? 0 : REST_TILT[this.weapon] || 0)) * (1 - (this.swingW || 0))); if (this.props.H) this.updateProp('H', null, 0); }
     this.updateProp('L', p.held && !stow ? null : this.armW > 0.5 && !(this.gripW > 0.4) && !(this.offGripW > 0.3) ? this.off : null, p.offOff - 90);
   }
   worldOf(Q) {
