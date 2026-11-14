@@ -78,7 +78,9 @@ const XFER = 0.1;   // s the weapon glides between the back holder and the hand 
 const WEAPON = { novice: 'sword', pharmacist: 'pestle', cook: 'knife', blacksmith: 'hammer', hairdresser: 'scissors', artist: 'brush' };
 // 대기·걷기에서 무기를 쥔 각도 더하기(도, 휘두르는 동안은 0): 큰 망치 머리가 얼굴 옆에 서 있던 것(2026-11-14) → 앞으로 숙여 듦
 const REST_TILT = { hammer: -55 };
-const FLINCH = 0.24;   // s, 피격 반응 길이 (ModelBody.flinch)
+const FLINCH = 0.24;
+// 기본공격(콤보 동작) 칼 잔상: 색 0.55배·칼날 바깥쪽 45%만 — 흰 부채꼴이 몬스터 얼굴과 직업 이펙트를 덮던 것(2026-11-14). 스킬 잔상은 그대로
+const BASIC_TRAIL = 0.55;   // s, 피격 반응 길이 (ModelBody.flinch)
 const OFF = { cook: 'pan', hairdresser: 'dryer', artist: 'palette' };
 
 let actionsPromise = null;
@@ -751,7 +753,7 @@ export class ModelBody {
     // (trail = one [start, end] window, or a list of them: skill flurries only trail the cutting part of each strike)
     const a = this.sh.actions[this.action], tw = a && a.trail, wins = tw ? (typeof tw[0] === 'number' ? [tw] : tw) : [];
     const on = this.swingW > 0.5 && SWING_TRAIL.on && wins.some(w => this.t >= w[0] && this.t <= w[1]);
-    if (on || (this.trail && this.trail.s.length)) { if (!this.trail) this.trail = new SwingTrail(this.scene); this.trail.update(dt, on ? this.bladePoints() : null, a && a.trailColor, a && a.trailLife, a && a.trailBase); }
+    if (on || (this.trail && this.trail.s.length)) { if (!this.trail) this.trail = new SwingTrail(this.scene); this.trail.update(dt, on ? this.bladePoints() : null, a && a.trailColor && a.combo ? a.trailColor.map(v => v * BASIC_TRAIL) : a && a.trailColor, a && a.trailLife, a && a.combo ? Math.max(a.trailBase || 0.35, 0.55) : a && a.trailBase); }
   }
   poseOf(name) {
     const a = this.sh.actions[name]; if (!a) return this.currentPose();
