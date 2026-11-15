@@ -1297,11 +1297,11 @@
 "job": "western_pharmacist",
 "tier": 2,
 "cat": 0,
-"catName": "고급 약 마법",
+"catName": "정밀 제약술",
 "idx": 1,
-"name": "작열 캡슐",
+"name": "작열·분열 캡슐",
 "type": "attack",
-"desc": "대상에 캡슐을 붙인 뒤 지연 폭발시킨다. 화상과 반응 표식 부여.",
+"desc": "붉고 흰 캡슐을 던진다. 캡슐은 대상 위에서 빠르게 돌다 두 쪽으로 갈라지고, 금빛 과립 5개가 서로 다른 곡선으로 차례로 꽂힌다. 마지막 과립이 붉은 반응 고리를 터뜨려 둘레에 피해와 화상을 준다. 대상이 쓰러지면 남은 과립은 가까운 적에게 날아간다.",
 "maxLv": 5,
 "unlock": 30,
 "prereq": [],
@@ -1311,25 +1311,17 @@
 "mp": 22,
 "cd": 7,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "throw",
+"recover": 0.3,
+"anim": "wp_compound",
 "ops": [
 {
-"op": "proj",
-"kind": "normal",
-"coef": 0.6,
-"fx": "capsule",
-"speed": 14,
-"attach": true
-},
-{
-"op": "delay",
-"after": 1.2,
-"r": 2.0,
-"coef": 2.8,
-"elem": "fire",
-"burst": "explosion_fire",
-"onTarget": true,
+"op": "custom",
+"fn": "wp_capsule",
+"n": 5,
+"coef": 1.6,
+"fin": 1.8,
+"finR": 1.6,
+"retarget": 6,
 "st": [
 {
 "id": "burn",
@@ -1337,11 +1329,7 @@
 "val": 0.15,
 "ch": 1.0
 }
-],
-"mark": {
-"type": "reaction",
-"n": 1
-}
+]
 }
 ],
 "mods": [],
@@ -1363,11 +1351,11 @@
 "job": "western_pharmacist",
 "tier": 2,
 "cat": 0,
-"catName": "고급 약 마법",
+"catName": "정밀 제약술",
 "idx": 2,
-"name": "극저온 앰플",
+"name": "극저온 결정화",
 "type": "attack",
-"desc": "얼음 결정 범위 공격. 이미 둔화된 일반 적은 짧게 빙결된다.",
+"desc": "앰플을 한 점에 꽂는다. 푸른 막이 퍼지고 가장자리부터 가운데로 얼음 결정이 솟아오른 뒤, 가운데 결정이 터지며 냉기 피해와 둔화를 준다. 이미 둔화된 일반 적은 잠깐 얼어붙는다.",
 "maxLv": 5,
 "unlock": 33,
 "prereq": [],
@@ -1377,17 +1365,15 @@
 "mp": 24,
 "cd": 8,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "throw",
+"recover": 0.3,
+"anim": "wp_compound",
 "ops": [
 {
-"op": "proj",
-"kind": "lob",
-"coef": 2.4,
+"op": "custom",
+"fn": "wp_cryo",
 "r": 2.4,
-"elem": "ice",
-"fx": "ampoule",
-"burst": "ice_crystal",
+"coef": 2.4,
+"freeze": 1.2,
 "st": [
 {
 "id": "slow",
@@ -1395,20 +1381,7 @@
 "val": 0.4,
 "ch": 1.0
 }
-],
-"vsStatus": {
-"id": "slow",
-"st": {
-"id": "freeze",
-"dur": 1.2,
-"val": 0,
-"ch": 1.0
-}
-},
-"mark": {
-"type": "reaction",
-"n": 1
-}
+]
 }
 ],
 "mods": [],
@@ -1430,11 +1403,11 @@
 "job": "western_pharmacist",
 "tier": 2,
 "cat": 0,
-"catName": "고급 약 마법",
+"catName": "정밀 제약술",
 "idx": 3,
-"name": "전도성 약액",
+"name": "이온 관통술",
 "type": "attack",
-"desc": "직선으로 관통하는 전기 약액을 발사하고 표식을 남긴다.",
+"desc": "은빛 약액 구슬을 한 줄로 세운 뒤, 푸른 흰 번개 한 줄기로 앞의 적들을 꿰뚫는다. 맞은 적마다 반응 표식이 남는다.",
 "maxLv": 5,
 "unlock": 36,
 "prereq": [],
@@ -1444,29 +1417,21 @@
 "mp": 24,
 "cd": 7,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "cast",
+"recover": 0.3,
+"anim": "wp_compound",
 "ops": [
 {
-"op": "hit",
-"shape": "line",
-"coef": 2.6,
+"op": "custom",
+"fn": "wp_ion",
 "len": 9,
 "w": 1.2,
-"elem": "shock",
-"fx": {
-"beam": "lightning"
-},
-"mark": {
-"type": "reaction",
-"n": 1
-}
+"coef": 2.6
 }
 ],
 "mods": [],
 "flags": {},
 "fx": {
-"color": 16769120
+"color": 12576511
 },
 "status": {
 "data": true,
@@ -1482,11 +1447,11 @@
 "job": "western_pharmacist",
 "tier": 2,
 "cat": 0,
-"catName": "고급 약 마법",
+"catName": "정밀 제약술",
 "idx": 4,
-"name": "삼중 처방",
+"name": "삼상 복합제",
 "type": "attack",
-"desc": "화염·냉기·전격 약탄을 차례로 쏜다. 같은 적이 세 속성에 모두 맞으면 추가 폭발.",
+"desc": "붉은 캡슐·푸른 앰플·금빛 정제가 대상 둘레에 삼각형으로 선 뒤 화염 → 냉기 → 전격 순서로 꽂힌다. 셋 모두 같은 적에게 맞으면 복합 반응 폭발이 한 번 일어난다. 대상의 반응 표식이 많을수록 강해진다.",
 "maxLv": 5,
 "unlock": 40,
 "prereq": [],
@@ -1496,52 +1461,21 @@
 "mp": 30,
 "cd": 10,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "throw",
+"recover": 0.3,
+"anim": "wp_compound",
 "ops": [
 {
-"op": "proj",
-"kind": "normal",
-"coef": 1.0,
-"elem": "fire",
-"fx": "flask_fire",
-"speed": 13,
-"burst": "explosion_fire",
-"tri": "fire"
-},
-{
-"op": "proj",
-"kind": "normal",
-"coef": 1.0,
-"at": 0.18,
-"elem": "ice",
-"fx": "flask_ice",
-"speed": 13,
-"burst": "explosion_ice",
-"tri": "ice"
-},
-{
-"op": "proj",
-"kind": "normal",
-"coef": 1.0,
-"at": 0.36,
-"elem": "shock",
-"fx": "flask_shock",
-"speed": 13,
-"burst": "explosion_shock",
-"tri": "shock"
-},
-{
 "op": "custom",
-"fn": "triple_check",
-"coef": 2.5,
+"fn": "wp_tri",
+"coef": 1.0,
+"combo": 2.5,
 "r": 2.2
 }
 ],
 "mods": [],
 "flags": {},
 "fx": {
-"color": 16777215
+"color": 16769162
 },
 "status": {
 "data": true,
@@ -1557,49 +1491,28 @@
 "job": "western_pharmacist",
 "tier": 2,
 "cat": 0,
-"catName": "고급 약 마법",
+"catName": "정밀 제약술",
 "idx": 5,
-"name": "제약 마도포",
+"name": "대형 캡슐 붕괴",
 "type": "ultimate",
-"desc": "관통 광선을 쏘고 끝 지점에서 대형 폭발을 일으킨다.",
+"desc": "조준한 곳 위에 거대한 반투명 캡슐을 띄운다. 과립이 가운데로 모여 핵이 되고, 캡슐이 열리며 핵이 떨어져 땅에 닿는 순간 넓은 범위에 큰 피해를 준다.",
 "maxLv": 3,
 "unlock": 45,
 "prereq": [],
 "weapon": null,
-"target": "dir",
-"range": 12,
+"target": "ground",
+"range": 9,
 "mp": 70,
 "cd": 60,
-"cast": 0.9,
-"recover": 0.35,
-"anim": "cast",
+"cast": 0.0,
+"recover": 0.4,
+"anim": "wp_condense",
 "ops": [
 {
-"op": "telegraph",
-"shape": "line",
-"len": 12,
-"w": 2.0,
-"dur": 0.9
-},
-{
-"op": "hit",
-"shape": "line",
-"coef": 6.0,
-"len": 12,
-"w": 2.0,
-"elem": "light",
-"fx": {
-"beam": "laser"
-}
-},
-{
-"op": "delay",
-"after": 0.25,
-"r": 3.6,
-"coef": 7.0,
-"atEnd": true,
-"burst": "explosion_big",
-"elem": "fire"
+"op": "custom",
+"fn": "wp_collapse",
+"r": 3.8,
+"coef": 10.0
 }
 ],
 "mods": [],
@@ -1621,11 +1534,11 @@
 "job": "western_pharmacist",
 "tier": 2,
 "cat": 1,
-"catName": "표식과 연쇄 반응",
+"catName": "표적 전달과 약물 반응",
 "idx": 1,
-"name": "반응 촉진",
+"name": "촉매 활성화",
 "type": "support",
-"desc": "일정 시간 표식 부여량이 늘고, 1차 약병도 표식을 남긴다.",
+"desc": "어깨 뒤에 작은 촉매 앰플 3개를 띄운다. 지속 시간 동안 양약사 공격 스킬을 쓸 때마다 앰플 하나가 빛나며 그 공격의 반응 표식 +1, 피해가 오른다(3회). 약사 약병 공격도 표식을 남긴다.",
 "maxLv": 5,
 "unlock": 30,
 "prereq": [],
@@ -1635,20 +1548,23 @@
 "mp": 20,
 "cd": 20,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "cast",
+"recover": 0.25,
+"anim": "wp_compound",
 "ops": [
 {
-"op": "buff",
-"id": "catalyst",
-"dur": 10,
-"val": 1,
-"target": "self"
+"op": "custom",
+"fn": "wp_catalyst",
+"dur": 12,
+"charges": 3,
+"dmg": 0.15,
+"dmgLv": 0.03
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16765562
+},
 "status": {
 "data": true,
 "impl": true,
@@ -1663,11 +1579,11 @@
 "job": "western_pharmacist",
 "tier": 2,
 "cat": 1,
-"catName": "표식과 연쇄 반응",
+"catName": "표적 전달과 약물 반응",
 "idx": 2,
-"name": "표적 처방",
+"name": "정밀 표적 전달",
 "type": "support",
-"desc": "지정한 적의 표식 축적량과 표식 폭발 피해를 강화한다.",
+"desc": "반투명한 약물 운반체를 적 하나에 붙인다. 그 적에게는 반응 표식이 하나 더 쌓이고, 표식을 소비하는 공격(연쇄 용출·임계 농도)의 피해가 커진다. 한 번에 한 적에게만 붙는다.",
 "maxLv": 5,
 "unlock": 33,
 "prereq": [],
@@ -1677,29 +1593,23 @@
 "mp": 16,
 "cd": 14,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "cast",
+"recover": 0.25,
+"anim": "wp_compound",
 "ops": [
 {
-"op": "hit",
-"shape": "single",
-"coef": 0.0,
-"st": [
-{
-"id": "prescribed",
+"op": "custom",
+"fn": "wp_carrier",
 "dur": 10,
-"val": 0.5,
-"ch": 1.0
-}
-],
-"fx": {
-"burst": "mark_pop"
-}
+"durLv": 1,
+"bonus": 0.3,
+"bonusLv": 0.05
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 7004368
+},
 "status": {
 "data": true,
 "impl": true,
@@ -1714,11 +1624,11 @@
 "job": "western_pharmacist",
 "tier": 2,
 "cat": 1,
-"catName": "표식과 연쇄 반응",
+"catName": "표적 전달과 약물 반응",
 "idx": 3,
-"name": "연쇄 약병 폭발",
+"name": "연쇄 용출",
 "type": "attack",
-"desc": "대상의 표식을 터뜨려 주변 표식 보유 적에게 폭발을 전파한다. 적마다 한 번만 발동.",
+"desc": "대상의 반응 표식을 소비해 터뜨린다. 풀려난 미립자가 곡선을 그리며 가까운 '표식이 있는' 적에게 차례로 옮겨 가 그 표식도 터뜨린다. 한 번의 시전에서 같은 적에게는 한 번만 이어진다.",
 "maxLv": 5,
 "unlock": 36,
 "prereq": [],
@@ -1728,20 +1638,25 @@
 "mp": 26,
 "cd": 9,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "cast",
+"recover": 0.3,
+"anim": "wp_compound",
 "ops": [
 {
 "op": "custom",
-"fn": "mark_chain",
+"fn": "wp_chain",
 "coef": 1.6,
-"perStack": 0.6,
-"range": 5
+"perStack": 0.5,
+"sub": 1.2,
+"r": 2.0,
+"range": 5,
+"max": 5
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 7004368
+},
 "status": {
 "data": true,
 "impl": true,
@@ -1756,11 +1671,11 @@
 "job": "western_pharmacist",
 "tier": 2,
 "cat": 1,
-"catName": "표식과 연쇄 반응",
+"catName": "표적 전달과 약물 반응",
 "idx": 4,
-"name": "잔류 반응",
+"name": "서방형 미립자",
 "type": "passive",
-"desc": "표식 폭발 자리에 지속 피해 영역이 남는다. 잔류 피해는 표식을 만들지 않는다.",
+"desc": "표식이 터진 자리에 빛나는 과립 지대가 4초 동안 남아 1초마다 작은 피해를 준다. 과립은 시간이 지날수록 줄어든다. 지대의 피해는 표식을 만들지 않는다.",
 "maxLv": 5,
 "unlock": 40,
 "prereq": [],
@@ -1795,11 +1710,11 @@
 "job": "western_pharmacist",
 "tier": 2,
 "cat": 1,
-"catName": "표식과 연쇄 반응",
+"catName": "표적 전달과 약물 반응",
 "idx": 5,
-"name": "임계 반응",
+"name": "임계 농도",
 "type": "ultimate",
-"desc": "범위 안의 모든 표식을 소비해 대폭발을 일으킨다. 소비량이 많을수록 강해진다.",
+"desc": "주변 적들의 반응 표식을 모두 거둬들인다. 표식마다 가운데로 빛줄기가 모이고 맑은 구 안에서 결정이 자라다가, 푸른 흰 충격파로 터진다. 거둔 표식이 많을수록 강하다(표식이 없으면 약함).",
 "maxLv": 3,
 "unlock": 45,
 "prereq": [],
@@ -1808,28 +1723,24 @@
 "range": 0,
 "mp": 60,
 "cd": 50,
-"cast": 0.6,
-"recover": 0.35,
-"anim": "cast",
+"cast": 0.0,
+"recover": 0.4,
+"anim": "wp_condense",
 "ops": [
 {
-"op": "telegraph",
-"shape": "circle",
-"r": 6,
-"dur": 0.6
-},
-{
 "op": "custom",
-"fn": "critical_mass",
+"fn": "wp_critical",
 "r": 6,
-"coef": 3.0,
-"perStack": 0.8,
-"cap": 15
+"base": 1.4,
+"per": 0.65,
+"cap": 9
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 10148095
+},
 "status": {
 "data": true,
 "impl": true,
@@ -1844,11 +1755,11 @@
 "job": "western_pharmacist",
 "tier": 2,
 "cat": 2,
-"catName": "전문 조제와 생존",
+"catName": "첨단 조제와 생체 보호",
 "idx": 1,
-"name": "고급 회복제 제작",
+"name": "고순도 제제 조제",
 "type": "craft",
-"desc": "농축 HP 회복제를 만든다.",
+"desc": "불순물을 걸러 낸 농축 HP 회복제를 만든다.",
 "maxLv": 5,
 "unlock": 30,
 "prereq": [],
@@ -1881,11 +1792,11 @@
 "job": "western_pharmacist",
 "tier": 2,
 "cat": 2,
-"catName": "전문 조제와 생존",
+"catName": "첨단 조제와 생체 보호",
 "idx": 2,
-"name": "지속 방출 제제",
+"name": "서방형 캡슐 조제",
 "type": "craft",
-"desc": "지속 HP 또는 MP 회복 제제를 만든다.",
+"desc": "조금씩 녹아 15초 동안 HP 또는 기력을 회복시키는 서방형 캡슐을 만든다.",
 "maxLv": 5,
 "unlock": 33,
 "prereq": [],
@@ -1919,11 +1830,11 @@
 "job": "western_pharmacist",
 "tier": 2,
 "cat": 2,
-"catName": "전문 조제와 생존",
+"catName": "첨단 조제와 생체 보호",
 "idx": 3,
-"name": "광역 분무 치료",
+"name": "생체 회복 분무",
 "type": "support",
-"desc": "자신과 생명체 소환물을 회복하는 치유 안개를 뿌린다.",
+"desc": "앰플을 꽃잎처럼 펼쳐 둘레에 옅은 청록 안개를 뿜는다. 6초 동안 1초마다 범위 안의 나와 생명체 소환물이 회복된다(기계 소환물 제외).",
 "maxLv": 5,
 "unlock": 36,
 "prereq": [],
@@ -1933,8 +1844,8 @@
 "mp": 28,
 "cd": 18,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "cast",
+"recover": 0.25,
+"anim": "wp_compound",
 "ops": [
 {
 "op": "area",
@@ -1943,14 +1854,17 @@
 "dur": 6,
 "tick": 1.0,
 "heal": 0.03,
-"fx": "healing_mist",
+"fx": "none",
 "follow": false,
-"living": true
+"living": true,
+"wp": "spray"
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 7004368
+},
 "status": {
 "data": true,
 "impl": true,
@@ -1965,11 +1879,11 @@
 "job": "western_pharmacist",
 "tier": 2,
 "cat": 2,
-"catName": "전문 조제와 생존",
+"catName": "첨단 조제와 생체 보호",
 "idx": 4,
-"name": "응급 보호막",
+"name": "다층 코팅막",
 "type": "support",
-"desc": "피해를 흡수하는 보호막. 체력이 낮을수록 강해진다.",
+"desc": "얇은 막 세 겹으로 몸을 감싸 피해를 흡수한다. 체력이 낮을수록 막이 두껍다. 막이 깎이면 바깥 겹부터 벗겨진다.",
 "maxLv": 5,
 "unlock": 40,
 "prereq": [],
@@ -1979,20 +1893,28 @@
 "mp": 22,
 "cd": 16,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "cast",
+"recover": 0.25,
+"anim": "wp_compound",
 "ops": [
 {
 "op": "shield",
 "base": 40,
 "coef": 1.2,
 "dur": 8,
-"lowHp": 1.0
+"lowHp": 1.0,
+"noAura": true
+},
+{
+"op": "fx",
+"wp": "coat",
+"dur": 8
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 10151679
+},
 "status": {
 "data": true,
 "impl": true,
@@ -2007,11 +1929,11 @@
 "job": "western_pharmacist",
 "tier": 2,
 "cat": 2,
-"catName": "전문 조제와 생존",
+"catName": "첨단 조제와 생체 보호",
 "idx": 5,
-"name": "생명 보존 처방",
+"name": "최종 처방·생명 유지",
 "type": "passive",
-"desc": "치명적인 피해를 받으면 소량의 HP를 남기고 보호막을 만든다. (내부 쿨타임 120초)",
+"desc": "치명적인 피해를 받으면 가슴의 응급 캡슐이 깨져 체력을 조금 남기고, 같은 양의 보호막과 짧은 재생을 준다. (내부 쿨타임 120초)",
 "maxLv": 5,
 "unlock": 45,
 "prereq": [],
@@ -2032,6 +1954,7 @@
 ]
 },
 "fx": {},
+"icd": 120,
 "status": {
 "data": true,
 "impl": true,
@@ -9769,7 +9692,7 @@
 },
 {
 "id": "prescribed",
-"name": "표적 처방",
+"name": "표적 전달",
 "kind": "mark",
 "debuff": true,
 "cleanse": false,
@@ -9925,7 +9848,7 @@
 },
 {
 "id": "catalyst",
-"name": "반응 촉진",
+"name": "촉매 활성화",
 "kind": "flag",
 "buff": true,
 "stack": "max",
@@ -10215,7 +10138,7 @@
 {
 "id": "c_potion_l",
 "name": "농축 회복제",
-"desc": "HP를 크게 회복한다.",
+"desc": "불순물을 걸러 낸 고순도 회복제. HP를 크게 회복한다.",
 "type": "consumable",
 "job": "",
 "tier": 2,
@@ -10240,7 +10163,7 @@
 {
 "id": "c_regen_hp",
 "name": "지속 회복 제제",
-"desc": "15초 동안 HP를 회복한다.",
+"desc": "서방형 캡슐. 15초 동안 조금씩 녹아 HP를 회복한다.",
 "type": "consumable",
 "job": "",
 "tier": 2,
@@ -10265,7 +10188,7 @@
 {
 "id": "c_regen_sp",
 "name": "지속 활력 제제",
-"desc": "15초 동안 기력을 회복한다.",
+"desc": "서방형 캡슐. 15초 동안 조금씩 녹아 기력을 회복한다.",
 "type": "consumable",
 "job": "",
 "tier": 2,

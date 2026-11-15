@@ -824,6 +824,35 @@ AR_ALL = AR_ACTS + [AR_SWEEP, AR_FLICK, AR_DAB, AR_BATON, AR_STAC]
 
 SKILL_ACTS += AR_ALL   # 예술가 1차 (양손 붓)
 
+# ------------------------------------------------------------------------------------------------ 양약사 2차 (2026-11-16)
+# 공중 조제(wp_compound): 두 손을 가슴 앞으로 모아 허공에서 약을 '조립'하듯 비틀었다가(0.08~0.15 s) 0.22 s에 앞으로 툭 내밀어 놓아 보냄 —
+# 그 순간 오른손(handPoint) 자리에서 캡슐·앰플·운반체가 생김(js/wpharm.js handPoint). 짧은 준비, 유봉은 등에(stow), 잔상 없음.
+WP_COMPOUND = action('wp_compound', [
+    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
+    key(0.08, 'o', twist=-10, lean=-4, sink=0.04, hand=[-18, 8, 0.55], blade=[-10, 40], elbow=[-0.8, -0.6, -0.4], armL=[58, 32]),
+    key(0.15, 's', twist=-13, lean=-5, sink=0.05, hand=[-12, 16, 0.50], blade=[-6, 50], elbow=[-0.8, -0.5, -0.4], armL=[66, 28], squint=True),
+    key(0.22, None, twist=8, lean=9, sink=0.06, hand=[-6, 14, 0.98], blade=[0, 10], elbow=[-0.6, -0.8, -0.1], armL=[82, 24], squint=True),
+    key(0.32, 'o', twist=10, lean=10, sink=0.06, hand=[-4, 12, 0.96], blade=[2, 8], elbow=[-0.6, -0.8, -0.1], armL=[78, 22]),
+    key(0.46, 's', twist=4, lean=4, sink=0.03, hand=[-16, -16, 0.76], blade=[-6, 16], elbow=[-0.7, -1, -0.2], armL=[30, 18]),
+    key(0.58, 's', hand=[-30, -40, 0.70], blade=[-10, 20], armL=[12, 18]),
+], 0.22, 0.40, None, fadeIn=0.05, fadeOut=0.14)
+WP_COMPOUND.update(stow=True, throwT=0.22)
+# 응축(wp_condense, 궁극기 대형 캡슐 붕괴·임계 농도): 0.12 s에 시작 신호(op 실행) -> 두 팔을 활짝 벌림(0.34 s) -> 가운데로 천천히 끌어모아
+# 응축(0.78 s) -> 0.9 s에 두 손을 앞으로 밀어 놓아 보냄 -> 1.15 s까지 버팀 -> 복귀. 실제 주 타격은 js/wpharm.js(접촉 1.05 s 뒤 = 누른 뒤 약 1.17 s).
+WP_CONDENSE = action('wp_condense', [
+    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
+    key(0.12, 'o', twist=-4, lean=-3, sink=0.03, hand=[-50, 0, 0.80], blade=[-40, 20], elbow=[-0.9, -0.6, -0.2], armL=[30, 60]),
+    key(0.34, 's', twist=0, lean=-9, sink=0.05, hand=[-84, 22, 0.98], blade=[-80, 40], elbow=[-0.6, -0.9, -0.1], armL=[24, 96], squint=True),
+    key(0.56, 's', twist=0, lean=-8, sink=0.08, hand=[-62, 26, 0.90], blade=[-50, 40], elbow=[-0.7, -0.8, -0.2], armL=[46, 74]),
+    key(0.78, 's', twist=-2, lean=-4, sink=0.10, hand=[-16, 22, 0.62], blade=[-8, 40], elbow=[-0.8, -0.6, -0.4], armL=[74, 34], squint=True),
+    key(0.90, None, twist=6, lean=10, sink=0.08, hand=[-4, 26, 1.0], blade=[0, 30], elbow=[-0.6, -0.8, -0.1], armL=[96, 26], squint=True),
+    key(1.15, 'o', twist=6, lean=11, sink=0.08, hand=[-4, 24, 0.98], blade=[0, 28], elbow=[-0.6, -0.8, -0.1], armL=[92, 24]),
+    key(1.36, 's', twist=2, lean=4, sink=0.03, hand=[-16, -16, 0.76], blade=[-6, 16], elbow=[-0.7, -1, -0.2], armL=[30, 18]),
+    key(1.50, 's', hand=[-30, -40, 0.70], blade=[-10, 20], armL=[12, 18]),
+], 0.12, 1.20, None, fadeIn=0.06, fadeOut=0.16)
+WP_CONDENSE.update(stow=True)
+SKILL_ACTS += [WP_COMPOUND, WP_CONDENSE]
+
 acts = json.load(open(P))
 names = {'attack', 'attack2'} | {x['name'] for x in SKILL_ACTS}
 acts = [a for a in acts if a['name'] not in names and not a['name'].startswith('nv_yeon_')]

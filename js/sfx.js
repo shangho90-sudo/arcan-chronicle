@@ -25,6 +25,7 @@ export const SFX_NAMES = ['levelup', 'jobchange', 'dialog', 'warp', 'hit', 'heav
   'bs_wall', 'bs_block', 'bs_rivet', 'bs_rivet_pop', 'bs_rivet_shot', 'bs_forge', 'bs_break',
   'ck_flip', 'ck_board', 'ck_soup', 'ck_pepper', 'ck_flour', 'ck_skewer', 'ck_eat', 'ck_ball_toss', 'ck_ball_fly', 'ck_ball_hit', 'ck_ball_fin',
   'hd_snip', 'hd_dryer', 'hd_style', 'hd_gust', 'hd_hot', 'hd_cold',
+  'wp_granule', 'wp_ring', 'wp_crystal', 'wp_ion', 'wp_collapse',   // 양약사 2차 (tools/audio/wp_sfx.py)
   'nv_sal_cast', 'nv_sal_hit', 'nv_yeon_cast', 'nv_yeon_hit',
   'nv_biyeon_cast', 'nv_biyeon_hit', 'nv_bash_cast', 'nv_bash_hit',
   'heal', 'shield', 'dodge', 'throw', 'boss_slam', 'monster_attack', 'monster_die',

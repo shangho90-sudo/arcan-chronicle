@@ -1,0 +1,26 @@
+{
+ "note": "Synthesized in-repo (no Runway credit). Regenerate with python3 tools/audio/wp_sfx.py (fixed seed).",
+ "generatedOn": "2026-11-16",
+ "assets": [
+  {
+   "file": "sfx_wp_granule.mp3",
+   "description": "과립 명중: 작고 단단한 유리 '틱' + 짧은 탄산 쉭"
+  },
+  {
+   "file": "sfx_wp_ring.mp3",
+   "description": "반응 고리·연쇄 시작 폭발: 유리 '퐁' + 짧은 불꽃"
+  },
+  {
+   "file": "sfx_wp_crystal.mp3",
+   "description": "결정 폭발·복합 반응: 얼음 결정 '쨍' + 맑은 여운"
+  },
+  {
+   "file": "sfx_wp_ion.mp3",
+   "description": "이온 관통: 전기 '찌직' + 짧은 쿵"
+  },
+  {
+   "file": "sfx_wp_collapse.mp3",
+   "description": "궁극기 주 타격: 낮은 '쿵' + 결정 파쇄 + 맑은 여운"
+  }
+ ]
+}

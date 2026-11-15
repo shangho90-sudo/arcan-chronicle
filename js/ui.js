@@ -299,7 +299,7 @@ export class UI {
     h("hSp").style.width = (100 * p.sp / p.maxSp) + "%"; h("hSpT").textContent = "기력 " + Math.floor(p.sp) + " / " + Math.round(p.maxSp);
     const need = p.sheet.expToNext; h("hExp").style.width = (need ? 100 * P.exp / need : 100) + "%";
     h("hExpT").textContent = need ? `EXP ${P.exp} / ${need}  (${(100 * P.exp / need).toFixed(1)}%)` : "최고 레벨";
-    h("hStatus").innerHTML = p.status.list.map(s => `<span style="color:${s.def.color}">${s.def.name} ${Math.ceil(s.remaining)}s</span>`).join(" ");
+    h("hStatus").innerHTML = p.status.list.map(s => `<span style="color:${s.def.color}">${s.def.name} ${Math.ceil(s.remaining)}s</span>`).join(" ") + (p.skills2 && p.skills2.wp ? p.skills2.wp.statusHtml() : "");   // 양약사 최종 처방: 준비 / 재정비 남은 초
     this.minimap.draw(G);
     h("hZone").textContent = G.zone ? G.zone.def.name : ""; h("hGold").textContent = P.gold.toLocaleString() + " G";
     this._qt = (this._qt || 0) - 1; if (this._qt <= 0) { this._qt = 15; this.updateTracker(); }
