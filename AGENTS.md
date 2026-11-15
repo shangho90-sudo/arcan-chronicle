@@ -8,7 +8,7 @@
 ## 기본
 - 빌드 없음. `python3 -m http.server 8765` 후 `http://localhost:8765/index.html`.
 - three.js r160을 로컬 import map(`index.html`, `vendor/three-r160/`)으로 불러옵니다. CDN 장애 시 0% 멈춤을 방지하기 위해 동일 버전과 LICENSE를 저장소에 포함합니다. npm 의존성 없음. 새 라이브러리 추가 금지(필요하면 먼저 사용자에게 확인).
-- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs && node tests/gear.test.mjs && node tests/warp.test.mjs && node tests/pharmacist-audio.test.mjs && node tests/smith.test.mjs && node tests/gates.test.mjs && node tests/wpharm.test.mjs && node tests/chef.test.mjs && node tests/herbal.test.mjs` (현재 core 495 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 638 통과; gates 860 통과).
+- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs && node tests/gear.test.mjs && node tests/warp.test.mjs && node tests/pharmacist-audio.test.mjs && node tests/smith.test.mjs && node tests/gates.test.mjs && node tests/wpharm.test.mjs && node tests/chef.test.mjs && node tests/herbal.test.mjs && node tests/storyscene.test.mjs` (현재 core 495 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 638 통과; gates 860 통과).
 - 테스트하지 않은 것을 "검증됨"이라고 보고하지 말 것.
 
 ## 데이터 우선
@@ -41,6 +41,13 @@
 - 런타임 `js/questworld.js`: `storyNpcs`(from/until/hide), `kill`+`spawn`(퀘스트 보스), `collect`+`gather`(줍기), `collect`+`drop`(퀘스트 드롭). 보스 `qb_*`의 `yieldAt`/`surviveSec`/`look`/`hpMul`(`actors.js`·`creature.js`·`core.js`). 확인 `tools/browser-tests/storyquests.js`.
 - 이야기 NPC 자리는 `story.py` `spot_near`(도착 지점 앞, 소품·건물·마을 가로등/화단·원래 NPC를 피함), 화면 확인 `tools/browser-tests/npcspot.js`.
 - 이야기 NPC 모델: `model.js` `NPC_MODELS`(아스텔 `npc_astel` = Tripo→`tools/npcs/static_npc.py`, 색만 바꾼 `tex` = `tools/npcs/recolor.py`).
+
+## 메인 스토리 대화 장면 (2026-11-15, 사용자 요청 '창세기전처럼 대화창 애니메이션')
+- **메인 퀘스트(`questCategory` = main, `mq*`·`q1_start` 등)의 받기·진행·완료 대사만** 장면으로 재생(`game.js` `questTalk` → `js/storyscene.js` `StoryScene.play`). NPC 대화 메뉴 자체·주민·상점·서브 퀘스트는 예전 대화창(`ui.showDialog`) 그대로. 퀘스트마다 코드 없음 — 대사는 `quests.json` 텍스트를 `js/storyparse.js` `parseStory`가 나눔: `<br>` = 줄, `<b class='gold'>이름</b>` = 화자(이름 → npcs.json `name`, 없으면 이야기 보스 `qb_*` 이름 끝 → `mon:<id>`, '나'/플레이어 이름 → `player`), `<i>…</i>`만 있는 줄 = 서술(이름 패 없음·가운데 기울임), 표시 없는 줄 = 그 NPC, 86자 넘는 줄은 문장 단위로 쪽 나눔, 선택 `data-expr='angry'` = 표정. 그래서 대사는 지금처럼 `story.py` `say()`로 쓰면 됨.
+- 화면: 게임은 뒤에 보임(어둡게·2.5 px 흐림, HUD·이름표·키패드 숨김 `.storyopen`), 큰 반신 초상 두 자리(첫 화자 오른쪽, 다음 화자 왼쪽, 세 번째부터 방금 말하지 않은 쪽을 바꿈; 화자가 한 명뿐이면 플레이어가 왼쪽에 듣는 사람으로), 말하는 쪽 밝게·앞, 듣는 쪽 0.9배·어둡게, 새 화자는 작게 튀어 오름, 평소 숨쉬기. 아래 반투명 남색 상자 + 금빛 테 + 이름 패(주아체, 화자 쪽에 붙음), 타자기 42자/초(`cps`), ▼ 깜박임. 누르기/Space/Enter/F = 줄 끝내기 → 다음 쪽, '건너뛰기'·Esc = 마지막 쪽. 마지막 쪽에 원래 단추(수락하기/나중에 + 보상, 돌아가기/대화 종료)를 같은 상자에 — **키로는 답을 고르지 않음**(빠른 Space가 퀘스트를 받아 버리지 않게, Tab으로 단추에 간 뒤 Enter만), 끝 쪽이 뜬 뒤 0.3초 안의 누르기는 무시. 열려 있는 동안 `ui.current`(이름 `story`, `ui.openLayer`)라 게임 입력이 막히고, 단추가 다른 창을 열면 그대로 바뀜(`ui.close`가 `_onClose`를 부름). CSS `index.html` "메인 스토리 대화 장면" 블록(휴대폰 세로: 초상은 상자 위 47vh, 상자 화면 폭).
+- 초상 고르기: `assets/ui/story/portraits.json`의 `portraits[화자 키]`(또는 `names`에 그 이름) = 2D 일러스트(세로 3:4, 배경 투명, `facing`, 표정 `expr`) → 없으면 **3D 모델 반신 렌더**(`portrait.js` `renderBust` 576×768 투명 PNG, NPC는 모델 키마다 화면 밖에서 한 번 만들어 캐시 — 이야기 NPC 대부분이 경비병·화가 등 모델을 빌려 써서 같은 얼굴일 수 있음; 플레이어는 지금 몸·직업) → 모델도 없으면(이야기 보스 화자 그레이스·말라키온·'그림자' 등) 이름 패만. 가로 방향은 화면 가운데를 보도록 자동으로 뒤집음.
+- 일러스트 만들기: `python3 tools/story/portraits.py`(인자 없이 = 인물 20명 목록·프롬프트·예상 크레딧, `--balance` 잔액, `--run [키…]` 생성 — Runway `text_to_image`, 키 `~/.runway/key`, 이어받기 `tools/story/portraits_state.json`, 결과 `assets/ui/story/<키>.webp` + manifest 자동 갱신, 투명 배경이 안 오면 귀퉁이 채우기로 단색 배경 제거). 참고 그림(3D 렌더)은 자기 모델이 있는 아스텔·촌장만(`USE_REF`) — `node tools/story/refs.js`(→ `/tmp/story_refs`). 다른 게임 캐릭터를 따라 그리지 말 것.
+- 확인: `tests/storyscene.test.mjs`(메인 대사 전부: 쪽 나누기·글자 빠짐 없음·화자 → NPC, manifest 파일 존재), 브라우저 `tools/browser-tests/storyscene.js`(`URL= SIZES=1280x720,390x844t OUT=`: 촌장 첫 메인 → 장면·초상·타자기·넘기기·수락, 세 화자, 19장 보스 화자·건너뛰기, 서술, 서브·상점은 예전 창).
 
 ## 프롤로그 (2026-11-08)
 - 새 캐릭터는 마을에 나타나기 전에 서장을 봅니다(`game.js` `openCreate` → `playPrologue` → `enterWorld`). 대사·장면 제목·그림 설명·움직임은 `assets/data/prologue.json`, 재생 `js/prologue.js`. 그림 6장은 이미지 생성 도구로 만든 1600×900 일러스트(`assets/ui/prologue/p<N>.jpg`, 제작 정보·프롬프트는 같은 폴더 `README.md`). 교체하면 `fx` 위치 %도 조정. `tools/prologue/paint.py`는 예전 그림 보관용이며 `legacy-output/`으로만 출력합니다. 확인 `tools/browser-tests/prologue.js`(`BROWSER_PATH`로 설치된 브라우저 지정 가능).
@@ -277,6 +284,7 @@
 - `skilltest.js`: 180개 스킬 자동 시전 (`JOBS=painter ONLY=pt_a1 node skilltest.js`).
 
 ## 알려진 미완료
+- 메인 스토리 대화 장면의 2D 일러스트는 아직 없음(2026-11-15 Runway 크레딧 0·이 환경에서 API 접속 막힘) — 모든 화자가 3D 반신 렌더 또는 이름 패만. `tools/story/portraits.py --run`으로 만들면 바로 쓰임.
 - 스킬 아이콘은 견습생·약사 1차·대장장이 1차·양약사 2차·쉐프 2차·한약사 2차만 그림(대장장이는 `tools/ui/smith_icons.py`, 양약사는 `tools/ui/wp_icons.py`, 쉐프는 `tools/ui/chef_icons.py`, 한약사는 `tools/ui/herbal_icons.py`)(`assets/ui/skills`, `tools/ui/skill_icons_crop.py`가 참고 그림 `tools/ui/ref/`에서 잘라 냄 — 약사 15개는 `pharmacist_ref2.png`, `fx_pharm.py icons`를 돌린 뒤에는 다시 실행, `skillui.js` `SKILL_ART`), 나머지는 코드 생성 임시 아이콘.
 - 몬스터: 귀여운 모델(`cute_*`)은 리깅이 없어 모든 동작이 절차 동작. 불씨 비룡 계열(drake)만 예전 모델.
 - 모든 필드(40곳)가 `js/nature.js` 렌더(존별 `nature.ground`/`tint`/`rockTint`/`grass`/`lod`). 서리 고원은 색조만 차갑게(눈 덮인 잎 없음).

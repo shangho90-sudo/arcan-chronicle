@@ -912,3 +912,10 @@
 - 계열 C '첨단 조제와 생체 보호': 고순도 제제 조제·서방형 캡슐 조제(제작 완성 연출, 서방형 캡슐을 먹으면 회복 틱마다 과립이 사라짐), 생체 회복 분무(기계 소환물 제외), 다층 코팅막(보호막 비율 = 겹 수), 최종 처방·생명 유지(체력 15~35% + 같은 보호막 + 재생, 내부 쿨타임 120초 저장 유지, 0.3초 유예, 버프 줄 표시).
 - 새 파일: `js/wpharm.js`(규칙), `js/wpharmfx.js`(이펙트), `tools/blender/fx_wpharm.py`(메시), `tools/ui/wp_icons.py`(아이콘 15), `tools/audio/wp_sfx.py`(효과음 5), 동작 `wp_compound`/`wp_condense`, 테스트 `tests/wpharm.test.mjs`·`tools/browser-tests/wpharm_skills.js`. 자세한 규칙은 AGENTS.md "양약사 2차 스킬".
 - 확인: 단위 테스트 123개, SwiftShader 브라우저 장면(a1·a1kill 제외 전부: a2·a3·a4·a5·b1·b2·b3·b5·boss·c3·c4·c5·craft·regen·marks)에서 오류 0·전역 히트스톱 0·카메라 kick은 궁극기 주 타격 1번·10초 뒤 남은 이펙트 없음. 확인 못 한 것: 실제 휴대폰, 사람이 직접 하는 손맛, 동작(wp_compound/condense)의 가까운 화면, 대상 사망 시 과립 재지정의 화면(a1kill 장면은 테스트 스크립트 오류로 수치만 단위 테스트).
+
+### 2026-11-15 — 메인 스토리 대화 장면 (창세기전식 반신 초상 + 남색 대화 상자)
+- 사용자 요청 '창세기전처럼 스토리는 대화창 애니메이션으로'. 결정: **메인 퀘스트 대사만**(받기·진행·완료, `questCategory` main — `mq*`·`q1_start`·전직 시험 등 90개), 상점·주민·서브 퀘스트·NPC 대화 메뉴는 예전 창 그대로. 초상은 주요 인물 2D 일러스트(만들 예정) + 그 밖·그 전에는 3D 모델 반신 렌더. 참고 화면의 그림·인물은 쓰지 않고 연출 방식만.
+- `js/storyscene.js`(장면) + `js/storyparse.js`(대사 나누기, 순수 함수) + `portrait.js` `renderBust`(576×768 투명 반신, 모델 키마다 캐시) + `ui.js` `openLayer` + `game.js` `questTalk` + `index.html` CSS 블록. 대사는 기존 `quests.json` HTML을 그대로 읽음(퀘스트마다 코드·데이터 수정 없음): 347쪽, 화자 표시 299쪽 중 284쪽이 NPC로 이어짐, 나머지는 이야기 보스(그레이스·말라키온 등)와 '그림자'·'순례자'(그림 없으면 이름 패만).
+- 연출: 게임 화면 어둡게·살짝 흐리게(HUD 숨김), 두 자리 초상(말하는 쪽 밝고 앞·듣는 쪽 0.9배 어둡게, 새 화자 튀어 오름, 숨쉬기, 한 사람만 말하면 플레이어가 왼쪽), 이름 패 + 반투명 남색 상자 + 얇은 금빛 테(주아체), 타자기, ▼ 깜박임, 건너뛰기, 마지막 쪽에 원래 단추(수락하기/나중에 + 보상, 돌아가기/대화 종료). 키(Space/Enter/F)는 넘기기만 — 답은 누르거나 Tab+Enter(빠른 Space로 퀘스트를 받아 버리지 않게).
+- 일러스트: **아직 없음**. Runway API(`api.dev.runwayml.com`)는 이 작업 환경의 프록시가 막아 잔액도 확인 못 함(사용자 말로는 크레딧 0). `tools/story/portraits.py`(인물 20명 프롬프트, `--balance`, `--run`, 이어받기, manifest 자동 갱신, 투명 배경이 안 오면 단색 배경 제거)와 `tools/story/refs.js`(3D 참고 렌더)를 준비. 예상 20장 × 8 크레딧 ≈ 160(다시 뽑기 여유 ≈ 240) — 그림당 크레딧은 가정값(`COST`), 실제 모델 가격표로 확인할 것.
+- 확인: `tests/storyscene.test.mjs`(1194 통과), 브라우저 `tools/browser-tests/storyscene.js` 1280×720·390×844 터치(결과는 아래 줄).

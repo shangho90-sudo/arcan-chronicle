@@ -104,7 +104,8 @@ export class StoryScene {
       if (['Space', 'Enter', 'NumpadEnter', 'KeyF', 'KeyE', 'Escape'].includes(e.code)) {
         e.stopPropagation(); e.preventDefault(); if (e.repeat) return;
         if (e.code === 'Escape') { if (this.i < this.pages.length - 1 || this.typing) this.skip(); return; }
-        if (this.atEnd() && !this.typing) { const b = this.el.querySelector('.vn-opts button'); if (b && e.code !== 'KeyF' && e.code !== 'KeyE') b.click(); return; }
+        // last page: keys never pick an answer by themselves (a fast Space would accept the quest) — Enter only on a focused button (Tab)
+        if (this.atEnd() && !this.typing) { const f = document.activeElement; if ((e.code === 'Enter' || e.code === 'NumpadEnter') && f && f.closest && f.closest('.vn-opts')) f.click(); return; }
         this.advance();
       }
     };
@@ -227,14 +228,16 @@ export class StoryScene {
     this.opts.forEach(([label, fn], i) => {
       const b = document.createElement('button'); b.type = 'button';
       b.className = 'vn-btn' + (i === this.opts.length - 1 && this.opts.length > 1 ? ' alt' : ''); b.textContent = label;
-      b.onclick = e => { e.stopPropagation(); this.G.audio && this.G.audio.sfx('dialog'); fn(); };
+      b.onclick = e => { e.stopPropagation(); if (performance.now() - this.endAt < 300) return; this.G.audio && this.G.audio.sfx('dialog'); fn(); };   // no tap-through from the tap that finished the line
       o.appendChild(b);
     });
-    this.endEl.classList.add('show'); this.box.classList.add('end');
+    this.endEl.classList.add('show'); this.box.classList.add('end'); this.endAt = performance.now();
   }
 
   advance() {
-    if (!this.el || performance.now() - this.shownAt < 250) return;   // the tap that opened the scene
+    const now = performance.now();
+    if (!this.el || now - this.shownAt < 250 || now - (this.advAt || 0) < 140) return;   // the tap that opened the scene / one press = one step
+    this.advAt = now;
     if (this.typing) { this.finishType(); return; }
     if (this.atEnd()) { this.showEnd(); return; }
     this.next();

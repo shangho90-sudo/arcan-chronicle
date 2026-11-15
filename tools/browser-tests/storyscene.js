@@ -11,7 +11,7 @@ const fails = [], errs = []; const ok = (c, m) => { console.log((c ? '  ok   ' :
     console.log('== ' + sz);
     const touch = sz.endsWith('t'), [W, H] = sz.replace('t', '').split('x').map(Number);
     const ctx = await b.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1, hasTouch: touch, isMobile: touch });
-    const pg = await ctx.newPage(); errs.length = 0; pg.on('pageerror', e => errs.push(e.message)); pg.on('console', m => { if (m.type() === 'error') errs.push('console: ' + m.text()); if (/UICLOSE/.test(m.text())) console.log(m.text()); });
+    const pg = await ctx.newPage(); errs.length = 0; pg.on('pageerror', e => errs.push(e.message)); pg.on('console', m => { if (m.type() === 'error') errs.push('console: ' + m.text()); if (/UICLOSE|ADV/.test(m.text())) console.log(m.text()); });
     const ev = (f, a) => pg.evaluate(f, a), shot = n => pg.screenshot({ path: `${OUT}/vn_${sz}_${n}.png`, timeout: 300000 });
     const S = 'button,[role=button],[aria-label]';
     const find = t => pg.waitForFunction(([S, t]) => [...document.querySelectorAll(S)].some(b => (b.getAttribute('aria-label') || b.textContent || '').trim() === t), [S, t], { timeout: 300000 });
@@ -19,12 +19,13 @@ const fails = [], errs = []; const ok = (c, m) => { console.log((c ? '  ok   ' :
     const inZone = id => pg.waitForFunction(id => window.G && G.inWorld && G.zone && G.zone.def.id === id && G.player && !G.loading && !G.input.block, id, { timeout: 400000 });
     // 넘기기: 휴대폰은 화면 위쪽 터치, PC는 Space(타자 중이면 줄 끝내기)
     const tapNext = async () => { if (touch) await pg.touchscreen.tap(W / 2, H * 0.3); else await pg.keyboard.press('Space'); await pg.waitForTimeout(350); };
+    const goNext = async () => { await ev(() => G.story.typing && G.story.finishType()); await pg.waitForTimeout(120); await tapNext(); };   // 타자기가 끝났는지와 상관없이 정확히 다음 쪽
     const st = () => ev(() => { const s = G.story, el = document.querySelector('.vnscene'); if (!el) return null;
       const por = side => { const p = el.querySelector('.vn-por.' + side); return { who: p.dataset.who || null, shown: p.classList.contains('shown'), speak: p.classList.contains('speak'), listen: p.classList.contains('listen'), none: p.classList.contains('none'), src: (p.querySelector('img').getAttribute('src') || '').slice(0, 30) }; };
       return { i: s.i, n: s.pages.length, typing: s.typing, name: el.querySelector('.vn-nm').textContent, text: el.querySelector('.vn-text').textContent, end: el.querySelector('.vn-end').classList.contains('show'),
         btns: [...el.querySelectorAll('.vn-opts button')].map(b => b.textContent), left: por('left'), right: por('right'), block: G.input.block, hudHidden: getComputedStyle(document.querySelector('.layer.hud')).opacity === '0' }; });
-    const portraits = () => pg.waitForFunction(() => { const el = document.querySelector('.vnscene'); return el && [...el.querySelectorAll('.vn-por')].every(p => !p.dataset.who || p.classList.contains('shown') || p.classList.contains('none')); }, null, { timeout: 120000 }).catch(() => {});
-    const sceneOn = () => pg.waitForFunction(() => !!document.querySelector('.vnscene.on'), null, { timeout: 120000 }).catch(async e => { console.log('scene state', await ev(() => [G.ui.currentName, document.querySelector('.layer.windows').innerHTML.slice(0, 300)])); throw e; });
+    const portraits = () => pg.waitForFunction(() => { const el = document.querySelector('.vnscene'); return el && [...el.querySelectorAll('.vn-por')].every(p => !p.dataset.who || p.classList.contains('shown') || p.classList.contains('none')); }, null, { timeout: 240000, polling: 400 }).catch(() => {});
+    const sceneOn = () => pg.waitForFunction(() => !!document.querySelector('.vnscene.on'), null, { timeout: 240000, polling: 400 }).catch(async e => { console.log('scene state', await ev(() => [G.ui.currentName, document.querySelector('.layer.windows').innerHTML.slice(0, 300)])); throw e; });
     const toEnd = async () => { for (let k = 0; k < 40; k++) { const s = await st(); if (!s || (s.end && !s.typing)) return s; await tapNext(); } return st(); };
 
     await pg.goto(URL, { timeout: 300000 }); await ev(() => localStorage.clear()); await pg.reload({ timeout: 300000 });
@@ -51,8 +52,9 @@ const fails = [], errs = []; const ok = (c, m) => { console.log((c ? '  ok   ' :
     ok(s.left.who === 'player' && s.left.shown && s.left.listen, '왼쪽 = 플레이어(듣는 쪽, 어둡게) ' + JSON.stringify(s.left));
     await shot('1_first_typing');
     await ev(() => { G.story.cps = 3; G.story.type(G.story.pages[G.story.i].html); }); await pg.waitForTimeout(150);   // 느린 타자기로 다시 시작(SwiftShader는 프레임이 느려 보통 속도면 누르기 전에 끝남)
-    const i0 = (await st()).i; await tapNext(); s = await st(); ok(!s.typing && s.i === i0 && s.text.length > 22, '타자 중 한 번 누르면 줄만 끝남(쪽은 그대로)'); await ev(() => { G.story.cps = 42; });
-    await tapNext(); s = await st(); ok(s.i === i0 + 1 || s.end, '다음 누르면 다음 쪽');
+    if (process.env.DEBUG) await ev(() => { const S = G.story, a = S.advance.bind(S); S.advance = () => { console.log('ADV ' + new Error().stack.split('\n').slice(2, 5).join(' | ')); return a(); }; addEventListener('keydown', e => console.log('ADV key ' + e.code + ' ' + e.eventPhase), true); });
+    const i0 = (await st()).i; await tapNext(); s = await st(); ok(!s.typing && s.i === i0 && s.text.length > 22, '타자 중 한 번 누르면 줄만 끝남(쪽은 그대로) ' + JSON.stringify({ i0, i: s.i, n: s.n, typing: s.typing, len: s.text.length })); await ev(() => { G.story.cps = 42; });
+    await tapNext(); s = await st(); ok(s.i === i0 + 1 || s.end, '다음 누르면 다음 쪽 ' + JSON.stringify({ i0, i: s.i, end: s.end }));
     await pg.waitForTimeout(300); await shot('2_first_line_done');
     s = await toEnd();
     ok(s.end && s.btns.join(',') === '수락하기,나중에', '끝 쪽: 수락하기/나중에 ' + s.btns);
@@ -69,10 +71,10 @@ const fails = [], errs = []; const ok = (c, m) => { console.log((c ? '  ok   ' :
     await ev(() => { const q = G.data.quests.mq02a, n = G.data.npcs[q.turnIn]; G.questTalk(n, q, q.completeText, G.back(n)); });
     await sceneOn(); await portraits();
     s = await st(); ok(s.name === '아스텔' && s.right.who === 'astel' && !s.left.who, '아스텔 오른쪽, 플레이어 없음(여러 화자) ' + JSON.stringify([s.left.who, s.right.who]));
-    await tapNext(); await tapNext(); await portraits(); s = await st();
+    await goNext(); await portraits(); s = await st();
     ok(s.name === '카스티야' && s.left.who === 'castilla' && s.left.speak && s.right.listen, '두 번째 화자 왼쪽에서 말함·아스텔 어둡게');
     await pg.waitForTimeout(400); await shot('4_two_speakers');
-    await tapNext(); await tapNext(); await portraits(); s = await st();
+    await goNext(); await portraits(); s = await st();
     ok(s.name === '카일러스' && (s.left.who === 'kylus' || s.right.who === 'kylus') && s.left.who !== s.right.who, '세 번째 화자는 방금 말하지 않은 쪽을 바꿈 ' + JSON.stringify([s.left.who, s.right.who]));
     s = await toEnd(); ok(s.btns.join(',') === '돌아가기,대화 종료', '완료 대사 끝: 돌아가기/대화 종료');
     await pg.waitForTimeout(300); await shot('5_three_end');
@@ -80,14 +82,14 @@ const fails = [], errs = []; const ok = (c, m) => { console.log((c ? '  ok   ' :
 
     // 3) 뒷장: 19장 ② 받기(아스텔·그레이스 — 그레이스는 이야기 보스, 그림이 없으면 이름 패만) + 건너뛰기
     await ev(() => { const q = G.data.quests.mq19b, n = G.data.npcs[q.giver]; G.offerQuest(n, q); });
-    await sceneOn(); await tapNext(); await tapNext(); await portraits(); s = await st();
+    await sceneOn(); await goNext(); await portraits(); s = await st();
     ok(s.name === '그레이스', '보스 화자 이름 ' + s.name + ' ' + JSON.stringify(s.left));
     await pg.waitForTimeout(400); await shot('6_ch19_grace');
     await click('건너뛰기'); s = await st(); ok(s.end && s.i === s.n - 1 && s.btns[0] === '수락하기', '건너뛰기 → 마지막 쪽 단추');
     await click('나중에'); await pg.waitForTimeout(400); await ev(() => G.ui.close());
     // 20장 ①: 케린(빌린 경비병 모델) + 서술 줄
     await ev(() => { const q = G.data.quests.mq20a, n = G.data.npcs[q.turnIn]; G.questTalk(n, q, q.completeText, G.back(n)); });
-    await sceneOn(); await tapNext(); s = await st();
+    await sceneOn(); await goNext(); s = await st();
     ok(await ev(() => document.querySelector('.vn-text').classList.contains('narr') && document.querySelector('.vn-box').classList.contains('noname')), '서술 줄: 이름 패 없음·가운데 기울임');
     await pg.waitForTimeout(400); await shot('7_narration');
     await click('건너뛰기'); await click('대화 종료');
