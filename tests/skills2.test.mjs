@@ -22,7 +22,7 @@ for (const j of jobs) {
   const s = d.skillsOf(j); Eq(s.length, 15, j + " has 15");
   for (let c = 0; c < 3; c++) Eq(s.filter(x => x.cat === c).length, 5, j + " cat " + c + " has 5");
   Ok(s.some(x => x.type === "attack" && x.ops.some(o => o.op === "hit" && o.shape === "single" || o.op === "proj" || o.op === "custom")) || s.some(x => x.type === "summon"), j + " has a single-target damage option");
-  Ok(s.some(x => ["support", "passive"].includes(x.type) && x.ops.concat([]).some(o => ["shield", "heal", "buff", "cleanse", "melody", "area"].includes(o.op)) || x.mods?.some(m => ["maxHp", "def"].includes(m.stat))), j + " has a survival tool");
+  Ok(s.some(x => ["support", "passive"].includes(x.type) && x.ops.concat([]).some(o => ["shield", "heal", "buff", "cleanse", "melody", "area"].includes(o.op) || o.survival) || x.mods?.some(m => ["maxHp", "def"].includes(m.stat))), j + " has a survival tool");
 }
 const ids = new Set(d.skill2List.map(s => s.id)); Eq(ids.size, 188, "unique ids");
 for (const s of d.skill2List) {

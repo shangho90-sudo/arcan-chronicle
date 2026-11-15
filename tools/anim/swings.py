@@ -940,6 +940,75 @@ CF_SHOW = action('cf_show', [      # 마스터 셰프 쇼타임: 빠른 손질 3
 ], 0.15, 1.3, None, fadeIn=0.06, fadeOut=0.18)
 CF_ALL = [CF_WOK, CF_SPLASH, CF_PLACE, CF_SKEWER, CF_SCOOP, CF_PLATE, CF_DRAW, CF_SERVE, CF_SHOW]
 SKILL_ACTS += CF_ALL   # 쉐프 2차
+# ------------------------------------------------------------------------------------------------ 한약사 2차 (2026-11-16 '본초 도사')
+# 손은 비우고 유봉은 동작 내내 등에(stow — 약사 약병 투구와 같은 규칙). 타격 시각(hitT) = 스킬 op가 실행되는 순간(skillrt release: 0.35 s 이하).
+# hb_brew 대주천·금강 약갑: 손으로 가슴 앞에 원을 그리다 기를 몸 안으로 끌어들임(0.30 s)
+# hb_sow  백초 훈증진·소환 4종: 몸을 낮춰 오른손으로 땅에 약초·씨앗을 흩뿌리고(0.10~0.22 s) 두 손을 들어 올려 자라게 함(0.34 s)
+# hb_raise 청룡승근·황정지맥: 손바닥을 아래에서 앞위로 쳐올려 땅속 기운을 끌어올림(0.28 s)
+# hb_moxa 주작천구: 가슴 앞 손끝에 쑥뜸 불을 붙이고(0~0.12 s) 뒤로 젖혔다가 앞으로 던짐(0.26 s)
+# hb_flick 백호유침: 손을 어깨 앞에 모았다가 손끝을 짧게 튕김(0.16 s)
+# hb_pour 현무약해: 호리병을 들어 앞으로 기울여 쏟음(0.24 s)
+# hb_gather 백초귀원·신농백초원(시전 시간 있는 궁극기): 두 손을 머리 위로 크게 펼쳐 기를 모았다가 가슴 앞으로 끌어내림
+HB0 = dict(hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18])
+HB_BREW = action('hb_brew', [
+    key(0.00, **HB0),
+    key(0.10, 'o', twist=-8, lean=2, sink=0.04, hand=[-40, 8, 0.62], blade=[-30, 30], elbow=[-0.7, -0.8, -0.4], armL=[60, 24]),
+    key(0.18, 's', twist=4, lean=3, sink=0.05, hand=[10, 22, 0.66], blade=[20, 40], elbow=[-0.5, -1, -0.2], armL=[72, 30]),
+    key(0.25, 's', twist=8, lean=2, sink=0.06, hand=[36, 4, 0.60], blade=[40, 10], elbow=[-0.3, -1, 0.1], armL=[64, 28]),
+    key(0.30, 'i', twist=0, lean=-3, sink=0.08, hand=[-6, -2, 0.36], blade=[0, 60], elbow=[-0.8, -1, -0.1], armL=[48, 36], squint=True),
+    key(0.46, 'o', twist=0, lean=-4, sink=0.07, hand=[-8, -6, 0.34], blade=[0, 60], elbow=[-0.8, -1, -0.1], armL=[44, 36]),
+    key(0.64, 's', **HB0),
+], 0.30, 0.48, None, fadeIn=0.06, fadeOut=0.16)
+HB_SOW = action('hb_sow', [
+    key(0.00, **HB0),
+    key(0.10, 'o', twist=-16, lean=14, sink=0.16, hand=[-44, -46, 0.86], blade=[-30, -20], elbow=[-0.6, -1, -0.4], armL=[20, 26]),
+    key(0.22, 's', twist=14, lean=16, sink=0.18, hand=[30, -50, 0.92], blade=[40, -24], elbow=[-0.3, -1, 0.1], armL=[24, 30]),
+    key(0.34, 'i', twist=0, lean=-8, sink=0.04, hand=[-10, 62, 0.86], blade=[-6, 90], elbow=[-0.6, 0.2, -1], armL=[150, 34], squint=True),
+    key(0.50, 'o', twist=0, lean=-9, sink=0.03, hand=[-10, 66, 0.84], blade=[-6, 96], elbow=[-0.6, 0.2, -1], armL=[156, 34]),
+    key(0.70, 's', **HB0),
+], 0.34, 0.50, None, fadeIn=0.06, fadeOut=0.16)
+HB_RAISE = action('hb_raise', [
+    key(0.00, **HB0),
+    key(0.12, 'o', twist=-10, lean=10, sink=0.15, hand=[-14, -52, 0.74], blade=[-10, -30], elbow=[-0.6, -1, -0.3], armL=[16, 24]),
+    key(0.20, 's', twist=-12, lean=12, sink=0.17, hand=[-12, -56, 0.72], blade=[-8, -34], elbow=[-0.6, -1, -0.3], armL=[16, 24]),
+    key(0.28, 'i', twist=4, lean=-2, sink=0.05, hand=[0, 26, 1.0], blade=[0, 60], elbow=[-0.5, -0.6, -0.4], armL=[90, 26], squint=True),
+    key(0.42, 'o', twist=5, lean=-3, sink=0.04, hand=[2, 30, 0.98], blade=[2, 66], elbow=[-0.5, -0.6, -0.4], armL=[94, 26]),
+    key(0.62, 's', **HB0),
+], 0.28, 0.46, None, fadeIn=0.06, fadeOut=0.16)
+HB_MOXA = action('hb_moxa', [
+    key(0.00, **HB0),
+    key(0.08, 'o', twist=-4, lean=2, sink=0.05, hand=[-20, 4, 0.42], blade=[0, 50], elbow=[-0.8, -1, -0.1], armL=[70, 20]),
+    key(0.16, 's', twist=-30, lean=-6, sink=0.08, hand=[-104, 34, 0.80], blade=[-130, 40], elbow=[-0.4, -0.5, -1], armL=[40, 30]),
+    key(0.26, 'i', twist=16, lean=12, sink=0.10, hand=[2, 6, 1.0], blade=[6, -4], elbow=[-0.5, -1, -0.1], armL=[14, 34], squint=True),
+    key(0.36, 'o', twist=22, lean=12, sink=0.10, hand=[20, -14, 0.92], blade=[30, -20], elbow=[-0.3, -1, 0.1], armL=[12, 38]),
+    key(0.56, 's', **HB0),
+], 0.26, 0.42, None, fadeIn=0.05, fadeOut=0.15)
+HB_MOXA.update(stow=True)
+HB_FLICK = action('hb_flick', [
+    key(0.00, **HB0),
+    key(0.09, 'o', twist=-10, lean=-2, sink=0.05, hand=[-26, 30, 0.48], blade=[-20, 70], elbow=[-0.8, -0.6, -0.5], armL=[40, 30]),
+    key(0.16, 'i', twist=8, lean=8, sink=0.07, hand=[0, 12, 0.98], blade=[0, 6], elbow=[-0.6, -1, -0.1], armL=[30, 34], squint=True),
+    key(0.28, 'o', twist=10, lean=8, sink=0.07, hand=[4, 8, 0.96], blade=[4, 0], elbow=[-0.6, -1, -0.1], armL=[28, 34]),
+    key(0.46, 's', **HB0),
+], 0.16, 0.36, None, fadeIn=0.05, fadeOut=0.14)
+HB_POUR = action('hb_pour', [
+    key(0.00, **HB0),
+    key(0.12, 'o', twist=-14, lean=-6, sink=0.04, hand=[-20, 44, 0.70], blade=[-10, 80], elbow=[-0.7, -0.4, -0.8], armL=[40, 26]),
+    key(0.24, 'i', twist=10, lean=14, sink=0.12, hand=[0, 2, 1.0], blade=[0, -40], elbow=[-0.5, -1, -0.1], armL=[60, 30], squint=True),
+    key(0.40, 'o', twist=14, lean=16, sink=0.13, hand=[10, -10, 0.98], blade=[8, -60], elbow=[-0.4, -1, 0], armL=[56, 30]),
+    key(0.60, 's', **HB0),
+], 0.24, 0.44, None, fadeIn=0.05, fadeOut=0.16)
+HB_GATHER = action('hb_gather', [
+    key(0.00, **HB0),
+    key(0.22, 'o', twist=0, lean=-10, sink=0.02, hand=[-30, 70, 0.92], blade=[-20, 100], elbow=[-0.7, 0.3, -1], armL=[168, 40]),
+    key(0.50, 's', twist=0, lean=-12, sink=0.0, hand=[-26, 76, 0.94], blade=[-16, 110], elbow=[-0.7, 0.3, -1], armL=[172, 42]),
+    key(0.74, 'i', twist=0, lean=6, sink=0.12, hand=[-8, 0, 0.42], blade=[0, 70], elbow=[-0.8, -1, -0.1], armL=[60, 34], squint=True),
+    key(0.98, 'o', twist=0, lean=4, sink=0.10, hand=[-8, -4, 0.40], blade=[0, 70], elbow=[-0.8, -1, -0.1], armL=[56, 34]),
+    key(1.20, 's', **HB0),
+], 0.30, 0.6, None, fadeIn=0.06, fadeOut=0.18)
+HB_ACTS = [HB_BREW, HB_SOW, HB_RAISE, HB_MOXA, HB_FLICK, HB_POUR, HB_GATHER]
+for _a in HB_ACTS: _a.update(stow=True)
+SKILL_ACTS += HB_ACTS
 
 acts = json.load(open(P))
 names = {'attack', 'attack2'} | {x['name'] for x in SKILL_ACTS}

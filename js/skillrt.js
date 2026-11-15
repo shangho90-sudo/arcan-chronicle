@@ -25,6 +25,8 @@ import { SmithKit, clearLine } from './smith.js';
 import { WpKit } from './wpharm.js';
 // 쉐프 2차: 웍·플람베·압력솥·꼬치·쇼타임 / 소르베·플레이팅·밀푀유·설탕 벽·크로캉부슈 / 부용·봉 아페티·한 끗·그랑 디너 규칙 (js/chef.js)
 import { ChefKit } from './chef.js';
+// 한약사 2차 (2026-11-16 '본초 도사'): 탕약·경락·영물 소환·오행 침구 규칙 (js/herbal.js), 그림 js/herbalfx.js
+import { HerbalKit } from './herbal.js';
 
 let G = null; export function bindSkillRt(g) { G = g; }
 const DEG = Math.PI / 180;
@@ -48,6 +50,7 @@ export const FX = {
   smith(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.smith) return G.skillFx.smith[kind](a, o); } catch (e) { console.warn('fx smith', e); } return null; },   // 대장장이 1차 (js/smithfx.js)
   wp(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.wp) return G.skillFx.wp[kind](a, o); } catch (e) { console.warn('fx wp', kind, e); } return null; },   // 양약사 2차: 캡슐·앰플·결정·표식 고리 (js/wpharmfx.js)
   chef(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.chef) return G.skillFx.chef[kind](a, o); } catch (e) { console.warn('fx chef', e); } return null; },   // 쉐프 2차 (js/cheffx.js)
+  herbal(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.herbal) return G.skillFx.herbal.make(kind, a, o); } catch (e) { console.warn('fx herbal', kind, e); } return null; },   // 한약사 2차 (js/herbalfx.js)
   hair(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.hair) return G.skillFx.hair[kind](a, o); } catch (e) { console.warn('fx hair', e); } return null; },   // 미용사 1차: 큰 가위·빗·드라이어·헤어롤 (js/hairfx.js)
   bash(kind, pos, dir, o = {}) { try { if (G.skillFx && G.skillFx.bash) return G.skillFx.bash[kind](pos, dir, o); } catch (e) { console.warn('fx bash', e); } },   // 배쉬 (js/bashfx.js)
   beam(kind, a, b, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.beam(kind, a, b, o); } catch (e) { console.warn('fx', kind, e); } },
@@ -132,6 +135,7 @@ export class SkillEngine {
     this.smith = new SmithKit(this, { applyStatus, fx: FX.smith, G: () => G });   // 대장장이 1차 규칙 (js/smith.js)
     this.wp = typeof WpKit === 'function' ? new WpKit(this, { applyStatus, fx: (k, a, o) => FX.wp(k, a, o), G: () => G, addMark, takeMarks }) : null;   // 양약사 2차 규칙 (js/wpharm.js)
     this.chef = typeof ChefKit === 'function' ? new ChefKit(this, { applyStatus, fx: FX.chef, G: () => G }) : null;   // 쉐프 2차 규칙 (js/chef.js)
+    this.herbal = typeof HerbalKit === 'function' ? new HerbalKit(this, { applyStatus, fx: (k, a, o) => FX.herbal ? FX.herbal(k, a, o) : null, G: () => G }) : null;   // 한약사 2차 규칙 (js/herbal.js)
     this.restoreCooldowns();
   }
   get book() { return this.pc.sheet.book; }
@@ -286,6 +290,7 @@ export class SkillEngine {
     this.summons = this.summons.filter(s => !s.dead);
     this.smith.tick(dt); if (this.wp) this.wp.tick(dt);
     if (this.chef) this.chef.tick(dt);
+    if (this.herbal) this.herbal.tick(dt);
     if (this.melody) this.tickMelody(dt);
     if (this.overclockT > 0) { this.overclockT -= dt; if (this.overclockT <= 0) { applyStatus(pc, { id: 'cooldown_heat', dur: this.coolT, val: 1, ch: 1 }, pc); } }
     for (const m of pc.zone.actors) if (m._marks) { if (m.dead) clearMarks(m); else tickMarks(m, dt); }
@@ -298,6 +303,7 @@ export class SkillEngine {
     if (this.melody) { this.melody.fx.dispose(); this.melody = null; }
     this.smith.clear(); if (this.wp) this.wp.clear();
     if (this.chef) this.chef.clear();   // 쉐프: 기다리는 단계·쟁반·소르베·원반 취소(피해 없음)
+    if (this.herbal) this.herbal.clear();
     this.pending = []; this.casting = null; if (this.channel) { this.channel = null; }
     for (const m of (this.pc.zone ? this.pc.zone.actors : [])) clearMarks(m);
   }
@@ -1019,6 +1025,7 @@ export class Summon {
 
 // ------------------------------------------------------------------ unique mechanics
 export const CUSTOM = {
+  herb(eng, op, ctx) { if (eng.herbal) eng.herbal.cast(op, ctx); },   // 한약사 2차 15종 (js/herbal.js, op.k = 칸)
   meatball_volley(eng, op, ctx) { meatballVolley(eng, op, ctx, G); },   // 요리사 미트볼 던지기 (js/meatball.js + js/cookfx.js volley)
   // 양약사 2차 (js/wpharm.js): 작열·분열 캡슐 · 극저온 결정화 · 이온 관통술 · 삼상 복합제 · 대형 캡슐 붕괴 · 촉매 활성화 · 정밀 표적 전달 · 연쇄 용출 · 임계 농도
   ...Object.fromEntries(['wp_capsule', 'wp_cryo', 'wp_ion', 'wp_tri', 'wp_collapse', 'wp_catalyst', 'wp_carrier', 'wp_chain', 'wp_critical'].map(k => [k, (eng, op, ctx) => eng.wp && eng.wp[k](op, ctx)])),

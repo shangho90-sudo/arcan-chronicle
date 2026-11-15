@@ -156,36 +156,48 @@ S(J, 2, 2, C_, 4, 'wp_c4', '다층 코팅막', 'support', '얇은 막 세 겹으
   ops=[shield(40, 1.2, 8, lowHp=1.0, noAura=True), dict(op='fx', wp='coat', dur=8)], fx=dict(color=0x9ae6ff))
 S(J, 2, 2, C_, 5, 'wp_c5', '최종 처방·생명 유지', 'passive', '치명적인 피해를 받으면 가슴의 응급 캡슐이 깨져 체력을 조금 남기고, 같은 양의 보호막과 짧은 재생을 준다. (내부 쿨타임 120초)', flags=dict(cheatDeath=[0.15, 0.05]), icd=120)
 
-# ======================================================================= 한약사 (herbalist)
+# ======================================================================= 한약사 (herbalist) — 2026-11-16 개편 '본초 도사'
+# 기를 달여 약초와 영물을 깨우는 한약사. 규칙은 js/herbal.js(HerbalKit, CUSTOM 'herb' — op.k = 스킬 칸), 그림은 js/herbalfx.js
+# (Blender tools/blender/fx_herbal.py -> assets/fx/fx_herbal.glb.json), 동작은 tools/anim/swings.py hb_*(손은 비우고 유봉은 등에 — stow).
+# 수치는 예전 한약사 값에서 출발(같은 레벨·장비 기준), 계획·이전 값은 docs/STATUS.md. 여러 타·여러 메시로 나눠도 총합은 그대로.
 J, C = 'herbalist', 0x6ac040
-S(J, 2, 0, '약초와 보양', 1, 'hb_a1', '보양탕 달이기', 'craft', '최대 HP와 자연 회복을 높이는 탕약을 만든다.')
-S(J, 2, 0, '약초와 보양', 2, 'hb_a2', '기력 순환', 'support', '자신과 주변 소환물의 이동 속도를 높이고 자신의 MP 회복을 강화한다.', target='self', mp=18, cd=20, anim='cast',
-  ops=[buff('haste', 8, 0.2, target='all'), buff('mpregen', 8, 4)])
-S(J, 2, 0, '약초와 보양', 3, 'hb_a3', '금강 약초', 'support', '방어력과 경직 저항을 강화한다.', target='self', mp=18, cd=22, anim='cast', ops=[buff('defup', 10, 0.3), buff('ccres', 10, 0.5)])
-S(J, 2, 0, '약초와 보양', 4, 'hb_a4', '정화의 약초밭', 'support', '주기적으로 회복하고 상태이상을 정화하는 영역을 만든다.', target='ground', range=6, mp=30, cd=24, anim='cast',
-  ops=[area('heal', 3.0, 8, tick=1.5, heal=0.025, cleanse=True, fx='herb_field', herb=True, living=True)])
-S(J, 2, 0, '약초와 보양', 5, 'hb_a5', '백초대환', 'ultimate', '즉시 크게 회복한 뒤 공격·방어·회복 효과를 강화한다.', target='self', mp=60, cd=60, cast=0.5, anim='cast',
-  ops=[heal(pct=0.35), buff('atkup', 12, 0.25), buff('defup', 12, 0.3), buff('healup', 12, 0.3), dict(op='fx', burst='heal', r=3)])
-S(J, 2, 1, '식물과 영물 소환', 1, 'hb_b1', '가시덩굴 소환', 'summon', '적을 속박하고 반복 공격하는 가시덩굴을 소환한다.', target='ground', range=7, mp=24, cd=10, anim='cast',
-  ops=[summon('vine', ai='static_melee', life=10, hp=0.6, coef=0.6, rate=1.0, range=2.2, onHit=[st('root', 1.2)], limit=2, living=True)])
-S(J, 2, 1, '식물과 영물 소환', 2, 'hb_b2', '독초 화원', 'summon', '독성 포자를 뿌리는 지속 피해 영역을 만든다.', target='ground', range=7, mp=26, cd=14, anim='cast',
-  ops=[area('dmg', 2.8, 8, tick=1.0, coef=0.45, elem='poison', st=[st('poison', 3, 0.1)], fx='poison_garden', herb=True)])
-S(J, 2, 1, '식물과 영물 소환', 3, 'hb_b3', '약초 정령', 'summon', '잎 투사체로 공격하고 주기적으로 주인을 회복하는 정령.', target='self', mp=28, cd=20, anim='cast',
-  ops=[summon('herb_spirit', ai='follow_ranged', life=30, hp=0.5, coef=0.7, rate=1.4, range=7, proj='leaf', healOwner=0.03, healEvery=4, limit=1, living=True, fly=True)])
-S(J, 2, 1, '식물과 영물 소환', 4, 'hb_b4', '고목 수호령', 'summon', '적의 주의를 끌고 뿌리로 범위 공격하는 고목 수호령.', target='ground', range=6, mp=34, cd=28, anim='cast',
-  ops=[summon('tree_guardian', ai='taunt_aoe', life=20, hp=2.5, coef=1.0, rate=2.2, range=2.6, taunt=True, limit=1, living=True)])
-S(J, 2, 1, '식물과 영물 소환', 5, 'hb_b5', '신령의 숲', 'ultimate', '넓은 둔화 영역을 펼치고 식물 소환물을 강화한다.', target='self', mp=70, cd=70, cast=0.8, anim='cast',
-  ops=[dict(op='telegraph', shape='circle', r=7, dur=0.8), area('slow', 7, 12, tick=1.0, coef=0.3, st=[st('slow', 1.5, 0.45)], fx='forest_sanctum', empowerSummons=0.5)])
-S(J, 2, 2, '음양오행 공격', 1, 'hb_c1', '목행·청룡덩굴', 'attack', '직선으로 관통하는 덩굴. 속박된 적에게 추가 피해.', range=9, mp=20, cd=6, anim='cast',
-  ops=[hit('line', 2.4, len=9, w=1.2, elem='wood', vsStatus=dict(id='root', mul=1.6), fx=dict(beam='vine_line'))], fx=dict(color=0x4ac060))
-S(J, 2, 2, '음양오행 공격', 2, 'hb_c2', '화행·주작염', 'attack', '불새 투사체가 날아가 범위 폭발과 화상을 일으킨다.', target='ground', range=9, mp=24, cd=8, anim='cast',
-  ops=[proj('normal', 2.6, r=2.2, speed=11, elem='fire', fx='firebird', burst='explosion_fire', st=[st('burn', 4, 0.15)], toGround=True)], fx=dict(color=0xff5a2a))
-S(J, 2, 2, '음양오행 공격', 3, 'hb_c3', '토행·황토진', 'attack', '지면 범위 공격. 영역 안의 자신은 받는 피해가 줄어든다.', target='ground', range=6, mp=24, cd=10, anim='cast',
-  ops=[hit('circle', 2.2, r=2.6, atAim=True, elem='earth', fx=dict(burst='dust')), area('ward', 2.6, 6, tick=0.5, selfBuff=('dmgreduce', 0.25), fx='earth_seal')], fx=dict(color=0xd8a040))
-S(J, 2, 2, '음양오행 공격', 4, 'hb_c4', '금행·백호침', 'attack', '부채꼴로 금빛 침을 날린다. 중심의 적이 여러 번 맞으면 방어력이 감소한다.', range=6, mp=22, cd=7, anim='cast',
-  ops=[hit('cone', 0.6, r=6, ang=50, hits=4, gap=0.06, elem='metal', centerStack=dict(n=3, st=st('defdown', 5, 0.2)), fx=dict(slash='fan_needles'))], fx=dict(color=0xffd860))
-S(J, 2, 2, '음양오행 공격', 5, 'hb_c5', '수행·현무파', 'attack', '물결로 밀치고 둔화시킨다. 통과한 약초 영역의 지속시간을 조금 늘린다(최대 +4초).', range=8, mp=24, cd=9, anim='cast',
-  ops=[hit('line', 1.8, len=8, w=2.4, elem='water', knock=2.5, st=[st('slow', 3, 0.35)], extendHerb=2.0, extendCap=4.0, fx=dict(beam='water_wave'))], fx=dict(color=0x4aa0ff))
+HA, HB, HC = '비전 탕약과 경락', '본초 영물술', '오행 침구술'
+def herb(k, **kw): return dict(op='custom', fn='herb', k=k, **kw)
+S(J, 2, 0, HA, 1, 'hb_a1', '구증구포·보원탕', 'craft', '아홉 번 찌고 말린 약초를 작은 탕관에 달여 보원탕(90초 동안 최대 HP +15%)을 만든다. 여러 개를 한 번에 달일 수 있다.')
+S(J, 2, 0, HA, 2, 'hb_a2', '대주천', 'support', '발끝에서 손끝까지 기를 한 바퀴 돌려 기력 회복이 빨라지고, 나와 가까운(10 m) 생명 소환물의 이동 속도가 오른다.', target='self', mp=18, cd=20, anim='hb_brew', sfx='hb_resonance', sfxAt='strike', sfxLead=0.05,
+  ops=[herb('a2', dur=8, mp=4, haste=0.2, near=10)], fx=dict(color=0x40d8b0))
+S(J, 2, 0, HA, 3, 'hb_a3', '금강 약갑', 'support', '나무껍질과 잎맥으로 된 옥빛 약갑이 어깨와 팔을 감싼다. 방어력과 경직 저항이 오르고 작은 보호막이 생긴다. 다시 쓰면 시간만 새로 채워진다(겹치지 않음).', target='self', mp=18, cd=22, anim='hb_brew', sfx='hb_resonance', sfxAt='strike', sfxLead=0.05,
+  ops=[herb('a3', survival=True, dur=10, def_=0.3, ccres=0.5, shield=0.06, shieldLv=0.01)], fx=dict(color=0x60d890))
+S(J, 2, 0, HA, 4, 'hb_a4', '백초 훈증진', 'support', '가운데 작은 탕관을 놓고 둥근 약초진을 편다. 진 안의 나와 생명 소환물이 주기적으로 회복하고 해로운 상태 하나가 풀린다. 바닥 무늬가 실제 범위.', target='ground', range=6, mp=30, cd=24, anim='hb_sow', sfx='hb_simmer', sfxAt='strike',
+  ops=[herb('a4', survival=True, r=3.0, dur=8, tick=1.5, heal=0.025, grow=0.5)], fx=dict(color=0xffc060))
+S(J, 2, 0, HA, 5, 'hb_a5', '백초귀원', 'ultimate', '둥글게 펼친 약초의 기를 금빛 환약 하나로 모아 삼킨다. 환약이 몸에 스며드는 순간 크게 회복하고, 빛의 약초꽃이 피어 공격·방어·회복 효과가 오른다.', target='self', mp=60, cd=60, cast=0.5, anim='hb_gather', sfx='hb_bloom', sfxAt='op',
+  ops=[herb('a5', heal=0.35, absorb=0.62, dur=12, atk=0.25, def_=0.3, healup=0.3)], fx=dict(color=0xffd060))
+S(J, 2, 1, HB, 1, 'hb_b1', '갈근·반룡근', 'summon', '땅에 뿌린 씨앗에서 굵은 칡뿌리가 솟아 주변의 적 발을 감아 묶고, 뿌리 끝의 작은 용머리가 거듭 문다. 보스는 묶이지 않고 느려진다.', target='ground', range=7, mp=24, cd=10, anim='hb_sow', sfx='hb_root', sfxAt='strike',
+  ops=[herb('b1', life=10, hp=0.6, coef=0.6, rate=1.0, range=2.2, root=1.2, limit=2, grow=0.5)], fx=dict(color=0x8ac050))
+S(J, 2, 1, HB, 2, 'hb_b2', '독초·자운화', 'summon', '보라 꽃봉오리가 차례로 자라 피어나며 1초마다 독 포자를 둥글게 내뿜는다. 범위 안의 적은 중독되어(지속 피해) 공격력이 떨어진다. 꽃이 몇 송이든 한 적은 한 번씩만 맞는다.', target='ground', range=7, mp=26, cd=14, anim='hb_sow', sfx='hb_root', sfxAt='strike',
+  ops=[herb('b2', r=2.8, dur=8, tick=1.0, coef=0.45, poison=0.1, poisonDur=3, atkdown=0.1, grow=0.6)], fx=dict(color=0xa060e0))
+S(J, 2, 1, HB, 3, 'hb_b3', '천년삼 동자', 'summon', '씨앗에서 싹이 터 통통한 천년삼 동자가 튀어나온다. 뿌리 팔로 적을 채찍질하고, 4초마다 금빛 약방울을 주인에게 보내 회복시킨다. 다시 부르면 지금 동자가 새로 기운을 얻는다.', target='self', mp=28, cd=20, anim='hb_sow', sfx='hb_root', sfxAt='strike',
+  ops=[herb('b3', life=30, hp=0.5, coef=0.7, rate=1.4, range=2.6, heal=0.03, healEvery=4, limit=1, grow=0.7)], fx=dict(color=0xffd080))
+S(J, 2, 1, HB, 4, 'hb_b4', '영지·녹각수호령', 'summon', '약초와 뿌리가 모여 영지 뿔을 단 사슴 수호령이 된다. 주변의 일반 몬스터를 끌어들이고(보스 제외) 가까운 적을 들이받으며, 발을 구르면 뿌리가 부채꼴로 뻗어 범위 피해를 준다.', target='ground', range=6, mp=34, cd=28, anim='hb_sow', sfx='hb_root', sfxAt='strike',
+  ops=[herb('b4', life=20, hp=2.5, coef=0.5, rate=2.2, range=1.9, stomp=1.0, stompEvery=4.4, stompR=3.2, stompAng=100, limit=1, grow=0.8)], fx=dict(color=0x60c0a0))
+S(J, 2, 1, HB, 5, 'hb_b5', '신농백초원', 'ultimate', '하늘에 커다란 본초 두루마리를 펼친다. 그려진 약초가 빛으로 내려와 넓은 약초밭이 되고, 그 순간 땅속 뿌리가 솟아 안의 적에게 피해를 준다. 약초밭은 적을 느리게 하고 그 안의 내 식물·영물 소환물을 강화한다.', target='self', mp=70, cd=70, cast=0.8, anim='hb_gather', sfx='hb_bloom', sfxAt='op',
+  ops=[dict(op='telegraph', shape='circle', r=7, dur=0.8), herb('b5', r=7, dur=12, coef=2.4, slow=0.45, empower=0.5, tick=1.0)], fx=dict(color=0xb0ff70))
+S(J, 2, 2, HC, 1, 'hb_c1', '목행·청룡승근', 'attack', '앞쪽 일직선으로 뿌리가 차례로 땅을 뚫고 솟아오르고, 마지막 뿌리가 수염 달린 청룡 머리가 되어 꿰뚫는다. 묶인(속박) 적에게는 추가 피해.', range=9, mp=20, cd=6, anim='hb_raise', sfx='hb_root', sfxAt='strike',
+  ops=[herb('c1', coef=2.4, len=9, w=1.2, vsRoot=1.6, step=0.055)], fx=dict(color=0x4ad0a0))
+S(J, 2, 2, HC, 2, 'hb_c2', '화행·주작천구', 'attack', '손에서 작은 쑥뜸에 불을 붙여 던지면 붉은 날개를 편 주작이 낮게 날아가 부딪친다. 좌우로 날개 모양 불꽃이 퍼져 범위 피해와 화상. 방어력이 깎인 적에게 더 아프다.', target='ground', range=9, mp=24, cd=8, anim='hb_moxa', sfx='throw', sfxAt='strike',
+  ops=[herb('c2', coef=2.6, speed=11, core=1.3, wing=5.0, depth=1.4, burn=0.15, burnDur=4, vsDefdown=1.25)], fx=dict(color=0xff5a2a))
+S(J, 2, 2, HC, 3, 'hb_c3', '토행·황정지맥', 'attack', '금빛 맥이 땅속을 달려 둥근 지맥을 그리고, 적이 선 자리마다 낮은 돌기둥과 뿌리가 차례로 솟는다. 그 뒤 지맥 안에 선 나는 받는 피해가 줄어든다.', target='ground', range=6, mp=24, cd=10, anim='hb_raise', sfx='hb_root', sfxAt='strike',
+  ops=[herb('c3', coef=2.2, r=2.6, run=0.25, ward=6, dr=0.25)], fx=dict(color=0xd8a040))
+S(J, 2, 2, HC, 4, 'hb_c4', '금행·백호유침', 'attack', '어깨 뒤에 백금 침이 부채처럼 펼쳐졌다가 손끝 한 번에 앞쪽 부채꼴로 날아간다. 적마다 침 4개가 조금씩 다른 곡선으로 모여 꽂히고, 가운데 적이 3번 맞으면 방어력이 떨어진다.', range=6, mp=22, cd=7, anim='hb_flick', sfx='hb_needle', sfxAt='strike',
+  ops=[herb('c4', coef=0.6, r=6, ang=50, per=4, maxT=5, gap=0.06, speed=16, stackN=3, defdown=0.2, defdownDur=5)], fx=dict(color=0xf0f0ff))
+S(J, 2, 2, HC, 5, 'hb_c5', '수행·현무약해', 'attack', '호리병의 청옥빛 약수가 넓고 낮은 물결이 되어 앞으로 밀려간다. 맞은 적은 밀려나고 느려지며(보스는 안 밀림), 물결이 지나간 내 약초 영역(백초 훈증진·자운화)은 2초 늘어난다(한 번 쓸 때 영역마다 한 번, 영역마다 최대 +4초).', range=8, mp=24, cd=9, anim='hb_pour', sfx='splash', sfxAt='strike',
+  ops=[herb('c5', coef=1.8, len=8, w=2.4, speed=12, knock=2.5, slow=0.35, slowDur=3, extend=2.0, extendCap=4.0)], fx=dict(color=0x3a90ff))
+
+# 누른 순간의 준비 연출(op 'pre', at = -동작의 타격 시각): 씨앗 뿌리기·손 원 그리기·쑥뜸 불붙이기·어깨 뒤 침·호리병 (그림만, 피해 없음)
+HB_PRE = dict(hb_a2=('brew', 0.30), hb_a3=('brew', 0.30), hb_a4=('sow', 0.34), hb_b1=('sow', 0.34), hb_b2=('sow', 0.34), hb_b3=('sow', 0.34), hb_b4=('sow', 0.34),
+              hb_c1=('raise', 0.28), hb_c3=('raise', 0.28), hb_c2=('moxa', 0.26), hb_c4=('needles', 0.16), hb_c5=('gourd', 0.24))
+for _d in SK:
+    if _d['id'] in HB_PRE: w, t = HB_PRE[_d['id']]; _d['ops'].insert(0, herb('pre', what=w, at=-t))
 
 # ======================================================================= 요리사 (cook)
 J, C = 'cook', 0xff9a40
@@ -539,7 +551,7 @@ ITEMS = [
     item('f_course_atk', '특제 코스: 불꽃 스테이크', '공격력이 오르는 고급 음식. (음식 효과는 중첩되지 않음)', 'consumable', 2, sell=12, use=dict(status='atkup', duration=60, value=0.15)),
     item('f_course_def', '특제 코스: 든든한 스튜', '방어력이 오르는 고급 음식.', 'consumable', 2, sell=12, use=dict(status='defup', duration=60, value=0.2)),
     item('f_course_heal', '특제 코스: 생명의 샐러드', '회복량이 오르는 고급 음식.', 'consumable', 2, sell=12, use=dict(status='healup', duration=60, value=0.2)),
-    item('f_tonic', '보양탕', '최대 HP와 자연 회복을 높이는 탕약.', 'consumable', 2, sell=10, use=dict(status='well_fed2', duration=90, value=0.15)),
+    item('f_tonic', '보원탕', '구증구포로 달인 탕약. 90초 동안 최대 HP +15%.', 'consumable', 2, sell=10, use=dict(status='well_fed2', duration=90, value=0.15)),
     item('t_whetstone', '숫돌', '사용하면 60초 동안 공격력이 오른다.', 'consumable', 1, sell=3, use=dict(status='whetted', duration=60, value=0.12)),
     item('t_dye_red', '진홍 염색약', '외형(옷) 색을 바꾼다.', 'consumable', 1, sell=2, use=dict(dye='#d84050')),
     item('t_dye_blue', '청람 염색약', '외형(옷) 색을 바꾼다.', 'consumable', 1, sell=2, use=dict(dye='#4a70e0')),
