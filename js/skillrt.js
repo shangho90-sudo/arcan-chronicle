@@ -233,7 +233,7 @@ export class SkillEngine {
     // 약사 약병 투구 (action.stow, ph_pitch): the flask the skill throws is in the real right hand from the press (the same effect
     // object the projectile then flies with — no swap at the release); 약병폭격 has no projectile: its flask is tossed up and away
     const A0 = sh.actions[anim];
-    if (A0 && A0.stow && !d.cast) {
+    if (A0 && A0.stow && !d.cast && d.job !== 'western_pharmacist') {   // 양약사 공중 조제(wp_compound)는 손의 약병 없이 — 캡슐·앰플은 js/wpharmfx.js가 손(handPoint)에서 만듦
       const pop = d.ops.find(o => o.pharmProj), hp = () => { let h = null; try { h = pc.body && pc.body.handPoint && pc.body.handPoint(); } catch (e) { h = null; } return h ? { x: h.x, y: h.y, z: -h.z } : null; };
       const fx = FX.pharm('proj', hp() || { x: pc.pos.x, y: (pc.pos.y || 0) + 1, z: pc.pos.z }, { elem: pop ? pop.elem : 'poison', held: true });
       if (fx && fx.set) { const f = ctx.facing, h = ctx.heldFlask = { t: 0, dead: false, pos: null, fx,

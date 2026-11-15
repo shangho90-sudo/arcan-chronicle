@@ -564,7 +564,8 @@ export class Player extends Combatant {
     if (u.status) { const k = d.id.startsWith('f_') ? 1 + this.sheet.final.foodPower : 1; applyStatus(this, { id: u.status, dur: u.duration * k, val: u.value * (u.status === 'regen' ? this.maxHp : 1), ch: 1 }, this); }
     this.potionCd = Math.max(this.cfg.potionCooldown, u.cooldown);
     G.fx.play("heal", { x: this.pos.x, y: this.pos.y + 0.8, z: this.pos.z }, 1); G.audio.sfx("heal");
-    if (d.id.startsWith('f_') && G.skillFx && G.skillFx.cook) G.skillFx.cook.eat(this, { kind: cookFoodKind(d.id) });   // 음식: 도시락·수프 그릇이 나타나 한 입씩 (js/cookfx.js)
+    if (d.id.startsWith('f_') && G.skillFx && G.skillFx.cook) G.skillFx.cook.eat(this, { kind: cookFoodKind(d.id) });
+    if ((d.id === 'c_regen_hp' || d.id === 'c_regen_sp') && u.status && G.skillFx && G.skillFx.wp) G.skillFx.wp.regen(this, { status: u.status });   // 서방형 캡슐: 회복 틱마다 과립이 하나씩 빛나며 사라짐 (js/wpharmfx.js)   // 음식: 도시락·수프 그릇이 나타나 한 입씩 (js/cookfx.js)
     return true;
   }
   /** dye / weapon module / embroidery consumables: applied to the equipped gear, recorded in the save */

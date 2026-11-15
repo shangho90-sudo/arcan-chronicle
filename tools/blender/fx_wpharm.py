@@ -11,6 +11,7 @@ Meshes (game axes: +Y up, metres = 1 unit; js/wpharmfx.js 가 크기·색·움�
   wp_tablet     정제: 반지름 1, 두께 ±0.28 볼록한 원판 + 가운데 홈(정점 색 어둡게)
   wp_vial       작은 약병: 바닥 y 0, 몸통 반지름 0.3 .. 0.62, 목 0.12 .. 0.82, 코르크 0.82 .. 0.98(정점 색 갈색)
   wp_shard      결정 파편: 길쭉한 삼각 뿔 길이 1 (y 0 .. 1)
+  wp_sphere     맑은 구·코팅막: 반지름 1 UV 구(24 x 14)
 json: {b64}
 """
 import os, sys, math, json, base64
@@ -56,6 +57,11 @@ def vial(bm, col, uvl):
     P = [(0.0, 0.0), (0.26, 0.0), (0.3, 0.05), (0.3, 0.56), (0.22, 0.64), (0.12, 0.68), (0.12, 0.82), (0.15, 0.84), (0.15, 0.98), (0.0, 0.98)]
     lathe(bm, col, P, 14, lambda k, p: CORK if k >= 6 else W)
 
+def sphere(bm, col, uvl):
+    bmesh.ops.create_uvsphere(bm, u_segments=24, v_segments=14, radius=1.0)
+    for f in bm.faces:
+        for l in f.loops: l[col] = W
+
 def shard(bm, col, uvl):
     P = [(0.0, 0.0), (0.18, 0.08), (0.12, 0.6), (0.0, 1.0)]
     lathe(bm, col, P, 3, lambda k, p: W)
@@ -63,7 +69,7 @@ def shard(bm, col, uvl):
 def main():
     FP.reset()
     obs = [new_obj('wp_cap_half', cap_half), new_obj('wp_granule', granule, False), new_obj('wp_ampoule', ampoule), new_obj('wp_crystal', crystal, False),
-           new_obj('wp_tablet', tablet), new_obj('wp_vial', vial), new_obj('wp_shard', shard, False)]
+           new_obj('wp_tablet', tablet), new_obj('wp_vial', vial), new_obj('wp_shard', shard, False), new_obj('wp_sphere', sphere)]
     tris = {o.name: sum(len(p.vertices) - 2 for p in o.data.polygons) for o in obs}
     bpy.ops.object.select_all(action='DESELECT')
     for o in obs: o.select_set(True)

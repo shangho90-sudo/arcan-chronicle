@@ -8,7 +8,7 @@
 ## 기본
 - 빌드 없음. `python3 -m http.server 8765` 후 `http://localhost:8765/index.html`.
 - three.js r160을 로컬 import map(`index.html`, `vendor/three-r160/`)으로 불러옵니다. CDN 장애 시 0% 멈춤을 방지하기 위해 동일 버전과 LICENSE를 저장소에 포함합니다. npm 의존성 없음. 새 라이브러리 추가 금지(필요하면 먼저 사용자에게 확인).
-- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs && node tests/gear.test.mjs && node tests/warp.test.mjs && node tests/pharmacist-audio.test.mjs && node tests/smith.test.mjs && node tests/gates.test.mjs` (현재 core 495 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 638 통과; gates 860 통과).
+- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs && node tests/gear.test.mjs && node tests/warp.test.mjs && node tests/pharmacist-audio.test.mjs && node tests/smith.test.mjs && node tests/gates.test.mjs && node tests/wpharm.test.mjs` (현재 core 495 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 638 통과; gates 860 통과).
 - 테스트하지 않은 것을 "검증됨"이라고 보고하지 말 것.
 
 ## 데이터 우선
@@ -151,6 +151,14 @@
   - 보조: 광역 회복진 `pulse(대상)` = 실제 회복 순간 민트 물결이 원 안쪽으로 흐르고 방울이 몸을 감아 오름(`kit.healPulse`), 아드레날린 주사·약 보호막 = 주황/파랑 방울이 모였다가(주사 순간·보호막 순간) 몸을 따라 오름 + 발밑 작은 문양(`kit.gather`, 주사는 지속 중 1.1초마다 한 방울 `riseOne` — 직선 빛줄기·화살표 스프라이트는 없앰). **약 보호막 그림은 2초만**(사용자 요청, `PHARM.shield.show`) — 보호막 양·면역 상태는 원래 8초 그대로, '보호막 N' 머리 위 표시도 그대로.
   - 확인: `tools/browser-tests/pharm3_skills.js`(`FAST=1` 찍지 않는 프레임은 그리지 않음, `CAMLOCK=1 FOCUS=5 ZOOM=2.4` 착탄 지점 가까이, `ZONE=mushroom_grove` 어두운 바닥, `STRESS=20` 연속 시전 뒤 geometry·texture·program·JS 힙·남은 입자) + `tools/browser-tests/pharm_support.js`(`SKILL=ph1_c6|c7|c8`: 보호막 그림이 사라진 시각·보호막/면역 끝 시각·3초에 맞은 피해 흡수, 회복 시각 = pulse 시각).
 
+## 양약사 2차 스킬 (2026-11-16 전면 개편 — 정밀 제약 마법사)
+- id·배우는 레벨(30/33/36/40/45)·최대 레벨(궁극기 3)·3×5 배치는 그대로 → 예전 저장의 습득 레벨·포인트·칸이 그대로 새 스킬이 됨(`SAVE_VERSION` 4 그대로). 계열 A '정밀 제약술' · B '표적 전달과 약물 반응' · C '첨단 조제와 생체 보호'. 데이터 `tools/skills2/gen.py`의 `wp_*`(수치는 custom op 필드), 규칙 `js/wpharm.js` `WpKit`(`SkillEngine.wp`, CUSTOM `wp_capsule/cryo/ion/tri/collapse/catalyst/carrier/chain/critical`, 기본 시각은 `WP`), 화면 `js/wpharmfx.js` `WpFx`(`CookFx`를 이어받아 풀 재사용, `G.skillFx.wp`), 메시 `python3 tools/blender/fx_wpharm.py` → `assets/fx/fx_wpharm.glb.json`(캡슐 반쪽·과립·앰플·결정·정제·작은 약병·파편·구, 정점 색만 — 유리는 셰이더의 가장자리 빛 + 안쪽 색), 동작 `wp_compound`(공중 조제, 0.22초에 손에서 놓음, 유봉은 등에 `stow`)·`wp_condense`(궁극기: 팔을 벌려 응축 → 밀어 놓음, op는 0.12초에 시작) in `swings.py`, 아이콘 `python3 tools/ui/wp_icons.py`(smith_icons 틀), 효과음 `python3 tools/audio/wp_sfx.py`(`wp_granule/ring/crystal/ion/collapse`, 음량 `io.js`).
+- **반응 표식**(`reaction`, skillrt `addMark`): 대상마다 최대 3·8초(더할 때마다 8초로), 한 번 시전에 대상마다 1(+ 촉매 충전 시전 1, + 정밀 표적 전달 대상 1) — 같은 시전의 여러 타격은 더 쌓지 않음(`WpKit.mark`, `ctx.wpMarks`). 그림 = 발밑 얇은 청록 고리 + 카메라 쪽 구슬 1~3(이름표·체력 막대를 가리지 않음), 소비·사망·만료 때 고리가 퍼지며 사라짐. 촉매 활성화 동안 약사 1차 약병(`tag: flask`)도 표식(충전은 안 씀).
+- **되풀이 방지**: 연쇄 용출은 시전마다 방문 집합·최대 수(5 + ⌊(Lv−1)/2⌋)·5 m, 표식 없는 적으로 이어지지 않음(시작 대상만 예외), 둘레 폭발은 파생 피해. 서방형 미립자 지대 피해는 파생(`derived`)이라 표식·지대·연쇄를 만들지 않음, 동시에 3개·1.2 m 안은 시간만 새로. 최종 처방은 `eng.cd.wp_c5`(120초, `d.icd` — `saveCooldowns`/`restoreCooldowns`로 재접속에도 유지), 발동 뒤 0.3초 유예 동안의 치명타는 흡수만(두 번 발동 없음), 버프 줄(`hStatus`)에 '최종 처방 준비/재정비 N s'.
+- 타격감: 모든 피해는 `quiet`(전역 `G.hitStop`·무작위 흔들림 없음), 카메라 `Renderer.kick`은 궁극기 주 타격(대형 캡슐 붕괴 접촉·임계 농도 폭발) 한 번만. 양약사 궁극기는 `release`의 공용 `addShake`도 건너뜀. 저사양은 장식 입자만 줄임.
+- 수치·문구: 스킬창 설명은 `wpLevelText`(같은 op 필드로 계산 — 수치를 바꾸면 문구도 따라감). 총 피해 기준(같은 레벨): 작열·분열 캡슐 3.4(과립 1.6 + 고리 1.8 = 예전 0.6 + 2.8), 대형 캡슐 붕괴 10.0(반경 3.8), 임계 농도 1.4 + 0.65/표식(최대 9). 바꾸면 `tests/wpharm.test.mjs`도.
+- 확인: `tests/wpharm.test.mjs`(규칙), `tools/browser-tests/wpharm_skills.js`(`SCENES=a1,a1kill,a2,a3,a4,a5,b1,b2,b3,b5,boss,c3,c4,c5,craft,regen,marks LV= GENDER= SIZE= FX= DET=1 NOCROP=1 URL=`; 띠 + 피해 시각·fx 호출·소리·kick 표).
+
 ## 요리사 1차 스킬 (2026-11-13 일부 개편: 식칼 썰기·팬 강타·미트볼 던지기)
 - 기력·재사용·사거리는 그대로. 총 피해 계수도 일반 규칙 그대로: hit/proj op의 `split` = 타수·개수가 늘어도 총합(`coef × 기본 수 × (1 + 0.06 × ⌊(Lv−1)/2⌋)`)을 고르게 나눔(`skillrt.js` `opHit`/`opProj`). 수를 바꾸면 총합이 변하지 않게 `split`을 유지할 것.
 - 식칼 썰기 `ck1_a1`: 캐릭터는 한 번만 썸(동작 `ck_chop`, 타격 0.22초, `noStretch` — 타수에 맞춰 동작을 늘리지 않음), 허공의 큰 식칼이 대상 위에서 2~6번(`hits=2, hitsPerLv=1`, 0.12초 간격) 내려 썸. fx op `cook: 'knife'`(누른 순간) → 핸들 `ctx.cookFx.strike(t, h, last)`가 피해 틱마다(썬 자국·작은 섬광·채소 조각), 벨 대상이 없으면 `miss()`로 물러남. 대상이 죽으면 남은 타는 사거리 안 다른 적에게 넘어감(단일 대상 스킬 공통 규칙).
@@ -249,7 +257,7 @@
 - `skilltest.js`: 180개 스킬 자동 시전 (`JOBS=painter ONLY=pt_a1 node skilltest.js`).
 
 ## 알려진 미완료
-- 스킬 아이콘은 견습생·약사 1차·대장장이 1차만 그림(대장장이는 `tools/ui/smith_icons.py`)(`assets/ui/skills`, `tools/ui/skill_icons_crop.py`가 참고 그림 `tools/ui/ref/`에서 잘라 냄 — 약사 15개는 `pharmacist_ref2.png`, `fx_pharm.py icons`를 돌린 뒤에는 다시 실행, `skillui.js` `SKILL_ART`), 나머지는 코드 생성 임시 아이콘.
+- 스킬 아이콘은 견습생·약사 1차·대장장이 1차·양약사 2차만 그림(대장장이는 `tools/ui/smith_icons.py`, 양약사는 `tools/ui/wp_icons.py`)(`assets/ui/skills`, `tools/ui/skill_icons_crop.py`가 참고 그림 `tools/ui/ref/`에서 잘라 냄 — 약사 15개는 `pharmacist_ref2.png`, `fx_pharm.py icons`를 돌린 뒤에는 다시 실행, `skillui.js` `SKILL_ART`), 나머지는 코드 생성 임시 아이콘.
 - 몬스터: 귀여운 모델(`cute_*`)은 리깅이 없어 모든 동작이 절차 동작. 불씨 비룡 계열(drake)만 예전 모델.
 - 모든 필드(40곳)가 `js/nature.js` 렌더(존별 `nature.ground`/`tint`/`rockTint`/`grass`/`lod`). 서리 고원은 색조만 차갑게(눈 덮인 잎 없음).
 - 휴대폰 화면은 자동 화면 확인만 함(실기기 미확인). 사람이 처음부터 끝까지 플레이한 검증 없음.
