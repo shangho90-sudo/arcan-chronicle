@@ -103,7 +103,7 @@ void main(){ float x = (vUv.x - .5) * 2., y = vUv.y;
   float flick = .85 + .15 * sin(uTime * 2.4 + uSeed + y * 6.);
   float sp = 0.; for (int i = 0; i < 4; i++) { float fi = float(i); float yy = fract(uTime * .28 + fi * .25 + uSeed);
     float xx = sin(fi * 7.3 + uSeed + uTime * .9) * .38; sp += smoothstep(.07, 0., length(vec2((x - xx) * .55, (y - yy) * 1.6))) * (1. - yy) * smoothstep(0., .1, yy); }
-  float A = (core * v * flick * 2.4 + sp * 1.1) * uA;
+  float A = (core * v * flick * 1.9 + sp * 1.1) * uA;
   gl_FragColor = vec4(uCol * A, A); }`;
 const VS = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`;
 const fxMats = new Map();

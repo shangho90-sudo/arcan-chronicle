@@ -40,8 +40,8 @@ const ZOOM = +(process.env.ZOOM || 2.0), ONLY = process.env.ONLY || '';
   await ev(() => {
     const P = G.player.pos, L = G.zone.things.filter(t => t.key && t.key.startsWith('mq05a'));
     const t = L.sort((a, b) => Math.hypot(a.pos.x - P.x, a.pos.z - P.z) - Math.hypot(b.pos.x - P.x, b.pos.z - P.z))[0]; window.QP = t;
-    let best = null; for (let k = 0; k < 30 && !best; k++) { const q = T.scr(0.9 + ((k % 6) - 2.5) * 0.7, 3.4 + (k / 6 | 0) * 0.6); if (!G.zone.geo.blocked(q.x, q.z, 0.8)) best = q; }
-    best = best || T.scr(0.9, 3.4); t.pos = G.zone.geo.ground(best.x, best.z);
+    let best = null; for (let k = 0; k < 30 && !best; k++) { const q = T.scr((TOUCH ? 1.7 : 0.9) + ((k % 6) - 2.5) * (TOUCH ? 0.35 : 0.7), (TOUCH ? 2.6 : 3.4) + (k / 6 | 0) * 0.6); if (!G.zone.geo.blocked(q.x, q.z, 0.8)) best = q; }
+    best = best || T.scr(TOUCH ? 1.7 : 0.9, TOUCH ? 2.6 : 3.4); t.pos = G.zone.geo.ground(best.x, best.z);
     G.render.setFocus(G.player.pos, true); T.quiet();
   });
   await pg.waitForTimeout(2500); R.questLabels = await ev(() => T.labels()); await shot('quest');
