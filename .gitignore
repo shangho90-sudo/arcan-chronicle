@@ -13,3 +13,4 @@ tools/blender/out/
 tools/blender/tex/
 tools/prologue/legacy-output/
 docs/prologue-review/
+*.blend1

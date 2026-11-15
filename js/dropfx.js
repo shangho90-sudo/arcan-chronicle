@@ -99,11 +99,11 @@ void main(){ vec2 p = (vUv - .5) * 2.; float r = length(p), a = atan(p.y, p.x);
 const BEAM_FS = `uniform vec3 uCol; uniform float uA, uTime, uSeed; varying vec2 vUv;
 void main(){ float x = (vUv.x - .5) * 2., y = vUv.y;
   float core = exp(-x * x * 26.) * .9 + exp(-x * x * 4.) * .28;
-  float v = smoothstep(0., .1, y) * pow(1. - y, 1.6);
+  float v = smoothstep(0., .08, y) * pow(1. - y, 1.25);
   float flick = .85 + .15 * sin(uTime * 2.4 + uSeed + y * 6.);
   float sp = 0.; for (int i = 0; i < 4; i++) { float fi = float(i); float yy = fract(uTime * .28 + fi * .25 + uSeed);
     float xx = sin(fi * 7.3 + uSeed + uTime * .9) * .38; sp += smoothstep(.07, 0., length(vec2((x - xx) * .55, (y - yy) * 1.6))) * (1. - yy) * smoothstep(0., .1, yy); }
-  float A = (core * v * flick + sp * .9) * uA;
+  float A = (core * v * flick * 2.4 + sp * 1.1) * uA;
   gl_FragColor = vec4(uCol * A, A); }`;
 const VS = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`;
 const fxMats = new Map();
@@ -144,7 +144,7 @@ export function groundItem(id, def, opts = {}) {
       root.position.copy(T(pos));
       const lift = 0.16 + Math.sin(time * 2.2 + phase) * 0.05;
       spin.position.y = lift; spin.rotation.y = time * 0.9 + phase;
-      sh.material.opacity = 1; sh.scale.setScalar(size * (1.3 - lift));
+      sh.scale.setScalar(size * (1.3 - lift));
       if (beam && cam) { tmp.copy(cam.position).sub(root.position); beam.rotation.y = Math.atan2(tmp.x, tmp.z); }
       const pop = Math.min(1, time * 4); root.scale.setScalar(0.4 + 0.6 * (1 - (1 - pop) * (1 - pop)));
     },

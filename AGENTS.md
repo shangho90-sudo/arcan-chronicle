@@ -199,6 +199,13 @@
 - 모델·아이콘: `tools/tripo/gear_assets.py`(Tripo 초안 40개, 원본은 저장소 밖 `RAW`) → `python3 tools/blender/gear.py`(아이콘 128 px `assets/ui/items/<id>.png`, 유봉 메시 2600삼각형·512 텍스처 `assets/items/<id>.glb.json`; `FORCE=1`로 다시). 게임: `items3d.js` `gearModel`(유봉은 임시 절차 모델 → 받아지면 교체, 갑옷·장신구의 떨어진 모습은 기존 절차 모델), 아이콘은 `ui.itemIcons`에 그림 경로.
 - 확인: `tests/gear.test.mjs`, `tools/browser-tests/gear.js`(`SIZE= GENDER= ONLY=merchants,shop,pestle,jobbuff,drop,sheets`).
 
+## 땅에 떨어진 아이템·이름표 (2026-11-15, 사용자: '아이템이 그래픽이랑 너무 다름 — 3D로, 위에 이름')
+- 모습은 `js/dropfx.js` `groundItem(id, def, {quest})` 하나(`actors.js` `Loot`가 씀, 퀘스트 줍기 `questworld.js` `QuestPickup`은 `{quest: true}`만 넘김). 예전 평평한 도트 아이콘 판(`ui.iconMesh`)·흰 원통 빛기둥은 쓰지 않음. 줍기 거리·끌어당김·가방·퀘스트 진행·수명은 `Loot.update` 그대로.
+- 모델: `items3d.js`에 그림 모델이 있으면 그것(장비·물약·재료 — 땅 위에서만 `paintMat` 사본), 없으면(`qi_*` 퀘스트 아이템 50종 등) Blender 소품 `python3 tools/blender/items_drop.py` → `assets/items/drop_items.glb.json`(37종 `drop_<모델>`, 정점 색만·이미지 없음, 모델마다 ≤ 800 삼각형, 빛나는 부분 `__glow`) + `assets/items/drop_map.json`(아이템 → 모델·색조). 지도는 아이템 이름·설명의 낱말 규칙 `RULES`(위에서 처음 맞는 것)와 종류별 대체 `FALLBACK`(퀘스트 = 보따리, 재료 = 주머니, 소모품 = 병) — 아이템마다 손으로 적지 말고 규칙을 고친 뒤 `items_drop.py --map`(표 출력). 새 퀘스트 아이템(`story.py`)을 더하면 다시 돌려 표를 볼 것. 원본 `tools/blender/drop/drop_items.blend`.
+- 등급 `dropfx.js` `itemTier`/`TIER`: 퀘스트(`qi_*` 또는 줍기) 금빛 · 드롭 전용 장비(`dropFrom`) 보라 · 장비 하늘색 · 그 밖 흰색. 찾기 표시 = 가는 빛기둥(카메라를 보는 판 하나, 셰이더 — 퀘스트 2.3 m, 장비 1.1~1.5 m, 일반 아이템은 없음) + 바닥 빛 고리(도는 반짝임) + 옅은 접촉 그림자. 가산 혼합·블룸 문턱 아래 — 전역 블룸·노출은 건드리지 말 것. 모델 크기(가장 긴 변) 퀘스트 0.5 m·그 밖 0.42 m, 둥실·천천히 돎.
+- 이름표: `ui.js` `itemPlates`(`updatePlates` 안) → `.plate.item.<등급>`(주아체 14 px/휴대폰 12 px, 어두운 테두리, CSS `index.html` '땅에 떨어진 아이템 이름'). 규칙 `dropfx.js` `LABEL`: 플레이어 10 m(휴대폰 8 m) 안, 끝 2.5 m에서 흐려짐, 동시에 6개(휴대폰 4개) — 퀘스트 → 보라 → 장비 → 가까운 순, 화면에서 이미 놓인 이름과 겹치면 뺌. 위치 `Loot.labelPos`(모델 위 0.42 m). 수가 2 이상이면 '×N'.
+- 확인 `tools/browser-tests/drops.js`(`TAG=before|after SIZE=1280x720|390x844t URL= ONLY=quest`; 속삭이는 숲 `mq05a` 병든 이끼 줍기·전리품 6개(유봉·갑옷·장신구·약초·송곳니·물약)·14개 몰림·줍기 뒤 퀘스트 진행·가방 수·콘솔 오류, 결과 `/tmp/drops/<TAG>_<SIZE>_*.png`·`.json`).
+
 ## 직업 모델 (2026-11-07)
 - 요리사는 2026-11-15부터 왼손에 프라이팬을 들지 않음(사용자 요청 '캐릭터랑 겹쳐 보임', `model.js` `OFF`에서 뺌) — 빈 왼손은 살짝 편 손가락(`EMPTY_L`). 팬 강타의 큰 프라이팬(`cookfx.js` `pan`)은 그대로.
 - 전직하면 모습이 바뀌는 직업은 `model.js` `JOB_MODELS`(지금은 약사 `pharmacist_m`/`_f`, 대장장이 `blacksmith_m`/`_f`, 예술가 `artist_m`/`_f`, 요리사 `cook_m`/`_f`, 미용사 `hairdresser_m`/`_f` — 1차 직업 5개 모두). 모델은 반드시 같은 67뼈 휴머노이드 뼈대 GLB를 `python3 tools/models/glb_to_model.py <in.glb> <이름>`로 변환. 변신 연출은 `rewardfx.js` `JobChangeFx`(빛기둥·고치·날개·나팔·`Audio.chime('fanfare')`), 확인 `tools/browser-tests/jobchange.js`(`JOB=`·`GENDER=`).
