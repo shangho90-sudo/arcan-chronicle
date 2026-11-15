@@ -1,0 +1,6 @@
+{
+  "provider": "synthesized (tools/audio/herbal_sfx.py, numpy + scipy, fixed seed)",
+  "generatedOn": "2026-11-16",
+  "note": "한약사 2차 스킬. Runway 크레딧 없이 직접 합성. 같은 이름의 파일로 바꿔 넣으면 교체됨. 그 밖의 한약사 소리는 기존 heal·splash·fire·throw·magic 재사용.",
+  "assets": ["sfx_hb_simmer.mp3", "sfx_hb_root.mp3", "sfx_hb_needle.mp3", "sfx_hb_resonance.mp3", "sfx_hb_bloom.mp3"]
+}

@@ -8,7 +8,7 @@
 ## 기본
 - 빌드 없음. `python3 -m http.server 8765` 후 `http://localhost:8765/index.html`.
 - three.js r160을 로컬 import map(`index.html`, `vendor/three-r160/`)으로 불러옵니다. CDN 장애 시 0% 멈춤을 방지하기 위해 동일 버전과 LICENSE를 저장소에 포함합니다. npm 의존성 없음. 새 라이브러리 추가 금지(필요하면 먼저 사용자에게 확인).
-- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs && node tests/gear.test.mjs && node tests/warp.test.mjs && node tests/pharmacist-audio.test.mjs && node tests/smith.test.mjs && node tests/gates.test.mjs && node tests/wpharm.test.mjs && node tests/chef.test.mjs` (현재 core 495 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 638 통과; gates 860 통과).
+- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs && node tests/gear.test.mjs && node tests/warp.test.mjs && node tests/pharmacist-audio.test.mjs && node tests/smith.test.mjs && node tests/gates.test.mjs && node tests/wpharm.test.mjs && node tests/chef.test.mjs && node tests/herbal.test.mjs` (현재 core 495 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략, 638 통과; gates 860 통과).
 - 테스트하지 않은 것을 "검증됨"이라고 보고하지 말 것.
 
 ## 데이터 우선
@@ -158,6 +158,14 @@
 - 타격감: 모든 피해는 `quiet`(전역 `G.hitStop`·무작위 흔들림 없음), 카메라 `Renderer.kick`은 궁극기 주 타격(대형 캡슐 붕괴 접촉·임계 농도 폭발) 한 번만. 양약사 궁극기는 `release`의 공용 `addShake`도 건너뜀. 저사양은 장식 입자만 줄임.
 - 수치·문구: 스킬창 설명은 `wpLevelText`(같은 op 필드로 계산 — 수치를 바꾸면 문구도 따라감). 총 피해 기준(같은 레벨): 작열·분열 캡슐 3.4(과립 1.6 + 고리 1.8 = 예전 0.6 + 2.8), 대형 캡슐 붕괴 10.0(반경 3.8), 임계 농도 1.4 + 0.65/표식(최대 9). 바꾸면 `tests/wpharm.test.mjs`도.
 - 확인: `tests/wpharm.test.mjs`(규칙), `tools/browser-tests/wpharm_skills.js`(`SCENES=a1,a1kill,a2,a3,a4,a5,b1,b2,b3,b5,boss,c3,c4,c5,craft,regen,marks LV= GENDER= SIZE= FX= DET=1 NOCROP=1 URL=`; 띠 + 피해 시각·fx 호출·소리·kick 표).
+## 한약사 2차 스킬 (2026-11-16 개편 '본초 도사')
+- 스킬 id·3×5 배치·배우는 레벨(30/33/36/40/45)·최대 레벨·종류는 그대로(`hb_a1`~`c5`) — 예전 저장의 레벨·포인트·칸이 그대로 새 스킬이 됨(`SAVE_VERSION` 4). 계열 A '비전 탕약과 경락' · B '본초 영물술' · C '오행 침구술'. 제작 `hb_a1` 구증구포·보원탕은 레시피 `r_tonic` → `f_tonic`(이름만 '보원탕') 그대로.
+- 데이터 `tools/skills2/gen.py`(`herb(k, …)` = CUSTOM `herb`, `op.k` = 칸; 누른 순간 연출은 `HB_PRE`가 넣는 `herb('pre', what, at=-타격 시각)`), 규칙 `js/herbal.js`(`HerbalKit` = `SkillEngine.herbal`, 렌더 없음 — fx 핸들이 null이어도 동작; 소환물 `HerbSummon`; 툴팁 `herbText` ← `skillui.js` `levelText`), 그림 `js/herbalfx.js`(`HerbalFx extends CookFx`, `SkillFx.herbal.make(kind, a, o)`).
+- 규칙: 여러 뿌리·꽃·침 메시로 그려도 피해는 정해진 횟수(청룡승근·황정지맥·주작천구·현무약해 = 적마다 시전당 1번, 자운화 = 틱마다 적마다 1번, 백호유침 = 대상마다 침 4개 = 예전 4타 총합). 소환물(반룡근·천년삼 동자·녹각수호령)은 '생명 소환물'(`living`, `herbal`) — 훈증진 회복·정화, 대주천(10 m 안), 신농백초원 강화(영역 안에서만, 들어오고 나가는 프레임에 켜고 끔, 상한 `HERB.buffCap` 0.5 — max, 더하지 않음)를 받음. 씨앗 → 성장 → 완성: 그림의 완성 = 행동 시작(`grow`). 반룡근 2개(다시 쓰면 가장 오래된 것 교체), 동자·수호령 1개(다시 쓰면 시간·체력 새로 채움), 전체 8. 대상이 죽으면 0.25초 안에 가장 가까운 적으로(방어력 감소 대상 우선 = 백호유침 시너지), 지형 충돌(`geo.move`), 주인과 16 m·높이 차(보스 결계) → 주인 곁에서 다시 자람. 수호령 도발은 일반 몬스터만(`noBossTaunt`, `actors.js` `Monster.player`), 속박은 보스에게 둔화(상태 규칙), 밀림은 보스·무거운 몬스터 없음(엔진 규칙). 현무약해 연장: 약초 영역(훈증진·자운화, `herb`)마다 시전당 1번 +2초, 영역당 누적 최대 +4초(`extendField`). 정리: 사망·존 이동·전직(`clearTemp` → `HerbalKit.clear`).
+- 동작 `hb_brew/hb_sow/hb_raise/hb_moxa/hb_flick/hb_pour/hb_gather`(`swings.py`, `stow` — 손은 비우고 유봉은 등에; `skillrt.js` 약사 손 약병은 한약사에게 붙이지 않음). 타격 시각을 바꾸면 `gen.py` `HB_PRE`의 시각도 같이(`tests/herbal.test.mjs`가 확인).
+- 타격감: 강한 순간만 시전자·대상 `freezeT` + `Renderer.kick` 한 번(`HERB.stop/kick`), 피해는 `quiet`(치명타여도 전역 `G.hitStop`·`addShake` 없음). 소리 `hb_simmer/root/needle/resonance/bloom`(`python3 tools/audio/herbal_sfx.py` 합성, `herbalist-sfx-credits.json`, 음량 `io.js`), 같은 소리 반복은 `HERB.sfxGap`으로 제한.
+- 메시 `python3 tools/blender/fx_herbal.py` → `assets/fx/fx_herbal.glb.json`(탕관·뚜껑·호리병·환약·쑥뜸·두루마리 축·침·뿌리·약초·잎·봉오리·꽃잎·줄기·천년삼 몸/잎/팔다리·사슴 몸/머리/다리/영지 뿔·청룡 머리·주작 몸/날개·돌기둥·등껍질·약갑 판, 정점 색만, 8.7천 삼각형, 원본 `tools/blender/herbal/`). 소환물은 부위별 메시를 게임이 절차로 움직임(깡충은 규칙의 `hopT` 공중 구간에서만 전진 — 미끄러지지 않음). 두루마리 그림은 캔버스 텍스처 한 번(`paperTex`). 아이콘 15개 `python3 tools/ui/herbal_icons.py`(PIL, 대장장이 틀 재사용, `skillui.js` `SKILL_ART`). 금강 약갑 판은 뼈 위치 `ModelBody.bonePoint(name)`(model.js)를 따라감.
+- 확인 `tests/herbal.test.mjs`(규칙·데이터·예전 저장), 브라우저 `tools/browser-tests/herbal_skills.js`(`SKILLS=a2,…,c5,brew LV= GENDER= SIZE= FX= DET=1 SHOTS=0 URL=`; 띠 PNG + JSON: 피해 틱·이펙트 호출·소리·소환물·정리 뒤 남은 이펙트·전역 히트스톱 횟수). SwiftShader에서 스킬 하나 1~2분.
 
 ## 요리사 1차 스킬 (2026-11-13 일부 개편: 식칼 썰기·팬 강타·미트볼 던지기)
 - 기력·재사용·사거리는 그대로. 총 피해 계수도 일반 규칙 그대로: hit/proj op의 `split` = 타수·개수가 늘어도 총합(`coef × 기본 수 × (1 + 0.06 × ⌊(Lv−1)/2⌋)`)을 고르게 나눔(`skillrt.js` `opHit`/`opProj`). 수를 바꾸면 총합이 변하지 않게 `split`을 유지할 것.
@@ -269,7 +277,7 @@
 - `skilltest.js`: 180개 스킬 자동 시전 (`JOBS=painter ONLY=pt_a1 node skilltest.js`).
 
 ## 알려진 미완료
-- 스킬 아이콘은 견습생·약사 1차·대장장이 1차·양약사 2차·쉐프 2차만 그림(대장장이는 `tools/ui/smith_icons.py`, 양약사는 `tools/ui/wp_icons.py`, 쉐프는 `tools/ui/chef_icons.py`)(`assets/ui/skills`, `tools/ui/skill_icons_crop.py`가 참고 그림 `tools/ui/ref/`에서 잘라 냄 — 약사 15개는 `pharmacist_ref2.png`, `fx_pharm.py icons`를 돌린 뒤에는 다시 실행, `skillui.js` `SKILL_ART`), 나머지는 코드 생성 임시 아이콘.
+- 스킬 아이콘은 견습생·약사 1차·대장장이 1차·양약사 2차·쉐프 2차·한약사 2차만 그림(대장장이는 `tools/ui/smith_icons.py`, 양약사는 `tools/ui/wp_icons.py`, 쉐프는 `tools/ui/chef_icons.py`, 한약사는 `tools/ui/herbal_icons.py`)(`assets/ui/skills`, `tools/ui/skill_icons_crop.py`가 참고 그림 `tools/ui/ref/`에서 잘라 냄 — 약사 15개는 `pharmacist_ref2.png`, `fx_pharm.py icons`를 돌린 뒤에는 다시 실행, `skillui.js` `SKILL_ART`), 나머지는 코드 생성 임시 아이콘.
 - 몬스터: 귀여운 모델(`cute_*`)은 리깅이 없어 모든 동작이 절차 동작. 불씨 비룡 계열(drake)만 예전 모델.
 - 모든 필드(40곳)가 `js/nature.js` 렌더(존별 `nature.ground`/`tint`/`rockTint`/`grass`/`lod`). 서리 고원은 색조만 차갑게(눈 덮인 잎 없음).
 - 휴대폰 화면은 자동 화면 확인만 함(실기기 미확인). 사람이 처음부터 끝까지 플레이한 검증 없음.

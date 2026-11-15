@@ -403,7 +403,7 @@ export class HerbSummon {
       if (this.think <= 0 || !this.target || this.target.dead) { this.think = HERB.think; this.target = this.pick(); }
       if (this.kind === 'root') this.upRoot(dt); else if (this.kind === 'ginseng') this.upGinseng(dt); else this.upDeer(dt);
     }
-    if (this.view && this.view.update) this.view.update(dt, this);
+    if (this.view && this.view.sync) this.view.sync(this);
   }
   pick() {
     const pc = this.kit.pc, R = this.kind === 'root' ? this.o.range : 9, ot = pc.target && !pc.target.dead ? pc.target : null;
@@ -463,4 +463,29 @@ export class HerbSummon {
     if (mv < Math.hypot(dx, dz) * 0.1) { this._stuck = (this._stuck || 0) + 0.016; if (this._stuck > 1.5) { const pc = this.kit.pc; const p = this.kit.spot({ x: pc.pos.x - pc.facing.x, z: pc.pos.z - pc.facing.z }, this.radius); this.pos = { x: p.x, y: p.y, z: p.z }; this._stuck = 0; } } else this._stuck = 0;
   }
   face(p) { const dx = p.x - this.pos.x, dz = p.z - this.pos.z, m = Math.hypot(dx, dz); if (m > 1e-3) this.facing = { x: dx / m, z: dz / m }; }
+}
+
+// ------------------------------------------------------------------ 툴팁(스킬 창 현재/다음 레벨): 실제 op 값으로 계산 (js/skillui.js levelText)
+const pct = v => (Math.round(v * 1000) / 10).toString().replace(/\.0$/, '') + '%';
+const sec = v => (Math.round(v * 10) / 10).toString() + '초';
+export function herbText(d, L) {
+  const ult = d.type === 'ultimate', m = 1 + (ult ? 0.25 : 0.12) * (L - 1), o = (d.ops || []).find(x => x.fn === 'herb' && x.k !== 'pre'); if (!o) return '';
+  const D = v => sec(durL(v, L)), out = [];
+  switch (o.k) {
+    case 'a2': out.push(`기력 회복 +${o.mp}/초`, `이동 속도 +${pct(o.haste * m)}(나와 ${o.near} m 안 생명 소환물)`, `지속 ${D(o.dur)}`); break;
+    case 'a3': out.push(`방어력 +${pct(o.def_ * m)}`, `경직 저항 ${pct(o.ccres)}`, `보호막 최대 HP의 ${pct(o.shield + (o.shieldLv || 0) * (L - 1))}`, `지속 ${D(o.dur)}(다시 쓰면 갱신)`); break;
+    case 'a4': out.push(`반경 ${o.r} m`, `${sec(o.tick)}마다 최대 HP의 ${pct(o.heal * m)} 회복 + 해로운 상태 1개 정화(나·생명 소환물)`, `지속 ${D(o.dur)}`, '현무약해로 최대 +4초'); break;
+    case 'a5': out.push(`흡수 순간 최대 HP의 ${pct(o.heal * m)} 회복`, `공격력 +${pct(o.atk * m)} · 방어력 +${pct(o.def_ * m)} · 회복량 +${pct(o.healup)}`, `지속 ${D(o.dur)}`); break;
+    case 'b1': out.push(`뿌리 물기 ${pct(o.coef * m)}/${sec(o.rate)} · 사거리 ${o.range} m`, `속박 ${sec(o.root)}(보스는 둔화)`, `${D(o.life)} · 최대 ${o.limit}개`); break;
+    case 'b2': out.push(`반경 ${o.r} m · ${sec(o.tick)}마다 ${pct(o.coef * m)}`, `중독(지속 피해 ${pct(o.poison * m)}) + 공격력 -${pct(o.atkdown * m)} ${sec(o.poisonDur)}`, `지속 ${D(o.dur)}`, '현무약해로 최대 +4초'); break;
+    case 'b3': out.push(`뿌리 채찍 ${pct(o.coef * m)}/${sec(o.rate)}`, `${sec(o.healEvery)}마다 주인 최대 HP의 ${pct(o.heal * m)} 회복`, `${D(o.life)} · 체력 내 최대 HP의 ${pct(o.hp * m)}`); break;
+    case 'b4': out.push(`들이받기 ${pct(o.coef * m)}/${sec(o.rate)}`, `발구르기 부채꼴 ${o.stompR} m ${o.stompAng}° ${pct(o.stomp * m)}/${sec(o.stompEvery)}`, '일반 몬스터 도발(보스 제외)', `${D(o.life)} · 체력 내 최대 HP의 ${pct(o.hp * m)}`); break;
+    case 'b5': out.push(`반경 ${o.r} m · 시전 순간 뿌리 ${pct(o.coef * m)}`, `적 이동 속도 -${pct(Math.min(0.7, o.slow * m))}`, `안의 내 식물·영물 소환물 피해 +${pct(Math.min(HERB.buffCap, o.empower))}`, `지속 ${D(o.dur)}`); break;
+    case 'c1': out.push(`직선 ${o.len} m · ${pct(o.coef * m)}(적마다 1번)`, `속박된 적 ×${o.vsRoot}`); break;
+    case 'c2': out.push(`${pct(o.coef * m)} · 날개 폭 ${o.wing} m`, `화상 ${sec(o.burnDur)}`, `방어력 감소 대상 ×${o.vsDefdown}`); break;
+    case 'c3': out.push(`반경 ${o.r} m · ${pct(o.coef * m)}(적마다 1번)`, `지맥 안 받는 피해 -${pct(o.dr)} ${D(o.ward)}`); break;
+    case 'c4': out.push(`부채꼴 ${o.r} m ${o.ang}° · 대상마다 침 ${o.per}개 × ${pct(o.coef * m)} (총 ${pct(o.coef * o.per * m)})`, `최대 ${o.maxT}명`, `가운데 적 ${o.stackN}번째 침: 방어력 -${pct(o.defdown)} ${sec(o.defdownDur)}`); break;
+    case 'c5': out.push(`물결 ${o.len} m × ${o.w} m · ${pct(o.coef * m)}`, `밀어냄(보스 제외) · 둔화 ${pct(o.slow * m)} ${sec(o.slowDur)}`, `지나간 약초 영역 +${sec(o.extend)}(영역마다 최대 +${sec(o.extendCap)})`); break;
+  }
+  return out.join(' · ');
 }

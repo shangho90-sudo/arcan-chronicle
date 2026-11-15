@@ -641,6 +641,12 @@ export class ModelBody {
     this.root.updateMatrixWorld(true); const b = md.bones[hi];
     return _v(b.t.x - 0.027 / md.scale, b.t.y - 0.01, b.t.z + 0.01).applyMatrix4(mul(_m().copy(this.W[hi]), b.inv)).applyMatrix4(this.mesh.matrixWorld);
   }
+  /** world position (three space) of a named bone joint, or null — 한약사 금강 약갑 판이 어깨·팔뚝을 따라감 (js/herbalfx.js) */
+  bonePoint(name) {
+    const md = this.md, hi = md.byName[name]; if (hi === undefined || !this.W || !this.visible) return null;
+    this.root.updateMatrixWorld(true); const b = md.bones[hi];
+    return _v(b.t.x, b.t.y, b.t.z).applyMatrix4(mul(_m().copy(this.W[hi]), b.inv)).applyMatrix4(this.mesh.matrixWorld);
+  }
   updateOverlay(dt) {
     const o = this.over;
     if (o) {

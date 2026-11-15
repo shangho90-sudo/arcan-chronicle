@@ -4,6 +4,7 @@ import { UI } from './ui.js';
 import { craft, NORMAL_SLOTS, ADV1_LEVEL, ADV2_LEVEL } from './skillsys.js';
 import { wpLevelText } from './wpharm.js';   // 양약사 2차: 실제 계산과 같은 수치 문구
 import { chefLevelText } from './chef.js';   // 쉐프 2차: 스킬 창 수치 줄(실제 데이터)
+import { herbText } from './herbal.js';   // 한약사 2차 툴팁(실제 op 값)
 
 let G = null; export function bindSkillUi(g) { G = g; }
 const $ = (tag, cls, parent, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html !== undefined) e.innerHTML = html; if (parent) parent.appendChild(e); return e; };
@@ -36,7 +37,7 @@ function glyph(g, d) {
   g.restore();
 }
 // 그림 아이콘이 있는 스킬(견습생 기본 검술 8종·약사 1차 15종, tools/ui/skill_icons_crop.py → assets/ui/skills/<id>.png). 나머지는 아래 캔버스 임시 아이콘.
-const SKILL_ART = new Set(['nv_a1', 'nv_a2', 'nv_a3', 'nv_a4', 'nv_p1', 'nv_p2', 'nv_p3', 'nv_p4', ...['a1', 'a3', 'a4', 'a5', 'a6', 'b1', 'b2', 'b4', 'b5', 'b6', 'c1', 'c6', 'c7', 'c8', 'c9'].map(k => 'ph1_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'bs1_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'wp_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'cf_' + k)]);   // + 쉐프 2차 15종(tools/ui/chef_icons.py) + 양약사 2차 15종(원형, tools/ui/wp_icons.py)   // + 대장장이 1차 15종(원형, tools/ui/smith_icons.py)   // 견습생(둥근 사각형) + 약사 1차(원형, 2026-11-11 개편 뒤 15종)
+const SKILL_ART = new Set(['nv_a1', 'nv_a2', 'nv_a3', 'nv_a4', 'nv_p1', 'nv_p2', 'nv_p3', 'nv_p4', ...['a1', 'a3', 'a4', 'a5', 'a6', 'b1', 'b2', 'b4', 'b5', 'b6', 'c1', 'c6', 'c7', 'c8', 'c9'].map(k => 'ph1_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'bs1_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'wp_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'cf_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'hb_' + k)]);   // + 한약사 2차 15종(tools/ui/herbal_icons.py)   // + 쉐프 2차 15종(tools/ui/chef_icons.py) + 양약사 2차 15종(원형, tools/ui/wp_icons.py)   // + 대장장이 1차 15종(원형, tools/ui/smith_icons.py)   // 견습생(둥근 사각형) + 약사 1차(원형, 2026-11-11 개편 뒤 15종)
 export function skillIcon(d, size = 48) {
   const k = d.id + size; if (iconCache.has(k)) return iconCache.get(k);
   if (SKILL_ART.has(d.id)) { const html = `<span class="icon i3d skic ${d.id.startsWith('nv_') ? 'skart' : 'skround'}" style="width:${size}px;height:${size}px;background:url(assets/ui/skills/${d.id}.png) center/contain no-repeat;image-rendering:auto"></span>`; iconCache.set(k, html); return html; }
@@ -64,6 +65,8 @@ function levelText(d, L) {
   if (d.job === 'chef') { const t = chefLevelText(d, L, G.data); if (t) return t; }
   const wt = wpLevelText(d, L); if (wt) return d.type === 'passive' ? wt : wt + ` · 연출 등급 ${Math.max(1, Math.min(10, 3 + L + (d.type === 'ultimate' ? 2 + L : 0)))}`;
   const m = 1 + (d.type === 'ultimate' ? 0.25 : 0.12) * (L - 1), out = [];
+  if (d.job === 'herbalist' && d.ops.some(o => o.fn === 'herb')) { const h = herbText(d, L); if (h) out.push(h); }
+  else
   for (const op of d.ops) {
     if (op.op === 'hit' && op.coef > 0) {
       const phys = !op.elem && d.type !== 'ultimate' && op.shape !== 'circle' || !!d.weapon, b = (op.hits || 1) + (op.hitsPerLv ? Math.floor(op.hitsPerLv * (L - 1)) : 0), h = b + (phys && !op.noExtra && !op.hitsPerLv ? Math.floor((L - 1) / 2) : 0);
@@ -188,6 +191,7 @@ Object.assign(UI.prototype, {
       if (r.made > 0 && (rc.skill === 'wp_c1' || rc.skill === 'wp_c2') && G.skillFx && G.skillFx.wp) G.skillFx.wp.made(p, { kind: rc.skill === 'wp_c1' ? 'vial' : 'capsule' });   // 양약사 조제 완성: 약병이 채워져 반짝 / 캡슐에 과립이 담겨 봉해짐 (js/wpharmfx.js)
       if (r.made > 0 && out.id.startsWith('f_course') && G.skillFx && G.skillFx.chef) G.skillFx.chef.menu(p, { id: out.id, n: r.made });   // 시그니처 메뉴: 메인 → 곁들임 → 소스, 테두리 금빛 (js/cheffx.js)
       if (r.made > 0 && (out.id === 'f_lunch' || out.id === 'f_soup') && G.skillFx && G.skillFx.cook) G.skillFx.cook.made(p, { kind: out.id === 'f_soup' ? 'soup' : 'lunch' });   // 간단한 도시락·따뜻한 수프: the finished dish pops up (js/cookfx.js)
+      if (r.made > 0 && rc.skill === 'hb_a1' && G.skillFx && G.skillFx.herbal) { G.skillFx.herbal.make('brew', p, { n: r.made }); G.audio.sfx('hb_simmer'); }   // 구증구포·보원탕: 약초가 탕관 둘레를 돌다 빠지고 완성 탕약이 떠오름(묶음 제작도 한 번, 개수는 토스트)
       this.toast(r.made > 0 ? `${out.name} x${r.made} 제작${r.failed ? ` (${r.failed}번 실패)` : ''}${r.bonus ? ` (추가 생산 +${r.bonus})` : ''}${r.returned ? ` · 재료 ${r.returned}개 반환` : ''}` : `제작 실패 — 재료가 사라졌습니다 (성공 확률 ${Math.round(r.rate * 100)}%)`); G.autoSave(); this.showCraft();
     });
   },
