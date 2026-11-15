@@ -459,8 +459,15 @@ export class UI {
     if (name !== "dialog" && window.ResizeObserver) { const ro = new ResizeObserver(() => { if (this.current === wnd) this.fit(); else ro.disconnect(); }); ro.observe(wnd); }
     return body;
   }
+  /** 메인 스토리 대화 장면(js/storyscene.js): a full-screen layer that takes the place of the current window (input blocked, HUD hidden) */
+  openLayer(name, el, onClose) {
+    this.close(false);
+    el._onClose = onClose; this.win.appendChild(el);
+    this.current = el; this.currentName = name; this.closable = false; this.root.classList.add("storyopen");
+    G.input.block = true;
+  }
   fit() {
-    if (!this.current || ["dialog", "title", "create"].includes(this.currentName)) return; const w = this.current; w.style.transform = "";
+    if (!this.current || ["dialog", "title", "create", "story"].includes(this.currentName)) return; const w = this.current; w.style.transform = "";
     // phones: the windows are laid out for ~1600 px and only scaled down, which made text unreadably small. There the
     // window is laid out narrower (columns stack when it gets narrow: CSS .window.narrow), never scaled below PHONE_S,
     // and whatever does not fit in height scrolls inside the window.
@@ -479,9 +486,10 @@ export class UI {
   }
   close(notify = true) {
     const was = !!this.current;
-    if (this.currentName === 'dialog') G.audio.stopNpcVoice();
+    if (this.currentName === 'dialog' || this.currentName === 'story') G.audio.stopNpcVoice();
+    if (this.current && this.current._onClose) { const f = this.current._onClose; this.current._onClose = null; f(); }
     if (this.current) this.current.remove(); if (this.dim) this.dim.remove();
-    this.current = null; this.currentName = null; this.dim = null; this.root.classList.remove("winopen");
+    this.current = null; this.currentName = null; this.dim = null; this.root.classList.remove("winopen", "storyopen");
     G.input.block = !G.inWorld; if (G.paused) G.paused = false;
     if (was && notify) G.audio.sfx("ui_back");
   }

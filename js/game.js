@@ -584,7 +584,7 @@ class Game {
       const st = Q.stateOf(q), turnIn = q.turnIn || q.giver;
       if (st === QS.Available) opts.push(["[퀘스트] " + q.name, () => this.offerQuest(npc, q)]);
       else if (st === QS.Completable && turnIn === npc.id) opts.push(["[완료] " + q.name, () => this.completeQuest(npc, q)]);
-      else opts.push(["[진행 중] " + q.name, () => this.ui.showDialog(npc, q.progressText, this.back(npc))]);
+      else opts.push(["[진행 중] " + q.name, () => this.questTalk(npc, q, q.progressText, this.back(npc))]);
     }
     if (npc.role === "jobmaster" && npc.job) opts.push(["직업 상담", () => this.ui.showJobs(npc.job)]);
     if (npc.role === "warp") opts.push(["마을 이동", () => this.ui.showTownWarp(npc)]);
@@ -597,14 +597,23 @@ class Game {
     this.ui.showDialog(npc, line, opts);
   }
   back(npc) { return [["돌아가기", () => this.openNpcMenu(npc)], ["대화 종료", () => this.ui.close()]]; }
+  /** quest dialogue: main quests play as a story scene (js/storyscene.js), everything else in the plain dialogue window */
+  questTalk(npc, q, html, opts, reward = "") {
+    if (questCategory(q) === "main" && !this.noStoryScene) {
+      const go = m => { (this.story || (this.story = new m.StoryScene(this))).play({ npc, html, opts, reward, title: q.name }); };
+      if (this._storyMod) return go(this._storyMod);
+      return import("./storyscene.js").then(m => { this._storyMod = m; go(m); }).catch(e => { console.warn("story scene", e); this.ui.showDialog(npc, html + (reward ? `<div class="reward">${reward}</div>` : ""), opts); });
+    }
+    this.ui.showDialog(npc, html + (reward ? `<div class="reward">${reward}</div>` : ""), opts);
+  }
   offerQuest(npc, q) {
-    this.ui.showDialog(npc, q.offerText + `<div class="reward">보상: ${rewardText(q)}</div>`, [["수락하기", () => { this.quests.accept(q.id); this.openNpcMenu(npc); }], ["나중에", () => this.openNpcMenu(npc)]]);
+    this.questTalk(npc, q, q.offerText, [["수락하기", () => { this.quests.accept(q.id); this.openNpcMenu(npc); }], ["나중에", () => this.openNpcMenu(npc)]], `보상: ${rewardText(q)}`);
   }
   completeQuest(npc, q) {
     const e = this.quests.complete(q.id); if (e) return this.ui.toast(e);
     if (q.reward.gold > 0) this.ui.toast("+" + q.reward.gold + " G"); if (q.reward.exp > 0) this.ui.toast("경험치 +" + q.reward.exp);
     for (const it of q.reward.items || []) this.ui.itemToast(this.data.item(it.id), it.count);
-    this.ui.showDialog(npc, q.completeText, this.back(npc));
+    this.questTalk(npc, q, q.completeText, this.back(npc));
   }
 
   // ------------------------------------------------------------------ combat events

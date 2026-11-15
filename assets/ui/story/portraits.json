@@ -1,0 +1,4 @@
+{
+  "about": "메인 스토리 대화 장면(js/storyscene.js)의 2D 반신 일러스트. 키 = 화자 키(npcs.json id, 몬스터는 'mon:<id>', 플레이어는 'player'). file = 이 폴더의 그림(세로 3:4(예: 1152×1536), 배경 투명 webp/png), facing = 얼굴이 향한 쪽(right = 보는 사람의 오른쪽, 화면 가운데를 보도록 자동으로 뒤집음), expr = 표정별 그림(대사 <b class='gold' data-expr='angry'>), names = 같은 그림을 쓸 다른 이름. 여기 없는 화자는 3D 모델 반신 렌더. 만들기: python3 tools/story/portraits.py",
+  "portraits": {}
+}
