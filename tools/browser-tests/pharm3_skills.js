@@ -1,20 +1,22 @@
 // 약사 스킬(유봉강타 ph1_a1 · 밀어내기 ph1_a4 · 던지는 약병 ph1_b1/b2/b4/b6)을 실제 스킬 경로로 시전하고, 기준 시각(첫 피해, 없으면 첫 타격 이펙트;
 // 던지는 스킬은 약병이 손을 떠난 프레임) 앞뒤 화면을 띠로 저장 (smash_skill.js를 일반화, 2026-11-13). G.step(1/FPS) 한 프레임씩, Math.random 고정.
-// Usage: SKILL=ph1_a1|ph1_a4|ph1_b1.. SCENE=hit|whiff|repeat|kill|sheathed|fan|wall GENDER=m|f SIZE=1100x760|390x844t FX=1|0 TAG=after DIR=90
+// Usage: SKILL=ph1_a1|ph1_a4|ph1_a6|ph1_b1.. SCENE=hit|whiff|miss|repeat|kill|sheathed|fan|wall GENDER=m|f SIZE=1100x760|390x844t FX=1|0 TAG=after DIR=90
 //        URL=http://localhost:8798/index.html OUT=/tmp/pharm3 ZOOM=1.5 CW= CH= FOCUS=(앞쪽 m) MARKS=-0.2,.. SEC=(찍는 길이)
 //        REF=0.333 (기준 시각을 알면 띠에 들어갈 프레임만 찍음) NOSHOT=1 (수치만)  node tools/browser-tests/pharm3_skills.js
 //   -> OUT/<TAG>_<skill>_<scene>_<gender>_<size>_fx<FX>.png + .json
 //   장면: hit = 앞 1.6 m 멧돼지 하나 / whiff = 대상 없음 / kill = 체력 5 / repeat = 연속 2회 / sheathed = 무기를 멘 채(키 입력 경로)
 //         fan(ph1_a4) = 부채꼴 안 3마리 + 옆(부채꼴 밖) 1마리 + 뒤 1마리 / wall(ph1_a4) = 벽을 등진 몬스터
 //         던지는 스킬은 hit·sheathed·kill·whiff 모두 5 m 앞 땅을 겨냥(멧돼지는 그 자리에)
+//         ph1_a6(천근쇄약) = 4 m 앞 조준점 한가운데 1마리 + 둘레 4마리(중심 보너스 밖) / miss = 명중 판정이 모두 실패(MISS)
+//   shout = 실제로 뜬 타격감 문구(ui.impactText: 시각·글·대상 번호 k·크기) — 유봉강타 '쾅!'/'콰앙!'/'퍽!', 천근쇄약 '쿠웅!!' + '쾅!'
 //   로그: 이펙트(pharm.*) 호출 시각, 소리, 몬스터별 피해 시각·양·밀린 거리, 히트스톱(시전자·대상 freezeT, 전역 hitStopT), 카메라 흔들림,
 //   행동 잠금이 풀린 프레임, 던진 약병이 생긴 시각·자리와 그때 오른손까지 거리(throw), 남은 이펙트 수, 콘솔 오류
 const { chromium } = require('playwright'); const fs = require('fs'); const { execSync } = require('child_process');
 const SKILL = process.env.SKILL || 'ph1_a1', SCENE = process.env.SCENE || 'hit', DIR = +(process.env.DIR || 90), FPS = +(process.env.FPS || 60), G_ = process.env.GENDER || 'm';
 const SIZE = process.env.SIZE || '1100x760', TOUCH = SIZE.endsWith('t'), [VW, VH] = SIZE.replace('t', '').split('x').map(Number);
-const FX = process.env.FX !== '0', TAG = process.env.TAG || 'after', OUT = process.env.OUT || '/tmp/pharm3', THROW = /^ph1_b/.test(SKILL), PUSH = SKILL === 'ph1_a4';
-const ZOOM = +(process.env.ZOOM || (THROW ? 1.0 : PUSH ? 1.15 : 1.5)), FOCUS = +(process.env.FOCUS || (THROW ? 2.6 : PUSH ? 1.7 : 1.0));
-const CW = +(process.env.CW || Math.min(VW, THROW ? 620 : PUSH ? 560 : 460)), CH = +(process.env.CH || Math.min(VH, THROW ? 440 : PUSH ? 460 : 420));
+const FX = process.env.FX !== '0', TAG = process.env.TAG || 'after', OUT = process.env.OUT || '/tmp/pharm3', THROW = /^ph1_b/.test(SKILL), PUSH = SKILL === 'ph1_a4', SLAM = SKILL === 'ph1_a6';   // SLAM: 천근쇄약 — 한가운데 1 + 둘레 4 (타격감 문구 '쿠웅!!' 1 + '쾅!' 2, lite 1)
+const ZOOM = +(process.env.ZOOM || (THROW || SLAM ? 1.0 : PUSH ? 1.15 : 1.5)), FOCUS = +(process.env.FOCUS || (THROW ? 2.6 : SLAM ? 3.6 : PUSH ? 1.7 : 1.0));
+const CW = +(process.env.CW || Math.min(VW, THROW || SLAM ? 620 : PUSH ? 560 : 460)), CH = +(process.env.CH || Math.min(VH, THROW ? 440 : PUSH ? 460 : 420));
 const MARKS = (process.env.MARKS || (THROW ? '-0.25,-0.17,-0.12,-0.083,-0.05,-0.033,-0.017,0,0.017,0.033,0.067,0.12,0.2,0.27,0.35,0.5' : '-0.30,-0.20,-0.13,-0.08,-0.05,-0.017,0,0.017,0.05,0.083,0.13,0.20,0.30,0.45,0.60,0.9')).split(',').map(Number);
 const SEC = +(process.env.SEC || (SCENE === 'repeat' ? 2.2 : SCENE === 'sheathed' ? 1.9 : THROW ? 1.8 : 1.5));
 (async () => {
@@ -51,6 +53,7 @@ const SEC = +(process.env.SEC || (SCENE === 'repeat' ? 2.2 : SCENE === 'sheathed
   await pg.waitForFunction(() => G.skillFx.pharm.ready && G.player.body && G.player.body.md, null, { timeout: 120000 });
   await pg.waitForTimeout(1500);
   const name = `${TAG}_${SKILL}_${SCENE}_${G_}_${SIZE}_fx${FX ? 1 : 0}`, dirOut = `${OUT}/${name}`; fs.rmSync(dirOut, { recursive: true, force: true }); fs.mkdirSync(dirOut, { recursive: true });
+  await ev(s => { window.__slam = s; }, SLAM);
   await ev(([dir, scene, thr, push]) => {
     const p = G.player, a = (window.__wdir ?? dir) * Math.PI / 180, f = { x: Math.sin(a), z: Math.cos(a) };
     for (const m of [...G.zone.actors]) if (m !== p && m.def && m.body) m.remove && m.remove();
@@ -60,12 +63,14 @@ const SEC = +(process.env.SEC || (SCENE === 'repeat' ? 2.2 : SCENE === 'sheathed
     let spots = [[thr ? 5 : 1.6, 0]];
     if (push && scene === 'fan') spots = [[1.5, 0], [2.0, 1.2], [2.1, -1.3], [0.3, 2.4], [-1.6, 0]];   // 3 inside the fan, 1 beside (outside the angle), 1 behind
     if (push && scene === 'wall') spots = [[1.6, 0]];
+    if (window.__slam) spots = [[4, 0], [4.3, 1.9], [3.6, -2.1], [5.8, 0.6], [2.2, 0.4]];   // 천근쇄약: 조준점(4 m 앞) 한가운데 1 (중심 보너스 1.5 m 안) + 둘레 4 (1.8~2.2 m)
     window.__ds = spots.map(([d, s]) => { const m = G.dev.dummies('mon_boar', 1, 0.01, at(d, s))[0]; m.teleport(at(d, s)); m.thinkStep = () => {}; return m; });
   }, [DIR, SCENE, THROW, PUSH]);
   await pg.waitForFunction(() => window.__ds.every(m => m.body), null, { timeout: 120000 });
   if (process.env.CAMLOCK) await ev(() => { window.__camLock = true; });
   const info = await ev(([scene, fps, skill, thr, focus]) => {
     let seed = 12345; Math.random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+    if (scene === 'miss') Math.random = () => 0.0001;   // every accuracy roll fails -> MISS: no impact text
     const p = G.player, f = window.__f, ds = window.__ds, m = ds[0];
     for (const d of ds) { d.teleport(d.pos); d.setFacing(-f.x, -f.z); d.body.place(d.pos); }
     if (scene !== 'sheathed' && p.body.setArmed) { p.body.setArmed(true); p.calmT = 0; }
@@ -80,9 +85,10 @@ const SEC = +(process.env.SEC || (SCENE === 'repeat' ? 2.2 : SCENE === 'sheathed
     const S = G.skillFx.pharm;
     for (const k of ['smash', 'swing', 'push', 'sweep', 'proj', 'burst', 'flask', 'cast']) if (S[k] && !S['__w' + k]) { S['__w' + k] = true; const o = S[k].bind(S); S[k] = (pc, opt) => { L.fx.push({ k, t: +window.__t.toFixed(3), whiff: !!(opt && opt.whiff), n: opt && opt.hits ? opt.hits.length : undefined }); return o(pc, opt); }; }
     const os = G.audio.sfx.bind(G.audio); G.audio.sfx = (n) => { L.sfx.push({ n, t: +window.__t.toFixed(3) }); return os(n); };
+    if (G.ui.impactText && !G.ui.__wi) { G.ui.__wi = true; const oi = G.ui.impactText.bind(G.ui); G.ui.impactText = (q, txt, o) => { const n0 = G.ui.floats.length; oi(q, txt, o); const fl = G.ui.floats[G.ui.floats.length - 1]; if (G.ui.floats.length > n0 || (fl && fl.imp && fl.born === G.ui.fclock && fl.e.textContent === txt)) (window.__log.shout || (window.__log.shout = [])).push({ t: +window.__t.toFixed(3), s: fl.e.textContent, k: window.__ds.indexOf(o && o.key), size: o && o.size, shake: o && o.shake }); }; }   // 타격감 문구(ui.impactText): 실제로 뜬 것만, k = 대상 번호
     const od = G.ui.damageText.bind(G.ui); G.ui.damageText = (...a) => { L.num.push({ t: +window.__t.toFixed(3), v: a[1], kind: a[2] }); return od(...a); };
     G.sheet.book.sk.slots[0] = skill; p.target = thr ? null : m; window.__sp0 = p.sp;
-    const aim = thr ? window.__at(5) : window.__at(1.6);
+    const aim = thr ? window.__at(5) : window.__slam ? window.__at(4) : window.__at(1.6);
     if (scene === 'whiff' && thr) { for (const d of ds) { d.dead = true; d.remove(); } }
     if (scene === 'sheathed') {   // the real key path: slot 1 holds the skill, the press goes through Player.actions (draw / stow rules included)
       G.input.block = false; window.__press = 1; window.__aim = aim; L.casts.push({ t: 0, e: 'key' });
@@ -118,7 +124,7 @@ const SEC = +(process.env.SEC || (SCENE === 'repeat' ? 2.2 : SCENE === 'sheathed
   const res = await ev(() => { const L = window.__log, ds = window.__ds, p = G.player; const rng = a => a.length ? [a[0], a[a.length - 1], a.length] : null;
     const lockEnd = L.lock.findIndex((v, i) => i > 3 && v <= 0);
     const camMax = Math.max(...L.cam), first = L.cam.findIndex(v => v > 0.002), last = L.cam.length - 1 - [...L.cam].reverse().findIndex(v => v > 0.002);
-    return { fx: L.fx, sfx: L.sfx, dmg: L.dmg, num: L.num, freezePlayer: rng(L.freezeP), freezeTarget: rng(L.freezeT), globalHitStop: rng(L.gstop), casts: L.casts, proj: L.proj,
+    return { shout: L.shout || [], shownImp: G.ui.floats.filter(f => f.imp).length, fx: L.fx, sfx: L.sfx, dmg: L.dmg, num: L.num, freezePlayer: rng(L.freezeP), freezeTarget: rng(L.freezeT), globalHitStop: rng(L.gstop), casts: L.casts, proj: L.proj,
       lockEndFrame: lockEnd, camMax: +camMax.toFixed(4), camFirstFrame: first, camLastFrame: camMax > 0.002 ? last : -1,
       moved: ds.map((d, k) => d && !d.removed ? +Math.hypot(d.pos.x - window.__p0[k].x, d.pos.z - window.__p0[k].z).toFixed(2) : null),
       blockedAfter: ds.map(d => d && !d.removed ? !!G.zone.geo.blocked(d.pos.x, d.pos.z, 0.2) : null),

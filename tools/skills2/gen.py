@@ -88,7 +88,7 @@ S(J, 1, 0, '유봉 전투', 2, 'ph1_a4', '밀어내기', 'attack', '유봉을 �
 S(J, 1, 0, '유봉 전투', 3, 'ph1_a3', '유봉 휘두르기', 'attack', '유봉을 들고 제자리에서 두 바퀴 돌며 주변의 적을 5번 연속으로 친다. 마지막 타격은 적을 밀쳐 낸다.', weapon='pestle', target='self', range=2.8, mp=14, cd=8, anim='ph_spin', sfx='ph_spin', sfxAt='op',
   ops=[dict(op='fx', pharm='cast', at=-0.18), hit('circle', 0.5, r=2.8, hits=5, gap=0.13, noExtra=True, swingSfx='ph_spin', fx=dict(pharm='spin'), last=dict(coef=0.8, push=2.4, shake=[0.12, 0.18], fx=dict(pharm='spin')))], fx=dict(color=0xffd27a))
 S(J, 1, 0, '유봉 전투', 4, 'ph1_a6', '천근쇄약', 'attack', '거대한 황금 유봉을 불러내 지면을 내려찍는다. 넓은 범위에 450% 피해, 한가운데 적은 50% 추가 피해.', weapon='pestle', target='ground', range=6, mp=26, cd=16, anim='ph_slam',
-  ops=[dict(op='fx', pharm='cast', at=-0.30), dict(op='fx', pharm='pestle', at=-0.12, fall=0.42, r=4.2), delay(0.30, 4.2, 4.5, core=0.5, coreR=1.5, sfx='ph_slam', burst='none', st=[st('stagger', 0.6)], shake=[0.32, 0.36])], fx=dict(color=0xffc040))
+  ops=[dict(op='fx', pharm='cast', at=-0.30), dict(op='fx', pharm='pestle', at=-0.12, fall=0.42, r=4.2), delay(0.30, 4.2, 4.5, core=0.5, coreR=1.5, shout='slam', sfx='ph_slam', burst='none', st=[st('stagger', 0.6)], shake=[0.32, 0.36])], fx=dict(color=0xffc040))
 S(J, 1, 0, '유봉 전투', 5, 'ph1_a5', '유봉 숙련', 'passive', '유봉 기본 공격 피해와 공격 속도가 증가한다.', weapon='pestle',
   flags=dict(basicDmg=[0.06, 0.04]), mods=[dict(stat='atkSpeed', mul=0.04, mulLv=0.02)])
 S(J, 1, 1, '기초 약병술', 1, 'ph1_b1', '화염 약병', 'attack', '약병을 던져 작은 폭발과 화상을 일으킨다.', target='ground', range=7, mp=12, cd=5, anim='ph_pitch', sfxAt='strike', sfxLead=0.02,

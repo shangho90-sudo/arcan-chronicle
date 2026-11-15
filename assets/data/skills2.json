@@ -670,6 +670,7 @@
 "coef": 4.5,
 "core": 0.5,
 "coreR": 1.5,
+"shout": "slam",
 "sfx": "ph_slam",
 "burst": "none",
 "st": [

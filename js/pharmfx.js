@@ -853,3 +853,29 @@ export class PharmFx {
   clear() { for (const e of this.live) this._free(e); this.live = []; this.kit.clear(); }
 }
 const _a = new THREE.Vector3(), _b = new THREE.Vector3(), _c = new THREE.Vector3(), _mx = new THREE.Matrix4();
+
+/** 타격감 문구(2026-11-16, 요리사 cookfx.js SHOUT와 같은 ui.js impactText): 실제로 맞은 대상(MISS 아님)에만, 피해·섬광과 같은 프레임.
+ *  유봉강타 ph1_a1 = 한 번에 문구 하나: 보통 '쾅!', 치명타 '콰앙!'(더 큼), 그 타로 쓰러뜨리면 '퍽!'.
+ *  천근쇄약 ph1_a6 = 한가운데(+50% 중심 보너스를 받은 적 중 중심에 가장 가까운 하나) '쿠웅!!'(금색, 가장 크고 더 세게 튀고 흔들림),
+ *  나머지 맞은 적은 중심에 가까운 순으로 '쾅!' others개까지(휴대폰·그래픽 효과 끔은 othersLite개). 한가운데 적이 없으면 '쾅!'만. */
+export const SHOUT = {
+  smash: { word: '쾅!', crit: '콰앙!', kill: '퍽!', col: '#fff1c4', edge: '#5a3a00', size: 1.45, critSize: 1.7, killSize: 1.5, shake: 1.25 },
+  slam: { core: '쿠웅!!', word: '쾅!', col: '#ffc93a', edge: '#4a2200', wordCol: '#fff1c4', size: 2.0, wordSize: 1.15, shake: 1.8, wordShake: 1.1, others: 2, othersLite: 1 },
+};
+const shoutTop = (t) => Math.min(1.7, 0.75 + (t.radius || 0.5) * 0.9);   // same height rule as cookfx cookTop
+function say(G, t, text, col, edge, size, shake, from, force) {
+  G.ui.impactText({ x: t.pos.x, y: t.pos.y || 0, z: t.pos.z }, text, { key: t, col, edge, size, shake, top: shoutTop(t), r: t.radius || 0.5, from, force });
+}
+/** kind 'smash': hits = [{t, crit}] (one target); kind 'slam': hits = [{t, d (distance to the centre), core (got the centre bonus)}] */
+export function pharmShout(G, kind, hits, o = {}) {
+  const S = SHOUT[kind]; if (!S || !hits || !hits.length || !G || !G.ui || !G.ui.impactText) return;
+  if (kind === 'smash') {
+    const h = hits[0], t = h.t;
+    const [w, sz] = t.dead ? [S.kill, S.killSize] : h.crit ? [S.crit, S.critSize] : [S.word, S.size];
+    say(G, t, w, S.col, S.edge, sz, S.shake, o.from, false);
+  } else if (kind === 'slam') {
+    const by = [...hits].sort((a, b) => a.d - b.d), c = by[0].core ? by.shift() : null;
+    if (c) say(G, c.t, S.core, S.col, S.edge, S.size, S.shake, o.from, true);
+    by.slice(0, lite() ? S.othersLite : S.others).forEach(h => say(G, h.t, S.word, S.wordCol, S.edge, S.wordSize, S.wordShake, o.from, false));
+  }
+}

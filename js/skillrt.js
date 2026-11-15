@@ -5,6 +5,7 @@ import { THREE, T } from './render.js';
 import { HitShape, CombatMath, clamp, clamp01 } from './core.js';
 import { skillSound } from './sfx.js';
 import { cookImpact, cookCanToss, cookShout } from './cookfx.js';
+import { pharmShout } from './pharmfx.js';
 // 미트볼 던지기 ck1_b1: 5개가 서로 다른 곡선으로 한 적에게 차례로 (CUSTOM.meatball_volley)
 import { meatballVolley } from './meatball.js';
 import { salImpact } from './salfx.js';
@@ -316,7 +317,7 @@ export class SkillEngine {
     const quietFx = !!(op.quiet || op.pharm === 'burst' || (op.fx && (op.fx.pharm === 'smash' || op.fx.pharm === 'push' || (op.fx.cook && op.fx.cook !== 'chop') || op.fx.hair))) || !!(op.hairProj || op.hair === 'trap');   // 미용사 빗·헤어롤 덫·fx.hair도 전역 히트스톱 없이   // own local hit-stop + camera kick, never the global ones (quiet: 대장장이)
     const hd = { source: pc, amount: r.amount, crit: r.crit, kdir, knockback: knock, localStop: quietFx ? 'quiet' : !!(op.fx && (op.fx.bash || op.fx.cook)) };   // 식칼 썰기: a critical chop no longer stops the whole game (the chops keep their rhythm)
     if (op.derived) hd.derived = true;
-    t.takeDamage(hd); ctx.missed = !!hd.missed;
+    t.takeDamage(hd); ctx.missed = !!hd.missed; ctx.crit = !hd.missed && !!hd.crit;
     if (!hd.missed && !op.derived) this.smith.directHit(t);   // 단조 낙인 타수: 직접 공격만(파생 피해 제외)
     if (op.push && !t.isBoss && !t.dead) { const m = Math.hypot(kdir.x, kdir.z) || 1; t.knock = { x: kdir.x / m * op.push * 10, z: kdir.z / m * op.push * 10 }; t.hitReact = Math.max(t.hitReact || 0, 0.4); }   // push = m 밀어냄(배쉬, 무거운 몬스터 포함·보스 제외)
     if (op.pull && !t.isBoss && !t.dead) { const p = op.pullTo || ctx.aim; const ddx = p.x - t.pos.x, ddz = p.z - t.pos.z, m = Math.hypot(ddx, ddz); if (m > 0.3) t.knock = { x: ddx / m * op.pull * 3, z: ddz / m * op.pull * 3 }; }
@@ -578,6 +579,7 @@ export class SkillEngine {
             cookShout(G, t, 'pan', { from: pc.pos }); if (sd) cookShout(G, t, 'stun', { force: true, from: pc.pos });   // 타격감 문구 '쾅!' (+ 기절이 걸렸을 때만 '기절!')
           }
         }
+        if (op.fx && op.fx.pharm === 'smash' && ts[0] && !ctx.missed && op.coef > 0) pharmShout(G, 'smash', [{ t: ts[0], crit: ctx.crit }], { from: pc.pos });   // 유봉강타: 실제로 맞으면 '쾅!'(치명타 '콰앙!', 쓰러뜨리면 '퍽!') — js/pharmfx.js SHOUT
         if (op.fx && op.fx.cook === 'chop' && ts[0] && !ctx.missed) cookShout(G, ts[0], 'chop', { h, last: h === hits_ - 1, from: pc.pos });   // 식칼 썰기: 실제로 썬 타에만 '썰!'/'싹둑!', 마지막 '썰썰썰!'
         if (op.fx && op.fx.smith) {   // 대장장이 타격 연출(피해 뒤 — MISS는 빗나간 것으로): 실제로 맞은 대상에만 불티·섬광, 시전자·대상만 잠깐 멈춤
           const live = ts.filter(() => !ctx.missed || ts.length > 1), t0 = [...live].sort((a, b) => pc.dist(a) - pc.dist(b))[0], heavy = op.fx.smith === 'finish' || op.fx.smith === 'brand';
@@ -651,15 +653,18 @@ export class SkillEngine {
     if (op.pharm) FX.pharm(op.pharm, { x: c.x, y: pc.zone.geo.ground(c.x, c.z).y, z: c.z }, { elem: op.elem, r, linger: op.linger, rain: op.rain, big: op.big, scale: op.vscale, hit: ts.length > 0 });   // big / scale = 약병폭격 마지막 병·크기 변화(그림만, 피해는 그대로)   // linger: 바닥 서리·웅덩이가 상태이상 시간만큼 옅게 남음
     if (op.shake && G.render.addShake && !G.reduceFlash) G.render.addShake(op.shake[0], op.shake[1]);
     const cb = this.book.passive('centerBonus');
+    let shouts = null;
     for (const t of ts) {
       const centre = Math.hypot(t.pos.x - c.x, t.pos.z - c.z) < r * 0.35;
       // core: own centre bonus inside coreR (천근쇄약: +50 % within 1.5 m), 정확한 투척(약병 전용) 중심 보너스와는 겹치지 않음
       const core = op.core && Math.hypot(t.pos.x - c.x, t.pos.z - c.z) <= (op.coreR || r * 0.35) ? 1 + op.core : 1;
       this.dmg(t, op.coef * core, ctx, { ...op, centerHit: centre && cb > 0 && !op.core, centerBonus: 0 });
+      if (op.shout && !ctx.missed) (shouts || (shouts = [])).push({ t, d: Math.hypot(t.pos.x - c.x, t.pos.z - c.z), core: core > 1 });   // 타격감 문구 대상(MISS 제외)
       if (op.hair === 'trap' && !ctx.missed) { t.freezeT = Math.max(t.freezeT || 0, HAIR_STOP[0]); if (t.body && t.body.punch) t.body.punch(t.pos.x - c.x, t.pos.z - c.z, 0.12); }   // 헤어롤 덫: 감아 죄는 순간 맞은 적만 짧게 멈춤
       this.onHit(t, op, ctx);
       if (op.react) this.react(t, op.react, ctx);
     }
+    if (shouts) pharmShout(G, op.shout, shouts, { from: pc.pos });   // 천근쇄약 (shout: 'slam'): 한가운데 '쿠웅!!' + 다른 적 '쾅!' 2개(lite 1) — js/pharmfx.js SHOUT
     if (op.area) this.addArea({ op: 'area', ...op.area }, ctx, c);
     if (op.knock) for (const t of ts) if (!t.isBoss) { const dx = t.pos.x - c.x, dz = t.pos.z - c.z, m = Math.hypot(dx, dz) || 1; t.knock = { x: dx / m * op.knock * 3, z: dz / m * op.knock * 3 }; }
     if (!op.sfxOnHit || ts.length) G.audio.sfx(skillSound(ctx.d, op));   // sfxOnHit: silent when nothing was hit
