@@ -6,22 +6,13 @@
 //  - gathering: a "collect" objective with "gather": {zone, n?} lays glowing pickups in that zone (줍기·조사·표식)
 //  - quest drops: a "collect" objective with "drop": {from:[monster ids], chance} drops its item from those monsters
 import { Npc, Monster, Loot } from './actors.js';
-import { THREE, T } from './render.js';
 
 let G = null;
 const has = (a, x) => Array.isArray(a) && a.includes(x);
 
-/** a pickup that stays until taken, with a soft light pillar so it can be found */
+/** a pickup that stays until taken; gold "find me" glow column + ring and gold name label (js/dropfx.js, 2026-11-15) */
 class QuestPickup extends Loot {
-  constructor(zone, id, count, at, key) {
-    super(zone, id, count, at); this.life = 1e9; this.key = key;
-    const g = new THREE.CylinderGeometry(0.16, 0.42, 3.2, 12, 1, true); g.translate(0, 1.6, 0);
-    const m = new THREE.MeshBasicMaterial({ color: 0xffe3a0, transparent: true, opacity: 0.32, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
-    this.beam = new THREE.Mesh(g, m); this.beam.renderOrder = 3; G.render.scene.add(this.beam);
-    this.beam.position.copy(T(this.pos));
-  }
-  update(dt) { super.update(dt); if (this.beam) { this.beam.position.copy(T(this.pos)); this.beam.material.opacity = 0.22 + 0.12 * Math.sin(this.t * 3); } }
-  dispose() { super.dispose(); if (this.beam) { G.render.scene.remove(this.beam); this.beam.geometry.dispose(); this.beam.material.dispose(); this.beam = null; } }
+  constructor(zone, id, count, at, key) { super(zone, id, count, at, { quest: true }); this.life = 1e9; this.key = key; }
 }
 
 export class QuestWorld {

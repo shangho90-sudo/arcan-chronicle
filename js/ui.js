@@ -8,6 +8,7 @@ import { renderPortrait, renderThumb, bodyTexturesReady } from './portrait.js';
 import { Minimap } from './minimap.js';
 import { MAP_KINDS, npcMapKind, mapIconURL } from './mapicons.js';
 import { installQuestHud, bindQuestHud } from './questhud.js';
+import { LABEL } from './dropfx.js';
 
 let G = null;
 export function bindGame(g) { G = g; bindQuestHud(g); }
@@ -399,7 +400,35 @@ export class UI {
       if (!(a._plateH > 0) && a.body && a.body.root) { const bb = new THREE.Box3().setFromObject(a.body.root); const h = bb.max.y - bb.min.y; if (isFinite(h) && h > 0.1) a._plateH = h; }
       place(p, { x: a.pos.x, y: a.pos.y + (a._plateH || a.def.radius * 2 + 0.4) + 0.45, z: a.pos.z });
     }
+    this.itemPlates(z, pl, place);
     for (const [k, p] of this.plates) if (!p._seen) { p.remove(); this.plates.delete(k); }
+  }
+  /** names over items on the ground (js/dropfx.js LABEL, 2026-11-15): Jua, quest gold / rare violet / gear blue / white,
+   *  only near the player (fade at the edge), at most LABEL.max (quest first, then rarity, then nearest), and a label that
+   *  would overlap one already placed on screen is left out */
+  itemPlates(z, pl, place) {
+    if (!pl) return;
+    const phone = this.world.clientWidth < 600, R = phone ? LABEL.rangePhone : LABEL.range, cap = phone ? LABEL.maxPhone : LABEL.max;
+    const rank = { quest: 0, rare: 1, gear: 2, normal: 3 }, cand = [];
+    for (const t of z.things) {
+      if (t.dead || !t.label || !t.labelPos) continue;
+      const d = Math.hypot(t.pos.x - pl.pos.x, t.pos.z - pl.pos.z); if (d > R) continue;
+      cand.push({ t, d });
+    }
+    cand.sort((a, b) => rank[a.t.tier] - rank[b.t.tier] || a.d - b.d);
+    const boxes = [], fs = phone ? 12 : 14; let n = 0;
+    for (const { t, d } of cand) {
+      if (n >= cap) break;
+      const s = G.render.toScreen(t.labelPos), txt = t.label + (t.count > 1 ? ' ×' + t.count : '');
+      const w = txt.length * fs * 0.95 + 10, h = fs + 6, bx = { x0: s.x - w / 2, x1: s.x + w / 2, y0: s.y - h, y1: s.y };
+      if (boxes.some(o => bx.x0 < o.x1 && bx.x1 > o.x0 && bx.y0 < o.y1 && bx.y1 > o.y0)) continue;
+      boxes.push(bx); n++;
+      const p = this.plate(t, false);
+      if (p._tier !== t.tier) { p.className = 'plate item ' + t.tier; p._tier = t.tier; }
+      const nm = p.querySelector('.pname'); if (nm._t !== txt) { nm._t = txt; nm.textContent = txt; }
+      p.style.opacity = Math.max(0, Math.min(1, (R - d) / LABEL.fade)).toFixed(2);
+      place(p, t.labelPos);
+    }
   }
   clearPlates() { for (const p of this.plates.values()) p.remove(); this.plates.clear(); }
 

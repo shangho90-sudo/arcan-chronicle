@@ -2,7 +2,7 @@
 // Port of Assets/Arcan/Scripts/Runtime/{Actors,Combat} (C#).
 import { CombatMath, HitShape, StatusSet, clamp, clamp01, DEG, missChance, levelGapDamage } from './core.js';
 import { SpriteBody, dirFromWorld, hitTime, duration, lockTime, action, TelegraphView, T, THREE } from './render.js';
-import { lootModel, hasItemModel } from './items3d.js';
+import { groundItem } from './dropfx.js';
 import { SkillEngine, applyStatus, clearMarks } from './skillrt.js';
 import { STEP_COL as ART_STEP_COL } from './artfx.js';
 import { CreatureBody, loadCreature, loadCreatureLook, CREATURES } from './creature.js';
@@ -933,14 +933,17 @@ export class GroundZone {
 }
 
 export class Loot {
-  constructor(zone, id, count, at) {
+  /** opts.quest: a quest pickup (gold glow + gold label) — the look is js/dropfx.js groundItem (2026-11-15) */
+  constructor(zone, id, count, at, opts = {}) {
     this.zone = zone; this.id = id; this.count = count; this.t = 0; this.life = 120; this.warn = 0;
     const a = Math.random() * Math.PI * 2, r = Math.random() * 0.6; this.pos = zone.geo.ground(at.x + Math.cos(a) * r, at.z + Math.sin(a) * r);
     const def = G.data.item(id);
-    this.is3d = hasItemModel(id);
-    this.mesh = this.is3d ? lootModel(id) : G.ui.iconMesh(def ? def.icon : null); G.render.scene.add(this.mesh);
+    this.def = def; this.view = groundItem(id, def, opts); this.mesh = this.view.root; G.render.scene.add(this.mesh);
+    this.label = def ? def.name : id; this.tier = this.view.tier;
     if (G.skillFx) G.skillFx.burst("sparks", { x: this.pos.x, y: this.pos.y + 0.3, z: this.pos.z }, { radius: 0.35, color: 0xffe08a });
   }
+  /** label anchor (game coords) for ui.js updatePlates */
+  get labelPos() { return { x: this.pos.x, y: this.pos.y + this.view.top, z: this.pos.z }; }
   update(dt) {
     this.t += dt; this.life -= dt; if (this.warn > 0) this.warn -= dt;
     const p = G.player;
@@ -951,10 +954,9 @@ export class Loot {
         if (d < 0.45) { const n = p.sheet.bag.add(this.id, this.count); if (n > 0) { this.count -= n; G.ui.itemToast(G.data.item(this.id), n); G.audio.sfx("pickup"); } if (this.count <= 0) return this.done(); }
       } else if (d < 1 && this.warn <= 0) { G.ui.toast("가방이 가득 찼습니다"); this.warn = 4; }
     }
-    this.mesh.position.copy(T({ x: this.pos.x, y: this.pos.y + 0.2 + Math.abs(Math.sin(this.t * 3)) * 0.15, z: this.pos.z }));
-    if (this.is3d) this.mesh.rotation.y = this.t * 1.6; else this.mesh.quaternion.copy(G.render.cam.quaternion);
+    this.view.update(this.t, this.pos, G.render.cam);
     if (this.life <= 0) this.done();
   }
   done() { this.dead = true; this.dispose(); }
-  dispose() { G.render.scene.remove(this.mesh); }
+  dispose() { G.render.scene.remove(this.mesh); this.view.dispose(); }
 }

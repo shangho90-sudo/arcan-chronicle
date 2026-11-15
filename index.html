@@ -111,6 +111,14 @@ small { font-size:.8em; }
 .plate.npc .pname { font-family:Jua, sans-serif; font-size:20px; font-weight:400; letter-spacing:.5px; -webkit-text-stroke:3px #1a1008; paint-order:stroke fill; text-shadow:0 3px 4px rgba(0,0,0,.55); }
 .plate.npc .mark:not(:empty) { margin-bottom:10px; }
 @media (max-width:600px) { .plate.npc .pname { font-size:14px; -webkit-text-stroke:2.5px #1a1008; } }
+/* 땅에 떨어진 아이템 이름 (js/dropfx.js LABEL, ui.js itemPlates): 주아체, 퀘스트 금빛·드롭 전용 장비 보라·장비 하늘색·그 밖 흰색 */
+.plate.item { pointer-events:none; transition:opacity .2s; }
+.plate.item .mark { display:none; }
+.plate.item .pname { font-family:Jua, sans-serif; font-size:14px; font-weight:400; letter-spacing:.3px; color:#fffaf0; -webkit-text-stroke:2.5px #1a1008; paint-order:stroke fill; text-shadow:0 2px 3px rgba(0,0,0,.55); }
+.plate.item.quest .pname { color:#ffd26a; -webkit-text-stroke-color:#2a1604; }
+.plate.item.rare .pname { color:#d8b4ff; -webkit-text-stroke-color:#1c0c2c; }
+.plate.item.gear .pname { color:#9ad8ff; -webkit-text-stroke-color:#081a2a; }
+@media (max-width:600px) { .plate.item .pname { font-size:12px; -webkit-text-stroke:2px #1a1008; } }
 @keyframes qmbob { 0%,100% { transform:translateY(0) scale(1); } 50% { transform:translateY(-7px) scale(1.06); } }
 .phb { width:56px; height:6px; margin:2px auto 0; background:#2a2228; border:1px solid #000; } .phb i { display:block; height:100%; background:#e05a4a; }
 /* monster plates (always on): name white (your level or lower) / red (stronger), HP bar under it */

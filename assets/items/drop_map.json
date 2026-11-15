@@ -1,0 +1,491 @@
+{
+"fallback": {
+"accessory": "keepsake",
+"armor": "bundle",
+"consumable": "vial",
+"material": "pouch",
+"quest": "bundle",
+"weapon": "bundle"
+},
+"items": {
+"a_armor_1": {
+"m": "bundle"
+},
+"a_armor_2": {
+"m": "bundle"
+},
+"a_armor_3": {
+"m": "cloth"
+},
+"a_armor_g1": {
+"m": "bundle"
+},
+"a_armor_g10": {
+"m": "scale"
+},
+"a_armor_g2": {
+"m": "bundle"
+},
+"a_armor_g3": {
+"m": "ingot",
+"tint": "#c8e4ff"
+},
+"a_armor_g4": {
+"m": "bundle"
+},
+"a_armor_g5": {
+"m": "bundle"
+},
+"a_armor_g6": {
+"m": "wool"
+},
+"a_armor_g7": {
+"m": "ingot",
+"tint": "#c8e4ff"
+},
+"a_armor_g8": {
+"m": "scale"
+},
+"a_armor_g9": {
+"m": "bundle"
+},
+"ac_amulet_2": {
+"m": "moss"
+},
+"ac_g1": {
+"m": "keepsake"
+},
+"ac_g10": {
+"m": "token"
+},
+"ac_g11": {
+"m": "keepsake"
+},
+"ac_g12": {
+"m": "keepsake"
+},
+"ac_g2": {
+"m": "keepsake"
+},
+"ac_g3": {
+"m": "keepsake"
+},
+"ac_g4": {
+"m": "feather"
+},
+"ac_g5": {
+"m": "keepsake"
+},
+"ac_g6": {
+"m": "keepsake"
+},
+"ac_g7": {
+"m": "crystal"
+},
+"ac_g8": {
+"m": "keepsake"
+},
+"ac_g9": {
+"m": "keepsake"
+},
+"ac_j_art": {
+"m": "keepsake"
+},
+"ac_j_cook": {
+"m": "keepsake"
+},
+"ac_j_craft": {
+"m": "keepsake"
+},
+"ac_j_hair": {
+"m": "keepsake"
+},
+"ac_j_herb": {
+"m": "keepsake"
+},
+"ac_j_muse": {
+"m": "keepsake"
+},
+"ac_j_pharm": {
+"m": "keepsake"
+},
+"ac_j_smith": {
+"m": "ember"
+},
+"ac_ring_1": {
+"m": "keepsake"
+},
+"ac_ring_3": {
+"m": "crystal"
+},
+"c_antidote": {
+"m": "vial"
+},
+"c_potion_m": {
+"m": "vial"
+},
+"c_potion_s": {
+"m": "vial"
+},
+"c_sp_potion": {
+"m": "vial"
+},
+"m_boar_tusk": {
+"m": "moss"
+},
+"m_bog_tusk": {
+"m": "moss"
+},
+"m_boss_cap": {
+"m": "pouch"
+},
+"m_cinder_gland": {
+"m": "ember"
+},
+"m_dragon_blood": {
+"m": "crystal"
+},
+"m_dragon_heart": {
+"m": "pouch"
+},
+"m_drake_scale": {
+"m": "scale"
+},
+"m_fox_fur": {
+"m": "wool"
+},
+"m_frost_fang": {
+"m": "ice"
+},
+"m_frost_horn": {
+"m": "horn"
+},
+"m_glacier_horn": {
+"m": "horn"
+},
+"m_herb": {
+"m": "herb"
+},
+"m_ice_tail": {
+"m": "wool"
+},
+"m_jelly": {
+"m": "wool"
+},
+"m_lava_tusk": {
+"m": "pouch"
+},
+"m_mist_bear_claw": {
+"m": "pouch"
+},
+"m_mist_fang": {
+"m": "pouch"
+},
+"m_mist_tail": {
+"m": "tail"
+},
+"m_moss_stone": {
+"m": "flower"
+},
+"m_rune_shard": {
+"m": "tablet"
+},
+"m_snow_pelt": {
+"m": "pouch"
+},
+"m_spore": {
+"m": "pouch"
+},
+"m_toad_gland": {
+"m": "pouch"
+},
+"m_wolf_fang": {
+"m": "pouch"
+},
+"qi_abyss_obs": {
+"m": "scroll"
+},
+"qi_altar_core": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"qi_assassin_trace": {
+"m": "feather",
+"tint": "#5a5470"
+},
+"qi_bamboo": {
+"m": "bamboo"
+},
+"qi_barley_seed": {
+"m": "seedbag"
+},
+"qi_beetle_shell": {
+"m": "carapace"
+},
+"qi_black_blood": {
+"m": "vial",
+"tint": "#6a3048"
+},
+"qi_black_crystal": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"qi_black_feather": {
+"m": "feather",
+"tint": "#5a5470"
+},
+"qi_blue_lamp": {
+"m": "lamp"
+},
+"qi_boar_meat": {
+"m": "meat"
+},
+"qi_buried_record": {
+"m": "scroll"
+},
+"qi_burning_shrine": {
+"m": "ember"
+},
+"qi_cairn": {
+"m": "cairn"
+},
+"qi_cloak_scrap": {
+"m": "cloth"
+},
+"qi_collapse_mark": {
+"m": "tablet"
+},
+"qi_deer_antler": {
+"m": "antler",
+"tint": "#d8ecff"
+},
+"qi_epitaph": {
+"m": "tablet"
+},
+"qi_frozen_wood": {
+"m": "logs",
+"tint": "#dce8f4"
+},
+"qi_gargoyle_feather": {
+"m": "feather",
+"tint": "#b8b4b0"
+},
+"qi_hammer_mark": {
+"m": "tablet",
+"tint": "#a09088"
+},
+"qi_hills_herb": {
+"m": "herb"
+},
+"qi_honey": {
+"m": "honey"
+},
+"qi_ice_flower": {
+"m": "flower"
+},
+"qi_ice_steel": {
+"m": "ingot",
+"tint": "#c8e4ff"
+},
+"qi_illusion_shard": {
+"m": "shard",
+"tint": "#c0a0ff"
+},
+"qi_keepsake": {
+"m": "keepsake"
+},
+"qi_lake_ice": {
+"m": "ice"
+},
+"qi_lost_pilgrim": {
+"m": "token"
+},
+"qi_oil_barrel": {
+"m": "barrel"
+},
+"qi_old_scale": {
+"m": "scale"
+},
+"qi_owl_feather": {
+"m": "feather",
+"tint": "#c89a64"
+},
+"qi_pilgrim_lamp": {
+"m": "lamp"
+},
+"qi_poison_sample": {
+"m": "moss",
+"tint": "#b090c8"
+},
+"qi_prayer_book": {
+"m": "book"
+},
+"qi_quarry_stone": {
+"m": "stone"
+},
+"qi_ram_horn": {
+"m": "horn"
+},
+"qi_rubbing": {
+"m": "scroll"
+},
+"qi_salamander_tail": {
+"m": "tail",
+"tint": "#e0603a"
+},
+"qi_scorpion_tail": {
+"m": "tail",
+"tint": "#c89048"
+},
+"qi_shadow_ember": {
+"m": "orb"
+},
+"qi_shadow_hole": {
+"m": "orb"
+},
+"qi_sheep_wool": {
+"m": "wool"
+},
+"qi_shepherd_item": {
+"m": "bundle"
+},
+"qi_snail_shell": {
+"m": "shell"
+},
+"qi_spider_silk": {
+"m": "spool"
+},
+"qi_stolen_pick": {
+"m": "pick"
+},
+"qi_supply_cache": {
+"m": "scroll"
+},
+"qi_turtle_moss": {
+"m": "carapace",
+"tint": "#9ac070"
+},
+"qi_village_diary": {
+"m": "book"
+},
+"w_brush_1": {
+"m": "bundle"
+},
+"w_brush_2": {
+"m": "bundle"
+},
+"w_brush_3": {
+"m": "bundle"
+},
+"w_hammer_1": {
+"m": "bundle"
+},
+"w_hammer_2": {
+"m": "ingot",
+"tint": "#c8e4ff"
+},
+"w_hammer_3": {
+"m": "bundle"
+},
+"w_knife_1": {
+"m": "bundle"
+},
+"w_knife_2": {
+"m": "bundle"
+},
+"w_knife_3": {
+"m": "bundle"
+},
+"w_pestle_1": {
+"m": "bundle"
+},
+"w_pestle_2": {
+"m": "bundle"
+},
+"w_pestle_3": {
+"m": "bundle"
+},
+"w_pestle_g1": {
+"m": "bundle"
+},
+"w_pestle_g10": {
+"m": "bundle"
+},
+"w_pestle_g2": {
+"m": "bundle"
+},
+"w_pestle_g3": {
+"m": "ingot",
+"tint": "#c8e4ff"
+},
+"w_pestle_g4": {
+"m": "bundle"
+},
+"w_pestle_g5": {
+"m": "crystal"
+},
+"w_pestle_g6": {
+"m": "flower"
+},
+"w_pestle_g7": {
+"m": "crystal"
+},
+"w_pestle_g8": {
+"m": "bundle"
+},
+"w_pestle_g9": {
+"m": "bundle"
+},
+"w_scissors_1": {
+"m": "bundle"
+},
+"w_scissors_2": {
+"m": "bundle"
+},
+"w_scissors_3": {
+"m": "bundle"
+},
+"w_stick_1": {
+"m": "bundle"
+}
+},
+"models": [
+"antler",
+"bamboo",
+"barrel",
+"book",
+"bundle",
+"cairn",
+"carapace",
+"cloth",
+"crystal",
+"ember",
+"feather",
+"flower",
+"herb",
+"honey",
+"horn",
+"ice",
+"ingot",
+"keepsake",
+"lamp",
+"logs",
+"meat",
+"moss",
+"orb",
+"pick",
+"pouch",
+"scale",
+"scroll",
+"seedbag",
+"shard",
+"shell",
+"spool",
+"stone",
+"tablet",
+"tail",
+"token",
+"vial",
+"wool"
+]
+}

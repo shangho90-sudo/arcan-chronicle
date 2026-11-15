@@ -2,6 +2,7 @@
 import { GameData, SaveStore, SAVE_SLOTS, saveSlotKey, CharacterSheet, QuestLog, QS, ZoneGeometry, NavGrid, newProfile, DEG, clamp, HitShape, levelGapExp, monsterAtLevel, discoverTown, payWarp, warpPrice, zoneLock, questCategory } from './core.js';
 import { Renderer, Fx, TelegraphView, TG_TIME, loadSheet, preloadTextures, THREE, T } from './render.js';
 import { Player, Monster, Boss, Npc, Loot, bindGame as bindActors } from './actors.js';
+import { preloadDrops } from './dropfx.js';
 import { Input, Audio } from './io.js';
 import { UI, bindGame as bindUi, rewardText } from './ui.js';
 import { loadPlayerModel, loadActions } from './model.js';
@@ -342,6 +343,7 @@ class Game {
       progress(15 + Math.round(++resourceDone / resources.length * 60));
     }));
     progress(75, "텍스처 준비하는 중...");
+    preloadDrops();
     await preloadTextures([...sheetNames].map(n => "assets/sprites/" + n + ".png").concat(["assets/fx/effects.png", "assets/ui/icons.png", "assets/ui/shadow.png"]));
     const unlock = () => this.audio.unlock();
     // capture phase: the first click anywhere (even on a title button) starts the sound before the button acts
