@@ -3838,7 +3838,11 @@
    "offerText": "<b class='gold'>곤</b> 수확제 요리에 꿀이 모자라! 사냥터 숲의 걷는 나무들이 벌통을 다 엎었다고.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>곤</b> 이 꿀이면 왕도 최고의 파이를 굽지!",
-   "story": true
+   "story": true,
+   "needZones": [
+    "kairion_capital",
+    "kairion_hunt"
+   ]
   },
   {
    "id": "qs07",
@@ -3891,7 +3895,10 @@
    "offerText": "<b class='gold'>쇠돌</b> 구릉지 딱정벌레 껍질은 방패에 덧대기 좋대요. 스승님께 보낼 거예요!",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>쇠돌</b> 와, 이걸로 방패 몇 개는 더 만들겠어요.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "kairion_hills"
+   ]
   },
   {
    "id": "qs08",
@@ -3973,7 +3980,11 @@
    "offerText": "<b class='gold'>오린</b> 고갯길 고블린들이 우리 곡괭이를 다 훔쳐 갔어.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>오린</b> 찾아 줬구나! 다음엔 싸게 팔게.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "baltern",
+    "baltern_pass"
+   ]
   },
   {
    "id": "qs10",
@@ -4020,7 +4031,12 @@
    "offerText": "<b class='gold'>가론</b> 절벽길 매들이 전령을 덮친다. 가고일 깃은 화살 깃으로 쓰고.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>가론</b> 이제 전령이 무사히 오가겠어.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "baltern",
+    "baltern_cliffs",
+    "baltern_pass"
+   ]
   },
   {
    "id": "qs11",
@@ -4064,7 +4080,12 @@
    "offerText": "<b class='gold'>가론</b> 피난민 숙소를 고칠 돌이 필요해. 채석장 아르마딜로들이 길을 막고 있어.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>가론</b> 이걸로 지붕을 올리겠어.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "baltern",
+    "baltern_pass",
+    "baltern_quarry"
+   ]
   },
   {
    "id": "qs12",
@@ -4105,7 +4126,11 @@
    "offerText": "<b class='gold'>미르</b> 안개 골짜기 두꺼비 독샘으로 해독제를 만들어요.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>미르</b> 해독제 몇 병 드릴게요.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "baltern",
+    "mist_valley"
+   ]
   },
   {
    "id": "qs13",
@@ -4149,7 +4174,10 @@
    "offerText": "<b class='gold'>보름</b> 안개 골짜기 팬더들이 죽순을 다 가져갔어요! 여관 봄 요리에 꼭 필요한데.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>보름</b> 오늘 저녁은 죽순 볶음이에요!",
-   "story": true
+   "story": true,
+   "needZones": [
+    "mist_valley"
+   ]
   },
   {
    "id": "qs14",
@@ -4190,7 +4218,11 @@
    "offerText": "<b class='gold'>가론</b> 고갯길 상인을 습격하는 우두머리 곰이 있다. 늑대 무리를 거느리고.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>가론</b> 이제 고갯길에 상인들이 돌아오겠군.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "baltern",
+    "mist_valley"
+   ]
   },
   {
    "id": "qs15",
@@ -4234,7 +4266,10 @@
    "offerText": "<b class='gold'>티아</b> 장난꾸러기 요정들이 등불을 훔쳐 갔어요. 등불 없이는 순례를 못 해요.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>티아</b> 찾아 주셨군요! 이제 길을 밝힐 수 있어요.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "blue_forest_edge"
+   ]
   },
   {
    "id": "qs16",
@@ -4272,7 +4307,11 @@
    "offerText": "<b class='gold'>세오</b> 성수를 담는 단지는 별빛 사슴의 뿔로 만들어요. 떨어진 뿔만 주워 오세요.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>세오</b> 고맙습니다. 회복 물약을 몇 병 드리지요.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "blue_forest",
+    "lumiere"
+   ]
   },
   {
    "id": "qs17",
@@ -4319,7 +4358,11 @@
    "offerText": "<b class='gold'>세오</b> 디고나가 사라진 뒤 고목지에 등불 유령이 떠돌아요.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>세오</b> 넋들이 조금은 편해졌을 거예요.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "blue_forest_heart",
+    "lumiere"
+   ]
   },
   {
    "id": "qs18",
@@ -4360,7 +4403,12 @@
    "offerText": "<b class='gold'>베른</b> 순례길에 짐승이 늘었습니다. 순례자들이 다닐 수 있게 해 주십시오.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>베른</b> 루미에르가 감사드립니다.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "blue_forest",
+    "lumiere",
+    "mist_valley"
+   ]
   },
   {
    "id": "qs19",
@@ -4395,7 +4443,11 @@
    "offerText": "<b class='gold'>네아</b> 밤마다 도깨비불이 양떼를 들판 밖으로 홀려 가요. 그이도 양을 찾으러 나갔다가….",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>네아</b> 이 양털… 우리 양들 거예요. 그이는요?",
-   "story": true
+   "story": true,
+   "needZones": [
+    "silvern",
+    "silvern_fields"
+   ]
   },
   {
    "id": "qs20",
@@ -4439,7 +4491,12 @@
    "offerText": "<b class='gold'>네아</b> 그이는 남쪽 숲으로 갔을 거예요. 피리를 늘 갖고 다녔어요.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>네아</b> 피리… 그이 거예요. 늑대 굴 쪽으로 간 것 같대요.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "mist_valley",
+    "silvern",
+    "silvern_woods"
+   ]
   },
   {
    "id": "qs21",
@@ -4486,7 +4543,12 @@
    "offerText": "<b class='gold'>라엘</b> 늑대 굴은 남쪽 숲 깊은 곳이야. 부엉이 깃털로 길 표시를 하며 들어가자.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>토빈</b> 살았다… 다리를 다쳐서 굴에 갇혀 있었어. 양들은 습지로 몰려갔어.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "blue_forest",
+    "mist_valley",
+    "silvern"
+   ]
   },
   {
    "id": "qs22",
@@ -4527,7 +4589,11 @@
    "offerText": "<b class='gold'>토빈</b> 습지 우두머리 곰이 양떼를 몰아넣었어. 피리를 불면 양들은 돌아올 거야.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>토빈</b> 양들이 돌아왔어! 데르카이 영주님께도 네 이야기를 해 두지.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "mist_valley",
+    "silvern"
+   ]
   },
   {
    "id": "qs23",
@@ -4568,7 +4634,11 @@
    "offerText": "<b class='gold'>오나</b> 국경 수비대용 해독제가 모자라요. 전갈 꼬리가 재료예요.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>오나</b> 해독제를 넉넉히 드릴게요.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "gravel",
+    "gravel_border"
+   ]
   },
   {
    "id": "qs24",
@@ -4612,7 +4682,11 @@
    "offerText": "<b class='gold'>한스</b> 우리 마을은… 지도에서 지워졌습니다. 유품이라도 찾아 주세요.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>한스</b> 어머니의 빗… 고맙습니다.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "gravel",
+    "lost_villages"
+   ]
   },
   {
    "id": "qs25",
@@ -4656,7 +4730,12 @@
    "offerText": "<b class='gold'>요이센</b> 안전한 길에 표식을 남겨 두자. 언젠가 다시 들어가야 할지도 몰라.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>요이센</b> 좋아. 이 표식, 나중에 쓸 일이 있을 거야.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "gravel",
+    "gravel_border",
+    "zirat_outskirts"
+   ]
   },
   {
    "id": "qs26",
@@ -4697,7 +4776,11 @@
    "offerText": "<b class='gold'>다이센</b> 철퇴 손잡이를 다시 감아야 한다. 할아버지는 큰뿔양 뿔을 썼지.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>다이센</b> …할아버지가 처음 이 철퇴를 쥐여 주던 날이 생각나는군.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "berg_burned",
+    "berg_canyon"
+   ]
   },
   {
    "id": "qs27",
@@ -4738,7 +4821,12 @@
    "offerText": "<b class='gold'>치르젠</b> 연합군 겨울 외투가 모자랍니다. 고원 곰 가죽을 부탁드립니다.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>치르젠</b> 사만 명이 겨울을 날 수 있겠군요.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "berg_burned",
+    "gravel",
+    "gravel_border"
+   ]
   },
   {
    "id": "qs28",
@@ -4782,7 +4870,11 @@
    "offerText": "<b class='gold'>다이센</b> 전쟁이 끝나면 고원을 돌려받는다지. 그럼 심을 게 있어야지.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>다이센</b> …보리밭이 다시 생기겠군.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "berg_burned",
+    "lost_villages"
+   ]
   },
   {
    "id": "qs29",
@@ -4829,7 +4921,11 @@
    "offerText": "<b class='gold'>리라</b> 연합군 방한복을 만들어요. 서리 고원 산양 털이 최고예요.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>리라</b> 이걸로 따뜻한 망토를 지을게요.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "frost_highland",
+    "kairion_capital"
+   ]
   },
   {
    "id": "qs30",
@@ -4873,7 +4969,11 @@
    "offerText": "<b class='gold'>소연</b> 왕자님 오른팔 화상에는 얼음꽃 연고가 들어요.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>소연</b> 연고 완성! 다음에 왕자님을 만나면 꼭 전해 줘요.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "frost_highland",
+    "kairion_capital"
+   ]
   },
   {
    "id": "qs31",
@@ -4914,7 +5014,10 @@
    "offerText": "<b class='gold'>카야</b> 사냥꾼 오두막이 곰과 늑대에게 포위됐어!",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>카야</b> 살았어. 고원 깊은 곳의 산양왕 이야기 들어 봤어?",
-   "story": true
+   "story": true,
+   "needZones": [
+    "frost_highland"
+   ]
   },
   {
    "id": "qs32",
@@ -4949,7 +5052,10 @@
    "offerText": "<b class='gold'>카야</b> 산양왕의 뿔은 2차 직업 장인들이 탐내는 재료야.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>카야</b> 전설로만 듣던 뿔이야. 가져가.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "frost_highland"
+   ]
   },
   {
    "id": "qs33",
@@ -4996,7 +5102,11 @@
    "offerText": "<b class='gold'>브람</b> 사만 명이 먹는다. 하루에도 산 하나가 사라지지.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>브람</b> 오늘 저녁은 고기다!",
-   "story": true
+   "story": true,
+   "needZones": [
+    "capital_plain",
+    "gravel_border"
+   ]
   },
   {
    "id": "qs34",
@@ -5040,7 +5150,11 @@
    "offerText": "<b class='gold'>카스티야</b> 무너진 다리 강바닥에… 그 사람 물건이 남아 있을지도 몰라.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>카스티야</b> …방패 장식이야. 살아 있을 거야. 분명히.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "baltazar",
+    "broken_bridge"
+   ]
   },
   {
    "id": "qs35",
@@ -5084,7 +5198,11 @@
    "offerText": "<b class='gold'>유디트</b> 기도서라도 건져야 해요.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>유디트</b> 대사제님의 일기 한 장이 끼어 있어요. '오라버니, 돌아보지 않으셨지요'….",
-   "story": true
+   "story": true,
+   "needZones": [
+    "blue_forest_heart",
+    "lumiere_ruins_field"
+   ]
   },
   {
    "id": "qs36",
@@ -5125,7 +5243,12 @@
    "offerText": "<b class='gold'>카심</b> 교역로 뒷길을 열어 주면 물건을 더 들여놓을게.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>카심</b> 이제 장사가 좀 되겠어.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "broken_bridge",
+    "capital_plain",
+    "marseon"
+   ]
   },
   {
    "id": "qs37",
@@ -5166,7 +5289,12 @@
    "offerText": "<b class='gold'>도르</b> 좋은 가죽이 필요해. 외곽 멧돼지라면 딱이지.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>도르</b> 좋은 가죽이야. 조끼 하나 지어 주지.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "lumiere_ruins_field",
+    "marseon",
+    "mist_valley"
+   ]
   },
   {
    "id": "qs38",
@@ -5213,7 +5341,12 @@
    "offerText": "<b class='gold'>에르딘</b> 대장간 화로가 식어 가요. 도롱뇽 꼬리가 최고의 연료예요.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>에르딘</b> 화로가 다시 노래해요!",
-   "story": true
+   "story": true,
+   "needZones": [
+    "baltazar",
+    "baltazar_mines",
+    "crimson_forest"
+   ]
   },
   {
    "id": "qs39",
@@ -5254,7 +5387,10 @@
    "offerText": "<b class='gold'>볼드란</b> 숲을 이렇게 만든 건 내 수정이네. 정리하게 도와주겠나?",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>볼드란</b> 이건… 내가 만든 마지막 장신구일세. 받아 두게.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "crimson_heart"
+   ]
   },
   {
    "id": "qs40",
@@ -5295,7 +5431,11 @@
    "offerText": "<b class='gold'>바르크</b> 광산길이 막히면 왕국의 화로도 식는다.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>바르크</b> 광석 묶음을 가져가게.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "baltazar",
+    "baltazar_mines"
+   ]
   },
   {
    "id": "qs41",
@@ -5336,7 +5476,11 @@
    "offerText": "<b class='gold'>레아</b> 설인 때문에 말들이 놀라서 큰일이야.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>레아</b> 기병대가 다시 달릴 수 있겠어.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "frost_highland",
+    "north_canyon"
+   ]
   },
   {
    "id": "qs42",
@@ -5377,7 +5521,11 @@
    "offerText": "<b class='gold'>베리온</b> 볼드란 공을 능침 안에 모시고 싶습니다. 길을 정리해 주십시오.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>베리온</b> …편히 쉬십시오, 공.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "baltazar",
+    "royal_tomb"
+   ]
   },
   {
    "id": "qs43",
@@ -5418,7 +5566,12 @@
    "offerText": "<b class='gold'>볼크</b> 전쟁을 피해 온 사람들이 요새로 온다. 늑대들이 행렬을 노려.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>볼크</b> 행렬이 무사히 도착했다. 요새 상점을 열어 두지.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "frost_highland",
+    "kreutz_fort",
+    "north_canyon"
+   ]
   },
   {
    "id": "qs44",
@@ -5469,7 +5622,12 @@
    "offerText": "<b class='gold'>볼크</b> 장작과 고기가 없으면 이 겨울을 못 넘긴다.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>볼크</b> 불을 피울 수 있겠어.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "kreutz_fort",
+    "kreutz_snowfield",
+    "north_canyon"
+   ]
   },
   {
    "id": "qs45",
@@ -5519,7 +5677,13 @@
    "offerText": "<b class='gold'>일렉</b> 밤마다 호수 밑에서 소리가 울려. 얼음 조각을 가져와 줘.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>일렉</b> …얼음이 떨려. 심장 소리 같아.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "frost_highland",
+    "frozen_lake",
+    "kreutz_fort",
+    "north_canyon"
+   ]
   },
   {
    "id": "qs46",
@@ -5554,7 +5718,11 @@
    "offerText": "<b class='gold'>일렉</b> 빙곰이 울음의 근원을 지키는 것 같아.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>일렉</b> 빙곰 몸속에서 나온 검은 결정이야. 희미하게… 뛰고 있어.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "frozen_lake",
+    "kreutz_fort"
+   ]
   },
   {
    "id": "qs47",
@@ -5599,7 +5767,11 @@
    "offerText": "<b class='gold'>유디트</b> 대사제님이 찾던 기록이 용의 유적에 있대요.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>유디트</b> 아르칸이 다섯 조각을 흩은 날의 기록이에요!",
-   "story": true
+   "story": true,
+   "needZones": [
+    "dragon_ruins",
+    "lumiere_ruins_field"
+   ]
   },
   {
    "id": "qs48",
@@ -5646,7 +5818,11 @@
    "offerText": "<b class='gold'>유디트</b> 수호석들이 비문을 품고 있어요.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>유디트</b> \"다섯째 조각은 사람의 마음에 숨는다. 내어줄 수 있는 것도 마음뿐이다.\"",
-   "story": true
+   "story": true,
+   "needZones": [
+    "dragon_ruins",
+    "lumiere_ruins_field"
+   ]
   },
   {
    "id": "qs49",
@@ -5696,7 +5872,12 @@
    "offerText": "<b class='gold'>에르딘</b> 비룡 둥지의 오래된 비늘로 무기를 강화할 수 있어요.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>에르딘</b> 이 비늘… 아르칸의 것일지도 몰라요.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "baltazar",
+    "baltazar_mines",
+    "dragon_ruins"
+   ]
   },
   {
    "id": "qs50",
@@ -5735,7 +5916,11 @@
    "offerText": "<b class='gold'>유디트</b> 유적의 주인, 용혈 비룡이 마지막 비문을 지키고 있어요.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>유디트</b> 아르칸의 비늘로 만든 장신구예요. 가져가세요.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "dragon_ruins",
+    "lumiere_ruins_field"
+   ]
   },
   {
    "id": "qs51",
@@ -5777,7 +5962,11 @@
    "offerText": "<b class='gold'>요이센</b> 내가 쌓은 돌무더기를 황무지 안쪽까지 이어 두자.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>요이센</b> 이제 심연까지 길이 보여.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "gravel",
+    "zirat_wastes"
+   ]
   },
   {
    "id": "qs52",
@@ -5818,7 +6007,11 @@
    "offerText": "<b class='gold'>치르젠</b> 연합군 퇴로를 확보해야 합니다.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>치르젠</b> 퇴로가 열렸습니다.",
-   "story": true
+   "story": true,
+   "needZones": [
+    "capital_plain",
+    "zirat_abyss_rim"
+   ]
   }
  ],
  "storyNpcs": [

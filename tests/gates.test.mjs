@@ -92,14 +92,45 @@ for (const z of fields) {
   rows.push(`${z.unlock}:${z.id}:${lo}-${hi}`);
 }
 ok(fields.length >= 35, '메인 퀘스트가 지나는 필드 ' + fields.length);
-// 서브 퀘스트 참고(실패 아님): 받을 수 있게 된 때 목표 지역이 아직 닫힌 것
-const subWarn = [];
-for (const q of d.questList.filter(q => questCategory(q) === 'sub')) {
-  const pre = (q.prereq || []).filter(p => questCategory(d.quests[p]) === 'main' || /^mq/.test(p));
-  const sid = pre.sort((a, b) => M.order.indexOf(b) - M.order.indexOf(a))[0];
-  const zs = q.objectives.flatMap(o => [o.gather && o.gather.zone, o.spawn && o.spawn.zone]).filter(Boolean);
-  const k = sid ? M.order.indexOf(sid) : -1;
-  for (const z of zs) if (d.zones[z].unlock && M.order.indexOf(d.zones[z].unlock) > k) subWarn.push(`${q.id}→${z}(${d.zones[z].unlock})`);
+// 서브 퀘스트(2026-11-15): 받을 수 있게 되는 순간 쓰는 지역(주는/완료 NPC 자리, 줍기·보스 지역)이 모두 열려 있고 목표 몬스터가 열린 곳에 있음.
+// needZones(story.py)가 그렇게 늦춤 — 늦춰진 퀘스트와 새로 받을 수 있는 메인 단계를 출력
+{
+  const subs = d.questList.filter(q => questCategory(q) === 'sub'), first = {}, naive = {};
+  const place = npc => d.storyNpcs.filter(e => e.npc === npc && !e.hide).map(e => e.zone).concat(Object.values(Z).filter(z => (z.npcs || []).some(x => x.npc === npc)).map(z => z.id));
+  const doneM = new Set(), addM = id => { if (doneM.has(id)) return; for (const p of d.quests[id].prereq || []) addM(p); doneM.add(id); };
+  for (const sid of M.order) {
+    for (const p of d.quests[sid].prereq || []) addM(p);
+    for (const [rec, gate] of [[first, true], [naive, false]]) {
+      const done = new Set(doneM); for (const id in rec) done.add(id);
+      let more = true;
+      while (more) { more = false;
+        for (const q of subs) {
+          if (done.has(q.id) || !(q.prereq || []).every(p => done.has(p))) continue;
+          const pf = newProfile(d, '서브', 'm'); pf.quests = [...done].map(id => ({ id, state: 'completed', counts: [] }));
+          if (gate && (q.needZones || []).some(z => zoneLock(d, pf, z))) continue;
+          rec[q.id] = sid; done.add(q.id); more = true;
+          if (!gate) continue;
+          const R = reach(pf);
+          for (const npc of new Set([q.giver, q.turnIn || q.giver])) ok(place(npc).some(z => R.has(z)), `${q.id} ${q.name}: NPC ${npc} 가 열린 곳에 (${place(npc)})`);
+          for (const o of q.objectives) {
+            for (const z of [o.gather && o.gather.zone, o.spawn && o.spawn.zone]) if (z) ok(R.has(z), `${q.id} ${z} 열림`);
+            const mons = o.type === 'kill' && !o.spawn ? [o.target] : o.drop ? o.drop.from : [];
+            if (mons.length) ok(mons.some(m => [...(lives[m] || [])].some(z => R.has(z))), `${q.id} 목표 ${mons} 가 열린 곳에`);
+          }
+        }
+      }
+    }
+    addM(sid);
+  }
+  ok(subs.every(q => first[q.id]), '모든 서브 퀘스트를 언젠가 받을 수 있음 ' + subs.filter(q => !first[q.id]).map(q => q.id));
+  const late = subs.filter(q => first[q.id] !== naive[q.id]).map(q => `${q.id}(${q.name}) ${naive[q.id]}→${first[q.id]}`);
+  for (const id of ['qs20', 'qs30', 'qs44', 'qs45', 'qs49']) ok(M.order.indexOf(first[id]) >= M.order.indexOf(d.zones[{ qs20: 'silvern_woods', qs30: 'frost_highland', qs44: 'kreutz_snowfield', qs45: 'frozen_lake', qs49: 'dragon_ruins' }[id]].unlock) - 1, id + ' 지역이 열린 뒤에');
+  console.log('늦춘 서브 퀘스트 ' + late.length + '개: ' + late.join(', '));
+  // 이미 받은 것은 그대로(예전 저장)
+  const pf = newProfile(d, '옛', 'm'); pf.level = 50;
+  const { CharacterSheet, QuestLog, QS } = await import('../js/core.js');
+  pf.quests = [{ id: 'qs30', state: 'active', counts: [0] }]; const ql = new QuestLog(d, new CharacterSheet(d, pf));
+  ok(ql.stateOf(d.quests.qs30) === QS.Active, '예전 저장에서 이미 받은 서브 퀘스트는 그대로');
+  pf.quests = [{ id: 'qs29', state: 'completed', counts: [] }]; ok(new QuestLog(d, new CharacterSheet(d, pf)).stateOf(d.quests.qs30) === QS.Locked, '서리 고원이 닫혀 있으면 qs30 못 받음');
 }
-if (subWarn.length) console.log('참고: 받은 뒤 나중 메인 단계에서 열리는 서브 목표 ' + subWarn.length + '개: ' + subWarn.join(', '));
 console.log(n + ' passed (main steps ' + M.order.length + ', fields ' + fields.length + ')');

@@ -499,6 +499,8 @@ export class QuestLog {
     if (this.ch.p.level < q.minLevel) return QS.Locked;
     if (q.jobReq) { const jr = this.data.job(q.jobReq); if (!jr || this.ch.p.job !== jr.parent) return QS.Locked; }
     for (const pre of q.prereq || []) { const pp = this.find(pre); if (!pp || pp.state !== "completed") return QS.Locked; }
+    // 2026-11-15: 서브 퀘스트가 쓰는 지역이 메인 퀘스트로 아직 닫혀 있으면 받을 수 없음(tools/quests/story.py needZones). 이미 받은 것은 위에서 그대로
+    for (const z of q.needZones || []) if (zoneLock(this.data, this.ch.p, z)) return QS.Locked;
     return QS.Available;
   }
   isDone(q, pr) { return q.objectives.every((o, i) => this.current(q, i, pr) >= o.count); }

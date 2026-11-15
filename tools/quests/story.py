@@ -21,6 +21,7 @@ LEVELS = load(D('levels.json'))['expToNext']
 ZONES = load(D('zones.json'))['zones']
 ZLIST = ZONES if isinstance(ZONES, list) else [dict(v, id=k) for k, v in ZONES.items()]
 
+def zone_def_stub(zid): return next((z for z in ZLIST if z['id'] == zid), {})
 def zone_def(zid):
     z = next(z for z in ZLIST if z['id'] == zid)
     if 'file' in z:
@@ -716,6 +717,29 @@ def build():
                  prereq=pre, minLevel=q['lv'], objectives=objs, reward=reward(q), consumeCollected=q['consume'],
                  offerText=q['offerText'], progressText=q['progressText'], completeText=q['completeText'], story=True)
         out.append(d)
+    # 2026-11-15: 서브 퀘스트는 쓰는 지역(주는/완료 NPC 자리·대화·줍기·보스, 목표 몬스터가 사는 곳 중 가장 먼저 열리는 곳)이
+    # 메인 퀘스트로 모두 열려야 받을 수 있음 → "needZones" (js/core.js QuestLog.stateOf; 이미 받은 퀘스트는 그대로)
+    wmain = load(D('zones.json')).get('world', {}).get('main', {}); morder = {sid: i for i, sid in enumerate(wmain.get('order', []))}
+    rank = lambda z: morder.get(zone_def_stub(z).get('unlock'), -1)
+    mzones = {}
+    for z in ZLIST:
+        for c in zone_def(z['id']).get('monsters', []): mzones.setdefault(c['monster'], set()).add(z['id'])
+    src = {q['id']: q for q in QUESTS}
+    for d in out:
+        if d['category'] != 'sub': continue
+        q = src[d['id']]; zs = {q['gz'], q['tz']}
+        for o in q['objectives']:
+            for z in (o.get('_at'), (o.get('spawn') or {}).get('zone'), (o.get('gather') or {}).get('zone')):
+                if z: zs.add(z)
+            tgts = [o['target']] if o['type'] == 'kill' and not o.get('spawn') else (o.get('drop') or {}).get('from') or []
+            cand = set().union(*[mzones.get(m, set()) for m in tgts]) if tgts else set()
+            if cand: zs.add(min(cand, key=lambda z: (rank(z), z)))
+        need = sorted(z for z in zs if zone_def_stub(z).get('unlock'))
+        if need: d['needZones'] = need
+        late = max(need, key=rank, default=None)
+        pre_main = [p for p in d['prereq'] if p in morder]
+        if late and pre_main and rank(late) > max(morder[p] for p in pre_main) + 1:
+            print('  늦춤', d['id'], d['name'], '→', zone_def_stub(late)['unlock'], '(' + late + ')')
     # story NPC placements: an NPC stands in a zone from the moment the first quest that needs it there becomes
     # available (its prereqs done) until the last such quest is handed in. NPCs already placed in the zone's data skip.
     order = {q['id']: i for i, q in enumerate(out)}
