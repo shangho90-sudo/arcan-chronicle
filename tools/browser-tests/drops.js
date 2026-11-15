@@ -37,13 +37,13 @@ const ZOOM = +(process.env.ZOOM || 2.0), ONLY = process.env.ONLY || '';
   R.start = await ev(() => T.prog('mq05a'));
   R.questPickups = await ev(() => G.zone.things.filter(t => t.key && t.key.startsWith('mq05a')).length);
   // 숲 들머리(마을에서 온 자리) 열린 땅으로 가장 가까운 줍기 하나를 옮겨 놓고(무작위 자리는 나무 아래일 수 있음) 3.4 m 떨어져 봄
-  await ev(() => {
+  await ev(TOUCH => {
     const P = G.player.pos, L = G.zone.things.filter(t => t.key && t.key.startsWith('mq05a'));
     const t = L.sort((a, b) => Math.hypot(a.pos.x - P.x, a.pos.z - P.z) - Math.hypot(b.pos.x - P.x, b.pos.z - P.z))[0]; window.QP = t;
     let best = null; for (let k = 0; k < 30 && !best; k++) { const q = T.scr((TOUCH ? 1.7 : 0.9) + ((k % 6) - 2.5) * (TOUCH ? 0.35 : 0.7), (TOUCH ? 2.6 : 3.4) + (k / 6 | 0) * 0.6); if (!G.zone.geo.blocked(q.x, q.z, 0.8)) best = q; }
     best = best || T.scr(TOUCH ? 1.7 : 0.9, TOUCH ? 2.6 : 3.4); t.pos = G.zone.geo.ground(best.x, best.z);
     G.render.setFocus(G.player.pos, true); T.quiet();
-  });
+  }, TOUCH);
   await pg.waitForTimeout(2500); R.questLabels = await ev(() => T.labels()); await shot('quest');
   // 가까이: 플레이어를 줍기 왼쪽 아래 1.9 m(끌어당김 1.8 m 밖)에 세우고 확대
   await ev(z => { window.P0 = { x: G.player.pos.x, z: G.player.pos.z }; const q = T.scr(-1.7, -0.9, QP.pos); G.player.teleport({ x: q.x, z: q.z }); T.zoom(z); G.render.setFocus(G.player.pos, true); }, ZOOM);
