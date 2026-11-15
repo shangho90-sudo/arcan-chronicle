@@ -241,7 +241,7 @@ export function payWarp(data, p, from, to) {
 
 /** save slots: 0 = 자동 저장 (the old single save key, written on warps / page hide / the first save), 1..SAVE_SLOTS = 직접 저장.
  *  Every slot holds a whole profile in the same format (SAVE_VERSION), so any slot loads with the same migrate(). */
-export const SAVE_SLOTS = 5;
+export const SAVE_SLOTS = 12;
 export function saveSlotKey(i) { return "arcan_save_" + (i | 0); }
 export class SaveStore {
   constructor(key = "arcan_save_0") { this.key = key; this.lastError = null; }
