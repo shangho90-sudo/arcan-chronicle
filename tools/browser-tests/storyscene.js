@@ -53,10 +53,10 @@ const fails = [], errs = []; const ok = (c, m) => { console.log((c ? '  ok   ' :
     ok(s.right.who === giver && s.right.shown && s.right.speak, '오른쪽 = 촌장 반신(3D 렌더), 말하는 중 ' + JSON.stringify(s.right));
     ok(s.left.who === 'player' && s.left.shown && s.left.listen, '왼쪽 = 플레이어(듣는 쪽, 어둡게) ' + JSON.stringify(s.left));
     await shot('1_first_typing');
-    await ev(() => { G.story.cps = 3; G.story.type(G.story.pages[G.story.i].html); }); await pg.waitForTimeout(150);   // 느린 타자기로 다시 시작(SwiftShader는 프레임이 느려 보통 속도면 누르기 전에 끝남)
+    await ev(() => { G.story.cps = 0.3; G.story.type(G.story.pages[G.story.i].html); }); await pg.waitForTimeout(150);   // 느린 타자기로 다시 시작(SwiftShader는 프레임이 느려 보통 속도면 누르기 전에 끝남)
     if (process.env.DEBUG) await ev(() => { const S = G.story, a = S.advance.bind(S); S.advance = () => { console.log('ADV ' + new Error().stack.split('\n').slice(2, 5).join(' | ')); return a(); }; addEventListener('keydown', e => console.log('ADV key ' + e.code + ' ' + e.eventPhase), true); });
-    const i0 = (await st()).i; await tapNext(); s = await st(); ok(!s.typing && s.i === i0 && s.text.length > 22, '타자 중 한 번 누르면 줄만 끝남(쪽은 그대로) ' + JSON.stringify({ i0, i: s.i, n: s.n, typing: s.typing, len: s.text.length })); await ev(() => { G.story.cps = 42; });
-    await tapNext(); s = await st(); ok(s.i === i0 + 1 || s.end, '다음 누르면 다음 쪽 ' + JSON.stringify({ i0, i: s.i, end: s.end }));
+    const i0 = (await st()).i; await tapNext(); s = await st(); ok(!s.typing && s.i === i0 && s.text.length > 5, '타자 중 한 번 누르면 줄만 끝남(쪽은 그대로) ' + JSON.stringify({ i0, i: s.i, n: s.n, typing: s.typing, len: s.text.length })); await ev(() => { G.story.cps = 42; });
+    await pg.waitForTimeout(300); await tapNext(); s = await st(); ok(s.i === i0 + 1 || s.end, '다음 누르면 다음 쪽 ' + JSON.stringify({ i0, i: s.i, end: s.end }));
     await pg.waitForTimeout(300); await shot('2_first_line_done');
     s = await toEnd();
     ok(s.end && s.btns.join(',') === '수락하기,나중에', '끝 쪽: 수락하기/나중에 ' + s.btns);

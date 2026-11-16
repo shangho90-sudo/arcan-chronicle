@@ -236,7 +236,7 @@ export class StoryScene {
 
   advance() {
     const now = performance.now();
-    if (!this.el || now - this.shownAt < 250 || now - (this.advAt || 0) < 140) return;   // the tap that opened the scene / one press = one step
+    if (!this.el || now - this.shownAt < 250 || now - (this.advAt || 0) < 300) return;   // the tap that opened the scene / one press = one step (a doubled event never skips a line)
     this.advAt = now;
     if (this.typing) { this.finishType(); return; }
     if (this.atEnd()) { this.showEnd(); return; }
