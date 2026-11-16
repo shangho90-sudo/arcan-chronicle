@@ -59,16 +59,16 @@ const CFG = {
   for (const KEY of LIST) {
     const [ID, DUR, MARKS, DIST, MONS, PRE, PLAN] = CFG[KEY]; errs.length = 0;
     const name = `${TAG}_${KEY}_lv${LV}_${G_}_${SIZE}_fx${FX ? 1 : 0}`, dirOut = `${OUT}/${name}`; fs.rmSync(dirOut, { recursive: true, force: true }); fs.mkdirSync(dirOut, { recursive: true });
-    await ev(([mons]) => {
-      const p = G.player, f = { x: 0, z: 1 };
+    await ev(([mons, face]) => {
+      const p = G.player, f = (() => { const [x, z] = face; const m = Math.hypot(x, z); return { x: x / m, z: z / m }; })();
       p.skills2.clearTemp(); for (const m of [...G.zone.actors]) if (m !== p && m.def && m.body) m.remove && m.remove();
       G.skillFx.clear(); p.teleport(window.__spot); p.body.place(p.pos); p.setFacing(f.x, f.z); p.target = null; p.lockOn = null; p.path = []; G.dev.full();
       p.skills2.cd = {}; p.skills.lock = 0; for (const s of p.status.list.slice()) p.status.remove(s.def.id);
       window.__f = f; window.__at = (d, s = 0) => ({ x: p.pos.x + f.x * d - f.z * s, z: p.pos.z + f.z * d + f.x * s });
       window.__ds = mons.map(([d, s]) => { const at = window.__at(d, s), m = G.dev.dummies('mon_boar', 1, 0.01, at)[0]; m.teleport(at); m.__spot = at; return m; });
-    }, [MONS]);
+    }, [MONS, (process.env.FACE || '-0.55,-0.85').split(',').map(Number)]);
     await pg.waitForFunction(() => window.__ds.every(m => m.body), null, { timeout: 120000 });
-    const info = await ev(async ([fps, id, dist, key, pre, det]) => {
+    const info = await ev(async ([fps, id, dist, key, pre, det, focus]) => {
       let seed = 4242; Math.random = det ? () => 0.5 : () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
       const p = G.player, f = window.__f, m = window.__ds[0], eng = p.skills2;
       for (const q of window.__ds) { q.thinkStep = () => {}; q.teleport(q.__spot); q.setFacing(-f.x, -f.z); q.body.place(q.pos); q.hp = q.maxHp; q.__hp = q.hp; }
@@ -81,7 +81,7 @@ const CFG = {
       if (key === 'b1' || key === 'b5') p.hp = Math.round(p.maxHp * 0.5);
       if (key === 'b4') p.sp = Math.round(p.maxSp * 0.3);
       window.__castKey = castKey;
-      G.render.setFocus({ x: p.pos.x + f.x * Math.max(1.5, dist * 0.6), y: 0, z: p.pos.z + f.z * Math.max(1.5, dist * 0.6) }, true);
+      const fo = window.__focus = focus ?? Math.max(1.5, dist * 0.6); G.render.setFocus({ x: p.pos.x + f.x * fo, y: 0, z: p.pos.z + f.z * fo }, true);
       const L = window.__log = { fx: [], sfx: [], dmg: [], heal: [], summons: [], gstop: 0, shake: 0 };
       window.__t = 0;
       const H = G.skillFx.music; if (!H.__w) { H.__w = true; const o = H.make.bind(H); H.make = (k, a, opt) => { window.__log.fx.push([k, +window.__t.toFixed(2)]); return o(k, a, opt); }; }
@@ -90,17 +90,18 @@ const CFG = {
       p.target = m || null; window.__hp0 = p.hp;
       const e = castKey(key, dist ? window.__at(dist) : null); if (e) return 'cast error: ' + e;
       return { mult: eng.mult(G.data.skill2(id)), matk: p.stat('matk'), hp: p.hp, maxHp: p.maxHp, phrase: eng.res.phrase };
-    }, [FPS, ID, DIST, KEY, PRE, !!process.env.DET]);
+    }, [FPS, ID, DIST, KEY, PRE, !!process.env.DET, process.env.FOCUS != null ? +process.env.FOCUS : null]);
     if (typeof info === 'string') { console.log(KEY, info); continue; }
     const frames = [], total = Math.round(DUR * FPS);
     for (let i = 0; i < total; i++) {
       const shot = process.env.SHOTS !== '0' && MARKS.some(m => i === Math.round(m * FPS));
       const c = await ev(([i, fps, shot, plan, dist]) => {
         window.__t = i / fps; for (const [k, at] of plan) if (i === Math.round(at * fps)) { if (k === '__hit') { const q = window.__ds[0]; G.player.takeDamage({ source: q, amount: 20 }); continue; } const e = window.__castKey(k, dist ? window.__at(dist + 1) : null); if (e) window.__log.planErr = k + ': ' + e; } window.__noDraw = !shot; const p = G.player, L = window.__log;
-        const hp0 = p.hp; G.step(1 / fps, true); if (p.hp > hp0 + 0.5) L.heal.push([+window.__t.toFixed(2), Math.round(p.hp - hp0)]);
+        const hp0 = p.hp; G.step(1 / fps, true);
+        if (i === Math.round(0.3 * fps)) { const M = G.skillFx.music; let hr = null, hl = null, hd = null; try { hr = p.body.handPoint().toArray(); hl = p.body.bonePoint('Left_Hand'); hd = p.body.bonePoint('Head'); } catch (e) { } L.probe = { hr, hl: hl && hl.toArray(), hd: hd && hd.toArray(), pos: [p.pos.x, p.pos.z], live: M.live.map(e => [e.kind, e.items.map(m => [m.userData.kind, m.position.toArray().map(v => +v.toFixed(2)), +m.scale.x.toFixed(2), m.material.uniforms && m.material.uniforms.uA ? +(+m.material.uniforms.uA.value).toFixed(2) : null])]) }; } if (p.hp > hp0 + 0.5) L.heal.push([+window.__t.toFixed(2), Math.round(p.hp - hp0)]);
         window.__ds.forEach((q, qi) => { if (!q.removed && q.hp < q.__hp) { L.dmg.push([+window.__t.toFixed(2), qi, Math.round(q.__hp - q.hp)]); q.__hp = q.hp; } });
         if (i % 6 === 0) L.summons.push([+window.__t.toFixed(2), p.skills2.summons.filter(s => !s.dead).map(s => s.kind + ':' + (s.log ? s.log.notes + '/' + s.log.chords : '')).join(' '), +p.skills2.res.phrase.toFixed(2), p.skills2.melody ? p.skills2.melody.id + (p.skills2.melody.boost ? '+' + p.skills2.melody.boost : '') : '']);
-        const f = window.__f, s = G.render.toScreen({ x: p.pos.x + f.x * 1.6, y: p.pos.y + 1.0, z: p.pos.z + f.z * 1.6 });
+        const f = window.__f, fo = window.__focus ?? 1.6, s = G.render.toScreen({ x: p.pos.x + f.x * fo, y: p.pos.y + 1.0, z: p.pos.z + f.z * fo });
         return [s.x, s.y];
       }, [i, FPS, shot, PLAN, DIST]);
       const fn = `${dirOut}/${String(i).padStart(3, '0')}.png`, CW = Math.min(VW, 760), CH = Math.min(VH, 600);
@@ -110,7 +111,7 @@ const CFG = {
     const res = await ev(() => { const L = window.__log, p = G.player, eng = p.skills2; window.__noDraw = true;
       const out = { fx: L.fx, sfx: L.sfx, dmg: L.dmg, heal: L.heal, total: L.dmg.reduce((a, d) => a + d[2], 0), perTarget: window.__ds.map((q, qi) => L.dmg.filter(d => d[1] === qi).length), gstop: L.gstop, shake: L.shake,
         summons: L.summons.filter((s, i) => i % 3 === 0), status: window.__ds.map(q => q.removed ? 'gone' : q.status.list.map(x => x.def.id).join('+')), me: p.status.list.map(x => x.def.id + ':' + (x.value || 0).toFixed(2)).join(' '), shield: Math.round(p.shield || 0),
-        live: G.skillFx.music.live.length, timers: eng.music.timers.length, phrase: +eng.res.phrase.toFixed(2), kit: { echo: eng.music.log.echo, react: eng.music.log.react, coda: eng.music.log.coda, sym: eng.music.log.sym && { fin: eng.music.log.sym.fin, n: eng.music.log.sym.hits.length }, heals: eng.music.log.heals, mp: Math.round(eng.music.log.mp), a4: eng.music.log.a4 }, planErr: L.planErr };
+        probe: L.probe, live: G.skillFx.music.live.length, timers: eng.music.timers.length, phrase: +eng.res.phrase.toFixed(2), kit: { echo: eng.music.log.echo, react: eng.music.log.react, coda: eng.music.log.coda, sym: eng.music.log.sym && { fin: eng.music.log.sym.fin, n: eng.music.log.sym.hits.length }, heals: eng.music.log.heals, mp: Math.round(eng.music.log.mp), a4: eng.music.log.a4 }, planErr: L.planErr };
       for (let i = 0; i < 240; i++) G.step(1 / 15, true); eng.clearTemp(); for (let i = 0; i < 20; i++) G.step(1 / 15, true);
       out.liveAfterClear = G.skillFx.music.live.length; out.summonsAfterClear = eng.summons.length; window.__noDraw = false; return out; });
     res.info = info; res.errors = errs.slice(0, 8);

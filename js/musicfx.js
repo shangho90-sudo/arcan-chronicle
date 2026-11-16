@@ -21,7 +21,7 @@ export const MUFX = {
   col: { gold: 0xffe08a, goldB: 0xffa020, silver: 0xeaf4ff, silverB: 0x8aa8e0, mint: 0xb8ffb0, mintB: 0x40c060, blue: 0x9ad0ff, blueB: 0x2a6ae0,
     ice: 0xe8f6ff, iceB: 0x7ab0e0, rose: 0xffc8d8, roseB: 0xd06090, violet: 0xe0d0ff, violetB: 0x7a5ad0, white: 0xffffff, warm: 0xfff0d0 },
   mel: { aria: [0xc8ffa0, 0x60c040], march: [0xffe080, 0xd09020], coral: [0xe8f4ff, 0x7aa8e0], serenade: [0xa8d8ff, 0x3a6ae0] },
-  size: { violin: 0.72, cello: 1.25, flute: 0.66, horn: 0.5, cymbal: 0.21, baton: 0.42, harpSmall: 0.7, harpBig: 2.6, note: 0.22, player: 1.15, bell: 0.55 },
+  size: { violin: 0.62, cello: 1.25, flute: 0.66, horn: 0.5, cymbal: 0.21, baton: 0.42, harpSmall: 0.7, harpBig: 2.6, note: 0.22, player: 1.15, bell: 0.55 },
 };
 const C = MUFX.col;
 const P3 = (p) => new THREE.Vector3(p.x, p.y || 0, -p.z);
@@ -41,8 +41,8 @@ const HARP_N = 7, harpTop = (x) => 1.0 - 0.18 * Math.sin(Math.PI * x / 0.62) + 0
 
 // 얇은 곡면 띠(현악 초승달·음파·충격파): 부채꼴 지오메트리(uv.x = 각도 0..1, uv.y = 반지름 0..1), uP = 띠 반지름, uW2 = 띠 두께, uWob = 찌그러짐
 const ARC_VS = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`;
-const ARC_FS = `uniform vec3 uW, uB; uniform float uA, uP, uW2, uWob, uT; varying vec2 vUv;
-void main(){ float u = vUv.x, v = vUv.y, side = smoothstep(0., .14, u) * smoothstep(1., .86, u);
+const ARC_FS = `uniform vec3 uW, uB; uniform float uA, uP, uW2, uWob, uT, uFull; varying vec2 vUv;
+void main(){ float u = vUv.x, v = vUv.y, side = max(uFull, smoothstep(0., .14, u) * smoothstep(1., .86, u));
   float fr = uP + uWob * (.5 * sin(u * 23. + uT * 7.) + .3 * sin(u * 51. - uT * 11.));
   float d = abs(v - fr), band = exp(-d * d / (uW2 * uW2)), core = exp(-d * d / (uW2 * uW2 * .12));
   float tail = smoothstep(fr - .35, fr, v) * step(v, fr) * .18;
@@ -83,7 +83,7 @@ export class MusicFx extends CookFx {
   }
   _mat(kind) {
     const U = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, { value: v }])), Cc = () => new THREE.Color(1, 1, 1);
-    if (kind === 'arc') return new THREE.ShaderMaterial({ uniforms: U({ uW: Cc(), uB: Cc(), uA: 0, uP: 0.5, uW2: 0.05, uWob: 0, uT: 0 }), vertexShader: ARC_VS, fragmentShader: ARC_FS, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
+    if (kind === 'arc') return new THREE.ShaderMaterial({ uniforms: U({ uW: Cc(), uB: Cc(), uA: 0, uP: 0.5, uW2: 0.05, uWob: 0, uT: 0, uFull: 0 }), vertexShader: ARC_VS, fragmentShader: ARC_FS, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
     if (kind === 'gh') return new THREE.ShaderMaterial({ uniforms: U({ uTint: Cc(), uRim: new THREE.Color(0xc8d8ff), uA: 0.8, uGlow: 0 }), vertexShader: GH_VS, fragmentShader: GH_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide });
     if (kind === 'tx') return new THREE.ShaderMaterial({ uniforms: U({ uMap: null, uA: 0, uP: 0, uLit: 0 }), vertexShader: ARC_VS, fragmentShader: TX_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide });
     return super._mat(kind);
@@ -94,8 +94,8 @@ export class MusicFx extends CookFx {
   _fk(e) { return e.ending != null ? 1 - clamp01((e.t - e.ending) / Math.max(0.01, e.life - e.ending)) : 1; }
   /** 악기·소품(정점 색, 밝은 재질) — see = 반투명 환영 */
   inst(e, name, o = {}) { const geo = this.geo[name]; if (!geo) return null; if (o.ghost) { const m = this._m(e, 'gh', geo, o.order ?? 3), u = m.material.uniforms; u.uTint.value.setHex(o.tint ?? 0xffffff); u.uRim.value.setHex(o.rim ?? 0xc8d8ff); u.uA.value = o.a ?? 0.8; u.uGlow.value = o.glow ?? 0; return m; }
-    const m = this.solid(e, geo, { tint: o.tint, rim: o.rim, spec: o.spec ?? 0.7 }); m.material.uniforms.uGlow.value = o.glow ?? 0; return m; }
-  arc(e, ang, w, b, order = 5) { const m = this._m(e, 'arc', this.fan(ang), order), u = m.material.uniforms; u.uW.value.setHex(w); u.uB.value.setHex(b); u.uA.value = 0; u.uP.value = 0.5; u.uW2.value = 0.05; u.uWob.value = 0; return m; }
+    const m = this.solid(e, geo, { tint: o.tint, rim: o.rim, spec: o.spec ?? 0.7 }); m.material.uniforms.uGlow.value = o.glow ?? 0.12; return m; }   // 기본 약한 자체 빛: 그늘에서도 악기 색이 읽히게
+  arc(e, ang, w, b, order = 5) { const m = this._m(e, 'arc', this.fan(ang), order), u = m.material.uniforms; u.uW.value.setHex(w); u.uB.value.setHex(b); u.uA.value = 0; u.uP.value = 0.5; u.uW2.value = 0.05; u.uWob.value = 0; u.uFull.value = ang >= 359 ? 1 : 0; return m; }
   /** z축을 dir로, y를 up 쪽으로 (악기 놓기) */
   orient(m, dir, up = UP) { const z = _a.copy(dir).normalize(), x = _b.crossVectors(up, z); if (x.lengthSq() < 1e-6) x.set(1, 0, 0); x.normalize(); const y = _c.crossVectors(z, x); _mx.makeBasis(x, y, z); m.quaternion.setFromRotationMatrix(_mx); return m; }
   /** x축을 dir로 (활·플루트·현) */
@@ -149,11 +149,11 @@ export class MusicFx extends CookFx {
         void len;
       } else if (what === 'violin') {   // 바이올린(턱 -> 왼손) + 활(오른손에서 브리지를 지나감)
         const ch = this.chin(pc), dir = _b.subVectors(hL, ch), L = Math.max(0.3, dir.length()); dir.normalize();
-        vn.position.copy(ch); this.orient(vn, dir, UP); vn.scale.setScalar(L / 0.71);
-        const br = ch.clone().addScaledVector(dir, 0.19 * L / 0.71).addScaledVector(UP, 0.06 * L / 0.71), bd = _c.subVectors(br, hR).normalize();
+        vn.position.copy(ch); this.orient(vn, dir, UP); vn.scale.setScalar(S.violin / 0.71);   // 실제 바이올린 크기(약 0.6 m) — 스크롤 쪽이 왼손을 향함
+        const br = ch.clone().addScaledVector(dir, 0.19 * S.violin / 0.71).addScaledVector(UP, 0.06 * S.violin / 0.71), bd = _c.subVectors(br, hR).normalize();
         bw.position.copy(hR); this.orientX(bw, bd, dir); bw.scale.setScalar(0.7);
         const last = st.strokes.length ? t - st.strokes[st.strokes.length - 1] : 9, vib = Math.exp(-last * 7);
-        vn.material.uniforms.uGlow.value = 0.08 + 0.4 * vib; const a = fk * smooth(0, 0.1, t); vn.material.uniforms.uA.value = a; bw.material.uniforms.uA.value = a; e.br = br;
+        vn.material.uniforms.uGlow.value = 0.04 + 0.35 * vib; const a = fk * smooth(0, 0.1, t); vn.material.uniforms.uA.value = a; bw.material.uniforms.uA.value = a; e.br = br;
       } else if (what === 'bells') {   // 대상 둘레 금빛 나팔구 -> 음압이 가운데로 -> 공명막 -> 파열
         const tg = o.tgt && !o.tgt.dead ? o.tgt : null, c = tg ? P3(tg.pos) : (e.c0 || (e.c0 = P3(o.aim || pc.pos))); if (tg) e.c0 = c.clone();
         const R = Math.max(1.2, st.r * 0.95), y = c.y + 1.0;
@@ -162,7 +162,7 @@ export class MusicFx extends CookFx {
           const blow = st.blowT >= 0 ? clamp01((t - st.blowT) / st.burstT) : 0; m.material.uniforms.uGlow.value = 0.15 + 0.7 * blow; m.material.uniforms.uA.value = st.burstAt != null ? 1 - smooth(0.05, 0.3, t - st.burstAt) : 1; });
         if (st.blowT >= 0 && st.burstAt == null) {   // 가운데로 모이는 음압 고리 + 부푸는 공명막
           const k = clamp01((t - st.blowT) / st.burstT);
-          rings.forEach((m, i) => { const kk = (k * 1.6 + i / rings.length) % 1; m.position.set(c.x, y, c.z); m.scale.setScalar(R * (1 - kk) * 1.1 + 0.2); m.material.uniforms.uP.value = 0.9; m.material.uniforms.uW2.value = 0.04; m.rotation.set(-Math.PI / 2, 0, 0); m.material.uniforms.uA.value = 0.9 * smooth(0, 0.2, kk) * (1 - smooth(0.7, 1, kk)); });
+          rings.forEach((m, i) => { const kk = (k * 1.6 + i / rings.length) % 1; m.position.set(c.x, y, c.z); m.scale.setScalar(R * (1 - kk) * 1.1 + 0.2); m.material.uniforms.uP.value = 0.9; m.material.uniforms.uW2.value = 0.04; m.rotation.set(0, 0, 0); m.material.uniforms.uA.value = 0.9 * smooth(0, 0.2, kk) * (1 - smooth(0.7, 1, kk)); });
           mem.position.set(c.x, y, c.z); mem.quaternion.copy(this.camQ); mem.scale.setScalar(0.3 + 0.9 * easeOut(k)); mem.material.uniforms.uA.value = 0.3 + 0.6 * k;
         } else { for (const m of rings) m.material.uniforms.uA.value = 0; mem.material.uniforms.uA.value = st.burstAt != null ? 0 : 0; }
       } else {   // 손에 든 악기(하프·나팔·첼로·플루트·지휘봉·접힌 틀)
@@ -246,10 +246,10 @@ export class MusicFx extends CookFx {
       if (mel === 'march' && hn) { const p = base.clone().addScaledVector(f, -0.55).addScaledVector(r, 0.25).setY(base.y + 1.6 + 0.05 * Math.sin(t * 5)); hn.position.copy(p); this.orient(hn, f.clone().setY(0.6)); hn.scale.setScalar(0.42); hn.material.uniforms.uA.value = 0.75 * fk; hn.material.uniforms.uGlow.value = 0.15 * bk;
         const moved = lastP && Math.hypot(base.x - lastP.x, base.z - lastP.z) > 0.01; lastP = base.clone(); beatT -= dt;
         if (moved && beatT <= 0 && fk > 0.5) { beatT = 0.45; this.chevron(base.clone().addScaledVector(f, 0.5), f, col); } }
-      if (mel === 'coral') { rings.forEach((m, i) => { m.position.set(base.x, base.y + 0.55 + i * 0.13, base.z); m.rotation.set(-Math.PI / 2, 0, t * 0.3 * (i % 2 ? 1 : -1)); m.scale.setScalar(0.78 + 0.02 * Math.sin(t * 3 + i)); m.material.uniforms.uP.value = 0.92; m.material.uniforms.uW2.value = 0.02;
+      if (mel === 'coral') { rings.forEach((m, i) => { m.position.set(base.x, base.y + 0.55 + i * 0.13, base.z); m.rotation.set(0, t * 0.3 * (i % 2 ? 1 : -1), 0); m.scale.setScalar(0.78 + 0.02 * Math.sin(t * 3 + i)); m.material.uniforms.uP.value = 0.92; m.material.uniforms.uW2.value = 0.02;
           m.material.uniforms.uWob.value = 0.012 * (e.fl || 0); m.material.uniforms.uT.value = t; m.material.uniforms.uA.value = (0.55 + 0.6 * (e.fl || 0)) * fk * bk * 0.8; }); e.fl = Math.max(0, (e.fl || 0) - dt * 4);
         if (fl) { fl.m.position.copy(base).addScaledVector(fl.d, 0.8).setY(base.y + 0.85); fl.m.quaternion.copy(this.camQ); fl.m.scale.setScalar(0.5); fl.m.material.uniforms.uA.value = (e.fl || 0) * 1.5; } }
-      if (mel === 'serenade' && fu) { const p = base.clone().addScaledVector(r, 0.55).setY(base.y + 1.5 + 0.05 * Math.sin(t * 2.3)); fu.position.copy(p); this.orientX(fu, r.clone().addScaledVector(UP, 0.15)); fu.scale.setScalar(0.5); fu.material.uniforms.uA.value = 0.85 * fk; fu.material.uniforms.uGlow.value = 0.15 * bk;
+      if (mel === 'serenade' && fu) { const p = base.clone().addScaledVector(r, 0.42).addScaledVector(f, -0.15).setY(base.y + 1.5 + 0.05 * Math.sin(t * 2.3)); fu.position.copy(p); this.orientX(fu, r.clone().addScaledVector(UP, 0.15)); fu.scale.setScalar(0.5); fu.material.uniforms.uA.value = 0.85 * fk; fu.material.uniforms.uGlow.value = 0.15 * bk;
         if (mn) { mn.position.copy(p).addScaledVector(UP, 0.35); mn.quaternion.copy(this.camQ); mn.rotateZ(0.4); mn.scale.setScalar(0.11); mn.material.uniforms.uA.value = 0.9 * fk; mn.material.uniforms.uGlow.value = 0.4; } }
       if (bl) { bl.position.set(base.x, base.y + 0.06, base.z); this._flat(bl, 0.7, base.y + 0.06); bl.material.uniforms.uA.value = 0.5 * boost * fk; }
     });
@@ -288,12 +288,12 @@ export class MusicFx extends CookFx {
   // ================================================================== 궁극기
   k_score(pc, o) {   // 파멸의 코다: 거대 악보 -> 음표 점등 -> 현악·타악·관악·쉼·합주
     const f = D3(o.facing || pc.facing), org = P3(o.origin || pc.pos), r = _a.crossVectors(f, UP).normalize().clone(), cast = o.cast || 0, low = lite();
-    const sp = org.clone().addScaledVector(f, -0.9).setY(org.y + 2.55), W = 2.6, H = 1.3; let lit = Math.min(8, o.n || 0), stage = -1, consumed = -1;
+    const sp = org.clone().addScaledVector(f, 0.4).addScaledVector(r, 1.5).setY(org.y + 3.0), W = 2.2, H = 1.1; let lit = Math.min(8, o.n || 0), stage = -1, consumed = -1;   // 악보는 머리 위 옆 — 캐릭터를 가리지 않게
     const e = this._fx('score', cast + 2.6, (e) => {
       const t = e.t, fk = this._fk(e), open = easeOut(t / 0.45);
-      pg.position.copy(sp); pg.quaternion.copy(this.camQ); pg.scale.set(W, H, 1); pg.material.uniforms.uP.value = open; pg.material.uniforms.uA.value = 0.95 * fk;
+      pg.position.copy(sp); pg.quaternion.copy(this.camQ); pg.scale.set(W, H, 1); pg.material.uniforms.uP.value = open; pg.material.uniforms.uA.value = 0.82 * fk;
       ns.forEach((m, i) => { const x = -0.32 + i * 0.09, y = -0.08 + 0.05 * Math.sin(i * 1.9); m.position.copy(sp).addScaledVector(this.camR, x * W).addScaledVector(UP, y * H).addScaledVector(this.toCam, 0.03);
-        m.quaternion.copy(this.camQ); m.scale.setScalar(0.17); const on = i < lit ? smooth(0.12 + i * (Math.max(0.2, cast - 0.15) / 8), 0.2 + i * (Math.max(0.2, cast - 0.15) / 8), t) : 0;
+        m.quaternion.copy(this.camQ); m.scale.setScalar(0.26); const on = i < lit ? smooth(0.12 + i * (Math.max(0.2, cast - 0.15) / 8), 0.2 + i * (Math.max(0.2, cast - 0.15) / 8), t) : 0;
         m.material.uniforms.uGlow.value = 0.1 + 0.8 * on * (consumed >= 0 ? Math.exp(-(t - consumed) * 2) + 0.3 : 1); m.material.uniforms.uA.value = (i < lit ? 0.4 + 0.6 * on : 0.12) * open * fk; });
       void stage;
     });
@@ -314,7 +314,7 @@ export class MusicFx extends CookFx {
     const cast = o.cast || 0, low = lite(); let raised = -1, mcol = null;
     const e = this._fx('encore', cast + 1.6, (e) => {
       const t = e.t, base = P3(pc.pos), f = D3(pc.facing), r = _a.crossVectors(f, UP).normalize().clone(), fk = this._fk(e), join = easeOut(t / Math.max(0.3, cast || 0.4));
-      staff.forEach((m, i) => { m.position.set(base.x, base.y + 0.5 + i * 0.16, base.z); m.rotation.set(-Math.PI / 2, 0, i * 0.7 + t * 0.4); m.scale.setScalar(0.95 + 0.25 * (1 - join)); m.material.uniforms.uP.value = 0.95; m.material.uniforms.uW2.value = 0.015; m.material.uniforms.uWob.value = 0.04 * (1 - join); m.material.uniforms.uT.value = t; m.material.uniforms.uA.value = (0.3 + 0.6 * join) * fk; });
+      staff.forEach((m, i) => { m.position.set(base.x, base.y + 0.5 + i * 0.16, base.z); m.rotation.set(0, i * 0.7 + t * 0.4, 0); m.scale.setScalar(0.95 + 0.25 * (1 - join)); m.material.uniforms.uP.value = 0.95; m.material.uniforms.uW2.value = 0.015; m.material.uniforms.uWob.value = 0.04 * (1 - join); m.material.uniforms.uT.value = t; m.material.uniforms.uA.value = (0.3 + 0.6 * join) * fk; });
       hs.forEach((m, i) => { const a = (i / (hs.length - 1) - 0.5) * 2.2, p = base.clone().addScaledVector(f, -0.9 * Math.cos(a)).addScaledVector(r, 1.3 * Math.sin(a)).setY(base.y + 0.2); const L = 2.4 * smooth(0, 0.3, t - i * 0.03);
         m.position.copy(p); m.quaternion.identity(); m.scale.set(1.6, Math.max(0.001, L), 1.6); const pl = raised >= 0 ? Math.exp(-Math.abs(t - raised - i * 0.03) * 6) : 0; m.material.uniforms.uGlow.value = 0.25 + 1.2 * pl; m.material.uniforms.uA.value = 0.8 * fk; });
     });
@@ -329,7 +329,7 @@ export class MusicFx extends CookFx {
     const f = D3(o.facing || pc.facing), org = P3(o.origin || pc.pos), r = _a.crossVectors(f, UP).normalize().clone(), cast = o.cast || 0, low = lite() || o.low;
     const kinds = low ? ['strings', 'brass', 'perc'] : ['strings', 'brass', 'perc', 'brass', 'strings'], inst = { strings: 'mu_violin', brass: 'mu_horn', perc: 'mu_cymbal' };
     const g = org.clone(); g.y = groundY(org.x, -org.z);
-    const P = kinds.map((k, i) => { const a = (i / (kinds.length - 1) - 0.5) * 2.4; return { k, p: g.clone().addScaledVector(f, -2.2 * Math.cos(a) - 0.6).addScaledVector(r, 2.4 * Math.sin(a)), play: -9, out: -1 }; });
+    const P = kinds.map((k, i) => { const a = (i / (kinds.length - 1) - 0.5) * 2.4; return { k, p: g.clone().addScaledVector(f, -1.7 * Math.cos(a) - 0.5).addScaledVector(r, 2.1 * Math.sin(a)), play: -9, out: -1 }; });
     let tutti = -1;
     const e = this._fx('stage', cast + 3.6, (e) => {
       const t = e.t, fk = this._fk(e);
@@ -402,10 +402,10 @@ export class MusicFx extends CookFx {
         const out = fade >= 0 ? 1 - smooth(i * 0.12, i * 0.12 + 0.35, t - fade) : 1, rg = Math.exp(-Math.max(0, t - regroup) * 4);
         q.b.position.copy(p).setY(p.y + 0.04 * Math.sin(t * 2.6 + i)); this.orient(q.b, f); q.b.scale.setScalar(0.95 * inK); q.b.material.uniforms.uA.value = 0.72 * out * (1 - 0.5 * Math.exp(-Math.max(0, t - hurt) * 10)) * (1 - 0.5 * rg); q.b.material.uniforms.uGlow.value = 0.1 + 0.5 * pl;
         const sh = p.clone().addScaledVector(f, 0.12).setY(p.y + 0.62 * 0.95);
-        if (i === 0) { q.i.position.copy(sh).addScaledVector(r, -0.12).setY(sh.y + 0.1); this.orient(q.i, f.clone().addScaledVector(r, -0.6)); q.i.scale.setScalar(0.4 * inK); }
-        else if (i === 1) { q.i.position.copy(p).addScaledVector(f, 0.35); this.orientY(q.i, UP.clone().addScaledVector(f, -0.2), f); q.i.scale.setScalar(0.62 * inK); }
-        else { q.i.position.copy(sh).addScaledVector(r, -0.12).setY(sh.y + 0.18); this.orientX(q.i, r.clone().negate()); q.i.scale.setScalar(0.42 * inK); }
-        q.i.material.uniforms.uA.value = 0.9 * out; q.i.material.uniforms.uGlow.value = 0.15 + 0.7 * pl;
+        if (i === 0) { q.i.position.copy(sh).addScaledVector(r, -0.12).setY(sh.y + 0.1); this.orient(q.i, f.clone().addScaledVector(r, -0.6)); q.i.scale.setScalar(0.55 * inK); }
+        else if (i === 1) { q.i.position.copy(p).addScaledVector(f, 0.35); this.orientY(q.i, UP.clone().addScaledVector(f, -0.2), f); q.i.scale.setScalar(0.8 * inK); }
+        else { q.i.position.copy(sh).addScaledVector(r, -0.12).setY(sh.y + 0.18); this.orientX(q.i, r.clone().negate()); q.i.scale.setScalar(0.56 * inK); }
+        q.i.material.uniforms.uA.value = 0.95 * out; q.i.material.uniforms.uGlow.value = 0.3 + 0.7 * pl;
         q.arm.position.copy(sh).addScaledVector(r, 0.16); q.arm.rotation.set(0, Math.atan2(f.x, f.z), 0); q.arm.rotateX(-0.6 - 0.9 * Math.sin(Math.min(1, pl) * 3.14) * (i === 2 ? 0.2 : 1)); q.arm.rotateZ(i === 0 ? 0.4 * Math.sin(t * 9) * pl : 0); q.arm.scale.setScalar(0.95 * inK); q.arm.material.uniforms.uA.value = 0.72 * out; });
       if (fade >= 0 && t - fade > 0.9) e.t = e.life;
     });
