@@ -96,7 +96,7 @@ export class StoryScene {
     this.box = el.querySelector('.vn-box'); this.nameEl = el.querySelector('.vn-nm'); this.tiEl = el.querySelector('.vn-ti');
     this.text = el.querySelector('.vn-text'); this.endEl = el.querySelector('.vn-end');
     this.por = { left: el.querySelector('.vn-por.left'), right: el.querySelector('.vn-por.right') };
-    ui.openLayer('story', el, () => this.cleanup());
+    ui.openLayer('story', el, () => this.cleanup(el));
     el.addEventListener('pointerup', e => { if (e.target.closest('button')) return; e.preventDefault(); this.advance(); });
     el.querySelector('.vn-skip').onclick = e => { e.stopPropagation(); G.audio && G.audio.sfx('ui'); this.skip(); };
     this.onKey = e => {
@@ -109,7 +109,7 @@ export class StoryScene {
         this.advance();
       }
     };
-    window.addEventListener('keydown', this.onKey, true);
+    el._key = this.onKey; window.addEventListener('keydown', this.onKey, true);
     this.shownAt = performance.now();
     requestAnimationFrame(() => el.classList.add('on'));
 
@@ -254,8 +254,10 @@ export class StoryScene {
     this.type(p.html); this.finishType();
   }
 
-  cleanup() {
-    clearInterval(this.tick); window.removeEventListener('keydown', this.onKey, true); this.el = null;
+  /** the scene's element left the screen (ui.close / another window); a newer scene may already own this.el */
+  cleanup(el) {
+    if (el && el._key) window.removeEventListener('keydown', el._key, true);
+    if (this.el === el) { clearInterval(this.tick); this.el = null; }
   }
 }
 

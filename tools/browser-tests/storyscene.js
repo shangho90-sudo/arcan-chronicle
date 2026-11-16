@@ -38,6 +38,8 @@ const fails = [], errs = []; const ok = (c, m) => { console.log((c ? '  ok   ' :
     await ev(g => { const n = G.zone.npcs.find(n => n.def.id === g); const p = G.player; p.teleport({ x: n.pos.x, z: n.pos.z - 2.4 }); p.body.place(p.pos); G.render.setFocus(p.pos, true); G.interact(n); }, giver);
     await pg.waitForTimeout(800);
     ok(await ev(() => G.ui.currentName === 'dialog' && !!document.querySelector('.window.dialog')), 'NPC 메뉴는 예전 대화창');
+    // 느린 타자기(6자/초)로 시작 — SwiftShader·바쁜 기계에서는 보통 속도(42자/초)면 확인하기 전에 줄이 끝남
+    await ev(() => import('./js/storyscene.js').then(m => { G._storyMod = m; G.story = new m.StoryScene(G); G.story.cps = 6; }));
     const qname = await ev(() => G.data.quests.q1_start.name);
     await click('[퀘스트] ' + qname);
     await sceneOn();
