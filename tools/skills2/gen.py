@@ -450,37 +450,63 @@ S(J, 1, 2, '영감과 창작', 3, 'ar1_c3', '작은 걸작', 'summon', '그림 �
 S(J, 1, 2, '영감과 창작', 4, 'ar1_c4', '예술 부적 제작', 'craft', '공격·방어·기력 강화 부적을 만든다.')
 S(J, 1, 2, '영감과 창작', 5, 'ar1_c5', '창작의 흐름', 'passive', '회화와 음악을 번갈아 쓰면 다음 스킬의 기력 소모가 줄어든다.', flags=dict(flow=[0.2, 0.06]))
 
-# ======================================================================= 화가 (painter) — colours
+# ======================================================================= 화가 (painter) — 2026-11-16 개편 '그린 그림을 현실로 꺼내는 창조 마도사'
+# 밑그림 -> 채색 -> 실체화 -> 작품 완성. 스킬 id·3×5 배치·배우는 레벨·최대 레벨·종류는 그대로(예전 저장의 레벨·포인트·칸이 그대로 새 스킬이 됨).
+# 규칙은 js/painter.js(PaintKit, CUSTOM 'paint' — op.k = 칸), 그림은 js/painterfx.js(메시 tools/blender/fx_painter.py), 동작 pt_* (tools/anim/swings.py,
+# 양손 붓), 소리 pt_* (tools/audio/painter_sfx.py), 아이콘 tools/ui/painter_icons.py. 수치는 예전 화가 값에서(같은 레벨 기준 총 피해 비슷하게, 이전 값은 docs/STATUS.md).
+# 채색(빨강·파랑·노랑)은 대상마다 시전자별로 색마다 하나(같은 색은 시간만 갱신, 8초). 혼색·궁극기 반응 피해는 파생(derived) — 다시 채색·반응을 만들지 않음.
 J, C = 'painter', 0x8a5ae0
-S(J, 2, 0, '잉크 소환술', 1, 'pt_a1', '잉크 늑대', 'summon', '적을 쫓아 물어뜯는 잉크 늑대.', target='ground', range=6, mp=24, cd=12, anim='cast',
-  ops=[summon('ink_wolf', ai='chase_melee', life=16, hp=0.9, coef=1.0, rate=0.9, range=1.6, limit=2, living=True)])
-S(J, 2, 0, '잉크 소환술', 2, 'pt_a2', '종이학 무리', 'summon', '잉크 깃털을 떨어뜨리는 종이학 무리.', target='self', mp=24, cd=16, anim='cast',
-  ops=[summon('paper_crane', ai='follow_ranged', n=3, life=14, hp=0.3, coef=0.4, rate=0.9, range=7, proj='ink_blob', limit=3, living=True, fly=True)])
-S(J, 2, 0, '잉크 소환술', 3, 'pt_a3', '채색 기사', 'summon', '적의 주의를 끌고 검으로 공격하는 그림 기사.', target='ground', range=6, mp=30, cd=24, anim='cast',
-  ops=[summon('painted_knight', ai='taunt_melee', life=20, hp=2.2, coef=1.1, rate=1.1, range=1.8, taunt=True, limit=1, living=True)])
-S(J, 2, 0, '잉크 소환술', 4, 'pt_a4', '그림자 모사', 'summon', '적의 모습을 본뜬 분신. 고정된 소환 능력치를 쓰며 보스 스킬은 따라 하지 않는다.', target='enemy', range=8, mp=28, cd=22, anim='cast',
-  ops=[summon('shadow_clone', ai='chase_melee', life=12, hp=1.2, coef=1.0, rate=1.0, range=1.8, limit=1, living=True, copyTarget=True)])
-S(J, 2, 0, '잉크 소환술', 5, 'pt_a5', '살아 있는 용화', 'ultimate', '용이 전장을 가로지르며 먹물 숨결을 내뿜는다.', range=12, mp=75, cd=75, cast=0.8, anim='cast',
-  ops=[dict(op='telegraph', shape='line', len=12, w=3.0, dur=0.8), custom('dragon', len=12, w=3.0, coef=2.2, hits=4, gap=0.25, color='ink')])
-S(J, 2, 1, '채색과 폭발', 1, 'pt_b1', '진홍의 붓질', 'attack', '붉은 궤적으로 피해를 주고 화상성 채색을 남긴다.', range=4.0, mp=20, cd=6, anim='attack',
-  ops=[hit('cone', 2.2, r=4.0, ang=80, elem='fire', color='red', st=[st('burn', 3, 0.12)], fx=dict(slash='brush_stroke'))], fx=dict(color=0xe03040))
-S(J, 2, 1, '채색과 폭발', 2, 'pt_b2', '청람의 물결', 'attack', '푸른 파도로 피해를 주고 둔화성 채색을 남긴다.', range=8, mp=22, cd=7, anim='cast',
-  ops=[hit('line', 2.0, len=8, w=2.2, elem='water', color='blue', st=[st('slow', 3, 0.3)], fx=dict(beam='water_wave'))], fx=dict(color=0x3a6aff))
-S(J, 2, 1, '채색과 폭발', 3, 'pt_b3', '황금의 점묘', 'attack', '대상 주변에 금빛 점이 찍히고 차례로 터진다.', target='enemy', range=8, mp=24, cd=9, anim='cast',
-  ops=[custom('dots', n=6, r=2.2, blast=1.0, coef=0.8, start=0.4, gap=0.15, color='gold', burst='explosion_gold')], fx=dict(color=0xffd040))
-S(J, 2, 1, '채색과 폭발', 4, 'pt_b4', '혼색 반응', 'attack', '서로 다른 채색을 소비해 피해와 범위를 키운다.', target='enemy', range=8, mp=26, cd=8, anim='cast',
-  ops=[custom('mix', coef=2.0, perColor=1.0, r=1.6, rPer=0.8)])
-S(J, 2, 1, '채색과 폭발', 5, 'pt_b5', '프리즘 대폭발', 'ultimate', '다색 폭발. 주변 채색 영역도 각각 한 번씩만 반응한다.', target='self', mp=70, cd=70, cast=0.6, anim='cast',
-  ops=[dict(op='telegraph', shape='circle', r=6, dur=0.6), custom('prism', r=6, coef=6.0, perColor=1.2)])
-S(J, 2, 2, '풍경과 결계', 1, 'pt_c1', '초원의 풍경화', 'support', '자신과 생명체 소환물을 회복하는 초원을 그린다.', target='ground', range=6, mp=26, cd=20, anim='cast',
-  ops=[area('heal', 3.0, 8, tick=1.0, heal=0.025, fx='meadow', landscape=True, living=True)])
-S(J, 2, 2, '풍경과 결계', 2, 'pt_c2', '성벽의 풍경화', 'summon', '적의 이동과 투사체를 막는 임시 성벽.', target='ground', range=5, mp=24, cd=18, anim='cast',
-  ops=[summon('painted_wall', ai='wall', life=8, hp=2.0, width=3.4, limit=2, landscape=True)])
-S(J, 2, 2, '풍경과 결계', 3, 'pt_c3', '폭풍의 풍경화', 'attack', '비와 번개가 쏟아지는 지속 피해 영역.', target='ground', range=7, mp=28, cd=14, anim='cast',
-  ops=[area('dmg', 3.0, 7, tick=0.7, coef=0.45, elem='shock', fx='storm', landscape=True)])
-S(J, 2, 2, '풍경과 결계', 4, 'pt_c4', '화폭 확장', 'passive', '풍경 영역의 크기와 지속시간이 늘어난다.', flags=dict(landscapeSize=[0.15, 0.05], landscapeTime=[0.15, 0.05]))
-S(J, 2, 2, '풍경과 결계', 5, 'pt_c5', '천지화폭', 'ultimate', '이미 그린 풍경 영역과 그림 소환물을 강화한다.', target='self', mp=60, cd=60, cast=0.5, anim='cast',
-  ops=[dict(op='empower', landscapes=0.6, summons=0.5, dur=12, extend=4)])
+PA, PB, PC = '생명을 그리는 화필', '색채 연성술', '현실이 되는 풍경화'
+def paint(k, **kw): return dict(op='custom', fn='paint', k=k, **kw)
+S(J, 2, 0, PA, 1, 'pt_a1', '묵수·흑랑', 'summon', '붓으로 늑대의 윤곽을 그리면 먹이 번져 몸통이 되고, 늑대가 그림 밖으로 뛰어나온다. 적을 쫓아 물어뜯고, 때때로 짧게 돌진해 앞의 적을 물고 지나간다. 최대 2마리(더 그리면 가장 오래된 늑대가 사라짐).',
+  target='ground', range=6, mp=24, cd=12, anim='pt_sketch', sfx='pt_sketch', sfxAt='op',
+  ops=[paint('a1', at=-0.34, life=16, hp=0.9, bite=0.9, rate=0.9, range=1.6, dash=dict(coef=1.0, every=5.0, dist=4.5, w=1.0), limit=2, draw=0.75)], fx=dict(color=0x2a2238))
+S(J, 2, 0, PA, 2, 'pt_a2', '비화·채색군학', 'summon', '작은 종이에 색이 번지고 접혀 종이학 편대가 된다. 편대는 적 둘레를 돌며 잉크 깃털을 쏘고, 학이 하나씩 차례로 급강하한다. 학이 몇 마리든 편대 전체의 피해는 정해져 있다. 다시 쓰면 지금 편대의 시간이 새로 채워진다.',
+  target='self', mp=24, cd=16, anim='pt_sketch', sfx='pt_sketch', sfxAt='op',
+  ops=[paint('a2', at=-0.34, life=14, hp=0.9, n=5, hits=3, feather=1.0, rate=0.9, range=7, dive=dict(coef=0.6, every=2.6, per=2.0), limit=1, draw=0.8)], fx=dict(color=0xf0e8d8))
+S(J, 2, 0, PA, 3, 'pt_a3', '유화·팔레트 기사', 'summon', '황금 액자 안의 기사 밑그림에 두꺼운 물감이 갑옷을 채우고, 기사가 액자 밖으로 걸어 나온다. 일반 몬스터의 주의를 끌고(보스는 끌지 않음) 검을 크게 휘둘러 앞쪽 적들을 벤다. 다시 쓰면 지금 기사의 시간·체력이 새로 채워진다.',
+  target='ground', range=6, mp=30, cd=24, anim='pt_sketch', sfx='pt_sketch', sfxAt='op',
+  ops=[paint('a3', at=-0.34, life=20, hp=2.2, swing=1.1, rate=1.3, range=2.0, r=2.4, ang=110, maxT=4, limit=1, draw=0.95)], fx=dict(color=0x3a6ae8))
+S(J, 2, 0, PA, 4, 'pt_a4', '크로키·잔상 모사', 'summon', '대상의 윤곽을 연필선으로 빠르게 스케치하면 겹친 선이 입체가 되어 흑백 드로잉 분신이 종이에서 떨어져 나온다. 분신은 정해진 소환 능력치로 기본 공격과 짧은 돌진만 한다(대상의 능력·보스 기술은 따라 하지 않음).',
+  target='enemy', range=8, mp=28, cd=22, anim='pt_sketch', sfx='pt_sketch', sfxAt='op',
+  ops=[paint('a4', at=-0.34, life=12, hp=1.2, atk=1.0, rate=1.0, range=1.8, dash=dict(coef=0.8, every=4.0, dist=3.0, w=1.0), limit=1, draw=0.7)], fx=dict(color=0x606068))
+S(J, 2, 0, PA, 5, 'pt_a5', '궁극·화룡점정', 'ultimate', '앞쪽 공중에 긴 두루마리를 펼치고 굵은 먹선으로 용을 그린 뒤, 붓끝으로 마지막 눈을 찍는다. 눈이 빛나는 순간 용이 종이 밖으로 나와 앞쪽(12 m)을 가로지르며 경로의 적을 꿰뚫고, 끝에서 먹물 숨결을 뿜는다. 적마다 관통 한 번, 숨결 한 번.',
+  range=12, mp=75, cd=75, cast=0.8, anim='pt_eye', sfxAt='op',
+  ops=[dict(op='telegraph', shape='line', len=12, w=3.0, dur=0.8), paint('a5', len=12, w=3.0, pierce=4.4, fly=0.9, breath=dict(r=3.2, coef=4.4))], fx=dict(color=0x1a1622))
+S(J, 2, 1, PB, 1, 'pt_b1', '진홍·임파스토', 'attack', '몸을 돌려 붓을 크게 휘두르면 두껍고 붓결이 살아 있는 붉은 물감 띠가 앞쪽 부채꼴을 휩쓴다. 붓질이 지나가는 순간 피해와 화상, 빨강 채색. 맞은 자리에 입체 붓 자국과 불씨가 잠깐 남는다.',
+  range=4.0, mp=20, cd=6, anim='pt_sweep', sfx='pt_brush', sfxAt='strike', sfxLead=0.06,
+  ops=[paint('b1', r=4.0, ang=80, coef=2.2, sweep=0.12, burn=0.12, burnDur=3)], fx=dict(color=0xe03040))
+S(J, 2, 1, PB, 2, 'pt_b2', '청람·워터컬러', 'attack', '붓을 낮게 쓸어내리면 투명한 푸른 물감이 땅을 따라 넓고 낮은 파도가 되어 앞으로 번져 간다. 지나가는 적마다 한 번 피해·둔화·파랑 채색. 파도 뒤에 남는 옅은 번짐은 장식이다.',
+  range=8, mp=22, cd=7, anim='pt_low', sfx='pt_wash', sfxAt='strike', sfxLead=0.05,
+  ops=[paint('b2', len=8, w=2.2, speed=10, coef=2.0, slow=0.3, slowDur=3)], fx=dict(color=0x3a6aff))
+S(J, 2, 1, PB, 3, 'pt_b3', '황금·포인틸리즘', 'attack', '처음 고른 자리 둘레에 붓끝을 톡톡 튕길 때마다 금빛 점이 차례로 찍히고, 바깥 고리부터 안쪽으로 터진 뒤 가운데 점이 크게 터진다. 처음 자리에 고정되므로 빠져나가면 피할 수 있다. 맞을 때마다 노랑 채색.',
+  target='enemy', range=8, mp=24, cd=9, anim='pt_dots', sfx='pt_dot', sfxAt='strike',
+  ops=[paint('b3', rings=[2.4, 1.7, 1.0], coef=0.6, gap=0.15, start=0.3, fin=dict(r=1.1, coef=1.2, after=0.2), dots=18)], fx=dict(color=0xffd040))
+S(J, 2, 1, PB, 4, 'pt_b4', '팔레트 퓨전', 'attack', '대상과 둘레 적(2.6 m)에 묻은 내 채색이 떨어져 작은 팔레트로 모이고, 붓이 휘저으면 꽃처럼 펼쳐지며 피해를 준다. 색 조합마다 반응 하나: 빨강+파랑 = 증기 폭발, 파랑+노랑 = 넓은 둔화 파동, 노랑+빨강 = 가운데 강한 일격, 세 색 = 삼원색 반응. 채색이 하나 이하면 기본 피해만.',
+  target='enemy', range=8, mp=26, cd=8, anim='pt_mix', sfx='pt_mix', sfxAt='strike',
+  ops=[paint('b4', r=2.6, coef=1.6, steam=dict(r=1.6, coef=1.4), wave=dict(r=3.5, coef=0.4, slow=0.4, dur=3), core=dict(coef=2.2), tri=dict(coef=2.8, steam=1.0, slow=0.4))], fx=dict(color=0xd070ff))
+S(J, 2, 1, PB, 5, 'pt_b5', '궁극·스펙트럼 걸작', 'ultimate', '둘레(6 m) 적들의 내 채색을 거둬 공중에 붉은·푸른·금빛 추상화를 그린다. 마지막 붓질로 그림이 완성되는 순간 다색 파동이 퍼진다. 거둔 색 종류와 수만큼 강해지고, 빨강 = 화상, 파랑 = 둔화, 노랑 = 가운데 파열. 채색이 없어도 기본 피해. 내 풍경 영역은 영역마다 한 번 함께 반응한다.',
+  target='self', mp=70, cd=70, cast=0.6, anim='pt_finale', sfxAt='op',
+  ops=[dict(op='telegraph', shape='circle', r=6, dur=0.6), paint('b5', r=6, coef=6.0, perKind=0.15, perCount=0.03, countCap=10, burn=0.15, burnDur=4, slow=0.4, slowDur=4, core=dict(r=2.2, coef=2.0), land=1.6)], fx=dict(color=0xffffff))
+S(J, 2, 2, PC, 1, 'pt_c1', '수채정원·꽃의 들판', 'support', '연두 밑칠이 번지고 줄기가 붓선처럼 자라 꽃이 차례로 핀다. 들판(바닥 테두리 = 실제 범위) 안의 나와 생명 소환물(기계 제외)이 1초마다 회복하고, 회복할 때 꽃에서 빛방울이 날아든다. 들판은 하나만.',
+  target='ground', range=6, mp=26, cd=20, anim='pt_land', sfx='pt_wash', sfxAt='strike',
+  ops=[paint('c1', survival=True, r=3.0, dur=8, tick=1.0, heal=0.025, grow=0.6)], fx=dict(color=0x9ae070))
+S(J, 2, 2, PC, 2, 'pt_c2', '원근화법·백색 성벽', 'summon', '공중에 원근 보조선과 성벽 윤곽을 긋고 흰 물감을 채우면, 평면 그림이 접히듯 일어서 입체 성벽(3.4 m)이 된다. 적의 이동과 적의 직선 투사체를 막는다. 내구도와 남은 시간은 따로이며, 끝나면 다시 평면 그림이 되어 지워진다. 지형 속·출입구·나와 겹치는 곳·통로를 완전히 막는 곳에는 세울 수 없다. 최대 2개.',
+  target='ground', range=5, mp=24, cd=18, anim='pt_land', sfx='pt_fold', sfxAt='strike',
+  ops=[paint('c2', width=3.4, life=8, hp=2.0, limit=2, grow=0.5)], fx=dict(color=0xf4f0e8))
+S(J, 2, 2, PC, 3, 'pt_c3', '폭풍화·뇌운의 캔버스', 'attack', '공중의 작은 화폭에 먹구름을 그리면 구름이 흘러나와 정한 곳 위에 머문다. 1초마다 비가 범위 안 적에게 작은 피해를 주고, 번개가 떨어지기 직전 땅에 짧은 먹빛 예고가 뜬다(예고 자리 = 번개 자리). 폭풍은 하나만.',
+  target='ground', range=7, mp=28, cd=14, anim='pt_land', sfx='pt_wash', sfxAt='strike',
+  ops=[paint('c3', r=3.0, dur=7, rain=0.2, rainTick=1.0, bolt=0.62, boltEvery=1.4, boltR=1.2, warn=0.45)], fx=dict(color=0x5a6a9a))
+S(J, 2, 2, PC, 4, 'pt_c4', '마스터의 구도', 'passive', '풍경 영역(꽃의 들판·백색 성벽·뇌운의 캔버스)의 크기와 지속 시간이 늘어난다. 그릴 때 가장자리에 보조 붓선이 한 번 더 그어진다. 성벽은 늘어난 길이로 세울 수 없는 자리면 원래 길이로 세운다.',
+  flags=dict(landscapeSize=[0.15, 0.05], landscapeTime=[0.15, 0.05]))
+S(J, 2, 2, PC, 5, 'pt_c5', '궁극·만상갤러리', 'ultimate', '등 뒤에 반투명 화폭 세 장을 펼치고, 이미 그린 풍경과 그림 소환물을 금빛 붓선으로 이은 뒤 마지막 색으로 강화한다. 시전 순간 한 번: 꽃의 들판 = 회복 파동, 백색 성벽 = 내구도 일부 회복, 뇌운 = 예고 뒤 추가 번개. 그림 소환물은 10초 동안 공격력이 오른다(겹치지 않음). 작품이 하나도 없으면 쓸 수 없다(기력·재사용 대기 안 씀).',
+  target='self', mp=60, cd=60, cast=0.5, anim='pt_finale', sfxAt='op',
+  ops=[paint('c5', range=20, dur=10, summonAtk=0.4, heal=0.06, repair=0.3, bolt=1.2, boost=0.3)], fx=dict(color=0xffd27a))
+
+# 누른 순간의 준비 연출(op 'pre', at = -동작의 타격 시각): 붓끝에 물감 모으기 (그림만, 피해 없음)
+PT_PRE = dict(pt_b1=('red', 0.28), pt_b2=('blue', 0.26), pt_b3=('gold', 0.16), pt_b4=('palette', 0.30), pt_c1=('green', 0.30), pt_c2=('white', 0.30), pt_c3=('ink', 0.30))
+for _d in SK:
+    if _d['id'] in PT_PRE: w, t = PT_PRE[_d['id']]; _d['ops'].insert(0, paint('pre', what=w, at=-t))
 
 # ======================================================================= 음악가 (musician) — phrases
 J, C = 'musician', 0x60d0a0

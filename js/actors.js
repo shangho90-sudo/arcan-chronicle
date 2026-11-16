@@ -902,7 +902,8 @@ export class Projectile {
     const sx = this.dir.x * this.speed * dt, sz = this.dir.z * this.speed * dt;
     this.pos = { x: this.pos.x + sx, y: this.pos.y, z: this.pos.z + sz }; this.travelled += Math.hypot(sx, sz);
     if (this.f) G.fx.move(this.f, this.gen, this.pos); if (this.vis) this.vis.set(this.pos, { x: this.dir.x, y: 0, z: this.dir.z });
-    if (this.zone.geo.blocked(this.pos.x, this.pos.z, 0.05) || this.travelled >= this.range) { G.fx.play("smoke", this.pos, 0.5); return this.done(); }
+    if (this.zone.geo.blocked(this.pos.x, this.pos.z, 0.05) || this.travelled >= this.range) { if (this.travelled < this.range && this.owner && this.owner.faction !== "player" && G.player && G.player.skills2 && G.player.skills2.painter) G.player.skills2.painter.projBlocked(this.pos, this);   // 화가 백색 성벽: 막은 투사체만큼 내구도
+      G.fx.play("smoke", this.pos, 0.5); return this.done(); }
     for (const c of this.zone.actors) {
       if (c.dead || c.faction === this.owner.faction) continue;
       if (Math.hypot(this.pos.x - c.pos.x, this.pos.z - c.pos.z) <= c.radius + 0.2 && Math.abs(this.pos.y - (c.pos.y + 0.7)) < 1.6) {

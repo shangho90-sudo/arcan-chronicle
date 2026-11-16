@@ -1,0 +1,6 @@
+{
+  "provider": "synthesized (tools/audio/painter_sfx.py, numpy + scipy, fixed seed)",
+  "generatedOn": "2026-11-16",
+  "note": "화가 2차 스킬. Runway 크레딧 없이 직접 합성. 같은 이름의 파일로 바꿔 넣으면 교체됨. 회복 소리는 기존 heal 재사용.",
+  "assets": ["sfx_pt_sketch.mp3", "sfx_pt_brush.mp3", "sfx_pt_wash.mp3", "sfx_pt_dot.mp3", "sfx_pt_mix.mp3", "sfx_pt_ink.mp3", "sfx_pt_frame.mp3", "sfx_pt_fold.mp3", "sfx_pt_bolt.mp3", "sfx_pt_bite.mp3"]
+}

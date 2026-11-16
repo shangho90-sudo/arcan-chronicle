@@ -7,6 +7,7 @@ import { enLevelText } from './engineer.js';   // 엔지니어 2차: 실제 계�
 import { chefLevelText } from './chef.js';   // 쉐프 2차: 스킬 창 수치 줄(실제 데이터)
 import { herbText } from './herbal.js';   // 한약사 2차 툴팁(실제 op 값)
 import { dsLevelText } from './designer.js';   // 디자이너 2차: 스킬 창 수치 줄(실제 데이터)
+import { paintText } from './painter.js';   // 화가 2차 툴팁(실제 op 값)
 
 let G = null; export function bindSkillUi(g) { G = g; }
 const $ = (tag, cls, parent, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html !== undefined) e.innerHTML = html; if (parent) parent.appendChild(e); return e; };
@@ -39,7 +40,7 @@ function glyph(g, d) {
   g.restore();
 }
 // 그림 아이콘이 있는 스킬(견습생 기본 검술 8종·약사 1차 15종, tools/ui/skill_icons_crop.py → assets/ui/skills/<id>.png). 나머지는 아래 캔버스 임시 아이콘.
-const SKILL_ART = new Set(['nv_a1', 'nv_a2', 'nv_a3', 'nv_a4', 'nv_p1', 'nv_p2', 'nv_p3', 'nv_p4', ...['a1', 'a3', 'a4', 'a5', 'a6', 'b1', 'b2', 'b4', 'b5', 'b6', 'c1', 'c6', 'c7', 'c8', 'c9'].map(k => 'ph1_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'bs1_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'wp_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'cf_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'hb_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'en_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'ds_' + k)]);   // + 엔지니어 2차 15종(tools/ui/en_icons.py)   // + 한약사 2차 15종(tools/ui/herbal_icons.py)   // + 쉐프 2차 15종(tools/ui/chef_icons.py) + 양약사 2차 15종(원형, tools/ui/wp_icons.py)   // + 대장장이 1차 15종(원형, tools/ui/smith_icons.py)   // 견습생(둥근 사각형) + 약사 1차(원형, 2026-11-11 개편 뒤 15종)   // + 디자이너 2차 15종(tools/ui/designer_icons.py)
+const SKILL_ART = new Set(['nv_a1', 'nv_a2', 'nv_a3', 'nv_a4', 'nv_p1', 'nv_p2', 'nv_p3', 'nv_p4', ...['a1', 'a3', 'a4', 'a5', 'a6', 'b1', 'b2', 'b4', 'b5', 'b6', 'c1', 'c6', 'c7', 'c8', 'c9'].map(k => 'ph1_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'bs1_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'wp_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'cf_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'hb_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'en_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'ds_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'pt_' + k)]);   // + 화가 2차 15종(tools/ui/painter_icons.py)   // + 엔지니어 2차 15종(tools/ui/en_icons.py)   // + 한약사 2차 15종(tools/ui/herbal_icons.py)   // + 쉐프 2차 15종(tools/ui/chef_icons.py) + 양약사 2차 15종(원형, tools/ui/wp_icons.py)   // + 대장장이 1차 15종(원형, tools/ui/smith_icons.py)   // 견습생(둥근 사각형) + 약사 1차(원형, 2026-11-11 개편 뒤 15종)   // + 디자이너 2차 15종(tools/ui/designer_icons.py)
 export function skillIcon(d, size = 48) {
   const k = d.id + size; if (iconCache.has(k)) return iconCache.get(k);
   if (SKILL_ART.has(d.id)) { const html = `<span class="icon i3d skic ${d.id.startsWith('nv_') ? 'skart' : 'skround'}" style="width:${size}px;height:${size}px;background:url(assets/ui/skills/${d.id}.png) center/contain no-repeat;image-rendering:auto"></span>`; iconCache.set(k, html); return html; }
@@ -69,6 +70,7 @@ function levelText(d, L) {
   const wt = wpLevelText(d, L) || enLevelText(d, L); if (wt) return d.type === 'passive' ? wt : wt + ` · 연출 등급 ${Math.max(1, Math.min(10, 3 + L + (d.type === 'ultimate' ? 2 + L : 0)))}`;
   const m = 1 + (d.type === 'ultimate' ? 0.25 : 0.12) * (L - 1), out = [];
   if (d.job === 'herbalist' && d.ops.some(o => o.fn === 'herb')) { const h = herbText(d, L); if (h) out.push(h); }
+  else if (d.job === 'painter') { const pb = G.player && G.player.sheet && G.player.sheet.book; const h = paintText(d, L, pb ? { size: pb.passive('landscapeSize'), time: pb.passive('landscapeTime') } : {}); if (h) out.push(h); }
   else
   for (const op of d.ops) {
     if (op.op === 'hit' && op.coef > 0) {

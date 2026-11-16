@@ -1146,6 +1146,104 @@ DS_POSE = action('ds_pose', [        # 뮤즈의 초대·오트쿠튀르 컬렉�
 ], 0.25, 0.40, None, fadeIn=0.06, fadeOut=0.16)
 DS_ALL = [DS_DRAPE, DS_SNIP, DS_SEW, DS_CROSS, DS_FINALE, DS_GLIDE, DS_SPIN, DS_POSE]
 SKILL_ACTS += DS_ALL   # 디자이너 2차
+# ------------------------------------------------------------------------------------------------ 화가 2차 (2026-11-16 '그린 그림을 현실로')
+# 예술가와 같은 양손 큰 붓(offGrip = AR_OFFGRIP, 왼손이 붓대를 같이 잡음). paint = 실제 붓끝이 물감 획을 남기는 구간(js/artfx.js stroke —
+# 화가 스킬은 js/painter.js 가 붓끝 획 색을 정함). 타격 시각(hitT) = 스킬 op 실행 순간(skillrt release: 0.35 s 이하) = '마지막 획·점찍기'.
+# pt_sketch 소환 4종: 허공에 윤곽을 두 번 빠르게 긋고(0.06~0.26 s) 마지막 점을 콕 찍음(0.34 s)
+# pt_sweep  진홍·임파스토: 몸통을 크게 돌려 오른쪽 뒤에서 왼쪽 앞으로 넓은 붓질(0.28 s)
+# pt_low    청람·워터컬러: 몸을 낮춰 붓을 땅 가까이 앞으로 쓸어냄(0.26 s)
+# pt_dots   황금·포인틸리즘: 손목을 튕겨 붓끝으로 톡톡톡(0.16 · 0.24 · 0.32 s)
+# pt_mix    팔레트 퓨전: 가슴 앞에서 작은 원을 두 번 휘저은 뒤 앞으로 펼침(0.30 s)
+# pt_land   풍경 3종: 낮게 가로로 밑칠을 긋고 위로 올려 마무리(0.30 s)
+# pt_eye    화룡점정(시전 0.8 s): 붓을 높이 들어 긴 먹선 두 번 -> 0.8 s 앞으로 콕 눈을 찍음
+# pt_finale 스펙트럼 걸작·만상갤러리(시전 0.5~0.6 s): 머리 위에서 크게 원을 그린 뒤 마지막 획(0.55 s)
+PT_SKETCH = action('pt_sketch', [
+    key(0.00, **AG),
+    key(0.06, 'o', twist=-16, lean=-2, sink=0.05, hand=[-30, 30, 0.80], blade=[-30, 60], elbow=[-0.6, -0.5, -0.8]),
+    key(0.14, 's', twist=10, lean=4, sink=0.06, hand=[12, 10, 0.92], blade=[30, 30], elbow=AE),
+    key(0.20, 's', twist=-8, lean=2, sink=0.06, hand=[-16, 34, 0.86], blade=[-16, 64], elbow=[-0.6, -0.5, -0.8]),
+    key(0.26, 's', twist=-14, lean=-2, sink=0.07, hand=[-24, 8, 0.62], blade=[-6, 20], elbow=[-0.5, -0.4, -1]),
+    key(0.34, None, twist=8, lean=14, sink=0.10, hand=[0, 6, 1.0], blade=[0, 0], elbow=[-0.5, -0.8, -0.2], squint=True),
+    key(0.44, 'o', twist=10, lean=13, sink=0.10, hand=[2, 8, 0.98], blade=[4, 8], elbow=[-0.5, -0.8, -0.2]),
+    key(0.62, 's', **AG),
+], hitT=0.34, lock=0.50, trail=None, fadeIn=0.06, fadeOut=0.15)
+PT_SKETCH.update(offGrip=AR_OFFGRIP, paint=[0.05, 0.27])
+PT_SWEEP = action('pt_sweep', [
+    key(0.00, **AG),
+    key(0.13, 'o', twist=-56, lean=-4, sink=0.10, hand=[-70, 14, 0.74], blade=[-118, 14], elbow=[-0.5, -0.8, -0.8]),
+    key(0.19, 's', twist=-60, lean=-4, sink=0.12, hand=[-72, 16, 0.72], blade=[-124, 16], elbow=[-0.5, -0.8, -0.8]),
+    key(0.245, 'i', twist=-18, lean=8, sink=0.13, hand=[-34, 4, 0.94], blade=[-52, 2], elbow=AE, squint=True),
+    key(0.28, None, twist=20, lean=12, sink=0.14, hand=[8, 0, 1.0], blade=[14, -2], elbow=AE, squint=True),
+    key(0.36, 'o', twist=54, lean=12, sink=0.13, hand=[50, -4, 0.86], blade=[96, -8], elbow=[-0.1, -1, 0.2]),
+    key(0.48, 's', twist=24, lean=5, sink=0.07, hand=[16, -24, 0.70], blade=[32, 6], elbow=[-0.4, -1, -0.1]),
+    key(0.62, 's', **AG),
+], hitT=0.28, lock=0.42, trail=None, fadeIn=0.08, fadeOut=0.16)
+PT_SWEEP.update(offGrip=AR_OFFGRIP, paint=[0.21, 0.37])
+PT_LOW = action('pt_low', [
+    key(0.00, **AG),
+    key(0.12, 'o', twist=-20, lean=-2, sink=0.08, hand=[-30, 20, 0.66], blade=[-20, 60], elbow=[-0.6, -0.5, -0.8]),
+    key(0.20, 'i', twist=-6, lean=18, sink=0.20, hand=[-14, -40, 0.84], blade=[-6, -50], elbow=[-0.6, -1, -0.3], squint=True),
+    key(0.26, None, twist=6, lean=22, sink=0.24, hand=[0, -44, 1.0], blade=[0, -60], elbow=[-0.5, -1, -0.1], squint=True),
+    key(0.36, 'o', twist=10, lean=20, sink=0.22, hand=[6, -36, 1.0], blade=[4, -40], elbow=[-0.5, -1, -0.1]),
+    key(0.50, 's', twist=4, lean=6, sink=0.06, hand=[-10, -28, 0.72], blade=[6, 10], elbow=[-0.7, -1, -0.2]),
+    key(0.62, 's', **AG),
+], hitT=0.26, lock=0.42, trail=None, fadeIn=0.07, fadeOut=0.15)
+PT_LOW.update(offGrip=AR_OFFGRIP, paint=[0.19, 0.36])
+PT_DOTS = action('pt_dots', [
+    key(0.00, **AG),
+    key(0.09, 'o', twist=-8, lean=-3, sink=0.04, hand=[-18, 30, 0.72], blade=[-8, 64], elbow=[-0.7, -0.4, -0.7]),
+    key(0.16, 'i', twist=4, lean=8, sink=0.06, hand=[-6, 8, 0.98], blade=[0, 0], elbow=AE, squint=True),
+    key(0.20, 'o', twist=0, lean=5, sink=0.05, hand=[4, 22, 0.86], blade=[10, 40], elbow=AE),
+    key(0.24, 'i', twist=8, lean=9, sink=0.06, hand=[10, 6, 0.99], blade=[14, -2], elbow=AE, squint=True),
+    key(0.28, 'o', twist=-2, lean=5, sink=0.05, hand=[-16, 22, 0.86], blade=[-14, 40], elbow=AE),
+    key(0.32, 'i', twist=4, lean=11, sink=0.07, hand=[-10, 2, 1.0], blade=[-8, -6], elbow=AE, squint=True),
+    key(0.42, 'o', twist=6, lean=8, sink=0.05, hand=[-4, -10, 0.86], blade=[2, 10], elbow=AE),
+    key(0.56, 's', **AG),
+], hitT=0.16, lock=0.40, trail=None, fadeIn=0.06, fadeOut=0.14)
+PT_DOTS.update(offGrip=AR_OFFGRIP, hitTimes=[0.16, 0.24, 0.32])
+PT_MIX = action('pt_mix', [
+    key(0.00, **AG),
+    key(0.07, 'o', twist=-6, lean=4, sink=0.06, hand=[-24, -12, 0.70], blade=[-10, -30], elbow=[-0.6, -0.8, -0.6]),
+    key(0.13, 's', twist=6, lean=5, sink=0.07, hand=[10, -6, 0.74], blade=[20, -30], elbow=AE),
+    key(0.19, 's', twist=-4, lean=4, sink=0.07, hand=[-14, -18, 0.66], blade=[-10, -34], elbow=[-0.6, -0.8, -0.6]),
+    key(0.24, 's', twist=4, lean=5, sink=0.07, hand=[8, -8, 0.74], blade=[16, -30], elbow=AE),
+    key(0.30, None, twist=8, lean=12, sink=0.10, hand=[2, 14, 1.0], blade=[4, 30], elbow=[-0.5, -0.8, -0.2], squint=True),
+    key(0.42, 'o', twist=8, lean=11, sink=0.09, hand=[4, 18, 0.98], blade=[6, 40], elbow=[-0.5, -0.8, -0.2]),
+    key(0.58, 's', **AG),
+], hitT=0.30, lock=0.46, trail=None, fadeIn=0.06, fadeOut=0.15)
+PT_MIX.update(offGrip=AR_OFFGRIP, paint=[0.06, 0.26])
+PT_LAND = action('pt_land', [
+    key(0.00, **AG),
+    key(0.10, 'o', twist=-30, lean=12, sink=0.16, hand=[-46, -36, 0.86], blade=[-60, -30], elbow=[-0.6, -1, -0.4]),
+    key(0.22, 's', twist=26, lean=14, sink=0.17, hand=[34, -38, 0.90], blade=[60, -30], elbow=[-0.2, -1, 0.1], squint=True),
+    key(0.30, None, twist=6, lean=-2, sink=0.06, hand=[4, 30, 0.96], blade=[6, 70], elbow=[-0.5, -0.5, -0.6], squint=True),
+    key(0.42, 'o', twist=4, lean=-3, sink=0.05, hand=[2, 34, 0.94], blade=[4, 76], elbow=[-0.5, -0.5, -0.6]),
+    key(0.62, 's', **AG),
+], hitT=0.30, lock=0.46, trail=None, fadeIn=0.06, fadeOut=0.16)
+PT_LAND.update(offGrip=AR_OFFGRIP, paint=[0.09, 0.31])
+PT_EYE = action('pt_eye', [
+    key(0.00, **AG),
+    key(0.18, 'o', twist=-12, lean=-8, sink=0.02, hand=[-26, 56, 0.84], blade=[-30, 90], elbow=[-0.7, -0.3, -0.8]),
+    key(0.36, 's', twist=18, lean=-4, sink=0.04, hand=[30, 40, 0.92], blade=[60, 60], elbow=[-0.3, -0.6, -0.2]),
+    key(0.52, 's', twist=-20, lean=-2, sink=0.05, hand=[-34, 30, 0.90], blade=[-50, 50], elbow=[-0.6, -0.5, -0.8]),
+    key(0.68, 's', twist=-10, lean=-4, sink=0.06, hand=[-20, 18, 0.56], blade=[-6, 30], elbow=[-0.5, -0.4, -1]),
+    key(0.80, None, twist=10, lean=16, sink=0.10, hand=[0, 16, 1.0], blade=[0, 10], elbow=[-0.5, -0.8, -0.2], squint=True),
+    key(0.96, 'o', twist=12, lean=14, sink=0.10, hand=[2, 18, 0.98], blade=[4, 16], elbow=[-0.5, -0.8, -0.2]),
+    key(1.20, 's', **AG),
+], hitT=0.80, lock=0.6, trail=None, fadeIn=0.06, fadeOut=0.18)
+PT_EYE.update(offGrip=AR_OFFGRIP, paint=[0.16, 0.70])
+PT_FINALE = action('pt_finale', [
+    key(0.00, **AG),
+    key(0.16, 'o', twist=-20, lean=-10, sink=0.02, hand=[-40, 64, 0.90], blade=[-40, 100], elbow=[-0.7, 0.2, -1]),
+    key(0.30, 's', twist=20, lean=-10, sink=0.02, hand=[36, 64, 0.90], blade=[50, 100], elbow=[-0.3, 0.2, -0.6]),
+    key(0.44, 's', twist=-10, lean=-8, sink=0.03, hand=[-20, 70, 0.88], blade=[-20, 110], elbow=[-0.7, 0.2, -1]),
+    key(0.55, None, twist=12, lean=18, sink=0.12, hand=[6, -10, 1.0], blade=[10, -30], elbow=AE, squint=True),
+    key(0.70, 'o', twist=14, lean=16, sink=0.12, hand=[8, -14, 0.98], blade=[12, -36], elbow=AE),
+    key(0.92, 's', **AG),
+], hitT=0.55, lock=0.6, trail=None, fadeIn=0.06, fadeOut=0.18)
+PT_FINALE.update(offGrip=AR_OFFGRIP, paint=[0.14, 0.58])
+PT_ALL = [PT_SKETCH, PT_SWEEP, PT_LOW, PT_DOTS, PT_MIX, PT_LAND, PT_EYE, PT_FINALE]
+SKILL_ACTS += PT_ALL   # 화가 2차
 
 acts = json.load(open(P))
 names = {'attack', 'attack2'} | {x['name'] for x in SKILL_ACTS}

@@ -31,6 +31,8 @@ import { ChefKit } from './chef.js';
 import { HerbalKit } from './herbal.js';
 // 디자이너 2차: 시침 표식·실크 드레이핑·패턴 브레이크·스티치·크로스 커팅·피날레 / 실크 로드·피루엣·미러 피팅·뮤즈·컬렉션 / 리스티치·피팅 규칙 (js/designer.js)
 import { DsKit } from './designer.js';
+// 화가 2차 (2026-11-16 '그린 그림을 현실로'): 그림 소환물·채색·혼색·풍경 규칙 (js/painter.js), 그림 js/painterfx.js
+import { PaintKit } from './painter.js';
 
 let G = null; export function bindSkillRt(g) { G = g; }
 const DEG = Math.PI / 180;
@@ -55,6 +57,7 @@ export const FX = {
   en(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.en && G.skillFx.en[kind]) return G.skillFx.en[kind](a, o); } catch (e) { console.warn('fx en', kind, e); } return null; },   // 엔지니어 2차: 병기·화기·포격 (js/engfx.js)
   wp(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.wp) return G.skillFx.wp[kind](a, o); } catch (e) { console.warn('fx wp', kind, e); } return null; },   // 양약사 2차: 캡슐·앰플·결정·표식 고리 (js/wpharmfx.js)
   chef(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.chef) return G.skillFx.chef[kind](a, o); } catch (e) { console.warn('fx chef', e); } return null; },   // 쉐프 2차 (js/cheffx.js)
+  painter(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.painter) return G.skillFx.painter.make(kind, a, o); } catch (e) { console.warn('fx painter', kind, e); } return null; },   // 화가 2차 (js/painterfx.js)
   herbal(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.herbal) return G.skillFx.herbal.make(kind, a, o); } catch (e) { console.warn('fx herbal', kind, e); } return null; },   // 한약사 2차 (js/herbalfx.js)
   ds(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.ds) return G.skillFx.ds[kind](a, o); } catch (e) { console.warn('fx ds', kind, e); } return null; },   // 디자이너 2차 (js/designerfx.js)
   hair(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.hair) return G.skillFx.hair[kind](a, o); } catch (e) { console.warn('fx hair', e); } return null; },   // 미용사 1차: 큰 가위·빗·드라이어·헤어롤 (js/hairfx.js)
@@ -144,6 +147,7 @@ export class SkillEngine {
     this.herbal = typeof HerbalKit === 'function' ? new HerbalKit(this, { applyStatus, fx: (k, a, o) => FX.herbal ? FX.herbal(k, a, o) : null, G: () => G }) : null;   // 한약사 2차 규칙 (js/herbal.js)
     this.en = typeof EnKit === 'function' ? new EnKit(this, { applyStatus, fx: (k, a, o) => FX.en(k, a, o), G: () => G, Summon }) : null;   // 엔지니어 2차 규칙 (js/engineer.js)
     this.ds = typeof DsKit === 'function' ? new DsKit(this, { applyStatus, fx: FX.ds, G: () => G, summon: (o, ctx, p) => this.dsSummon(o, ctx, p) }) : null;   // 디자이너 2차 규칙 (js/designer.js)
+    this.painter = typeof PaintKit === 'function' ? new PaintKit(this, { applyStatus, fx: (k, a, o) => FX.painter ? FX.painter(k, a, o) : null, G: () => G }) : null;   // 화가 2차 규칙 (js/painter.js)
     this.restoreCooldowns();
   }
   /** 디자이너 미러 피팅: 정해진 자리에 마네킹(AI 없음, 일반 적의 주의를 끎) — 종류별 상한·전체 8 규칙은 opSummon과 같음 */
@@ -191,6 +195,7 @@ export class SkillEngine {
     if (this.chef) { const ce = this.chef.validate(d, aim); if (ce) return ce; }
     if (this.en) { const ee = this.en.validate(d, aim); if (ee) return ee; }   // 엔지니어: 설치 자리·워커 자리·레드라인 냉각   // 슈가 아라베스크 자리 검사(지형·출입구·나/소환수·통로) — 자원을 쓰기 전에
     if (this.ds) { const de = this.ds.validate(d, aim); if (de) return de; }   // 실크 로드: 앞이 바로 막힘   // 슈가 아라베스크 자리 검사(지형·출입구·나/소환수·통로) — 자원을 쓰기 전에
+    if (this.painter) { const pe = this.painter.validate(d, aim); if (pe) return pe; }   // 화가: 백색 성벽 자리·만상갤러리 작품 — 자원을 쓰기 전에   // 슈가 아라베스크 자리 검사(지형·출입구·나/소환수·통로) — 자원을 쓰기 전에
     if (d.target === 'ground' && d.ops.some(o => o.op === 'summon')) { const p = this.groundAim(d, aim); if (pc.zone.geo.blocked(p.x, p.z, 0.4)) return '설치할 수 없는 위치입니다'; if (this.nearPortal(p, 2.5)) return '출입구 근처에는 설치할 수 없습니다'; }
     return null;
   }
@@ -238,7 +243,7 @@ export class SkillEngine {
     ctx.act = act;
     pc.body.play(act, aspd, true);
     const castT = d.cast || 0;
-    if (castT > 0) { this.casting = { ctx, t: castT, cost }; G.ui.floatText(pc.pos, d.name, '#ffe08a', 1.0, 2.1); }
+    if (castT > 0) { this.casting = { ctx, t: castT, cost }; G.ui.floatText(pc.pos, d.name, '#ffe08a', 1.0, 2.1); if (this.painter) this.painter.onCast(d, ctx); }   // 화가 궁극기: 시전 동안 두루마리·추상화·화폭
     else this.release(ctx);
     if (d.ops.some(o => o.op === 'consume' && o.potionCd)) pc.potionCd = G.data.config.potionCooldown;
     this.combatT = Math.max(this.combatT, d.type === 'attack' || d.type === 'ultimate' ? 5 : 0);
@@ -281,7 +286,7 @@ export class SkillEngine {
       ctx.yeonPre = true;
       cb.hitTimes.forEach((t, i) => this.pending.push({ time: this.clock + Math.max(0, t - YEON_LEAD), op: { op: '_run', run: () => { if (!pc.dead) FX.yeon('strike', { follow: pc, y: cb.hitFx[i] && cb.hitFx[i].yeon, lead: Math.min(YEON_LEAD, t) }); } }, ctx }));
     }
-    if (d.type === 'ultimate' && d.job !== 'western_pharmacist' && d.job !== 'chef' && d.job !== 'engineer' && d.job !== 'designer') { G.render.addShake && !G.reduceFlash && G.render.addShake(0.12, 0.25); }   // 양약사·쉐프 궁극기: 주 타격 순간 kick 한 번만(js/wpharm.js)
+    if (d.type === 'ultimate' && d.job !== 'western_pharmacist' && d.job !== 'chef' && d.job !== 'engineer' && d.job !== 'designer' && d.job !== 'painter') { G.render.addShake && !G.reduceFlash && G.render.addShake(0.12, 0.25); }   // 양약사·쉐프 궁극기: 주 타격 순간 kick 한 번만(js/wpharm.js)
   }
   interruptCast(reason) {
     const c = this.casting; if (!c) return; this.casting = null;
@@ -289,6 +294,7 @@ export class SkillEngine {
     // rule: interrupted before release -> MP / resource refunded, cooldown cleared
     this.pc.sp = Math.min(this.pc.maxSp, this.pc.sp + c.cost); if (c.ctx.d.res && c.ctx.d.res.cost) this.res[c.ctx.d.res.type] += c.ctx.d.res.cost;
     this.cd[c.ctx.id] = 0; if (reason) G.ui.toast(reason);
+    if (this.painter) this.painter.onInterrupt(c.ctx);
   }
   tick(dt) {
     const pc = this.pc; this.clock += dt;
@@ -312,6 +318,7 @@ export class SkillEngine {
     if (this.en) this.en.tick(dt);
     if (this.herbal) this.herbal.tick(dt);
     if (this.ds) this.ds.tick(dt);
+    if (this.painter) this.painter.tick(dt);
     if (this.melody) this.tickMelody(dt);
     if (this.overclockT > 0) { this.overclockT -= dt; if (this.overclockT <= 0) { applyStatus(pc, { id: 'cooldown_heat', dur: this.coolT, val: 1, ch: 1 }, pc); } }
     for (const m of pc.zone.actors) if (m._marks) { if (m.dead) clearMarks(m); else tickMarks(m, dt); }
@@ -327,6 +334,7 @@ export class SkillEngine {
     if (this.chef) this.chef.clear();
     if (this.en) this.en.clear();   // 엔지니어: 비콘·지정 고리(병기는 summons 정리에서)   // 쉐프: 기다리는 단계·쟁반·소르베·원반 취소(피해 없음)
     if (this.herbal) this.herbal.clear();
+    if (this.painter) this.painter.clear();   // 화가: 그림 소환물은 summons 쪽, 채색·풍경·성벽·용·예약 타격은 여기
     this.pending = []; this.casting = null; if (this.channel) { this.channel = null; }
     for (const m of (this.pc.zone ? this.pc.zone.actors : [])) clearMarks(m);
   }
@@ -1052,7 +1060,8 @@ export class Summon {
 
 // ------------------------------------------------------------------ unique mechanics
 export const CUSTOM = {
-  herb(eng, op, ctx) { if (eng.herbal) eng.herbal.cast(op, ctx); },   // 한약사 2차 15종 (js/herbal.js, op.k = 칸)
+  herb(eng, op, ctx) { if (eng.herbal) eng.herbal.cast(op, ctx); },   
+  paint(eng, op, ctx) { if (eng.painter) eng.painter.cast(op, ctx); },   // 화가 2차 15종 (js/painter.js, op.k = 칸)   // 한약사 2차 15종 (js/herbal.js, op.k = 칸)
   meatball_volley(eng, op, ctx) { meatballVolley(eng, op, ctx, G); },   // 요리사 미트볼 던지기 (js/meatball.js + js/cookfx.js volley)
   // 양약사 2차 (js/wpharm.js): 작열·분열 캡슐 · 극저온 결정화 · 이온 관통술 · 삼상 복합제 · 대형 캡슐 붕괴 · 촉매 활성화 · 정밀 표적 전달 · 연쇄 용출 · 임계 농도
   ...Object.fromEntries(['en_sentry', 'en_spider', 'en_drones', 'en_anchor', 'en_walker', 'en_pile', 'en_breach', 'en_hive', 'en_rail', 'en_orbital', 'en_beacon', 'en_redline'].map(k => [k, (eng, op, ctx) => eng.en && eng.en[k](op, ctx)])),   // 엔지니어 2차 (js/engineer.js)
