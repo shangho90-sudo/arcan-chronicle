@@ -115,7 +115,7 @@ const CFG = {
     res.info = info; res.errors = errs.slice(0, 8);
     const pick = MARKS.map(m => frames[Math.round(m * FPS)] || null);
     fs.writeFileSync('/tmp/herbal/_strip.py', `from PIL import Image, ImageDraw\nfr=${JSON.stringify(pick.map(f => f || ''))}\nlab=${JSON.stringify(MARKS)}\nims=[Image.open(f) if f else None for f in fr]\nw,h=next(i for i in ims if i).size\nims=[(i or Image.new('RGB',(w,h),(0,0,0))).resize((w*2//3,h*2//3)) for i in ims]\nw,h=ims[0].size\nn=len(ims); cols=(n+1)//2 if n>6 else n; rows=(n+cols-1)//cols\nsh=Image.new('RGB',(w*cols,(h+22)*rows),(20,20,28))\nd=ImageDraw.Draw(sh)\nfor i,(im,l) in enumerate(zip(ims,lab)):\n  x=(i%cols)*w; y=(i//cols)*(h+22)\n  sh.paste(im,(x,y+22)); d.text((x+6,y+4),('${KEY} t %.2fs'%l),fill=(255,255,255))\nsh.save('${OUT}/${name}.png')`);
-    try { execSync('python3 /tmp/herbal/_strip.py'); fs.rmSync(dirOut, { recursive: true, force: true }); } catch (e) { console.log('strip failed', e.message); }
+    if (process.env.SHOTS !== '0') try { execSync('python3 /tmp/herbal/_strip.py'); fs.rmSync(dirOut, { recursive: true, force: true }); } catch (e) { console.log('strip failed', e.message); }
     console.log(name, JSON.stringify(res)); fs.writeFileSync(`${OUT}/${name}.json`, JSON.stringify(res, null, 1));
   }
   await b.close();
