@@ -508,36 +508,51 @@ PT_PRE = dict(pt_b1=('red', 0.28), pt_b2=('blue', 0.26), pt_b3=('gold', 0.16), p
 for _d in SK:
     if _d['id'] in PT_PRE: w, t = PT_PRE[_d['id']]; _d['ops'].insert(0, paint('pre', what=w, at=-t))
 
-# ======================================================================= 음악가 (musician) — phrases
+# ======================================================================= 음악가 (musician) — 2026-11-16 개편 '마에스트로'
+# 연주로 전장을 움직이고 환영 오케스트라를 지휘한다. 규칙은 js/musician.js(MusicKit, CUSTOM 'mu' — op.k = 칸), 그림은 js/musicfx.js
+# (Blender tools/blender/fx_music.py -> assets/fx/fx_music.glb.json: 바이올린·활·첼로·플루트·하프·심벌즈·지휘봉·나팔·악보·음표·환영 연주자),
+# 동작은 tools/anim/swings.py mu_*(붓은 등에 — stow, 왼손은 handL IK로 악기를 잡음). id·배우는 레벨·최대 레벨·종류·기력·재사용·사거리·시전 시간은 그대로.
+# 총 피해는 예전 값 그대로(같은 레벨·장비): 스트링 피어스 1.8(관통) · 디스코드 브레이크 1.8 · 크레셴도 러시 0.8 x 4(마지막 타 = 같은 대상 연속 명중이면
+# x (1 + 0.35 x 연속 수), 4연속 = 4.32) · 레조넌스 버스트 2.4 + 약화 적 추가 파동 1.4 · 코다 4.0 x (1 + 0.35 x 소비 악절, 최대 8)를 현악 15/타악 15/관악 20/합주 50 %로 ·
+# 심포니 0.9 x 10 + 합주 5.0 · 팬텀 트리오 = 예전 2명 x 0.6/0.9초(초당 1.33)를 3명이 0.45초마다 차례로 0.5 + 3바퀴마다 합주 0.9(초당 1.33).
 J, C = 'musician', 0x60d0a0
-S(J, 2, 0, '공격 선율', 1, 'mu_a1', '음파 화살', 'attack', '관통하는 음표. 맞히면 악절을 얻는다.', range=10, mp=18, cd=4, anim='throw',
-  ops=[proj('normal', 1.8, speed=18, pierce=True, range=10, elem='sound', fx='note', burst='explosion_note', gain=dict(type='phrase', n=1))])
-S(J, 2, 0, '공격 선율', 2, 'mu_a2', '불협화음', 'attack', '범위 피해와 함께 적의 공격력을 낮춘다.', target='self', range=3.2, mp=22, cd=8, anim='cast',
-  ops=[hit('circle', 1.8, r=3.2, elem='sound', st=[st('atkdown', 5, 0.2)], gain=dict(type='phrase', n=1), fx=dict(burst='explosion_note'))])
-S(J, 2, 0, '공격 선율', 3, 'mu_a3', '크레셴도', 'attack', '같은 적을 연속으로 맞히면 마지막 타격이 강해진다.', target='enemy', range=8, mp=22, cd=7, anim='cast',
-  ops=[proj('homing', 0.8, count=4, gap=0.18, speed=14, elem='sound', fx='note', burst='explosion_note', crescendo=0.35, gain=dict(type='phrase', n=1, once=True))])
-S(J, 2, 0, '공격 선율', 4, 'mu_a4', '공명 폭발', 'attack', '대상 주변이 폭발한다. 약화된 적에게 추가 파동.', target='enemy', range=8, mp=24, cd=8, anim='cast',
-  ops=[hit('circle', 2.4, r=2.2, atTarget=True, elem='sound', react=dict(need='atkdown', coef=1.4, r=2.6, burst='explosion_note'), gain=dict(type='phrase', n=1), fx=dict(burst='explosion_note'))])
-S(J, 2, 0, '공격 선율', 5, 'mu_a5', '파멸의 피날레', 'ultimate', '모은 악절을 소비해 거대한 음표와 충격파를 날린다.', target='self', mp=60, cd=60, cast=0.7, anim='cast',
-  ops=[dict(op='telegraph', shape='circle', r=6, dur=0.7), hit('circle', 4.0, r=6, elem='sound', consume=dict(type='phrase', mulPer=0.35), fx=dict(burst='explosion_big'), at=0.7)])
-S(J, 2, 1, '선율과 회복', 1, 'mu_b1', '치유의 선율', 'support', '이동하며 자신과 생명체 소환물을 지속 회복한다. (지속 선율은 하나만)', target='self', mp=20, cd=6, anim='cast',
-  ops=[dict(op='melody', id='mel_heal', dur=20, heal=0.012, tick=1.0)])
-S(J, 2, 1, '선율과 회복', 2, 'mu_b2', '용기의 행진곡', 'support', '공격력과 이동 속도를 높인다. (지속 선율)', target='self', mp=20, cd=6, anim='cast',
-  ops=[dict(op='melody', id='mel_courage', dur=20, atk=0.15, speed=0.12)])
-S(J, 2, 1, '선율과 회복', 3, 'mu_b3', '수호의 찬가', 'support', '피해 감소와 상태이상 저항. (지속 선율)', target='self', mp=20, cd=6, anim='cast',
-  ops=[dict(op='melody', id='mel_guard', dur=20, dr=0.15, ccres=0.5)])
-S(J, 2, 1, '선율과 회복', 4, 'mu_b4', '마나의 세레나데', 'support', '기력(MP)을 회복한다. (지속 선율)', target='self', mp=0, cd=6, anim='cast',
-  ops=[dict(op='melody', id='mel_mana', dur=20, mp=0.02, tick=1.0)])
-S(J, 2, 1, '선율과 회복', 5, 'mu_b5', '생명의 앙코르', 'ultimate', '크게 회복하고 보호막을 두르며 현재 선율을 강화한다.', target='self', mp=60, cd=70, cast=0.5, anim='cast',
-  ops=[heal(pct=0.35), shield(80, 1.8, 10), dict(op='melodyBoost', mul=0.6, dur=12)])
-S(J, 2, 2, '악기와 무대', 1, 'mu_c1', '메아리 연주', 'support', '다음 음악 공격을 약한 위력으로 한 번 더 연주한다. 메아리는 다시 메아리치지 않는다.', target='self', mp=14, cd=12, anim='cast', ops=[buff('echo', 10, 0.5)])
-S(J, 2, 2, '악기와 무대', 2, 'mu_c2', '음향 증폭기', 'summon', '주변에서 내 음파 공격의 범위를 넓히는 증폭기.', target='ground', range=5, mp=22, cd=18, anim='cast',
-  ops=[summon('amplifier', ai='amp', life=15, hp=1.0, amp=0.35, r=5, limit=1, machine=True)])
-S(J, 2, 2, '악기와 무대', 3, 'mu_c3', '환영 악단', 'summon', '선택 대상에게 음표를 쏘는 환영 연주자.', target='ground', range=6, mp=28, cd=20, anim='cast',
-  ops=[summon('phantom_musician', ai='turret', n=2, life=15, hp=0.8, coef=0.6, rate=0.9, range=8, proj='note', limit=2, living=False)])
-S(J, 2, 2, '악기와 무대', 4, 'mu_c4', '절대음감', 'passive', '악절 획득 효율이 오르고, 선율을 바꾼 뒤 첫 공격이 강해진다.', flags=dict(phraseGain=[0.25, 0.1], switchBonus=[0.2, 0.08]))
-S(J, 2, 2, '악기와 무대', 5, 'mu_c5', '그랜드 심포니', 'ultimate', '악단의 연속 공격과 선율 강화, 그리고 합주 마무리.', target='self', mp=75, cd=75, cast=0.6, anim='cast',
-  ops=[dict(op='telegraph', shape='circle', r=6, dur=0.6), dict(op='melodyBoost', mul=0.5, dur=10), custom('symphony', n=10, r=6, coef=0.9, gap=0.2, finale=dict(r=6, coef=5.0))])
+MA, MB, MC = '전장의 협주곡', '생명을 잇는 선율', '환영 오케스트라'
+def mu(k, **kw): return dict(op='custom', fn='mu', k=k, **kw)
+S(J, 2, 0, MA, 1, 'mu_a1', '현악·스트링 피어스', 'attack', '눈앞에 빛나는 현 세 줄을 띄우고 손끝으로 튕긴다. 현의 진동이 금빛 파동이 되어 앞으로 곧게 날아가며 닿는 적을 모두 꿰뚫는다. 맞히면 악절 1개.', range=10, mp=18, cd=4, anim='mu_pluck', sfx='mu_pluck', sfxAt='strike', sfxLead=0.02, recover=0.3,
+  ops=[mu('a1', coef=1.8, len=10, w=1.0, speed=18, phrase=1)], fx=dict(color=0xffd870))
+S(J, 2, 0, MA, 2, 'mu_a2', '타악·디스코드 브레이크', 'attack', '양손의 환영 심벌즈를 크게 벌렸다가 맞부딪친다. 부딪는 순간 찌그러진 원형 음파가 퍼져 주변 적에게 피해를 주고 공격력을 낮추며, 일반 적의 동작을 잠깐 끊는다(보스는 경직 면역). 맞히면 악절 1개.', target='self', range=3.2, mp=22, cd=8, anim='mu_clash', sfx='mu_cymbal', sfxAt='strike', sfxLead=0.0,
+  ops=[mu('a2', coef=1.8, r=3.2, atkdown=0.2, atkdownDur=5, stagger=0.35, phrase=1)], fx=dict(color=0xffb050))
+S(J, 2, 0, MA, 3, 'mu_a3', '현악·크레셴도 러시', 'attack', '환영 바이올린을 어깨에 얹고 활을 켤 때마다 초승달 파동이 하나씩 날아간다. 점점 크고 밝아지며, 같은 적을 연달아 맞히면 마지막 굵은 화음이 크게 강해진다(대상이 쓰러지면 남은 파동은 다른 적에게 가지만 연속 기록은 새로 시작).', target='enemy', range=8, mp=22, cd=7, anim='mu_bow', sfx='mu_bow', sfxAt='op', recover=0.62,
+  ops=[mu('a3', coef=0.8, n=4, gap=0.18, speed=14, cres=0.35, phrase=1)], fx=dict(color=0xffc8a0))
+S(J, 2, 0, MA, 4, 'mu_a4', '관악·레조넌스 버스트', 'attack', '대상 둘레에 금빛 나팔구가 둥글게 나타나 음압을 가운데로 모은다. 부풀어 오른 공명막이 터지며 범위 피해. 공격력 감소 상태(디스코드 브레이크 등)인 적에게는 추가 파동이 한 번 더 울린다(한 번 쓸 때 적마다 한 번).', target='enemy', range=8, mp=24, cd=8, anim='mu_horn', sfx='mu_horn', sfxAt='strike', sfxLead=0.0, recover=0.45,
+  ops=[mu('a4', coef=2.4, r=2.2, burst=0.34, react=dict(need='atkdown', coef=1.4, r=1.6), phrase=1)], fx=dict(color=0xffe08a))
+S(J, 2, 0, MA, 5, 'mu_a5', '궁극·종악장: 파멸의 코다', 'ultimate', '모은 악절을 거대한 악보에 옮겨 적고 지휘봉을 내린다. 현악 파동 → 타악 충격 → 관악 포격 → 짧은 쉼 → 강한 합주가 차례로 앞쪽을 휩쓴다. 소비한 악절(최대 8)마다 피해 +35%, 악절이 없어도 기본 피해는 들어간다.', target='self', mp=60, cd=60, cast=0.7, anim='mu_coda', sfx='mu_coda', sfxAt='op', recover=1.4,
+  ops=[mu('a5', coef=4.0, per=0.35, cap=8, r=6.0, ang=110, fr=4.5, fwd=2.5, w=[0.15, 0.15, 0.20, 0.50], at_=[0.10, 0.42, 0.74, 1.22])], fx=dict(color=0xfff0c0))
+S(J, 2, 1, MB, 1, 'mu_b1', '하프·생명의 아리아', 'support', '작은 환영 하프의 현이 차례로 울린다. 움직이는 동안에도 1초마다 나와 주변(6 m) 생명 소환물이 회복한다(기계 제외). 지속 선율은 하나만 — 다른 선율을 켜면 바뀐다.', target='self', mp=20, cd=6, anim='mu_harp', sfx='mu_harp', sfxAt='strike', sfxLead=0.0,
+  ops=[mu('b1', survival=True, mel='aria', dur=20, heal=0.012, tick=1.0, near=6)], fx=dict(color=0x9af07a))
+S(J, 2, 1, MB, 2, 'mu_b2', '브라스·영웅의 행진', 'support', '등 뒤에 작은 금빛 관악기가 나타나 행진곡을 분다. 공격력과 이동 속도가 오른다(지속 선율).', target='self', mp=20, cd=6, anim='mu_horn', sfx='mu_fanfare', sfxAt='strike', sfxLead=0.0,
+  ops=[mu('b2', mel='march', dur=20, atk=0.15, speed=0.12)], fx=dict(color=0xffd050))
+S(J, 2, 1, MB, 3, 'mu_b3', '첼로·수호의 코랄', 'support', '낮은 첼로 소리가 몸 둘레에 청백색 오선 띠를 두른다. 받는 피해가 줄고(보호막이 아니라 피해 감소) 상태이상 시간이 짧아진다(지속 선율). 맞은 쪽 현이 잠깐 떨린다.', target='self', mp=20, cd=6, anim='mu_cello', sfx='mu_cello', sfxAt='strike', sfxLead=0.0,
+  ops=[mu('b3', survival=True, mel='coral', dur=20, dr=0.15, ccres=0.5)], fx=dict(color=0xbfe6ff))
+S(J, 2, 1, MB, 4, 'mu_b4', '플루트·월광 세레나데', 'support', '은빛 플루트의 푸른 선율에 작은 초승달과 음표가 모여든다. 1초마다 기력(MP)을 회복한다(지속 선율, 유지 비용 없음).', target='self', mp=0, cd=6, anim='mu_flute', sfx='mu_flute', sfxAt='strike', sfxLead=0.0,
+  ops=[mu('b4', mel='serenade', dur=20, mp=0.02, tick=1.0)], fx=dict(color=0x7ab8ff))
+S(J, 2, 1, MB, 5, 'mu_b5', '궁극·앙코르: 불멸의 선율', 'ultimate', '흐려진 오선이 다시 이어지고 커다란 하프 현이 펼쳐진다. 두 팔을 올리는 순간 크게 회복하고 보호막을 두르며, 지금 켜 둔 선율이 12초 동안 60% 강해진다(선율이 없어도 회복·보호막은 그대로).', target='self', mp=60, cd=70, cast=0.5, anim='mu_encore', sfx='mu_encore', sfxAt='op',
+  ops=[mu('b5', survival=True, heal=0.35, shBase=80, shCoef=1.8, shDur=10, boost=0.6, boostDur=12)], fx=dict(color=0xf0ffd0))
+S(J, 2, 2, MC, 1, 'mu_c1', '카논·에코 리프라이즈', 'support', '등 뒤에 반투명한 내 잔상이 서서 동작을 조금 늦게 따라 한다. 10초 안에 쓰는 다음 공격 선율(스트링 피어스·디스코드 브레이크·크레셴도 러시·레조넌스 버스트) 하나를 절반 위력으로 한 번 더 연주한다(기력·악절 없음, 메아리는 다시 메아리치지 않음).', target='self', mp=14, cd=12, anim='mu_baton', sfx='mu_echo', sfxAt='strike', sfxLead=0.0,
+  ops=[mu('c1', dur=10, val=0.5, delay=0.4)], fx=dict(color=0xd8e0ff))
+S(J, 2, 2, MC, 2, 'mu_c2', '공명 하프', 'summon', '접힌 금빛 틀을 내려놓으면 펼쳐지며 현이 이어져 작은 하프가 된다. 하프 둘레(5 m) 안에 서 있는 동안 내 음파 공격이 넓어진다 — 투사체는 사거리, 범위 공격은 반경 +35%(여러 개를 곱하지 않음).', target='ground', range=5, mp=22, cd=18, anim='mu_place', sfx='mu_harp', sfxAt='strike', sfxLead=0.0,
+  ops=[mu('c2', life=15, amp=0.35, r=5, unfold=0.5)], fx=dict(color=0xffe090))
+S(J, 2, 2, MC, 3, 'mu_c3', '실내악·팬텀 트리오', 'summon', '바이올린·첼로·플루트 환영 연주자가 차례로 나타나 작은 삼각 대형으로 선다. 내가 고른 적(없으면 가장 가까운 적)을 차례로 연주해 공격하고, 세 바퀴마다 셋이 함께 합주 타격. 다시 부르면 새 트리오로 바뀐다.', target='ground', range=6, mp=28, cd=20, anim='mu_baton', sfx='mu_trio', sfxAt='strike', sfxLead=0.0,
+  ops=[mu('c3', life=15, hp=0.8, coef=0.5, chord=0.9, every=3, gap=0.45, range=8, enter=0.25)], fx=dict(color=0xc8b0ff))
+S(J, 2, 2, MC, 4, 'mu_c4', '마에스트로의 청음', 'passive', '악절을 더 잘 모은다. 다른 선율로 바꾸면 작은 조율 파동과 금빛 악센트가 울리고, 다음 공격 선율 한 번이 강해진다(쌓이지 않음, 같은 선율을 다시 켜면 생기지 않음, 6초에 한 번).',
+  flags=dict(phraseGain=[0.25, 0.1], switchBonus=[0.2, 0.08]))
+S(J, 2, 2, MC, 5, 'mu_c5', '궁극·그랜드 심포니: 별빛 악단', 'ultimate', '등 뒤에 반원으로 별빛 환영 악단이 선다. 지휘에 맞춰 현악 → 관악 → 타악 순서로 앞쪽 적을 공격하고, 마지막에 모두 함께 앞으로 큰 화음 파동을 보낸다. 지금 켜 둔 선율도 10초 동안 50% 강해진다(앙코르와 겹치면 더 강한 쪽만).', target='self', mp=75, cd=75, cast=0.6, anim='mu_symph', sfx='mu_symph', sfxAt='op', recover=1.2,
+  ops=[mu('c5', n=10, coef=0.9, r=7, fin=5.0, finR=7, finAng=140, boost=0.5, boostDur=10, at_=[0.10, 0.75, 1.20, 1.85], parts=[4, 3, 3], phrase=1)], fx=dict(color=0xe8d8ff))
+# 누른 순간의 준비 연출(op 'pre', at = -동작의 타격 시각): 현 세 줄·심벌즈·바이올린·나팔구 등장(그림만, 피해 없음). 궁극기 3개는 시전 시작에 js/musician.js onCast.
+MU_PRE = dict(mu_a1=('strings', 0.22), mu_a2=('cymbals', 0.30), mu_a3=('violin', 0.20), mu_a4=('bells', 0.30), mu_b1=('harp', 0.26), mu_b2=('horn', 0.30),
+              mu_b3=('cello', 0.30), mu_b4=('flute', 0.30), mu_c1=('baton', 0.26), mu_c2=('frame', 0.30), mu_c3=('baton', 0.26))
+for _d in SK:
+    if _d['id'] in MU_PRE: w, t = MU_PRE[_d['id']]; _d['ops'].insert(0, mu('pre', what=w, at=-t))
 
 # ======================================================================= statuses (shared)
 STATUSES = [

@@ -183,10 +183,10 @@ function npcIdle(t, look) {
     Head: mul(ry(Math.max(-35, Math.min(35, look)) + sw * 3), rx(Math.sin(t * 0.9) * 2)),
   };
 }
-const NUM = ['bob', 'lean', 'twist', 'legL', 'legR', 'wOff', 'offOff', 'fall', 'sink', 'tuck', 'adv', 'toBack', 'grip2', 'snip'];   // grip2 = 0..1 the LEFT hand also holds the weapon (미용사 큰 가위), snip = 0..1 how far the shears are open   // toBack = 0..1 the sword hand goes to the grip on the back (draw / sheathe)
+const NUM = ['bob', 'lean', 'twist', 'legL', 'legR', 'wOff', 'offOff', 'fall', 'sink', 'tuck', 'adv', 'toBack', 'grip2', 'snip', 'ikL'];   // ikL = 0..1 weight of the LEFT hand IK (pose.handL, 음악가 악기 잡기)   // grip2 = 0..1 the LEFT hand also holds the weapon (미용사 큰 가위), snip = 0..1 how far the shears are open   // toBack = 0..1 the sword hand goes to the grip on the back (draw / sheathe)
 // weapon-swing keys (see SWING below): hand = [azimuth, elevation, reach] of the sword hand around the right shoulder,
 // blade = [azimuth, elevation] of the blade, elbow = pole the elbow points at, step = [left, right] foot offsets (m)
-const VEC = ['hand', 'blade', 'elbow', 'step', 'lift'];   // lift = [left, right] ankle lift (m), adv = root travel (m) of a combo strike
+const VEC = ['hand', 'blade', 'elbow', 'step', 'lift', 'handL', 'bladeL', 'elbowL'];   // handL/bladeL/elbowL: left hand around the LEFT shoulder (same az/el/reach convention as hand)   // lift = [left, right] ankle lift (m), adv = root travel (m) of a combo strike
 const ikW = p => (p.hand ? (p.ik ?? 1) : 0), plantW = p => (p.step ? (p.plant ?? 1) : 0);
 function lerpPose(a, b, k) {
   const o = { armR: [a.armR[0] + (b.armR[0] - a.armR[0]) * k, a.armR[1] + (b.armR[1] - a.armR[1]) * k], armL: [a.armL[0] + (b.armL[0] - a.armL[0]) * k, a.armL[1] + (b.armL[1] - a.armL[1]) * k], squint: k < 0.5 ? a.squint : b.squint, held: a.held };
@@ -914,6 +914,16 @@ export class ModelBody {
       Q = blendBones(Q, { Left_UpperArm: mul(RpL, r2.Rua), Left_LowerArm: mul(r2.Rua.clone().invert(), r2.Rla), Left_Hand: mul(r2.Rla.clone().invert(), r2.Rh) }, this.swingW);
       W = this.worldOf(Q); this.offGripW = this.swingW;
     }
+    // left hand IK (pose.handL = [az, el, reach] around the left shoulder, bladeL = where the fingers point, elbowL = pole; weight ikL):
+    // 음악가 2차 악기 연주 — 바이올린 목·첼로 목·플루트·심벌즈를 왼손이 실제로 잡음 (tools/anim/swings.py mu_*). Other actions have no handL.
+    this.ikLW = !md.cfg.npc && p.handL && md.byName.Left_UpperArm !== undefined && !(this.gripW > 0.01) && !(this.offGripW > 0.01) ? Math.max(0, Math.min(1, p.ikL ?? 0)) : 0;
+    if (this.ikLW > 0.01) {
+      const c3 = armChainL(md), shL3 = md.byName.Left_Shoulder, dSh3 = mul(_m().copy(W[shL3]), md.bones[shL3].inv), Sn3 = c3.S.clone().applyMatrix4(dSh3);
+      const T3 = Sn3.clone().addScaledVector(dirAE(p.handL[0], p.handL[1]), (c3.L1 + c3.L2) * p.handL[2]);
+      const r3 = solveArm(c3, Sn3, T3, p.elbowL ? _v(...p.elbowL).normalize() : _v(0.6, -1, -0.35).normalize(), p.bladeL ? dirAE(p.bladeL[0], p.bladeL[1]) : _v(0, 0.3, 1)), Rp3 = rotOnly(dSh3).clone().invert();
+      Q = blendBones(Q, { Left_UpperArm: mul(Rp3, r3.Rua), Left_LowerArm: mul(r3.Rua.clone().invert(), r3.Rla), Left_Hand: mul(r3.Rla.clone().invert(), r3.Rh) }, this.ikLW);
+      W = this.worldOf(Q);
+    }
     for (let i = 0; i < md.bones.length; i++) {
       const b = md.bones[i], bone = this.bones[i];
       bone.matrix.copy(b.parent < 0 ? W[i] : mul(_m().copy(W[b.parent]).invert(), W[i]));
@@ -942,7 +952,7 @@ export class ModelBody {
     const stow = !!(ca && ca.stow) && !md.cfg.npc, wkind = shearsOn ? 'shears:' + (sw ? sw[1] : 1) : wid && isWeaponModel(wid) ? 'item:' + wid : this.weapon;
     if (stow) { const w0 = this.weaponId ? this.weaponId() : null; this.updateProp('R', w0 && isWeaponModel(w0) ? 'item:' + w0 : this.weapon, 0); this.updateProp('H', p.held || null, (p.wOff - 90) * (1 - (this.swingW || 0))); }
     else { this.updateProp('R', p.held || wkind, (p.wOff - 90 + (p.held ? 0 : (REST_TILT[this.weapon] || 0) + (RUN_TILT[this.weapon] || 0) * Math.min(1, this.gaitW || 0))) * (1 - (this.swingW || 0))); if (this.props.H) this.updateProp('H', null, 0); }
-    this.updateProp('L', p.held && !stow ? null : this.armW > 0.5 && !(this.gripW > 0.4) && !(this.offGripW > 0.3) ? this.off : null, p.offOff - 90 + (OFF_TILT[this.off] || 0));
+    this.updateProp('L', p.held && !stow ? null : this.armW > 0.5 && !(this.gripW > 0.4) && !(this.offGripW > 0.3) && !(this.ikLW > 0.3) ? this.off : null, p.offOff - 90 + (OFF_TILT[this.off] || 0));
   }
   worldOf(Q) {
     const md = this.md, W = new Array(md.bones.length), S = this.bscale || (this.bscale = boneScales(md));

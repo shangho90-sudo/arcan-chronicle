@@ -1244,6 +1244,133 @@ PT_FINALE = action('pt_finale', [
 PT_FINALE.update(offGrip=AR_OFFGRIP, paint=[0.14, 0.58])
 PT_ALL = [PT_SKETCH, PT_SWEEP, PT_LOW, PT_DOTS, PT_MIX, PT_LAND, PT_EYE, PT_FINALE]
 SKILL_ACTS += PT_ALL   # 화가 2차
+# ------------------------------------------------------------------------------------------------ 음악가 2차 (2026-11-16 '마에스트로')
+# 붓은 동작 내내 등에(stow), 오른손 = hand IK, 왼손 = handL IK(az + = 캐릭터 왼쪽, 왼 어깨 기준; ikL = 무게) — 악기는 js/musicfx.js가
+# 실제 손 위치(handPoint·bonePoint)에 맞춰 그림(바이올린 목 = 왼손, 활 = 오른손이 현 위를 지나감, 플루트 = 두 손을 잇는 축, 심벌즈 = 각 손).
+# 타격 시각 hitT = 스킬 op가 실행되는 순간(현을 튕김·심벌즈가 닿음·나팔을 붊·지휘봉이 내려옴). 시전 시간이 있는 궁극기는 시전이 끝날 때 op가
+# 시작하므로 동작의 큰 하강 = 시전 시간 + op의 at_(gen.py mu_a5·mu_c5) — 바꾸면 같이 고칠 것(tests/musician.test.mjs가 확인).
+MU0 = dict(hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18])
+LP = dict(elbowL=[0.6, -1, -0.35])
+def mk(t, e=None, L=None, ikL=1.0, **kw):
+    if L is None: return key(t, e, ikL=0.0, **kw)
+    return key(t, e, handL=L[0], bladeL=L[1], ikL=ikL, **LP, **kw)
+MU_PLUCK = action('mu_pluck', [   # 스트링 피어스: 왼손은 가슴 앞을 받치고, 오른손을 당겼다가 손끝으로 튕김(0.22 s)
+    mk(0.00, **MU0),
+    mk(0.10, 'o', L=([-14, 4, 0.62], [0, 60]), ikL=0.9, twist=-14, lean=-2, sink=0.05, hand=[-12, 2, 0.34], blade=[-20, 40], elbow=[-0.6, -0.8, -0.6]),
+    mk(0.17, 's', L=([-14, 4, 0.62], [0, 60]), twist=-18, lean=-3, sink=0.06, hand=[-16, 0, 0.30], blade=[-30, 30], elbow=[-0.6, -0.8, -0.6]),
+    mk(0.22, 'i', L=([-10, 6, 0.64], [0, 60]), twist=8, lean=8, sink=0.07, hand=[8, 6, 0.96], blade=[10, 0], elbow=[-0.5, -1, -0.2], squint=True),
+    mk(0.34, 'o', L=([-6, 2, 0.58], [0, 60]), ikL=0.6, twist=10, lean=8, sink=0.06, hand=[12, 4, 0.92], blade=[16, 4], elbow=[-0.5, -1, -0.2]),
+    mk(0.52, 's', **MU0),
+], 0.22, 0.38, None, fadeIn=0.05, fadeOut=0.16)
+MU_CLASH = action('mu_clash', [   # 디스코드 브레이크: 두 팔을 옆으로 크게 벌렸다가(0.16 s) 가슴 앞에서 심벌즈를 맞부딪침(0.30 s)
+    mk(0.00, **MU0),
+    mk(0.16, 'o', L=([84, 12, 0.92], [80, 10]), twist=0, lean=-6, sink=0.04, hand=[-84, 12, 0.92], blade=[-80, 10], elbow=[-0.4, -1, -0.6]),
+    mk(0.22, 's', L=([88, 16, 0.94], [84, 14]), twist=0, lean=-7, sink=0.04, hand=[-88, 16, 0.94], blade=[-84, 14], elbow=[-0.4, -1, -0.6]),
+    mk(0.30, 'i', L=([-22, 6, 0.80], [-80, 10]), twist=0, lean=9, sink=0.10, hand=[22, 6, 0.80], blade=[80, 10], elbow=[-0.6, -1, 0.1], squint=True),
+    mk(0.40, 'o', L=([-18, 2, 0.76], [-80, 6]), twist=0, lean=10, sink=0.11, hand=[18, 2, 0.76], blade=[80, 6], elbow=[-0.6, -1, 0.1]),
+    mk(0.62, 's', **MU0),
+], 0.30, 0.44, None, fadeIn=0.05, fadeOut=0.16)
+MU_BOW = action('mu_bow', [   # 크레셴도 러시: 바이올린을 왼 어깨에 얹고(왼손 = 목 끝) 활을 네 번 켬 — 활을 끝까지 당기는 순간(0.20 / 0.38 / 0.56 / 0.74 s)마다 파동
+    mk(0.00, **MU0),
+    mk(0.10, 'o', L=([34, 14, 0.86], [20, 40]), twist=-8, lean=-3, sink=0.04, hand=[34, 16, 0.50], blade=[70, 10], elbow=[-0.4, -0.6, -0.8]),
+    mk(0.20, 'i', L=([34, 14, 0.86], [20, 40]), twist=-14, lean=-1, sink=0.05, hand=[-34, -4, 0.86], blade=[40, 20], elbow=[-0.4, -1, -0.4], squint=True),
+    mk(0.38, 'i', L=([34, 15, 0.86], [20, 40]), twist=-6, lean=0, sink=0.05, hand=[30, 14, 0.52], blade=[70, 10], elbow=[-0.4, -0.6, -0.8]),
+    mk(0.56, 'i', L=([34, 14, 0.86], [20, 40]), twist=-16, lean=1, sink=0.06, hand=[-38, -6, 0.88], blade=[40, 20], elbow=[-0.4, -1, -0.4], squint=True),
+    mk(0.74, 'i', L=([35, 15, 0.86], [20, 40]), twist=-4, lean=3, sink=0.07, hand=[32, 14, 0.50], blade=[70, 10], elbow=[-0.4, -0.6, -0.8], squint=True),
+    mk(0.90, 'o', L=([30, 10, 0.80], [20, 40]), ikL=0.5, twist=-6, lean=2, sink=0.05, hand=[-10, -10, 0.70], blade=[30, 20], elbow=[-0.6, -1, -0.3]),
+    mk(1.08, 's', **MU0),
+], 0.20, 0.82, None, fadeIn=0.05, fadeOut=0.16)
+MU_HORN = action('mu_horn', [   # 레조넌스 버스트·영웅의 행진: 두 손으로 나팔을 입에 대고(0.12 s) 몸을 젖혔다가 힘껏 붊(0.30 s)
+    mk(0.00, **MU0),
+    mk(0.12, 'o', L=([-26, 26, 0.46], [0, 20]), twist=0, lean=-2, sink=0.03, hand=[26, 26, 0.48], blade=[0, 20], elbow=[-0.8, -0.6, -0.3]),
+    mk(0.22, 's', L=([-26, 30, 0.44], [0, 26]), twist=0, lean=-8, sink=0.02, hand=[26, 30, 0.46], blade=[0, 26], elbow=[-0.8, -0.6, -0.3]),
+    mk(0.30, 'i', L=([-24, 22, 0.50], [0, 14]), twist=0, lean=6, sink=0.07, hand=[24, 22, 0.52], blade=[0, 14], elbow=[-0.8, -0.6, -0.3], squint=True),
+    mk(0.46, 'o', L=([-24, 22, 0.50], [0, 14]), ikL=0.7, twist=0, lean=5, sink=0.06, hand=[24, 22, 0.52], blade=[0, 14], elbow=[-0.8, -0.6, -0.3]),
+    mk(0.64, 's', **MU0),
+], 0.30, 0.46, None, fadeIn=0.05, fadeOut=0.16)
+MU_HARP = action('mu_harp', [   # 생명의 아리아: 앞 왼쪽에 뜬 작은 하프의 현을 두 손으로 차례로 뜯음(0.26 s)
+    mk(0.00, **MU0),
+    mk(0.12, 'o', L=([4, -2, 0.72], [0, 70]), twist=-6, lean=4, sink=0.05, hand=[40, -4, 0.64], blade=[30, 50], elbow=[-0.6, -1, -0.3]),
+    mk(0.19, 's', L=([0, 4, 0.70], [0, 70]), twist=-8, lean=4, sink=0.05, hand=[44, 4, 0.62], blade=[30, 50], elbow=[-0.6, -1, -0.3]),
+    mk(0.26, 'i', L=([8, -6, 0.74], [0, 70]), twist=-2, lean=5, sink=0.06, hand=[34, -10, 0.66], blade=[30, 50], elbow=[-0.6, -1, -0.3], squint=True),
+    mk(0.40, 'o', L=([4, 2, 0.70], [0, 70]), ikL=0.6, twist=-4, lean=4, sink=0.05, hand=[40, 2, 0.62], blade=[30, 50], elbow=[-0.6, -1, -0.3]),
+    mk(0.60, 's', **MU0),
+], 0.26, 0.44, None, fadeIn=0.05, fadeOut=0.16)
+MU_CELLO = action('mu_cello', [   # 수호의 코랄: 앞 왼쪽에 선 첼로 목을 왼손으로 잡고 오른손 활을 허리 높이에서 길게 켬(0.30 s)
+    mk(0.00, **MU0),
+    mk(0.12, 'o', L=([-4, 6, 0.70], [0, 80]), twist=-10, lean=6, sink=0.10, hand=[46, -30, 0.62], blade=[80, -10], elbow=[-0.5, -1, -0.2]),
+    mk(0.30, 'i', L=([-4, 6, 0.70], [0, 80]), twist=-18, lean=7, sink=0.12, hand=[-30, -38, 0.88], blade=[80, -10], elbow=[-0.5, -1, -0.2], squint=True),
+    mk(0.48, 'o', L=([-4, 4, 0.70], [0, 80]), ikL=0.7, twist=-12, lean=6, sink=0.10, hand=[20, -32, 0.66], blade=[80, -10], elbow=[-0.5, -1, -0.2]),
+    mk(0.66, 's', **MU0),
+], 0.30, 0.46, None, fadeIn=0.05, fadeOut=0.16)
+MU_FLUTE = action('mu_flute', [   # 월광 세레나데: 플루트를 입에서 오른쪽으로 가로 들고(왼손 = 입 옆, 오른손 = 오른쪽 끝) 붊(0.30 s)
+    mk(0.00, **MU0),
+    mk(0.14, 'o', L=([-34, 32, 0.40], [-80, 10]), twist=6, lean=-2, sink=0.04, hand=[-46, 26, 0.70], blade=[-80, 10], elbow=[-0.4, -1, -0.4]),
+    mk(0.30, 'i', L=([-36, 30, 0.40], [-80, 10]), twist=8, lean=-4, sink=0.05, hand=[-50, 24, 0.72], blade=[-80, 10], elbow=[-0.4, -1, -0.4], squint=True),
+    mk(0.48, 'o', L=([-34, 30, 0.40], [-80, 10]), ikL=0.7, twist=6, lean=-3, sink=0.04, hand=[-48, 24, 0.70], blade=[-80, 10], elbow=[-0.4, -1, -0.4]),
+    mk(0.66, 's', **MU0),
+], 0.30, 0.46, None, fadeIn=0.05, fadeOut=0.16)
+MU_BATON = action('mu_baton', [   # 에코 리프라이즈·팬텀 트리오: 지휘봉을 들었다가 한 박 내림(0.26 s), 왼손은 악단 쪽으로 펼침
+    mk(0.00, **MU0),
+    mk(0.14, 'o', L=([30, 20, 0.80], [40, 30]), ikL=0.7, twist=-6, lean=-4, sink=0.03, hand=[-16, 54, 0.84], blade=[-10, 70], elbow=[-0.7, -0.3, -0.8]),
+    mk(0.26, 'i', L=([34, 10, 0.86], [40, 20]), ikL=0.7, twist=4, lean=8, sink=0.07, hand=[-4, 2, 0.98], blade=[0, -10], elbow=[-0.6, -1, -0.2], squint=True),
+    mk(0.40, 'o', L=([30, 6, 0.80], [40, 20]), ikL=0.5, twist=6, lean=7, sink=0.06, hand=[4, -6, 0.92], blade=[10, -20], elbow=[-0.6, -1, -0.2]),
+    mk(0.58, 's', **MU0),
+], 0.26, 0.42, None, fadeIn=0.05, fadeOut=0.16)
+MU_PLACE = action('mu_place', [   # 공명 하프: 몸을 낮춰 두 손으로 접힌 틀을 앞에 내려놓음(0.30 s)
+    mk(0.00, **MU0),
+    mk(0.14, 'o', L=([-12, -20, 0.70], [0, 40]), twist=0, lean=8, sink=0.10, hand=[12, -20, 0.70], blade=[0, 40], elbow=[-0.6, -1, -0.2]),
+    mk(0.30, 'i', L=([-8, -52, 0.96], [0, 10]), twist=0, lean=22, sink=0.24, hand=[8, -52, 0.96], blade=[0, 10], elbow=[-0.6, -1, -0.2], squint=True),
+    mk(0.46, 'o', L=([-8, -50, 0.94], [0, 10]), ikL=0.6, twist=0, lean=20, sink=0.22, hand=[8, -50, 0.94], blade=[0, 10], elbow=[-0.6, -1, -0.2]),
+    mk(0.70, 's', **MU0),
+], 0.30, 0.48, None, fadeIn=0.05, fadeOut=0.18)
+# 궁극기(시전 시간 있음): 누른 순간부터 재생. 코다 = 시전 0.7 s + at_ [0.10, 0.42, 0.74, 1.22] → 하강 0.80 / 1.12 / 1.44 / 쉼 / 1.92 s
+MU_CODA = action('mu_coda', [
+    mk(0.00, **MU0),
+    mk(0.20, 'o', L=([-18, 18, 0.80], [-20, 60]), twist=-6, lean=-4, sink=0.03, hand=[-18, 40, 0.80], blade=[-10, 60], elbow=[-0.7, -0.4, -0.8]),
+    mk(0.66, 's', L=([-18, 20, 0.80], [-20, 60]), twist=-10, lean=-9, sink=0.02, hand=[-14, 72, 0.92], blade=[-6, 100], elbow=[-0.7, -0.2, -0.8]),
+    mk(0.80, 'i', L=([-18, 16, 0.80], [-20, 60]), twist=6, lean=8, sink=0.08, hand=[-4, 4, 1.0], blade=[0, -10], elbow=[-0.6, -1, -0.2], squint=True),
+    mk(0.98, 'o', L=([-18, 16, 0.80], [-20, 60]), twist=0, lean=2, sink=0.05, hand=[-14, 40, 0.84], blade=[-6, 60], elbow=[-0.7, -0.4, -0.8]),
+    mk(1.12, 'i', L=([-18, 16, 0.80], [-20, 60]), twist=-4, lean=7, sink=0.07, hand=[-20, 2, 0.96], blade=[-10, -10], elbow=[-0.6, -1, -0.2], squint=True),
+    mk(1.30, 'o', L=([-18, 16, 0.80], [-20, 60]), twist=0, lean=2, sink=0.05, hand=[-10, 44, 0.84], blade=[-6, 60], elbow=[-0.7, -0.4, -0.8]),
+    mk(1.44, 'i', L=([-18, 16, 0.80], [-20, 60]), twist=6, lean=7, sink=0.07, hand=[6, 0, 0.96], blade=[10, -10], elbow=[-0.6, -1, -0.2], squint=True),
+    mk(1.62, 'o', L=([40, 70, 0.92], [20, 100]), twist=0, lean=-8, sink=0.02, hand=[-30, 74, 0.94], blade=[-10, 110], elbow=[-0.7, -0.2, -0.8]),
+    mk(1.84, 's', L=([42, 76, 0.94], [20, 100]), twist=0, lean=-11, sink=0.0, hand=[-32, 78, 0.95], blade=[-10, 115], elbow=[-0.7, -0.2, -0.8]),
+    mk(1.92, 'i', L=([-6, -10, 0.80], [0, -20]), twist=0, lean=16, sink=0.16, hand=[4, -14, 1.0], blade=[0, -40], elbow=[-0.6, -1, -0.2], squint=True),
+    mk(2.10, 'o', L=([-6, -14, 0.78], [0, -20]), ikL=0.6, twist=0, lean=17, sink=0.17, hand=[4, -18, 0.98], blade=[0, -46], elbow=[-0.6, -1, -0.2]),
+    mk(2.40, 's', **MU0),
+], 0.72, 0.6, None, fadeIn=0.06, fadeOut=0.2)
+# 앙코르 = 시전 0.5 s: 낮게 모았다가 두 팔을 머리 위로 올리는 순간(0.52 s) 회복·보호막
+MU_ENCORE = action('mu_encore', [
+    mk(0.00, **MU0),
+    mk(0.26, 'o', L=([-10, -24, 0.60], [0, 40]), twist=0, lean=8, sink=0.12, hand=[10, -24, 0.60], blade=[0, 40], elbow=[-0.6, -1, -0.2]),
+    mk(0.40, 's', L=([-12, -28, 0.56], [0, 40]), twist=0, lean=9, sink=0.14, hand=[12, -28, 0.56], blade=[0, 40], elbow=[-0.6, -1, -0.2]),
+    mk(0.52, 'o', L=([24, 74, 0.96], [10, 100]), twist=0, lean=-10, sink=0.0, hand=[-24, 74, 0.96], blade=[-10, 100], elbow=[-0.7, -0.2, -0.8], squint=True),
+    mk(0.86, 's', L=([26, 76, 0.95], [10, 100]), ikL=0.8, twist=0, lean=-9, sink=0.0, hand=[-26, 76, 0.95], blade=[-10, 100], elbow=[-0.7, -0.2, -0.8]),
+    mk(1.20, 's', **MU0),
+], 0.52, 0.6, None, fadeIn=0.06, fadeOut=0.2)
+# 심포니 = 시전 0.6 s + at_ [0.10 현악, 0.75 관악, 1.20 타악, 1.85 합주] → 0.70 / 1.35 / 1.80 / 2.45 s 하강
+MU_SYMPH = action('mu_symph', [
+    mk(0.00, **MU0),
+    mk(0.30, 'o', L=([60, 40, 0.92], [60, 50]), twist=-4, lean=-6, sink=0.02, hand=[-60, 40, 0.92], blade=[-60, 50], elbow=[-0.5, -0.4, -0.8]),
+    mk(0.60, 's', L=([40, 30, 0.88], [40, 40]), twist=-8, lean=-8, sink=0.02, hand=[-16, 66, 0.90], blade=[-8, 96], elbow=[-0.7, -0.2, -0.8]),
+    mk(0.70, 'i', L=([40, 22, 0.86], [40, 30]), twist=4, lean=6, sink=0.07, hand=[-6, 6, 0.98], blade=[0, -8], elbow=[-0.6, -1, -0.2], squint=True),
+    mk(0.88, 's', L=([40, 22, 0.86], [40, 30]), twist=-2, lean=3, sink=0.05, hand=[-10, 30, 0.86], blade=[-6, 40], elbow=[-0.7, -0.5, -0.6]),
+    mk(1.02, 's', L=([40, 22, 0.86], [40, 30]), twist=2, lean=5, sink=0.06, hand=[-4, 8, 0.94], blade=[0, -4], elbow=[-0.6, -1, -0.2]),
+    mk(1.22, 'o', L=([20, 46, 0.90], [20, 60]), twist=8, lean=-4, sink=0.03, hand=[-30, 52, 0.88], blade=[-20, 70], elbow=[-0.7, -0.3, -0.8]),
+    mk(1.35, 'i', L=([20, 36, 0.90], [20, 50]), twist=10, lean=6, sink=0.07, hand=[-34, 10, 0.98], blade=[-30, 0], elbow=[-0.6, -1, -0.2], squint=True),
+    mk(1.62, 'o', L=([-10, 30, 0.84], [-20, 40]), twist=-8, lean=-2, sink=0.04, hand=[10, 50, 0.86], blade=[10, 70], elbow=[-0.7, -0.3, -0.8]),
+    mk(1.80, 'i', L=([-10, 20, 0.84], [-20, 30]), twist=-10, lean=8, sink=0.09, hand=[16, 4, 0.98], blade=[20, -10], elbow=[-0.6, -1, -0.2], squint=True),
+    mk(2.16, 'o', L=([40, 72, 0.94], [20, 105]), twist=0, lean=-10, sink=0.01, hand=[-40, 72, 0.94], blade=[-20, 105], elbow=[-0.7, -0.2, -0.8]),
+    mk(2.36, 's', L=([42, 78, 0.95], [20, 112]), twist=0, lean=-12, sink=0.0, hand=[-42, 78, 0.95], blade=[-20, 112], elbow=[-0.7, -0.2, -0.8]),
+    mk(2.45, 'i', L=([-4, -8, 0.82], [0, -20]), twist=0, lean=17, sink=0.17, hand=[4, -12, 1.0], blade=[0, -40], elbow=[-0.6, -1, -0.2], squint=True),
+    mk(2.64, 'o', L=([-4, -12, 0.80], [0, -24]), ikL=0.6, twist=0, lean=18, sink=0.18, hand=[4, -16, 0.98], blade=[0, -46], elbow=[-0.6, -1, -0.2]),
+    mk(2.95, 's', **MU0),
+], 0.70, 0.6, None, fadeIn=0.06, fadeOut=0.2)
+MU_ACTS = [MU_PLUCK, MU_CLASH, MU_BOW, MU_HORN, MU_HARP, MU_CELLO, MU_FLUTE, MU_BATON, MU_PLACE, MU_CODA, MU_ENCORE, MU_SYMPH]
+for _a in MU_ACTS: _a.update(stow=True)
+MU_BOW.update(strokes=[0.20, 0.38, 0.56, 0.74])   # 활을 끝까지 당긴 순간 = 파동 발사(gen.py mu_a3 gap 0.18과 같음)
+SKILL_ACTS += MU_ACTS
 
 acts = json.load(open(P))
 names = {'attack', 'attack2'} | {x['name'] for x in SKILL_ACTS}

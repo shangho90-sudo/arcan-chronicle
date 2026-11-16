@@ -33,6 +33,8 @@ import { HerbalKit } from './herbal.js';
 import { DsKit } from './designer.js';
 // 화가 2차 (2026-11-16 '그린 그림을 현실로'): 그림 소환물·채색·혼색·풍경 규칙 (js/painter.js), 그림 js/painterfx.js
 import { PaintKit } from './painter.js';
+// 음악가 2차 (2026-11-16 '마에스트로'): 악절·지속 선율·환영 악단 규칙 (js/musician.js), 그림 js/musicfx.js
+import { MusicKit } from './musician.js';
 
 let G = null; export function bindSkillRt(g) { G = g; }
 const DEG = Math.PI / 180;
@@ -58,6 +60,7 @@ export const FX = {
   wp(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.wp) return G.skillFx.wp[kind](a, o); } catch (e) { console.warn('fx wp', kind, e); } return null; },   // 양약사 2차: 캡슐·앰플·결정·표식 고리 (js/wpharmfx.js)
   chef(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.chef) return G.skillFx.chef[kind](a, o); } catch (e) { console.warn('fx chef', e); } return null; },   // 쉐프 2차 (js/cheffx.js)
   painter(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.painter) return G.skillFx.painter.make(kind, a, o); } catch (e) { console.warn('fx painter', kind, e); } return null; },   // 화가 2차 (js/painterfx.js)
+  music(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.music) return G.skillFx.music.make(kind, a, o); } catch (e) { console.warn('fx music', kind, e); } return null; },   // 음악가 2차 (js/musicfx.js)
   herbal(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.herbal) return G.skillFx.herbal.make(kind, a, o); } catch (e) { console.warn('fx herbal', kind, e); } return null; },   // 한약사 2차 (js/herbalfx.js)
   ds(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.ds) return G.skillFx.ds[kind](a, o); } catch (e) { console.warn('fx ds', kind, e); } return null; },   // 디자이너 2차 (js/designerfx.js)
   hair(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.hair) return G.skillFx.hair[kind](a, o); } catch (e) { console.warn('fx hair', e); } return null; },   // 미용사 1차: 큰 가위·빗·드라이어·헤어롤 (js/hairfx.js)
@@ -148,6 +151,7 @@ export class SkillEngine {
     this.en = typeof EnKit === 'function' ? new EnKit(this, { applyStatus, fx: (k, a, o) => FX.en(k, a, o), G: () => G, Summon }) : null;   // 엔지니어 2차 규칙 (js/engineer.js)
     this.ds = typeof DsKit === 'function' ? new DsKit(this, { applyStatus, fx: FX.ds, G: () => G, summon: (o, ctx, p) => this.dsSummon(o, ctx, p) }) : null;   // 디자이너 2차 규칙 (js/designer.js)
     this.painter = typeof PaintKit === 'function' ? new PaintKit(this, { applyStatus, fx: (k, a, o) => FX.painter ? FX.painter(k, a, o) : null, G: () => G }) : null;   // 화가 2차 규칙 (js/painter.js)
+    this.music = typeof MusicKit === 'function' ? new MusicKit(this, { applyStatus, fx: (k, a, o) => FX.music ? FX.music(k, a, o) : null, G: () => G }) : null;   // 음악가 2차 규칙 (js/musician.js)
     this.restoreCooldowns();
   }
   /** 디자이너 미러 피팅: 정해진 자리에 마네킹(AI 없음, 일반 적의 주의를 끎) — 종류별 상한·전체 8 규칙은 opSummon과 같음 */
@@ -228,6 +232,7 @@ export class SkillEngine {
     if (this.wp) this.wp.onCast(d, ctx);   // 촉매 활성화 충전 사용
     if (this.en) this.en.onCast(d, ctx);   // 엔지니어: 누른 시각·손/팔 장치 그림·전력 획득
     if (this.ds) this.ds.onCast(d, ctx);   // 디자이너 궁극기: 시전 동안 패턴 도면·재단 점선 / 런웨이 예고(실제 범위)
+    if (this.music) this.music.onCast(d, ctx);   // 음악가: 코다 악절 수 기록·궁극기 시전 연출
     if (d.tags) { if (d.tags.includes('music') || d.tags.includes('paint')) this.lastFamily = d.tags.includes('music') ? 'music' : 'paint'; }
     if (d.job === 'musician' && d.type === 'attack') this.lastFamily = 'music';
     // animation
@@ -265,7 +270,7 @@ export class SkillEngine {
     // 약사 약병 투구 (action.stow, ph_pitch): the flask the skill throws is in the real right hand from the press (the same effect
     // object the projectile then flies with — no swap at the release); 약병폭격 has no projectile: its flask is tossed up and away
     const A0 = sh.actions[anim];
-    if (A0 && A0.stow && !d.cast && d.job !== 'western_pharmacist' && d.job !== 'herbalist' && d.job !== 'engineer') {   // 엔지니어: 손의 장치는 js/engfx.js   // 한약사 hb_*도 손의 약병 없음(js/herbalfx.js pre)   // 양약사 공중 조제(wp_compound)는 손의 약병 없이 — 캡슐·앰플은 js/wpharmfx.js가 손(handPoint)에서 만듦
+    if (A0 && A0.stow && !d.cast && d.job !== 'western_pharmacist' && d.job !== 'herbalist' && d.job !== 'engineer' && d.job !== 'musician') {   // 엔지니어: 손의 장치는 js/engfx.js   // 한약사 hb_*도 손의 약병 없음(js/herbalfx.js pre)   // 양약사 공중 조제(wp_compound)는 손의 약병 없이 — 캡슐·앰플은 js/wpharmfx.js가 손(handPoint)에서 만듦
       const pop = d.ops.find(o => o.pharmProj), hp = () => { let h = null; try { h = pc.body && pc.body.handPoint && pc.body.handPoint(); } catch (e) { h = null; } return h ? { x: h.x, y: h.y, z: -h.z } : null; };
       const fx = FX.pharm('proj', hp() || { x: pc.pos.x, y: (pc.pos.y || 0) + 1, z: pc.pos.z }, { elem: pop ? pop.elem : 'poison', held: true });
       if (fx && fx.set) { const f = ctx.facing, h = ctx.heldFlask = { t: 0, dead: false, pos: null, fx,
@@ -286,7 +291,7 @@ export class SkillEngine {
       ctx.yeonPre = true;
       cb.hitTimes.forEach((t, i) => this.pending.push({ time: this.clock + Math.max(0, t - YEON_LEAD), op: { op: '_run', run: () => { if (!pc.dead) FX.yeon('strike', { follow: pc, y: cb.hitFx[i] && cb.hitFx[i].yeon, lead: Math.min(YEON_LEAD, t) }); } }, ctx }));
     }
-    if (d.type === 'ultimate' && d.job !== 'western_pharmacist' && d.job !== 'chef' && d.job !== 'engineer' && d.job !== 'designer' && d.job !== 'painter') { G.render.addShake && !G.reduceFlash && G.render.addShake(0.12, 0.25); }   // 양약사·쉐프 궁극기: 주 타격 순간 kick 한 번만(js/wpharm.js)
+    if (d.type === 'ultimate' && d.job !== 'western_pharmacist' && d.job !== 'chef' && d.job !== 'engineer' && d.job !== 'designer' && d.job !== 'painter' && d.job !== 'musician') { G.render.addShake && !G.reduceFlash && G.render.addShake(0.12, 0.25); }   // 양약사·쉐프 궁극기: 주 타격 순간 kick 한 번만(js/wpharm.js)
   }
   interruptCast(reason) {
     const c = this.casting; if (!c) return; this.casting = null;
@@ -319,7 +324,8 @@ export class SkillEngine {
     if (this.herbal) this.herbal.tick(dt);
     if (this.ds) this.ds.tick(dt);
     if (this.painter) this.painter.tick(dt);
-    if (this.melody) this.tickMelody(dt);
+    if (this.music) this.music.tick(dt);   // 음악가 지속 선율(melody.mu)·악단·메아리는 여기서
+    if (this.melody && !this.melody.mu) this.tickMelody(dt);
     if (this.overclockT > 0) { this.overclockT -= dt; if (this.overclockT <= 0) { applyStatus(pc, { id: 'cooldown_heat', dur: this.coolT, val: 1, ch: 1 }, pc); } }
     for (const m of pc.zone.actors) if (m._marks) { if (m.dead) clearMarks(m); else tickMarks(m, dt); }
   }
@@ -335,6 +341,7 @@ export class SkillEngine {
     if (this.en) this.en.clear();   // 엔지니어: 비콘·지정 고리(병기는 summons 정리에서)   // 쉐프: 기다리는 단계·쟁반·소르베·원반 취소(피해 없음)
     if (this.herbal) this.herbal.clear();
     if (this.painter) this.painter.clear();   // 화가: 그림 소환물은 summons 쪽, 채색·풍경·성벽·용·예약 타격은 여기
+    if (this.music) this.music.clear();   // 음악가: 예약 타격·파동·하프·선율·메아리·배경 음악 낮춤 정리
     this.pending = []; this.casting = null; if (this.channel) { this.channel = null; }
     for (const m of (this.pc.zone ? this.pc.zone.actors : [])) clearMarks(m);
   }
@@ -405,6 +412,7 @@ export class SkillEngine {
   }
   ampMul(ctx) {
     let m = 1; if (ctx.d.job === 'musician' || (ctx.d.tags && ctx.d.tags.includes('music'))) for (const s of this.summons) if (s.kind === 'amplifier' && !s.dead && this.pc.dist(s) < (s.o.r || 5)) m = Math.max(m, 1 + s.o.amp);
+    if (this.music && (ctx.d.job === 'musician' || (ctx.d.tags && ctx.d.tags.includes('music')))) m = Math.max(m, this.music.ampK());   // 음악가 공명 하프(곱하지 않음)
     if (this.pc.status.flag('inspired') && ctx.d.tags) m *= 1.25; return m;
   }
   targets(shape) { return this.pc.zone.actors.filter(c => c && !c.dead && c.faction !== 'player' && !c.isSummon && shape.overlaps(c.pos.x, c.pos.z, c.radius)); }
@@ -1062,6 +1070,7 @@ export class Summon {
 export const CUSTOM = {
   herb(eng, op, ctx) { if (eng.herbal) eng.herbal.cast(op, ctx); },   
   paint(eng, op, ctx) { if (eng.painter) eng.painter.cast(op, ctx); },   // 화가 2차 15종 (js/painter.js, op.k = 칸)   // 한약사 2차 15종 (js/herbal.js, op.k = 칸)
+  mu(eng, op, ctx) { if (eng.music) eng.music.cast(op, ctx); },   // 음악가 2차 15종 (js/musician.js, op.k = 칸)
   meatball_volley(eng, op, ctx) { meatballVolley(eng, op, ctx, G); },   // 요리사 미트볼 던지기 (js/meatball.js + js/cookfx.js volley)
   // 양약사 2차 (js/wpharm.js): 작열·분열 캡슐 · 극저온 결정화 · 이온 관통술 · 삼상 복합제 · 대형 캡슐 붕괴 · 촉매 활성화 · 정밀 표적 전달 · 연쇄 용출 · 임계 농도
   ...Object.fromEntries(['en_sentry', 'en_spider', 'en_drones', 'en_anchor', 'en_walker', 'en_pile', 'en_breach', 'en_hive', 'en_rail', 'en_orbital', 'en_beacon', 'en_redline'].map(k => [k, (eng, op, ctx) => eng.en && eng.en[k](op, ctx)])),   // 엔지니어 2차 (js/engineer.js)

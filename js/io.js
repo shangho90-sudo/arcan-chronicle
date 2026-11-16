@@ -84,7 +84,7 @@ export class Audio {
     if (this.ctx) { if (this.ctx.state === "suspended") this.ctx.resume().then(() => this.onState && this.onState()).catch(() => { }); return; }
     try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); this.gMusic = this.ctx.createGain(); this.gMusic.connect(this.ctx.destination); this.gSfx = this.ctx.createGain(); this.gSfx.connect(this.ctx.destination); this.apply(); this.ctx.onstatechange = () => this.onState && this.onState(); if (this.ctx.state === "suspended") this.ctx.resume().catch(() => { }); if (this.wantMusic) this.playMusic(this.wantMusic, true); this.preloadSfx(); } catch (e) { this.ctx = null; }
   }
-  apply() { if (this.ctx) { this.gMusic.gain.value = this.music * 0.5; this.gSfx.gain.value = this.sfxVol; if (this.sfxVol <= 0) this.stopNpcVoice(); if (this.music <= 0 && this.stopSkillBed) this.stopSkillBed(); } }
+  apply() { if (this.ctx) { this.gMusic.gain.value = this.music * 0.5 * (this.duckK ?? 1); this.gSfx.gain.value = this.sfxVol; if (this.sfxVol <= 0) this.stopNpcVoice(); if (this.music <= 0 && this.stopSkillBed) this.stopSkillBed(); } }
   async loadNpcVoices() {
     try { const r = await fetch('assets/data/npc-voices.json'); if (!r.ok) throw new Error(r.status); this.npcVoices = await r.json(); }
     catch (e) { console.warn('NPC 인사 음성을 불러오지 못했습니다.', e); }
@@ -135,6 +135,8 @@ export class Audio {
     s.onended = () => { this.voices.delete(voice); s.disconnect(); g.disconnect(); }; s.start();
   }
   // A short spell bed shares the music volume; its area owns cancellation, including pending loads.
+  /** 음악가 궁극기 연주 동안 배경 음악을 잠깐 낮춤(k 배율, 1 = 원래대로). 0.25초에 걸쳐 바뀜 — 설정 음량(apply)은 그대로 */
+  duck(k) { if (!this.ctx || !this.gMusic) return; this.duckK = k; const g = this.gMusic.gain, t = this.ctx.currentTime; try { g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(this.music * 0.5 * k, t + 0.25); } catch (e) { g.value = this.music * 0.5 * k; } }
   skillBed(name) {
     if (this.stopSkillBed) this.stopSkillBed();
     let cancelled = false, source = null;

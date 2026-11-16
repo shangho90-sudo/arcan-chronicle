@@ -9065,11 +9065,11 @@
 "job": "musician",
 "tier": 2,
 "cat": 0,
-"catName": "공격 선율",
+"catName": "전장의 협주곡",
 "idx": 1,
-"name": "음파 화살",
+"name": "현악·스트링 피어스",
 "type": "attack",
-"desc": "관통하는 음표. 맞히면 악절을 얻는다.",
+"desc": "눈앞에 빛나는 현 세 줄을 띄우고 손끝으로 튕긴다. 현의 진동이 금빛 파동이 되어 앞으로 곧게 날아가며 닿는 적을 모두 꿰뚫는다. 맞히면 악절 1개.",
 "maxLv": 5,
 "unlock": 30,
 "prereq": [],
@@ -9079,28 +9079,35 @@
 "mp": 18,
 "cd": 4,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "throw",
+"recover": 0.3,
+"anim": "mu_pluck",
 "ops": [
 {
-"op": "proj",
-"kind": "normal",
+"op": "custom",
+"fn": "mu",
+"k": "pre",
+"what": "strings",
+"at": -0.22
+},
+{
+"op": "custom",
+"fn": "mu",
+"k": "a1",
 "coef": 1.8,
+"len": 10,
+"w": 1.0,
 "speed": 18,
-"pierce": true,
-"range": 10,
-"elem": "sound",
-"fx": "note",
-"burst": "explosion_note",
-"gain": {
-"type": "phrase",
-"n": 1
-}
+"phrase": 1
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16767088
+},
+"sfx": "mu_pluck",
+"sfxAt": "strike",
+"sfxLead": 0.02,
 "status": {
 "data": true,
 "impl": true,
@@ -9115,11 +9122,11 @@
 "job": "musician",
 "tier": 2,
 "cat": 0,
-"catName": "공격 선율",
+"catName": "전장의 협주곡",
 "idx": 2,
-"name": "불협화음",
+"name": "타악·디스코드 브레이크",
 "type": "attack",
-"desc": "범위 피해와 함께 적의 공격력을 낮춘다.",
+"desc": "양손의 환영 심벌즈를 크게 벌렸다가 맞부딪친다. 부딪는 순간 찌그러진 원형 음파가 퍼져 주변 적에게 피해를 주고 공격력을 낮추며, 일반 적의 동작을 잠깐 끊는다(보스는 경직 면역). 맞히면 악절 1개.",
 "maxLv": 5,
 "unlock": 33,
 "prereq": [],
@@ -9130,34 +9137,35 @@
 "cd": 8,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "cast",
+"anim": "mu_clash",
 "ops": [
 {
-"op": "hit",
-"shape": "circle",
+"op": "custom",
+"fn": "mu",
+"k": "pre",
+"what": "cymbals",
+"at": -0.3
+},
+{
+"op": "custom",
+"fn": "mu",
+"k": "a2",
 "coef": 1.8,
 "r": 3.2,
-"elem": "sound",
-"st": [
-{
-"id": "atkdown",
-"dur": 5,
-"val": 0.2,
-"ch": 1.0
-}
-],
-"gain": {
-"type": "phrase",
-"n": 1
-},
-"fx": {
-"burst": "explosion_note"
-}
+"atkdown": 0.2,
+"atkdownDur": 5,
+"stagger": 0.35,
+"phrase": 1
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16756816
+},
+"sfx": "mu_cymbal",
+"sfxAt": "strike",
+"sfxLead": 0.0,
 "status": {
 "data": true,
 "impl": true,
@@ -9172,11 +9180,11 @@
 "job": "musician",
 "tier": 2,
 "cat": 0,
-"catName": "공격 선율",
+"catName": "전장의 협주곡",
 "idx": 3,
-"name": "크레셴도",
+"name": "현악·크레셴도 러시",
 "type": "attack",
-"desc": "같은 적을 연속으로 맞히면 마지막 타격이 강해진다.",
+"desc": "환영 바이올린을 어깨에 얹고 활을 켤 때마다 초승달 파동이 하나씩 날아간다. 점점 크고 밝아지며, 같은 적을 연달아 맞히면 마지막 굵은 화음이 크게 강해진다(대상이 쓰러지면 남은 파동은 다른 적에게 가지만 연속 기록은 새로 시작).",
 "maxLv": 5,
 "unlock": 36,
 "prereq": [],
@@ -9186,30 +9194,35 @@
 "mp": 22,
 "cd": 7,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "cast",
+"recover": 0.62,
+"anim": "mu_bow",
 "ops": [
 {
-"op": "proj",
-"kind": "homing",
+"op": "custom",
+"fn": "mu",
+"k": "pre",
+"what": "violin",
+"at": -0.2
+},
+{
+"op": "custom",
+"fn": "mu",
+"k": "a3",
 "coef": 0.8,
-"count": 4,
+"n": 4,
 "gap": 0.18,
 "speed": 14,
-"elem": "sound",
-"fx": "note",
-"burst": "explosion_note",
-"crescendo": 0.35,
-"gain": {
-"type": "phrase",
-"n": 1,
-"once": true
-}
+"cres": 0.35,
+"phrase": 1
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16763040
+},
+"sfx": "mu_bow",
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -9224,11 +9237,11 @@
 "job": "musician",
 "tier": 2,
 "cat": 0,
-"catName": "공격 선율",
+"catName": "전장의 협주곡",
 "idx": 4,
-"name": "공명 폭발",
+"name": "관악·레조넌스 버스트",
 "type": "attack",
-"desc": "대상 주변이 폭발한다. 약화된 적에게 추가 파동.",
+"desc": "대상 둘레에 금빛 나팔구가 둥글게 나타나 음압을 가운데로 모은다. 부풀어 오른 공명막이 터지며 범위 피해. 공격력 감소 상태(디스코드 브레이크 등)인 적에게는 추가 파동이 한 번 더 울린다(한 번 쓸 때 적마다 한 번).",
 "maxLv": 5,
 "unlock": 40,
 "prereq": [],
@@ -9238,34 +9251,39 @@
 "mp": 24,
 "cd": 8,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "cast",
+"recover": 0.45,
+"anim": "mu_horn",
 "ops": [
 {
-"op": "hit",
-"shape": "circle",
+"op": "custom",
+"fn": "mu",
+"k": "pre",
+"what": "bells",
+"at": -0.3
+},
+{
+"op": "custom",
+"fn": "mu",
+"k": "a4",
 "coef": 2.4,
 "r": 2.2,
-"atTarget": true,
-"elem": "sound",
+"burst": 0.34,
 "react": {
 "need": "atkdown",
 "coef": 1.4,
-"r": 2.6,
-"burst": "explosion_note"
+"r": 1.6
 },
-"gain": {
-"type": "phrase",
-"n": 1
-},
-"fx": {
-"burst": "explosion_note"
-}
+"phrase": 1
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16769162
+},
+"sfx": "mu_horn",
+"sfxAt": "strike",
+"sfxLead": 0.0,
 "status": {
 "data": true,
 "impl": true,
@@ -9280,11 +9298,11 @@
 "job": "musician",
 "tier": 2,
 "cat": 0,
-"catName": "공격 선율",
+"catName": "전장의 협주곡",
 "idx": 5,
-"name": "파멸의 피날레",
+"name": "궁극·종악장: 파멸의 코다",
 "type": "ultimate",
-"desc": "모은 악절을 소비해 거대한 음표와 충격파를 날린다.",
+"desc": "모은 악절을 거대한 악보에 옮겨 적고 지휘봉을 내린다. 현악 파동 → 타악 충격 → 관악 포격 → 짧은 쉼 → 강한 합주가 차례로 앞쪽을 휩쓴다. 소비한 악절(최대 8)마다 피해 +35%, 악절이 없어도 기본 피해는 들어간다.",
 "maxLv": 3,
 "unlock": 45,
 "prereq": [],
@@ -9294,34 +9312,41 @@
 "mp": 60,
 "cd": 60,
 "cast": 0.7,
-"recover": 0.35,
-"anim": "cast",
+"recover": 1.4,
+"anim": "mu_coda",
 "ops": [
 {
-"op": "telegraph",
-"shape": "circle",
-"r": 6,
-"dur": 0.7
-},
-{
-"op": "hit",
-"shape": "circle",
+"op": "custom",
+"fn": "mu",
+"k": "a5",
 "coef": 4.0,
-"r": 6,
-"elem": "sound",
-"consume": {
-"type": "phrase",
-"mulPer": 0.35
-},
-"fx": {
-"burst": "explosion_big"
-},
-"at": 0.7
+"per": 0.35,
+"cap": 8,
+"r": 6.0,
+"ang": 110,
+"fr": 4.5,
+"fwd": 2.5,
+"w": [
+0.15,
+0.15,
+0.2,
+0.5
+],
+"at_": [
+0.1,
+0.42,
+0.74,
+1.22
+]
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16773312
+},
+"sfx": "mu_coda",
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -9336,11 +9361,11 @@
 "job": "musician",
 "tier": 2,
 "cat": 1,
-"catName": "선율과 회복",
+"catName": "생명을 잇는 선율",
 "idx": 1,
-"name": "치유의 선율",
+"name": "하프·생명의 아리아",
 "type": "support",
-"desc": "이동하며 자신과 생명체 소환물을 지속 회복한다. (지속 선율은 하나만)",
+"desc": "작은 환영 하프의 현이 차례로 울린다. 움직이는 동안에도 1초마다 나와 주변(6 m) 생명 소환물이 회복한다(기계 제외). 지속 선율은 하나만 — 다른 선율을 켜면 바뀐다.",
 "maxLv": 5,
 "unlock": 30,
 "prereq": [],
@@ -9351,19 +9376,35 @@
 "cd": 6,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "cast",
+"anim": "mu_harp",
 "ops": [
 {
-"op": "melody",
-"id": "mel_heal",
+"op": "custom",
+"fn": "mu",
+"k": "pre",
+"what": "harp",
+"at": -0.26
+},
+{
+"op": "custom",
+"fn": "mu",
+"k": "b1",
+"survival": true,
+"mel": "aria",
 "dur": 20,
 "heal": 0.012,
-"tick": 1.0
+"tick": 1.0,
+"near": 6
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 10154106
+},
+"sfx": "mu_harp",
+"sfxAt": "strike",
+"sfxLead": 0.0,
 "status": {
 "data": true,
 "impl": true,
@@ -9378,11 +9419,11 @@
 "job": "musician",
 "tier": 2,
 "cat": 1,
-"catName": "선율과 회복",
+"catName": "생명을 잇는 선율",
 "idx": 2,
-"name": "용기의 행진곡",
+"name": "브라스·영웅의 행진",
 "type": "support",
-"desc": "공격력과 이동 속도를 높인다. (지속 선율)",
+"desc": "등 뒤에 작은 금빛 관악기가 나타나 행진곡을 분다. 공격력과 이동 속도가 오른다(지속 선율).",
 "maxLv": 5,
 "unlock": 33,
 "prereq": [],
@@ -9393,11 +9434,20 @@
 "cd": 6,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "cast",
+"anim": "mu_horn",
 "ops": [
 {
-"op": "melody",
-"id": "mel_courage",
+"op": "custom",
+"fn": "mu",
+"k": "pre",
+"what": "horn",
+"at": -0.3
+},
+{
+"op": "custom",
+"fn": "mu",
+"k": "b2",
+"mel": "march",
 "dur": 20,
 "atk": 0.15,
 "speed": 0.12
@@ -9405,7 +9455,12 @@
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16765008
+},
+"sfx": "mu_fanfare",
+"sfxAt": "strike",
+"sfxLead": 0.0,
 "status": {
 "data": true,
 "impl": true,
@@ -9420,11 +9475,11 @@
 "job": "musician",
 "tier": 2,
 "cat": 1,
-"catName": "선율과 회복",
+"catName": "생명을 잇는 선율",
 "idx": 3,
-"name": "수호의 찬가",
+"name": "첼로·수호의 코랄",
 "type": "support",
-"desc": "피해 감소와 상태이상 저항. (지속 선율)",
+"desc": "낮은 첼로 소리가 몸 둘레에 청백색 오선 띠를 두른다. 받는 피해가 줄고(보호막이 아니라 피해 감소) 상태이상 시간이 짧아진다(지속 선율). 맞은 쪽 현이 잠깐 떨린다.",
 "maxLv": 5,
 "unlock": 36,
 "prereq": [],
@@ -9435,11 +9490,21 @@
 "cd": 6,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "cast",
+"anim": "mu_cello",
 "ops": [
 {
-"op": "melody",
-"id": "mel_guard",
+"op": "custom",
+"fn": "mu",
+"k": "pre",
+"what": "cello",
+"at": -0.3
+},
+{
+"op": "custom",
+"fn": "mu",
+"k": "b3",
+"survival": true,
+"mel": "coral",
 "dur": 20,
 "dr": 0.15,
 "ccres": 0.5
@@ -9447,7 +9512,12 @@
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 12576511
+},
+"sfx": "mu_cello",
+"sfxAt": "strike",
+"sfxLead": 0.0,
 "status": {
 "data": true,
 "impl": true,
@@ -9462,11 +9532,11 @@
 "job": "musician",
 "tier": 2,
 "cat": 1,
-"catName": "선율과 회복",
+"catName": "생명을 잇는 선율",
 "idx": 4,
-"name": "마나의 세레나데",
+"name": "플루트·월광 세레나데",
 "type": "support",
-"desc": "기력(MP)을 회복한다. (지속 선율)",
+"desc": "은빛 플루트의 푸른 선율에 작은 초승달과 음표가 모여든다. 1초마다 기력(MP)을 회복한다(지속 선율, 유지 비용 없음).",
 "maxLv": 5,
 "unlock": 40,
 "prereq": [],
@@ -9477,11 +9547,20 @@
 "cd": 6,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "cast",
+"anim": "mu_flute",
 "ops": [
 {
-"op": "melody",
-"id": "mel_mana",
+"op": "custom",
+"fn": "mu",
+"k": "pre",
+"what": "flute",
+"at": -0.3
+},
+{
+"op": "custom",
+"fn": "mu",
+"k": "b4",
+"mel": "serenade",
 "dur": 20,
 "mp": 0.02,
 "tick": 1.0
@@ -9489,7 +9568,12 @@
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 8042751
+},
+"sfx": "mu_flute",
+"sfxAt": "strike",
+"sfxLead": 0.0,
 "status": {
 "data": true,
 "impl": true,
@@ -9504,11 +9588,11 @@
 "job": "musician",
 "tier": 2,
 "cat": 1,
-"catName": "선율과 회복",
+"catName": "생명을 잇는 선율",
 "idx": 5,
-"name": "생명의 앙코르",
+"name": "궁극·앙코르: 불멸의 선율",
 "type": "ultimate",
-"desc": "크게 회복하고 보호막을 두르며 현재 선율을 강화한다.",
+"desc": "흐려진 오선이 다시 이어지고 커다란 하프 현이 펼쳐진다. 두 팔을 올리는 순간 크게 회복하고 보호막을 두르며, 지금 켜 둔 선율이 12초 동안 60% 강해진다(선율이 없어도 회복·보호막은 그대로).",
 "maxLv": 3,
 "unlock": 45,
 "prereq": [],
@@ -9519,28 +9603,28 @@
 "cd": 70,
 "cast": 0.5,
 "recover": 0.35,
-"anim": "cast",
+"anim": "mu_encore",
 "ops": [
 {
-"op": "heal",
-"pct": 0.35,
-"flat": 0
-},
-{
-"op": "shield",
-"base": 80,
-"coef": 1.8,
-"dur": 10
-},
-{
-"op": "melodyBoost",
-"mul": 0.6,
-"dur": 12
+"op": "custom",
+"fn": "mu",
+"k": "b5",
+"survival": true,
+"heal": 0.35,
+"shBase": 80,
+"shCoef": 1.8,
+"shDur": 10,
+"boost": 0.6,
+"boostDur": 12
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 15794128
+},
+"sfx": "mu_encore",
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -9555,11 +9639,11 @@
 "job": "musician",
 "tier": 2,
 "cat": 2,
-"catName": "악기와 무대",
+"catName": "환영 오케스트라",
 "idx": 1,
-"name": "메아리 연주",
+"name": "카논·에코 리프라이즈",
 "type": "support",
-"desc": "다음 음악 공격을 약한 위력으로 한 번 더 연주한다. 메아리는 다시 메아리치지 않는다.",
+"desc": "등 뒤에 반투명한 내 잔상이 서서 동작을 조금 늦게 따라 한다. 10초 안에 쓰는 다음 공격 선율(스트링 피어스·디스코드 브레이크·크레셴도 러시·레조넌스 버스트) 하나를 절반 위력으로 한 번 더 연주한다(기력·악절 없음, 메아리는 다시 메아리치지 않음).",
 "maxLv": 5,
 "unlock": 30,
 "prereq": [],
@@ -9570,19 +9654,32 @@
 "cd": 12,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "cast",
+"anim": "mu_baton",
 "ops": [
 {
-"op": "buff",
-"id": "echo",
+"op": "custom",
+"fn": "mu",
+"k": "pre",
+"what": "baton",
+"at": -0.26
+},
+{
+"op": "custom",
+"fn": "mu",
+"k": "c1",
 "dur": 10,
 "val": 0.5,
-"target": "self"
+"delay": 0.4
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 14213375
+},
+"sfx": "mu_echo",
+"sfxAt": "strike",
+"sfxLead": 0.0,
 "status": {
 "data": true,
 "impl": true,
@@ -9597,11 +9694,11 @@
 "job": "musician",
 "tier": 2,
 "cat": 2,
-"catName": "악기와 무대",
+"catName": "환영 오케스트라",
 "idx": 2,
-"name": "음향 증폭기",
+"name": "공명 하프",
 "type": "summon",
-"desc": "주변에서 내 음파 공격의 범위를 넓히는 증폭기.",
+"desc": "접힌 금빛 틀을 내려놓으면 펼쳐지며 현이 이어져 작은 하프가 된다. 하프 둘레(5 m) 안에 서 있는 동안 내 음파 공격이 넓어진다 — 투사체는 사거리, 범위 공격은 반경 +35%(여러 개를 곱하지 않음).",
 "maxLv": 5,
 "unlock": 33,
 "prereq": [],
@@ -9612,23 +9709,33 @@
 "cd": 18,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "cast",
+"anim": "mu_place",
 "ops": [
 {
-"op": "summon",
-"kind": "amplifier",
-"ai": "amp",
+"op": "custom",
+"fn": "mu",
+"k": "pre",
+"what": "frame",
+"at": -0.3
+},
+{
+"op": "custom",
+"fn": "mu",
+"k": "c2",
 "life": 15,
-"hp": 1.0,
 "amp": 0.35,
 "r": 5,
-"limit": 1,
-"machine": true
+"unfold": 0.5
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16769168
+},
+"sfx": "mu_harp",
+"sfxAt": "strike",
+"sfxLead": 0.0,
 "status": {
 "data": true,
 "impl": true,
@@ -9643,11 +9750,11 @@
 "job": "musician",
 "tier": 2,
 "cat": 2,
-"catName": "악기와 무대",
+"catName": "환영 오케스트라",
 "idx": 3,
-"name": "환영 악단",
+"name": "실내악·팬텀 트리오",
 "type": "summon",
-"desc": "선택 대상에게 음표를 쏘는 환영 연주자.",
+"desc": "바이올린·첼로·플루트 환영 연주자가 차례로 나타나 작은 삼각 대형으로 선다. 내가 고른 적(없으면 가장 가까운 적)을 차례로 연주해 공격하고, 세 바퀴마다 셋이 함께 합주 타격. 다시 부르면 새 트리오로 바뀐다.",
 "maxLv": 5,
 "unlock": 36,
 "prereq": [],
@@ -9658,26 +9765,37 @@
 "cd": 20,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "cast",
+"anim": "mu_baton",
 "ops": [
 {
-"op": "summon",
-"kind": "phantom_musician",
-"ai": "turret",
-"n": 2,
+"op": "custom",
+"fn": "mu",
+"k": "pre",
+"what": "baton",
+"at": -0.26
+},
+{
+"op": "custom",
+"fn": "mu",
+"k": "c3",
 "life": 15,
 "hp": 0.8,
-"coef": 0.6,
-"rate": 0.9,
+"coef": 0.5,
+"chord": 0.9,
+"every": 3,
+"gap": 0.45,
 "range": 8,
-"proj": "note",
-"limit": 2,
-"living": false
+"enter": 0.25
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 13152511
+},
+"sfx": "mu_trio",
+"sfxAt": "strike",
+"sfxLead": 0.0,
 "status": {
 "data": true,
 "impl": true,
@@ -9692,11 +9810,11 @@
 "job": "musician",
 "tier": 2,
 "cat": 2,
-"catName": "악기와 무대",
+"catName": "환영 오케스트라",
 "idx": 4,
-"name": "절대음감",
+"name": "마에스트로의 청음",
 "type": "passive",
-"desc": "악절 획득 효율이 오르고, 선율을 바꾼 뒤 첫 공격이 강해진다.",
+"desc": "악절을 더 잘 모은다. 다른 선율로 바꾸면 작은 조율 파동과 금빛 악센트가 울리고, 다음 공격 선율 한 번이 강해진다(쌓이지 않음, 같은 선율을 다시 켜면 생기지 않음, 6초에 한 번).",
 "maxLv": 5,
 "unlock": 40,
 "prereq": [],
@@ -9735,11 +9853,11 @@
 "job": "musician",
 "tier": 2,
 "cat": 2,
-"catName": "악기와 무대",
+"catName": "환영 오케스트라",
 "idx": 5,
-"name": "그랜드 심포니",
+"name": "궁극·그랜드 심포니: 별빛 악단",
 "type": "ultimate",
-"desc": "악단의 연속 공격과 선율 강화, 그리고 합주 마무리.",
+"desc": "등 뒤에 반원으로 별빛 환영 악단이 선다. 지휘에 맞춰 현악 → 관악 → 타악 순서로 앞쪽 적을 공격하고, 마지막에 모두 함께 앞으로 큰 화음 파동을 보낸다. 지금 켜 둔 선율도 10초 동안 50% 강해진다(앙코르와 겹치면 더 강한 쪽만).",
 "maxLv": 3,
 "unlock": 45,
 "prereq": [],
@@ -9749,36 +9867,42 @@
 "mp": 75,
 "cd": 75,
 "cast": 0.6,
-"recover": 0.35,
-"anim": "cast",
+"recover": 1.2,
+"anim": "mu_symph",
 "ops": [
 {
-"op": "telegraph",
-"shape": "circle",
-"r": 6,
-"dur": 0.6
-},
-{
-"op": "melodyBoost",
-"mul": 0.5,
-"dur": 10
-},
-{
 "op": "custom",
-"fn": "symphony",
+"fn": "mu",
+"k": "c5",
 "n": 10,
-"r": 6,
 "coef": 0.9,
-"gap": 0.2,
-"finale": {
-"r": 6,
-"coef": 5.0
-}
+"r": 7,
+"fin": 5.0,
+"finR": 7,
+"finAng": 140,
+"boost": 0.5,
+"boostDur": 10,
+"at_": [
+0.1,
+0.75,
+1.2,
+1.85
+],
+"parts": [
+4,
+3,
+3
+],
+"phrase": 1
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 15259903
+},
+"sfx": "mu_symph",
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
