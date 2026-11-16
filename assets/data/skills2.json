@@ -5196,11 +5196,11 @@
 "job": "engineer",
 "tier": 2,
 "cat": 0,
-"catName": "자동 병기",
+"catName": "전술 기계공학",
 "idx": 1,
-"name": "자동 포탑",
+"name": "전개식 센트리",
 "type": "summon",
-"desc": "선택 대상을 우선 사격하는 포탑을 설치한다.",
+"desc": "공구함 장치를 지정한 곳에 던진다. 땅에 닿으면 지지대 세 개와 포신이 펼쳐지고, 적을 찾아 총구에서 탄을 쏜다. 같은 적을 4번 연속 맞히면 짧은 집중 사격을 한다(3초에 한 번). 대상이 죽거나 사거리를 벗어나면 다시 찾는다.",
 "maxLv": 5,
 "unlock": 30,
 "prereq": [],
@@ -5210,30 +5210,37 @@
 "mp": 20,
 "cd": 8,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "cast",
+"recover": 0.25,
+"anim": "en_toss",
 "ops": [
 {
-"op": "summon",
-"kind": "turret",
-"ai": "turret",
+"op": "custom",
+"fn": "en_sentry",
 "life": 20,
 "hp": 1.0,
 "coef": 0.7,
 "rate": 0.8,
 "range": 8,
-"proj": "bullet",
 "limit": 2,
-"machine": true
+"focusN": 4,
+"burst": {
+"n": 3,
+"gap": 0.09,
+"coef": 0.45,
+"cd": 3.0
+}
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 5949695
+},
 "res": {
 "type": "power",
 "cost": 2
 },
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -5248,11 +5255,11 @@
 "job": "engineer",
 "tier": 2,
 "cat": 0,
-"catName": "자동 병기",
+"catName": "전술 기계공학",
 "idx": 2,
-"name": "추적 지뢰",
+"name": "스파이더 마인",
 "type": "summon",
-"desc": "다가온 적을 짧게 추적한 뒤 폭발하는 지뢰.",
+"desc": "원반 모양 지뢰를 던진다. 다리 네 개를 펴고 기다리다 적이 2.5 m 안에 들어오면 붉은 등을 깜박이며 짧게 쫓아가고, 가까워지면 뛰어올라 한 번 터진다. 한 번에 쫓는 거리와 수명에 한계가 있고 벽을 넘지 못한다.",
 "maxLv": 5,
 "unlock": 33,
 "prereq": [],
@@ -5262,34 +5269,34 @@
 "mp": 16,
 "cd": 6,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "cast",
+"recover": 0.25,
+"anim": "en_toss",
 "ops": [
 {
-"op": "summon",
-"kind": "mine",
-"ai": "mine",
+"op": "custom",
+"fn": "en_spider",
 "life": 25,
-"hp": 0.3,
 "trigger": 2.5,
-"chase": 3.0,
-"boom": {
+"speed": 4.5,
+"run": 6.0,
+"total": 14.0,
+"leap": 0.9,
 "r": 2.2,
 "coef": 3.2,
-"burst": "explosion_fire",
-"elem": "fire"
-},
 "limit": 3,
-"machine": true
+"elem": "fire"
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16747072
+},
 "res": {
 "type": "power",
 "cost": 1
 },
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -5304,11 +5311,11 @@
 "job": "engineer",
 "tier": 2,
 "cat": 0,
-"catName": "자동 병기",
+"catName": "전술 기계공학",
 "idx": 3,
-"name": "공격 드론 편대",
+"name": "트라이윙 편대",
 "type": "summon",
-"desc": "주인 주변을 날며 선택 대상을 집중 공격하는 드론 3기.",
+"desc": "등 뒤에서 접힌 드론 세 기를 차례로 쏘아 올린다. 날개를 펴고 내 둘레에 삼각 대형을 짜 같은 적을 차례로 쏘고, 3초마다 대형을 맞춰 한꺼번에 일제 사격한다. 편대의 공격력은 세 기가 나눠 가진다.",
 "maxLv": 5,
 "unlock": 36,
 "prereq": [],
@@ -5318,32 +5325,32 @@
 "mp": 26,
 "cd": 18,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "cast",
+"recover": 0.25,
+"anim": "en_signal",
 "ops": [
 {
-"op": "summon",
-"kind": "drone",
-"ai": "follow_ranged",
+"op": "custom",
+"fn": "en_drones",
 "n": 3,
 "life": 18,
 "hp": 0.4,
-"coef": 0.35,
+"coef": 1.05,
 "rate": 0.5,
 "range": 7,
-"proj": "bullet",
-"limit": 3,
-"machine": true,
-"fly": true
+"salvo": 3.0,
+"salvoMul": 1.5
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 7004415
+},
 "res": {
 "type": "power",
 "cost": 3
 },
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -5358,11 +5365,11 @@
 "job": "engineer",
 "tier": 2,
 "cat": 0,
-"catName": "자동 병기",
+"catName": "전술 기계공학",
 "idx": 4,
-"name": "전자기 구속기",
+"name": "테슬라 앵커",
 "type": "summon",
-"desc": "둔화 전기장을 만들고 기계 병기의 우선 표적을 지정한다.",
+"desc": "전극 세 개를 삼각형으로 박아 코일을 펴고 전류로 잇는다. 삼각형 안의 적은 감전 피해와 둔화를 받는다. 삼각형 안의 내 선택 대상(없으면 가운데에 가장 가까운 적)을 표적으로 지정해 내 병기들이 먼저 노린다.",
 "maxLv": 5,
 "unlock": 40,
 "prereq": [],
@@ -5372,19 +5379,17 @@
 "mp": 22,
 "cd": 16,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "cast",
+"recover": 0.25,
+"anim": "en_toss",
 "ops": [
 {
-"op": "summon",
-"kind": "em_device",
-"ai": "aura",
+"op": "custom",
+"fn": "en_anchor",
+"R": 3.0,
 "life": 10,
-"hp": 0.8,
-"aura": {
-"r": 3.0,
 "tick": 0.5,
 "coef": 0.2,
+"limit": 1,
 "elem": "shock",
 "st": [
 {
@@ -5393,21 +5398,19 @@
 "val": 0.4,
 "ch": 1.0
 }
-],
-"fx": "emfield"
-},
-"focus": true,
-"limit": 1,
-"machine": true
+]
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 8057087
+},
 "res": {
 "type": "power",
 "cost": 2
 },
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -5422,50 +5425,59 @@
 "job": "engineer",
 "tier": 2,
 "cat": 0,
-"catName": "자동 병기",
+"catName": "전술 기계공학",
 "idx": 5,
-"name": "이동 요새",
+"name": "아틀라스 워커",
 "type": "ultimate",
-"desc": "대형 기계가 포격·기관총·미사일을 연속으로 쏟아낸다.",
+"desc": "가까운 곳에 동력 코어를 떨어뜨리면 다리·몸체·장갑이 차례로 붙어 커다란 보행 병기가 일어선다. 기관포 연사 → 미사일 → 주포 순서로 공격을 되풀이하고, 시간이 끝나면 장갑을 접고 흩어진다.",
 "maxLv": 3,
 "unlock": 45,
 "prereq": [],
 "weapon": null,
 "target": "self",
-"range": 2.0,
+"range": 0,
 "mp": 60,
 "cd": 80,
-"cast": 0.8,
-"recover": 0.35,
-"anim": "cast",
+"cast": 0.0,
+"recover": 0.3,
+"anim": "en_toss",
 "ops": [
 {
-"op": "summon",
-"kind": "fortress",
-"ai": "fortress",
+"op": "custom",
+"fn": "en_walker",
 "life": 14,
 "hp": 4.0,
-"coef": 0.9,
-"rate": 0.35,
-"range": 10,
-"proj": "shell",
-"missiles": {
-"every": 3.0,
-"n": 4,
-"coef": 1.5
+"range": 9,
+"gun": {
+"n": 12,
+"gap": 0.12,
+"coef": 0.4
 },
-"limit": 1,
-"machine": true,
-"ultimate": true
+"missile": {
+"n": 4,
+"gap": 0.14,
+"coef": 1.4,
+"r": 1.6,
+"cap": 3
+},
+"cannon": {
+"coef": 5.0,
+"r": 2.2
+},
+"cycle": 6.0,
+"walkMax": 3.0
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16756816
+},
 "res": {
 "type": "power",
 "cost": 5
 },
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -5480,38 +5492,47 @@
 "job": "engineer",
 "tier": 2,
 "cat": 1,
-"catName": "총기와 고급 화기",
+"catName": "전자기 무장술",
 "idx": 1,
-"name": "철갑 사격",
+"name": "파일 벙커",
 "type": "attack",
-"desc": "방어력 일부를 무시하는 사격.",
+"desc": "자세를 낮추고 짧게 파고들며 팔 옆의 타격 장치를 편다. 피스톤이 압축·잠금된 뒤 강철 말뚝이 튀어나와 바로 앞의 적 하나를 꿰뚫는다(방어력 50 % 무시). 맞은 적 뒤쪽 원뿔로 충격파가 퍼져 그 뒤의 적에게도 피해를 준다. 사거리가 짧다.",
 "maxLv": 5,
 "unlock": 30,
 "prereq": [],
 "weapon": null,
 "target": "enemy",
-"range": 9,
+"range": 2.4,
 "mp": 18,
 "cd": 5,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "throw",
+"recover": 0.3,
+"anim": "en_pile",
 "ops": [
 {
-"op": "proj",
-"kind": "normal",
-"coef": 2.6,
-"speed": 26,
-"fx": "bullet",
-"burst": "hit_pierce",
-"armorPen": 0.4
+"op": "lunge",
+"dist": 0.9,
+"dur": 0.16,
+"at": -0.12
+},
+{
+"op": "custom",
+"fn": "en_pile",
+"coef": 3.4,
+"pen": 0.5,
+"back": {
+"r": 2.4,
+"ang": 50,
+"coef": 0.9
+}
 }
 ],
 "mods": [],
 "flags": {},
 "fx": {
-"color": 16765024
+"color": 16760944
 },
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -5526,11 +5547,11 @@
 "job": "engineer",
 "tier": 2,
 "cat": 1,
-"catName": "총기와 고급 화기",
+"catName": "전자기 무장술",
 "idx": 2,
-"name": "산탄 폭발",
+"name": "브리치 캐논",
 "type": "attack",
-"desc": "가까울수록 강한 부채꼴 산탄.",
+"desc": "짧고 굵은 포신을 두 손으로 받쳐 앞쪽 부채꼴로 산탄을 쏜다. 가까울수록 피해가 크고(최대 135 %, 최소 65 %) 짧게 경직시킨다. 테슬라 앵커가 지정한 적에게는 15 % 더 아프다.",
 "maxLv": 5,
 "unlock": 33,
 "prereq": [],
@@ -5540,24 +5561,30 @@
 "mp": 20,
 "cd": 6,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "throw",
+"recover": 0.3,
+"anim": "en_cannon",
 "ops": [
 {
-"op": "hit",
-"shape": "cone",
-"coef": 2.8,
+"op": "custom",
+"fn": "en_breach",
 "r": 5,
 "ang": 55,
-"falloff": 0.6,
-"fx": {
-"slash": "shotgun_cone"
-}
+"coef": 2.8,
+"near": 1.35,
+"far": 0.65,
+"stagger": [
+0.6,
+0.25
+],
+"anchorBonus": 0.15
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16752704
+},
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -5572,11 +5599,11 @@
 "job": "engineer",
 "tier": 2,
 "cat": 1,
-"catName": "총기와 고급 화기",
+"catName": "전자기 무장술",
 "idx": 3,
-"name": "유도 미사일",
+"name": "벌집 미사일 포드",
 "type": "attack",
-"desc": "선택한 대상을 추적하는 미사일 여러 발.",
+"desc": "어깨 뒤 포드의 벌집 덮개가 열리고 작은 미사일 6발이 차례로 솟아올랐다가 서로 다른 곡선으로 대상에게 날아가 작게 터진다. 대상이 쓰러지면 가까운 적에게, 없으면 사라진다. 레드라인 중에는 2발 더.",
 "maxLv": 5,
 "unlock": 36,
 "prereq": [],
@@ -5586,29 +5613,29 @@
 "mp": 28,
 "cd": 9,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "throw",
+"recover": 0.3,
+"anim": "en_signal",
 "ops": [
 {
-"op": "proj",
-"kind": "homing",
-"coef": 1.1,
-"count": 4,
-"gap": 0.1,
-"speed": 10,
-"r": 1.2,
-"fx": "missile",
-"burst": "explosion_fire",
-"elem": "fire"
+"op": "custom",
+"fn": "en_hive",
+"n": 6,
+"coef": 0.75,
+"r": 1.0,
+"retarget": 6,
+"extra": 2
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16751168
+},
 "res": {
 "type": "power",
 "gain": 1
 },
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -5623,11 +5650,11 @@
 "job": "engineer",
 "tier": 2,
 "cat": 1,
-"catName": "총기와 고급 화기",
+"catName": "전자기 무장술",
 "idx": 4,
-"name": "전자기 레일건",
+"name": "헬릭스 레일캐논",
 "type": "attack",
-"desc": "충전 후 긴 직선을 관통하는 레일건.",
+"desc": "두 레일을 좌우로 벌리고 코일을 뒤에서 앞으로 차례로 밝혀 0.85초 축전한 뒤, 누른 순간의 방향으로 청백 탄체를 쏜다. 14 m 직선 위의 적을 모두 한 번씩 꿰뚫고, 꿰뚫린 적은 8초 동안 궤도 포격의 우선 표적이 된다.",
 "maxLv": 5,
 "unlock": 40,
 "prereq": [],
@@ -5636,32 +5663,25 @@
 "range": 14,
 "mp": 32,
 "cd": 12,
-"cast": 0.9,
-"recover": 0.35,
-"anim": "cast",
+"cast": 0.0,
+"recover": 0.8,
+"anim": "en_rail",
 "ops": [
 {
-"op": "telegraph",
-"shape": "line",
+"op": "custom",
+"fn": "en_rail",
 "len": 14,
 "w": 1.2,
-"dur": 0.9
-},
-{
-"op": "hit",
-"shape": "line",
 "coef": 5.0,
-"len": 14,
-"w": 1.2,
-"elem": "shock",
-"fx": {
-"beam": "rail"
-}
+"elem": "shock"
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 12577023
+},
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -5676,11 +5696,11 @@
 "job": "engineer",
 "tier": 2,
 "cat": 1,
-"catName": "총기와 고급 화기",
+"catName": "전자기 무장술",
 "idx": 5,
-"name": "궤도 포격",
+"name": "오비탈 브레이커",
 "type": "ultimate",
-"desc": "넓은 범위를 예고한 뒤 대규모 연속 포격.",
+"desc": "표적 지정기를 쏘아 올리면 바닥에 조준 고리 세 개가 차례로 고정되고, 가는 낙하 궤적과 함께 정밀 포격 3발이 떨어진 뒤 가운데에 강한 관통 포격이 꽂힌다. 레일캐논에 꿰뚫린 적을 먼저 노리고 20 % 더 아프다.",
 "maxLv": 3,
 "unlock": 45,
 "prereq": [],
@@ -5689,33 +5709,30 @@
 "range": 9,
 "mp": 70,
 "cd": 75,
-"cast": 0.5,
-"recover": 0.35,
-"anim": "cast",
+"cast": 0.0,
+"recover": 0.3,
+"anim": "en_signal",
 "ops": [
 {
-"op": "telegraph",
-"shape": "circle",
-"r": 5,
-"dur": 1.6,
-"atAim": true
-},
-{
 "op": "custom",
-"fn": "barrage",
-"n": 14,
-"r": 5,
-"blast": 1.6,
-"coef": 1.4,
-"start": 1.6,
-"gap": 0.12,
-"burst": "explosion_fire",
-"marker": "orbital_marker"
+"fn": "en_orbital",
+"R": 5,
+"n": 3,
+"coef": 2.2,
+"r": 1.6,
+"core": {
+"coef": 6.0,
+"r": 2.6
+},
+"railBonus": 0.2
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 12577023
+},
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -5730,11 +5747,11 @@
 "job": "engineer",
 "tier": 2,
 "cat": 2,
-"catName": "제작·수리·개조",
+"catName": "현장 정비와 동력 제어",
 "idx": 1,
-"name": "총기 제작",
+"name": "정밀 병기 제작",
 "type": "craft",
-"desc": "권총·산탄총·소총을 만든다.",
+"desc": "권총·산탄총·소총을 만든다. 완성하면 설계도 위에서 총열·몸체·동력 코어가 맞물려 결합된다.",
 "maxLv": 5,
 "unlock": 30,
 "prereq": [],
@@ -5769,11 +5786,11 @@
 "job": "engineer",
 "tier": 2,
 "cat": 2,
-"catName": "제작·수리·개조",
+"catName": "현장 정비와 동력 제어",
 "idx": 2,
-"name": "병기 개조",
+"name": "모듈 어셈블리",
 "type": "craft",
-"desc": "공격 속도형·범위형 개조 모듈을 만든다. 유형마다 장단점이 있다.",
+"desc": "속사 모듈(공격 속도↑ 공격력↓)·확산 모듈(공격력↑ 공격 속도↓)을 만든다. 무기에 단 모듈은 내 센트리·드론·워커 기관포에도 같은 장단점으로 적용되고 외형 부품(회전 탄창 / 넓은 포구)이 바뀐다. 지뢰·앵커는 그대로.",
 "maxLv": 5,
 "unlock": 33,
 "prereq": [],
@@ -5807,11 +5824,11 @@
 "job": "engineer",
 "tier": 2,
 "cat": 2,
-"catName": "제작·수리·개조",
+"catName": "현장 정비와 동력 제어",
 "idx": 3,
-"name": "현장 수리",
+"name": "리페어 비콘",
 "type": "support",
-"desc": "기계 소환물을 수리하고(손상이 클수록 효율 증가) 자신에게 작은 장갑 보호막을 씌운다.",
+"desc": "발밑에 정비 비콘을 꽂고 작은 정비 드론을 부른다. 6초 동안 1초마다 6 m 안의 손상된 기계 병기를 수리하고(손상이 클수록 효율↑, 한 번에 최대 체력의 9 %까지), 나에게 작은 장갑 보호막을 씌운다. 생명체 소환물은 수리하지 않는다.",
 "maxLv": 5,
 "unlock": 36,
 "prereq": [],
@@ -5821,25 +5838,34 @@
 "mp": 18,
 "cd": 10,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "cast",
+"recover": 0.25,
+"anim": "en_toss",
 "ops": [
 {
-"op": "repair",
-"pct": 0.35,
-"missingBonus": 0.5
+"op": "custom",
+"fn": "en_beacon",
+"life": 6,
+"r": 6,
+"tick": 1.0,
+"pct": 0.06,
+"missingBonus": 0.5,
+"cap": 0.09
 },
 {
 "op": "shield",
 "base": 30,
 "coef": 0.6,
 "dur": 6,
-"power": "atk"
+"power": "atk",
+"noAura": true
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 5957330
+},
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -5854,11 +5880,11 @@
 "job": "engineer",
 "tier": 2,
 "cat": 2,
-"catName": "제작·수리·개조",
+"catName": "현장 정비와 동력 제어",
 "idx": 4,
-"name": "동력 회수",
+"name": "리커버리 코어",
 "type": "passive",
-"desc": "기계가 수명 종료로 사라지면 전력 일부를 돌려받는다. 파괴되면 덜 돌려받으며, 소비량보다 많이 돌려받지 않는다.",
+"desc": "내 기계 병기가 수명을 다하면 들인 전력의 일부를 작은 청색 코어로 회수한다. 부서지면 절반만, 교체·지역 이동·쓰러짐으로 사라지면 회수하지 않는다. 기계마다 한 번, 들인 전력보다 많이 돌려받지 않는다.",
 "maxLv": 5,
 "unlock": 40,
 "prereq": [],
@@ -5893,11 +5919,11 @@
 "job": "engineer",
 "tier": 2,
 "cat": 2,
-"catName": "제작·수리·개조",
+"catName": "현장 정비와 동력 제어",
 "idx": 5,
-"name": "오버클럭",
+"name": "레드라인 프로토콜",
 "type": "support",
-"desc": "기계의 화력·공격 속도를 높인다. 끝나면 냉각 상태(약화)가 된다.",
+"desc": "내 기계 병기의 동력 코어를 한계까지 올린다. 8초 동안 병기의 공격 속도 40 %·화력 25 %가 오르고(발사 간격은 0.22초보다 짧아지지 않음), 끝나면 4초 동안 냉각되어 약해진다(공격 속도 −20 %, 화력 −20 %). 생명체 소환물에는 적용되지 않는다.",
 "maxLv": 5,
 "unlock": 45,
 "prereq": [],
@@ -5907,20 +5933,29 @@
 "mp": 24,
 "cd": 30,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "cast",
+"recover": 0.25,
+"anim": "en_signal",
 "ops": [
 {
-"op": "overclock",
+"op": "custom",
+"fn": "en_redline",
 "dur": 8,
-"mul": 0.5,
+"durLv": 0.5,
+"dmg": 0.25,
+"dmgLv": 0.05,
+"rate": 1.4,
+"minGap": 0.22,
 "cool": 4,
-"coolMul": -0.3
+"coolDmg": -0.2,
+"coolRate": 0.8
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16742960
+},
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -9919,7 +9954,7 @@
 },
 {
 "id": "overclock",
-"name": "오버클럭",
+"name": "레드라인",
 "kind": "flag",
 "buff": true,
 "stack": "refresh",

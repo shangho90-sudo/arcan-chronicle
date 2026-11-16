@@ -307,33 +307,55 @@ S(J, 1, 2, '장인의 제작', 3, 'bs1_c3', '숫돌 연마', 'craft', '일시적
 S(J, 1, 2, '장인의 제작', 4, 'bs1_c4', '재료 회수', 'craft', '장비를 분해해 재료 일부를 얻는다. 전투에서는 낙인을 깨거나 철벽을 걷어차 맞히면 고철 조각이 튀어 저절로 모이고, 모을 때마다 기력을 조금 되찾는다(10초에 3개까지, 가방에는 들어가지 않음).', flags=dict(scrap=[3, 1]))
 S(J, 1, 2, '장인의 제작', 5, 'bs1_c5', '알뜰 공급', 'passive', '기본 제작 비용이 줄어든다. (제작·분해·판매로 이익이 나지 않도록 상한 적용) 전투에서 고철 조각을 모으면 작은 보호막을 얻는다(겹치지 않음).', flags=dict(craftDiscount=[0.05, 0.03], scrapShield=[0.04, 0.01]))
 
-# ======================================================================= 엔지니어 (engineer) — power + device cap
+# ======================================================================= 엔지니어 (engineer) — 전장에서 병기를 즉석 조립하고 지휘하는 마도공학자
+# 2026-11-16 전면 개편: id·배우는 레벨(30/33/36/40/45)·최대 레벨·유형·3×5 배치·제작 레시피는 그대로 — 예전 저장의 습득 레벨·포인트·칸이 그대로 새 스킬이 됨.
+# 규칙 js/engineer.js (EnKit, CUSTOM en_*, 기본 시각 EN), 화면 js/engfx.js (메시 tools/blender/fx_engineer.py), 동작 en_toss/en_signal/en_pile/en_cannon/en_rail (tools/anim/swings.py).
+# 병기 표적 순서: 1) 내 테슬라 앵커가 지정한 대상 2) 사거리 안 내 선택 대상 3) 가까운 적. 피해는 모두 quiet(전역 정지·무작위 흔들림 없음), 카메라 kick은 파일 벙커·궁극기 주 타격만.
+# 수치 출발점 = 예전 엔지니어: 포탑 0.7/0.8초·20초·2기, 지뢰 3.2(2.2 m)·3개, 드론 0.35×3/0.5초, 구속기 0.2/0.5초·둔화 40 %, 요새 14초, 철갑 2.6(방어 무시 40 %),
+# 산탄 2.8(5 m 55°), 유도 미사일 1.1×4, 레일건 5.0(14 m), 궤도 포격 1.4×14 무작위, 수리 35 %, 동력 환급 30 %(+10 %/Lv), 오버클럭 8초 + 냉각 4초.
 J, C = 'engineer', 0x5ac8ff
-S(J, 2, 0, '자동 병기', 1, 'en_a1', '자동 포탑', 'summon', '선택 대상을 우선 사격하는 포탑을 설치한다.', target='ground', range=6, mp=20, res=dict(type='power', cost=2), cd=8, anim='cast',
-  ops=[summon('turret', ai='turret', life=20, hp=1.0, coef=0.7, rate=0.8, range=8, proj='bullet', limit=2, machine=True)])
-S(J, 2, 0, '자동 병기', 2, 'en_a2', '추적 지뢰', 'summon', '다가온 적을 짧게 추적한 뒤 폭발하는 지뢰.', target='ground', range=6, mp=16, res=dict(type='power', cost=1), cd=6, anim='cast',
-  ops=[summon('mine', ai='mine', life=25, hp=0.3, trigger=2.5, chase=3.0, boom=dict(r=2.2, coef=3.2, burst='explosion_fire', elem='fire'), limit=3, machine=True)])
-S(J, 2, 0, '자동 병기', 3, 'en_a3', '공격 드론 편대', 'summon', '주인 주변을 날며 선택 대상을 집중 공격하는 드론 3기.', target='self', mp=26, res=dict(type='power', cost=3), cd=18, anim='cast',
-  ops=[summon('drone', ai='follow_ranged', n=3, life=18, hp=0.4, coef=0.35, rate=0.5, range=7, proj='bullet', limit=3, machine=True, fly=True)])
-S(J, 2, 0, '자동 병기', 4, 'en_a4', '전자기 구속기', 'summon', '둔화 전기장을 만들고 기계 병기의 우선 표적을 지정한다.', target='ground', range=6, mp=22, res=dict(type='power', cost=2), cd=16, anim='cast',
-  ops=[summon('em_device', ai='aura', life=10, hp=0.8, aura=dict(r=3.0, tick=0.5, coef=0.2, elem='shock', st=[st('slow', 1, 0.4)], fx='emfield'), focus=True, limit=1, machine=True)])
-S(J, 2, 0, '자동 병기', 5, 'en_a5', '이동 요새', 'ultimate', '대형 기계가 포격·기관총·미사일을 연속으로 쏟아낸다.', target='self', mp=60, res=dict(type='power', cost=5), cd=80, cast=0.8, anim='cast',
-  ops=[summon('fortress', ai='fortress', life=14, hp=4.0, coef=0.9, rate=0.35, range=10, proj='shell', missiles=dict(every=3.0, n=4, coef=1.5), limit=1, machine=True, ultimate=True)])
-S(J, 2, 1, '총기와 고급 화기', 1, 'en_b1', '철갑 사격', 'attack', '방어력 일부를 무시하는 사격.', target='enemy', range=9, mp=18, cd=5, anim='throw',
-  ops=[proj('normal', 2.6, speed=26, fx='bullet', burst='hit_pierce', armorPen=0.4)], fx=dict(color=0xffd060))
-S(J, 2, 1, '총기와 고급 화기', 2, 'en_b2', '산탄 폭발', 'attack', '가까울수록 강한 부채꼴 산탄.', range=5, mp=20, cd=6, anim='throw',
-  ops=[hit('cone', 2.8, r=5, ang=55, falloff=0.6, fx=dict(slash='shotgun_cone'))])
-S(J, 2, 1, '총기와 고급 화기', 3, 'en_b3', '유도 미사일', 'attack', '선택한 대상을 추적하는 미사일 여러 발.', target='enemy', range=11, mp=28, res=dict(type='power', gain=1), cd=9, anim='throw',
-  ops=[proj('homing', 1.1, count=4, gap=0.1, speed=10, r=1.2, fx='missile', burst='explosion_fire', elem='fire')])
-S(J, 2, 1, '총기와 고급 화기', 4, 'en_b4', '전자기 레일건', 'attack', '충전 후 긴 직선을 관통하는 레일건.', range=14, mp=32, cd=12, cast=0.9, anim='cast',
-  ops=[dict(op='telegraph', shape='line', len=14, w=1.2, dur=0.9), hit('line', 5.0, len=14, w=1.2, elem='shock', fx=dict(beam='rail'))])
-S(J, 2, 1, '총기와 고급 화기', 5, 'en_b5', '궤도 포격', 'ultimate', '넓은 범위를 예고한 뒤 대규모 연속 포격.', target='ground', range=9, mp=70, cd=75, cast=0.5, anim='cast',
-  ops=[dict(op='telegraph', shape='circle', r=5, dur=1.6, atAim=True), custom('barrage', n=14, r=5, blast=1.6, coef=1.4, start=1.6, gap=0.12, burst='explosion_fire', marker='orbital_marker')])
-S(J, 2, 2, '제작·수리·개조', 1, 'en_c1', '총기 제작', 'craft', '권총·산탄총·소총을 만든다.')
-S(J, 2, 2, '제작·수리·개조', 2, 'en_c2', '병기 개조', 'craft', '공격 속도형·범위형 개조 모듈을 만든다. 유형마다 장단점이 있다.')
-S(J, 2, 2, '제작·수리·개조', 3, 'en_c3', '현장 수리', 'support', '기계 소환물을 수리하고(손상이 클수록 효율 증가) 자신에게 작은 장갑 보호막을 씌운다.', target='self', mp=18, cd=10, anim='cast', ops=[dict(op='repair', pct=0.35, missingBonus=0.5), shield(30, 0.6, 6, power='atk')])
-S(J, 2, 2, '제작·수리·개조', 4, 'en_c4', '동력 회수', 'passive', '기계가 수명 종료로 사라지면 전력 일부를 돌려받는다. 파괴되면 덜 돌려받으며, 소비량보다 많이 돌려받지 않는다.', flags=dict(powerRefund=[0.3, 0.1]))
-S(J, 2, 2, '제작·수리·개조', 5, 'en_c5', '오버클럭', 'support', '기계의 화력·공격 속도를 높인다. 끝나면 냉각 상태(약화)가 된다.', target='self', mp=24, cd=30, anim='cast', ops=[dict(op='overclock', dur=8, mul=0.5, cool=4, coolMul=-0.3)])
+A_, B_, C_ = '전술 기계공학', '전자기 무장술', '현장 정비와 동력 제어'
+S(J, 2, 0, A_, 1, 'en_a1', '전개식 센트리', 'summon', '공구함 장치를 지정한 곳에 던진다. 땅에 닿으면 지지대 세 개와 포신이 펼쳐지고, 적을 찾아 총구에서 탄을 쏜다. 같은 적을 4번 연속 맞히면 짧은 집중 사격을 한다(3초에 한 번). 대상이 죽거나 사거리를 벗어나면 다시 찾는다.',
+  target='ground', range=6, mp=20, res=dict(type='power', cost=2), cd=8, anim='en_toss', recover=0.25,
+  ops=[custom('en_sentry', life=20, hp=1.0, coef=0.7, rate=0.8, range=8, limit=2, focusN=4, burst=dict(n=3, gap=0.09, coef=0.45, cd=3.0))], fx=dict(color=0x5ac8ff))
+S(J, 2, 0, A_, 2, 'en_a2', '스파이더 마인', 'summon', '원반 모양 지뢰를 던진다. 다리 네 개를 펴고 기다리다 적이 2.5 m 안에 들어오면 붉은 등을 깜박이며 짧게 쫓아가고, 가까워지면 뛰어올라 한 번 터진다. 한 번에 쫓는 거리와 수명에 한계가 있고 벽을 넘지 못한다.',
+  target='ground', range=6, mp=16, res=dict(type='power', cost=1), cd=6, anim='en_toss', recover=0.25,
+  ops=[custom('en_spider', life=25, trigger=2.5, speed=4.5, run=6.0, total=14.0, leap=0.9, r=2.2, coef=3.2, limit=3, elem='fire')], fx=dict(color=0xff8a40))
+S(J, 2, 0, A_, 3, 'en_a3', '트라이윙 편대', 'summon', '등 뒤에서 접힌 드론 세 기를 차례로 쏘아 올린다. 날개를 펴고 내 둘레에 삼각 대형을 짜 같은 적을 차례로 쏘고, 3초마다 대형을 맞춰 한꺼번에 일제 사격한다. 편대의 공격력은 세 기가 나눠 가진다.',
+  target='self', mp=26, res=dict(type='power', cost=3), cd=18, anim='en_signal', recover=0.25,
+  ops=[custom('en_drones', n=3, life=18, hp=0.4, coef=1.05, rate=0.5, range=7, salvo=3.0, salvoMul=1.5)], fx=dict(color=0x6ae0ff))
+S(J, 2, 0, A_, 4, 'en_a4', '테슬라 앵커', 'summon', '전극 세 개를 삼각형으로 박아 코일을 펴고 전류로 잇는다. 삼각형 안의 적은 감전 피해와 둔화를 받는다. 삼각형 안의 내 선택 대상(없으면 가운데에 가장 가까운 적)을 표적으로 지정해 내 병기들이 먼저 노린다.',
+  target='ground', range=6, mp=22, res=dict(type='power', cost=2), cd=16, anim='en_toss', recover=0.25,
+  ops=[custom('en_anchor', R=3.0, life=10, tick=0.5, coef=0.2, limit=1, elem='shock', st=[st('slow', 1, 0.4)])], fx=dict(color=0x7af0ff))
+S(J, 2, 0, A_, 5, 'en_a5', '아틀라스 워커', 'ultimate', '가까운 곳에 동력 코어를 떨어뜨리면 다리·몸체·장갑이 차례로 붙어 커다란 보행 병기가 일어선다. 기관포 연사 → 미사일 → 주포 순서로 공격을 되풀이하고, 시간이 끝나면 장갑을 접고 흩어진다.',
+  target='self', range=0, mp=60, res=dict(type='power', cost=5), cd=80, anim='en_toss', recover=0.3,
+  ops=[custom('en_walker', life=14, hp=4.0, range=9, gun=dict(n=12, gap=0.12, coef=0.4), missile=dict(n=4, gap=0.14, coef=1.4, r=1.6, cap=3), cannon=dict(coef=5.0, r=2.2), cycle=6.0, walkMax=3.0)], fx=dict(color=0xffb050))
+S(J, 2, 1, B_, 1, 'en_b1', '파일 벙커', 'attack', '자세를 낮추고 짧게 파고들며 팔 옆의 타격 장치를 편다. 피스톤이 압축·잠금된 뒤 강철 말뚝이 튀어나와 바로 앞의 적 하나를 꿰뚫는다(방어력 50 % 무시). 맞은 적 뒤쪽 원뿔로 충격파가 퍼져 그 뒤의 적에게도 피해를 준다. 사거리가 짧다.',
+  target='enemy', range=2.4, mp=18, cd=5, anim='en_pile', recover=0.3,
+  ops=[dict(op='lunge', dist=0.9, dur=0.16, at=-0.12), custom('en_pile', coef=3.4, pen=0.5, back=dict(r=2.4, ang=50, coef=0.9))], fx=dict(color=0xffc070))
+S(J, 2, 1, B_, 2, 'en_b2', '브리치 캐논', 'attack', '짧고 굵은 포신을 두 손으로 받쳐 앞쪽 부채꼴로 산탄을 쏜다. 가까울수록 피해가 크고(최대 135 %, 최소 65 %) 짧게 경직시킨다. 테슬라 앵커가 지정한 적에게는 15 % 더 아프다.',
+  target='dir', range=5, mp=20, cd=6, anim='en_cannon', recover=0.3,
+  ops=[custom('en_breach', r=5, ang=55, coef=2.8, near=1.35, far=0.65, stagger=[0.6, 0.25], anchorBonus=0.15)], fx=dict(color=0xffa040))
+S(J, 2, 1, B_, 3, 'en_b3', '벌집 미사일 포드', 'attack', '어깨 뒤 포드의 벌집 덮개가 열리고 작은 미사일 6발이 차례로 솟아올랐다가 서로 다른 곡선으로 대상에게 날아가 작게 터진다. 대상이 쓰러지면 가까운 적에게, 없으면 사라진다. 레드라인 중에는 2발 더.',
+  target='enemy', range=11, mp=28, res=dict(type='power', gain=1), cd=9, anim='en_signal', recover=0.3,
+  ops=[custom('en_hive', n=6, coef=0.75, r=1.0, retarget=6, extra=2)], fx=dict(color=0xff9a40))
+S(J, 2, 1, B_, 4, 'en_b4', '헬릭스 레일캐논', 'attack', '두 레일을 좌우로 벌리고 코일을 뒤에서 앞으로 차례로 밝혀 0.85초 축전한 뒤, 누른 순간의 방향으로 청백 탄체를 쏜다. 14 m 직선 위의 적을 모두 한 번씩 꿰뚫고, 꿰뚫린 적은 8초 동안 궤도 포격의 우선 표적이 된다.',
+  target='dir', range=14, mp=32, cd=12, anim='en_rail', recover=0.8,
+  ops=[custom('en_rail', len=14, w=1.2, coef=5.0, elem='shock')], fx=dict(color=0xbfe8ff))
+S(J, 2, 1, B_, 5, 'en_b5', '오비탈 브레이커', 'ultimate', '표적 지정기를 쏘아 올리면 바닥에 조준 고리 세 개가 차례로 고정되고, 가는 낙하 궤적과 함께 정밀 포격 3발이 떨어진 뒤 가운데에 강한 관통 포격이 꽂힌다. 레일캐논에 꿰뚫린 적을 먼저 노리고 20 % 더 아프다.',
+  target='ground', range=9, mp=70, cd=75, anim='en_signal', recover=0.3,
+  ops=[custom('en_orbital', R=5, n=3, coef=2.2, r=1.6, core=dict(coef=6.0, r=2.6), railBonus=0.2)], fx=dict(color=0xbfe8ff))
+S(J, 2, 2, C_, 1, 'en_c1', '정밀 병기 제작', 'craft', '권총·산탄총·소총을 만든다. 완성하면 설계도 위에서 총열·몸체·동력 코어가 맞물려 결합된다.')
+S(J, 2, 2, C_, 2, 'en_c2', '모듈 어셈블리', 'craft', '속사 모듈(공격 속도↑ 공격력↓)·확산 모듈(공격력↑ 공격 속도↓)을 만든다. 무기에 단 모듈은 내 센트리·드론·워커 기관포에도 같은 장단점으로 적용되고 외형 부품(회전 탄창 / 넓은 포구)이 바뀐다. 지뢰·앵커는 그대로.')
+S(J, 2, 2, C_, 3, 'en_c3', '리페어 비콘', 'support', '발밑에 정비 비콘을 꽂고 작은 정비 드론을 부른다. 6초 동안 1초마다 6 m 안의 손상된 기계 병기를 수리하고(손상이 클수록 효율↑, 한 번에 최대 체력의 9 %까지), 나에게 작은 장갑 보호막을 씌운다. 생명체 소환물은 수리하지 않는다.',
+  target='self', mp=18, cd=10, anim='en_toss', recover=0.25,
+  ops=[custom('en_beacon', life=6, r=6, tick=1.0, pct=0.06, missingBonus=0.5, cap=0.09), shield(30, 0.6, 6, power='atk', noAura=True)], fx=dict(color=0x5ae6d2))
+S(J, 2, 2, C_, 4, 'en_c4', '리커버리 코어', 'passive', '내 기계 병기가 수명을 다하면 들인 전력의 일부를 작은 청색 코어로 회수한다. 부서지면 절반만, 교체·지역 이동·쓰러짐으로 사라지면 회수하지 않는다. 기계마다 한 번, 들인 전력보다 많이 돌려받지 않는다.', flags=dict(powerRefund=[0.3, 0.1]))
+S(J, 2, 2, C_, 5, 'en_c5', '레드라인 프로토콜', 'support', '내 기계 병기의 동력 코어를 한계까지 올린다. 8초 동안 병기의 공격 속도 40 %·화력 25 %가 오르고(발사 간격은 0.22초보다 짧아지지 않음), 끝나면 4초 동안 냉각되어 약해진다(공격 속도 −20 %, 화력 −20 %). 생명체 소환물에는 적용되지 않는다.',
+  target='self', mp=24, cd=30, anim='en_signal', recover=0.25,
+  ops=[custom('en_redline', dur=8, durLv=0.5, dmg=0.25, dmgLv=0.05, rate=1.4, minGap=0.22, cool=4, coolDmg=-0.2, coolRate=0.8)], fx=dict(color=0xff7a30))
+for _d in SK:   # 엔지니어 소리는 규칙(js/engineer.js)이 실제 순간에 냄 — 누른 순간의 공용 소리는 없음
+    if _d['job'] == 'engineer' and _d['type'] not in ('craft', 'passive'): _d['sfxAt'] = 'op'
 
 # ======================================================================= 미용사 (hairdresser)
 J, C = 'hairdresser', 0xff7ab0
@@ -522,7 +544,7 @@ STATUSES = [
     dict(id='catalyst', name='촉매 활성화', kind='flag', buff=True, stack='max', color='#5aa0ff'),
     dict(id='inspired', name='영감', kind='flag', buff=True, stack='max', color='#50c8c8'),
     dict(id='echo', name='메아리', kind='flag', buff=True, stack='max', color='#60d0a0'),
-    dict(id='overclock', name='오버클럭', kind='flag', buff=True, stack='refresh', color='#ff9a30'),
+    dict(id='overclock', name='레드라인', kind='flag', buff=True, stack='refresh', color='#ff9a30'),
     dict(id='cooldown_heat', name='냉각 중', kind='flag', debuff=True, cleanse=False, stack='refresh', color='#8090a0'),
     dict(id='well_fed2', name='탕약 기운', kind='statMul', stat='maxHp', buff=True, stack='max', cap=0.3, group='food', color='#ffb060'),
     dict(id='whetted', name='숫돌 연마', kind='statMul', stat='atk', buff=True, stack='max', cap=0.3, color='#c0c8d8'),

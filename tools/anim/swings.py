@@ -1010,6 +1010,66 @@ HB_ACTS = [HB_BREW, HB_SOW, HB_RAISE, HB_MOXA, HB_FLICK, HB_POUR, HB_GATHER]
 for _a in HB_ACTS: _a.update(stow=True)
 SKILL_ACTS += HB_ACTS
 
+# ------------------------------------------------------------------------------------------------ 엔지니어 2차 (2026-11-16)
+# 망치는 동작 내내 등에(stow) — 장치·화기는 js/engfx.js 가 손·팔·어깨에 붙여 그림. 일반 스킬 준비는 짧게(0.2~0.3 s).
+# en_toss: 공구함 장치를 낮게 던짐(0.22 s에 손을 떠남) -> 왼 손목 단말을 들어 오른손으로 두드림(0.34~0.5 s)
+EN_TOSS = action('en_toss', [
+    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
+    key(0.10, 'o', twist=-16, lean=-3, sink=0.06, hand=[-70, -30, 0.80], blade=[-60, 0], elbow=[-0.8, -0.9, -0.2], armL=[20, 30]),
+    key(0.22, None, twist=10, lean=8, sink=0.07, hand=[-4, -2, 1.0], blade=[0, -10], elbow=[-0.6, -0.9, -0.1], armL=[16, 34], squint=True),
+    key(0.34, 'o', twist=-6, lean=3, sink=0.04, hand=[-30, 6, 0.55], blade=[-20, 30], elbow=[-0.8, -0.6, -0.4], armL=[70, 40]),
+    key(0.44, 's', twist=-8, lean=3, sink=0.04, hand=[-26, 2, 0.50], blade=[-20, 30], elbow=[-0.8, -0.6, -0.4], armL=[72, 42]),
+    key(0.50, 's', twist=-8, lean=3, sink=0.04, hand=[-30, 8, 0.52], blade=[-20, 30], elbow=[-0.8, -0.6, -0.4], armL=[72, 42]),
+    key(0.64, 's', hand=[-30, -40, 0.70], blade=[-10, 20], armL=[12, 18]),
+], 0.22, 0.36, None, fadeIn=0.05, fadeOut=0.14)
+EN_TOSS.update(stow=True, throwT=0.22)
+# en_signal: 왼 손목 단말을 가슴 앞에 들고 오른손으로 누름(0.2 s = 신호) -> 손을 위로 뻗어 지시
+EN_SIGNAL = action('en_signal', [
+    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
+    key(0.10, 'o', twist=-6, lean=-2, sink=0.03, hand=[-32, 4, 0.55], blade=[-20, 30], elbow=[-0.8, -0.6, -0.4], armL=[74, 44]),
+    key(0.20, None, twist=-8, lean=-1, sink=0.04, hand=[-26, 0, 0.50], blade=[-20, 30], elbow=[-0.8, -0.6, -0.4], armL=[76, 46], squint=True),
+    key(0.32, 'o', twist=4, lean=-4, sink=0.03, hand=[-10, 60, 0.95], blade=[0, 80], elbow=[-0.5, -0.5, -0.2], armL=[60, 36]),
+    key(0.46, 's', twist=2, lean=-2, sink=0.02, hand=[-12, 52, 0.92], blade=[0, 70], elbow=[-0.5, -0.5, -0.2], armL=[40, 26]),
+    key(0.60, 's', hand=[-30, -40, 0.70], blade=[-10, 20], armL=[12, 18]),
+], 0.20, 0.34, None, fadeIn=0.05, fadeOut=0.14)
+EN_SIGNAL.update(stow=True)
+# en_pile: 몸을 낮추고 오른팔을 옆구리로 당겼다가(0.16 s 피스톤 압축·잠금) 0.28 s에 앞으로 밀어 넣음(말뚝) -> 버팀 -> 복귀
+EN_PILE = action('en_pile', [
+    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
+    key(0.10, 'o', twist=-22, lean=6, sink=0.14, hand=[-60, -20, 0.45], blade=[-10, 0], elbow=[-0.6, -1, 0.4], armL=[40, 30]),
+    key(0.18, 's', twist=-24, lean=8, sink=0.16, hand=[-64, -18, 0.42], blade=[-10, 0], elbow=[-0.6, -1, 0.4], armL=[42, 30], squint=True),
+    key(0.28, None, twist=14, lean=16, sink=0.18, hand=[-2, -4, 1.0], blade=[0, -4], elbow=[-0.5, -1, 0.0], armL=[20, 40], squint=True),
+    key(0.40, 'o', twist=12, lean=14, sink=0.16, hand=[-4, -6, 0.98], blade=[0, -4], elbow=[-0.5, -1, 0.0], armL=[20, 40]),
+    key(0.56, 's', twist=4, lean=4, sink=0.05, hand=[-20, -30, 0.75], blade=[-6, 10], elbow=[-0.7, -1, -0.2], armL=[14, 22]),
+    key(0.68, 's', hand=[-30, -40, 0.70], blade=[-10, 20], armL=[12, 18]),
+], 0.28, 0.46, None, fadeIn=0.04, fadeOut=0.14)
+EN_PILE.update(stow=True)
+# en_cannon: 두 손으로 짧은 포신을 가슴 앞에 받침(0.18 s 탄약실 점등) -> 0.30 s 발사, 상체가 뒤로 젖혀지는 반동 -> 복귀
+EN_CANNON = action('en_cannon', [
+    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
+    key(0.12, 'o', twist=-4, lean=6, sink=0.10, hand=[-8, -6, 0.78], blade=[0, 0], elbow=[-0.6, -1, -0.1], armL=[80, 10]),
+    key(0.26, 's', twist=-4, lean=8, sink=0.12, hand=[-6, -4, 0.80], blade=[0, 0], elbow=[-0.6, -1, -0.1], armL=[82, 10], squint=True),
+    key(0.30, None, twist=-2, lean=7, sink=0.12, hand=[-6, -2, 0.80], blade=[0, 0], elbow=[-0.6, -1, -0.1], armL=[82, 10], squint=True),
+    key(0.38, 'o', twist=6, lean=-10, sink=0.08, hand=[-8, 14, 0.66], blade=[0, 20], elbow=[-0.6, -0.8, -0.2], armL=[84, 22]),
+    key(0.54, 's', twist=2, lean=-2, sink=0.05, hand=[-10, -4, 0.74], blade=[0, 4], elbow=[-0.6, -1, -0.1], armL=[60, 14]),
+    key(0.68, 's', hand=[-30, -40, 0.70], blade=[-10, 20], armL=[12, 18]),
+], 0.30, 0.46, None, fadeIn=0.04, fadeOut=0.14)
+EN_CANNON.update(stow=True)
+# en_rail: 레일캐논을 두 손으로 겨누고 버팀(축전 0.1~0.86 s, 발을 넓게·몸을 낮춤) -> 0.88 s 발사 반동(뒤로 젖힘) -> 복귀.
+# hitT는 0.30(release 의 op 실행 시각) — 실제 발사 시각은 js/engineer.js EN.rail.fire(0.88 s)
+EN_RAIL = action('en_rail', [
+    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
+    key(0.14, 'o', twist=-10, lean=6, sink=0.12, hand=[-10, -2, 0.82], blade=[0, 0], elbow=[-0.6, -1, -0.1], armL=[84, 8]),
+    key(0.30, 's', twist=-10, lean=8, sink=0.14, hand=[-8, 0, 0.84], blade=[0, 0], elbow=[-0.6, -1, -0.1], armL=[86, 8]),
+    key(0.84, 's', twist=-12, lean=10, sink=0.16, hand=[-8, 0, 0.84], blade=[0, 0], elbow=[-0.6, -1, -0.1], armL=[86, 8], squint=True),
+    key(0.88, None, twist=-12, lean=10, sink=0.16, hand=[-8, 0, 0.84], blade=[0, 0], elbow=[-0.6, -1, -0.1], armL=[86, 8], squint=True),
+    key(0.98, 'o', twist=4, lean=-12, sink=0.10, hand=[-10, 18, 0.66], blade=[0, 24], elbow=[-0.6, -0.8, -0.2], armL=[84, 24]),
+    key(1.16, 's', twist=2, lean=-2, sink=0.05, hand=[-12, -6, 0.74], blade=[0, 4], elbow=[-0.6, -1, -0.1], armL=[60, 14]),
+    key(1.30, 's', hand=[-30, -40, 0.70], blade=[-10, 20], armL=[12, 18]),
+], 0.30, 1.10, None, fadeIn=0.04, fadeOut=0.16)
+EN_RAIL.update(stow=True, fireT=0.88)
+SKILL_ACTS += [EN_TOSS, EN_SIGNAL, EN_PILE, EN_CANNON, EN_RAIL]
+
 acts = json.load(open(P))
 names = {'attack', 'attack2'} | {x['name'] for x in SKILL_ACTS}
 acts = [a for a in acts if a['name'] not in names and not a['name'].startswith('nv_yeon_')]

@@ -2,7 +2,8 @@
 // Mixed into the existing UI class so the original look (ivory / teal / gold, Galmuri) and input handling stay.
 import { UI } from './ui.js';
 import { craft, NORMAL_SLOTS, ADV1_LEVEL, ADV2_LEVEL } from './skillsys.js';
-import { wpLevelText } from './wpharm.js';   // 양약사 2차: 실제 계산과 같은 수치 문구
+import { wpLevelText } from './wpharm.js';
+import { enLevelText } from './engineer.js';   // 엔지니어 2차: 실제 계산과 같은 수치 문구   // 양약사 2차: 실제 계산과 같은 수치 문구
 import { chefLevelText } from './chef.js';   // 쉐프 2차: 스킬 창 수치 줄(실제 데이터)
 import { herbText } from './herbal.js';   // 한약사 2차 툴팁(실제 op 값)
 
@@ -37,7 +38,7 @@ function glyph(g, d) {
   g.restore();
 }
 // 그림 아이콘이 있는 스킬(견습생 기본 검술 8종·약사 1차 15종, tools/ui/skill_icons_crop.py → assets/ui/skills/<id>.png). 나머지는 아래 캔버스 임시 아이콘.
-const SKILL_ART = new Set(['nv_a1', 'nv_a2', 'nv_a3', 'nv_a4', 'nv_p1', 'nv_p2', 'nv_p3', 'nv_p4', ...['a1', 'a3', 'a4', 'a5', 'a6', 'b1', 'b2', 'b4', 'b5', 'b6', 'c1', 'c6', 'c7', 'c8', 'c9'].map(k => 'ph1_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'bs1_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'wp_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'cf_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'hb_' + k)]);   // + 한약사 2차 15종(tools/ui/herbal_icons.py)   // + 쉐프 2차 15종(tools/ui/chef_icons.py) + 양약사 2차 15종(원형, tools/ui/wp_icons.py)   // + 대장장이 1차 15종(원형, tools/ui/smith_icons.py)   // 견습생(둥근 사각형) + 약사 1차(원형, 2026-11-11 개편 뒤 15종)
+const SKILL_ART = new Set(['nv_a1', 'nv_a2', 'nv_a3', 'nv_a4', 'nv_p1', 'nv_p2', 'nv_p3', 'nv_p4', ...['a1', 'a3', 'a4', 'a5', 'a6', 'b1', 'b2', 'b4', 'b5', 'b6', 'c1', 'c6', 'c7', 'c8', 'c9'].map(k => 'ph1_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'bs1_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'wp_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'cf_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'hb_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'en_' + k)]);   // + 엔지니어 2차 15종(tools/ui/en_icons.py)   // + 한약사 2차 15종(tools/ui/herbal_icons.py)   // + 쉐프 2차 15종(tools/ui/chef_icons.py) + 양약사 2차 15종(원형, tools/ui/wp_icons.py)   // + 대장장이 1차 15종(원형, tools/ui/smith_icons.py)   // 견습생(둥근 사각형) + 약사 1차(원형, 2026-11-11 개편 뒤 15종)
 export function skillIcon(d, size = 48) {
   const k = d.id + size; if (iconCache.has(k)) return iconCache.get(k);
   if (SKILL_ART.has(d.id)) { const html = `<span class="icon i3d skic ${d.id.startsWith('nv_') ? 'skart' : 'skround'}" style="width:${size}px;height:${size}px;background:url(assets/ui/skills/${d.id}.png) center/contain no-repeat;image-rendering:auto"></span>`; iconCache.set(k, html); return html; }
@@ -63,7 +64,7 @@ const PCT_ADD = new Set(['elemRes', 'eva', 'crit']);   // these add a fraction -
 const FLAG_KO = { restRegen: '휴식 중 3초마다 체력 회복', basicDmg: '기본 공격 피해', beatHaste: '박자 가속', centerBonus: '중심부 추가 피해', cheatDeath: '치명상 버티기', craftDiscount: '제작 재료 절약', 'craftExtra:potion': '포션 추가 제작', 'craftReturn:food': '요리 재료 반환', fitting: '완벽한 피팅', flow: '흐름 지속', ingredientDrop: '재료 획득률', killHaste: '처치 시 가속', landscapeSize: '풍경화 범위', landscapeTime: '풍경화 지속', paintRange: '붓 사거리', phraseGain: '악절 획득', powerRefund: '동력 환급', projSpeed: '투사체 속도', residue: '잔여 효과', staggerBonus: '경직 추가 피해', switchBonus: '전환 추가 피해', throwRange: '투척 사거리', vsDefdown: '방어 약화 대상 추가 피해' };
 function levelText(d, L) {
   if (d.job === 'chef') { const t = chefLevelText(d, L, G.data); if (t) return t; }
-  const wt = wpLevelText(d, L); if (wt) return d.type === 'passive' ? wt : wt + ` · 연출 등급 ${Math.max(1, Math.min(10, 3 + L + (d.type === 'ultimate' ? 2 + L : 0)))}`;
+  const wt = wpLevelText(d, L) || enLevelText(d, L); if (wt) return d.type === 'passive' ? wt : wt + ` · 연출 등급 ${Math.max(1, Math.min(10, 3 + L + (d.type === 'ultimate' ? 2 + L : 0)))}`;
   const m = 1 + (d.type === 'ultimate' ? 0.25 : 0.12) * (L - 1), out = [];
   if (d.job === 'herbalist' && d.ops.some(o => o.fn === 'herb')) { const h = herbText(d, L); if (h) out.push(h); }
   else
@@ -188,6 +189,7 @@ Object.assign(UI.prototype, {
       const r = craft(G.data, p.sheet, book, rc, n);
       if (r.err) return this.toast(r.err);
       if (r.made > 0) G.audio.sfx('levelup'); else G.audio.sfx('ui_back');
+      if (r.made > 0 && (rc.skill === 'en_c1' || rc.skill === 'en_c2') && G.skillFx && G.skillFx.en) G.skillFx.en.made(p, { kind: rc.skill === 'en_c2' ? 'module' : 'gun' });   // 엔지니어 정밀 병기 제작·모듈 어셈블리: 설계도 위에서 부품이 결합 (js/engfx.js, 여러 개도 한 번)
       if (r.made > 0 && (rc.skill === 'wp_c1' || rc.skill === 'wp_c2') && G.skillFx && G.skillFx.wp) G.skillFx.wp.made(p, { kind: rc.skill === 'wp_c1' ? 'vial' : 'capsule' });   // 양약사 조제 완성: 약병이 채워져 반짝 / 캡슐에 과립이 담겨 봉해짐 (js/wpharmfx.js)
       if (r.made > 0 && out.id.startsWith('f_course') && G.skillFx && G.skillFx.chef) G.skillFx.chef.menu(p, { id: out.id, n: r.made });   // 시그니처 메뉴: 메인 → 곁들임 → 소스, 테두리 금빛 (js/cheffx.js)
       if (r.made > 0 && (out.id === 'f_lunch' || out.id === 'f_soup') && G.skillFx && G.skillFx.cook) G.skillFx.cook.made(p, { kind: out.id === 'f_soup' ? 'soup' : 'lunch' });   // 간단한 도시락·따뜻한 수프: the finished dish pops up (js/cookfx.js)
@@ -280,7 +282,7 @@ UI.prototype.updateControls = function () {
   for (let i = 0; i < NORMAL_SLOTS; i++) set(this.btn['skill' + (i + 1)], G.data.skill2(sk.slots[i]), i);
   // job resources only for the jobs that use them
   const job = p.sheet.p.job; let html = '';
-  if (job === 'engineer') html = `전력 <b>${Math.floor(eng.res.power)}</b>/10 · 기계 ${eng.summons.filter(s => s.machine && !s.dead).length}`;
+  if (job === 'engineer') { const h = eng.en ? eng.en.heat() : 0, r = eng.en && eng.en.red; html = `전력 <b>${Math.floor(eng.res.power)}</b>/10 · 기계 ${eng.summons.filter(s => s.machine && !s.dead).length}` + (h > 0 ? ` · <span style="color:#ff9a3a">레드라인 ${Math.ceil(r.until - eng.clock)}s</span>` : h < 0 ? ` · <span style="color:#9ab0d0">냉각 ${Math.ceil(r.coolUntil - eng.clock)}s</span>` : ''); }
   else if (job === 'musician') html = `악절 <b>${Math.floor(eng.res.phrase)}</b>/8${eng.melody ? ' · ♪ ' + eng.melody.ctx.d.name : ''}`;
   else if (eng.summons.some(s => !s.dead)) html = `소환물 ${eng.summons.filter(s => !s.dead).length}`;
   if (eng.casting) html += ` · 시전 중: ${eng.casting.ctx.d.name}`;

@@ -1,0 +1,58 @@
+{
+ "note": "Synthesized in-repo (no Runway credit). Regenerate with python3 tools/audio/en_sfx.py (fixed seed).",
+ "generatedOn": "2026-11-16",
+ "assets": [
+  {
+   "file": "sfx_en_lock.mp3",
+   "description": "잠금·전개: 작은 금속 '철컥' 두 번"
+  },
+  {
+   "file": "sfx_en_motor.mp3",
+   "description": "모터 가동: 짧게 올라가는 '위잉'"
+  },
+  {
+   "file": "sfx_en_shot.mp3",
+   "description": "센트리·드론·기관포 한 발: 짧고 마른 '탕'(작게)"
+  },
+  {
+   "file": "sfx_en_pile.mp3",
+   "description": "파일 벙커: 피스톤 '쉭' + 강철 말뚝 '쾅' + 금속 울림"
+  },
+  {
+   "file": "sfx_en_cannon.mp3",
+   "description": "브리치 캐논·워커 주포: 낮은 '쿵' + 넓은 폭발음 + 증기"
+  },
+  {
+   "file": "sfx_en_missile.mp3",
+   "description": "미사일 발사: '슈욱'"
+  },
+  {
+   "file": "sfx_en_pop.mp3",
+   "description": "작은 폭발: '퍽'"
+  },
+  {
+   "file": "sfx_en_charge.mp3",
+   "description": "축전: 올라가는 전기 '징—'"
+  },
+  {
+   "file": "sfx_en_rail.mp3",
+   "description": "레일캐논 발사: 날카로운 '찌잉' + 쿵"
+  },
+  {
+   "file": "sfx_en_zap.mp3",
+   "description": "테슬라 감전: 짧은 '찌직'"
+  },
+  {
+   "file": "sfx_en_weld.mp3",
+   "description": "용접 불꽃: 지글 '츠츳'"
+  },
+  {
+   "file": "sfx_en_exhaust.mp3",
+   "description": "배기: '푸슉' 증기"
+  },
+  {
+   "file": "sfx_en_drop.mp3",
+   "description": "워커 동력 코어 착지: 묵직한 '쿵' + 금속 울림"
+  }
+ ]
+}

@@ -636,6 +636,12 @@ export class ModelBody {
   /** a stow action (action.stow, e.g. ph_pitch) is playing: the right hand throws, the weapon rides on the back */
   get stowing() { const a = this.sh.actions[this.action]; return !!(a && a.stow) && !this.finished && !this.md.cfg.npc; }
   /** right palm in world (three) space, or null — where a thrown item leaves the hand */
+  /** 왼손 위치(엔지니어 손목 단말 그림용, js/engfx.js) — 없으면 null */
+  handPointL() {
+    const md = this.md, hi = md.byName.Left_Hand; if (hi === undefined || !this.W || !this.visible) return null;
+    this.root.updateMatrixWorld(true); const b = md.bones[hi];
+    return _v(b.t.x, b.t.y - 0.01, b.t.z + 0.01).applyMatrix4(mul(_m().copy(this.W[hi]), b.inv)).applyMatrix4(this.mesh.matrixWorld);
+  }
   handPoint() {
     const md = this.md, hi = md.byName.Right_Hand; if (hi === undefined || !this.W || !this.visible) return null;
     this.root.updateMatrixWorld(true); const b = md.bones[hi];
