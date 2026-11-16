@@ -114,7 +114,7 @@ export class MusicKit {
     if (d.type === 'ultimate' && d.cast > 0) {
       const pc = this.pc, k = d.id === 'mu_a5' ? 'score' : d.id === 'mu_b5' ? 'encore' : 'stage';
       ctx.muPre = this.fx(k, pc, { cast: d.cast, n: Math.min(MU.cap, ctx.muPress), facing: ctx.facing, origin: { ...pc.pos }, mel: this.mel ? this.mel.id : null, low: this.lowSpec() });
-      this.watch = ctx; this.duck(true);
+      this.watch = ctx; this.duck(true); if (d.sfx) this.sfx(d.sfx);   // 궁극기 시작 구절(코다 금관·앙코르 하프·심포니 현)
     }
   }
   lowSpec() { const G = this.G; return !!(G && ((G.input && G.input.mobile) || (G.settings && G.settings.graphicsFx === false))); }

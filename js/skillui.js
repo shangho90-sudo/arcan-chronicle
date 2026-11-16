@@ -8,6 +8,7 @@ import { chefLevelText } from './chef.js';   // 쉐프 2차: 스킬 창 수치 �
 import { herbText } from './herbal.js';   // 한약사 2차 툴팁(실제 op 값)
 import { dsLevelText } from './designer.js';   // 디자이너 2차: 스킬 창 수치 줄(실제 데이터)
 import { paintText } from './painter.js';   // 화가 2차 툴팁(실제 op 값)
+import { muText, MU } from './musician.js';   // 음악가 2차 툴팁(실제 op 값)·HUD 선율 색
 
 let G = null; export function bindSkillUi(g) { G = g; }
 const $ = (tag, cls, parent, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html !== undefined) e.innerHTML = html; if (parent) parent.appendChild(e); return e; };
@@ -40,7 +41,7 @@ function glyph(g, d) {
   g.restore();
 }
 // 그림 아이콘이 있는 스킬(견습생 기본 검술 8종·약사 1차 15종, tools/ui/skill_icons_crop.py → assets/ui/skills/<id>.png). 나머지는 아래 캔버스 임시 아이콘.
-const SKILL_ART = new Set(['nv_a1', 'nv_a2', 'nv_a3', 'nv_a4', 'nv_p1', 'nv_p2', 'nv_p3', 'nv_p4', ...['a1', 'a3', 'a4', 'a5', 'a6', 'b1', 'b2', 'b4', 'b5', 'b6', 'c1', 'c6', 'c7', 'c8', 'c9'].map(k => 'ph1_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'bs1_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'wp_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'cf_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'hb_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'en_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'ds_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'pt_' + k)]);   // + 화가 2차 15종(tools/ui/painter_icons.py)   // + 엔지니어 2차 15종(tools/ui/en_icons.py)   // + 한약사 2차 15종(tools/ui/herbal_icons.py)   // + 쉐프 2차 15종(tools/ui/chef_icons.py) + 양약사 2차 15종(원형, tools/ui/wp_icons.py)   // + 대장장이 1차 15종(원형, tools/ui/smith_icons.py)   // 견습생(둥근 사각형) + 약사 1차(원형, 2026-11-11 개편 뒤 15종)   // + 디자이너 2차 15종(tools/ui/designer_icons.py)
+const SKILL_ART = new Set(['nv_a1', 'nv_a2', 'nv_a3', 'nv_a4', 'nv_p1', 'nv_p2', 'nv_p3', 'nv_p4', ...['a1', 'a3', 'a4', 'a5', 'a6', 'b1', 'b2', 'b4', 'b5', 'b6', 'c1', 'c6', 'c7', 'c8', 'c9'].map(k => 'ph1_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'bs1_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'wp_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'cf_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'hb_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'en_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'ds_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'pt_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'mu_' + k)]);   // + 화가 2차 15종(tools/ui/painter_icons.py)   // + 엔지니어 2차 15종(tools/ui/en_icons.py)   // + 한약사 2차 15종(tools/ui/herbal_icons.py)   // + 쉐프 2차 15종(tools/ui/chef_icons.py) + 양약사 2차 15종(원형, tools/ui/wp_icons.py)   // + 대장장이 1차 15종(원형, tools/ui/smith_icons.py)   // 견습생(둥근 사각형) + 약사 1차(원형, 2026-11-11 개편 뒤 15종)   // + 디자이너 2차 15종(tools/ui/designer_icons.py)
 export function skillIcon(d, size = 48) {
   const k = d.id + size; if (iconCache.has(k)) return iconCache.get(k);
   if (SKILL_ART.has(d.id)) { const html = `<span class="icon i3d skic ${d.id.startsWith('nv_') ? 'skart' : 'skround'}" style="width:${size}px;height:${size}px;background:url(assets/ui/skills/${d.id}.png) center/contain no-repeat;image-rendering:auto"></span>`; iconCache.set(k, html); return html; }
@@ -71,6 +72,7 @@ function levelText(d, L) {
   const m = 1 + (d.type === 'ultimate' ? 0.25 : 0.12) * (L - 1), out = [];
   if (d.job === 'herbalist' && d.ops.some(o => o.fn === 'herb')) { const h = herbText(d, L); if (h) out.push(h); }
   else if (d.job === 'painter') { const pb = G.player && G.player.sheet && G.player.sheet.book; const h = paintText(d, L, pb ? { size: pb.passive('landscapeSize'), time: pb.passive('landscapeTime') } : {}); if (h) out.push(h); }
+  else if (d.job === 'musician') { const h = muText(d, L, { phrase: G.player && G.player.skills2 ? G.player.skills2.res.phrase : 0 }); if (h) out.push(h); }
   else
   for (const op of d.ops) {
     if (op.op === 'hit' && op.coef > 0) {
@@ -288,7 +290,13 @@ UI.prototype.updateControls = function () {
   // job resources only for the jobs that use them
   const job = p.sheet.p.job; let html = '';
   if (job === 'engineer') { const h = eng.en ? eng.en.heat() : 0, r = eng.en && eng.en.red; html = `전력 <b>${Math.floor(eng.res.power)}</b>/10 · 기계 ${eng.summons.filter(s => s.machine && !s.dead).length}` + (h > 0 ? ` · <span style="color:#ff9a3a">레드라인 ${Math.ceil(r.until - eng.clock)}s</span>` : h < 0 ? ` · <span style="color:#9ab0d0">냉각 ${Math.ceil(r.coolUntil - eng.clock)}s</span>` : ''); }
-  else if (job === 'musician') html = `악절 <b>${Math.floor(eng.res.phrase)}</b>/8${eng.melody ? ' · ♪ ' + eng.melody.ctx.d.name : ''}`;
+  else if (job === 'musician') {   // 음악가 2차: 악절 8칸 음표(코다가 쓰면 위로 날아가며 사라짐) + 켜 둔 선율(색·남은 초·강화) + 메아리·조율 대기
+    const ph = eng.res.phrase || 0, mk = eng.music, sp = mk && mk.spent && eng.clock - mk.spent.at < 0.7 ? mk.spent : null, k = sp ? (eng.clock - sp.at) / 0.7 : 0;
+    let notes = ''; for (let i = 0; i < MU.cap; i++) { const on = i < Math.floor(ph), half = !on && i < ph, gone = sp && !on && i >= Math.floor(ph) && i < Math.floor(ph) + sp.n;
+      notes += `<span style="display:inline-block;width:0.9em;text-align:center;color:${on ? '#ffd870' : gone ? '#fff2b0' : half ? '#a08850' : '#5a5060'};${gone ? `transform:translateY(${(-14 * k).toFixed(1)}px);opacity:${(1 - k).toFixed(2)}` : ''}">♪</span>`; }
+    const m = eng.melody && eng.melody.mu ? eng.melody : null, mm = m ? MU.mel[m.id] : null, b = m ? m.boost : 0;
+    html = `악절 ${notes} <b>${Math.floor(ph)}</b>/${MU.cap}${m ? ` · <b style="color:${mm.col}">♫ ${mm.name}</b> ${Math.ceil(m.t)}초${b > 0 ? ` <b style="color:#ffe080">강화 +${Math.round(b * 100)}%</b>` : ''}` : ''}${p.status && p.status.has && p.status.has('echo') ? ' · <b style="color:#d8e0ff">메아리 대기</b>' : ''}${mk && mk.switchArm ? ' · <b style="color:#ffd870">조율 준비</b>' : ''}`;
+  }
   else if (eng.summons.some(s => !s.dead)) html = `소환물 ${eng.summons.filter(s => !s.dead).length}`;
   if (eng.casting) html += ` · 시전 중: ${eng.casting.ctx.d.name}`;
   this.resBar.innerHTML = html; this.resBar.style.display = html ? '' : 'none';

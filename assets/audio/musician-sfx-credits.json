@@ -1,0 +1,28 @@
+{
+  "provider": "synthesized (tools/audio/music_sfx.py, numpy + scipy, fixed seed)",
+  "generatedOn": "2026-11-16",
+  "note": "음악가 2차 스킬. Runway 크레딧 없이 직접 합성(라장조 5음). 같은 이름의 파일로 바꿔 넣으면 교체됨.",
+  "assets": [
+    "sfx_mu_bow.mp3",
+    "sfx_mu_burst.mp3",
+    "sfx_mu_cello.mp3",
+    "sfx_mu_chord.mp3",
+    "sfx_mu_coda.mp3",
+    "sfx_mu_cymbal.mp3",
+    "sfx_mu_echo.mp3",
+    "sfx_mu_encore.mp3",
+    "sfx_mu_fanfare.mp3",
+    "sfx_mu_flute.mp3",
+    "sfx_mu_flute_tick.mp3",
+    "sfx_mu_harp.mp3",
+    "sfx_mu_harp_tick.mp3",
+    "sfx_mu_horn.mp3",
+    "sfx_mu_note.mp3",
+    "sfx_mu_pluck.mp3",
+    "sfx_mu_string.mp3",
+    "sfx_mu_symph.mp3",
+    "sfx_mu_trio.mp3",
+    "sfx_mu_tune.mp3",
+    "sfx_mu_wave_hit.mp3"
+  ]
+}
