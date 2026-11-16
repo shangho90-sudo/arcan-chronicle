@@ -224,36 +224,39 @@ S(J, 1, 2, '식사와 기초 조리', 4, 'ck1_c4', '간식 시간', 'support', '
   sfxAt='op', ops=[consume('food', cook='snack', ops=[heal(pct=0.08), buff('haste', 4, 0.25)])])
 S(J, 1, 2, '식사와 기초 조리', 5, 'ck1_c5', '알뜰한 손질', 'passive', '요리 제작에 쓴 일반 식재료 일부를 확률적으로 돌려받는다.', flags={'craftReturn:food': [0.10, 0.05]})
 
-# ======================================================================= 쉐프 (chef) — temperature contrast
+# ======================================================================= 쉐프 (chef) — 2026-11-16 2차 개편: 전장을 고급 레스토랑 무대로
+# 스킬 id·3×5 배치·배우는 레벨·최대 레벨·종류는 그대로(저장한 레벨·포인트·장착 칸이 그대로 새 스킬이 됨). 규칙은 js/chef.js(ChefKit, CUSTOM chef_*),
+# 그림은 js/cheffx.js(메시 tools/blender/fx_chef.py), 동작 cf_* (tools/anim/swings.py), 소리 cf_* (tools/audio/chef_sfx.py), 아이콘 tools/ui/chef_icons.py.
+# 수치는 개편 전 쉐프 값에서: 여러 번 때려도 총합은 그대로(split), 반응(증기 폭발·열충격)은 대상마다 시전 한 번에 한 번, 반응 피해는 다시 반응을 일으키지 않음.
 J, C = 'chef', 0xff6a30
-S(J, 2, 0, '화염 조리', 1, 'cf_a1', '화염 볶음', 'attack', '전방에 불꽃과 식재료를 흩뿌려 범위 공격.', range=3.6, mp=22, cd=6, anim='attack',
-  ops=[hit('cone', 2.6, r=3.6, ang=80, elem='fire', temp=+1, st=[st('burn', 3, 0.12)], fx=dict(slash='fire_cone'))])
-S(J, 2, 0, '화염 조리', 2, 'cf_a2', '플람베', 'attack', '범위에 불길을 일으킨다. 냉각된 적에게는 증기 폭발이 추가된다.', target='ground', range=6, mp=26, cd=9, anim='cast',
-  ops=[hit('circle', 2.8, r=2.6, atAim=True, elem='fire', temp=+1, st=[st('burn', 4, 0.15)], react=dict(need='chilled', coef=2.0, r=2.0, burst='explosion_steam'), fx=dict(burst='explosion_fire'))])
-S(J, 2, 0, '화염 조리', 3, 'cf_a3', '압력솥 폭발', 'summon', '압력솥을 설치해 지연 폭발로 밀치고 화상 영역을 남긴다.', target='ground', range=6, mp=26, cd=14, anim='cast',
-  ops=[summon('pressure_cooker', ai='bomb', life=2.0, hp=0.4, fuse=2.0, boom=dict(r=2.8, coef=4.0, elem='fire', knock=3, burst='explosion_fire', area=dict(kind='dmg', r=2.4, dur=4, tick=1, coef=0.3, fx='fire', st=[st('burn', 2, 0.1)])), limit=2, machine=True)])
-S(J, 2, 0, '화염 조리', 4, 'cf_a4', '불꽃 꼬치 행진', 'attack', '지면에서 불타는 꼬치가 순서대로 솟아오른다.', range=9, mp=28, cd=10, anim='cast',
-  ops=[custom('march', n=6, step=1.4, r=1.2, coef=1.1, gap=0.12, elem='fire', fx='skewer_row', temp=+1)])
-S(J, 2, 0, '화염 조리', 5, 'cf_a5', '지옥의 오픈 키친', 'ultimate', '팬·꼬치·솥 연속 공격 뒤 대폭발.', target='self', mp=75, cd=70, cast=0.6, anim='cast',
-  ops=[dict(op='telegraph', shape='circle', r=5, dur=0.6), hit('circle', 1.6, r=4, hits=3, gap=0.3, elem='fire', fx=dict(slash='spin')), custom('march', n=8, step=0.0, ring=4, r=1.2, coef=1.0, gap=0.08, elem='fire', fx='skewer_row', at=1.0), delay(2.0, 5.0, 8.0, burst='explosion_big', elem='fire', self=True)])
-S(J, 2, 1, '냉채와 디저트', 1, 'cf_b1', '소르베 탄환', 'attack', '냉기 탄환을 연속으로 쏘며 둔화를 쌓는다.', target='enemy', range=8, mp=20, cd=5, anim='throw',
-  ops=[proj('normal', 0.8, count=4, gap=0.12, speed=16, elem='ice', fx='sorbet', burst='explosion_ice', temp=-1, st=[st('slow', 2, 0.12)], stackSlow=True)])
-S(J, 2, 1, '냉채와 디저트', 2, 'cf_b2', '급속 냉동', 'attack', '범위를 얼린다. 화상 상태의 적은 추가 피해 후 화상이 사라진다.', target='ground', range=6, mp=26, cd=9, anim='cast',
-  ops=[hit('circle', 2.4, r=2.6, atAim=True, elem='ice', temp=-1, st=[st('slow', 3, 0.4)], react=dict(need='burn', coef=2.2, consume='burn', burst='explosion_steam'), fx=dict(burst='ice_crystal'))])
-S(J, 2, 1, '냉채와 디저트', 3, 'cf_b3', '얼음 접시', 'attack', '관통하며 왕복하는 얼음 접시를 던진다.', range=8, mp=22, cd=7, anim='throw',
-  ops=[proj('boomerang', 1.8, speed=12, range=8, pierce=True, elem='ice', fx='ice_plate', temp=-1)])
-S(J, 2, 1, '냉채와 디저트', 4, 'cf_b4', '설탕 유리벽', 'summon', '이동과 투사체를 막는 설탕 유리벽. 부서지면 파편 피해.', target='ground', range=5, mp=24, cd=18, anim='cast',
-  ops=[summon('sugar_wall', ai='wall', life=8, hp=1.5, width=3.0, onBreak=dict(r=2.4, coef=1.6, burst='shield_break'), limit=2, machine=True)])
-S(J, 2, 1, '냉채와 디저트', 5, 'cf_b5', '겨울의 디저트 궁전', 'ultimate', '대형 빙과 장식으로 냉각한 뒤 파편 폭발.', target='self', mp=75, cd=70, cast=0.8, anim='cast',
-  ops=[dict(op='telegraph', shape='circle', r=6, dur=0.8), area('slow', 6, 3, tick=0.5, coef=0.4, elem='ice', st=[st('slow', 1, 0.5)], fx='frost', temp=-1), delay(2.6, 6, 7.0, burst='ice_crystal', elem='ice', self=True, st=[st('freeze', 1.5)])])
-S(J, 2, 2, '만찬과 회복', 1, 'cf_c1', '특제 코스 요리', 'craft', '공격·방어·회복 계열 고급 음식을 만든다.')
-S(J, 2, 2, '만찬과 회복', 2, 'cf_c2', '생명의 스튜', 'support', '냄비를 놓아 주변을 회복하는 영역을 만든다.', target='ground', range=4, mp=28, cd=22, anim='cast',
-  ops=[area('heal', 3.0, 8, tick=1.0, heal=0.025, fx='healing_mist', prop='cooking_pot', living=True)])
-S(J, 2, 2, '만찬과 회복', 3, 'cf_c3', '전투 배식', 'support', '요리를 먹어 즉시 회복하고 음식 효과를 잠시 증폭한다.', target='self', mp=10, cd=20, anim='cast',
-  ops=[consume('food', ops=[heal(pct=0.15), buff('foodup', 10, 0.5)])])
-S(J, 2, 2, '만찬과 회복', 4, 'cf_c4', '완벽한 레시피', 'passive', '직접 만든 음식의 지속시간과 회복량이 증가한다.', mods=[dict(stat='foodPower', add=0.1, addLv=0.05)])
-S(J, 2, 2, '만찬과 회복', 5, 'cf_c5', '왕실의 풀코스', 'ultimate', '보호막 → 공격 강화 → 큰 회복을 순서대로 제공한다.', target='self', mp=65, cd=75, cast=0.4, anim='cast',
-  ops=[shield(80, 2.0, 8), buff('atkup', 10, 0.3, at=1.5), heal(pct=0.4, at=3.0)])
+S(J, 2, 0, '불꽃의 오픈 키친', 1, 'cf_a1', '인페르노 웍', 'attack', '큰 웍을 두 번 뒤집어 정면 부채꼴을 볶는다. 첫 번째는 짧은 불꽃 호(70°, 3 m), 두 번째는 넓은 초승달 불길(120°, 3.6 m)로 화상을 남긴다. 공중으로 튄 재료는 다시 웍에 받아진다.', range=3.6, mp=22, cd=6, anim='cf_wok', sfx='cf_wok_toss', sfxAt='op', recover=0.45,
+  ops=[custom('chef_wok', at=-1, r1=3.0, ang1=70, coef1=1.0, gap=0.28, r2=3.6, ang2=120, coef2=1.6, st=[st('burn', 3, 0.12)])], fx=dict(color=0xff6a30))
+S(J, 2, 0, '불꽃의 오픈 키친', 2, 'cf_a2', '그랑 플람베', 'attack', '조준한 곳에 호박색 소스를 끼얹고 불씨를 던져 붙인다. 파란 불길이 소스를 따라 번진 뒤 주홍 불꽃이 솟아 범위 피해와 화상을 준다. 이미 둔화된 적은 시전마다 한 번 증기 폭발로 추가 피해를 받는다.', target='ground', range=6, mp=26, cd=9, anim='cf_splash', sfxAt='op', recover=0.4,
+  ops=[custom('chef_flambe', at=-1, r=2.6, coef=2.8, ignite=0.45, st=[st('burn', 4, 0.15)], steam=dict(need='slow', coef=2.0))], fx=dict(color=0xffa030))
+S(J, 2, 0, '불꽃의 오픈 키친', 3, 'cf_a3', '시그니처 압력솥', 'summon', '지정한 곳에 압력솥을 놓는다. 새어 나오는 증기가 곁의 적을 느리게 하고, 2.2초 뒤 뚜껑이 튀며 폭발해 피해·화상을 주고 적을 밀어낸다(보스는 밀리지 않음). 폭발 1초 전부터 바닥에 경고가 뜬다. 최대 2개, 더 놓으면 가장 오래된 솥이 조용히 치워진다.', target='ground', range=6, mp=26, cd=14, anim='cf_place', sfxAt='op',
+  ops=[summon('pressure_cooker', ai='chef_cooker', life=3.0, hp=0.4, fuse=2.2, warn=1.0, steam=dict(r=2.4, tick=0.5, slow=0.3, dur=0.8), boom=dict(r=2.8, coef=4.0, knock=3, elem='fire', burst='none', quiet=True, st=[st('burn', 3, 0.12)]), limit=2, machine=True)], fx=dict(color=0xd87a3a))
+S(J, 2, 0, '불꽃의 오픈 키친', 4, 'cf_a4', '브로셰트 러시', 'attack', '허공에서 재료가 꼬치에 꿰이고 짧은 불길에 구워진 뒤 차례로 날아간다. 꼬치는 앞쪽 직선(8 m)의 적을 모두 꿰뚫으며, 꼬치 하나는 같은 적을 한 번만 맞힌다. 스킬 레벨이 오르면 꼬치 수가 늘지만 총 피해는 나눠진다.', range=8, mp=28, cd=10, anim='cf_skewer', sfxAt='op', recover=0.35,
+  ops=[custom('chef_skewers', at=-1, n=4, len=8, w=1.2, total=2.2, gap=0.11, speed=20, elem='fire')], fx=dict(color=0xff8a3a))
+S(J, 2, 0, '불꽃의 오픈 키친', 5, 'cf_a5', '마스터 셰프 쇼타임', 'ultimate', '세 단계 쇼: ① 반투명 조리대 위로 식칼이 엇갈려 번뜩이며 재빨리 손질(3타) ② 거대한 웍이 재료를 불길과 함께 띄워 볶음(2타·화상) ③ 금빛 클로슈가 내려앉아 가장 큰 피해와 낮은 불꽃 충격파를 낸다. 단계마다 도구가 나타났다 사라진다.', target='self', mp=75, cd=70, cast=0.2, anim='cf_show', sfxAt='op',
+  ops=[custom('chef_show', at=0.0, fwd=2.0, prep=dict(r=3.5, coef=0.8, n=3, t=0.15, gap=0.15), stir=dict(r=4.0, coef=1.6, n=2, t=0.8, gap=0.25, st=[st('burn', 3, 0.15)]), cloche=dict(r=4.5, coef=7.0, t=1.55), wave=dict(r=6.0, coef=1.4))], fx=dict(color=0xffc040))
+S(J, 2, 1, '환상의 파티스리', 1, 'cf_b1', '소르베 퀸텟', 'attack', '다섯 가지 과일 소르베를 떠서 공중에 부채꼴로 펼친 뒤, 서로 다른 곡선으로 적 하나에게 차례로 날린다. 맞을 때마다 둔화가 조금씩 깊어진다(최대 40%). 대상이 쓰러지면 남은 소르베는 가까운 적을 찾고, 없으면 사라진다.', target='enemy', range=8, mp=20, cd=5, anim='cf_scoop', sfxAt='op', recover=0.3,
+  ops=[custom('chef_sorbet', at=-1, n=5, coef=0.64, gap=0.09, speed=13, retarget=6, slow=dict(dur=2.5, first=0.12, step=0.07, cap=0.4))], fx=dict(color=0x9ad8ff))
+S(J, 2, 1, '환상의 파티스리', 2, 'cf_b2', '프로즌 플레이팅', 'attack', '바닥에 얇은 접시 무늬를 그리고 소스로 장식하듯 서리 선을 그어 얼음꽃을 피운다. 범위 냉기 피해와 둔화. 맞기 직전에 화상이던 적은 화상이 사라지며 열충격 추가 피해를, 이미 둔화돼 있던 일반 적은 잠깐 빙결된다(보스 제외).', target='ground', range=6, mp=26, cd=9, anim='cf_plate', sfxAt='op', recover=0.4,
+  ops=[custom('chef_plating', at=-1, r=2.6, coef=2.4, bloom=0.35, st=[st('slow', 3, 0.4)], shock=dict(need='burn', coef=2.2), freeze=1.2)], fx=dict(color=0xbfe8ff))
+S(J, 2, 1, '환상의 파티스리', 3, 'cf_b3', '밀푀유 블레이드', 'attack', '금빛 페이스트리와 얇은 얼음 층을 겹친 원반을 던진다. 원반은 8 m를 꿰뚫고 날아갔다가 나에게 돌아오며, 갈 때와 올 때 같은 적을 한 번씩만 벤다. 돌아오는 동안 내가 움직이면 따라오고, 쓰러지면 그 자리에서 흩어진다.', range=8, mp=22, cd=7, anim='throw', sfxAt='op', recover=0.3,
+  ops=[custom('chef_mille', at=-1, len=8, speed=13, w=1.3, coef=1.8, back=1.8, life=2.6)], fx=dict(color=0xffd88a))
+S(J, 2, 1, '환상의 파티스리', 4, 'cf_b4', '슈가 아라베스크', 'summon', '허공에 그린 캐러멜 선이 이어져 굳으며 설탕 벽(폭 3.6 m)이 된다. 8초 동안 적의 이동과 적의 투사체를 막는다. 부서지거나 시간이 다 되면 설탕 파편이 한 번 터져 주변 적에게 피해를 준다(지역 이동 등으로 치워질 때는 터지지 않음). 지형 속·출입구·나나 동료와 겹치는 곳에는 세울 수 없다.', target='ground', range=5, mp=24, cd=18, anim='cf_draw', sfxAt='op',
+  ops=[summon('sugar_wall', ai='chef_sugar', life=8, hp=1.5, width=3.6, shards=dict(r=2.4, coef=1.6, elem='ice'), limit=2, machine=True)], fx=dict(color=0xffc86a))
+S(J, 2, 1, '환상의 파티스리', 5, 'cf_b5', '크로캉부슈 피날레', 'ultimate', '내 앞(1.5 m)에 작은 슈가 나선을 그리며 쌓여 디저트 탑이 되고, 금빛 캐러멜 실이 감기며 하얀 서리가 내려앉는다. 쌓이는 2초 동안 주변을 느리게 하고 약한 냉기 피해를 준다. 완성되면 위층부터 차례로 터져 냉기 피해를 주고, 맨 아래층은 넓은 냉기 고리를 내보내 일반 적을 잠깐 빙결시킨다.', target='self', mp=75, cd=70, cast=0.3, anim='cf_draw', sfxAt='op',
+  ops=[custom('chef_tower', at=0.0, fwd=1.5, form=2.0, aura=dict(r=6.0, tick=0.5, coef=0.3, slow=0.45, max=4), layers=dict(n=3, r=4.0, coef=1.6, gap=0.15), base=dict(r=6.5, coef=2.6, freeze=1.2))], fx=dict(color=0xfff0d8))
+S(J, 2, 2, '왕실의 테이블', 1, 'cf_c1', '시그니처 메뉴', 'craft', '공격·방어·회복 고급 코스 요리를 만든다. 성공하면 접시 위에 메인 → 곁들임 → 소스가 차례로 올라가고 테두리에 금빛이 돈다. 여러 개를 한 번에 만들 수 있다.')
+S(J, 2, 2, '왕실의 테이블', 2, 'cf_c2', '황금 부용', 'support', '지정한 곳에 구리 냄비를 놓는다. 8초 동안 1초마다 범위(바닥 표시) 안의 나와 살아 있는 소환수(기계 제외)를 최대 체력의 2.5%씩 회복한다. 냄비는 하나만 — 다시 쓰면 예전 냄비는 사라진다.', target='ground', range=4, mp=28, cd=22, anim='cf_serve', sfx='cf_place', sfxAt='strike', sfxLead=0.0,
+  ops=[area('heal', 3.0, 8, tick=1.0, heal=0.025, fx='none', chef='broth', living=True, single='broth')], fx=dict(color=0xffd27a))
+S(J, 2, 2, '왕실의 테이블', 3, 'cf_c3', '봉 아페티!', 'support', '가방의 음식 하나를 은쟁반에 올려 먹는다. 즉시 최대 체력의 15%를 회복하고, 그 음식의 효과가 10초 동안 50% 강해진다(원래 효과에서 계산 — 다시 써도 겹쳐 커지지 않음). 먹을 음식이 없으면 기력·재사용 대기를 쓰지 않는다. 물약 재사용 대기와는 따로 돈다.', target='self', mp=10, cd=20, anim='cf_serve', sfxAt='op',
+  ops=[consume('food', chef='bon', ops=[heal(pct=0.15)], boost=0.5, boostDur=10)], fx=dict(color=0xe8eef8))
+S(J, 2, 2, '왕실의 테이블', 4, 'cf_c4', '셰프의 한 끗', 'passive', '내가 직접 만든 음식은 회복량과 지속 시간이 늘어난다(가방의 그 음식 중 직접 만든 개수만큼). 강화된 음식을 먹을 때 허브 잎과 작은 금빛 반짝임이 뜬다.', flags=dict(chefTouch=[0.10, 0.05]))
+S(J, 2, 2, '왕실의 테이블', 5, 'cf_c5', '로열 그랑 디너', 'ultimate', '내 둘레에 작은 은쟁반 세 개가 놓이고 클로슈가 차례로 열린다. 첫째 — 은금빛 보호막, 둘째 — 공격력 30% 증가(10초), 셋째 — 최대 체력의 40% 회복. 효과는 뚜껑이 열리는 순간에 들어가며, 그 전에 쓰러지거나 지역을 옮기면 남은 쟁반은 취소된다. 가방의 음식과 무관하다.', target='self', mp=65, cd=75, cast=0.2, anim='cf_serve', sfxAt='op',
+  ops=[custom('chef_royal', at=0.0, times=[0.45, 0.95, 1.45], shield=dict(base=80, coef=2.0, dur=8), atk=dict(val=0.3, dur=10), heal=0.4)], fx=dict(color=0xffe08a))
 
 # ======================================================================= 대장장이 (blacksmith)
 J, C = 'blacksmith', 0xff8a30

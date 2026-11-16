@@ -193,6 +193,7 @@ export function craft(data, sheet, book, recipe, times = 1, rng = Math.random) {
   sheet.p.gold -= gold;
   // maker record for equipment (stored in profile, keyed by item id)
   const od = data.item(recipe.output.item);
+  if (od && outN > 0 && od.id.startsWith('f_')) { const cr = sheet.p.crafted = sheet.p.crafted || {}; cr['food:' + od.id] = (cr['food:' + od.id] | 0) + outN; }   // 직접 만든 음식 개수(셰프의 한 끗, js/chef.js foodTouch) — 더하기만 하는 키라 저장 형식 그대로
   if (od && outN > 0 && ['weapon', 'armor', 'accessory'].includes(od.type)) { sheet.p.crafted = sheet.p.crafted || {}; sheet.p.crafted[od.id] = { by: sheet.p.name, recipe: recipe.id }; }
   bag.changed();
   return { ok: true, made: outN, bonus, returned: ret.length, failed, rate };

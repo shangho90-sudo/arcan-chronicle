@@ -1,0 +1,33 @@
+{
+  "provider": "synthesized (tools/audio/chef_sfx.py, numpy + scipy, fixed seed)",
+  "generatedOn": "2026-11-16",
+  "note": "쉐프 2차 스킬. 직접 합성 — 같은 이름의 파일로 바꿔 넣으면 교체됨.",
+  "assets": [
+    "sfx_cf_choux_pop.mp3",
+    "sfx_cf_cloche_fall.mp3",
+    "sfx_cf_cloche_open.mp3",
+    "sfx_cf_cloche_slam.mp3",
+    "sfx_cf_disc.mp3",
+    "sfx_cf_disc_catch.mp3",
+    "sfx_cf_disc_hit.mp3",
+    "sfx_cf_flame.mp3",
+    "sfx_cf_frost.mp3",
+    "sfx_cf_frost_draw.mp3",
+    "sfx_cf_ignite.mp3",
+    "sfx_cf_knife.mp3",
+    "sfx_cf_place.mp3",
+    "sfx_cf_pop.mp3",
+    "sfx_cf_scoop.mp3",
+    "sfx_cf_serve.mp3",
+    "sfx_cf_shatter.mp3",
+    "sfx_cf_sizzle.mp3",
+    "sfx_cf_skewer.mp3",
+    "sfx_cf_sorbet_hit.mp3",
+    "sfx_cf_splash.mp3",
+    "sfx_cf_steam.mp3",
+    "sfx_cf_steam_hiss.mp3",
+    "sfx_cf_sugar.mp3",
+    "sfx_cf_whoosh.mp3",
+    "sfx_cf_wok_toss.mp3"
+  ]
+}

@@ -558,10 +558,11 @@ export class Player extends Combatant {
     const useful = ((u.heal > 0 || u.healPercent > 0) && this.hp < this.maxHp) || (u.sp > 0 && this.sp < this.maxSp) || (u.cure && this.status.has(u.cure)) || !!u.status;
     if (!useful) { G.ui.toast("지금은 효과가 없습니다"); return false; }
     if (!this.sheet.bag.remove(id, 1)) return false;
-    if (u.heal > 0 || u.healPercent > 0) this.heal(CombatMath.heal(u.heal, u.healPercent, this.maxHp, this.sheet.final.healPower));
+    const touch = id.startsWith('f_') && this.skills2 && this.skills2.chef ? this.skills2.chef.foodTouch(id) : 0;   // 셰프의 한 끗(js/chef.js): 직접 만든 음식이면 회복량·지속 시간 +
+    if (u.heal > 0 || u.healPercent > 0) this.heal(CombatMath.heal(u.heal, u.healPercent, this.maxHp, this.sheet.final.healPower) * (1 + touch));
     if (u.sp > 0) { this.sp = Math.min(this.maxSp, this.sp + u.sp); G.ui.floatText(this.pos, "+" + u.sp + " 기력", "#80ccff", 0.9, 1.6); }
     if (u.cure) this.status.remove(u.cure);
-    if (u.status) { const k = d.id.startsWith('f_') ? 1 + this.sheet.final.foodPower : 1; applyStatus(this, { id: u.status, dur: u.duration * k, val: u.value * (u.status === 'regen' ? this.maxHp : 1), ch: 1 }, this); }
+    if (u.status) { const k = d.id.startsWith('f_') ? (1 + this.sheet.final.foodPower) * (1 + touch) : 1; applyStatus(this, { id: u.status, dur: u.duration * k, val: u.value * (u.status === 'regen' ? this.maxHp * (1 + touch) : 1), ch: 1 }, this); }
     this.potionCd = Math.max(this.cfg.potionCooldown, u.cooldown);
     G.fx.play("heal", { x: this.pos.x, y: this.pos.y + 0.8, z: this.pos.z }, 1); G.audio.sfx("heal");
     if (d.id.startsWith('f_') && G.skillFx && G.skillFx.cook) G.skillFx.cook.eat(this, { kind: cookFoodKind(d.id) });

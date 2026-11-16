@@ -3541,11 +3541,11 @@
 "job": "chef",
 "tier": 2,
 "cat": 0,
-"catName": "화염 조리",
+"catName": "불꽃의 오픈 키친",
 "idx": 1,
-"name": "화염 볶음",
+"name": "인페르노 웍",
 "type": "attack",
-"desc": "전방에 불꽃과 식재료를 흩뿌려 범위 공격.",
+"desc": "큰 웍을 두 번 뒤집어 정면 부채꼴을 볶는다. 첫 번째는 짧은 불꽃 호(70°, 3 m), 두 번째는 넓은 초승달 불길(120°, 3.6 m)로 화상을 남긴다. 공중으로 튄 재료는 다시 웍에 받아진다.",
 "maxLv": 5,
 "unlock": 30,
 "prereq": [],
@@ -3555,17 +3555,20 @@
 "mp": 22,
 "cd": 6,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "attack",
+"recover": 0.45,
+"anim": "cf_wok",
 "ops": [
 {
-"op": "hit",
-"shape": "cone",
-"coef": 2.6,
-"r": 3.6,
-"ang": 80,
-"elem": "fire",
-"temp": 1,
+"op": "custom",
+"fn": "chef_wok",
+"at": -1,
+"r1": 3.0,
+"ang1": 70,
+"coef1": 1.0,
+"gap": 0.28,
+"r2": 3.6,
+"ang2": 120,
+"coef2": 1.6,
 "st": [
 {
 "id": "burn",
@@ -3573,15 +3576,16 @@
 "val": 0.12,
 "ch": 1.0
 }
-],
-"fx": {
-"slash": "fire_cone"
-}
+]
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16738864
+},
+"sfx": "cf_wok_toss",
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -3596,11 +3600,11 @@
 "job": "chef",
 "tier": 2,
 "cat": 0,
-"catName": "화염 조리",
+"catName": "불꽃의 오픈 키친",
 "idx": 2,
-"name": "플람베",
+"name": "그랑 플람베",
 "type": "attack",
-"desc": "범위에 불길을 일으킨다. 냉각된 적에게는 증기 폭발이 추가된다.",
+"desc": "조준한 곳에 호박색 소스를 끼얹고 불씨를 던져 붙인다. 파란 불길이 소스를 따라 번진 뒤 주홍 불꽃이 솟아 범위 피해와 화상을 준다. 이미 둔화된 적은 시전마다 한 번 증기 폭발로 추가 피해를 받는다.",
 "maxLv": 5,
 "unlock": 33,
 "prereq": [],
@@ -3610,17 +3614,16 @@
 "mp": 26,
 "cd": 9,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "cast",
+"recover": 0.4,
+"anim": "cf_splash",
 "ops": [
 {
-"op": "hit",
-"shape": "circle",
-"coef": 2.8,
+"op": "custom",
+"fn": "chef_flambe",
+"at": -1,
 "r": 2.6,
-"atAim": true,
-"elem": "fire",
-"temp": 1,
+"coef": 2.8,
+"ignite": 0.45,
 "st": [
 {
 "id": "burn",
@@ -3629,20 +3632,18 @@
 "ch": 1.0
 }
 ],
-"react": {
-"need": "chilled",
-"coef": 2.0,
-"r": 2.0,
-"burst": "explosion_steam"
-},
-"fx": {
-"burst": "explosion_fire"
+"steam": {
+"need": "slow",
+"coef": 2.0
 }
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16752688
+},
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -3657,11 +3658,11 @@
 "job": "chef",
 "tier": 2,
 "cat": 0,
-"catName": "화염 조리",
+"catName": "불꽃의 오픈 키친",
 "idx": 3,
-"name": "압력솥 폭발",
+"name": "시그니처 압력솥",
 "type": "summon",
-"desc": "압력솥을 설치해 지연 폭발로 밀치고 화상 영역을 남긴다.",
+"desc": "지정한 곳에 압력솥을 놓는다. 새어 나오는 증기가 곁의 적을 느리게 하고, 2.2초 뒤 뚜껑이 튀며 폭발해 피해·화상을 주고 적을 밀어낸다(보스는 밀리지 않음). 폭발 1초 전부터 바닥에 경고가 뜬다. 최대 2개, 더 놓으면 가장 오래된 솥이 조용히 치워진다.",
 "maxLv": 5,
 "unlock": 36,
 "prereq": [],
@@ -3672,37 +3673,37 @@
 "cd": 14,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "cast",
+"anim": "cf_place",
 "ops": [
 {
 "op": "summon",
 "kind": "pressure_cooker",
-"ai": "bomb",
-"life": 2.0,
+"ai": "chef_cooker",
+"life": 3.0,
 "hp": 0.4,
-"fuse": 2.0,
+"fuse": 2.2,
+"warn": 1.0,
+"steam": {
+"r": 2.4,
+"tick": 0.5,
+"slow": 0.3,
+"dur": 0.8
+},
 "boom": {
 "r": 2.8,
 "coef": 4.0,
-"elem": "fire",
 "knock": 3,
-"burst": "explosion_fire",
-"area": {
-"kind": "dmg",
-"r": 2.4,
-"dur": 4,
-"tick": 1,
-"coef": 0.3,
-"fx": "fire",
+"elem": "fire",
+"burst": "none",
+"quiet": true,
 "st": [
 {
 "id": "burn",
-"dur": 2,
-"val": 0.1,
+"dur": 3,
+"val": 0.12,
 "ch": 1.0
 }
 ]
-}
 },
 "limit": 2,
 "machine": true
@@ -3710,7 +3711,10 @@
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 14187066
+},
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -3725,39 +3729,42 @@
 "job": "chef",
 "tier": 2,
 "cat": 0,
-"catName": "화염 조리",
+"catName": "불꽃의 오픈 키친",
 "idx": 4,
-"name": "불꽃 꼬치 행진",
+"name": "브로셰트 러시",
 "type": "attack",
-"desc": "지면에서 불타는 꼬치가 순서대로 솟아오른다.",
+"desc": "허공에서 재료가 꼬치에 꿰이고 짧은 불길에 구워진 뒤 차례로 날아간다. 꼬치는 앞쪽 직선(8 m)의 적을 모두 꿰뚫으며, 꼬치 하나는 같은 적을 한 번만 맞힌다. 스킬 레벨이 오르면 꼬치 수가 늘지만 총 피해는 나눠진다.",
 "maxLv": 5,
 "unlock": 40,
 "prereq": [],
 "weapon": null,
 "target": "dir",
-"range": 9,
+"range": 8,
 "mp": 28,
 "cd": 10,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "cast",
+"anim": "cf_skewer",
 "ops": [
 {
 "op": "custom",
-"fn": "march",
-"n": 6,
-"step": 1.4,
-"r": 1.2,
-"coef": 1.1,
-"gap": 0.12,
-"elem": "fire",
-"fx": "skewer_row",
-"temp": 1
+"fn": "chef_skewers",
+"at": -1,
+"n": 4,
+"len": 8,
+"w": 1.2,
+"total": 2.2,
+"gap": 0.11,
+"speed": 20,
+"elem": "fire"
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16747066
+},
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -3772,11 +3779,11 @@
 "job": "chef",
 "tier": 2,
 "cat": 0,
-"catName": "화염 조리",
+"catName": "불꽃의 오픈 키친",
 "idx": 5,
-"name": "지옥의 오픈 키친",
+"name": "마스터 셰프 쇼타임",
 "type": "ultimate",
-"desc": "팬·꼬치·솥 연속 공격 뒤 대폭발.",
+"desc": "세 단계 쇼: ① 반투명 조리대 위로 식칼이 엇갈려 번뜩이며 재빨리 손질(3타) ② 거대한 웍이 재료를 불길과 함께 띄워 볶음(2타·화상) ③ 금빛 클로슈가 내려앉아 가장 큰 피해와 낮은 불꽃 충격파를 낸다. 단계마다 도구가 나타났다 사라진다.",
 "maxLv": 3,
 "unlock": 45,
 "prereq": [],
@@ -3785,54 +3792,54 @@
 "range": 2.0,
 "mp": 75,
 "cd": 70,
-"cast": 0.6,
+"cast": 0.2,
 "recover": 0.35,
-"anim": "cast",
+"anim": "cf_show",
 "ops": [
 {
-"op": "telegraph",
-"shape": "circle",
-"r": 5,
-"dur": 0.6
-},
-{
-"op": "hit",
-"shape": "circle",
-"coef": 1.6,
-"r": 4,
-"hits": 3,
-"gap": 0.3,
-"elem": "fire",
-"fx": {
-"slash": "spin"
-}
-},
-{
 "op": "custom",
-"fn": "march",
-"n": 8,
-"step": 0.0,
-"ring": 4,
-"r": 1.2,
-"coef": 1.0,
-"gap": 0.08,
-"elem": "fire",
-"fx": "skewer_row",
-"at": 1.0
+"fn": "chef_show",
+"at": 0.0,
+"fwd": 2.0,
+"prep": {
+"r": 3.5,
+"coef": 0.8,
+"n": 3,
+"t": 0.15,
+"gap": 0.15
 },
+"stir": {
+"r": 4.0,
+"coef": 1.6,
+"n": 2,
+"t": 0.8,
+"gap": 0.25,
+"st": [
 {
-"op": "delay",
-"after": 2.0,
-"r": 5.0,
-"coef": 8.0,
-"burst": "explosion_big",
-"elem": "fire",
-"self": true
+"id": "burn",
+"dur": 3,
+"val": 0.15,
+"ch": 1.0
+}
+]
+},
+"cloche": {
+"r": 4.5,
+"coef": 7.0,
+"t": 1.55
+},
+"wave": {
+"r": 6.0,
+"coef": 1.4
+}
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16760896
+},
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -3847,11 +3854,11 @@
 "job": "chef",
 "tier": 2,
 "cat": 1,
-"catName": "냉채와 디저트",
+"catName": "환상의 파티스리",
 "idx": 1,
-"name": "소르베 탄환",
+"name": "소르베 퀸텟",
 "type": "attack",
-"desc": "냉기 탄환을 연속으로 쏘며 둔화를 쌓는다.",
+"desc": "다섯 가지 과일 소르베를 떠서 공중에 부채꼴로 펼친 뒤, 서로 다른 곡선으로 적 하나에게 차례로 날린다. 맞을 때마다 둔화가 조금씩 깊어진다(최대 40%). 대상이 쓰러지면 남은 소르베는 가까운 적을 찾고, 없으면 사라진다.",
 "maxLv": 5,
 "unlock": 30,
 "prereq": [],
@@ -3861,34 +3868,32 @@
 "mp": 20,
 "cd": 5,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "throw",
+"recover": 0.3,
+"anim": "cf_scoop",
 "ops": [
 {
-"op": "proj",
-"kind": "normal",
-"coef": 0.8,
-"count": 4,
-"gap": 0.12,
-"speed": 16,
-"elem": "ice",
-"fx": "sorbet",
-"burst": "explosion_ice",
-"temp": -1,
-"st": [
-{
-"id": "slow",
-"dur": 2,
-"val": 0.12,
-"ch": 1.0
+"op": "custom",
+"fn": "chef_sorbet",
+"at": -1,
+"n": 5,
+"coef": 0.64,
+"gap": 0.09,
+"speed": 13,
+"retarget": 6,
+"slow": {
+"dur": 2.5,
+"first": 0.12,
+"step": 0.07,
+"cap": 0.4
 }
-],
-"stackSlow": true
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 10148095
+},
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -3903,11 +3908,11 @@
 "job": "chef",
 "tier": 2,
 "cat": 1,
-"catName": "냉채와 디저트",
+"catName": "환상의 파티스리",
 "idx": 2,
-"name": "급속 냉동",
+"name": "프로즌 플레이팅",
 "type": "attack",
-"desc": "범위를 얼린다. 화상 상태의 적은 추가 피해 후 화상이 사라진다.",
+"desc": "바닥에 얇은 접시 무늬를 그리고 소스로 장식하듯 서리 선을 그어 얼음꽃을 피운다. 범위 냉기 피해와 둔화. 맞기 직전에 화상이던 적은 화상이 사라지며 열충격 추가 피해를, 이미 둔화돼 있던 일반 적은 잠깐 빙결된다(보스 제외).",
 "maxLv": 5,
 "unlock": 33,
 "prereq": [],
@@ -3917,17 +3922,16 @@
 "mp": 26,
 "cd": 9,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "cast",
+"recover": 0.4,
+"anim": "cf_plate",
 "ops": [
 {
-"op": "hit",
-"shape": "circle",
-"coef": 2.4,
+"op": "custom",
+"fn": "chef_plating",
+"at": -1,
 "r": 2.6,
-"atAim": true,
-"elem": "ice",
-"temp": -1,
+"coef": 2.4,
+"bloom": 0.35,
 "st": [
 {
 "id": "slow",
@@ -3936,20 +3940,19 @@
 "ch": 1.0
 }
 ],
-"react": {
+"shock": {
 "need": "burn",
-"coef": 2.2,
-"consume": "burn",
-"burst": "explosion_steam"
+"coef": 2.2
 },
-"fx": {
-"burst": "ice_crystal"
-}
+"freeze": 1.2
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 12577023
+},
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -3964,11 +3967,11 @@
 "job": "chef",
 "tier": 2,
 "cat": 1,
-"catName": "냉채와 디저트",
+"catName": "환상의 파티스리",
 "idx": 3,
-"name": "얼음 접시",
+"name": "밀푀유 블레이드",
 "type": "attack",
-"desc": "관통하며 왕복하는 얼음 접시를 던진다.",
+"desc": "금빛 페이스트리와 얇은 얼음 층을 겹친 원반을 던진다. 원반은 8 m를 꿰뚫고 날아갔다가 나에게 돌아오며, 갈 때와 올 때 같은 적을 한 번씩만 벤다. 돌아오는 동안 내가 움직이면 따라오고, 쓰러지면 그 자리에서 흩어진다.",
 "maxLv": 5,
 "unlock": 36,
 "prereq": [],
@@ -3978,24 +3981,27 @@
 "mp": 22,
 "cd": 7,
 "cast": 0.0,
-"recover": 0.35,
+"recover": 0.3,
 "anim": "throw",
 "ops": [
 {
-"op": "proj",
-"kind": "boomerang",
+"op": "custom",
+"fn": "chef_mille",
+"at": -1,
+"len": 8,
+"speed": 13,
+"w": 1.3,
 "coef": 1.8,
-"speed": 12,
-"range": 8,
-"pierce": true,
-"elem": "ice",
-"fx": "ice_plate",
-"temp": -1
+"back": 1.8,
+"life": 2.6
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16767114
+},
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -4010,11 +4016,11 @@
 "job": "chef",
 "tier": 2,
 "cat": 1,
-"catName": "냉채와 디저트",
+"catName": "환상의 파티스리",
 "idx": 4,
-"name": "설탕 유리벽",
+"name": "슈가 아라베스크",
 "type": "summon",
-"desc": "이동과 투사체를 막는 설탕 유리벽. 부서지면 파편 피해.",
+"desc": "허공에 그린 캐러멜 선이 이어져 굳으며 설탕 벽(폭 3.6 m)이 된다. 8초 동안 적의 이동과 적의 투사체를 막는다. 부서지거나 시간이 다 되면 설탕 파편이 한 번 터져 주변 적에게 피해를 준다(지역 이동 등으로 치워질 때는 터지지 않음). 지형 속·출입구·나나 동료와 겹치는 곳에는 세울 수 없다.",
 "maxLv": 5,
 "unlock": 40,
 "prereq": [],
@@ -4025,19 +4031,19 @@
 "cd": 18,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "cast",
+"anim": "cf_draw",
 "ops": [
 {
 "op": "summon",
 "kind": "sugar_wall",
-"ai": "wall",
+"ai": "chef_sugar",
 "life": 8,
 "hp": 1.5,
-"width": 3.0,
-"onBreak": {
+"width": 3.6,
+"shards": {
 "r": 2.4,
 "coef": 1.6,
-"burst": "shield_break"
+"elem": "ice"
 },
 "limit": 2,
 "machine": true
@@ -4045,7 +4051,10 @@
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16762986
+},
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -4060,11 +4069,11 @@
 "job": "chef",
 "tier": 2,
 "cat": 1,
-"catName": "냉채와 디저트",
+"catName": "환상의 파티스리",
 "idx": 5,
-"name": "겨울의 디저트 궁전",
+"name": "크로캉부슈 피날레",
 "type": "ultimate",
-"desc": "대형 빙과 장식으로 냉각한 뒤 파편 폭발.",
+"desc": "내 앞(1.5 m)에 작은 슈가 나선을 그리며 쌓여 디저트 탑이 되고, 금빛 캐러멜 실이 감기며 하얀 서리가 내려앉는다. 쌓이는 2초 동안 주변을 느리게 하고 약한 냉기 피해를 준다. 완성되면 위층부터 차례로 터져 냉기 피해를 주고, 맨 아래층은 넓은 냉기 고리를 내보내 일반 적을 잠깐 빙결시킨다.",
 "maxLv": 3,
 "unlock": 45,
 "prereq": [],
@@ -4073,56 +4082,42 @@
 "range": 2.0,
 "mp": 75,
 "cd": 70,
-"cast": 0.8,
+"cast": 0.3,
 "recover": 0.35,
-"anim": "cast",
+"anim": "cf_draw",
 "ops": [
 {
-"op": "telegraph",
-"shape": "circle",
-"r": 6,
-"dur": 0.8
-},
-{
-"op": "area",
-"kind": "slow",
-"r": 6,
-"dur": 3,
+"op": "custom",
+"fn": "chef_tower",
+"at": 0.0,
+"fwd": 1.5,
+"form": 2.0,
+"aura": {
+"r": 6.0,
 "tick": 0.5,
-"coef": 0.4,
-"elem": "ice",
-"st": [
-{
-"id": "slow",
-"dur": 1,
-"val": 0.5,
-"ch": 1.0
-}
-],
-"fx": "frost",
-"temp": -1
+"coef": 0.3,
+"slow": 0.45,
+"max": 4
 },
-{
-"op": "delay",
-"after": 2.6,
-"r": 6,
-"coef": 7.0,
-"burst": "ice_crystal",
-"elem": "ice",
-"self": true,
-"st": [
-{
-"id": "freeze",
-"dur": 1.5,
-"val": 0,
-"ch": 1.0
+"layers": {
+"n": 3,
+"r": 4.0,
+"coef": 1.6,
+"gap": 0.15
+},
+"base": {
+"r": 6.5,
+"coef": 2.6,
+"freeze": 1.2
 }
-]
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16773336
+},
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -4137,11 +4132,11 @@
 "job": "chef",
 "tier": 2,
 "cat": 2,
-"catName": "만찬과 회복",
+"catName": "왕실의 테이블",
 "idx": 1,
-"name": "특제 코스 요리",
+"name": "시그니처 메뉴",
 "type": "craft",
-"desc": "공격·방어·회복 계열 고급 음식을 만든다.",
+"desc": "공격·방어·회복 고급 코스 요리를 만든다. 성공하면 접시 위에 메인 → 곁들임 → 소스가 차례로 올라가고 테두리에 금빛이 돈다. 여러 개를 한 번에 만들 수 있다.",
 "maxLv": 5,
 "unlock": 30,
 "prereq": [],
@@ -4176,11 +4171,11 @@
 "job": "chef",
 "tier": 2,
 "cat": 2,
-"catName": "만찬과 회복",
+"catName": "왕실의 테이블",
 "idx": 2,
-"name": "생명의 스튜",
+"name": "황금 부용",
 "type": "support",
-"desc": "냄비를 놓아 주변을 회복하는 영역을 만든다.",
+"desc": "지정한 곳에 구리 냄비를 놓는다. 8초 동안 1초마다 범위(바닥 표시) 안의 나와 살아 있는 소환수(기계 제외)를 최대 체력의 2.5%씩 회복한다. 냄비는 하나만 — 다시 쓰면 예전 냄비는 사라진다.",
 "maxLv": 5,
 "unlock": 33,
 "prereq": [],
@@ -4191,7 +4186,7 @@
 "cd": 22,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "cast",
+"anim": "cf_serve",
 "ops": [
 {
 "op": "area",
@@ -4200,14 +4195,20 @@
 "dur": 8,
 "tick": 1.0,
 "heal": 0.025,
-"fx": "healing_mist",
-"prop": "cooking_pot",
-"living": true
+"fx": "none",
+"chef": "broth",
+"living": true,
+"single": "broth"
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16765562
+},
+"sfx": "cf_place",
+"sfxAt": "strike",
+"sfxLead": 0.0,
 "status": {
 "data": true,
 "impl": true,
@@ -4222,11 +4223,11 @@
 "job": "chef",
 "tier": 2,
 "cat": 2,
-"catName": "만찬과 회복",
+"catName": "왕실의 테이블",
 "idx": 3,
-"name": "전투 배식",
+"name": "봉 아페티!",
 "type": "support",
-"desc": "요리를 먹어 즉시 회복하고 음식 효과를 잠시 증폭한다.",
+"desc": "가방의 음식 하나를 은쟁반에 올려 먹는다. 즉시 최대 체력의 15%를 회복하고, 그 음식의 효과가 10초 동안 50% 강해진다(원래 효과에서 계산 — 다시 써도 겹쳐 커지지 않음). 먹을 음식이 없으면 기력·재사용 대기를 쓰지 않는다. 물약 재사용 대기와는 따로 돈다.",
 "maxLv": 5,
 "unlock": 36,
 "prereq": [],
@@ -4237,30 +4238,29 @@
 "cd": 20,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "cast",
+"anim": "cf_serve",
 "ops": [
 {
 "op": "consume",
 "tag": "food",
+"chef": "bon",
 "ops": [
 {
 "op": "heal",
 "pct": 0.15,
 "flat": 0
-},
-{
-"op": "buff",
-"id": "foodup",
-"dur": 10,
-"val": 0.5,
-"target": "self"
 }
-]
+],
+"boost": 0.5,
+"boostDur": 10
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 15265528
+},
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -4275,11 +4275,11 @@
 "job": "chef",
 "tier": 2,
 "cat": 2,
-"catName": "만찬과 회복",
+"catName": "왕실의 테이블",
 "idx": 4,
-"name": "완벽한 레시피",
+"name": "셰프의 한 끗",
 "type": "passive",
-"desc": "직접 만든 음식의 지속시간과 회복량이 증가한다.",
+"desc": "내가 직접 만든 음식은 회복량과 지속 시간이 늘어난다(가방의 그 음식 중 직접 만든 개수만큼). 강화된 음식을 먹을 때 허브 잎과 작은 금빛 반짝임이 뜬다.",
 "maxLv": 5,
 "unlock": 40,
 "prereq": [],
@@ -4292,14 +4292,13 @@
 "recover": 0.35,
 "anim": null,
 "ops": [],
-"mods": [
-{
-"stat": "foodPower",
-"add": 0.1,
-"addLv": 0.05
-}
-],
-"flags": {},
+"mods": [],
+"flags": {
+"chefTouch": [
+0.1,
+0.05
+]
+},
 "fx": {},
 "status": {
 "data": true,
@@ -4315,11 +4314,11 @@
 "job": "chef",
 "tier": 2,
 "cat": 2,
-"catName": "만찬과 회복",
+"catName": "왕실의 테이블",
 "idx": 5,
-"name": "왕실의 풀코스",
+"name": "로열 그랑 디너",
 "type": "ultimate",
-"desc": "보호막 → 공격 강화 → 큰 회복을 순서대로 제공한다.",
+"desc": "내 둘레에 작은 은쟁반 세 개가 놓이고 클로슈가 차례로 열린다. 첫째 — 은금빛 보호막, 둘째 — 공격력 30% 증가(10초), 셋째 — 최대 체력의 40% 회복. 효과는 뚜껑이 열리는 순간에 들어가며, 그 전에 쓰러지거나 지역을 옮기면 남은 쟁반은 취소된다. 가방의 음식과 무관하다.",
 "maxLv": 3,
 "unlock": 45,
 "prereq": [],
@@ -4328,34 +4327,37 @@
 "range": 2.0,
 "mp": 65,
 "cd": 75,
-"cast": 0.4,
+"cast": 0.2,
 "recover": 0.35,
-"anim": "cast",
+"anim": "cf_serve",
 "ops": [
 {
-"op": "shield",
+"op": "custom",
+"fn": "chef_royal",
+"at": 0.0,
+"times": [
+0.45,
+0.95,
+1.45
+],
+"shield": {
 "base": 80,
 "coef": 2.0,
 "dur": 8
 },
-{
-"op": "buff",
-"id": "atkup",
-"dur": 10,
+"atk": {
 "val": 0.3,
-"target": "self",
-"at": 1.5
+"dur": 10
 },
-{
-"op": "heal",
-"pct": 0.4,
-"flat": 0,
-"at": 3.0
+"heal": 0.4
 }
 ],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 16769162
+},
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,

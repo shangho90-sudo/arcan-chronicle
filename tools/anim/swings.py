@@ -852,6 +852,94 @@ WP_CONDENSE = action('wp_condense', [
 ], 0.12, 1.20, None, fadeIn=0.06, fadeOut=0.16)
 WP_CONDENSE.update(stow=True)
 SKILL_ACTS += [WP_COMPOUND, WP_CONDENSE]
+# ------------------------------------------------------------------------------------------------ 쉐프 2차 (2026-11-16)
+# 쉐프는 요리사 몸 그대로(오른손 식칼). 웍·소스 냄비·압력솥·꼬치·클로슈 같은 큰 도구는 js/cheffx.js 소품이 손 위치(handPoint)를 따라 그림.
+# hitT = 그 스킬의 접촉 순간(js/chef.js hitT) — 웍은 0.22 s에 재료가 웍에 떨어지고(1타) 0.50 s에 두 번째로 받음(2타, gap 0.28).
+CR = dict(hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18])
+CF_WOK = action('cf_wok', [
+    key(0.00, **CR),
+    key(0.10, 'o', twist=-6, lean=6, sink=0.10, hand=[-8, -26, 0.86], blade=[-4, 0], elbow=[-0.6, -1, -0.3], armL=[62, 12]),
+    key(0.17, 'i', twist=4, lean=-6, sink=0.04, hand=[-4, 6, 0.96], blade=[0, 24], elbow=[-0.6, -0.8, -0.3], armL=[78, 10], squint=True),
+    key(0.22, 'o', twist=2, lean=2, sink=0.08, hand=[-6, -14, 0.92], blade=[-2, 6], elbow=[-0.6, -1, -0.3], armL=[66, 12]),
+    key(0.36, 's', twist=-10, lean=8, sink=0.14, hand=[-10, -30, 0.84], blade=[-6, -4], elbow=[-0.6, -1, -0.3], armL=[58, 14]),
+    key(0.45, 'i', twist=12, lean=-8, sink=0.03, hand=[0, 14, 1.0], blade=[4, 34], elbow=[-0.5, -0.8, -0.2], armL=[86, 8], squint=True),
+    key(0.50, 'o', twist=10, lean=4, sink=0.10, hand=[-4, -12, 0.94], blade=[0, 4], elbow=[-0.6, -1, -0.3], armL=[70, 12]),
+    key(0.64, 's', twist=4, lean=6, sink=0.08, hand=[-12, -28, 0.82], blade=[-4, 4], elbow=[-0.6, -1, -0.3], armL=[40, 16]),
+    key(0.80, 's', **CR),
+], 0.22, 0.62, None, fadeIn=0.06, fadeOut=0.16)
+CF_WOK.update(flipT=[0.22, 0.50])
+CF_SPLASH = action('cf_splash', [   # 소스 끼얹기(그랑 플람베): 오른손을 뒤로 낮게 뺐다가 앞 위로 쓸어 올림
+    key(0.00, **CR),
+    key(0.12, 'o', twist=-30, lean=-4, sink=0.10, hand=[-80, -30, 0.78], blade=[-100, -10], elbow=[-0.6, -1, -0.6], armL=[30, 30]),
+    key(0.18, 's', twist=-34, lean=-4, sink=0.11, hand=[-90, -32, 0.76], blade=[-110, -12], elbow=[-0.6, -1, -0.6], armL=[34, 32]),
+    key(0.24, 'i', twist=18, lean=12, sink=0.10, hand=[4, 4, 1.0], blade=[10, 20], elbow=[-0.5, -1, -0.1], armL=[20, 34], squint=True),
+    key(0.34, 'o', twist=24, lean=12, sink=0.09, hand=[22, 14, 0.94], blade=[30, 30], elbow=[-0.4, -1, 0.1], armL=[16, 36]),
+    key(0.62, 's', **CR),
+], 0.24, 0.40, None, fadeIn=0.05, fadeOut=0.16)
+CF_PLACE = action('cf_place', [    # 압력솥 놓기: 무릎을 굽혀 두 손으로 앞에 내려놓음
+    key(0.00, **CR),
+    key(0.14, 'o', twist=-4, lean=10, sink=0.18, hand=[-10, -10, 0.80], blade=[-4, 10], elbow=[-0.6, -1, -0.4], armL=[60, 10]),
+    key(0.30, 'i', twist=0, lean=26, sink=0.34, hand=[-6, -40, 0.96], blade=[0, -10], elbow=[-0.6, -1, -0.3], armL=[52, 6], squint=True),
+    key(0.42, 'o', twist=0, lean=22, sink=0.30, hand=[-6, -42, 0.94], blade=[0, -12], elbow=[-0.6, -1, -0.3], armL=[48, 6]),
+    key(0.68, 's', **CR),
+], 0.30, 0.46, None, fadeIn=0.06, fadeOut=0.16)
+CF_SKEWER = action('cf_skewer', [  # 꼬치 발사: 손을 당겼다가 앞으로 쭉 뻗어 가리킴(꼬치가 차례로 날아감)
+    key(0.00, **CR),
+    key(0.12, 'o', twist=-22, lean=-6, sink=0.08, hand=[-54, 10, 0.50], blade=[-8, 14], elbow=[-1, -0.6, -0.6], armL=[40, 30]),
+    key(0.20, 's', twist=-24, lean=-7, sink=0.09, hand=[-58, 12, 0.48], blade=[-6, 14], elbow=[-1, -0.6, -0.6], armL=[44, 32], squint=True),
+    key(0.26, 'i', twist=12, lean=14, sink=0.12, hand=[-2, 10, 1.0], blade=[0, 8], elbow=[-0.6, -1, -0.1], armL=[20, 30], squint=True),
+    key(0.50, 'o', twist=12, lean=14, sink=0.12, hand=[0, 8, 1.0], blade=[0, 6], elbow=[-0.6, -1, -0.1], armL=[18, 30]),
+    key(0.72, 's', **CR),
+], 0.26, 0.40, None, fadeIn=0.05, fadeOut=0.16)
+CF_SCOOP = action('cf_scoop', [    # 소르베 뜨기: 낮게 퍼 올렸다가 위로 펼쳐 내보냄
+    key(0.00, **CR),
+    key(0.12, 'o', twist=-8, lean=16, sink=0.18, hand=[-20, -46, 0.86], blade=[-10, -30], elbow=[-0.6, -1, -0.3], armL=[30, 20]),
+    key(0.24, 'i', twist=6, lean=-8, sink=0.04, hand=[-6, 40, 0.92], blade=[0, 70], elbow=[-0.6, -0.4, -0.6], armL=[120, 40], squint=True),
+    key(0.40, 'o', twist=8, lean=-6, sink=0.02, hand=[0, 30, 0.94], blade=[4, 50], elbow=[-0.6, -0.5, -0.5], armL=[110, 44]),
+    key(0.66, 's', **CR),
+], 0.24, 0.40, None, fadeIn=0.05, fadeOut=0.16)
+CF_PLATE = action('cf_plate', [    # 플레이팅: 낮고 넓게 가로로 소스를 긋듯
+    key(0.00, **CR),
+    key(0.12, 'o', twist=-36, lean=14, sink=0.16, hand=[-90, -40, 0.86], blade=[-120, -30], elbow=[-0.5, -1, -0.6], armL=[24, 30]),
+    key(0.28, 'i', twist=26, lean=18, sink=0.20, hand=[40, -42, 0.96], blade=[70, -34], elbow=[-0.2, -1, 0.3], armL=[14, 36], squint=True),
+    key(0.40, 'o', twist=30, lean=16, sink=0.18, hand=[52, -40, 0.90], blade=[84, -32], elbow=[-0.1, -1, 0.3], armL=[12, 36]),
+    key(0.66, 's', **CR),
+], 0.28, 0.44, None, fadeIn=0.05, fadeOut=0.16)
+CF_DRAW = action('cf_draw', [      # 캐러멜·설탕 선 그리기: 손끝으로 허공에 고리를 그림
+    key(0.00, **CR),
+    key(0.10, 'o', twist=-10, lean=-4, sink=0.04, hand=[-40, 30, 0.86], blade=[-30, 50], elbow=[-0.7, -0.4, -0.7], armL=[40, 30]),
+    key(0.20, 's', twist=-4, lean=0, sink=0.05, hand=[-10, 50, 0.92], blade=[0, 80], elbow=[-0.6, -0.3, -0.7], armL=[50, 34]),
+    key(0.27, 's', twist=6, lean=4, sink=0.06, hand=[20, 30, 0.94], blade=[30, 50], elbow=[-0.4, -0.6, -0.4], armL=[50, 34]),
+    key(0.33, 'i', twist=10, lean=10, sink=0.08, hand=[0, 0, 1.0], blade=[4, 10], elbow=[-0.5, -1, -0.2], armL=[40, 30], squint=True),
+    key(0.46, 'o', twist=8, lean=8, sink=0.07, hand=[-4, -6, 0.96], blade=[0, 6], elbow=[-0.5, -1, -0.2], armL=[30, 28]),
+    key(0.70, 's', **CR),
+], 0.33, 0.48, None, fadeIn=0.06, fadeOut=0.16)
+CF_SERVE = action('cf_serve', [    # 서빙: 왼손을 앞으로 내밀어 쟁반·냄비를 내보이고 오른손은 가슴 앞
+    key(0.00, **CR),
+    key(0.12, 'o', twist=-6, lean=-2, sink=0.04, hand=[-30, 0, 0.60], blade=[-10, 40], elbow=[-0.8, -0.8, -0.6], armL=[70, 20]),
+    key(0.25, 'i', twist=8, lean=6, sink=0.08, hand=[-26, -6, 0.62], blade=[-8, 36], elbow=[-0.8, -0.8, -0.6], armL=[96, 16], squint=True),
+    key(0.46, 'o', twist=8, lean=6, sink=0.08, hand=[-26, -8, 0.62], blade=[-8, 34], elbow=[-0.8, -0.8, -0.6], armL=[92, 16]),
+    key(0.72, 's', **CR),
+], 0.25, 0.40, None, fadeIn=0.06, fadeOut=0.16)
+CF_SHOW = action('cf_show', [      # 마스터 셰프 쇼타임: 빠른 손질 3번 → 웍 볶음 2번 → 두 팔을 들었다가 클로슈를 내리꽂는 손짓 (시전 0.2 s 뒤 단계들)
+    key(0.00, **CR),
+    key(0.12, 'o', twist=-6, lean=-4, sink=0.06, hand=[-10, 40, 0.80], blade=[-6, 90], elbow=[-0.6, 0.2, -1], armL=[30, 20]),
+    key(0.20, 'i', twist=2, lean=12, sink=0.12, hand=[0, -14, 1.0], blade=[2, -30], elbow=[-0.4, -1, -0.2], armL=[30, 24], squint=True),
+    key(0.28, 'o', twist=-4, lean=-2, sink=0.06, hand=[-8, 36, 0.82], blade=[-4, 84], elbow=[-0.6, 0.2, -1], armL=[30, 20]),
+    key(0.35, 'i', twist=4, lean=12, sink=0.12, hand=[2, -14, 1.0], blade=[2, -30], elbow=[-0.4, -1, -0.2], armL=[30, 24], squint=True),
+    key(0.43, 'o', twist=-2, lean=-2, sink=0.06, hand=[-6, 36, 0.82], blade=[-4, 84], elbow=[-0.6, 0.2, -1], armL=[30, 20]),
+    key(0.50, 'i', twist=6, lean=12, sink=0.12, hand=[4, -14, 1.0], blade=[2, -30], elbow=[-0.4, -1, -0.2], armL=[30, 24], squint=True),
+    key(0.70, 's', twist=-14, lean=6, sink=0.12, hand=[-30, -20, 0.86], blade=[-20, 0], elbow=[-0.6, -1, -0.4], armL=[66, 12]),
+    key(0.80, 'i', twist=10, lean=-6, sink=0.04, hand=[-4, 12, 0.98], blade=[0, 30], elbow=[-0.6, -0.8, -0.3], armL=[84, 10]),
+    key(0.95, 's', twist=-12, lean=6, sink=0.12, hand=[-30, -20, 0.86], blade=[-20, 0], elbow=[-0.6, -1, -0.4], armL=[66, 12]),
+    key(1.05, 'i', twist=12, lean=-6, sink=0.04, hand=[-2, 14, 0.98], blade=[0, 34], elbow=[-0.6, -0.8, -0.3], armL=[86, 10]),
+    key(1.22, 'o', twist=0, lean=-14, sink=0.04, hand=[-8, 80, 0.86], blade=[-2, 112], elbow=[-0.6, 0.3, -1], armL=[160, 34], squint=True),
+    key(1.36, 'i', twist=2, lean=24, sink=0.24, hand=[0, -22, 1.0], blade=[2, -50], elbow=[-0.4, -1, -0.2], armL=[30, 40], squint=True),
+    key(1.50, 'o', twist=4, lean=20, sink=0.20, hand=[4, -30, 0.94], blade=[4, -56], elbow=[-0.4, -1, -0.1], armL=[20, 40]),
+    key(1.75, 's', **CR),
+], 0.15, 1.3, None, fadeIn=0.06, fadeOut=0.18)
+CF_ALL = [CF_WOK, CF_SPLASH, CF_PLACE, CF_SKEWER, CF_SCOOP, CF_PLATE, CF_DRAW, CF_SERVE, CF_SHOW]
+SKILL_ACTS += CF_ALL   # 쉐프 2차
 
 acts = json.load(open(P))
 names = {'attack', 'attack2'} | {x['name'] for x in SKILL_ACTS}

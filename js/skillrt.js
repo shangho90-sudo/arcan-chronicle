@@ -23,6 +23,8 @@ import { bashImpact, BASH } from './bashfx.js';
 import { SmithKit, clearLine } from './smith.js';
 // 양약사 2차: 반응 표식·촉매·표적 전달·연쇄 용출·서방형 지대·최종 처방 규칙 (js/wpharm.js)
 import { WpKit } from './wpharm.js';
+// 쉐프 2차: 웍·플람베·압력솥·꼬치·쇼타임 / 소르베·플레이팅·밀푀유·설탕 벽·크로캉부슈 / 부용·봉 아페티·한 끗·그랑 디너 규칙 (js/chef.js)
+import { ChefKit } from './chef.js';
 
 let G = null; export function bindSkillRt(g) { G = g; }
 const DEG = Math.PI / 180;
@@ -45,6 +47,7 @@ export const FX = {
   cook(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.cook) return G.skillFx.cook[kind](a, o); } catch (e) { console.warn('fx cook', e); } return null; },   // 요리사 1차: 허공 식칼·큰 프라이팬·미트볼 (js/cookfx.js)
   smith(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.smith) return G.skillFx.smith[kind](a, o); } catch (e) { console.warn('fx smith', e); } return null; },   // 대장장이 1차 (js/smithfx.js)
   wp(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.wp) return G.skillFx.wp[kind](a, o); } catch (e) { console.warn('fx wp', kind, e); } return null; },   // 양약사 2차: 캡슐·앰플·결정·표식 고리 (js/wpharmfx.js)
+  chef(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.chef) return G.skillFx.chef[kind](a, o); } catch (e) { console.warn('fx chef', e); } return null; },   // 쉐프 2차 (js/cheffx.js)
   hair(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.hair) return G.skillFx.hair[kind](a, o); } catch (e) { console.warn('fx hair', e); } return null; },   // 미용사 1차: 큰 가위·빗·드라이어·헤어롤 (js/hairfx.js)
   bash(kind, pos, dir, o = {}) { try { if (G.skillFx && G.skillFx.bash) return G.skillFx.bash[kind](pos, dir, o); } catch (e) { console.warn('fx bash', e); } },   // 배쉬 (js/bashfx.js)
   beam(kind, a, b, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.beam(kind, a, b, o); } catch (e) { console.warn('fx', kind, e); } },
@@ -128,6 +131,7 @@ export class SkillEngine {
     this.combatT = 0; this.cheatDeathT = 0; this.overclockT = 0; this.coolT = 0; this.lastMelodySwitch = 0; this.echoUsed = false;
     this.smith = new SmithKit(this, { applyStatus, fx: FX.smith, G: () => G });   // 대장장이 1차 규칙 (js/smith.js)
     this.wp = typeof WpKit === 'function' ? new WpKit(this, { applyStatus, fx: (k, a, o) => FX.wp(k, a, o), G: () => G, addMark, takeMarks }) : null;   // 양약사 2차 규칙 (js/wpharm.js)
+    this.chef = typeof ChefKit === 'function' ? new ChefKit(this, { applyStatus, fx: FX.chef, G: () => G }) : null;   // 쉐프 2차 규칙 (js/chef.js)
     this.restoreCooldowns();
   }
   get book() { return this.pc.sheet.book; }
@@ -166,6 +170,7 @@ export class SkillEngine {
     for (const op of d.ops) if (op.op === 'consume' && op.potionCd && pc.potionCd > 0) return '물약 재사용 대기 중';
     if (d.target === 'enemy') { const t = this.targetFor(d); if (!t) return '대상이 없습니다'; if (pc.dist(t) > this.range(d) + t.radius + 0.8) return '사거리 밖입니다';
       if (d.ops.some(o => o.fn === 'smith_tongs') && !clearLine(pc.zone.geo, pc.pos, t.pos)) return '장애물에 막혀 있습니다'; }   // 집게는 벽 너머의 적을 잡지 못함
+    if (this.chef) { const ce = this.chef.validate(d, aim); if (ce) return ce; }   // 슈가 아라베스크 자리 검사(지형·출입구·나/소환수·통로) — 자원을 쓰기 전에
     if (d.target === 'ground' && d.ops.some(o => o.op === 'summon')) { const p = this.groundAim(d, aim); if (pc.zone.geo.blocked(p.x, p.z, 0.4)) return '설치할 수 없는 위치입니다'; if (this.nearPortal(p, 2.5)) return '출입구 근처에는 설치할 수 없습니다'; }
     return null;
   }
@@ -254,7 +259,7 @@ export class SkillEngine {
       ctx.yeonPre = true;
       cb.hitTimes.forEach((t, i) => this.pending.push({ time: this.clock + Math.max(0, t - YEON_LEAD), op: { op: '_run', run: () => { if (!pc.dead) FX.yeon('strike', { follow: pc, y: cb.hitFx[i] && cb.hitFx[i].yeon, lead: Math.min(YEON_LEAD, t) }); } }, ctx }));
     }
-    if (d.type === 'ultimate' && d.job !== 'western_pharmacist') { G.render.addShake && !G.reduceFlash && G.render.addShake(0.12, 0.25); }   // 양약사 궁극기: 주 타격 순간 kick 한 번만(js/wpharm.js)
+    if (d.type === 'ultimate' && d.job !== 'western_pharmacist' && d.job !== 'chef') { G.render.addShake && !G.reduceFlash && G.render.addShake(0.12, 0.25); }   // 양약사·쉐프 궁극기: 주 타격 순간 kick 한 번만(js/wpharm.js)
   }
   interruptCast(reason) {
     const c = this.casting; if (!c) return; this.casting = null;
@@ -280,6 +285,7 @@ export class SkillEngine {
     this.areas = this.areas.filter(a => !a.dead);
     this.summons = this.summons.filter(s => !s.dead);
     this.smith.tick(dt); if (this.wp) this.wp.tick(dt);
+    if (this.chef) this.chef.tick(dt);
     if (this.melody) this.tickMelody(dt);
     if (this.overclockT > 0) { this.overclockT -= dt; if (this.overclockT <= 0) { applyStatus(pc, { id: 'cooldown_heat', dur: this.coolT, val: 1, ch: 1 }, pc); } }
     for (const m of pc.zone.actors) if (m._marks) { if (m.dead) clearMarks(m); else tickMarks(m, dt); }
@@ -291,6 +297,7 @@ export class SkillEngine {
     for (const s of this.summons) s.vanish(true); this.summons = [];
     if (this.melody) { this.melody.fx.dispose(); this.melody = null; }
     this.smith.clear(); if (this.wp) this.wp.clear();
+    if (this.chef) this.chef.clear();   // 쉐프: 기다리는 단계·쟁반·소르베·원반 취소(피해 없음)
     this.pending = []; this.casting = null; if (this.channel) { this.channel = null; }
     for (const m of (this.pc.zone ? this.pc.zone.actors : [])) clearMarks(m);
   }
@@ -402,6 +409,7 @@ export class SkillEngine {
       case 'lunge': { const f = op.back ? { x: -ctx.facing.x, z: -ctx.facing.z } : ctx.facing; pc.startLunge(f, op.dist, op.dur || 0.2); return; }
       case 'summon': return this.opSummon(op, ctx);
       case 'consume': {
+        if (op.chef === 'bon' && this.chef) { this.chef.bon(op, ctx); return; }   // 봉 아페티! (js/chef.js): 음식 효과 + 회복 + 10초 강화
         const it = this.findConsumable(op.tag); if (!it) return;            // validated before; item may vanish -> skip effects
         pc.sheet.bag.remove(it.id, 1);
         if (op.tag === 'food' && it.use && it.use.status) applyStatus(pc, { id: it.use.status, dur: it.use.duration * (1 + pc.sheet.final.foodPower), val: it.use.value, ch: 1 }, pc);
@@ -690,6 +698,7 @@ export class SkillEngine {
     const pc = this.pc;
     let r = op.r, dur = op.dur * (1 + 0.05 * (ctx.L - 1));
     if (op.landscape) { r *= 1 + this.book.passive('landscapeSize'); dur *= 1 + this.book.passive('landscapeTime'); }
+    if (op.single) { for (const o of this.areas) if (o.op.single === op.single) o.dispose(); this.areas = this.areas.filter(o => !o.dead); }   // 황금 부용: 냄비는 하나만
     const a = new SkillArea(this, op, ctx, op.follow ? null : pc.zone.geo.ground(c.x, c.z), r, dur);
     // limit: max 6 areas, oldest removed
     this.areas.push(a); while (this.areas.length > 6) this.areas.shift().dispose();
@@ -722,6 +731,7 @@ export class SkillEngine {
       if (alive.length >= 8) alive[0].vanish(false);
       if (op.art) FX.art('canvas', p, { f: ctx.facing });   // 작은 걸작: a gold-framed canvas pops up and the painted creature jumps out of it
       const s = new Summon(this, op, ctx, p); this.summons.push(s); pc.zone.actors.push(s);
+      if (this.chef && String(op.ai).startsWith('chef_')) this.chef.summonInit(s);   // 압력솥·설탕 벽: 움직이지 않는 설치물 (js/chef.js)
     }
   }
   findConsumable(tag) {
@@ -840,6 +850,7 @@ class SkillArea {
     if (op.pharm) this.pfx = FX.pharm(op.pharm, { x: pos.x, y: pos.y, z: pos.z }, { r, dur });   // 광역 회복진 (js/pharmfx.js)
     if (op.wp) this.pfx = FX.wp(op.wp, { x: pos.x, y: pos.y, z: pos.z }, { r, dur, follow: eng.pc });   // 생체 회복 분무 (js/wpharmfx.js spray)
     if (op.cook) this.pfx = FX.cook(op.cook, { x: pos.x, y: eng.pc.zone.geo.ground(pos.x, pos.z).y, z: pos.z }, { r, dur, pre: ctx.cookFx });   // 밀가루 구름 (js/cookfx.js)
+    if (op.chef) this.pfx = FX.chef(op.chef, { x: pos.x, y: eng.pc.zone.geo.ground(pos.x, pos.z).y, z: pos.z }, { r, dur });   // 황금 부용 구리 냄비 (js/cheffx.js)
     if (op.art) this.pfx = FX.art(op.art, { x: pos.x, y: pos.y, z: pos.z }, { r, dur });         // 잉크 웅덩이 (js/artfx.js pool)
     if (op.prop) { this.prop = FX.summon(op.prop, {}); this.prop.position.copy(T(pos)); G.render.scene.add(this.prop); }
   }
@@ -968,6 +979,7 @@ export class Summon {
         }
         break;
       }
+      case 'chef_cooker': case 'chef_sugar': if (eng.chef) eng.chef.summonTick(this, dt); break;   // 쉐프 설치물 (js/chef.js) — AI 없음
       case 'bomb': if (this.t >= (o.fuse || 2)) { this.eng.blast(this.pos, o.boom, this.ctx); this.vanish(true); } else if (this.view.userData.anim) this.view.userData.anim(this.view, this.t); break;
       case 'aura': {
         if (this.cd <= 0) { const a = o.aura; this.cd = a.tick; for (const t of eng.targets(HitShape.circle(this.pos.x, this.pos.z, a.r))) { this.hitTarget(t, a.coef); for (const s of a.st || []) applyStatus(t, s, pc); } }
@@ -1015,6 +1027,10 @@ export const CUSTOM = {
   smith_anvil(eng, op, ctx) { eng.smith.smith_anvil(op, ctx); }, smith_tongs(eng, op, ctx) { eng.smith.smith_tongs(op, ctx); }, smith_quench(eng, op, ctx) { eng.smith.smith_quench(op, ctx); },
   smith_wall(eng, op, ctx) { eng.smith.smith_wall(op, ctx); }, smith_rivets(eng, op, ctx) { eng.smith.smith_rivets(op, ctx); },
   // (2026-11-16) 예전 양약사 triple_check · mark_chain · critical_mass 는 js/wpharm.js wp_tri · wp_chain · wp_critical 로 바뀜
+  // 쉐프 2차 (js/chef.js)
+  chef_wok(eng, op, ctx) { if (eng.chef) eng.chef.chef_wok(op, ctx); }, chef_flambe(eng, op, ctx) { if (eng.chef) eng.chef.chef_flambe(op, ctx); }, chef_skewers(eng, op, ctx) { if (eng.chef) eng.chef.chef_skewers(op, ctx); },
+  chef_show(eng, op, ctx) { if (eng.chef) eng.chef.chef_show(op, ctx); }, chef_sorbet(eng, op, ctx) { if (eng.chef) eng.chef.chef_sorbet(op, ctx); }, chef_plating(eng, op, ctx) { if (eng.chef) eng.chef.chef_plating(op, ctx); },
+  chef_mille(eng, op, ctx) { if (eng.chef) eng.chef.chef_mille(op, ctx); }, chef_tower(eng, op, ctx) { if (eng.chef) eng.chef.chef_tower(op, ctx); }, chef_royal(eng, op, ctx) { if (eng.chef) eng.chef.chef_royal(op, ctx); },
   march(eng, op, ctx) {           // 불꽃 꼬치 행진 / 오픈 키친 ring
     const pc = eng.pc, f = ctx.facing, o = ctx.origin;
     for (let i = 0; i < op.n; i++) {
