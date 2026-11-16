@@ -1,0 +1,117 @@
+{
+ "spent": 22,
+ "done": {
+  "hb_simmer": {
+   "prompt": "small clay herbal medicine pot bubbling and simmering, gentle boiling bubbles with a soft steam hiss and a faint magical chime, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 1.4,
+   "task": "fe23ba21-8ded-4f56-b722-a58b36d016ad",
+   "date": "2026-11-16",
+   "out": 0.63
+  },
+  "hb_root": {
+   "prompt": "thick magical tree roots bursting up out of the earth, cracking soil, creaking wood stretching, crumbling dirt, green nature magic whoosh, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 1.0,
+   "task": "c9a94289-1bdd-4dc4-91e6-ed3bbf48edeb",
+   "date": "2026-11-16",
+   "out": 0.76
+  },
+  "hb_needle": {
+   "prompt": "several thin golden acupuncture needles whizzing through the air very fast, then a tiny bright metallic ting impact, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 0.6,
+   "task": "6848a7cb-276f-450a-924c-a8c0393646cd",
+   "date": "2026-11-16",
+   "out": 0.63
+  },
+  "hb_resonance": {
+   "prompt": "deep calm qi energy resonance, soft singing bowl hum swelling with a rising mystical shimmer of light, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 1.4,
+   "task": "537088a7-22f3-4d65-bbbe-140934c74f8a",
+   "date": "2026-11-16",
+   "out": 1.41
+  },
+  "hb_bloom": {
+   "prompt": "magical golden flower of light blooming open, bright harp glissando with sparkling chimes, holy healing burst, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 1.6,
+   "task": "0474f600-a85e-4f67-a88d-c804adc10a05",
+   "date": "2026-11-16",
+   "out": 1.1
+  },
+  "hb_dragon": {
+   "prompt": "a friendly azure dragon spirit bursting up from the ground with a short echoing roar, rushing wind and leaves, magical, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 1.2,
+   "task": "d5437246-02ed-45f9-8b10-169b37e35668",
+   "date": "2026-11-16",
+   "out": 0.81
+  },
+  "hb_phoenix": {
+   "prompt": "small fire bird phoenix launching with a high clear bird cry and a whoosh of crackling flame wings, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 1.0,
+   "task": "7c39cc00-e9bb-4913-ae0f-ec732211e78f",
+   "date": "2026-11-16",
+   "out": 1.04
+  },
+  "hb_flameburst": {
+   "prompt": "fiery wings of flame spreading out in a wide burst, whoosh of fire with crackling embers, magical impact, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 1.0,
+   "task": "3a08cdef-6437-48e1-8d09-6c765af1f8fe",
+   "date": "2026-11-16",
+   "out": 1.04
+  },
+  "hb_quake": {
+   "prompt": "golden earth magic, stone pillars rising out of the ground with a heavy rumble and crunch, ending with a warm golden chime, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 1.0,
+   "task": "66afc43a-bcb6-4a65-96b6-65473c42cd05",
+   "date": "2026-11-16",
+   "out": 1.04
+  },
+  "hb_wave": {
+   "prompt": "a magical low wave of blue water rushing forward and splashing, flowing water whoosh with sparkling droplets, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 1.4,
+   "task": "37441ee7-4375-4e7d-815e-5c3fbf9714d0",
+   "date": "2026-11-16",
+   "out": 1.02
+  },
+  "hb_spore": {
+   "prompt": "soft poisonous flower releasing a puff of purple spores, airy pop and gentle hiss with a slightly eerie sparkle, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 0.8,
+   "task": "8793e100-fb70-47ea-a9c8-a7f93aea3c97",
+   "date": "2026-11-16",
+   "out": 0.57
+  },
+  "hb_stomp": {
+   "prompt": "a spirit deer stamping its hoof on the ground, wooden thud with a burst of roots and a magical chime, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 0.8,
+   "task": "04166867-a3f6-44b6-9bf8-1b0c853f589b",
+   "date": "2026-11-16",
+   "out": 0.84
+  },
+  "hb_hop": {
+   "prompt": "a tiny cute bouncy pop as a little plant creature jumps out of the soil, soft boing with leaf rustle, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 0.5,
+   "task": "10635591-2e2b-4b43-a537-d1e131e71c3f",
+   "date": "2026-11-16",
+   "out": 0.18
+  },
+  "hb_scroll": {
+   "prompt": "a huge paper scroll unrolling in the sky with a magical whoosh, rustling parchment and a rising golden shimmer, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 1.6,
+   "task": "effc137b-20cc-414f-b7fd-ed712cd784e6",
+   "date": "2026-11-16",
+   "out": 1.46
+  },
+  "hb_armor": {
+   "prompt": "protective armor of jade bark and leaves forming around a body, wooden creak with crystal clinks and a soft shield hum, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 0.9,
+   "task": "1430fb81-4760-4076-a586-aca16f6b7a53",
+   "date": "2026-11-16",
+   "out": 0.55
+  },
+  "hb_drop": {
+   "prompt": "a single golden healing droplet landing with a soft plip and warm sparkle chime, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 0.6,
+   "task": "189261bb-40e6-4ae1-be04-88b933c1eb6b",
+   "date": "2026-11-16",
+   "out": 0.63
+  }
+ }
+}

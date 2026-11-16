@@ -1,6 +1,99 @@
 {
-  "provider": "synthesized (tools/audio/herbal_sfx.py, numpy + scipy, fixed seed)",
+ "provider": "synthesized (tools/audio/herbal_sfx.py, numpy + scipy, fixed seed)",
+ "generatedOn": "2026-11-16",
+ "note": "한약사 2차 스킬. 2026-11-16 fx2: 효과음을 Runway eleven_text_to_sound_v2로 새로 만듦(runway 항목). 예전 합성음 다섯 개는 같은 이름으로 덮어씀(합성 스크립트 herbal_sfx.py는 대체용으로 남김).",
+ "assets": [
+  "sfx_hb_simmer.mp3",
+  "sfx_hb_root.mp3",
+  "sfx_hb_needle.mp3",
+  "sfx_hb_resonance.mp3",
+  "sfx_hb_bloom.mp3"
+ ],
+ "runway": {
+  "provider": "runway eleven_text_to_sound_v2 (tools/audio/herbal_runway_sfx.py)",
   "generatedOn": "2026-11-16",
-  "note": "한약사 2차 스킬. Runway 크레딧 없이 직접 합성. 같은 이름의 파일로 바꿔 넣으면 교체됨. 그 밖의 한약사 소리는 기존 heal·splash·fire·throw·magic 재사용.",
-  "assets": ["sfx_hb_simmer.mp3", "sfx_hb_root.mp3", "sfx_hb_needle.mp3", "sfx_hb_resonance.mp3", "sfx_hb_bloom.mp3"]
+  "creditsSpent": 22,
+  "assets": {
+   "sfx_hb_armor.mp3": {
+    "prompt": "protective armor of jade bark and leaves forming around a body, wooden creak with crystal clinks and a soft shield hum, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 0.9,
+    "date": "2026-11-16"
+   },
+   "sfx_hb_bloom.mp3": {
+    "prompt": "magical golden flower of light blooming open, bright harp glissando with sparkling chimes, holy healing burst, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 1.6,
+    "date": "2026-11-16"
+   },
+   "sfx_hb_dragon.mp3": {
+    "prompt": "a friendly azure dragon spirit bursting up from the ground with a short echoing roar, rushing wind and leaves, magical, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 1.2,
+    "date": "2026-11-16"
+   },
+   "sfx_hb_drop.mp3": {
+    "prompt": "a single golden healing droplet landing with a soft plip and warm sparkle chime, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 0.6,
+    "date": "2026-11-16"
+   },
+   "sfx_hb_flameburst.mp3": {
+    "prompt": "fiery wings of flame spreading out in a wide burst, whoosh of fire with crackling embers, magical impact, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 1.0,
+    "date": "2026-11-16"
+   },
+   "sfx_hb_hop.mp3": {
+    "prompt": "a tiny cute bouncy pop as a little plant creature jumps out of the soil, soft boing with leaf rustle, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 0.5,
+    "date": "2026-11-16"
+   },
+   "sfx_hb_needle.mp3": {
+    "prompt": "several thin golden acupuncture needles whizzing through the air very fast, then a tiny bright metallic ting impact, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 0.6,
+    "date": "2026-11-16"
+   },
+   "sfx_hb_phoenix.mp3": {
+    "prompt": "small fire bird phoenix launching with a high clear bird cry and a whoosh of crackling flame wings, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 1.0,
+    "date": "2026-11-16"
+   },
+   "sfx_hb_quake.mp3": {
+    "prompt": "golden earth magic, stone pillars rising out of the ground with a heavy rumble and crunch, ending with a warm golden chime, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 1.0,
+    "date": "2026-11-16"
+   },
+   "sfx_hb_resonance.mp3": {
+    "prompt": "deep calm qi energy resonance, soft singing bowl hum swelling with a rising mystical shimmer of light, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 1.4,
+    "date": "2026-11-16"
+   },
+   "sfx_hb_root.mp3": {
+    "prompt": "thick magical tree roots bursting up out of the earth, cracking soil, creaking wood stretching, crumbling dirt, green nature magic whoosh, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 1.0,
+    "date": "2026-11-16"
+   },
+   "sfx_hb_scroll.mp3": {
+    "prompt": "a huge paper scroll unrolling in the sky with a magical whoosh, rustling parchment and a rising golden shimmer, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 1.6,
+    "date": "2026-11-16"
+   },
+   "sfx_hb_simmer.mp3": {
+    "prompt": "small clay herbal medicine pot bubbling and simmering, gentle boiling bubbles with a soft steam hiss and a faint magical chime, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 1.4,
+    "date": "2026-11-16"
+   },
+   "sfx_hb_spore.mp3": {
+    "prompt": "soft poisonous flower releasing a puff of purple spores, airy pop and gentle hiss with a slightly eerie sparkle, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 0.8,
+    "date": "2026-11-16"
+   },
+   "sfx_hb_stomp.mp3": {
+    "prompt": "a spirit deer stamping its hoof on the ground, wooden thud with a burst of roots and a magical chime, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 0.8,
+    "date": "2026-11-16"
+   },
+   "sfx_hb_wave.mp3": {
+    "prompt": "a magical low wave of blue water rushing forward and splashing, flowing water whoosh with sparkling droplets, bright fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 1.4,
+    "date": "2026-11-16"
+   }
+  }
+ }
 }
