@@ -145,7 +145,7 @@ export class WpKit {
   wp_tri(op, ctx) {
     const pc = this.pc, W = WP.tri, t0 = alive(ctx.tgt) ? ctx.tgt : this.eng.targetFor(ctx.d); if (!t0) return;
     const st = { got: new Set(), last: { ...t0.pos } };
-    const fx = this.fx('tri', pc, { from: this.handPoint(), tgt: () => (alive(t0) ? t0 : null), at: () => (alive(t0) ? t0.pos : st.last), times: W.at });
+    const fx = this.fx('triad', pc, { from: this.handPoint(), tgt: () => (alive(t0) ? t0 : null), at: () => (alive(t0) ? t0.pos : st.last), times: W.at });
     const K = [{ elem: 'fire', st: [{ id: 'burn', dur: 3, val: 0.1, ch: 1 }], sfx: 'ph_glass_fire' }, { elem: 'ice', st: [{ id: 'slow', dur: 2, val: 0.3, ch: 1 }], sfx: 'ph_glass_ice' }, { elem: 'shock', st: [], sfx: 'wp_ion' }];
     K.forEach((k, i) => this.later(W.at[i], () => {
       if (!alive(t0)) { call(fx, 'fizzle', i); return; }

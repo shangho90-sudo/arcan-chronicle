@@ -108,8 +108,8 @@ const marks = (m) => (m._marks ? m._marks.reaction : 0);
 }
 // ------------------------------------------------------------------ A4 compound once / A5 ultimate kick once at contact
 { const W = world(), m = W.mon(0, 4); W.cast('wp_a4', 1, { tgt: m }); W.run(1.3);
-  ok(m.taken.length === 4 && W.fxLog.includes('tri.compound'), 'three element hits + one compound reaction');
-  const W2 = world(), k = W2.mon(0, 4); W2.cast('wp_a4', 1, { tgt: k }); W2.run(0.5); k.dead = true; W2.run(0.8); ok(!W2.fxLog.includes('tri.compound'), 'no compound if not all three hit');
+  ok(m.taken.length === 4 && W.fxLog.includes('triad.compound'), 'three element hits + one compound reaction');
+  const W2 = world(), k = W2.mon(0, 4); W2.cast('wp_a4', 1, { tgt: k }); W2.run(0.5); k.dead = true; W2.run(0.8); ok(!W2.fxLog.includes('triad.compound'), 'no compound if not all three hit');
   const W3 = world(), u = W3.mon(0, 3), v = W3.mon(2, 3); W3.cast('wp_a5', 1, { aim: { x: 0, y: 0, z: 3 } }); W3.run(1.0);
   ok(!u.taken.length && !W3.kicks.length, 'collapse: no damage / camera before contact'); W3.run(0.1);
   ok(u.taken.length === 1 && v.taken.length === 1 && W3.kicks.length === 1, 'collapse: one hit each + one camera kick at contact');

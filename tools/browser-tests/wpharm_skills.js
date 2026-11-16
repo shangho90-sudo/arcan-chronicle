@@ -6,6 +6,7 @@
 const { chromium } = require('playwright'); const fs = require('fs'); const { execSync } = require('child_process');
 const LIST = (process.env.SCENES || 'a1').split(','), LV = +(process.env.LV || 5), FPS = +(process.env.FPS || 60), G_ = process.env.GENDER || 'f';
 const SIZE = process.env.SIZE || '1100x760', TOUCH = SIZE.endsWith('t'), [VW, VH] = SIZE.replace('t', '').split('x').map(Number);
+const CW = Math.min(VW, TOUCH ? 390 : 760), CH = Math.min(VH, TOUCH ? 600 : 520);
 const FX = process.env.FX !== '0', TAG = process.env.TAG || 'after', OUT = process.env.OUT || '/tmp/wpharm', ZOOM = +(process.env.ZOOM || 1.0);
 // scene: skill, enemies [forward m, side m, marks, flags], duration, frame marks (s)
 const SC = {
@@ -55,7 +56,7 @@ const SC = {
     window.__spot = spot || { x: cx, z: cz };
     // logging wrappers (once)
     const W = G.skillFx.wp; window.__L = null; const T = () => +window.__t.toFixed(3);
-    for (const k of ['capsule', 'cryo', 'ion', 'tri', 'collapse', 'catalyst', 'carrier', 'chain', 'zone', 'critical', 'spray', 'coat', 'lastrx', 'made', 'regen', 'mark']) { if (typeof W[k] !== 'function') { console.error('wpfx missing ' + k + ' ' + typeof W[k]); continue; } const o = W[k].bind(W); W[k] = (a, opt) => { const h = o(a, opt); if (window.__L) window.__L.fx.push({ k, t: T(), ok: !!h });
+    for (const k of ['capsule', 'cryo', 'ion', 'triad', 'collapse', 'catalyst', 'carrier', 'chain', 'zone', 'critical', 'spray', 'coat', 'lastrx', 'made', 'regen', 'mark']) { if (typeof W[k] !== 'function') { console.error('wpfx missing ' + k + ' ' + typeof W[k]); continue; } const o = W[k].bind(W); W[k] = (a, opt) => { const h = o(a, opt); if (window.__L) window.__L.fx.push({ k, t: T(), ok: !!h });
       if (h) for (const m of Object.keys(h)) if (typeof h[m] === 'function' && !['update', 'dispose'].includes(m)) { const f0 = h[m]; h[m] = (...x) => { if (window.__L && k !== 'mark' && k !== 'zone') window.__L.fx.push({ k: k + '.' + m, t: T() }); return f0(...x); }; }
       return h; }; }
     const os = G.audio.sfx.bind(G.audio); G.audio.sfx = (n, o) => { if (window.__L) window.__L.sfx.push({ n, t: T() }); return os(n, o); };
@@ -67,7 +68,7 @@ const SC = {
   for (const name0 of LIST) { const S = SC[name0]; if (!S) { console.log('no scene', name0); continue; } errs.length = 0;
     const name = `${TAG}_${name0}_${G_}_${SIZE}_fx${FX ? 1 : 0}`, dirOut = `${OUT}/${name}`; fs.rmSync(dirOut, { recursive: true, force: true }); fs.mkdirSync(dirOut, { recursive: true });
     await ev(([foes]) => {
-      const p = G.player, f = { x: 0, z: -1 };   // 화면 위쪽(= 카메라에서 멀어지는 쪽)으로
+      const p = G.player, f = { x: 1, z: 0 };   // 화면 오른쪽 위로
       for (const m of [...G.zone.actors]) if (m !== p && m.def && m.body) m.remove && m.remove();
       G.skillFx.clear(); p.skills2.clearTemp(); p.teleport(window.__spot); p.body.place(p.pos); p.setFacing(f.x, f.z); p.target = null; p.lockOn = null; p.path = []; G.dev.full();
       for (const s of p.status.list.slice()) p.status.remove(s.def.id); p.shield = 0; p.skills2.cd = {}; p.skills.lock = 0;
@@ -79,7 +80,7 @@ const SC = {
       if (det) Math.random = () => 0.5;
       const p = G.player, f = window.__f, k = p.skills2.wp;
       window.__ds.forEach((q, i) => { q.thinkStep = () => {}; q.teleport(q.__spot); q.setFacing(-f.x, -f.z); q.body.place(q.pos); const fl = S.foes[i][3];
-        if (fl === 'boss') { q.isBoss = true; } if (fl === 'slow') q.status.apply(G.data.status('slow'), 4, 0.3); if (fl === 'weak') { const big = 40; Object.defineProperty(q, 'maxHp', { get: () => 2000 }); q.hp = big; } });
+        if (fl === 'boss') { q.isBoss = true; } if (fl === 'slow') q.status.apply(G.data.status('slow'), 4, 0.3); if (fl === 'weak') q.hp = 40; });
       if (p.body.setArmed) { p.body.setArmed(true); p.calmT = 0; }
       for (let i = 0; i < 10; i++) G.step(1 / fps, false);
       p.teleport(window.__spot); p.setFacing(f.x, f.z); window.__ds.forEach((q, i) => { q.knock = { x: 0, z: 0 }; q.teleport(q.__spot); q.__hp = q.hp; const n = S.foes[i][2] || 0; for (let j = 0; j < n; j++) k.mark(q, {}); });
@@ -87,6 +88,7 @@ const SC = {
       window.__L = { fx: [], sfx: [], dmg: [], kick: [], shake: [], gstop: [], marks: [], lock: [] }; window.__t = 0; window.__S = S;
       p.target = window.__ds[0] || null;
       const aim = S.aim ? window.__side(S.aim, 0) : window.__ds[0] ? { ...window.__ds[0].pos } : null;
+      { const bk = G.sheet.book; bk.sk.slots = ['', '', '', '']; [S.id, S.pre, S.then].filter(Boolean).forEach((id, i) => bk.equip(id, i, false)); }
       if (S.pre) { const e = p.skills2.cast(S.pre, aim); window.__L.pre = e || 'ok'; window.__castAt = Math.round(1.1 * fps); }
       else if (S.id) { const e = p.skills2.cast(S.id, aim); if (e) return 'cast error ' + e; }
       return { lv: S.id && p.skills2.lvl(S.id), atk: p.stat('atk'), mult: S.id && p.skills2.mult(G.data.skill2(S.id)), hp0: window.__ds.map(q => q.hp) };
@@ -95,7 +97,7 @@ const SC = {
     const frames = [], total = Math.round(S.dur * FPS);
     for (let i = 0; i < total; i++) {
       const shot = S.marks.some(m => i === Math.round(m * FPS));
-      await ev(([i, fps, shot, nm]) => {
+      const sc = await ev(([i, fps, shot, nm]) => {
         window.__t = i / fps; window.__noDraw = !shot; const p = G.player, L = window.__L, S = window.__S;
         if (S.pre && i === window.__castAt) { p.skills2.cd = {}; p.skills.lock = 0; p.sp = p.maxSp; L.cast = p.skills2.cast(S.id, null) || 'ok'; }
         if (S.then && i === Math.round(0.6 * fps)) { p.skills2.cd = {}; p.skills.lock = 0; L.then = p.skills2.cast(S.then, null) || 'ok'; }
@@ -111,15 +113,16 @@ const SC = {
         if (i % 6 === 0) L.marks.push([+window.__t.toFixed(2), ...window.__ds.map(q => q._marks ? q._marks.reaction : 0)]);
         if (nm === 'regen' && i % 30 === 0) L.marks.push(['hp', +window.__t.toFixed(2), Math.round(p.hp), (p.status.get('regen') || {}).remaining]);
         if (nm === 'c3' && i % 30 === 0) L.marks.push(['hp', +window.__t.toFixed(2), Math.round(p.hp)]);
+        const fd = (S.aim || (S.foes[0] ? S.foes[0][0] : 0)) * 0.5, sc = G.render.toScreen({ x: p.pos.x + window.__f.x * fd, y: p.pos.y + 1.0, z: p.pos.z + window.__f.z * fd }); return [sc.x, sc.y];
       }, [i, FPS, shot, name0]);
-      if (shot) { const fn = `${dirOut}/${String(i).padStart(3, '0')}.png`; await pg.screenshot({ path: fn, timeout: 300000 }); frames.push([fn, i / FPS]); }
+      if (shot) { const fn = `${dirOut}/${String(i).padStart(3, '0')}.png`; const nc = !!process.env.NOCROP; await pg.screenshot({ path: fn, timeout: 300000, ...(nc ? {} : { clip: { x: Math.max(0, Math.min(VW - CW, Math.round(sc[0] - CW / 2))), y: Math.max(0, Math.min(VH - CH, Math.round(sc[1] - CH / 2))), width: CW, height: CH } }) }); frames.push([fn, i / FPS]); }
     }
     const late = await ev(() => { window.__noDraw = true; for (let i = 0; i < 300; i++) G.step(1 / 30, true); window.__noDraw = false; const k = G.player.skills2.wp; return { liveAfter10s: G.skillFx.wp.live.length, zones: k.zones.length, carrier: !!k.carrier, cat: !!k.cat, things: G.player.skills2.things.length, pending: G.player.skills2.pending.length }; });
     const res = await ev(() => { const L = window.__L; return { cast: L.cast, then: L.then, pre: L.pre, used: L.used, fx: L.fx, sfx: L.sfx, dmg: L.dmg, kick: L.kick, shake: L.shake, gstop: L.gstop.length, marks: L.marks, total: L.dmg.reduce((s, d) => s + (d.a || 0), 0) }; });
     res.info = info; res.late = late; res.errors = errs.slice(0, 8);
     // strip: crop around the action (centre of the screen), 2 rows
     const cw = Math.min(VW, TOUCH ? 390 : 860), chh = Math.min(VH, TOUCH ? 640 : 600);
-    fs.writeFileSync('/tmp/_wpstrip.py', `from PIL import Image, ImageDraw\nfr=${JSON.stringify(frames)}\nims=[Image.open(f).convert('RGB') for f,_ in fr]\nW,H=ims[0].size; cw,ch=${cw},${chh}\nx0=(W-cw)//2; y0=max(0,(H-ch)//2-${TOUCH ? 60 : 40})\nif ${process.env.NOCROP ? 1 : 0}: x0,y0,cw,ch=0,0,W,H\nims=[i.crop((x0,y0,x0+cw,y0+ch)) for i in ims]\nn=len(ims); cols=(n+1)//2 if n>6 else n; rows=(n+cols-1)//cols\ns=0.6 if cols>4 else 1.0\nims=[i.resize((int(cw*s),int(ch*s))) for i in ims]; w,h=ims[0].size\nsh=Image.new('RGB',(w*cols,(h+20)*rows),(20,20,28)); d=ImageDraw.Draw(sh)\nfor k,(im,(_,t)) in enumerate(zip(ims,fr)):\n  x=(k%cols)*w; y=(k//cols)*(h+20); sh.paste(im,(x,y+20)); d.text((x+6,y+4),'t %.2fs'%t,fill=(255,255,255))\nsh.save('${OUT}/${name}.png')`);
+    fs.writeFileSync('/tmp/_wpstrip.py', `from PIL import Image, ImageDraw\nfr=${JSON.stringify(frames)}\nims=[Image.open(f).convert('RGB') for f,_ in fr]\nW,H=ims[0].size; cw,ch=${cw},${chh}\nx0=0;cw=W;ch=H; y0=0\nif ${process.env.NOCROP ? 1 : 0}: x0,y0,cw,ch=0,0,W,H\nims=[i.crop((x0,y0,x0+cw,y0+ch)) for i in ims]\nn=len(ims); cols=(n+1)//2 if n>6 else n; rows=(n+cols-1)//cols\ns=0.6 if cols>4 else 1.0\nims=[i.resize((int(cw*s),int(ch*s))) for i in ims]; w,h=ims[0].size\nsh=Image.new('RGB',(w*cols,(h+20)*rows),(20,20,28)); d=ImageDraw.Draw(sh)\nfor k,(im,(_,t)) in enumerate(zip(ims,fr)):\n  x=(k%cols)*w; y=(k//cols)*(h+20); sh.paste(im,(x,y+20)); d.text((x+6,y+4),'t %.2fs'%t,fill=(255,255,255))\nsh.save('${OUT}/${name}.png')`);
     try { execSync('python3 /tmp/_wpstrip.py'); fs.rmSync(dirOut, { recursive: true, force: true }); } catch (e) { console.log('strip failed', e.message); }
     fs.writeFileSync(`${OUT}/${name}.json`, JSON.stringify(res, null, 1));
     console.log(name, JSON.stringify({ total: res.total, hits: res.dmg.length, kick: res.kick, shake: res.shake, gstop: res.gstop, late, errors: res.errors, info }));

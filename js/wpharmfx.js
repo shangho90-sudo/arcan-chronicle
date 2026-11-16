@@ -8,7 +8,7 @@
 //   capsule(pc, {from, tgt(), at(), fly, split, n})   handle {launch(i, dur, ok), hit(i, pos, ok, last), fizzle(i), ring(pos, r)}
 //   cryo(pc, {from, at, r, fly, film, rise, burst})   handle {burst(hits)}
 //   ion(pc, {from, f, len, w, align, strike, n})      handle {strike(hits)}
-//   tri(pc, {from, tgt(), at(), times})               handle {hit(i, pos, ok), fizzle(i), compound(pos, r), end()}
+//   triad(pc, {from, tgt(), at(), times})               handle {hit(i, pos, ok), fizzle(i), compound(pos, r), end()}
 //   collapse(pc, {at, r, contact})                    handle {impact(n)}
 //   catalyst(pc, {dur, n})  carrier(pc, {from, tgt, fly})  chain(pc, {from, tgt, first})  zone(pos, {r, life})  critical(pos, {r, burst, snap})
 //   spray(pos, {r, dur, follow})  coat(pc, {dur, initial})  lastrx(pc, {dur})  made(pc, {kind: vial|capsule})  regen(pc, {status})
@@ -223,7 +223,7 @@ export class WpFx extends CookFx {
   }
 
   // ------------------------------------------------------------------ A4 삼상 복합제
-  tri(pc, o) {
+  triad(pc, o) {   // (이름이 tri면 CookFx의 this.tri — Tripo 소품 표 — 와 겹침)
     if (!this._ok()) return null; const C = WPFX.col, from = P3(o.from), times = o.times, low = lite();
     const centre = () => { const t = o.tgt(), p = o.at(); return P3({ x: p.x, y: (p.y || 0) + (t ? mid(t) : 0.8), z: p.z }); };
     const items = [];
@@ -272,8 +272,8 @@ export class WpFx extends CookFx {
       gr.forEach((q, i) => { const k = smooth(q.d, q.d + 0.32, t), a = q.a + t * 6 * (1 - k), rr = (1 - k) * 1.3; q.m.position.set(at.x + Math.cos(a) * rr, at.y + H + Math.sin(a * 1.3) * 0.25 * (1 - k), at.z + Math.sin(a) * rr); q.m.material.uniforms.uA.value = (1 - smooth(q.d + 0.28, q.d + 0.34, t)) * smooth(0.05, 0.12, t); });
       // core: forms, then falls after the halves open (accelerating), stops on the ground at T
       const fall = easeIn(smooth(0.74, T, t)), cy = at.y + H - (H - 0.35) * fall;
-      core.position.set(at.x, cy, at.z); core.scale.setScalar(0.12 + 0.3 * ck); core.visible = hit < 0; core.material.uniforms.uGlow.value = 0.6 + 1.2 * ck;
-      halo.position.copy(core.position); halo.quaternion.copy(this.camQ); halo.scale.setScalar(0.9 + 1.0 * ck); halo.material.uniforms.uA.value = hit < 0 ? 0.9 * ck : 0;
+      core.position.set(at.x, cy, at.z); core.scale.setScalar(0.1 + 0.22 * ck); core.visible = hit < 0; core.material.uniforms.uGlow.value = 0.2 + 0.4 * ck;   // 핵의 모양이 보이게(하얗게 날리지 않게)
+      halo.position.copy(core.position); halo.quaternion.copy(this.camQ); halo.scale.setScalar(0.7 + 0.6 * ck); halo.material.uniforms.uA.value = hit < 0 ? 0.5 * ck : 0;
       if (hit < 0 && t > 0.74) { this.seg(streak, core.position, _a.copy(core.position).setY(Math.min(at.y + H, core.position.y + 1.2 * fall + 0.2)), 0.22); streak.visible = true; streak.material.uniforms.uA.value = 0.9; } else streak.visible = false;
       for (const s of spikes) { const k = hit < 0 ? 0 : smooth(hit, hit + 0.1, t) * (1 - smooth(hit + 0.45, hit + 0.75, t)); s.m.scale.set(s.s * 0.8, s.s * k, s.s * 0.8); s.m.material.uniforms.uA.value = k; }
     });
@@ -281,7 +281,7 @@ export class WpFx extends CookFx {
     const hA = this.glassM(e, this.geo.wp_cap_half, { tint: C.glass, op: 0.18, rim: C.ice, glow: 0.05 }), hB = this.glassM(e, this.geo.wp_cap_half, { tint: C.glass, op: 0.18, rim: C.ice, glow: 0.05 });
     for (const [h, sg] of [[hA, 1], [hB, -1]]) { e.g.remove(h); g.add(h); h.scale.set(S, S * sg, S); }
     for (let i = 0; i < NG; i++) { const m = this.solid(e, this.geo.wp_granule, { tint: i % 3 ? C.ice : C.gold, spec: 0.8 }); m.material.uniforms.uGlow.value = 0.5; m.scale.setScalar(0.07); gr.push({ m, a: i / NG * Math.PI * 2, d: 0.08 + 0.3 * (i / NG) }); }
-    const core = this.solid(e, this.geo.wp_granule, { tint: C.ice, spec: 1 }), halo = this.spr(e, 0, C.white, C.iceB, 5), streak = this.spr(e, 2, C.white, C.ice, 5);
+    const core = this.solid(e, this.geo.wp_granule, { tint: 0x7ec8ff, spec: 1 }), halo = this.spr(e, 0, C.white, C.iceB, 5), streak = this.spr(e, 2, C.white, C.ice, 5);
     const spikes = []; const NS = low ? K.spikesLite : K.spikes;
     for (let i = 0; i < NS; i++) { const a = i / NS * Math.PI * 2 + 0.3, rr = o.r * 0.62; const m = this.glassM(e, this.geo.wp_crystal, { tint: C.ice, op: 0.6, glow: 0.3, order: 4 }); m.position.set(at.x + Math.cos(a) * rr, at.y, at.z + Math.sin(a) * rr); m.rotation.set(Math.cos(a) * 0.35, 0, -Math.sin(a) * 0.35); m.scale.setScalar(0.001); spikes.push({ m, s: rnd(0.6, 0.95) }); }
     return this._h(e, { impact: () => {
