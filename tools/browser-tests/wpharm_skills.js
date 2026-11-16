@@ -43,7 +43,7 @@ const SC = {
   await pg.waitForFunction(() => G.skillFx && G.skillFx.wp, null, { timeout: 120000 });
   await ev(async ([z, g, lv, plates]) => {
     G.frame = () => {}; const c = G.render.cam; c.zoom = z; c.updateProjectionMatrix();
-    document.querySelectorAll('.controls,.toasts,.qhud,.qh-reopen' + (plates ? '' : ',.plates')).forEach(e => e.style.display = 'none');
+    document.querySelectorAll('.hud,.controls,.toasts,.qhud,.qh-reopen' + (plates ? '' : ',.plates')).forEach(e => e.style.display = 'none');
     if (G.reward) { G.reward.jobChange = sw => sw && sw(); G.reward.levelUp = () => {}; }
     G.dev.level(45); G.sheet.p.gender = g; G.dev.job('pharmacist'); G.dev.job('western_pharmacist');
     const bk = G.sheet.book; bk.sk.points += 999; for (const d of G.data.skillsOf('western_pharmacist')) for (let i = 0; i < lv; i++) if (!bk.learnBlock(d.id)) bk.learn(d.id);
@@ -113,7 +113,7 @@ const SC = {
         if (i % 6 === 0) L.marks.push([+window.__t.toFixed(2), ...window.__ds.map(q => q._marks ? q._marks.reaction : 0)]);
         if (nm === 'regen' && i % 30 === 0) L.marks.push(['hp', +window.__t.toFixed(2), Math.round(p.hp), (p.status.get('regen') || {}).remaining]);
         if (nm === 'c3' && i % 30 === 0) L.marks.push(['hp', +window.__t.toFixed(2), Math.round(p.hp)]);
-        const fd = (S.aim || (S.foes[0] ? S.foes[0][0] : 0)) * 0.5, sc = G.render.toScreen({ x: p.pos.x + window.__f.x * fd, y: p.pos.y + 1.0, z: p.pos.z + window.__f.z * fd }); return [sc.x, sc.y];
+        const fd = (S.aim || (S.foes[0] ? S.foes[0][0] : 0)) * 0.5, sc = G.render.toScreen({ x: p.pos.x + window.__f.x * fd, y: p.pos.y + (S.id === 'wp_a5' ? 2.4 : S.id === 'wp_b5' ? 1.6 : 1.0), z: p.pos.z + window.__f.z * fd }); return [sc.x, sc.y];
       }, [i, FPS, shot, name0]);
       if (shot) { const fn = `${dirOut}/${String(i).padStart(3, '0')}.png`; const nc = !!process.env.NOCROP; await pg.screenshot({ path: fn, timeout: 300000, ...(nc ? {} : { clip: { x: Math.max(0, Math.min(VW - CW, Math.round(sc[0] - CW / 2))), y: Math.max(0, Math.min(VH - CH, Math.round(sc[1] - CH / 2))), width: CW, height: CH } }) }); frames.push([fn, i / FPS]); }
     }

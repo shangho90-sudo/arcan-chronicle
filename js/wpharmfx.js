@@ -24,7 +24,7 @@ export const WPFX = {
   capsule: { size: 0.13, granule: 0.06, trail: 7, trailLite: 4, arc: 1.1 },
   cryo: { rim: 8, rimLite: 6, mid: 4, crystal: 0.42, centre: 0.95, shards: 12, shardsLite: 5 },
   ion: { y: 1.05, segs: 12, branches: 3, branchesLite: 1 },
-  collapse: { h: 4.4, size: 0.72, granules: 12, granulesLite: 7, shards: 14, shardsLite: 6, spikes: 8, spikesLite: 5 },
+  collapse: { h: 3.2, size: 0.72, granules: 12, granulesLite: 7, shards: 14, shardsLite: 6, spikes: 8, spikesLite: 5 },
   zone: { granules: 10, granulesLite: 6 },
 };
 const P3 = (p) => new THREE.Vector3(p.x, p.y || 0, -p.z);
