@@ -64,9 +64,9 @@ def tube3(bm, col, pts, rad, colf, seg=8):
     n = len(pts); rings = []; prevN = None
     for i, p in enumerate(pts):
         a, b = pts[max(0, i - 1)], pts[min(n - 1, i + 1)]; t = [b[k] - a[k] for k in range(3)]; m = math.sqrt(sum(x * x for x in t)) or 1; t = [x / m for x in t]
-        ref = prevN or ([0, 0, 1] if abs(t[1]) > 0.9 else [0, 1, 0])
-        u = [t[1] * ref[2] - t[2] * ref[1], t[2] * ref[0] - t[0] * ref[2], t[0] * ref[1] - t[1] * ref[0]]; mu = math.sqrt(sum(x * x for x in u)) or 1; u = [x / mu for x in u]
-        w = [t[1] * u[2] - t[2] * u[1], t[2] * u[0] - t[0] * u[2], t[0] * u[1] - t[1] * u[0]]; prevN = w
+        ref = prevN or ([1, 0, 0] if abs(t[0]) < 0.9 else [0, 0, 1])   # parallel transport: keep the previous side vector (no twisting rings)
+        d = sum(ref[k] * t[k] for k in range(3)); u = [ref[k] - t[k] * d for k in range(3)]; mu = math.sqrt(sum(x * x for x in u)) or 1; u = [x / mu for x in u]
+        w = [t[1] * u[2] - t[2] * u[1], t[2] * u[0] - t[0] * u[2], t[0] * u[1] - t[1] * u[0]]; prevN = u
         r = rad[i] if isinstance(rad, (list, tuple)) else rad
         rings.append([bm.verts.new(V(*[p[k] + (u[k] * math.cos(2 * math.pi * s / seg) + w[k] * math.sin(2 * math.pi * s / seg)) * r for k in range(3)])) for s in range(seg)])
     for i in range(n - 1):
@@ -173,7 +173,7 @@ def gs_limb(bm, col, uvl):
 
 # ------------------------------------------------------------------ 영지·녹각수호령 (lingzhi deer)
 def deer_body(bm, col, uvl):
-    def bc(nx, ny, nz): return MOSS if ny > 0.55 and math.sin(nz * 9 + nx * 3) > -0.2 else mix(BARK_LO, BARK, 0.5 + 0.5 * ny) if math.sin(nz * 14 + ny * 3) > -0.5 else BARK_LO
+    def bc(nx, ny, nz): return MOSS if ny > 0.8 and math.sin(nz * 9 + nx * 3) > 0.2 else mix(BARK_LO, BARK, 0.5 + 0.5 * ny) if math.sin(nz * 14 + ny * 3) > -0.5 else BARK_LO
     ball(bm, col, (0, 0, 0), (0.30, 0.28, 0.56), bc, 16, 10)
     for i in range(5): tube3(bm, col, [(-0.2 + i * 0.1, 0.18, -0.5 + i * 0.22), (-0.24 + i * 0.1, 0.0, -0.45 + i * 0.22), (-0.2 + i * 0.1, -0.2, -0.5 + i * 0.22)], 0.03, lambda *a: BARK_LO, 5)   # root ribs
     tube3(bm, col, [(0, 0.12, -0.52), (0, 0.24, -0.66), (0, 0.32, -0.72)], [0.07, 0.05, 0.02], lambda *a: MOSS, 6)   # leafy tail
@@ -189,7 +189,7 @@ def deer_head(bm, col, uvl):
         leafshape(bm, col, (s * 0.1, 0.5, 0.12), (s * 0.85, 0.45, -0.2), (0, 0.2, 1), 0.16, 0.05, MOSS, LEAF, th=0.01)   # leaf ears
 
 def deer_leg(bm, col, uvl):
-    tube3(bm, col, [(0, 0, 0), (0.0, -0.22, 0.02), (0.0, -0.44, -0.02), (0.0, -0.62, 0.02)], [0.09, 0.06, 0.05, 0.045], lambda k, a: mix(BARK, BARK_LO, k), 7)
+    tube3(bm, col, [(0, 0, 0), (0.0, -0.22, 0.02), (0.0, -0.44, -0.02), (0.0, -0.62, 0.02)], [0.12, 0.085, 0.07, 0.06], lambda k, a: mix(BARK, BARK_LO, k), 7)
     for s in (-1, 1): tube3(bm, col, [(0, -0.58, 0.02), (s * 0.06, -0.62, 0.08), (s * 0.1, -0.62, 0.12)], [0.03, 0.02, 0.006], lambda *a: BARK_LO, 5)   # root toes
 
 def deer_antler(bm, col, uvl):
