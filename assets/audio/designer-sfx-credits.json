@@ -1,0 +1,21 @@
+{
+  "provider": "synthesized (tools/audio/designer_sfx.py, numpy + scipy, fixed seed)",
+  "generatedOn": "2026-11-16",
+  "note": "디자이너 2차 스킬. 직접 합성 — 같은 이름의 파일로 바꿔 넣으면 교체됨.",
+  "assets": [
+    "sfx_ds_cloth.mp3",
+    "sfx_ds_finale.mp3",
+    "sfx_ds_needle.mp3",
+    "sfx_ds_pin.mp3",
+    "sfx_ds_ribbon.mp3",
+    "sfx_ds_silk.mp3",
+    "sfx_ds_silk_hit.mp3",
+    "sfx_ds_snip.mp3",
+    "sfx_ds_snip_open.mp3",
+    "sfx_ds_snip_silver.mp3",
+    "sfx_ds_spot.mp3",
+    "sfx_ds_thread.mp3",
+    "sfx_ds_unfold.mp3",
+    "sfx_ds_whoosh.mp3"
+  ]
+}

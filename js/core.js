@@ -379,7 +379,9 @@ function gearModsProvider(sh) {
   if (a && a.emb === "def") out.push({ stat: "def", add: 0, mul: 0.10 });
   if (a && a.emb === "mp") out.push({ stat: "spRegen", add: 2, mul: 0 });
   const fit = sh.book ? sh.book.passive("fitting") : 0;
-  if (fit && p.armor && ((p.crafted || {})[p.armor] || (a && a.emb))) out.push({ stat: "def", add: 0, mul: fit }, { stat: "moveSpeed", add: 0, mul: fit * 0.5 });
+  // 테일러드 퍼펙션(디자이너): 지금 입은 의상이 직접 만든 것(제작 기록 by = 내 이름, by 없는 예전 기록 = 나)이거나 자수가 있을 때만 — js/designer.js fittingOn과 같은 판정
+  const cr = p.armor ? (p.crafted || {})[p.armor] : null, mine = !!cr && typeof cr === "object" && (!cr.by || cr.by === p.name);
+  if (fit && p.armor && (mine || (a && a.emb))) out.push({ stat: "def", add: 0, mul: fit }, { stat: "moveSpeed", add: 0, mul: fit * 0.5 });
   return out;
 }
 export class CharacterSheet {

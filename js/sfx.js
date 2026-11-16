@@ -26,6 +26,7 @@ export const SFX_NAMES = ['levelup', 'jobchange', 'dialog', 'warp', 'hit', 'heav
   'ck_flip', 'ck_board', 'ck_soup', 'ck_pepper', 'ck_flour', 'ck_skewer', 'ck_eat', 'ck_ball_toss', 'ck_ball_fly', 'ck_ball_hit', 'ck_ball_fin',
   'cf_wok_toss', 'cf_sizzle', 'cf_flame', 'cf_splash', 'cf_ignite', 'cf_steam', 'cf_place', 'cf_steam_hiss', 'cf_pop', 'cf_skewer', 'cf_whoosh', 'cf_knife', 'cf_cloche_fall', 'cf_cloche_slam', 'cf_scoop', 'cf_sorbet_hit', 'cf_frost_draw', 'cf_frost', 'cf_disc', 'cf_disc_hit', 'cf_disc_catch', 'cf_sugar', 'cf_shatter', 'cf_choux_pop', 'cf_serve', 'cf_cloche_open',   // 쉐프 2차 (tools/audio/chef_sfx.py)
   'hb_simmer', 'hb_root', 'hb_needle', 'hb_resonance', 'hb_bloom',   // 한약사 2차 (tools/audio/herbal_sfx.py)
+  'ds_snip_open', 'ds_snip', 'ds_snip_silver', 'ds_needle', 'ds_thread', 'ds_pin', 'ds_silk', 'ds_silk_hit', 'ds_cloth', 'ds_ribbon', 'ds_whoosh', 'ds_spot', 'ds_unfold', 'ds_finale',   // 디자이너 2차 (tools/audio/designer_sfx.py)
   'hd_snip', 'hd_dryer', 'hd_style', 'hd_gust', 'hd_hot', 'hd_cold',
   'wp_granule', 'wp_ring', 'wp_crystal', 'wp_ion', 'wp_collapse',   // 양약사 2차 (tools/audio/wp_sfx.py)
   'en_lock', 'en_motor', 'en_shot', 'en_pile', 'en_cannon', 'en_missile', 'en_pop', 'en_charge', 'en_rail', 'en_zap', 'en_weld', 'en_exhaust', 'en_drop',   // 엔지니어 2차 (tools/audio/en_sfx.py)

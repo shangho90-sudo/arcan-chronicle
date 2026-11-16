@@ -389,33 +389,37 @@ S(J, 1, 2, '스타일링과 관리', 3, 'hd1_c3', '기분 전환', 'support', '�
 S(J, 1, 2, '스타일링과 관리', 4, 'hd1_c4', '염색약 배합', 'craft', '외형 색을 바꾸는 염색약을 만든다.')
 S(J, 1, 2, '스타일링과 관리', 5, 'hd1_c5', '깔끔한 마무리', 'passive', '적을 처치하면 이동 속도가 증가한다. 중첩되지 않고 시간만 갱신.', flags=dict(killHaste=[0.15, 0.03]))
 
-# ======================================================================= 디자이너 (designer) — pattern marks
+# ======================================================================= 디자이너 (designer) — 2026-11-16 2차 개편: 오트쿠튀르 마도사
+# 스킬 id·3×5 배치·배우는 레벨·최대 레벨·종류는 그대로(저장한 레벨·포인트·장착 칸이 그대로 새 스킬이 됨). 규칙은 js/designer.js(DsKit, CUSTOM ds_*,
+# 시침 표식 = 대상·시전자마다 최대 3·8초), 그림은 js/designerfx.js(메시 tools/blender/fx_designer.py), 동작 ds_* (tools/anim/swings.py),
+# 소리 ds_* (tools/audio/designer_sfx.py), 아이콘 tools/ui/designer_icons.py. 레시피 r_outfit·r_emb_*·r_ribbon 은 그대로.
 J, C = 'designer', 0xe060c0
-S(J, 2, 0, '실과 재단', 1, 'ds_a1', '실크 속박', 'attack', '여러 적을 실로 연결해 묶는다. 보스는 둔화로 대체.', target='ground', range=7, mp=24, cd=10, anim='cast',
-  ops=[hit('circle', 1.2, r=3.0, atAim=True, st=[st('root', 2.0)], mark=dict(type='pattern', n=1), link=True, fx=dict(beam='thread_link'))])
-S(J, 2, 0, '실과 재단', 2, 'ds_a2', '패턴 절단', 'attack', '표식을 소비할수록 강해지는 가위 공격.', target='enemy', range=2.2, mp=20, cd=6, anim='attack',
-  ops=[hit('single', 2.0, consume=dict(type='pattern', mulPer=0.6), fx=dict(slash='scissor_snip', burst='hit_slash'))])
-S(J, 2, 0, '실과 재단', 3, 'ds_a3', '바늘비', 'attack', '지정한 지역에 바늘을 반복해서 쏟아 표식을 남긴다.', target='ground', range=8, mp=26, cd=10, anim='cast',
-  ops=[hit('circle', 0.5, r=2.4, atAim=True, hits=6, gap=0.2, mark=dict(type='pattern', n=1, every=3), fx=dict(slash='fan_needles'))])
-S(J, 2, 0, '실과 재단', 4, 'ds_a4', '교차 재단', 'attack', 'X자로 두 번 벤다. 교차 중심의 적은 추가 피해.', range=3.0, mp=22, cd=7, anim='attack',
-  ops=[hit('cone', 1.6, r=3.0, ang=70, hits=2, gap=0.15, centerBonus=0.6, fx=dict(slash='cross'))])
-S(J, 2, 0, '실과 재단', 5, 'ds_a5', '운명의 재단선', 'ultimate', '넓은 재단선을 새긴 뒤 한꺼번에 자른다. 속박된 적에게 강화.', target='self', mp=70, cd=70, cast=0.8, anim='cast',
-  ops=[dict(op='telegraph', shape='circle', r=6, dur=0.8), hit('circle', 7.0, r=6, vsStatus=dict(id='root', mul=1.5), consume=dict(type='pattern', mulPer=0.4), fx=dict(slash='cross'), at=0.8)])
-S(J, 2, 1, '리본과 무대', 1, 'ds_b1', '리본 대시', 'attack', '돌진하며 지나간 경로의 적을 공격하고 표식을 남긴다.', range=6, mp=20, cd=8, anim='dash',
-  ops=[dash(5.0, invuln=False, path=hit('line', 1.8, w=1.4, mark=dict(type='pattern', n=1), fx=dict(beam='ribbon_line')))])
-S(J, 2, 1, '리본과 무대', 2, 'ds_b2', '리본 회오리', 'attack', '적을 끌어당기며 반복 공격한다. 보스는 끌려오지 않는다.', target='ground', range=6, mp=26, cd=11, anim='cast',
-  ops=[area('dmg', 2.8, 2.5, tick=0.3, coef=0.35, pull=1.2, fx='wind')])
-S(J, 2, 1, '리본과 무대', 3, 'ds_b3', '마네킹 대역', 'summon', '적의 주의를 끄는 마네킹을 남기고 뒤로 물러난다. 사라질 때 실을 방출.', target='self', mp=22, cd=16, anim='dash',
-  ops=[summon('mannequin', ai='decoy', life=6, hp=1.6, taunt=True, onExpire=dict(r=2.6, coef=1.2, st=[st('root', 1.0)], burst='dust'), limit=1), dash(-3.0, invuln=False)])
-S(J, 2, 1, '리본과 무대', 4, 'ds_b4', '스포트라이트', 'support', '대상이 받는 치명타 피해가 커지고 위장·은신이 풀린다.', target='enemy', range=9, mp=16, cd=14, anim='cast',
-  ops=[hit('single', 0.0, st=[st('spotlit', 8, 0.5)], fx=dict(burst='gold'))])
-S(J, 2, 1, '리본과 무대', 5, 'ds_b5', '환상의 런웨이', 'ultimate', '리본과 분신의 연속 공격, 그리고 자신의 기동력 강화.', target='self', mp=70, cd=70, cast=0.4, anim='cast',
-  ops=[buff('haste', 10, 0.4), custom('runway', n=5, r=5, coef=1.6, gap=0.25, mark=dict(type='pattern', n=1))])
-S(J, 2, 2, '의상과 마법 자수', 1, 'ds_c1', '고급 의상 제작', 'craft', '직업별 고급 의상을 만든다.')
-S(J, 2, 2, '의상과 마법 자수', 2, 'ds_c2', '마법 자수', 'craft', '의상에 공격·방어·자원 회복 중 하나의 효과를 새긴다.')
-S(J, 2, 2, '의상과 마법 자수', 3, 'ds_c3', '리본 장식 제작', 'craft', '이동·상태이상 저항 장신구를 만든다.')
-S(J, 2, 2, '의상과 마법 자수', 4, 'ds_c4', '긴급 수선', 'support', '보호막을 만들고 출혈을 없앤다.', target='self', mp=18, cd=16, anim='cast', ops=[shield(50, 1.2, 8), cleanse(9, ['bleed'])])
-S(J, 2, 2, '의상과 마법 자수', 5, 'ds_c5', '완벽한 피팅', 'passive', '직접 만든 의상이나 자수 장비를 입으면 방어·이동 보너스.', flags=dict(fitting=[0.08, 0.03]))
+S(J, 2, 0, '마법 입체재단', 1, 'ds_a1', '실크 드레이핑', 'attack', '실크 두 줄이 양옆에서 날아가 조준한 곳의 적들을 반투명 원단으로 감싸고, 금빛 핀이 모서리를 고정하는 순간 범위 피해와 짧은 속박을 주며 시침 표식을 남긴다. 보스는 속박 대신 둔화. 속박이 끝나면 원단이 풀려 사라진다.', target='ground', range=7, mp=24, cd=10, anim='ds_drape', sfxAt='op', recover=0.35,
+  ops=[custom('ds_drape', at=-1, r=3.0, coef=1.2, pin=0.32, st=[st('root', 2.0)])], fx=dict(color=0xf0a0d8))
+S(J, 2, 0, '마법 입체재단', 2, 'ds_a2', '패턴 브레이크', 'attack', '가까운 적에게 짧은 재단 점선을 긋고, 큰 마법 가위가 점선을 따라 한 번 닫히는 순간 벤다. 그 적에게 남긴 내 시침 표식을 모두 소비해 표식마다 피해가 커지고, 속박된 적은 더 크게 베인다(배율 상한 있음). 표식이 없어도 기본 피해를 준다.', target='enemy', range=2.4, mp=20, cd=6, anim='ds_snip', sfxAt='op', recover=0.3,
+  ops=[custom('ds_break', at=-1, coef=2.0, per=0.7, bound=0.3, cap=2.8, total=3.2, len=2.2)], fx=dict(color=0xffd27a))
+S(J, 2, 0, '마법 입체재단', 3, 'ds_a3', '오트쿠튀르 스티치', 'attack', '조준한 곳에 지그재그 봉제선이 그려지고, 금빛 바늘이 그 선을 따라 차례로 꿰뚫으며 뒤로 실을 잇는다. 바늘이 지나는 자리의 적이 피해를 받고(적마다 최대 4번) 시침 표식이 남는다. 마지막 바늘이 실을 당겨 꿰인 적을 가운데로 조이며 마무리한다.', target='ground', range=8, mp=26, cd=10, anim='ds_sew', sfxAt='op', recover=0.35,
+  ops=[custom('ds_stitch', at=-1, r=2.4, n=6, gap=0.13, coef=0.55, w=1.3, maxPer=4, start=0.12, fin=dict(coef=0.8, pull=0.6))], fx=dict(color=0xffd27a))
+S(J, 2, 0, '마법 입체재단', 4, 'ds_a4', '크로스 커팅', 'attack', '분홍 대각선 베기와 은빛 반대 대각선 베기로 앞에 X자를 새긴다. 두 절단 경로에 닿은 적은 각각 피해를 받고, 두 선이 교차한 중심의 적은 한 번 더 크게 베인다(시전마다 대상마다 한 번).', range=3.0, mp=22, cd=7, anim='ds_cross', sfxAt='op', recover=0.3,
+  ops=[custom('ds_cross', at=-1, fwd=1.7, len=3.4, w=1.0, coef=1.6, gap=0.16, centre=dict(r=0.9, coef=1.5))], fx=dict(color=0xff8ac8))
+S(J, 2, 0, '마법 입체재단', 5, 'ds_a5', '그랑 패턴 피날레', 'ultimate', '머리 위에 의상 패턴 도면을 펼치고 앞쪽 넓은 바닥에 금빛 재단 점선을 차례로 새긴 뒤(0.8초), 거대한 가위가 닫히는 순간 모든 선을 한꺼번에 잘라 강한 범위 피해를 준다. 적마다 내 시침 표식을 소비해 강해지고, 속박된 적은 추가 피해(배율 상한 있음). 자르는 즉시 다시 움직일 수 있다.', target='self', mp=70, cd=70, cast=0.8, anim='ds_finale', sfxAt='op', recover=0.3,
+  ops=[custom('ds_finale', at=0, r=6.5, ang=110, coef=7.0, per=0.4, bound=0.5, cap=2.4, total=2.8, lines=7)], fx=dict(color=0xffd27a))
+S(J, 2, 1, '쿠튀르 런웨이', 1, 'ds_b1', '실크 로드', 'attack', '앞으로 얇은 실크 길을 펼치고 그 위를 짧게 미끄러져 돌진한다. 지나가는 길의 적을 한 번씩 베고 시침 표식을 남긴다. 실크 길은 실제로 갈 수 있는 곳까지만 펼쳐지며(벽을 지나지 않음) 무적 시간은 없다.', range=6, mp=20, cd=8, anim='ds_glide', sfxAt='op', recover=0.2,
+  ops=[custom('ds_road', at=-1, dist=5.0, speed=14, w=1.4, coef=1.8)], fx=dict(color=0xf0a0d8))
+S(J, 2, 1, '쿠튀르 런웨이', 2, 'ds_b2', '리본 피루엣', 'attack', '짧게 돌며 넓은 리본 두 줄을 서로 다른 각도로 펼친다. 둘레의 적을 약하게 끌어당기며 여섯 번 휘감고, 마지막에 매듭처럼 조여 피해와 둔화를 준다. 보스와 무거운 적은 끌려오지 않는다.', target='self', range=2.8, mp=26, cd=11, anim='ds_spin', sfxAt='op', recover=0.55,
+  ops=[custom('ds_pirouette', at=-1, r=2.8, n=6, gap=0.2, coef=0.35, pull=0.45, knot=dict(coef=0.9, slow=dict(val=0.3, dur=2.0)))], fx=dict(color=0xe07ad0))
+S(J, 2, 1, '쿠튀르 런웨이', 3, 'ds_b3', '미러 피팅', 'summon', '뒤로 짧게 물러나고, 원래 자리에 남은 잔상이 실로 풀리며 재봉 마네킹이 조립된다. 리본 망토를 입은 마네킹은 6초 동안 일반 적의 주의를 끈다(보스는 끌리지 않음). 시간이 다 되거나 부서지면 망토가 풀려 퍼지며 둘레에 피해와 둔화를 준다. 하나만 둘 수 있다.', target='self', mp=22, cd=16, anim='ds_glide', sfxAt='op', recover=0.2,
+  ops=[custom('ds_mirror', at=-1, back=3.0, life=6, hp=1.6, r=2.6, coef=1.2, slow=dict(val=0.4, dur=2.5), limit=1)], fx=dict(color=0xf0a0d8))
+S(J, 2, 1, '쿠튀르 런웨이', 4, 'ds_b4', '뮤즈의 초대', 'support', '지정한 적 위에 작은 조명을 비추고 발밑에 무대 문양, 양옆에 보석 핀을 세운다. 8초 동안 그 적이 받는 치명타 피해가 커진다. 다시 쓰면 시간만 새로 채워지고 효과가 겹치지 않는다.', target='enemy', range=9, mp=16, cd=14, anim='ds_pose', sfxAt='op', recover=0.25,
+  ops=[custom('ds_muse', at=-1, dur=8, val=0.5)], fx=dict(color=0xffe080))
+S(J, 2, 1, '쿠튀르 런웨이', 5, 'ds_b5', '오트쿠튀르 컬렉션', 'ultimate', '앞으로 좁고 짧은 빛의 런웨이를 펼친다. 망토·리본·장식이 서로 다른 의상을 입은 분신 세 명이 차례로 엇갈려 질주하며 경로의 적을 베고 시침 표식을 남기고(분신마다 적 한 번), 마지막에 본체가 가위와 리본을 펼치며 피날레를 장식한다. 10초 동안 이동 속도가 오른다.', target='self', mp=70, cd=70, cast=0.4, anim='ds_pose', sfxAt='op', recover=0.3,
+  ops=[buff('haste', 10, 0.4, noAura=True), custom('ds_collection', at=0, len=7.0, w=1.8, n=3, gap=0.3, run=0.34, coef=1.8, fin=dict(r=3.0, coef=2.6, t=1.3))], fx=dict(color=0xffd27a))
+S(J, 2, 2, '마스터 아틀리에', 1, 'ds_c1', '시그니처 쿠튀르', 'craft', '직업별 고급 의상을 만든다. 성공하면 머리 위 작은 마네킹에 원단이 걸리고 재단·봉제·장식 순서로 완성된 뒤 한 바퀴 돌아 보인다. 여러 벌을 한 번에 만들 수 있고, 만든 의상에는 제작자가 기록된다.')
+S(J, 2, 2, '마스터 아틀리에', 2, 'ds_c2', '아르카나 엠브로이더리', 'craft', '의상에 새기는 공격·방어·자원 회복 자수를 만든다. 공중의 바늘이 문양을 차례로 꿰매고(공격 = 뾰족한 별, 방어 = 촘촘한 격자, 회복 = 흐르는 곡선) 완성되면 선을 따라 빛이 한 번 흐른다. 자수는 입고 있는 의상에 적용되며 다시 입어도 겹치지 않는다.')
+S(J, 2, 2, '마스터 아틀리에', 3, 'ds_c3', '주얼 리본 크래프트', 'craft', '이동을 돕는 리본 장신구를 만든다. 리본 양 끝이 접혀 매듭이 지고 가운데 보석이 끼워진 뒤 주름을 따라 빛이 흐른다.')
+S(J, 2, 2, '마스터 아틀리에', 4, 'ds_c4', '미라클 리스티치', 'support', '누르는 즉시 보호막을 두르고 출혈을 없앤다(출혈이 없어도 보호막은 적용). 찢어진 천 조각이 몸을 감싸고 바늘이 가장자리를 빠르게 꿰매 실크 보호막이 된다. 맞을 때마다 주름과 빛 물결이 일고, 보호막이 줄어들수록 가장자리 실밥이 풀린다.', target='self', mp=18, cd=16, anim='ds_pose', sfxAt='op', recover=0.2,
+  ops=[custom('ds_restitch', at=-1, dur=8), shield(50, 1.2, 8, at=-1, noAura=True), cleanse(9, ['bleed'], at=-1, noAura=True)], fx=dict(color=0xe8d8ff))
+S(J, 2, 2, '마스터 아틀리에', 5, 'ds_c5', '테일러드 퍼펙션', 'passive', '내가 직접 만든 의상이나 자수가 새겨진 의상을 입으면 방어력과 이동 속도가 오른다. 조건이 맞는 순간 몸 윤곽을 따라 금빛 치수선이 지나가고 브로치가 한 번 빛난다(상시 입자 없음). 장비를 바꾸면 바로 다시 계산된다.', flags=dict(fitting=[0.08, 0.03]))
 
 # ======================================================================= 예술가 (artist)
 J, C = 'artist', 0x50c8c8

@@ -12,6 +12,7 @@ import { PharmFx } from './pharmfx.js';
 import { CookFx } from './cookfx.js';
 import { SmithFx } from './smithfx.js';
 import { ChefFx } from './cheffx.js';   // 쉐프 2차
+import { DesignerFx } from './designerfx.js';   // 디자이너 2차
 import { HairFx } from './hairfx.js';
 import { WpFx } from './wpharmfx.js';
 import { EnFx } from './engfx.js';
@@ -1656,6 +1657,7 @@ export class SkillFx {
     this.yeon = new YeonFx(this.root); this.yeon.load();                      // 견습생 '연' crescents (js/yeonfx.js)
     this.biyeon = new BiyeonFx(this.root); this.biyeon.load();                // 비연참 '비연파' crescent fan (js/biyeonfx.js)
     this.bash = new BashFx(this.root); this.bash.load();
+    this.ds = new DesignerFx(this.root); this.ds.load();                       // 디자이너 2차: 마법 가위·바늘·실·리본·원단·마네킹·런웨이 분신 (js/designerfx.js)
     this.chef = new ChefFx(this.root); this.chef.load();                     // 쉐프 2차: 웍·압력솥·클로슈·소르베·밀푀유·설탕 벽·크로캉부슈·구리 냄비 (js/cheffx.js)
     this.smith = new SmithFx(this.root); this.smith.load();                   // 대장장이 1차: 모루·집게·철판·리벳·불티·수증기 (js/smithfx.js)
     this.hair = new HairFx(this.root); this.hair.load();                      // 미용사 1차: 큰 가위·빗·드라이어·헤어롤 (js/hairfx.js)
@@ -1705,7 +1707,7 @@ export class SkillFx {
   // ------------------------------------------------------------------------------------ frame
   update(dt) {
     dt = Math.min(Math.max(dt, 0), 0.1); this.time += dt;
-    this.shatter.update(dt); this.sal.update(dt); this.yeon.update(dt); this.biyeon.update(dt); this.bash.update(dt); this.pharm.update(dt); this.cook.update(dt); this.smith.update(dt); this.chef.update(dt); this.hair.update(dt); this.art.update(dt); this.wp.update(dt); this.en.update(dt); this.herbal.update(dt);
+    this.shatter.update(dt); this.sal.update(dt); this.yeon.update(dt); this.biyeon.update(dt); this.bash.update(dt); this.pharm.update(dt); this.cook.update(dt); this.smith.update(dt); this.chef.update(dt); this.ds.update(dt); this.hair.update(dt); this.art.update(dt); this.wp.update(dt); this.en.update(dt); this.herbal.update(dt);
     const L = this.live;
     for (let i = 0; i < L.length; i++) {
       const e = L[i]; e.t += dt; e.lt = e.t * e.tk;
@@ -1716,7 +1718,7 @@ export class SkillFx {
     }
     this.pa.update(dt); this.pn.update(dt);
   }
-  clear() { this.shatter.clear(); this.sal.clear(); this.yeon.clear(); this.biyeon.clear(); this.bash.clear(); this.pharm.clear(); this.cook.clear(); this.smith.clear(); this.chef.clear(); this.hair.clear(); this.art.clear(); this.wp.clear(); this.en.clear(); this.herbal.clear(); for (const e of this.live) if (!e.dead) this._release(e); this.live.length = 0; this.pa.clear(); this.pn.clear(); }
+  clear() { this.shatter.clear(); this.sal.clear(); this.yeon.clear(); this.biyeon.clear(); this.bash.clear(); this.pharm.clear(); this.cook.clear(); this.smith.clear(); this.chef.clear(); this.ds.clear(); this.hair.clear(); this.art.clear(); this.wp.clear(); this.en.clear(); this.herbal.clear(); for (const e of this.live) if (!e.dead) this._release(e); this.live.length = 0; this.pa.clear(); this.pn.clear(); }
   /** remove from scene and free pooled rigs (shared caches stay) */
   dispose() { this.clear(); for (const p of this.pools.values()) for (const r of p) disposeRig(r); this.pools.clear(); this.root.removeFromParent(); this.pa.geo.dispose(); this.pn.geo.dispose(); this.pa.mat.dispose(); this.pn.mat.dispose(); }
 

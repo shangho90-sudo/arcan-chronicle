@@ -1070,6 +1070,83 @@ EN_RAIL = action('en_rail', [
 EN_RAIL.update(stow=True, fireT=0.88)
 SKILL_ACTS += [EN_TOSS, EN_SIGNAL, EN_PILE, EN_CANNON, EN_RAIL]
 
+# ------------------------------------------------------------------------------------------------ 디자이너 2차 (2026-11-16)
+# 미용사 몸·큰 가위(HP: grip2 = 두 손, snip = 벌어진 정도) 그대로. 큰 마법 가위·바늘·리본은 js/designerfx.js 가 그리고, 몸은 그 순간에 맞춰 움직임.
+DG = HD_GUARD
+def h1(az, el, reach, baz, bel, snip=0.1, **kw):   # 한 손(오른손 가위, 왼손 자유)
+    d = HP(az, el, reach, baz, bel, snip, **kw); d['grip2'] = 0; return d
+DS_DRAPE = action('ds_drape', [      # 실크 드레이핑: 두 팔을 모았다가 0.22 s에 양옆으로 활짝 펼쳐 실크를 던짐
+    hk(0.00, **DG),
+    hk(0.10, 'o', **h1(-20, -30, 0.50, -10, 10, 0.1, twist=-10, lean=-4, sink=0.08, armL=[40, -20])),
+    hk(0.22, 'i', **h1(-70, 10, 0.92, -90, 20, 0.6, twist=6, lean=6, sink=0.10, armL=[110, 40], sq=True)),
+    hk(0.32, 'o', **h1(-76, 14, 0.94, -96, 24, 0.6, twist=8, lean=6, sink=0.10, armL=[118, 44])),
+    hk(0.50, 's', **h1(-30, -24, 0.70, -10, 10, 0.2, twist=2, lean=2, sink=0.06, armL=[50, 20])),
+    hk(0.62, 's', **DG),
+], 0.22, 0.40, None, fadeIn=0.06, fadeOut=0.16)
+DS_SNIP = action('ds_snip', [        # 패턴 브레이크: 크게 벌려 뒤로 당겼다가 0.28 s에 마법 가위와 함께 '싹뚝'
+    hk(0.00, **DG),
+    hk(0.14, 'o', **HP(-4, -10, 0.46, -14, 20, 1.0, twist=-26, lean=-10, sink=0.08)),
+    hk(0.20, 's', **HP(-6, -8, 0.44, -16, 22, 1.0, twist=-30, lean=-12, sink=0.10, sq=True)),
+    hk(0.26, 'i', **HP(10, -12, 0.94, 0, 4, 0.8, twist=-2, lean=10, sink=0.12, sq=True)),
+    hk(0.28, None, **HP(14, -12, 1.02, 2, -2, 0.0, twist=12, lean=17, sink=0.14, sq=True)),
+    hk(0.38, 'o', **HP(16, -14, 1.0, 4, -4, 0.0, twist=14, lean=17, sink=0.14)),
+    hk(0.50, 's', **HP(16, -30, 0.74, 6, 6, 0.1, twist=6, lean=6, sink=0.06)),
+    hk(0.62, 's', **DG),
+], 0.28, 0.42, None, fadeIn=0.06, fadeOut=0.16)
+DS_SEW = action('ds_sew', [          # 오트쿠튀르 스티치: 가위를 등 쪽으로 낮추고 왼손으로 바늘을 지휘(위 -> 아래 세 번)
+    hk(0.00, **DG),
+    hk(0.10, 'o', **h1(-40, -40, 0.62, -20, 10, 0.1, twist=-8, lean=-2, sink=0.06, armL=[150, 30])),
+    hk(0.22, 'i', **h1(-40, -40, 0.62, -20, 10, 0.1, twist=4, lean=8, sink=0.10, armL=[70, 20], sq=True)),
+    hk(0.34, 'o', **h1(-40, -40, 0.62, -20, 10, 0.1, twist=-2, lean=2, sink=0.08, armL=[130, 26])),
+    hk(0.46, 'i', **h1(-40, -40, 0.62, -20, 10, 0.1, twist=6, lean=8, sink=0.10, armL=[60, 18])),
+    hk(0.60, 'o', **h1(-40, -40, 0.62, -20, 10, 0.1, twist=0, lean=4, sink=0.08, armL=[120, 24])),
+    hk(0.76, 'i', **h1(-36, -40, 0.66, -16, 10, 0.1, twist=8, lean=12, sink=0.12, armL=[40, 30], sq=True)),
+    hk(0.92, 's', **DG),
+], 0.22, 0.40, None, fadeIn=0.06, fadeOut=0.16)
+DS_CROSS = action('ds_cross', [      # 크로스 커팅: 오른쪽 위 -> 왼쪽 아래(0.22 s) 다음 왼쪽 위 -> 오른쪽 아래(0.38 s), 두 번 모두 닫으며
+    hk(0.00, **DG),
+    hk(0.12, 'o', **HP(-40, 40, 0.70, -60, 60, 1.0, twist=-30, lean=-6, sink=0.06)),
+    hk(0.20, 'i', **HP(0, 6, 0.96, -10, 10, 0.7, twist=-6, lean=8, sink=0.10, sq=True)),
+    hk(0.22, None, **HP(20, -20, 1.0, 20, -30, 0.0, twist=10, lean=14, sink=0.12, sq=True)),
+    hk(0.29, 'o', **HP(36, 40, 0.72, 50, 60, 1.0, twist=28, lean=-2, sink=0.08)),
+    hk(0.36, 'i', **HP(0, 6, 0.96, 10, 10, 0.7, twist=6, lean=10, sink=0.12, sq=True)),
+    hk(0.38, None, **HP(-24, -22, 1.0, -24, -32, 0.0, twist=-14, lean=16, sink=0.14, sq=True)),
+    hk(0.50, 'o', **HP(-26, -26, 0.94, -26, -36, 0.0, twist=-14, lean=14, sink=0.12)),
+    hk(0.66, 's', **DG),
+], 0.22, 0.50, None, fadeIn=0.05, fadeOut=0.16)
+DS_FINALE = action('ds_finale', [    # 그랑 패턴 피날레(시전 0.8 s): 가위를 머리 위로 들어 활짝 벌리고 버티다가 0.8 s에 앞으로 내리며 닫음
+    hk(0.00, **DG),
+    hk(0.20, 'o', **HP(4, 54, 0.82, 0, 86, 0.8, twist=-8, lean=-10, sink=0.06)),
+    hk(0.60, 's', **HP(2, 62, 0.86, 0, 92, 1.0, twist=-12, lean=-14, sink=0.08, sq=True)),
+    hk(0.74, 'i', **HP(8, 30, 0.98, 2, 40, 1.0, twist=-4, lean=6, sink=0.14, sq=True)),
+    hk(0.80, None, **HP(14, -22, 1.02, 4, -32, 0.0, twist=10, lean=24, sink=0.26, sq=True)),
+    hk(0.95, 'o', **HP(16, -30, 0.96, 6, -42, 0.0, twist=12, lean=24, sink=0.26)),
+    hk(1.20, 's', **DG),
+], 0.80, 0.95, None, fadeIn=0.06, fadeOut=0.18)
+DS_GLIDE = action('ds_glide', [      # 실크 로드·미러 피팅: 몸을 낮추고 가위를 뒤로 끌며 미끄러지듯
+    hk(0.00, **DG),
+    hk(0.08, 'o', **h1(-60, -30, 0.70, -100, -10, 0.2, twist=-14, lean=16, sink=0.18, armL=[60, 50])),
+    hk(0.30, 's', **h1(-64, -28, 0.70, -104, -8, 0.2, twist=-16, lean=18, sink=0.18, armL=[64, 52])),
+    hk(0.46, 's', **DG),
+], 0.05, 0.20, None, fadeIn=0.04, fadeOut=0.14)
+DS_SPIN = action('ds_spin', [        # 리본 피루엣: 두 팔을 펼치고 한 바퀴 돈 뒤 매듭을 묶듯 가슴 앞으로 모음
+    hk(0.00, **DG),
+    hk(0.10, 'o', **h1(-80, 0, 0.90, -100, 10, 0.4, twist=0, lean=2, sink=0.08, armL=[90, 40])),
+    hk(0.60, 's', **h1(-82, 0, 0.90, -100, 10, 0.4, twist=0, lean=2, sink=0.08, armL=[92, 40])),
+    hk(0.72, 'i', **HP(10, -10, 0.70, 0, 10, 0.0, twist=4, lean=8, sink=0.10, sq=True)),
+    hk(0.90, 's', **DG),
+], 0.10, 0.45, None, fadeIn=0.05, fadeOut=0.16)
+DS_SPIN.update(spins=[[0.08, 0.62, 360]])
+DS_POSE = action('ds_pose', [        # 뮤즈의 초대·오트쿠튀르 컬렉션·미라클 리스티치: 가위를 세워 들고 왼손을 내미는 무대 인사
+    hk(0.00, **DG),
+    hk(0.14, 'o', **h1(-20, 40, 0.62, -6, 80, 0.3, twist=-10, lean=-4, sink=0.04, armL=[70, 60])),
+    hk(0.25, 'i', **h1(-24, 44, 0.64, -8, 84, 0.5, twist=6, lean=4, sink=0.06, armL=[96, 50], sq=True)),
+    hk(0.42, 's', **h1(-24, 44, 0.64, -8, 84, 0.5, twist=6, lean=4, sink=0.06, armL=[96, 50])),
+    hk(0.62, 's', **DG),
+], 0.25, 0.40, None, fadeIn=0.06, fadeOut=0.16)
+DS_ALL = [DS_DRAPE, DS_SNIP, DS_SEW, DS_CROSS, DS_FINALE, DS_GLIDE, DS_SPIN, DS_POSE]
+SKILL_ACTS += DS_ALL   # 디자이너 2차
+
 acts = json.load(open(P))
 names = {'attack', 'attack2'} | {x['name'] for x in SKILL_ACTS}
 acts = [a for a in acts if a['name'] not in names and not a['name'].startswith('nv_yeon_')]
