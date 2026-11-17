@@ -78,10 +78,42 @@ def finale():
     sh = bp(grains(d, 50, 0.02, 0.9, 0.35, 0.5), 4000, 11000) * 0.3
     return norm(np.tanh(x * 0.9 + boom + reso + sh), d, t, 0.25)
 
+# ---- fx2(2026-11-17) 그림 순간 소리 다섯: Runway(tools/audio/designer_runway_sfx.py)가 하루 작업 한도에 걸려 우선 합성. Runway 가 되면 --run 이 같은 이름으로 덮어씀.
+def sparkle():   # 명중 '팡' 별: 높은 종 셋이 빠르게 + 반짝 알갱이
+    d = 0.5; t = T(d); x = np.zeros(len(t))
+    for k, (f0, at) in enumerate(((2637, 0.0), (3520, 0.04), (4699, 0.08))): x += bell(t - at, [(f0, 1, 0.6), (f0 * 1.5, 0.6, 0.25)], 0.12) * (t > at) * (0.8 - 0.15 * k)
+    x += bp(grains(d, 26, 0.0, 0.35, 0.45, 0.2), 6000, 12000) * 0.35
+    return norm(x, d, t, 0.1)
+def sigil():     # 마법진: 낮은 울림이 올라오며 맑은 종 화음
+    d = 0.9; t = T(d); f = 220 + 220 * np.clip(t / 0.6, 0, 1)
+    hum = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.minimum(1, t / 0.15) * np.exp(-np.maximum(0, t - 0.55) / 0.2) * 0.35
+    ch = bell(t - 0.25, [(1318, 1, 0.4), (1661, 0.9, 0.35), (1976, 0.8, 0.3), (2637, 0.6, 0.2)], 0.35) * (t > 0.25) * 0.5
+    sh = bp(grains(d, 30, 0.1, 0.7, 0.3, 0.4), 5000, 11000) * 0.25
+    return norm(hum + ch + sh, d, t, 0.15)
+def jewel():     # 보석 반짝: 아주 맑은 '팅' + 높은 배음
+    d = 0.6; t = T(d); x = bell(t, [(3136, 1, 0.6), (4699, 0.8, 0.4), (6272, 0.6, 0.25), (7902, 0.4, 0.15)], 0.18) * np.minimum(1, t / 0.002) + hp(N(t), 7000) * np.exp(-t / 0.004) * 0.3
+    return norm(x, d, t, 0.12)
+def mannequin(): # 마네킹: 나무 '똑' 두 번 + 반짝 퐁
+    d = 0.6; t = T(d); x = np.zeros(len(t))
+    for at in (0.0, 0.09): x += bp(N(t), 600, 2500) * np.exp(-np.maximum(0, t - at) / 0.012) * (t > at) * 0.9 + np.sin(2 * np.pi * 420 * (t - at)) * np.exp(-np.maximum(0, t - at) / 0.03) * (t > at) * 0.5
+    f = 600 + 900 * np.clip((t - 0.18) / 0.15, 0, 1); x += np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-np.maximum(0, t - 0.18) / 0.08) * (t > 0.18) * 0.4
+    x += bp(grains(d, 18, 0.2, 0.5, 0.3, 0.25), 5000, 11000) * 0.3
+    return norm(np.tanh(x), d, t, 0.1)
+def flashbulb(): # 런웨이 카메라 플래시: 셔터 '찰칵' 여러 번 + 플래시 '팝' + 반짝
+    d = 0.7; t = T(d); x = np.zeros(len(t))
+    for at in (0.0, 0.09, 0.16, 0.3, 0.41):
+        x += hp(N(t), 2500) * np.exp(-np.maximum(0, t - at) / 0.005) * (t > at) * 0.9 + bp(N(t), 300, 1800) * np.exp(-np.maximum(0, t - at - 0.012) / 0.02) * (t > at + 0.012) * 0.5
+    x += bp(grains(d, 24, 0.05, 0.6, 0.3, 0.3), 6000, 12000) * 0.3
+    return norm(np.tanh(x), d, t, 0.1)
+
 ALL = dict(snip_open=snip_open, snip=snip, snip_silver=lambda: snip(1.22), needle=needle, thread=thread, pin=pin, silk=silk, silk_hit=silk_hit, cloth=cloth,
-           ribbon=ribbon, whoosh=whoosh, spot=spot, unfold=unfold, finale=finale)
+           ribbon=ribbon, whoosh=whoosh, spot=spot, unfold=unfold, finale=finale, sparkle=sparkle, sigil=sigil, jewel=jewel, mannequin=mannequin, flashbulb=flashbulb)
 if __name__ == '__main__':
-    for name, fn in ALL.items(): S.save('sfx_ds_' + name, fn())
-    json.dump({'provider': 'synthesized (tools/audio/designer_sfx.py, numpy + scipy, fixed seed)', 'generatedOn': '2026-11-16',
-               'note': '디자이너 2차 스킬. 직접 합성 — 같은 이름의 파일로 바꿔 넣으면 교체됨.', 'assets': sorted('sfx_ds_%s.mp3' % n for n in ALL)},
-              open(os.path.join(S.OUT, 'designer-sfx-credits.json'), 'w'), ensure_ascii=False, indent=2)
+    # 인자 없이 = 전부(주의: 2026-11-17부터 14개는 Runway 소리 — 다시 돌리면 합성음으로 덮어씀), 인자 = 그 이름만(예: sparkle sigil jewel mannequin flashbulb)
+    names = sys.argv[1:] or list(ALL)
+    for name in names: S.save('sfx_ds_' + name, ALL[name]())
+    p = os.path.join(S.OUT, 'designer-sfx-credits.json'); c = json.load(open(p)) if os.path.exists(p) else {}
+    c.update({'provider': 'synthesized (tools/audio/designer_sfx.py, numpy + scipy, fixed seed)', 'generatedOn': c.get('generatedOn', '2026-11-16')})
+    c.setdefault('note', '디자이너 2차 스킬. 직접 합성 — 같은 이름의 파일로 바꿔 넣으면 교체됨.')
+    c['assets'] = sorted(set(c.get('assets', [])) | {'sfx_ds_%s.mp3' % n for n in names})
+    json.dump(c, open(p, 'w'), ensure_ascii=False, indent=2)

@@ -16,6 +16,9 @@ Usage:  python3 tools/blender/fx_designer.py   ->  assets/fx/fx_designer.glb.jso
   ds_skirt      퍼지는 치마 고리(분신 의상): 허리 y 0 반지름 0.22 .. 밑단 y -0.7 반지름 0.62, 주름
   ds_crown      작은 티아라(분신 의상): 반지름 0.13, 높이 0.1, 금 + 보석
   ds_hat        작은 실크 모자(분신 의상): 챙 반지름 0.2, 높이 0.18, 리본 띠
+  (fx2 2026-11-17) ds_beam 빛기둥 열린 원통(반지름 1, y 0..1, uv = 둘레·높이)   ds_star 통통한 오각 별(반지름 1, 분홍 금)
+  ds_petal 장미 꽃잎(길이 1, 휘어짐, 흰색 — 색은 instanceColor)   ds_gem 작은 깎은 보석 조각(반지름 1, 흰색 — 색은 instanceColor)
+  ds_heart 통통한 하트(반지름 약 1, 분홍)
 json: {b64}
 """
 import os, sys, math, json
@@ -144,10 +147,62 @@ def crown(bm, col, uvl):
 def hat(bm, col, uvl):
     lathe(bm, col, [(0.0, 0.0), (0.2, 0.0), (0.2, 0.012), (0.1, 0.02), (0.095, 0.17), (0.1, 0.18), (0.0, 0.18)], 18, lambda k, p: (0.25, 0.2, 0.32, 1) if k != 3 else PINK)
 
+# ------------------------------------------------------------------ fx2 (2026-11-17) 이펙트 메시: 빛기둥·별·꽃잎·보석 조각·하트
+WHITE = (1, 1, 1, 1)
+def beam(bm, col, uvl):
+    """열린 원통 빛기둥: 반지름 1, y 0..1, uv.x = 둘레 0..1, uv.y = 높이 0..1 (게임 셰이더가 줄무늬·위쪽 흐림을 그림)"""
+    seg, rows = 24, 4; vs = [[bm.verts.new(V(math.cos(2 * math.pi * i / seg), j / rows, math.sin(2 * math.pi * i / seg))) for i in range(seg + 1)] for j in range(rows + 1)]
+    for j in range(rows):
+        for i in range(seg):
+            q = (vs[j][i], vs[j][i + 1], vs[j + 1][i + 1], vs[j + 1][i]); uv = ((i / seg, j / rows), ((i + 1) / seg, j / rows), ((i + 1) / seg, (j + 1) / rows), (i / seg, (j + 1) / rows))
+            f = bm.faces.new(q)
+            for l, t in zip(f.loops, uv): l[uvl].uv = t; l[col] = WHITE
+def star(bm, col, uvl):
+    """통통한 오각 별('팡' 별): 반지름 1, 두께 ±0.3, 앞 +z, 가운데 흰 분홍 -> 끝 금"""
+    pts = []
+    for i in range(10):
+        a = math.pi / 2 + i * math.pi / 5; r = 1.0 if i % 2 == 0 else 0.5; pts.append((math.cos(a) * r, math.sin(a) * r))
+    fr, bk = bm.verts.new(V(0, 0, 0.3)), bm.verts.new(V(0, 0, -0.3)); rim = [bm.verts.new(V(x, y, 0)) for x, y in pts]
+    for i in range(10):
+        a, b = rim[i], rim[(i + 1) % 10]
+        for order in ((fr, a, b), (bk, b, a)):
+            f = bm.faces.new(order)
+            for l in f.loops: l[col] = PINK_HI if l.vert in (fr, bk) else (GOLD_HI if l.vert is rim[i] and i % 2 == 0 else GOLD)
+def petal(bm, col, uvl):
+    """장미 꽃잎: 밑(원점)에서 +y 로 길이 1, 너비 0.62, 안쪽으로 오목 + 끝이 살짝 뒤로 말림(흰색 — 게임이 instanceColor 로 칠함)"""
+    nu, nv = 6, 7; vs = []
+    for j in range(nv + 1):
+        v = j / nv; w = 0.62 * math.sin(math.pi * min(1.0, 0.18 + 0.86 * v)) * (0.55 + 0.45 * v)
+        row = []
+        for i in range(nu + 1):
+            u = i / nu * 2 - 1; x = u * w * 0.5; z = 0.16 * (u * u) - 0.12 * v * v
+            row.append(bm.verts.new(V(x, v, z)))
+        vs.append(row)
+    for j in range(nv):
+        for i in range(nu):
+            f = bm.faces.new((vs[j][i], vs[j][i + 1], vs[j + 1][i + 1], vs[j + 1][i]))
+            for l in f.loops: l[col] = (0.86, 0.8, 0.84, 1) if j == 0 else WHITE
+def gem(bm, col, uvl):
+    """작은 깎은 보석 조각(브릴리언트 컷 단순형): 반지름 1, 위 평평한 면 + 아래 뾰족"""
+    lathe(bm, col, [(0.0, -0.9), (0.85, -0.05), (1.0, 0.05), (0.6, 0.38), (0.0, 0.4)], 8, lambda k, p: WHITE if k >= 2 else (0.82, 0.86, 0.95, 1))
+def heart(bm, col, uvl):
+    """통통한 하트: 앞 +z, 반지름 약 1, 두께 ±0.32, 가운데 밝은 분홍"""
+    n = 28; pts = []
+    for i in range(n):
+        t = 2 * math.pi * i / n; x = 16 * math.sin(t) ** 3; y = 13 * math.cos(t) - 5 * math.cos(2 * t) - 2 * math.cos(3 * t) - math.cos(4 * t)
+        pts.append((x / 16.5, (y + 2.5) / 16.5))
+    fr, bk = bm.verts.new(V(0, 0.05, 0.32)), bm.verts.new(V(0, 0.05, -0.32)); rim = [bm.verts.new(V(x, y, 0)) for x, y in pts]
+    for i in range(n):
+        a, b = rim[i], rim[(i + 1) % n]
+        for order in ((fr, a, b), (bk, b, a)):
+            f = bm.faces.new(order)
+            for l in f.loops: l[col] = PINK_HI if l.vert in (fr, bk) else PINK
+
 def main():
     FP.reset()
     spec = [('ds_blade', blade, False), ('ds_screw', screw, True), ('ds_needle', needle, True), ('ds_pin', pin, True), ('ds_jewel', jewel, False), ('ds_bow', bow, True),
-            ('ds_mq_stand', mq_stand, True), ('ds_mq_torso', mq_torso, True), ('ds_mq_head', mq_head, True), ('ds_cape', cape, True), ('ds_skirt', skirt, True), ('ds_crown', crown, False), ('ds_hat', hat, True)]
+            ('ds_mq_stand', mq_stand, True), ('ds_mq_torso', mq_torso, True), ('ds_mq_head', mq_head, True), ('ds_cape', cape, True), ('ds_skirt', skirt, True), ('ds_crown', crown, False), ('ds_hat', hat, True),
+            ('ds_beam', beam, True), ('ds_star', star, False), ('ds_petal', petal, True), ('ds_gem', gem, False), ('ds_heart', heart, True)]
     obs = [new_obj(n, f, sm) for n, f, sm in spec]
     tris = {o.name: sum(len(p.vertices) - 2 for p in o.data.polygons) for o in obs}
     bpy.ops.object.select_all(action='DESELECT')
