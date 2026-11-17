@@ -1,11 +1,12 @@
 // 장비 40종·무기/방어구 상인 확인 (tools/gear/gear.py, js/items3d.js gearModel, js/ui.js gearLines):
 //   1 merchants  아르칸 마을 + 생성 마을 2곳(MTOWNS)에서 무기 상인·방어구 상인이 서 있는 모습, 다른 NPC·소품과의 거리
-//   2 shop       두 상점 창: 장비 줄 수(유봉 5 / 갑옷 5 + 장신구 5), 아이콘 그림이 실제로 받아졌는지, 화면
-//   3 pestle     약사로 유봉을 사서 장착: 손에 든 모델(Tripo 모델로 바뀌었는지), 등에 멘 모습, 공격으로 꺼내기
+//   2 shop       직업별(SHOPJOBS, 기본 견습생·약사·양약사·대장장이) 두 상점 창: 보이는 장비가 그 직업 계열뿐인지(2026-11-17 직업 필터),
+//                아이콘 그림이 실제로 받아졌는지(새 계열은 임시 3D 아이콘), 화면
+//   3 pestle     약사로 새 계열 유봉을 사서 장착: 손에 든 모델(임시 절차 모델 / model3d면 받아진 모델), 등에 멘 모습, 공격으로 꺼내기, 양약사 유봉
 //   4 jobbuff    약사의 은 저울: 약사(적용) ↔ 요리사(미적용) 능력치와 설명 줄
 //   5 drop       드롭 전용 장비: 실제 처치 처리(G.onMonsterKilled)를 2000번 돌려 드롭 비율 + 바닥에 떨어진 모습
 //   6 sheets     아이콘 40개 모음, 유봉 모델 10개 모음
-// Usage: SIZE=1280x800|390x844t GENDER=m|f ONLY=merchants,shop,... URL=http://localhost:8787/index.html node tools/browser-tests/gear.js
+// Usage: SIZE=1280x800|390x844t GENDER=m|f ONLY=merchants,shop,... SHOPJOBS=novice,pharmacist,... URL=http://localhost:8787/index.html node tools/browser-tests/gear.js
 //   -> OUT(/tmp/gear)/<SIZE>_<g>_*.png + <SIZE>_<g>.json
 const { chromium } = require('playwright'); const fs = require('fs');
 const SIZE = process.env.SIZE || '1280x800', TOUCH = SIZE.endsWith('t'), [VW, VH] = SIZE.replace('t', '').split('x').map(Number);
@@ -53,19 +54,25 @@ const MTOWNS = (process.env.MTOWNS || 'town,kairion_capital,marseon').split(',')
     if (await ev(() => G.zone.def.id !== 'town')) { await ev(() => G.travel('town')); await pg.waitForFunction(() => !G.loading && G.zone.def.id === 'town', null, { timeout: 400000 }); await ready(); await step(20); }
   }
 
-  // 2 shop windows
+  // 2 shop windows, per job (직업 계보 필터)
   if (run('shop')) {
     R.shop = {};
-    await ev(() => { G.dev.level(12); G.dev.job('pharmacist'); G.sheet.addGold(20000); });
-    for (const sid of ['shop_weapons', 'shop_armor']) {
-      const info = await ev(async sid => {
-        const sh = G.data.shops[sid]; G.ui.sel = {}; G.ui.shopSel = sh.items.find(i => G.data.item(i).gear); G.ui.showShop(sh);
-        const gear = sh.items.filter(i => G.data.item(i).gear), other = sh.items.filter(i => !G.data.item(i).gear);
-        const icons = await Promise.all(gear.map(i => new Promise(r => { const im = new Image(); im.onload = () => r(im.naturalWidth); im.onerror = () => r(0); im.src = G.ui.itemIcons[G.data.item(i).icon]; })));
-        return { name: sh.name, rows: document.querySelectorAll('.shoprow').length, gear: gear.map(i => G.data.item(i).name + ' Lv' + G.data.item(i).levelReq + ' ' + G.data.item(i).price + 'G'), other: other.map(i => G.data.item(i).name), iconPx: icons,
-          buybox: (document.querySelector('.buybox') || {}).textContent };
-      }, sid);
-      R.shop[sid] = info; await pg.waitForTimeout(800); await shot(`${base}_2${sid}.png`);
+    const JOBS = (process.env.SHOPJOBS || 'novice,pharmacist,western_pharmacist,blacksmith').split(',');
+    for (const job of JOBS) {
+      await ev(job => { const t = G.data.job(job).tier; G.dev.level(t === 0 ? 5 : t === 1 ? 20 : 40); if (G.sheet.p.job !== job) { if (t === 2) G.dev.job(G.data.job(job).parent); G.dev.job(job); } G.sheet.p.job = job; G.sheet.recalc(); G.sheet.addGold(20000); }, job);
+      for (const sid of ['shop_weapons', 'shop_armor']) {
+        const info = await ev(async sid => {
+          const sh = G.data.shops[sid]; G.ui.sel = {}; G.ui.shopSel = null; G.ui.showShop(sh);
+          const rows = [...document.querySelectorAll('.shoprow')]; rows.find(r => /Lv|G/.test(r.textContent)); if (rows[1]) rows[1].click(); else if (rows[0]) rows[0].click();
+          const { shopStockFor } = await import('./js/core.js'); const stock = shopStockFor(G.data, G.sheet.p, sh);
+          const gear = stock.filter(i => G.data.item(i).gear);
+          const icons = await Promise.all(gear.map(i => new Promise(r => { const im = new Image(); im.onload = () => r(im.naturalWidth); im.onerror = () => r(0); im.src = G.ui.itemIcons[G.data.item(i).icon]; })));
+          return { job: G.sheet.p.job, level: G.sheet.p.level, rows: document.querySelectorAll('.shoprow').length, all: sh.items.length,
+            lines: [...new Set(gear.map(i => G.data.item(i).line || G.data.item(i).type))], gear: gear.map(i => G.data.item(i).name + ' Lv' + G.data.item(i).levelReq + ' ' + G.data.item(i).price + 'G'),
+            other: stock.filter(i => !G.data.item(i).gear).map(i => G.data.item(i).name), iconPx: icons, buybox: (document.querySelector('.buybox') || {}).textContent };
+        }, sid);
+        R.shop[job + ':' + sid] = info; await pg.waitForTimeout(800); await shot(`${base}_2${job}_${sid}.png`);
+      }
     }
     R.shop.masterBlacksmith = await ev(() => { const n = G.data.npcs.master_blacksmith, sh = G.data.shops[n.shop]; return { shop: n.shop, items: sh.items.map(i => G.data.item(i).name) }; });
     await ev(() => G.ui.close && G.ui.close());
@@ -73,14 +80,14 @@ const MTOWNS = (process.env.MTOWNS || 'town,kairion_capital,marseon').split(',')
 
   // 3 buy + equip a pestle
   if (run('pestle')) {
-    await ev(() => { if (G.sheet.p.job !== 'pharmacist') { G.dev.level(12); G.dev.job('pharmacist'); } G.sheet.addGold(20000); });
+    await ev(() => { G.dev.level(12); if (G.sheet.p.job !== 'pharmacist') G.dev.job('pharmacist'); G.sheet.p.job = 'pharmacist'; G.sheet.recalc(); G.sheet.addGold(20000); });
     R.pestle = await ev(async () => {
-      const sh = G.data.shops.shop_weapons, gold0 = G.sheet.p.gold; G.ui.showShop(sh); G.ui.buy(sh, 'w_pestle_g1', 1);
-      const slot = G.sheet.p.inventory.findIndex(s => s.id === 'w_pestle_g1' && s.count > 0), err = G.sheet.bag.equipFromSlot(slot); G.ui.close && G.ui.close();
+      const sh = G.data.shops.shop_weapons, gold0 = G.sheet.p.gold; G.ui.showShop(sh); G.ui.buy(sh, 'wg_pharm_1', 1);
+      const slot = G.sheet.p.inventory.findIndex(s => s.id === 'wg_pharm_1' && s.count > 0), err = G.sheet.bag.equipFromSlot(slot); G.ui.close && G.ui.close();
       await G.player.attachBody(); G.player.body.place(G.player.pos); G.player.resetArms && G.player.resetArms();
       return { paid: gold0 - G.sheet.p.gold, equipErr: err, weapon: G.sheet.p.weapon, atk: Math.round(G.player.sheet.final.atk), bodyWeapon: G.player.body.weapon };
     });
-    const waitModel = async () => { await step(3); const t0 = Date.now(); await pg.waitForFunction(() => { const h = G.player.body.props && G.player.body.props.R; let ok = false; h && h.traverse(o => { if (o.userData.gearReady) ok = true; }); return ok; }, null, { timeout: 120000 }).catch(() => {}); return Date.now() - t0; };
+    const waitModel = async () => { await step(3); const t0 = Date.now(); if (!(await ev(() => !!(G.data.item(G.sheet.p.weapon) || {}).model3d))) return -1; await pg.waitForFunction(() => { const h = G.player.body.props && G.player.body.props.R; let ok = false; h && h.traverse(o => { if (o.userData.gearReady) ok = true; }); return ok; }, null, { timeout: 120000 }).catch(() => {}); return Date.now() - t0; };
     R.pestle.modelWaitMs = [await waitModel()]; await step(40);
     const CW = Math.min(VW, 320), CH = Math.min(VH, 360);
     const near = async (fn, zoom = 2.4) => {
@@ -97,8 +104,8 @@ const MTOWNS = (process.env.MTOWNS || 'town,kairion_capital,marseon').split(',')
     await step(14); R.pestle.drawing = await st(); await near(`${base}_3pestle_draw.png`);
     await step(16); R.pestle.attack = await st(); await near(`${base}_3pestle_hand_90.png`);
     await ev(() => G.input.hold('attack', false)); await step(40); await face(0); await step(4); await near(`${base}_3pestle_hand_0.png`);
-    for (const id of ['w_pestle_g5', 'w_pestle_g10']) {         // the best shop pestle and the best drop pestle in the hand
-      await ev(async id => { G.dev.level(50); G.sheet.bag.add(id, 1); const s = G.sheet.p.inventory.findIndex(s => s.id === id && s.count > 0); G.sheet.bag.equipFromSlot(s); await G.player.attachBody(); G.player.body.place(G.player.pos); G.player.body.setArmed ? G.player.body.setArmed(true, true) : 0; }, id);
+    for (const id of ['wg_pharm_5', 'wg_wpharm_7']) {         // the best shop pestle of the 1st line and the best drop pestle of a 2nd line in the hand
+      await ev(async id => { G.dev.level(50); const j = G.data.item(id).job; if (G.sheet.p.job !== j) G.sheet.p.job = j; G.sheet.bag.add(id, 1); const s = G.sheet.p.inventory.findIndex(s => s.id === id && s.count > 0); G.sheet.bag.equipFromSlot(s); await G.player.attachBody(); G.player.body.place(G.player.pos); G.player.body.setArmed ? G.player.body.setArmed(true, true) : 0; }, id);
       R.pestle.modelWaitMs.push(await waitModel()); await face(90); await ev(() => G.input.hold('attack', true)); await step(34); await near(`${base}_3pestle_${id}.png`); await ev(() => G.input.hold('attack', false)); await step(60);
     }
     R.pestle.last = await st();
@@ -129,13 +136,13 @@ const MTOWNS = (process.env.MTOWNS || 'town,kairion_capital,marseon').split(',')
   if (run('drop')) {
     await ev(() => G.travel('forest')); await pg.waitForFunction(() => !G.loading && G.zone.def.id === 'forest', null, { timeout: 400000 }); await ready(); await step(20);
     R.drop = await ev(() => {
-      const it = G.data.item('w_pestle_g6'), mid = it.dropFrom[0].monster, def = G.data.monsters[mid], want = it.dropFrom[0].chance;
+      const it = G.data.item('wg_pharm_6'), mid = it.dropFrom[0].monster, def = G.data.monsters[mid], want = it.dropFrom[0].chance;
       const m = G.dev.dummies(mid, 1, 2.5)[0], z = G.zone, N = 2000; let n = 0;
       const real = z.dropLoot; z.dropLoot = id => { if (id === it.id) n++; };
       const rw = G.reward; G.reward = null; const ft = G.ui.floatText; G.ui.floatText = () => {}; const sfx = G.audio.sfx; G.audio.sfx = () => {};
       for (let i = 0; i < N; i++) G.onMonsterKilled(m);
       z.dropLoot = real; G.reward = rw; G.ui.floatText = ft; G.audio.sfx = sfx; G.timers.length = 0;
-      const p = G.player.pos; z.dropLoot(it.id, 1, { x: p.x + 2.6, y: p.y, z: p.z + 1 }); z.dropLoot('a_armor_g6', 1, { x: p.x - 2.6, y: p.y, z: p.z + 1 }); z.dropLoot('ac_g9', 1, { x: p.x, y: p.y, z: p.z + 3 });
+      const p = G.player.pos; z.dropLoot(it.id, 1, { x: p.x + 2.6, y: p.y, z: p.z + 1 }); z.dropLoot('ag_pharm_6', 1, { x: p.x - 2.6, y: p.y, z: p.z + 1 }); z.dropLoot('ac_g9', 1, { x: p.x, y: p.y, z: p.z + 3 });
       return { item: it.name, monster: def.name, tableChance: want, kills: N, drops: n, rate: +(n / N).toFixed(4), inDrops: def.drops.filter(d => d.gear).map(d => G.data.item(d.item).name + ' ' + d.chance) };
     });
     await pg.waitForTimeout(4000); await step(3);
@@ -146,16 +153,17 @@ const MTOWNS = (process.env.MTOWNS || 'town,kairion_capital,marseon').split(',')
   // 6 contact sheets: 40 icons, 10 pestle models (the game's own item models)
   if (run('sheets')) {
     R.sheets = await ev(async () => {
-      const list = G.data.itemList.filter(i => i.gear), cv = document.createElement('canvas'), C = 10, S = 132; cv.width = C * S; cv.height = Math.ceil(list.length / C) * (S + 22);
+      const list = G.data.itemList.filter(i => i.gear && i.line), cv = document.createElement('canvas'), C = 14, S = 132; cv.width = C * S; cv.height = Math.ceil(list.length / C) * (S + 22);
       const x = cv.getContext('2d'); x.fillStyle = '#2a2436'; x.fillRect(0, 0, cv.width, cv.height); x.font = '13px sans-serif'; x.textAlign = 'center'; let ok = 0;
       await Promise.all(list.map((it, i) => new Promise(r => { const im = new Image(); im.onload = () => { x.drawImage(im, (i % C) * S + 6, Math.floor(i / C) * (S + 22) + 4, S - 12, S - 12); ok++; r(); }; im.onerror = r; im.src = G.ui.itemIcons[it.icon]; })));
       list.forEach((it, i) => { x.fillStyle = it.dropFrom ? '#ffd76a' : '#e8e2f0'; x.fillText(it.name.length > 9 ? it.name.slice(0, 9) + '…' : it.name, (i % C) * S + S / 2, Math.floor(i / C) * (S + 22) + S + 10); });
       const { THREE } = await import('./js/render.js'), I = await import('./js/items3d.js');
-      const ids = list.filter(i => i.type === 'weapon').map(i => i.id), W = 1500, H = 420;
+      const ws = list.filter(i => i.type === 'weapon'), lines = [...new Set(ws.map(i => i.line))], W = 980, H = 80 * lines.length;
       const r = new THREE.WebGLRenderer({ antialias: true, alpha: false, preserveDrawingBuffer: true }); r.setSize(W, H); r.setPixelRatio(1); r.outputColorSpace = THREE.SRGBColorSpace; r.setClearColor(0x2a2436, 1);
       const sc = new THREE.Scene(); sc.add(new THREE.HemisphereLight(0xffffff, 0x705848, 2.2)); const k = new THREE.DirectionalLight(0xfff2dc, 2.6); k.position.set(-2, 3, 3); sc.add(k);
-      const cam = new THREE.OrthographicCamera(-1.5, 1.5, 0.42, -0.42, 0.1, 20); cam.position.set(0, 0.6, 4); cam.lookAt(0, 0.12, 0);
-      const ms = ids.map((id, i) => { const m = I.itemModel(id); m.rotation.x = -Math.PI / 2; m.position.set(-1.35 + i * 0.3, -0.08, 0); m.rotation.z = 0; sc.add(m); return m; });
+      const hh = 0.25 * lines.length, cam = new THREE.OrthographicCamera(-1.53, 1.53, hh, -hh, 0.1, 20); cam.position.set(0, 0, 4); cam.lookAt(0, 0, 0);
+      const ms = ws.map(it => { const s = it.tier - 1, row = lines.indexOf(it.line), m = I.itemModel(it.id), b = new THREE.Group(); b.add(m); m.rotation.x = -Math.PI / 2;
+        const bb = new THREE.Box3().setFromObject(b), sz = bb.getSize(new THREE.Vector3()); b.scale.setScalar(0.42 / Math.max(sz.x, sz.y, sz.z)); b.position.set(-1.3 + s * 0.43, hh - 0.25 - row * 0.5 - 0.2, 0); sc.add(b); m.userData.gearReady = !it.model3d || m.userData.gearReady; return m; });
       for (let t = 0; t < 100 && !ms.every(m => m.userData.gearReady); t++) await new Promise(r => setTimeout(r, 200));
       r.render(sc, cam); const models = r.domElement.toDataURL('image/png'); r.dispose();
       return { icons: cv.toDataURL('image/png'), models, iconsOk: ok, total: list.length, modelsReady: ms.filter(m => m.userData.gearReady).length };

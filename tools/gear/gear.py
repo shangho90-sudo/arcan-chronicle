@@ -149,21 +149,22 @@ DROP2 = {'nov': st('crit', 0.02), 'pharm': st('elemRes', 0.05), 'smith': st('cri
          'art': st('maxSp', 40), 'wpharm': st('crit', 0.04), 'herb': st('elemRes', 0.06), 'eng': st('cdr', 0.04), 'chef': st('critDmg', 0.10),
          'design': st('crit', 0.04), 'paint': st('critDmg', 0.10), 'music': st('cdr', 0.04)}
 def r3(x): return round(x, 3)
+def rnd(x): return int(x + 0.5)          # JS Math.round과 같게(파이썬 round는 .5를 짝수로)
 def weapon_stats(L, kind, s, n, drop, key):
     P = POWER(L, drop); f = L / 50
-    main = {'sword': [st('atk', round(P))],
-            'pestle': [st('atk', round(P)), st('matk', round(round(P) * 0.45))],
-            'hammer': [st('atk', round(P)), st('def', round(P * 0.15))],
-            'knife': [st('atk', round(P)), st('crit', r3(0.02 + 0.04 * f))],
-            'scissors': [st('atk', round(P)), st('crit', r3(0.03 + 0.05 * f))],
-            'brush': [st('matk', round(P)), st('atk', round(round(P) * 0.45))]}[kind]
+    main = {'sword': [st('atk', rnd(P))],
+            'pestle': [st('atk', rnd(P)), st('matk', rnd(rnd(P) * 0.45))],
+            'hammer': [st('atk', rnd(P)), st('def', rnd(P * 0.15))],
+            'knife': [st('atk', rnd(P)), st('crit', r3(0.02 + 0.04 * f))],
+            'scissors': [st('atk', rnd(P)), st('crit', r3(0.03 + 0.05 * f))],
+            'brush': [st('matk', rnd(P)), st('atk', rnd(rnd(P) * 0.45))]}[kind]
     if s >= 2:
         stat, step, mul = SIG[key]; v = r3(step * (s - 1)); main.append(st(stat, 0, v) if mul else st(stat, v))
     if drop: main.append(dict(DROP2[key]))
     return main
 # 방어구 부가 효과: 자리(판매 마지막 단계 / 드롭 1 / 드롭 2) — 모든 계열 같음(직업 간 균형)
 def armor_stats(L, s, n, drop):
-    out = [st('def', round((4 + 1.8 * L) * lowK(L) * (1.08 if drop else 1))), st('maxHp', round((20 + 10 * L) * lowK(L) * (1.08 if drop else 1)))]
+    out = [st('def', rnd((4 + 1.8 * L) * lowK(L) * (1.08 if drop else 1))), st('maxHp', rnd((20 + 10 * L) * lowK(L) * (1.08 if drop else 1)))]
     sold = SOLD[n]
     if s == sold - 1 and n == 7: out.append(st('elemRes', 0.04))
     if drop and s == n - 1 and n == 7: out += [st('dmgReduce', 0.06), st('elemRes', 0.08)]
