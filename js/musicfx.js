@@ -22,7 +22,8 @@ export const MUFX = {
     ice: 0xe8f6ff, iceB: 0x7ab0e0, rose: 0xffc8d8, roseB: 0xd06090, violet: 0xe0d0ff, violetB: 0x7a5ad0, white: 0xffffff, warm: 0xfff0d0 },
   mel: { aria: [0xc8ffa0, 0x60c040], march: [0xffe080, 0xd09020], coral: [0xe8f4ff, 0x7aa8e0], serenade: [0xa8d8ff, 0x3a6ae0] },
   size: { violin: 0.62, cello: 1.25, flute: 0.66, horn: 0.5, cymbal: 0.21, baton: 0.42, harpSmall: 0.7, harpBig: 2.6, note: 0.22, player: 1.15, bell: 0.55 },
-  // fx2(2026-11-17 '더 화려하게'): 시전 마법진 -> 본체(큰 악기·꼬리·음표 입자) -> 명중 섬광·고리·별 -> 잔광 문양. 큰 것은 실제 판정 반경 안.
+  // fx2(2026-11-17 '더 화려하게'): 시전 마법진 -> 본체(큰 악기·꼬리·음표 입자) -> 명중 섬광·고리·별 -> 잔광 문양. 큰 것은 실제 판정 반경 안,
+  // 적 위·적 사이 빛기둥은 몸 높이(top × 0.85~0.9, 1.4 m 이하)까지만 — 머리 위 이름표·체력 막대를 가리지 않게(내 둘레·하프 기둥만 높게).
   fx2: true,
   cap: { spk: 700, p3: 180 },                    // 인스턴스 입자 상한(종류당 draw call 1)
   liteK: 0.45,                                   // 휴대폰·그래픽 효과 끔: 입자 수 배율(마법진·빛기둥·악기·연주자는 그대로)
@@ -373,7 +374,7 @@ export class MusicFx extends CookFx {
     let life = lead + 0.5; if (what === 'violin') life = 1.1; if (what === 'bells') life = 2.2;
     const st = { pluck: -1, clash: -1, strokes: [], blowT: -1, burstAt: null, burstT: -1, r: 1 };
     // fx2 (1) 시전 준비: 발밑 음악 마법진 + 손으로 모이는 음표 빛 (bells = 대상 쪽 마법진은 blow 때)
-    const SG = { strings: ['gold', 0, 0.95], cymbals: ['gold', 3, 1.0], violin: ['rose', 0, 0.95], harp: ['mint', 1, 1.0], horn: ['gold', 2, 1.0], cello: ['silver', 1, 1.0], flute: ['blue', 0, 1.0], baton: ['violet', 2, 1.1], frame: ['gold', 1, 1.0] }[what];
+    const SG = { bells: ['gold', 2, 0.9], strings: ['gold', 0, 0.95], cymbals: ['gold', 3, 1.0], violin: ['rose', 0, 0.95], harp: ['mint', 1, 1.0], horn: ['gold', 2, 1.0], cello: ['silver', 1, 1.0], flute: ['blue', 0, 1.0], baton: ['violet', 2, 1.1], frame: ['gold', 1, 1.0] }[what];
     let sg = null;
     if (MUFX.fx2 && SG && !o.echo) { sg = this.sigil(P3(pc.pos), SG[2], SG[0], { pat: SG[1], life: life + 0.35, follow: () => P3(pc.pos), snd: true, a: 0.8 }); this.gather(this.hand(pc), SG[0], 8, Math.min(0.3, lead)); }
     const e = this._fx('pre_' + what, life, (e) => {
@@ -445,7 +446,7 @@ export class MusicFx extends CookFx {
         if (i === n - 1) { this._end(e, 0.3); if (sg) sg.end(0.5); } },
       blow: (bt_, r) => { st.blowT = e.t; st.burstT = bt_; st.r = r; if (MUFX.fx2) { const tg = o.tgt && !o.tgt.dead ? o.tgt : null, c = tg ? P3(tg.pos) : (e.c0 || P3(o.aim || pc.pos)); e.bsig = this.sigil(c, r, 'gold', { pat: 2, grow: Math.min(0.4, bt_), life: bt_ + 0.9, a: 0.85, snd: true, follow: tg ? () => (tg.dead ? null : P3(tg.pos)) : null }); } },
       burst: (c, r, hits) => { st.burstAt = e.t; const p = P3(c); p.y = groundY(c.x, c.z); this.flashAt(p.clone().setY(p.y + 1.0), C.warm, C.goldB, 1.0, 0.16); this.shock(p, r, C.gold, C.goldB, { a: 1.8, w2: 0.04, life: 0.35 });
-        if (MUFX.fx2) { this.pillar(p, Math.min(0.7, r * 0.4), 3.0, 'gold', { life: 0.65 }); this.pang(p.clone().setY(p.y + 1.0), 'gold', { r: Math.min(1.0, r * 0.6), n: 14, ground: p.y }); this.popNotes(p.clone().setY(p.y + 1.0), 5, 'gold', { speed: 1.4 }); if (e.bsig) e.bsig.end(0.8); if (sg) sg.end(0.4); }
+        if (MUFX.fx2) { this.pillar(p, Math.min(0.7, r * 0.4), 1.3, 'gold', { life: 0.65 }); this.pang(p.clone().setY(p.y + 1.0), 'gold', { r: Math.min(1.0, r * 0.6), n: 14, ground: p.y }); this.popNotes(p.clone().setY(p.y + 1.0), 5, 'gold', { speed: 1.4 }); if (e.bsig) e.bsig.end(0.8); if (sg) sg.end(0.4); }
         this.notes(p.clone().setY(p.y + 0.8), lite() ? 3 : 6, { r: r * 0.6, size: 0.18, life: 0.8 }); for (const t of hits) this.flashAt(P3(t.pos).setY((t.pos.y || 0) + top(t) * 0.7), C.gold, C.goldB, 0.4, 0.12); this._end(e, 0.35); },
       react: (pos, r, hits) => { const p = P3(pos); p.y = groundY(pos.x, pos.z); this.shock(p, r, C.violet, C.violetB, { a: 1.5, wob: 0.03, life: 0.3 }); if (MUFX.fx2) this.pang(p.clone().setY(p.y + 0.8), 'violet', { r: Math.min(0.8, r * 0.5), n: 8, stars: 1, ground: p.y, quiet: true }); for (const t of hits) this.flashAt(P3(t.pos).setY((t.pos.y || 0) + top(t) * 0.6), C.violet, C.violetB, 0.3, 0.1); },
       end: () => { this._end(e, 0.25); if (sg) sg.end(0.4); } });
@@ -466,7 +467,7 @@ export class MusicFx extends CookFx {
       if (rim) { rim.position.copy(m.position); rim.rotation.copy(m.rotation); rim.scale.set(1.15 * w, 1, 1.15 * w); rim.material.uniforms.uP.value = 0.85; rim.material.uniforms.uA.value = 0.9 * fk; } });
     const m = this.arc(e, 110, gold ? C.gold : C.silver, gold ? C.goldB : C.silverB, 6), m2 = this.arc(e, 100, gold ? C.warm : C.silver, gold ? C.goldB : C.silverB, 6), tr = this.spr(e, 2, gold ? C.gold : C.silver, gold ? C.goldB : C.silverB, 5), rim = amp ? this.arc(e, 110, C.warm, C.goldB, 5) : null;
     e.pos = P3(p0);
-    return this._h(e, { set: (p, k) => { e.pos = P3(p).setY(P3(p0).y); e.prog = k; }, hit: (t, ok) => { const q = P3(t.pos).setY((t.pos.y || 0) + top(t) * 0.7); if (ok) { this.flashAt(q, C.warm, C.goldB, 0.55, 0.12); this.notes(q, 1, { size: 0.16, life: 0.5 }); if (MUFX.fx2) { this.pang(q, pal, { r: 0.5, n: 9, ground: groundY(t.pos.x, t.pos.z) }); this.pillar(P3(t.pos).setY(groundY(t.pos.x, t.pos.z)), 0.35, 2.0, pal, { life: 0.4, a: 0.8 }); } } else this.flashAt(q, C.silver, C.silverB, 0.25, 0.08); }, end: () => this._end(e, 0.18) });
+    return this._h(e, { set: (p, k) => { e.pos = P3(p).setY(P3(p0).y); e.prog = k; }, hit: (t, ok) => { const q = P3(t.pos).setY((t.pos.y || 0) + top(t) * 0.7); if (ok) { this.flashAt(q, C.warm, C.goldB, 0.55, 0.12); this.notes(q, 1, { size: 0.16, life: 0.5 }); if (MUFX.fx2) { this.pang(q, pal, { r: 0.5, n: 9, ground: groundY(t.pos.x, t.pos.z) }); this.pillar(P3(t.pos).setY(groundY(t.pos.x, t.pos.z)), 0.35, top(t) * 0.85, pal, { life: 0.4, a: 0.8 }); } } else this.flashAt(q, C.silver, C.silverB, 0.25, 0.08); }, end: () => this._end(e, 0.18) });
   }
   k_cres(p0, o) {
     const i = o.i || 0, last = !!o.last, s = 0.55 + 0.18 * i + (last ? 0.25 : 0), gold = !o.echo;
@@ -483,7 +484,7 @@ export class MusicFx extends CookFx {
       hit: (t, ok, k) => { const q = P3(t.pos).setY((t.pos.y || 0) + top(t) * 0.7); if (!ok) return this.flashAt(q, C.silver, C.silverB, 0.25, 0.08);
         const big = last && k > 1; this.flashAt(q, big ? C.warm : C.rose, big ? C.goldB : C.roseB, big ? 1.0 : 0.4 + 0.08 * i, big ? 0.18 : 0.1);
         if (MUFX.fx2) { const gy = groundY(t.pos.x, t.pos.z); this.pang(q, big ? 'gold' : 'rose', { r: big ? 0.9 : 0.4 + 0.06 * i, n: big ? 16 : 7, stars: big ? 3 : 1, ground: gy, quiet: !big && i % 2 === 1 });
-          if (big) { this.pillar(P3(t.pos).setY(gy), 0.6, 3.2, 'gold', { life: 0.7 }); this.sigil(P3(t.pos), 1.4, 'gold', { pat: 3, grow: 0.15, life: 0.9, a: 0.9 }); this.popNotes(q, 5, 'gold', { speed: 1.3 }); } }
+          if (big) { this.pillar(P3(t.pos).setY(gy), 0.6, top(t) * 0.9, 'gold', { life: 0.7 }); this.sigil(P3(t.pos), 1.4, 'gold', { pat: 3, grow: 0.15, life: 0.9, a: 0.9 }); this.popNotes(q, 5, 'gold', { speed: 1.3 }); } }
         if (big) { const g = P3(t.pos); g.y = groundY(t.pos.x, t.pos.z); this.shock(g, 1.4, C.gold, C.goldB, { a: 1.6, life: 0.32 }); this.notes(q, lite() ? 2 : 5, { r: 0.4, size: 0.2, life: 0.8 }); } },
       end: () => this._end(e, 0.12) });
   }
@@ -585,7 +586,7 @@ export class MusicFx extends CookFx {
         if (i === 2) { for (const s of [-1, 1]) { const bp = sp.clone().addScaledVector(r, s * 1.5).setY(sp.y - 0.5); sideBells.push(bp); this.flashAt(bp, C.gold, C.goldB, 0.5, 0.12); for (const t of q.hits) this.beam(bp, P3(t.pos).setY((t.pos.y || 0) + top(t) * 0.6), C.gold, C.goldB, 0.2, 0.16); } }
         if (i === 3) { const c = g.clone().addScaledVector(f, q.fwd); this.shock(c, q.r, C.warm, C.goldB, { a: 2.2, life: 0.45, w2: 0.04 }); this.shock(c, q.r * 0.6, C.gold, C.goldB, { a: 1.4, life: 0.35 });
           this.notes(c.clone().setY(c.y + 0.8), low ? 4 : 10, { r: q.r * 0.6, size: 0.22, life: 0.9 }); this.flashAt(sp, C.warm, C.goldB, 1.0, 0.18); this._end(e, 0.7);
-          if (MUFX.fx2) { this.sigil(c, q.r, 'gold', { pat: 2, grow: 0.15, life: 1.3, a: 0.95, spin: 1.2 }); this.pillar(c, Math.min(1.0, q.r * 0.25), 4.0, 'gold', { life: 0.85, a: 0.75 }); this.pang(c.clone().setY(c.y + 1.2), 'gold', { r: 1.2, n: 22, stars: lite() ? 2 : 5, ground: c.y }); this.popNotes(c.clone().setY(c.y + 1.0), 8, 'gold', { speed: 2.2, up: 1.3, size: 0.24 }); if (sg) sg.end(0.8); } } },
+          if (MUFX.fx2) { this.sigil(c, q.r, 'gold', { pat: 2, grow: 0.15, life: 1.3, a: 0.95, spin: 1.2 }); this.pillar(c, Math.min(1.0, q.r * 0.25), 1.4, 'gold', { life: 0.85, a: 0.75 }); this.pang(c.clone().setY(c.y + 1.2), 'gold', { r: 1.2, n: 22, stars: lite() ? 2 : 5, ground: c.y }); this.popNotes(c.clone().setY(c.y + 1.0), 8, 'gold', { speed: 2.2, up: 1.3, size: 0.24 }); if (sg) sg.end(0.8); } } },
       cancel: () => { this._end(e, 0.25); if (sg) sg.end(0.25); } });
   }
   k_encore(pc, o) {   // 앙코르: 흐려진 오선이 이어지고 큰 하프 현이 펼쳐짐 -> 두 팔을 올리는 순간 회복 파동
@@ -639,7 +640,7 @@ export class MusicFx extends CookFx {
         for (const t of q.hits) this.flashAt(P3(t.pos).setY((t.pos.y || 0) + top(t) * 0.7), C.warm, C.goldB, 0.5, 0.14);
         this.notes(g.clone().addScaledVector(f, 2).setY(g.y + 1.0), low ? 4 : 10, { r: 1.5, size: 0.22, life: 1.0 });
         P.forEach((p, i) => { p.out = e.t + 0.5 + i * 0.12; }); this._end(e, 0.5 + P.length * 0.12 + 0.4);
-        if (MUFX.fx2) { const c = g.clone().addScaledVector(f, Math.min(3, q.r * 0.45)); this.pillar(c, 0.9, 4.0, 'violet', { life: 0.85, a: 0.75 }); this.pang(c.clone().setY(c.y + 1.2), 'violet', { r: 1.2, n: 22, stars: lite() ? 2 : 5, ground: c.y }); this.popNotes(c.clone().setY(c.y + 1.0), 8, 'violet', { speed: 2.4, up: 1.3, size: 0.24 });
+        if (MUFX.fx2) { const c = g.clone().addScaledVector(f, Math.min(3, q.r * 0.45)); this.pillar(c, 0.9, 1.4, 'violet', { life: 0.85, a: 0.75 }); this.pang(c.clone().setY(c.y + 1.2), 'violet', { r: 1.2, n: 22, stars: lite() ? 2 : 5, ground: c.y }); this.popNotes(c.clone().setY(c.y + 1.0), 8, 'violet', { speed: 2.4, up: 1.3, size: 0.24 });
           for (const t of q.hits) this.pang(P3(t.pos).setY((t.pos.y || 0) + top(t) * 0.7), 'gold', { r: 0.6, n: 8, stars: 1, ground: groundY(t.pos.x, t.pos.z), quiet: true });
           for (const p of P) this.pillar(p.p, 0.35, 2.4, 'violet', { life: 0.6, a: 0.7 }); if (sg) sg.end(1.0); } },
       cancel: () => { this._end(e, 0.25); if (sg) sg.end(0.25); } });
@@ -725,7 +726,7 @@ export class MusicFx extends CookFx {
         if (ok) { this.flashAt(b, C.warm, C.violetB, 0.28, 0.08); if (MUFX.fx2) { this.pang(b, ['rose', 'violet', 'blue'][i], { r: 0.35, n: 5, stars: 1, ground: groundY(t.pos.x, t.pos.z), quiet: true, noRing2: true }); } } if (MUFX.fx2) this.popNotes(from(i), 1, ['rose', 'violet', 'blue'][i], { size: 0.15, up: 0.7 }); },
       chord: (t, ok) => { for (let i = 0; i < 3; i++) { P[i].play = e.t; this.beam(from(i), P3(t.pos).setY((t.pos.y || 0) + top(t) * 0.6), C.violet, C.violetB, 0.26, 0.14); }
         if (ok) { const g = P3(t.pos); g.y = groundY(t.pos.x, t.pos.z); this.shock(g, 1.2, C.warm, C.violetB, { a: 1.6, life: 0.32 }); this.notes(g.clone().setY(g.y + 1.0), 3, { size: 0.16, life: 0.7, tint: 0xe0d0ff });
-          if (MUFX.fx2) { this.pillar(g, 0.45, 2.6, 'violet', { life: 0.55 }); this.pang(g.clone().setY(g.y + 0.9), 'violet', { r: 0.7, n: 12, ground: g.y }); this.popNotes(g.clone().setY(g.y + 1.0), 3, 'violet'); } } },
+          if (MUFX.fx2) { this.pillar(g, 0.45, top(t) * 0.85, 'violet', { life: 0.55 }); this.pang(g.clone().setY(g.y + 0.9), 'violet', { r: 0.7, n: 12, ground: g.y }); this.popNotes(g.clone().setY(g.y + 1.0), 3, 'violet'); } } },
       hurt: () => { hurt = e.t; }, regroup: () => { regroup = e.t; }, fade: () => { if (fade < 0) fade = e.t; }, dispose: () => this._free(e) });
   }
 }
