@@ -38,9 +38,9 @@ export const PAINTFX = {
   wallH: 2.0, cloudH: 3.4,
   // fx2 (2026-11-17)
   fx2: true,
-  tripo: { wolf: 1.3, crane: 1.05, knight: 1.0, dragon: 1.25 },        // Tripo 모델 크기(소환물 크기에 곱함, 모델은 가로 가장 긴 변 1 / 기사는 높이 1)
+  tripo: { wolf: 1.3, crane: 1.5, knight: 1.0, dragon: 1.25 },        // Tripo 모델 크기(소환물 크기에 곱함, 모델은 가로 가장 긴 변 1 / 기사는 높이 1)
   tripoYaw: { wolf: 0, crane: 0, knight: -Math.PI / 2, dragon: -Math.PI / 2 },   // 모델 앞 방향 보정(라디안) — 기사·용 머리 초안은 +X 를 봄
-  inkK: { wolf: 0.55, dragon: 0.12 },                                   // Tripo 기본색을 먹빛으로 바꾸는 정도(0 = 그대로)
+  inkK: { wolf: 0.75, dragon: 0.12 },                                   // Tripo 기본색을 먹빛으로 바꾸는 정도(0 = 그대로)
   sfxGap: { pt_twinkle: 0.25, pt_sigil: 0.3, pt_flap: 0.4, pt_splash: 0.12, pt_howl: 1.0, pt_clank: 0.5, pt_roar: 1.0, pt_bloom: 0.8 },
 };
 // 직업 색(테일즈위버식 파스텔 + 금테): [선·밝은 색, 바탕·진한 색, 강조(금)] — HerbalFx 의 pang/sigil/beam/gather 가 쓰는 표(HERBFX.el)에 'pt_' 이름으로 더함
@@ -337,7 +337,7 @@ export class PaintFx extends HerbalFx {
   /** 소환물 완성 연출: 발밑 마법진(그리는 동안) + 종이로 모이는 반짝이 -> 완성 순간 빛기둥 + '팡' + 소리 */
   _birth(e, s, el, pat, r, draw, snd, o = {}) {
     if (!this.parts) return; const b = P3(s.pos);
-    this.psig(b, r, el, { pat, grow: draw * 0.8, life: draw + 0.7, a: 0.85, spin: 1.1, follow: () => P3(e.s.pos) });
+    this.psig(b, r, el, { pat, grow: draw * 0.8, life: draw + 0.7, a: 1.0, spin: 1.1, follow: () => P3(e.s.pos) });
     const paperAt = () => { const q = P3(e.s.pos).addScaledVector(this.toCam, 0.5); q.y += e.ppY ?? 0.9; return q; };
     this.gather(b, r * 0.9, paperAt, el, 12, draw * 0.8);
     this._later(draw, () => { const q = P3(e.s.pos); this.beam(q, o.beamR ?? 0.6, o.beamH ?? 2.6, el, { life: 0.6, a: 0.85 });
@@ -664,7 +664,7 @@ export class PaintFx extends HerbalFx {
     return this._h(e, { cancel: () => this._end(e, 0.3), flown: () => { e.flownT = e.t; } });
   }
   k_dragon(o3, o) {   // 용: 머리 + 몸통 관(머리 길을 따라 매 프레임 다시 그림 — 등 갈기 톱니·금빛 배·비늘 띠), 금 수염 리본 둘, 먹 꼬리. 관통·숨결은 규칙이 정한 순간
-    const f = D3(o.f), start = P3(o3), len = o.len || 12, S = P.dragon.size, hist = [], NR = lite() ? 18 : 26, NS = 10, gap = 0.22 * S;
+    const f = D3(o.f), start = P3(o3), len = o.len || 12, S = P.dragon.size, hist = [], NR = lite() ? 16 : 22, NS = 10, gap = 0.2 * S;
     if (o.pre && o.pre.flown) o.pre.flown();
     let s = 0, ended = null;
     const e = this._fx('dragon', 9, (e, dt) => {
@@ -677,7 +677,7 @@ export class PaintFx extends HerbalFx {
       if (head) { head.position.copy(hp); head.lookAt(hp.clone().add(f)); head.scale.setScalar(S * app); head.material.uniforms.uA.value = fade; head.material.uniforms.uDraw.value = smooth(0, 0.25, e.t); }
       // 몸통 관: 머리 길(호 길이 gap 간격)을 따라 고리 NR 개
       const pts = []; { let acc = 0, j = 0; for (let i = 0; i < NR; i++) { const want = (i + 0.6) * gap; while (j < hist.length - 1 && acc + hist[j].distanceTo(hist[j + 1]) < want) { acc += hist[j].distanceTo(hist[j + 1]); j++; } pts.push(hist[j]); } }
-      this._tubeSet(e.tube, pts, (i) => { const k = i / (NR - 1); return S * (0.25 + 0.06 * Math.sin(Math.min(1, k * 4) * Math.PI / 2)) * (1 - 0.85 * k) * smooth(0.02 * i, 0.02 * i + 0.2, e.t); });
+      this._tubeSet(e.tube, pts, (i) => { const k = i / (NR - 1); return S * (0.32 + 0.08 * Math.sin(Math.min(1, k * 4) * Math.PI / 2)) * (1 - 0.88 * smooth(0.35, 1, k)) * smooth(0.02 * i, 0.02 * i + 0.2, e.t); });   // 통통한 몸: 앞 1/3 은 굵게, 뒤에서 꼬리로 가늘어짐
       const u = body.material.uniforms; u.uA.value = fade; u.uDraw.value = 1; u.uY0.value = -99; u.uGlow.value = 0.04;
       // 금 수염(머리 양옆에서 뒤로 흐름)
       wh.forEach((w, i) => { const sgn = i ? 1 : -1, tip = hp.clone().addScaledVector(rgt, sgn * 0.3 * S).addScaledVector(dirH, 0.25 * S); tip.y -= 0.12 * S + 0.06 * Math.sin(e.t * 7 + i);
@@ -722,7 +722,7 @@ export class PaintFx extends HerbalFx {
       const p = pts[Math.min(i, pts.length - 1)], pa = pts[Math.max(0, i - 1)], pb = pts[Math.min(pts.length - 1, i + 1)];
       T.copy(pa).sub(pb); if (T.lengthSq() < 1e-8) T.set(0, 0, 1); T.normalize(); B.crossVectors(T, UP); if (B.lengthSq() < 1e-6) B.set(1, 0, 0); B.normalize(); N.crossVectors(B, T).normalize();
       const r = radius(i);
-      for (let j = 0; j < NS; j++) { const ang = j / NS * Math.PI * 2, crest = j === 0 ? (i % 2 ? 1.25 : 1.9) * (i < NR - 2 ? 1 : 1) : (j === 1 || j === NS - 1) ? 1.08 : 1;   // 등 갈기 톱니
+      for (let j = 0; j < NS; j++) { const ang = j / NS * Math.PI * 2, crest = j === 0 ? (i % 2 ? 1.15 : 1.45) * (i < NR - 2 ? 1 : 1) : (j === 1 || j === NS - 1) ? 1.08 : 1;   // 등 갈기 톱니
         d.copy(N).multiplyScalar(Math.cos(ang) * crest).addScaledVector(B, Math.sin(ang)); a.setXYZ(i * NS + j, p.x + d.x * r, p.y + d.y * r, p.z + d.z * r); }
     }
     const last = pts[Math.min(NR, pts.length) - 1], tl = pts[Math.min(NR - 1, pts.length - 1)]; d.copy(tl).sub(pts[Math.max(0, Math.min(NR, pts.length) - 2)]); a.setXYZ(NR * NS, last.x + d.x * 0.6, last.y + d.y * 0.6, last.z + d.z * 0.6);
