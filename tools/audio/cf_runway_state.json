@@ -1,0 +1,85 @@
+{
+ "spent": 18,
+ "done": {
+  "cf_wok_toss": {
+   "task": "e93fa16d-7fb6-47c6-a622-0d6086bc6595",
+   "duration": 0.6,
+   "date": "2026-11-17"
+  },
+  "cf_sizzle": {
+   "task": "3ff8fb8f-099a-4e7e-9ef3-3cc2a5335e96",
+   "duration": 0.8,
+   "date": "2026-11-17"
+  },
+  "cf_flame": {
+   "task": "2a544e6e-b490-4371-94ea-1743dbf71e8d",
+   "duration": 1.0,
+   "date": "2026-11-17"
+  },
+  "cf_splash": {
+   "task": "0d9df5a5-17c2-47d0-a70b-dc19620fb4c2",
+   "duration": 0.6,
+   "date": "2026-11-17"
+  },
+  "cf_ignite": {
+   "task": "f801caea-f59f-4e26-b061-c09951a6b4be",
+   "duration": 0.9,
+   "date": "2026-11-17"
+  },
+  "cf_steam": {
+   "task": "94d75980-df28-4374-a34d-a7b2c5242f85",
+   "duration": 0.9,
+   "date": "2026-11-17"
+  },
+  "cf_place": {
+   "task": "78d84c70-4b32-4f66-b7b7-0cd1e6a9f1ea",
+   "duration": 0.6,
+   "date": "2026-11-17"
+  },
+  "cf_steam_hiss": {
+   "task": "de9585cb-5571-48c7-8ffe-97248d36ee71",
+   "duration": 0.6,
+   "date": "2026-11-17"
+  },
+  "cf_pop": {
+   "task": "e3b917b6-0f0a-4182-ab12-d19686a00ffd",
+   "duration": 1.4,
+   "date": "2026-11-17"
+  },
+  "cf_skewer": {
+   "task": "a620cf25-bfb5-4444-a627-da0bb3a6be65",
+   "duration": 0.5,
+   "date": "2026-11-17"
+  },
+  "cf_whoosh": {
+   "task": "69a314d4-a8f0-4175-8788-152c8ddb3b1d",
+   "duration": 0.5,
+   "date": "2026-11-17"
+  },
+  "cf_knife": {
+   "task": "3e99892e-3cf5-4d94-9bcb-0fb526ad300f",
+   "duration": 0.5,
+   "date": "2026-11-17"
+  },
+  "cf_cloche_fall": {
+   "task": "ccc653ec-f138-4fd5-828b-c9261bab1be0",
+   "duration": 0.9,
+   "date": "2026-11-17"
+  },
+  "cf_cloche_slam": {
+   "task": "679a7927-14df-4834-8d2f-13572eacbf9a",
+   "duration": 1.8,
+   "date": "2026-11-17"
+  },
+  "cf_scoop": {
+   "task": "616e7433-3155-4cb0-bba3-b11577356d59",
+   "duration": 0.5,
+   "date": "2026-11-17"
+  },
+  "cf_sorbet_hit": {
+   "task": "54a43781-dd29-49c0-b845-c8dc632ae50d",
+   "duration": 0.5,
+   "date": "2026-11-17"
+  }
+ }
+}

@@ -18,6 +18,12 @@ Usage:  python3 tools/blender/fx_chef.py   ->  assets/fx/fx_chef.glb.json  (+ to
   chef_curl       캐러멜 곡선: 나선 고리 한 바퀴(관), 반지름 0.5, 높이 0..1 — 설탕 벽 테두리·크로캉부슈 실
   chef_food_a/b/c 웍에서 튀는 재료(새우 · 피망 고리 · 버섯), 크기 약 1
   chef_garnish    플레이팅 곁들임(브로콜리 송이), 크기 약 1
+  (2026-11-17 '화려하게' 개편 — 이펙트 메시, 정점 색 흰색(색은 셰이더/인스턴스 색), 인스턴싱용)
+  chef_star       통통한 다섯 꼭지 별: 반지름 1(꼭지), 두께 ±0.32 — 명중·잔광 반짝이
+  chef_petal      설탕 꽃잎·허브 잎 모양 판: 길이 1(y 0 .. 1), 폭 0.42, 살짝 휨 — 플레이팅·부용·디너
+  chef_flame      불꽃 덩어리: 아래가 둥글고 위가 뾰족한 물방울(y 0 .. 1, 반지름 0.38) — 웍·플람베·쇼타임 불꽃 입자
+  chef_pillar     빛기둥: 열린 원통 반지름 1, y 0 .. 1, 32칸 — UV u = 둘레, v = 높이
+  chef_helix      나선 띠: 반지름 1, y 0 .. 1, 두 바퀴, 폭 0.12 — UV u = 길이, v = 폭
 json: {b64}
 """
 import os, sys, math, json, base64, random
@@ -146,11 +152,54 @@ def garnish(bm, col, uvl):  # 브로콜리 송이
     tube(bm, col, [(0.0, -0.5), (0.0, 0.0)], 0.12, (0.56, 0.80, 0.36, 1), 8)
     for (x, y, z) in ((0, 0.2, 0), (0.22, 0.12, 0.1), (-0.2, 0.12, 0.12), (0.05, 0.12, -0.24), (0.0, 0.34, 0.1)): blob(bm, col, (x, y, z), (0.2, 0.18, 0.2), (0.22, 0.56, 0.18, 1), 8, 5)
 
+W1 = (1.0, 1.0, 1.0, 1); W_LO = (0.78, 0.78, 0.8, 1)
+def star(bm, col, uvl):
+    c_top = bm.verts.new(V(0, 0.32, 0)); c_bot = bm.verts.new(V(0, -0.32, 0)); ring = []
+    for i in range(10):
+        a = math.pi / 2 + i * math.pi / 5; r = 1.0 if i % 2 == 0 else 0.46
+        ring.append(bm.verts.new(V(math.cos(a) * r, 0, math.sin(a) * r)))
+    for i in range(10):
+        j = (i + 1) % 10
+        for f in (bm.faces.new((c_top, ring[i], ring[j])), bm.faces.new((c_bot, ring[j], ring[i]))):
+            for l in f.loops: l[col] = W1 if l.vert in (c_top, c_bot) else W_LO
+
+def petal(bm, col, uvl):
+    N, M = 7, 3; rows = []
+    for j in range(N + 1):
+        t = j / N; w = 0.42 * math.sin(math.pi * min(1, t * 1.08)) ** 0.8; bend = 0.18 * t * t
+        rows.append([bm.verts.new(V((k / M - 0.5) * 2 * w, t, bend + 0.06 * (1 - (2 * k / M - 1) ** 2))) for k in range(M + 1)])
+    for j in range(N):
+        for k in range(M):
+            f = bm.faces.new((rows[j][k], rows[j][k + 1], rows[j + 1][k + 1], rows[j + 1][k]))
+            for l in f.loops: l[col] = W1 if j > N // 3 else W_LO
+
+def flame(bm, col, uvl):
+    P = [(0.0, 0.0)] + [(0.38 * math.sin(math.pi * 0.5 * (i / 6)) * (1 - 0.15 * (i / 6)), 0.38 * (1 - math.cos(math.pi * 0.5 * (i / 6)))) for i in range(1, 7)] + [(0.24, 0.62), (0.1, 0.86), (0.0, 1.0)]
+    lathe(bm, col, P, 10, lambda k, p: W1 if k >= 6 else W_LO)
+
+def pillar(bm, col, uvl):
+    S = 32; lo = [bm.verts.new(V(math.cos(2 * math.pi * i / S), 0, math.sin(2 * math.pi * i / S))) for i in range(S)]
+    hi = [bm.verts.new(V(math.cos(2 * math.pi * i / S), 1, math.sin(2 * math.pi * i / S))) for i in range(S)]
+    for i in range(S):
+        j = (i + 1) % S; f = bm.faces.new((lo[i], lo[j], hi[j], hi[i])); u0, u1 = i / S, (i + 1) / S
+        for l, uv in zip(f.loops, ((u0, 0), (u1, 0), (u1, 1), (u0, 1))): l[col] = W1; l[uvl].uv = uv
+
+def helix(bm, col, uvl):
+    N = 64; turns = 2.0; w = 0.06; prev = None
+    for i in range(N + 1):
+        t = i / N; a = t * turns * 2 * math.pi; x, z = math.cos(a), math.sin(a)
+        cur = (bm.verts.new(V(x, t - w, z)), bm.verts.new(V(x, t + w, z)))
+        if prev:
+            f = bm.faces.new((prev[0], cur[0], cur[1], prev[1])); t0 = (i - 1) / N
+            for l, uv in zip(f.loops, ((t0, 0), (t, 0), (t, 1), (t0, 1))): l[col] = W1; l[uvl].uv = uv
+        prev = cur
+
 def main():
     FP.reset()
     spec = [('chef_wok', wok, True), ('chef_cooker', cooker, True), ('chef_cooker_lid', cooker_lid, True), ('chef_cloche', cloche, True), ('chef_tray', tray, True), ('chef_pot', pot, True),
             ('chef_sorbet', sorbet, True), ('chef_cone', cone, True), ('chef_mille', mille, False), ('chef_choux', choux, True), ('chef_leaf', leaf, True), ('chef_shard', shard, False),
-            ('chef_curl', curl, True), ('chef_food_a', food_a, True), ('chef_food_b', food_b, True), ('chef_food_c', food_c, True), ('chef_garnish', garnish, True)]
+            ('chef_curl', curl, True), ('chef_food_a', food_a, True), ('chef_food_b', food_b, True), ('chef_food_c', food_c, True), ('chef_garnish', garnish, True),
+            ('chef_star', star, False), ('chef_petal', petal, True), ('chef_flame', flame, True), ('chef_pillar', pillar, False), ('chef_helix', helix, False)]
     obs = [new_obj(n, f, sm) for n, f, sm in spec]
     for o in obs:
         if o.name in ('chef_wok', 'chef_cooker', 'chef_cooker_lid', 'chef_cloche', 'chef_tray', 'chef_pot', 'chef_mille'):

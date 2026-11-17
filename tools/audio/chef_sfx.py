@@ -1,4 +1,6 @@
-"""쉐프 2차 스킬 효과음 26개를 합성한다 (numpy + scipy, ffmpeg로 MP3). 2026-11-16.
+"""(2026-11-17부터 안 씀 — 게임의 sfx_cf_*.mp3 는 Runway 생성물: tools/audio/chef_runway_sfx.py. 이 스크립트는 예전 합성음 보관용,
+ --force 를 줘야 assets/audio 를 덮어씀.)
+쉐프 2차 스킬 효과음 26개를 합성한다 (numpy + scipy, ffmpeg로 MP3). 2026-11-16.
 
 Usage:  python3 tools/audio/chef_sfx.py   ->  assets/audio/sfx_cf_*.mp3 (+ /tmp/chef_sfx/*.wav)
 
@@ -117,4 +119,5 @@ ALL = dict(wok_toss=wok_toss, sizzle=sizzle, flame=flame, splash=splash, ignite=
            knife=knife, cloche_fall=cloche_fall, cloche_slam=cloche_slam, scoop=scoop, sorbet_hit=sorbet_hit, frost_draw=frost_draw, frost=frost, disc=disc, disc_hit=disc_hit,
            disc_catch=disc_catch, sugar=sugar, shatter=shatter, choux_pop=choux_pop, serve=serve, cloche_open=cloche_open)
 if __name__ == '__main__':
+    if '--force' not in sys.argv: print('Runway 효과음을 덮어쓰지 않음 — 예전 합성음이 필요하면 --force'); sys.exit(0)
     for name, fn in ALL.items(): S.save('sfx_cf_' + name, fn())
