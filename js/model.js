@@ -3,7 +3,7 @@
 // so actors.js keeps working; animation comes from the game's pose table, applied to the skeleton and
 // interpolated every frame, and the body turns smoothly to any angle.
 import { THREE, T, tex, paintMat, contactShadowTex, addOutline } from './render.js';
-import { itemModel, isWeaponModel, BRUSH_SCALE, shearsTierOf } from './items3d.js';
+import { itemModel, isWeaponModel, BRUSH_SCALE, shearsTierOf, shearLook } from './items3d.js';
 
 const DEG = Math.PI / 180;
 export const PLAYER_MODELS = {
@@ -243,7 +243,8 @@ const SHEAR_TIER = [null, { ring: 0xe65a8c, blade: 0xe4eaf4, pin: 0xf4c860 }, { 
 /** ring centre of half s (+1 right hand / -1 left hand) relative to the pivot, at open amount k (0..1) */
 function shearRing(s, k) { const S = SHEARS, a = s * (S.rest + S.open * k), x = s * S.ringX, z = -S.pivot; return _v(x * Math.cos(a) + z * Math.sin(a), 0, -x * Math.sin(a) + z * Math.cos(a)); }
 function makeShears(tier) {
-  const S = SHEARS, T = SHEAR_TIER[tier] || SHEAR_TIER[1], g = new THREE.Group(), inner = new THREE.Group(); g.add(inner);
+  // tier = 예전 색 단계 1~3, 또는 계열 무기 '<계열>:<단계>'(items3d.js shearLook — 계열 색, 단계 2부터 축 보석, 5부터 고리 금테)
+  const look = shearLook(tier), S = SHEARS, T = look || SHEAR_TIER[tier] || SHEAR_TIER[1], g = new THREE.Group(), inner = new THREE.Group(); g.add(inner);
   const M = (c, o = {}) => new THREE.MeshLambertMaterial({ color: c, emissive: c, emissiveIntensity: o.e ?? 0.18 });   // no env map in this renderer: lit silver, a little self-light so the blades never go black
   const halves = [];
   for (const s of [1, -1]) {
@@ -260,6 +261,13 @@ function makeShears(tier) {
     inner.add(h); halves.push(h);
   }
   const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.036, 10), M(T.pin, { r: 0.3, m: 0.9 })); inner.add(pin);
+  if (look && look.stage >= 2) {                         // 축 보석(단계마다 조금씩 커짐) — 두 반쪽과 함께 돌지 않게 inner에(축 위치)
+    const gem = new THREE.Mesh(new THREE.IcosahedronGeometry(0.016 + 0.0025 * look.stage, 0), M(look.gem, { e: 0.6 })); gem.position.y = 0.03; inner.add(gem);
+  }
+  if (look && look.stage >= 5) for (const h of halves) {   // 고리 금테
+    const r = h.children.find(o => o.geometry && o.geometry.type === 'TorusGeometry');
+    if (r) { const t = new THREE.Mesh(new THREE.TorusGeometry(SHEARS.ringR + 0.018, 0.006, 6, 20), M(0xe8b84a, { e: 0.25 })); t.rotation.x = Math.PI / 2; t.position.copy(r.position); h.add(t); }
+  }
   g.traverse(o => { if (o.isMesh) o.castShadow = true; });
   g.userData.shears = { inner, halves, k: -1 };
   setShears(g, 0);
@@ -1022,7 +1030,7 @@ export class ModelBody {
       if (kind) {
         const hi = this.md.byName[(side === 'L' ? 'Left' : 'Right') + '_Hand'];
         // held in mesh space: the matrix is the hand grip (or, for the right weapon, the back holder / a glide between them)
-        const holder = new THREE.Group(); holder.matrixAutoUpdate = false; holder.add(kind.startsWith('item:') ? itemModel(kind.slice(5)) : kind.startsWith('shears:') ? makeShears(+kind.slice(7)) : makeProp(kind));
+        const holder = new THREE.Group(); holder.matrixAutoUpdate = false; holder.add(kind.startsWith('item:') ? itemModel(kind.slice(5)) : kind.startsWith('shears:') ? makeShears(/^\d+$/.test(kind.slice(7)) ? +kind.slice(7) : kind.slice(7)) : makeProp(kind));
         // the player's weapon gets the same thin outline as the body (only its big parts: handle, head - small trims / gems skip it)
         if (side === 'R' && !this.md.cfg.npc) { const ms = []; holder.traverse(o => { if (o.isMesh && o.geometry) { o.geometry.computeBoundingSphere(); if (o.geometry.boundingSphere.radius > 0.06) ms.push(o); } }); for (const o of ms) addOutline(o); }
         this.mesh.add(holder); this.props[side] = holder; holder.userData.hi = hi;

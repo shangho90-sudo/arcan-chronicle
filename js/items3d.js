@@ -213,10 +213,22 @@ const GEAR_WEAPON = /^w_pestle_g\d+$/, GEAR_ARMOR = /^a_armor_g(\d+)$/, GEAR_ACC
 const GEAR_DEFS = new Map();
 export function registerGearDefs(list) { for (const d of list || []) if (d && d.gear && d.stand) GEAR_DEFS.set(d.id, d); }
 export const gearDef = id => GEAR_DEFS.get(id) || null;
-/** 미용사 큰 가위의 색 단계(1~3): 예전 w_scissors_N 또는 새 가위 계열의 stand 단계 */
-export function shearsTierOf(id) { const m = /^w_scissors_(\d)/.exec(id || ''); if (m) return +m[1]; const d = GEAR_DEFS.get(id); return d && d.kind === 'scissors' ? d.stand[1] : 0; }
+/** 미용사 큰 가위의 모습: 예전 w_scissors_N = 색 단계 1~3, 새 가위 계열(wg_hair_* · wg_design_*) = '<계열>:<단계>' (model.js makeShears가 shearLook으로 색을 고름).
+ *  손에 든 큰 가위는 두 반쪽이 축에서 벌어지는 절차 모델 그대로(동작 snip·grip2), 계열 색 + 단계가 오를수록 축 보석이 커지고 고리에 금테 — 땅·아이콘은 계열 디자인 GLB. */
+export function shearsTierOf(id) {
+  const m = /^w_scissors_(\d)/.exec(id || ''); if (m) return +m[1];
+  const d = GEAR_DEFS.get(id); if (!d || d.kind !== 'scissors') return 0;
+  const g = /^wg_(\w+)_(\d+)$/.exec(id); return g && SHEAR_LINE[g[1]] ? g[1] + ':' + g[2] : d.stand[1];
+}
+// 계열 색(tools/gear/designs.py 팔레트, tools/blender/gear2_wpn.py COL과 같음): ring 고리 · blade 날 · pin 축 · gem 축 보석(빛)
+const SHEAR_LINE = { hair: { ring: 0xe86a8e, blade: 0xf2f4f8, pin: 0xc8ccd6, gem: 0xe86a8e }, design: { ring: 0x4a3a8a, blade: 0xe4e6f0, pin: 0xe8a88a, gem: 0xf4e8ff } };
+/** '<계열>:<단계>' -> {ring, blade, pin, gem, stage} (없으면 null) */
+export function shearLook(key) { const m = /^(\w+):(\d+)$/.exec(String(key)); if (!m || !SHEAR_LINE[m[1]]) return null; return { ...SHEAR_LINE[m[1]], stage: +m[2] }; }
 export const isGearItem = id => GEAR_WEAPON.test(id) || GEAR_ARMOR.test(id) || GEAR_ACC.test(id) || GEAR_DEFS.has(id);
-export const GEAR_SCALE = 0.86;                 // 손에 든 유봉 크기(모델 길이 0.46 m × 이 값 × 손 배율 1.3)
+export const GEAR_SCALE = 0.86;                 // 예전 유봉(w_pestle_g*) 손에 든 크기(모델 길이 0.46 m × 이 값 × 손 배율 1.3)
+// 계열 무기(wg_*, tools/blender/gear2_wpn.py, glb.json의 v = 2)는 손 소품 단위 그대로(배율 1) — 종류별 길이를 모델이 이미 맞춤:
+// 검 0.40 · 유봉 0.40 · 망치 0.52 · 식칼 0.31 · 붓/악기 0.74 (예전 절차 모델과 같은 길이라 동작·잔상·등에 메기가 그대로)
+export const GEAR_SCALE_V2 = { sword: 1, pestle: 1, hammer: 1, knife: 1, scissors: 1, brush: 1, instrument: 1 };
 const gearCache = new Map();                    // id -> Promise<Object3D | null>
 function loadGear(id) {
   if (!gearCache.has(id)) gearCache.set(id, (async () => {
@@ -225,6 +237,7 @@ function loadGear(id) {
       const j = await r.json(), raw = atob(j.b64), u8 = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) u8[i] = raw.charCodeAt(i);
       const gltf = await new Promise((res, rej) => new GLTFLoader().parse(u8.buffer, '', res, rej));
       gltf.scene.traverse(o => { if (o.isMesh) { o.castShadow = true; o.material.roughness = 0.55; o.material.metalness = 0.05; } });
+      gltf.scene.userData.v = j.v || 1;
       return gltf.scene;
     } catch (e) { console.warn('gear model', e); return null; }
   })());
@@ -235,7 +248,8 @@ function gearWeapon(id, stand) {
   const g = G(); g.add(stand ? BUILD[stand[0]](stand[1]) : BUILD.pestle(2));
   loadGear(id).then(src => {
     if (!src) return;
-    const m = src.clone(true); m.scale.setScalar(GEAR_SCALE); m.rotation.x = R;           // model: head up (+y) -> item axis +z
+    const d = GEAR_DEFS.get(id), k = src.userData.v === 2 ? (GEAR_SCALE_V2[d && d.kind] ?? 1) : GEAR_SCALE;
+    const m = src.clone(true); m.scale.setScalar(k); m.rotation.x = R;           // model: head up (+y) -> item axis +z
     g.clear(); g.add(m); g.userData.gearReady = true;
     for (let p = g.parent; p; p = p.parent) if (p.userData && p.userData.len !== undefined) delete p.userData.len;      // blade length (model.js bladePoints) is measured again
   });

@@ -4646,7 +4646,9 @@
    "stand": [
     "stick",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_nov_1",
@@ -4727,7 +4729,9 @@
    "stand": [
     "stick",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_nov_2",
@@ -4813,7 +4817,9 @@
    "stand": [
     "stick",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_nov_3",
@@ -4918,7 +4924,9 @@
    "stand": [
     "stick",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_nov_4",
@@ -5023,7 +5031,9 @@
    "stand": [
     "pestle",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_pharm_1",
@@ -5109,7 +5119,9 @@
    "stand": [
     "pestle",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_pharm_2",
@@ -5200,7 +5212,9 @@
    "stand": [
     "pestle",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_pharm_3",
@@ -5291,7 +5305,9 @@
    "stand": [
     "pestle",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_pharm_4",
@@ -5382,7 +5398,9 @@
    "stand": [
     "pestle",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_pharm_5",
@@ -5497,7 +5515,9 @@
    "stand": [
     "pestle",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_pharm_6",
@@ -5626,7 +5646,9 @@
    "stand": [
     "pestle",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_pharm_7",
@@ -5736,7 +5758,9 @@
    "stand": [
     "hammer",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_smith_1",
@@ -5822,7 +5846,9 @@
    "stand": [
     "hammer",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_smith_2",
@@ -5913,7 +5939,9 @@
    "stand": [
     "hammer",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_smith_3",
@@ -6004,7 +6032,9 @@
    "stand": [
     "hammer",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_smith_4",
@@ -6095,7 +6125,9 @@
    "stand": [
     "hammer",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_smith_5",
@@ -6210,7 +6242,9 @@
    "stand": [
     "hammer",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_smith_6",
@@ -6339,7 +6373,9 @@
    "stand": [
     "hammer",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_smith_7",
@@ -6449,7 +6485,9 @@
    "stand": [
     "knife",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_cook_1",
@@ -6535,7 +6573,9 @@
    "stand": [
     "knife",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_cook_2",
@@ -6626,7 +6666,9 @@
    "stand": [
     "knife",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_cook_3",
@@ -6717,7 +6759,9 @@
    "stand": [
     "knife",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_cook_4",
@@ -6808,7 +6852,9 @@
    "stand": [
     "knife",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_cook_5",
@@ -6923,7 +6969,9 @@
    "stand": [
     "knife",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_cook_6",
@@ -7052,7 +7100,9 @@
    "stand": [
     "knife",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_cook_7",
@@ -7162,7 +7212,9 @@
    "stand": [
     "scissors",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_hair_1",
@@ -7248,7 +7300,9 @@
    "stand": [
     "scissors",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_hair_2",
@@ -7339,7 +7393,9 @@
    "stand": [
     "scissors",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_hair_3",
@@ -7430,7 +7486,9 @@
    "stand": [
     "scissors",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_hair_4",
@@ -7521,7 +7579,9 @@
    "stand": [
     "scissors",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_hair_5",
@@ -7636,7 +7696,9 @@
    "stand": [
     "scissors",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_hair_6",
@@ -7765,7 +7827,9 @@
    "stand": [
     "scissors",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_hair_7",
@@ -7875,7 +7939,9 @@
    "stand": [
     "brush",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_art_1",
@@ -7961,7 +8027,9 @@
    "stand": [
     "brush",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_art_2",
@@ -8052,7 +8120,9 @@
    "stand": [
     "brush",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_art_3",
@@ -8143,7 +8213,9 @@
    "stand": [
     "brush",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_art_4",
@@ -8234,7 +8306,9 @@
    "stand": [
     "brush",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_art_5",
@@ -8349,7 +8423,9 @@
    "stand": [
     "brush",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_art_6",
@@ -8478,7 +8554,9 @@
    "stand": [
     "brush",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_art_7",
@@ -8588,7 +8666,9 @@
    "stand": [
     "pestle",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_wpharm_1",
@@ -8674,7 +8754,9 @@
    "stand": [
     "pestle",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_wpharm_2",
@@ -8765,7 +8847,9 @@
    "stand": [
     "pestle",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_wpharm_3",
@@ -8856,7 +8940,9 @@
    "stand": [
     "pestle",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_wpharm_4",
@@ -8947,7 +9033,9 @@
    "stand": [
     "pestle",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_wpharm_5",
@@ -9062,7 +9150,9 @@
    "stand": [
     "pestle",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_wpharm_6",
@@ -9191,7 +9281,9 @@
    "stand": [
     "pestle",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_wpharm_7",
@@ -9301,7 +9393,9 @@
    "stand": [
     "pestle",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_herb_1",
@@ -9387,7 +9481,9 @@
    "stand": [
     "pestle",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_herb_2",
@@ -9478,7 +9574,9 @@
    "stand": [
     "pestle",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_herb_3",
@@ -9569,7 +9667,9 @@
    "stand": [
     "pestle",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_herb_4",
@@ -9660,7 +9760,9 @@
    "stand": [
     "pestle",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_herb_5",
@@ -9775,7 +9877,9 @@
    "stand": [
     "pestle",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_herb_6",
@@ -9904,7 +10008,9 @@
    "stand": [
     "pestle",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_herb_7",
@@ -10014,7 +10120,9 @@
    "stand": [
     "hammer",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_eng_1",
@@ -10100,7 +10208,9 @@
    "stand": [
     "hammer",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_eng_2",
@@ -10191,7 +10301,9 @@
    "stand": [
     "hammer",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_eng_3",
@@ -10282,7 +10394,9 @@
    "stand": [
     "hammer",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_eng_4",
@@ -10373,7 +10487,9 @@
    "stand": [
     "hammer",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_eng_5",
@@ -10488,7 +10604,9 @@
    "stand": [
     "hammer",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_eng_6",
@@ -10617,7 +10735,9 @@
    "stand": [
     "hammer",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_eng_7",
@@ -10727,7 +10847,9 @@
    "stand": [
     "knife",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_chef_1",
@@ -10813,7 +10935,9 @@
    "stand": [
     "knife",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_chef_2",
@@ -10904,7 +11028,9 @@
    "stand": [
     "knife",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_chef_3",
@@ -10995,7 +11121,9 @@
    "stand": [
     "knife",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_chef_4",
@@ -11086,7 +11214,9 @@
    "stand": [
     "knife",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_chef_5",
@@ -11201,7 +11331,9 @@
    "stand": [
     "knife",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_chef_6",
@@ -11330,7 +11462,9 @@
    "stand": [
     "knife",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_chef_7",
@@ -11440,7 +11574,9 @@
    "stand": [
     "scissors",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_design_1",
@@ -11526,7 +11662,9 @@
    "stand": [
     "scissors",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_design_2",
@@ -11617,7 +11755,9 @@
    "stand": [
     "scissors",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_design_3",
@@ -11708,7 +11848,9 @@
    "stand": [
     "scissors",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_design_4",
@@ -11799,7 +11941,9 @@
    "stand": [
     "scissors",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_design_5",
@@ -11914,7 +12058,9 @@
    "stand": [
     "scissors",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_design_6",
@@ -12043,7 +12189,9 @@
    "stand": [
     "scissors",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_design_7",
@@ -12153,7 +12301,9 @@
    "stand": [
     "brush",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_paint_1",
@@ -12239,7 +12389,9 @@
    "stand": [
     "brush",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_paint_2",
@@ -12330,7 +12482,9 @@
    "stand": [
     "brush",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_paint_3",
@@ -12421,7 +12575,9 @@
    "stand": [
     "brush",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_paint_4",
@@ -12512,7 +12668,9 @@
    "stand": [
     "brush",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_paint_5",
@@ -12627,7 +12785,9 @@
    "stand": [
     "brush",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_paint_6",
@@ -12756,7 +12916,9 @@
    "stand": [
     "brush",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_paint_7",
@@ -12866,7 +13028,9 @@
    "stand": [
     "brush",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_music_1",
@@ -12952,7 +13116,9 @@
    "stand": [
     "brush",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_music_2",
@@ -13043,7 +13209,9 @@
    "stand": [
     "brush",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_music_3",
@@ -13134,7 +13302,9 @@
    "stand": [
     "brush",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_music_4",
@@ -13225,7 +13395,9 @@
    "stand": [
     "brush",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_music_5",
@@ -13340,7 +13512,9 @@
    "stand": [
     "brush",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_music_6",
@@ -13469,7 +13643,9 @@
    "stand": [
     "brush",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "ag_music_7",
@@ -13579,7 +13755,9 @@
    "stand": [
     "brush",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "wg_artm_2",
@@ -13621,7 +13799,9 @@
    "stand": [
     "brush",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "wg_artm_3",
@@ -13668,7 +13848,9 @@
    "stand": [
     "brush",
     1
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "wg_artm_4",
@@ -13715,7 +13897,9 @@
    "stand": [
     "brush",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "wg_artm_5",
@@ -13762,7 +13946,9 @@
    "stand": [
     "brush",
     2
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "wg_artm_6",
@@ -13828,7 +14014,9 @@
    "stand": [
     "brush",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   },
   {
    "id": "wg_artm_7",
@@ -13894,7 +14082,9 @@
    "stand": [
     "brush",
     3
-   ]
+   ],
+   "art": true,
+   "model3d": true
   }
  ]
 }
