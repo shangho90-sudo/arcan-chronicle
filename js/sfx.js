@@ -28,7 +28,8 @@ export const SFX_NAMES = ['levelup', 'jobchange', 'dialog', 'warp', 'hit', 'heav
   'hb_simmer', 'hb_root', 'hb_needle', 'hb_resonance', 'hb_bloom', 'hb_dragon', 'hb_phoenix', 'hb_flameburst', 'hb_quake', 'hb_wave', 'hb_spore', 'hb_stomp', 'hb_hop', 'hb_scroll', 'hb_armor', 'hb_drop',   // fx2 Runway (tools/audio/herbal_runway_sfx.py)
     // 한약사 2차 (tools/audio/herbal_sfx.py)
   'ds_snip_open', 'ds_snip', 'ds_snip_silver', 'ds_needle', 'ds_thread', 'ds_pin', 'ds_silk', 'ds_silk_hit', 'ds_cloth', 'ds_ribbon', 'ds_whoosh', 'ds_spot', 'ds_unfold', 'ds_finale', 'ds_sparkle', 'ds_sigil', 'ds_jewel', 'ds_mannequin', 'ds_flashbulb',   // 디자이너 2차 (tools/audio/designer_sfx.py)
-  'pt_sketch', 'pt_brush', 'pt_wash', 'pt_dot', 'pt_mix', 'pt_ink', 'pt_frame', 'pt_fold', 'pt_bolt', 'pt_bite',   // 화가 2차 (tools/audio/painter_sfx.py)
+  'pt_sketch', 'pt_brush', 'pt_wash', 'pt_dot', 'pt_mix', 'pt_ink', 'pt_frame', 'pt_fold', 'pt_bolt', 'pt_bite',   // 화가 2차 (tools/audio/painter_sfx.py, fx2 Runway tools/audio/painter_runway_sfx.py)
+  'pt_sigil', 'pt_twinkle', 'pt_howl', 'pt_roar', 'pt_flap', 'pt_clank', 'pt_splash', 'pt_bloom',   // 화가 2차 fx2 그림 소리
   'mu_bow', 'mu_burst', 'mu_cello', 'mu_chord', 'mu_coda', 'mu_cymbal', 'mu_echo', 'mu_encore', 'mu_fanfare', 'mu_flute', 'mu_flute_tick', 'mu_harp', 'mu_harp_tick', 'mu_horn', 'mu_note', 'mu_pluck', 'mu_string', 'mu_symph', 'mu_trio', 'mu_tune', 'mu_wave_hit',   // 음악가 2차 (tools/audio/music_sfx.py)
   'hd_snip', 'hd_dryer', 'hd_style', 'hd_gust', 'hd_hot', 'hd_cold',
   'wp_granule', 'wp_ring', 'wp_crystal', 'wp_ion', 'wp_collapse',   // 양약사 2차 (Runway — tools/audio/wp_runway_sfx.py)

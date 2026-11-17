@@ -1,6 +1,28 @@
 {
-  "provider": "synthesized (tools/audio/painter_sfx.py, numpy + scipy, fixed seed)",
-  "generatedOn": "2026-11-16",
-  "note": "화가 2차 스킬. Runway 크레딧 없이 직접 합성. 같은 이름의 파일로 바꿔 넣으면 교체됨. 회복 소리는 기존 heal 재사용.",
-  "assets": ["sfx_pt_sketch.mp3", "sfx_pt_brush.mp3", "sfx_pt_wash.mp3", "sfx_pt_dot.mp3", "sfx_pt_mix.mp3", "sfx_pt_ink.mp3", "sfx_pt_frame.mp3", "sfx_pt_fold.mp3", "sfx_pt_bolt.mp3", "sfx_pt_bite.mp3"]
+ "note": "2026-11-17 fx2: Runway eleven_text_to_sound_v2 로 다시 만듦(예전 합성 10개를 같은 이름으로 대체 + 그림용 8개). 아직 못 만든 것은 synthesized 에 — tools/audio/painter_sfx.py 합성음(예전 10개는 --force 일 때만 다시 씀).",
+ "model": "runway eleven_text_to_sound_v2",
+ "tool": "tools/audio/painter_runway_sfx.py",
+ "post": "ffmpeg trim / loudnorm -16 LUFS / mono mp3 96k",
+ "spentCredits": 0,
+ "synthesized": {
+  "sfx_pt_sketch": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_pt_brush": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_pt_wash": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_pt_dot": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_pt_mix": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_pt_ink": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_pt_frame": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_pt_fold": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_pt_bolt": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_pt_bite": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_pt_sigil": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_pt_twinkle": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_pt_howl": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_pt_roar": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_pt_flap": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_pt_clank": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_pt_splash": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_pt_bloom": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)"
+ },
+ "sounds": {}
 }

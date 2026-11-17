@@ -13,6 +13,8 @@ Runway 크레딧이 없어 직접 합성(시드 고정 — 다시 돌리면 같�
   pt_fold    0.5 s  종이가 접히고 펴지는 소리(종이학·성벽)
   pt_bolt    0.5 s  번개: 날카로운 딱 + 짧은 우르릉(뇌운)
   pt_bite    0.2 s  먹 늑대가 무는 짧은 소리·용 관통(어두운 탁 + 잡음)
+2026-11-17 fx2: Runway 로 다시 만드는 스크립트는 tools/audio/painter_runway_sfx.py — 이 파일은 그 전까지의 임시 합성(새 8개 pt_sigil·pt_twinkle·pt_howl·pt_roar·pt_flap·pt_clank·pt_splash·pt_bloom 포함).
+  Usage 바뀜: 인자 없이 = 새 8개만, --force = 18개 모두(Runway 로 받은 것도 덮어씀), 이름… = 그것만.
 게임은 같은 소리를 짧게 반복하지 않음(js/painter.js PAINT.sfxGap), 음량은 js/io.js(pt_*).
 """
 import os, subprocess, wave
@@ -87,5 +89,49 @@ def save(name, x):
     subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', wav, '-codec:a', 'libmp3lame', '-b:a', '128k', mp3], check=True)
     print('wrote', mp3, os.path.getsize(mp3))
 
+# ---- fx2(2026-11-17) 그림용 새 소리 8개의 임시 합성(Runway tools/audio/painter_runway_sfx.py --run 이 같은 이름으로 대체). 자기 난수(r2)라 위 10개는 그대로.
+r2 = np.random.default_rng(1117)
+def chime(fs, d, decay=0.35, gap=0.05, g=0.4):
+    t = T(d); x = np.zeros(len(t))
+    for i, fq in enumerate(fs):
+        tt = T(d - i * gap); place(x, (np.sin(2 * np.pi * fq * tt) + 0.3 * np.sin(4 * np.pi * fq * tt)) * np.exp(-tt / decay) * np.minimum(1, tt / 0.005), i * gap, g)
+    return x
+def sigil():
+    d = 1.2; t = T(d); x = chime((523.3, 659.3, 784.0, 1046.5, 1318.5), d, 0.5, 0.09) + bp(r2.standard_normal(len(t)), 3000, 9000) * np.minimum(1, t / 0.6) * np.exp(-np.maximum(0, t - 0.6) / 0.2) * 0.15
+    return fade(norm(x), 0.02, 0.3)
+def twinkle():
+    return fade(norm(chime((1568.0, 2093.0, 2637.0, 3136.0), 0.6, 0.12, 0.06, 0.4)), 0.002, 0.15)
+def howl():
+    d = 1.2; t = T(d); f = 380 + 180 * np.sin(np.pi * np.minimum(1, t / 0.9)); x = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.minimum(1, t / 0.15) * np.exp(-np.maximum(0, t - 0.7) / 0.18)
+    x += 0.3 * np.sin(4 * np.pi * np.cumsum(f) / SR) * np.minimum(1, t / 0.15) * np.exp(-np.maximum(0, t - 0.7) / 0.18) + lp(r2.standard_normal(len(t)), 1500) * 0.1
+    return fade(norm(x), 0.05, 0.25)
+def roar():
+    d = 1.4; t = T(d); x = lp(r2.standard_normal(len(t)), 400) * (0.6 + 0.4 * np.sin(2 * np.pi * 23 * t)) * np.minimum(1, t / 0.1) * np.exp(-t / 0.6) * 1.2
+    x += np.sin(2 * np.pi * np.cumsum(90 - 30 * t) / SR) * np.exp(-t / 0.5) * 0.6 + bp(r2.standard_normal(len(t)), 800, 4000) * np.exp(-((t - 0.5) / 0.3) ** 2) * 0.3
+    return fade(norm(x), 0.02, 0.3)
+def flap():
+    d = 0.6; t = T(d); x = np.zeros(len(t))
+    for k in range(5): place(x, bp(r2.standard_normal(int(SR * 0.07)), 500, 3500) * np.hanning(int(SR * 0.07)), 0.05 + k * 0.1, 0.8)
+    return fade(norm(x), 0.004, 0.1)
+def clank():
+    d = 0.8; t = T(d); x = np.zeros(len(t)); place(x, tap(260, 0.15), 0.0, 1.0); place(x, tap(330, 0.12), 0.12, 0.8)
+    x += chime((392.0, 587.3, 784.0), d, 0.3, 0.05, 0.3)
+    return fade(norm(x), 0.002, 0.2)
+def splash():
+    d = 0.6; t = T(d); x = lp(r2.standard_normal(len(t)), 1800) * np.exp(-t / 0.12)
+    for k in range(6):
+        at = r2.uniform(0.03, 0.4); dd = 0.05; tt = T(dd); f = r2.uniform(700, 1500) * (1 + tt / dd); place(x, np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-tt / 0.015), at, 0.3)
+    return fade(norm(x), 0.002, 0.15)
+def bloom():
+    d = 1.0; t = T(d); x = chime((392.0, 523.3, 659.3, 784.0, 1046.5), d, 0.4, 0.1, 0.35) + bp(r2.standard_normal(len(t)), 400, 2500) * np.exp(-((t - 0.3) / 0.2) ** 2) * 0.2
+    return fade(norm(x), 0.01, 0.25)
+NEW = (('pt_sigil', sigil), ('pt_twinkle', twinkle), ('pt_howl', howl), ('pt_roar', roar), ('pt_flap', flap), ('pt_clank', clank), ('pt_splash', splash), ('pt_bloom', bloom))
+OLD = (('pt_sketch', sketch), ('pt_brush', brush), ('pt_wash', wash), ('pt_dot', dot), ('pt_mix', mix), ('pt_ink', ink), ('pt_frame', frame), ('pt_fold', fold), ('pt_bolt', bolt), ('pt_bite', bite))
+
 if __name__ == '__main__':
-    for n, f in (('pt_sketch', sketch), ('pt_brush', brush), ('pt_wash', wash), ('pt_dot', dot), ('pt_mix', mix), ('pt_ink', ink), ('pt_frame', frame), ('pt_fold', fold), ('pt_bolt', bolt), ('pt_bite', bite)): save(n, f())
+    import sys
+    # 기본: 새 8개만(Runway 로 아직 대체하지 않은 것) — Runway 로 바꾼 파일을 덮어쓰지 않게. --force = 예전 10개까지 모두 다시.
+    want = sys.argv[1:]
+    for n, f in (OLD + NEW if '--force' in want else NEW):
+        if want and '--force' not in want and n not in want: continue
+        save(n, f())

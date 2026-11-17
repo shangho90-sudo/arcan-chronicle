@@ -20,6 +20,9 @@ Meshes (game axes: +Y up, +Z forward, metres; 게임이 크기를 정함)
   pt_feather    잉크 깃털(원점 = 깃대 밑, +y 로 1)   pt_flower 수채 꽃(꽃잎 6 + 꽃술, 원점 = 줄기 끝, 반지름 ~0.5)
   pt_stem       붓선 줄기 + 잎(y 0..1)   pt_cloud 먹구름 덩어리(반지름 ~1, 아래 평평)   pt_wall 성벽 한 칸(x -0.5..0.5, y 0..1, 두께 z ±0.15, 흉벽)
   pt_palette    작은 팔레트(반지름 ~0.5, 엄지 구멍, 물감 3색)
+  (fx2 2026-11-17 '더 화려하게') pt_beam 빛기둥 열린 원통(반지름 1, y 0..1, uv = 둘레·높이)   pt_star 통통한 오각 별(반지름 1, 흰 금 — 게임이 색을 곱함)
+  pt_petal 물감 꽃잎(원점 = 밑, +y 로 1, 흰 바탕 — 게임이 색을 곱함)   pt_splat 물감 왕관 튐(밑 y 0, 반지름 1, 가장자리 뾰족 솟음 + 끝 방울, 흰 바탕)
+  pt_brush 큰 마법 붓(원점 = 자루 가운데, 붓털 끝 +y 0.62, 자루 끝 -y 0.5 — 궁극기 시전 때 공중에서 그림)
 json: {b64}
 """
 import os, sys, math, json, base64, random
@@ -238,13 +241,52 @@ def wall(bm, col, uvl):
         box(x, x + 0.14, 0.8, 1.0, -T, T, jit(WHITE, 0.025))
     box(-0.52, 0.52, 0.78, 0.82, -T - 0.02, T + 0.02, (0.86, 0.84, 0.8, 1))   # 위 턱
 
+# ------------------------------------------------------------------ fx2 (2026-11-17) 이펙트 메시
+def beam(bm, col, uvl):
+    seg, rows = 20, 4; vs = [[bm.verts.new(V(math.cos(2 * math.pi * i / seg), j / rows, math.sin(2 * math.pi * i / seg))) for i in range(seg + 1)] for j in range(rows + 1)]
+    for j in range(rows):
+        for i in range(seg):
+            f = bm.faces.new((vs[j][i], vs[j][i + 1], vs[j + 1][i + 1], vs[j + 1][i]))
+            for l, t in zip(f.loops, ((i / seg, j / rows), ((i + 1) / seg, j / rows), ((i + 1) / seg, (j + 1) / rows), (i / seg, (j + 1) / rows))): l[uvl].uv = t; l[col] = WHITE
+
+def star(bm, col, uvl):
+    pts = []
+    for i in range(10):
+        a = math.pi / 2 + i * math.pi / 5; r = 1.0 if i % 2 == 0 else 0.5; pts.append((math.cos(a) * r, math.sin(a) * r))
+    fr, bk = bm.verts.new(V(0, 0, 0.3)), bm.verts.new(V(0, 0, -0.3)); rim = [bm.verts.new(V(x, y, 0)) for x, y in pts]
+    for i in range(10):
+        a, b = rim[i], rim[(i + 1) % 10]
+        for order in ((fr, a, b), (bk, b, a)):
+            f = bm.faces.new(order)
+            for l in f.loops: l[col] = (1, 1, 1, 1) if l.vert in (fr, bk) else (0.86, 0.84, 0.8, 1)
+
+def petal(bm, col, uvl):
+    leafshape(bm, col, (0, 0, 0), (0, 1, 0), (1, 0, 0), 1.0, 0.42, (1, 1, 1, 1), (0.82, 0.8, 0.84, 1), th=0.02, curl=0.12, n=8)
+
+def splat(bm, col, uvl):
+    """물감 왕관 튐: 낮은 고리 + 바깥으로 기울어 솟은 뾰족 끝 9개 + 끝 방울"""
+    lathe(bm, col, [(0.0, 0.0), (0.7, 0.0), (0.98, 0.08), (0.9, 0.16), (0.62, 0.06), (0.0, 0.04)], 24, lambda k, p: (0.92,) * 3 + (1,))
+    for i in range(9):
+        a = 2 * math.pi * i / 9 + R.uniform(-0.15, 0.15); h = R.uniform(0.45, 0.8); ca, sa = math.cos(a), math.sin(a)
+        pts = [(ca * 0.86, 0.06, sa * 0.86), (ca * 1.0, h * 0.5, sa * 1.0), (ca * 1.12, h, sa * 1.12)]
+        tube3(bm, col, pts, [0.1, 0.06, 0.02], lambda k, s2: (0.9 + 0.1 * k,) * 3 + (1,), 6)
+        ball(bm, col, (ca * 1.16, h + 0.07, sa * 1.16), (0.07, 0.08, 0.07), lambda *n: (1, 1, 1, 1), 8, 5)
+
+def brush(bm, col, uvl):
+    """큰 마법 붓: 금테 나무 자루 + 은 물림쇠 + 통통한 붓털(끝은 흰색 — 게임이 물감 색을 곱하지 않음, 정점 색 그대로)"""
+    lathe(bm, col, [(0.0, -0.5), (0.05, -0.5), (0.055, -0.44), (0.042, -0.3), (0.036, 0.0), (0.04, 0.12), (0.06, 0.14), (0.064, 0.22), (0.0, 0.22)], 14,
+          lambda k, p: GOLD if k in (1, 2, 5, 6) else (STEEL if k >= 6 else (0.46, 0.22, 0.14, 1)))
+    lathe(bm, col, [(0.0, 0.2), (0.07, 0.22), (0.1, 0.3), (0.095, 0.42), (0.06, 0.54), (0.0, 0.64)], 16,
+          lambda k, p: mix((0.36, 0.24, 0.2, 1), (1.0, 0.94, 0.86, 1), k / 5) if k < 4 else (1.0, 0.98, 0.94, 1))
+
 def main():
     FP.reset()
     spec = [('pt_wolf_body', wolf_body), ('pt_wolf_head', wolf_head), ('pt_wolf_leg', wolf_leg), ('pt_wolf_tail', wolf_tail),
             ('pt_crane', crane), ('pt_crane_wing', crane_wing), ('pt_knight', knight), ('pt_sword', sword), ('pt_shield', shield), ('pt_croquis', croquis),
             ('pt_dragon_head', dragon_head), ('pt_dragon_seg', dragon_seg), ('pt_frame', frame), ('pt_rod', rod), ('pt_palette', palette),
-            ('pt_stroke', stroke), ('pt_dot', dot), ('pt_drop', drop), ('pt_feather', feather), ('pt_flower', flower), ('pt_stem', stem), ('pt_cloud', cloud), ('pt_wall', wall)]
-    flat = {'pt_crane', 'pt_crane_wing', 'pt_sword', 'pt_wall', 'pt_feather', 'pt_flower', 'pt_stem', 'pt_palette'}
+            ('pt_stroke', stroke), ('pt_dot', dot), ('pt_drop', drop), ('pt_feather', feather), ('pt_flower', flower), ('pt_stem', stem), ('pt_cloud', cloud), ('pt_wall', wall),
+            ('pt_beam', beam), ('pt_star', star), ('pt_petal', petal), ('pt_splat', splat), ('pt_brush', brush)]
+    flat = {'pt_crane', 'pt_crane_wing', 'pt_sword', 'pt_wall', 'pt_feather', 'pt_flower', 'pt_stem', 'pt_palette', 'pt_star', 'pt_petal'}
     obs = [new_obj(n, f, n not in flat) for n, f in spec]
     tris = {o.name: sum(len(p.vertices) - 2 for p in o.data.polygons) for o in obs}
     bpy.ops.object.select_all(action='DESELECT')
