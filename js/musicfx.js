@@ -45,7 +45,7 @@ const easeOut = (x) => 1 - Math.pow(1 - clamp01(x), 3);
 const easeBack = (x) => { x = clamp01(x); const c = 1.7; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
 let SEED = 11; const rnd = (a, b) => { SEED = (SEED * 16807) % 2147483647; return a + (SEED / 2147483647) * (b - a); };   // 자기 난수 — 게임 Math.random(명중·치명)을 건드리지 않음
 const UP = new THREE.Vector3(0, 1, 0);
-const _a = new THREE.Vector3(), _b = new THREE.Vector3(), _c = new THREE.Vector3(), _mx = new THREE.Matrix4();
+const _a = new THREE.Vector3(), _b = new THREE.Vector3(), _c = new THREE.Vector3(), _d = new THREE.Vector3(), _e = new THREE.Vector3(), _mx = new THREE.Matrix4();
 const groundY = (x, z) => { try { return window.G.zone.geo.ground(x, z).y; } catch (e) { return 0; } };
 const top = (t) => Math.min(1.7, 0.75 + (t.radius || 0.5) * 0.9);
 // 하프 현 자리(fx_music.py 와 같은 식): 공명판 (0.08, 0.08) -> (0.62, 0.82), 목 y_top(x)
@@ -97,8 +97,8 @@ void main(){
     ln(abs(rw - .42), .008, k); ln(abs(rw - .68), .008, k);
     for (int i = 0; i < 8; i++) { float aa = float(i) * .7854; vec2 d = vec2(cos(aa), sin(aa)); float tt = dot(w, d), ss = abs(w.x * d.y - w.y * d.x); ln(abs(ss - .1 * (1. - tt / .36)), .008, k * step(0., tt) * step(tt, .36)); }
   } else if (uK < 2.5) {
-    for (int i = 0; i < 8; i++) { float aa = float(i) * .7854; vec2 d = vec2(cos(aa), sin(aa)), n = vec2(-d.y, d.x); vec2 c = d * .52; float h = head(w, c, .06); CO += smoothstep(.012, -.01, h) * k; HA += smoothstep(.07, 0., h) * k * .5;
-      float tt = dot(w, d), ss = dot(w, n); ln(abs(ss - .055), .007, k * step(.18, tt) * step(tt, .52)); ln(length(w - (d * .2 + n * .055)) - .02, .01, k * .5); }
+    for (int i = 0; i < 8; i++) { float aa = float(i) * .7854; vec2 d = vec2(cos(aa), sin(aa)), n = vec2(-d.y, d.x); vec2 c = d * .55; float h = head(w, c, .042); CO += smoothstep(.012, -.01, h) * k; HA += smoothstep(.07, 0., h) * k * .5;
+      float tt = dot(w, d), ss = dot(w, n); ln(abs(ss - .04), .006, k * step(.24, tt) * step(tt, .55)); ln(abs(length(w - d * .24) - .03), .006, k * .7); }
     ln(abs(rw - .16), .009, k); CO += smoothstep(.06, .035, rw) * k;
   } else {
     for (int i = 0; i < 4; i++) { float rr = .2 + float(i) * .15, wv = .025 * sin(aw * (6. + float(i) * 2.) + uT * (3. - float(i))); ln(abs(rw - rr - wv), .008, k * (1. - float(i) * .12)); }
@@ -458,7 +458,8 @@ export class MusicFx extends CookFx {
     let trT = 0; const pal = gold ? 'gold' : 'silver';
     const e = this._fx('wave', 3, (e, dt) => { const fk = this._fk(e), k = e.prog || 0, sw = 1 + 0.25 * Math.sin(e.t * 30);
       if (MUFX.fx2 && e.ending == null && (trT -= dt) <= 0) { trT = lite() ? 0.06 : 0.03; const q = (e.pos || P3(p0)).clone().addScaledVector(f, -0.35), sd = _a.crossVectors(f, UP).normalize();   // fx2 꼬리: 초승달 뒤로 흩어지는 반짝이·음표
-        this.spark(q.clone().addScaledVector(sd, rnd(-0.8, 0.8) * w), { v: new THREE.Vector3(0, rnd(0.2, 0.7), 0).addScaledVector(f, -0.6), drag: 1.5, life: 0.5, s0: 0.2, s1: 0.04, col: MUFX.pal[pal][rnd(0, 1) > 0.5 ? 0 : 2], k: rnd(0, 1) > 0.7 ? 3 : 1, a: 1.0, rot: rnd(-0.4, 0.4) }); }
+        this.spark(q.clone().addScaledVector(sd, rnd(-0.8, 0.8) * w), { v: new THREE.Vector3(0, rnd(0.2, 0.7), 0).addScaledVector(f, -0.6), drag: 1.5, life: 0.5, s0: 0.2, s1: 0.04, col: MUFX.pal[pal][rnd(0, 1) > 0.5 ? 0 : 2], k: rnd(0, 1) > 0.7 ? 3 : 1, a: 1.0, rot: rnd(-0.4, 0.4) });
+        if ((e.nb = (e.nb || 0) + 1) % 3 === 0) this.bit('note', q.clone().addScaledVector(sd, rnd(-0.6, 0.6) * w).setY(q.y + rnd(0, 0.3)), { v: new THREE.Vector3(0, rnd(0.5, 1.0), 0), drag: 1.5, life: 0.55, s0: 0.13, s1: 0.05, rx: 0, ry: rnd(-0.5, 0.5), rz: rnd(-0.3, 0.3), col: MUFX.pal[pal][0], glow: 0.5, outK: 0.5 }); }
       m.position.copy(e.pos || P3(p0)).addScaledVector(f, -0.3); m.rotation.set(0, Math.atan2(f.x, f.z) - Math.PI / 2, 0); m.scale.set(0.9 * w, 1, 0.9 * w); m.material.uniforms.uP.value = 0.85; m.material.uniforms.uW2.value = 0.06 * sw; m.material.uniforms.uT.value = e.t; m.material.uniforms.uA.value = 2.4 * fk * (1 - 0.3 * k);
       m2.position.copy(m.position).addScaledVector(f, -0.25); m2.rotation.copy(m.rotation); m2.scale.set(0.75 * w, 1, 0.75 * w); m2.material.uniforms.uP.value = 0.85; m2.material.uniforms.uW2.value = 0.04; m2.material.uniforms.uT.value = e.t + 1; m2.material.uniforms.uA.value = 1.4 * fk;
       tr.position.copy(m.position).addScaledVector(f, -0.6); tr.scale.set(1.6, 0.16, 1); this._alignLine(tr, f); tr.material.uniforms.uA.value = 0.8 * fk;
@@ -472,7 +473,9 @@ export class MusicFx extends CookFx {
     let ctr = 0;
     const e = this._fx('cres', 2, (e, dt) => { const fk = this._fk(e), p = e.pos || P3(p0), d = e.dir || new THREE.Vector3(0, 0, -1);
       if (MUFX.fx2 && e.ending == null && (ctr -= dt) <= 0) { ctr = lite() ? 0.07 : 0.035; const pl = MUFX.pal[gold ? (last ? 'gold' : 'rose') : 'silver'];   // fx2 꼬리 반짝이
-        this.spark(p.clone().addScaledVector(d, -0.5 * s).add(new THREE.Vector3(rnd(-0.3, 0.3) * s, rnd(-0.1, 0.25), rnd(-0.3, 0.3) * s)), { v: new THREE.Vector3(0, rnd(0.3, 0.8), 0), drag: 1.5, life: 0.45, s0: 0.16 + 0.03 * i, s1: 0.03, col: pl[rnd(0, 1) > 0.5 ? 0 : 2], k: rnd(0, 1) > 0.75 ? 3 : 1, a: 1.0 }); }
+        const q = p.clone().addScaledVector(d, -0.5 * s).add(new THREE.Vector3(rnd(-0.3, 0.3) * s, rnd(-0.1, 0.25), rnd(-0.3, 0.3) * s));
+        this.spark(q, { v: new THREE.Vector3(0, rnd(0.3, 0.8), 0), drag: 1.5, life: 0.45, s0: 0.16 + 0.03 * i, s1: 0.03, col: pl[rnd(0, 1) > 0.5 ? 0 : 2], k: rnd(0, 1) > 0.75 ? 3 : 1, a: 1.0 });
+        if ((e.nb = (e.nb || 0) + 1) % 3 === 0) this.bit('note', q, { v: new THREE.Vector3(0, rnd(0.5, 1.0), 0), drag: 1.5, life: 0.5, s0: 0.12 + 0.02 * i, s1: 0.05, rx: 0, ry: rnd(-0.5, 0.5), rz: rnd(-0.3, 0.3), col: pl[0], glow: 0.5, outK: 0.5 }); }
       m.position.copy(p).addScaledVector(d, -0.35 * s); m.rotation.set(0, Math.atan2(d.x, d.z) - Math.PI / 2, 0); m.scale.set(s, 1, s); m.material.uniforms.uP.value = 0.8; m.material.uniforms.uW2.value = 0.05 + 0.02 * i; m.material.uniforms.uT.value = e.t; m.material.uniforms.uA.value = (1.2 + 0.25 * i) * fk; });
     const m = this.arc(e, 130, gold ? (last ? C.warm : C.rose) : C.silver, gold ? (last ? C.goldB : C.roseB) : C.silverB, 6);
     let lastP = P3(p0);
@@ -582,7 +585,7 @@ export class MusicFx extends CookFx {
         if (i === 2) { for (const s of [-1, 1]) { const bp = sp.clone().addScaledVector(r, s * 1.5).setY(sp.y - 0.5); sideBells.push(bp); this.flashAt(bp, C.gold, C.goldB, 0.5, 0.12); for (const t of q.hits) this.beam(bp, P3(t.pos).setY((t.pos.y || 0) + top(t) * 0.6), C.gold, C.goldB, 0.2, 0.16); } }
         if (i === 3) { const c = g.clone().addScaledVector(f, q.fwd); this.shock(c, q.r, C.warm, C.goldB, { a: 2.2, life: 0.45, w2: 0.04 }); this.shock(c, q.r * 0.6, C.gold, C.goldB, { a: 1.4, life: 0.35 });
           this.notes(c.clone().setY(c.y + 0.8), low ? 4 : 10, { r: q.r * 0.6, size: 0.22, life: 0.9 }); this.flashAt(sp, C.warm, C.goldB, 1.0, 0.18); this._end(e, 0.7);
-          if (MUFX.fx2) { this.sigil(c, q.r, 'gold', { pat: 2, grow: 0.15, life: 1.3, a: 0.95, spin: 1.2 }); this.pillar(c, Math.min(1.4, q.r * 0.35), 4.2, 'gold', { life: 0.9 }); this.pang(c.clone().setY(c.y + 1.2), 'gold', { r: 1.2, n: 22, stars: lite() ? 2 : 5, ground: c.y }); this.popNotes(c.clone().setY(c.y + 1.0), 8, 'gold', { speed: 2.2, up: 1.3, size: 0.24 }); if (sg) sg.end(0.8); } } },
+          if (MUFX.fx2) { this.sigil(c, q.r, 'gold', { pat: 2, grow: 0.15, life: 1.3, a: 0.95, spin: 1.2 }); this.pillar(c, Math.min(1.0, q.r * 0.25), 4.0, 'gold', { life: 0.85, a: 0.75 }); this.pang(c.clone().setY(c.y + 1.2), 'gold', { r: 1.2, n: 22, stars: lite() ? 2 : 5, ground: c.y }); this.popNotes(c.clone().setY(c.y + 1.0), 8, 'gold', { speed: 2.2, up: 1.3, size: 0.24 }); if (sg) sg.end(0.8); } } },
       cancel: () => { this._end(e, 0.25); if (sg) sg.end(0.25); } });
   }
   k_encore(pc, o) {   // 앙코르: 흐려진 오선이 이어지고 큰 하프 현이 펼쳐짐 -> 두 팔을 올리는 순간 회복 파동
@@ -615,13 +618,13 @@ export class MusicFx extends CookFx {
       const t = e.t, fk = this._fk(e);
       P.forEach((q, i) => { const inK = easeBack(clamp01((t - i * 0.08) / 0.35)), outK = q.out >= 0 ? 1 - smooth(0, 0.35, t - q.out) : 1, pl = Math.exp(-Math.max(0, t - q.play) * 5), tp = q.b.userData.tripo, H = tp ? MUFX.tripo.player : MUFX.size.player;
         const hop = tp ? 0.12 * Math.abs(Math.sin(t * 4 + i * 1.3)) + 0.15 * pl : 0;   // fx2: Tripo 환영은 통통 뛰며 연주
-        q.b.position.copy(q.p).setY(q.p.y + 0.05 * Math.sin(t * 3 + i) + hop); this.orient(q.b, f); q.b.scale.setScalar(H * inK * (tp ? 1 + 0.06 * pl : 1)); if (tp) q.b.scale.y *= 1 - 0.08 * pl; q.b.material.uniforms.uA.value = (tp ? 0.82 : 0.7) * outK * fk; q.b.material.uniforms.uGlow.value = 0.1 + 0.5 * pl + (tutti >= 0 ? 0.4 * Math.exp(-(t - tutti) * 2) : 0);
+        q.b.position.copy(q.p).setY(q.p.y + 0.05 * Math.sin(t * 3 + i) + hop); this.orient(q.b, tp ? _d.copy(f).lerp(_e.copy(this.toCam).setY(0).normalize(), 0.65).normalize() : f); q.b.scale.setScalar(H * inK * (tp ? 1 + 0.06 * pl : 1)); if (tp) q.b.scale.y *= 1 - 0.08 * pl; q.b.material.uniforms.uA.value = (tp ? 0.95 : 0.7) * outK * fk; q.b.material.uniforms.uGlow.value = 0.1 + 0.5 * pl + (tutti >= 0 ? 0.4 * Math.exp(-(t - tutti) * 2) : 0);
         const ip = q.p.clone().addScaledVector(f, tp ? 0.42 : 0.3).setY(q.p.y + (tp ? 0.5 : 0.9) * H + hop); q.i.position.copy(ip);
         if (q.k === 'strings' && q.i.userData.tripo) this.orientY(q.i, r.clone().negate().addScaledVector(UP, 0.9).normalize(), f); else q.k === 'brass' ? this.orient(q.i, f.clone().setY(0.4)) : q.k === 'perc' ? this.orient(q.i, f, UP) : this.orient(q.i, r.clone().negate().addScaledVector(f, 0.5), UP);
         q.i.scale.setScalar((q.k === 'strings' ? (q.i.userData.tripo ? 0.8 : 0.55) : q.k === 'brass' ? (tp ? 0.62 : 0.45) : (tp ? 0.3 : 0.2)) * inK * (1 + 0.12 * pl)); q.i.material.uniforms.uA.value = 0.9 * outK * fk; q.i.material.uniforms.uGlow.value = 0.2 + 0.8 * pl; });
       arcF.position.copy(g).setY(g.y + 0.06); this._flat(arcF, 3.0, g.y + 0.05); arcF.material.uniforms.uA.value = 0.25 * smooth(0, 0.4, t) * fk;
     });
-    for (const q of P) { q.b = MUFX.fx2 ? this.tmesh(e, 'player', { ghost: true, tint: 0xf0e8ff, rim: 0xd8c8ff, a: 0.82 }) : null; if (q.b) q.b.userData.tripo = true; else { q.b = this.inst(e, 'mu_player', { ghost: true, tint: 0xe8e0ff, rim: 0xd8c8ff, a: 0.7 }); q.b.userData.tripo = false; }
+    for (const q of P) { q.b = MUFX.fx2 ? this.tmesh(e, 'player', { ghost: true, tint: 0xfff8ff, rim: 0xc8b0ff, a: 0.95 }) : null; if (q.b) q.b.userData.tripo = true; else { q.b = this.inst(e, 'mu_player', { ghost: true, tint: 0xe8e0ff, rim: 0xd8c8ff, a: 0.7 }); q.b.userData.tripo = false; }
       q.i = q.k === 'strings' && MUFX.fx2 ? this.tmesh(e, 'cello', { ghost: true, tint: 0xfff4d8, rim: 0xffe8a0, a: 0.92 }) : null; if (q.i) q.i.userData.tripo = true; else { q.i = this.inst(e, inst[q.k], { ghost: true, tint: 0xfff0c0, rim: 0xffe8a0, a: 0.9 }); q.i.userData.tripo = false; } }
     const arcF = this.spr(e, 1, C.violet, C.violetB, 2);
     const of = (part) => P.filter(q => q.k === part);
@@ -636,7 +639,7 @@ export class MusicFx extends CookFx {
         for (const t of q.hits) this.flashAt(P3(t.pos).setY((t.pos.y || 0) + top(t) * 0.7), C.warm, C.goldB, 0.5, 0.14);
         this.notes(g.clone().addScaledVector(f, 2).setY(g.y + 1.0), low ? 4 : 10, { r: 1.5, size: 0.22, life: 1.0 });
         P.forEach((p, i) => { p.out = e.t + 0.5 + i * 0.12; }); this._end(e, 0.5 + P.length * 0.12 + 0.4);
-        if (MUFX.fx2) { const c = g.clone().addScaledVector(f, Math.min(3, q.r * 0.45)); this.pillar(c, 1.1, 4.4, 'violet', { life: 0.9 }); this.pang(c.clone().setY(c.y + 1.2), 'violet', { r: 1.2, n: 22, stars: lite() ? 2 : 5, ground: c.y }); this.popNotes(c.clone().setY(c.y + 1.0), 8, 'violet', { speed: 2.4, up: 1.3, size: 0.24 });
+        if (MUFX.fx2) { const c = g.clone().addScaledVector(f, Math.min(3, q.r * 0.45)); this.pillar(c, 0.9, 4.0, 'violet', { life: 0.85, a: 0.75 }); this.pang(c.clone().setY(c.y + 1.2), 'violet', { r: 1.2, n: 22, stars: lite() ? 2 : 5, ground: c.y }); this.popNotes(c.clone().setY(c.y + 1.0), 8, 'violet', { speed: 2.4, up: 1.3, size: 0.24 });
           for (const t of q.hits) this.pang(P3(t.pos).setY((t.pos.y || 0) + top(t) * 0.7), 'gold', { r: 0.6, n: 8, stars: 1, ground: groundY(t.pos.x, t.pos.z), quiet: true });
           for (const p of P) this.pillar(p.p, 0.35, 2.4, 'violet', { life: 0.6, a: 0.7 }); if (sg) sg.end(1.0); } },
       cancel: () => { this._end(e, 0.25); if (sg) sg.end(0.25); } });
@@ -669,8 +672,8 @@ export class MusicFx extends CookFx {
     const e = this._fx('harp', (o.life || 15) + 0.6, (e, dt) => {
       const t = e.t, fk = this._fk(e), un = easeBack(clamp01(t / (o.unfold || 0.5))), y = at.y;
       hp.position.copy(at).addScaledVector(r, 0.3 * 1.4); this.orient(hp, f.clone().negate().addScaledVector(r, 0.4)); hp.scale.set(1.4, 1.4 * Math.max(0.15, un), 1.4); hp.material.uniforms.uA.value = fk; hp.material.uniforms.uGlow.value = 0.08 + (near ? 0.12 : 0);
-      if (tharp) { hp.visible = false; tharp.position.copy(at).addScaledVector(r, 0.15); tharp.position.y = y; this.orientY(tharp, UP, f.clone().negate().addScaledVector(r, 0.6).normalize()); const H = MUFX.tripo.harp; tharp.scale.set(H, H * Math.max(0.15, un), H); tharp.material.uniforms.uA.value = fk; tharp.material.uniforms.uGlow.value = 0.04 + (near ? 0.08 : 0) + 0.35 * Math.exp(-Math.max(0, t - strum) * 6) * (t >= strum ? 1 : 0); }   // fx2: Tripo 금빛 하프
-      if (sgh) { const u = sgh.material.uniforms; u.uP.value = easeOut(clamp01(t / 0.6)); u.uT.value = t; u.uA.value = (near ? 0.5 : 0.3) * fk * smooth(0, 0.3, t) + 0.35 * Math.exp(-Math.max(0, t - strum) * 4) * (t >= strum ? 1 : 0) * fk; }
+      if (tharp) { hp.visible = false; tharp.position.copy(at).addScaledVector(r, 0.15); tharp.position.y = y; this.orientY(tharp, UP, _c.copy(this.toCam).setY(0).normalize().addScaledVector(r, 0.35).normalize());   /* 앞면(꽃 그림)이 카메라 쪽 */ const H = MUFX.tripo.harp; tharp.scale.set(H, H * Math.max(0.15, un), H); tharp.material.uniforms.uA.value = fk; tharp.material.uniforms.uGlow.value = 0.04 + (near ? 0.08 : 0) + 0.35 * Math.exp(-Math.max(0, t - strum) * 6) * (t >= strum ? 1 : 0); }   // fx2: Tripo 금빛 하프
+      if (sgh) { const u = sgh.material.uniforms; u.uP.value = easeOut(clamp01(t / 0.6)); u.uT.value = t; u.uA.value = (near ? 0.34 : 0.2) * fk * smooth(0, 0.3, t) + 0.3 * Math.exp(-Math.max(0, t - strum) * 4) * (t >= strum ? 1 : 0) * fk; }
       if (MUFX.fx2 && (twk -= dt) <= 0 && fk > 0.5) { twk = lite() ? 0.7 : 0.35; const top_ = at.clone().setY(y + rnd(0.4, 1.6) * MUFX.tripo.harp * 0.7); this.spark(top_.addScaledVector(r, rnd(-0.2, 0.4)), { v: new THREE.Vector3(0, 0.5, 0), life: 0.8, s0: 0.16, s1: 0.03, col: rnd(0, 1) > 0.5 ? MUFX.pal.mint[0] : MUFX.pal.gold[2], k: rnd(0, 1) > 0.6 ? 3 : 1, a: 0.9, tw: 12 }); }
       ss.forEach((m, i) => { if (tharp) { m.visible = false; return; } const x = 0.12 + i * (0.44 / (ss.length - 1)), y0 = harpBot(x) * 1.4, y1 = harpTop(x) * 1.4, on = smooth(0, 0.08, t - (o.unfold || 0.5) - i * 0.05);
         m.position.copy(hp.position).addScaledVector(_b.set(1, 0, 0).applyQuaternion(hp.quaternion), x * 1.4).setY(y + y0); m.quaternion.identity(); m.scale.set(1, Math.max(0.001, (y1 - y0) * on), 1);
@@ -696,7 +699,7 @@ export class MusicFx extends CookFx {
       P.forEach((q, i) => { const a = i * 2.094 + 0.5, p = c.clone().addScaledVector(f, Math.cos(a) * 0.75).addScaledVector(r, Math.sin(a) * 0.75), inK = easeBack(clamp01((t - i * enter) / 0.3)), pl = Math.exp(-Math.max(0, t - q.play) * 6);
         const out = fade >= 0 ? 1 - smooth(i * 0.12, i * 0.12 + 0.35, t - fade) : 1, rg = Math.exp(-Math.max(0, t - regroup) * 4), tp = q.b.userData.tripo, H = tp ? MUFX.tripo.player * 0.85 : 0.95;
         const hop = tp ? 0.1 * Math.abs(Math.sin(t * 3.4 + i * 2.1)) + 0.12 * pl : 0;   // fx2: Tripo 환영은 통통 뛰며 연주, 연주할 때 눌렸다 펴짐
-        q.b.position.copy(p).setY(p.y + 0.04 * Math.sin(t * 2.6 + i) + hop); this.orient(q.b, f); q.b.scale.setScalar(H * inK); if (tp) { q.b.scale.y *= 1 - 0.1 * pl; q.b.scale.x *= 1 + 0.06 * pl; } q.b.material.uniforms.uA.value = (tp ? 0.85 : 0.72) * out * (1 - 0.5 * Math.exp(-Math.max(0, t - hurt) * 10)) * (1 - 0.5 * rg); q.b.material.uniforms.uGlow.value = 0.1 + 0.5 * pl;
+        q.b.position.copy(p).setY(p.y + 0.04 * Math.sin(t * 2.6 + i) + hop); this.orient(q.b, tp ? _d.copy(f).lerp(_e.copy(this.toCam).setY(0).normalize(), 0.65).normalize() : f);   // fx2: Tripo 환영은 얼굴(나비넥타이)이 보이게 카메라 쪽으로 반쯤 돌아 연주 q.b.scale.setScalar(H * inK); if (tp) { q.b.scale.y *= 1 - 0.1 * pl; q.b.scale.x *= 1 + 0.06 * pl; } q.b.material.uniforms.uA.value = (tp ? 0.97 : 0.72) * out * (1 - 0.5 * Math.exp(-Math.max(0, t - hurt) * 10)) * (1 - 0.5 * rg); q.b.material.uniforms.uGlow.value = 0.1 + 0.5 * pl;
         const sh = p.clone().addScaledVector(f, tp ? 0.3 : 0.12).setY(p.y + (tp ? 0.48 : 0.62) * H + hop);
         if (i === 0) { q.i.position.copy(sh).addScaledVector(r, -0.12).setY(sh.y + 0.1); if (q.i.userData.tripo) { this.orientY(q.i, r.clone().negate().addScaledVector(UP, 0.5).normalize(), f); q.i.scale.setScalar(0.62 * inK); } else { this.orient(q.i, f.clone().addScaledVector(r, -0.6)); q.i.scale.setScalar(0.55 * inK); } }
         else if (i === 1) { q.i.position.copy(p).addScaledVector(f, tp ? 0.5 : 0.35); if (q.i.userData.tripo) q.i.position.y = groundY(q.i.position.x, -q.i.position.z) + hop * 0.3; this.orientY(q.i, UP.clone().addScaledVector(f, -0.2), f); q.i.scale.setScalar((q.i.userData.tripo ? 1.05 : 0.8) * inK); }
@@ -707,7 +710,7 @@ export class MusicFx extends CookFx {
       if (fade >= 0 && t - fade > 0.9) e.t = e.life;
     });
     for (const [i, q] of P.entries()) { const tint = [0xffe0f0, 0xe0e8ff, 0xe0fff0][i];
-      q.b = MUFX.fx2 ? this.tmesh(e, 'player', { ghost: true, tint, rim: 0xd8c8ff, a: 0.85 }) : null; if (q.b) q.b.userData.tripo = true; else { q.b = this.inst(e, 'mu_player', { ghost: true, tint, rim: 0xd8c8ff, a: 0.7 }); q.b.userData.tripo = false; }
+      q.b = MUFX.fx2 ? this.tmesh(e, 'player', { ghost: true, tint: [0xfff0f8, 0xf4f4ff, 0xf0fff6][i], rim: 0xc8b0ff, a: 0.95 }) : null; if (q.b) q.b.userData.tripo = true; else { q.b = this.inst(e, 'mu_player', { ghost: true, tint, rim: 0xd8c8ff, a: 0.7 }); q.b.userData.tripo = false; }
       q.i = i < 2 && MUFX.fx2 ? this.tmesh(e, 'cello', { ghost: true, tint: 0xfff4d8, rim: 0xffe8a0, a: 0.92 }) : null; if (q.i) q.i.userData.tripo = true; else { q.i = this.inst(e, parts[i], { ghost: true, tint: 0xfff0c0, rim: 0xffe8a0, a: 0.9 }); q.i.userData.tripo = false; }
       q.arm = this.inst(e, 'mu_arm', { ghost: true, tint: 0xe8e0ff, a: 0.7 }); }
     const sgt = MUFX.fx2 && this.parts ? this._sig(e, 2, 'violet', 1) : null; if (MUFX.fx2) { this._snd('mu_phantom'); this.pang(P3(s.pos).setY((s.pos.y || 0) + 0.9), 'violet', { r: 0.9, n: 14, quiet: true }); }
