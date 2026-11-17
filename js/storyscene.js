@@ -76,12 +76,12 @@ export class StoryScene {
     const pages = parseStory(html, defWho, resolve);
     if (!pages.length) pages.push({ who: defWho, html: '…', narr: false });
     this.pages = pages; this.opts = opts || []; this.reward = reward; this.i = -1; this.typing = false;
-    // slots: first NPC speaker → right; the next different speaker → left; a lone speaker gets the player on the left
+    // slots: first NPC speaker → right; the next different speaker → left (the player has no portrait)
     const keys = [...new Set(pages.filter(p => p.who && p.who.key).map(p => p.who.key))];
     this.cast = new Map();                                   // key → {name, title, src?}
     for (const p of pages) if (p.who && p.who.key && !this.cast.has(p.who.key)) this.cast.set(p.who.key, { name: p.who.name });
-    this.withPlayer = keys.filter(k => k !== 'player').length <= 1 && G.player;
-    if (this.withPlayer && !this.cast.has('player')) this.cast.set('player', { name: G.profile ? G.profile.name : '나' });
+    // 2026-11-17 user: no player portrait in the scene — only NPC illustrations (the player still speaks with a name plate)
+    this.withPlayer = false;
     this.slots = { left: null, right: null };
 
     // ---- DOM (registered as the UI's current window: input blocked, other windows replace it)
@@ -123,7 +123,7 @@ export class StoryScene {
       const art = ill[key] || (c.name && Object.values(ill).find(x => x && x.names && x.names.includes(c.name)));
       if (art && art.file) { c.art = art; c.src = Promise.resolve('assets/ui/story/' + art.file); c.facing = art.facing || 'right'; continue; }
       c.facing = 'right';                                     // renderBust turns the model toward the viewer's right
-      if (key === 'player') c.src = playerBust(G);
+      if (key === 'player') c.src = Promise.resolve(null);
       else { const mk = npcModelKey(def); c.src = mk ? npcBust(mk) : Promise.resolve(null); }
     }
     this.next();
@@ -135,18 +135,15 @@ export class StoryScene {
   stage(p) {
     const who = p.who && p.who.key ? p.who.key : null;
     const S = this.slots;
-    if (who) {
+    if (who && who !== 'player') {
       if (S.left !== who && S.right !== who) {
         let side;
-        if (who === 'player') side = 'left';                          // the player always stands on the left
-        else if (!S.right) side = 'right';
+        if (!S.right) side = 'right';
         else if (!S.left) side = 'left';
-        else if (S.left === 'player') side = 'right';
         else side = this.lastSide === 'right' ? 'left' : 'right';   // replace the one who did not just speak
         this.put(side, who);
       }
     }
-    if (this.withPlayer && !S.left) this.put('left', 'player');
     const speak = who ? (S.left === who ? 'left' : S.right === who ? 'right' : null) : null;
     for (const side of ['left', 'right']) {
       const el = this.por[side], on = speak === side;
@@ -162,7 +159,7 @@ export class StoryScene {
       if (img && img.getAttribute('src') && img.getAttribute('src') !== f) img.src = f;
     }
     this.lastSpeaker = who;
-    this.box.classList.toggle('narr', !!p.narr); this.box.classList.toggle('left', speak === 'left');
+    this.box.classList.toggle('narr', !!p.narr); this.box.classList.toggle('left', speak === 'left' || who === 'player');
   }
 
   put(side, key) {

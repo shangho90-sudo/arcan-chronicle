@@ -51,7 +51,7 @@ const fails = [], errs = []; const ok = (c, m) => { console.log((c ? '  ok   ' :
     ok(s.name === '하람', '이름 패 = 하람 (' + s.name + ')');
     await portraits(); s = await st();
     ok(s.right.who === giver && s.right.shown && s.right.speak, '오른쪽 = 촌장 반신(3D 렌더), 말하는 중 ' + JSON.stringify(s.right));
-    ok(s.left.who === 'player' && s.left.shown && s.left.listen, '왼쪽 = 플레이어(듣는 쪽, 어둡게) ' + JSON.stringify(s.left));
+    ok(!s.left.who && !s.left.shown, '왼쪽 비어 있음 — 플레이어 초상은 안 나옴 ' + JSON.stringify(s.left));
     await shot('1_first_typing');
     await ev(() => { G.story.cps = 0.3; G.story.type(G.story.pages[G.story.i].html); }); await pg.waitForTimeout(150);   // 느린 타자기로 다시 시작(SwiftShader는 프레임이 느려 보통 속도면 누르기 전에 끝남)
     if (process.env.DEBUG) await ev(() => { const S = G.story, a = S.advance.bind(S); S.advance = () => { console.log('ADV ' + new Error().stack.split('\n').slice(2, 5).join(' | ')); return a(); }; addEventListener('keydown', e => console.log('ADV key ' + e.code + ' ' + e.eventPhase), true); });

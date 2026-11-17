@@ -1,10 +1,11 @@
-// 미니맵·지역 지도의 NPC 종류 아이콘 (상점: 무기·방어구·물약·대장간, 전직 마스터: 약·망치·프라이팬·가위·팔레트).
+// 미니맵·지역 지도의 NPC 종류 아이콘 (상점: 무기·방어구·물약·대장간, 워프 안내인: 차원문, 전직 마스터: 약·망치·프라이팬·가위·팔레트).
 // 종류는 NPC 데이터(role / job / shop)에서 정함 — 이름으로 정하지 않음. 그림은 캔버스 벡터(원판 + 흰 그림 + 짙은 테두리).
 export const MAP_KINDS = {
   weapon:  { label: '무기 상점',   bg: '#c8463c', rim: '#4a0f0a' },
   armor:   { label: '방어구 상점', bg: '#3f78c8', rim: '#0c234a' },
   potion:  { label: '잡화·물약',   bg: '#2fa56a', rim: '#0a3a20' },
   forge:   { label: '대장간',       bg: '#7a6a5a', rim: '#2a2018' },
+  warp:    { label: '워프 안내인',  bg: '#5b4fd6', rim: '#1a1250' },
   job_pharmacist:  { label: '약사 전직',     bg: '#12a59a', rim: '#06403c', job: 1 },
   job_blacksmith:  { label: '대장장이 전직', bg: '#d0792a', rim: '#4a2406', job: 1 },
   job_cook:        { label: '요리사 전직',   bg: '#d9a520', rim: '#4a3604', job: 1 },
@@ -17,6 +18,7 @@ const SHOP_KIND = { shop_weapons: 'weapon', shop_armor: 'armor', shop_general: '
 export function npcMapKind(def) {
   if (!def) return '';
   if (def.role === 'jobmaster' && def.job && MAP_KINDS['job_' + def.job]) return 'job_' + def.job;
+  if (def.role === 'warp') return 'warp';
   return SHOP_KIND[def.shop] || '';
 }
 
@@ -38,6 +40,13 @@ const GLYPH = {
   },
   forge(c) {       // 모루
     poly(c, [[-0.8, -0.5], [0.62, -0.5], [0.62, -0.16], [0.24, -0.1], [0.2, 0.3], [0.5, 0.36], [0.5, 0.66], [-0.5, 0.66], [-0.5, 0.36], [-0.2, 0.3], [-0.24, -0.1], [-0.46, -0.16]]);
+  },
+  warp(c) {        // 소용돌이 차원문 + 반짝임
+    c.beginPath(); c.ellipse(0, 0.08, 0.5, 0.78, 0, 0, 6.283); ink(c);
+    c.save(); c.lineCap = 'round'; c.lineWidth = 0.13; c.strokeStyle = '#5b4fd6';
+    c.beginPath(); for (let i = 0; i <= 40; i++) { const t = i / 40, a = t * 9.4, r = 0.05 + t * 0.36; const x = Math.cos(a) * r, y = 0.08 + Math.sin(a) * r * 1.5; i ? c.lineTo(x, y) : c.moveTo(x, y); } c.stroke(); c.restore();
+    c.save(); c.translate(0.62, -0.66); c.scale(0.3, 0.3);
+    poly(c, [[0, -1], [0.25, -0.25], [1, 0], [0.25, 0.25], [0, 1], [-0.25, 0.25], [-1, 0], [-0.25, -0.25]]); c.restore();
   },
   job_pharmacist(c) {   // 알약 (캡슐)
     c.save(); c.rotate(-Math.PI / 4);
