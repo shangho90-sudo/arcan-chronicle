@@ -18,6 +18,8 @@
 //   muse(t, {dur}) -> end(), dispose()                                   작은 조명 + 무대 문양 + 보석 핀 둘
 //   runwayPre(pc, {f, o, len, w, dur}) -> go({paths, gap, run, fin, mid, r}), hit(i, p), finale(hits)   빛의 런웨이 + 의상이 다른 분신 셋
 //   restitch(pc, {dur, amount, cured}) · fit(pc) · unfit(pc) · made(pc, {kind, pattern, n})
+// fx2(2026-11-17 '더 화려하게'): 공용 층 — sigil(재단 마법진 SIG_FS) · beam(빛기둥 BM_FS) · pang(섬광·고리·별·하트) · petals · DParts 인스턴스 입자(반짝이·별·꽃잎·보석·하트),
+// Tripo 소품 tmesh('mannequin'|'brooch'|'spool') ← assets/fx/fx_designer_tripo.glb.json(없으면 절차 메시), 그림 순간 소리 _snd(ds_sparkle/sigil/jewel/mannequin/flashbulb). 자세한 내용 AGENTS.md '디자이너 2차 스킬' fx2 줄.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { CookFx } from './cookfx.js';
@@ -738,7 +740,7 @@ export class DesignerFx extends CookFx {
       const cl = cloakAt >= 0 ? clamp01((e.t - cloakAt) / 0.35) : 0;
       const cs = tm ? 0.55 : 1;   // Tripo 마네킹은 드레스를 이미 입고 있음 — 어깨에 짧은 리본 망토만
       cp.position.copy(at).setY(at.y + (tm ? 1.42 : 1.48) + (1 - cape) * 0.8 + cl * 0.6); cp.rotation.set(0.06 * Math.sin(e.t * 2.2), yaw + cl * 3, 0.05 * Math.sin(e.t * 1.7)); cp.scale.set(cs * (1 + cl * 2.2), cs * (1.0 - cl * 0.4), cs * (1 + cl * 2.2));
-      cp.material.uniforms.uA.value = cape * (1 - cl) * (1 - out); bw.position.copy(at).setY(cp.position.y + 0.02).addScaledVector(f, 0.12); bw.quaternion.copy(this.camQ); bw.scale.setScalar((tm ? 0.12 : 0.16) * cape * (1 - cl)); bw.material.uniforms.uA.value = cape * (1 - cl) * (1 - out);
+      cp.material.uniforms.uA.value = (tm ? (cl > 0 ? 0.8 * (1 - cl) : 0) : cape * (1 - cl)) * (1 - out);   // Tripo 마네킹은 드레스가 있어 망토는 풀릴 때만 bw.position.copy(at).setY(cp.position.y + 0.02).addScaledVector(f, 0.12); bw.quaternion.copy(this.camQ); bw.scale.setScalar((tm ? 0.12 : 0.16) * cape * (1 - cl)); bw.material.uniforms.uA.value = cape * (1 - cl) * (1 - out);
       // 조립 실(나선) — 다 감기면 사라짐; 보호 체력이 줄면 금실 몇 가닥이 풀려 늘어짐
       ths.forEach((m, k) => { const pts = []; for (let j = 0; j < 14; j++) { const v = j / 13, a = v * 9 + k * 2.1 + e.t * 3; pts.push(new THREE.Vector3(at.x + Math.cos(a) * 0.32 * (1 - v * 0.5), at.y + v * 1.7 * clamp01(e.t / 0.4), at.z + Math.sin(a) * 0.32 * (1 - v * 0.5))); }
         this._ribbonSet(m, pts, 0.02); m.material.uniforms.uA.value = I * 0.9 * (1 - smooth(0.35, 0.6, e.t)); });
