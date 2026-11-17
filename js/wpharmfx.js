@@ -113,6 +113,9 @@ void main(){ vec2 p = vUv * 2. - 1.; float r = length(p); float s = exp(-abs(p.x
 const MIST_FS = `varying vec2 vUv; varying vec3 vC; varying vec2 vA;
 void main(){ vec2 p = vUv * 2. - 1.; float r = length(p); gl_FragColor = vec4(vC, pow(clamp(1. - r, 0., 1.), 1.6) * vA.x); }`;
 const ADD = { transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide };
+// 일반 블렌딩 선(번개 겉빛): 밝은 바닥에서도 읽히게 진한 색 몸 + 가운데 밝은 심
+const LINEN_FS = `uniform vec3 uW, uB; uniform float uA; varying vec2 vUv;
+void main(){ vec2 p = vUv * 2. - 1.; float e = clamp(1. - pow(abs(p.x), 2.4), 0., 1.), a = e * exp(-abs(p.y) * 3.2) * smoothstep(1., .7, abs(p.y)); gl_FragColor = vec4(mix(uB, uW, exp(-abs(p.y) * 9.)), a * uA); }`;
 
 /** 한 종류의 입자 묶음 = InstancedMesh 하나. 입자: 위치·속도·중력·끌림·땅·회전·크기(시작→끝)·색·알파·자체 빛, 수명 동안 페이드 */
 class Parts {
@@ -195,6 +198,7 @@ export class WpFx extends CookFx {
     if (kind === 'discA') return new THREE.ShaderMaterial({ uniforms: U({ uW: C(), uB: C(), uA: 0, uK: 2, uP: 0, uT: 0, uAdd: 1 }), vertexShader: FLAT_VS, fragmentShader: DISC_FS, ...ADD });
     if (kind === 'sigil') return new THREE.ShaderMaterial({ uniforms: U({ uW: C(), uB: C(), uG: C(), uA: 0, uP: 0, uT: 0, uV: 0, uAdd: 0 }), vertexShader: FLAT_VS, fragmentShader: SIGIL_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
     if (kind === 'sigilA') return new THREE.ShaderMaterial({ uniforms: U({ uW: C(), uB: C(), uG: C(), uA: 0, uP: 0, uT: 0, uV: 0, uAdd: 1 }), vertexShader: FLAT_VS, fragmentShader: SIGIL_FS, ...ADD });
+    if (kind === 'lineN') return new THREE.ShaderMaterial({ uniforms: U({ uW: C(), uB: C(), uA: 0 }), vertexShader: FLAT_VS, fragmentShader: LINEN_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide });
     if (kind === 'pillar') return new THREE.ShaderMaterial({ uniforms: U({ uW: C(), uB: C(), uA: 0, uT: 0 }), vertexShader: PILLAR_VS, fragmentShader: PILLAR_FS, ...ADD });
     if (kind === 'helix') return new THREE.ShaderMaterial({ uniforms: U({ uW: C(), uB: C(), uA: 0, uP: 0 }), vertexShader: PILLAR_VS, fragmentShader: HELIX_FS, ...ADD });
     return super._mat(kind);
@@ -288,7 +292,7 @@ export class WpFx extends CookFx {
       pop = Math.max(0, pop - dt); shown += (n - shown) * Math.min(1, dt * 12);
       const p = P3(t.pos); e.g.position.set(p.x, p.y + 0.05, p.z);
       ring.scale.setScalar(R * 2 * (1 + 0.25 * pop / 0.25)); ring.material.uniforms.uA.value = WPFX.intensity * (0.9 + 0.25 * n + 0.15 * Math.sin(e.t * 5));
-      gold.scale.setScalar(R * 2.25 * (1 + 0.3 * pop / 0.25)); gold.rotation.z = e.t * 0.8; gold.material.uniforms.uA.value = 0.25 + 0.12 * n + 0.6 * pop / 0.25;
+      gold.scale.setScalar(R * 2.25 * (1 + 0.3 * pop / 0.25)); gold.rotation.z = e.t * 0.8; gold.material.uniforms.uA.value = 0.14 + 0.07 * n + 0.4 * pop / 0.25;
       _a.copy(this.toCam).setY(0).normalize(); const base = Math.atan2(_a.z, _a.x);
       beads.forEach((b, i) => { const a = base + (i - 1) * 0.42, on = i < Math.round(shown); b.position.set(Math.cos(a) * R, 0.05 + (on ? 0.04 * Math.sin(e.t * 4 + i) : 0), Math.sin(a) * R); b.quaternion.copy(this.camQ);
         b.scale.setScalar(M.bead * (on ? 1.25 + 0.4 * pop / 0.25 : 0.7)); b.material.uniforms.uA.value = on ? 1.6 : 0.25; });
@@ -423,18 +427,18 @@ export class WpFx extends CookFx {
         q.h.position.copy(q.m.position); q.h.quaternion.copy(this.camQ); q.h.scale.setScalar(0.42 + 0.25 * smooth(o.align, o.strike, t) + 0.05 * Math.sin(t * 40 + i)); q.h.material.uniforms.uA.value = 0.9 * a; });
       arcs.forEach((m, i) => { if (i + 1 >= orbs.length) return; m.visible = fired < 0 && t > o.align * 0.6; this.seg(m, orbs[i].m.position, orbs[i + 1].m.position, 0.05 + 0.03 * rand()); m.material.uniforms.uA.value = 0.6 + 0.6 * rand(); });
       if (fired < 0 && t > o.align && !low && (e.f = (e.f || 0) + 1) % 2 === 0) this.emit('glint', orbs[(rand() * orbs.length) | 0].m.position, 1, { col: [C.sky, C.white], speed: [0.4, 1.0], up: [-0.4, 0.4], size: [0.1, 0.18], life: [0.12, 0.2], g: 0 });
-      if (fired >= 0) { const q = 1 - smooth(fired + 0.04, fired + 0.26, t); for (const m of bolt) m.material.uniforms.uA.value = 1.6 * q; for (const m of glow) m.material.uniforms.uA.value = 0.75 * q; for (const m of br) m.material.uniforms.uA.value = 1.2 * q;
+      if (fired >= 0) { const q = 1 - smooth(fired + 0.04, fired + 0.26, t); for (const m of bolt) m.material.uniforms.uA.value = 1.6 * q; for (const m of glow) m.material.uniforms.uA.value = 0.85 * q; for (const m of br) m.material.uniforms.uA.value = 1.2 * q;
         scorch.material.uniforms.uA.value = 0.7 * (1 - smooth(fired + 0.1, fired + 0.6, t)); }
     });
     for (let i = 0; i < n; i++) { const m = this.glassM(e, this.geo.wp_granule, { tint: C.silver, op: 0.8, glow: 0.3, order: 4 }); m.scale.setScalar(0.095); orbs.push({ m, h: this.spr(e, 0, C.white, C.iceB, 5), p0: from.clone().add(_a.set(rnd(-0.25, 0.25), rnd(-0.1, 0.3), rnd(-0.25, 0.25))) }); }
     for (let i = 0; i < n - 1; i++) arcs.push(this.spr(e, 2, C.white, C.iceB, 5));
-    for (let i = 0; i < K.segs; i++) { const m = this.spr(e, 2, C.white, C.white, 7); m.visible = false; bolt.push(m); const g = this.spr(e, 2, C.sky, C.iceB, 6); g.visible = false; glow.push(g); }
+    for (let i = 0; i < K.segs; i++) { const m = this.spr(e, 2, C.white, C.white, 7); m.visible = false; bolt.push(m); const g = this._m(e, 'lineN', this.quad, 6); g.material.uniforms.uW.value.setHex(C.sky); g.material.uniforms.uB.value.setHex(0x2a6ee8); g.material.uniforms.uA.value = 0; g.visible = false; glow.push(g); }
     for (let i = 0; i < NB * 2; i++) { const m = this.spr(e, 2, C.white, C.ice, 6); m.visible = false; br.push(m); }
     const scorch = this.spr(e, 2, C.sky, C.iceB, 2); scorch.visible = false;   // 바닥에 남는 그은 자국(판정 직선 안)
     return this._h(e, { strike: (hits) => {
       fired = e.t; const pts = [], side = _b.crossVectors(f, UP).normalize().clone();
       for (let i = 0; i <= K.segs; i++) { const k = i / K.segs, j = i === 0 || i === K.segs ? 0 : rnd(-0.22, 0.22); pts.push(base.clone().addScaledVector(f, 0.3 + k * (o.len - 0.3)).addScaledVector(side, j * o.w * 0.5).add(_a.set(0, rnd(-0.12, 0.12) * (j ? 1 : 0), 0))); }
-      bolt.forEach((m, i) => { m.visible = true; this.seg(m, pts[i], pts[i + 1], 0.16); glow[i].visible = true; this.seg(glow[i], pts[i], pts[i + 1], 0.55); });
+      bolt.forEach((m, i) => { m.visible = true; this.seg(m, pts[i], pts[i + 1], 0.3); m.material.uniforms.uA.value = 1.6; glow[i].visible = true; this.seg(glow[i], pts[i], pts[i + 1], Math.min(1.2, o.w)); glow[i].material.uniforms.uA.value = 0.85; });
       for (let b = 0; b < NB; b++) { const i0 = 2 + Math.floor(rnd(0, K.segs - 4)), p0 = pts[i0], p1 = p0.clone().addScaledVector(side, rnd(-0.6, 0.6) * o.w).addScaledVector(f, rnd(0.2, 0.6)).add(_a.set(0, rnd(-0.2, 0.4), 0)), p2 = p1.clone().addScaledVector(side, rnd(-0.3, 0.3) * o.w).addScaledVector(f, 0.3);
         br[b * 2].visible = br[b * 2 + 1].visible = true; this.seg(br[b * 2], p0, p1, 0.08); this.seg(br[b * 2 + 1], p1, p2, 0.06); }
       const g0 = P3(pc.pos), g1 = g0.clone().addScaledVector(f, o.len); g0.y += 0.06; g1.y += 0.06; scorch.visible = true;   // 바닥 자국: 판정 직선 위에 납작하게
