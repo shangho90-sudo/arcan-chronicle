@@ -1,5 +1,6 @@
 // 한약사 2차 스킬 15종(2026-11-16 '본초 도사')을 실제 스킬 경로(skills2.cast → 동작 → js/herbal.js 규칙 → js/herbalfx.js)로 시전하고
 // 화면 띠와 수치를 남김. G.step(1/FPS) 한 프레임씩, 찍지 않는 프레임은 GPU 그리기를 건너뜀(SwiftShader가 느림).
+// CF=1: 띠를 잘라 내는 가운데를 조준점 쪽(거리 × 0.6)으로 — 먼 착탄 확인용(전/후 비교는 같은 CF로).
 // Usage: SKILLS=a2,a3,a4,a5,b1,b2,b3,b4,b5,c1,c2,c3,c4,c5,brew LV=1..5 GENDER=m|f SIZE=1100x760|390x844t FX=1|0 TAG=after ZOOM=1.2 DET=1(난수 0.5)
 //        SHOTS=0(수치만) URL=http://localhost:8818/index.html OUT=/tmp/herbal/shots node tools/browser-tests/herbal_skills.js
 //   -> OUT/<TAG>_<skill>_lv<LV>_<gender>_<size>_fx<FX>.png (띠) + .json(피해 틱·이펙트 호출·소리·소환물·남은 이펙트·콘솔 오류·전역 히트스톱)
@@ -68,7 +69,7 @@ const CFG = {
       window.__ds = mons.map(([d, s]) => { const at = window.__at(d, s), m = G.dev.dummies('mon_boar', 1, 0.01, at)[0]; m.teleport(at); m.__spot = at; return m; });
     }, [MONS]);
     await pg.waitForFunction(() => window.__ds.every(m => m.body), null, { timeout: 120000 });
-    const info = await ev(async ([fps, id, dist, key, pre, det]) => {
+    const info = await ev(async ([fps, id, dist, key, pre, det, cfv]) => {
       let seed = 4242; Math.random = det ? () => 0.5 : () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
       const p = G.player, f = window.__f, m = window.__ds[0], eng = p.skills2;
       for (const q of window.__ds) { q.thinkStep = () => {}; q.teleport(q.__spot); q.setFacing(-f.x, -f.z); q.body.place(q.pos); q.hp = q.maxHp; q.__hp = q.hp; }
@@ -81,7 +82,7 @@ const CFG = {
       if (key === 'c1' && m) m.status.apply(G.data.status('root'), 3, 0, null);
       G.render.setFocus({ x: p.pos.x + f.x * Math.max(1.5, dist * 0.6), y: 0, z: p.pos.z + f.z * Math.max(1.5, dist * 0.6) }, true);
       const L = window.__log = { fx: [], sfx: [], dmg: [], heal: [], summons: [], gstop: 0, shake: 0 };
-      window.__t = 0;
+      window.__t = 0; window.__cf = cfv ? Math.max(1.6, dist * 0.6) : 1.6;   // CF=1: 잘라 내는 가운데를 조준 쪽으로(띠 비교는 같은 값끼리)
       const H = G.skillFx.herbal; if (!H.__w) { H.__w = true; const o = H.make.bind(H); H.make = (k, a, opt) => { window.__log.fx.push([k, +window.__t.toFixed(2)]); return o(k, a, opt); }; }
       if (!G.audio.__w) { G.audio.__w = true; const os = G.audio.sfx.bind(G.audio); G.audio.sfx = (n, o) => { window.__log.sfx.push([n, +window.__t.toFixed(2)]); return os(n, o); }; }
       if (!G.__hs) { G.__hs = true; const oh = G.hitStop.bind(G); G.hitStop = (...a) => { window.__log.gstop++; return oh(...a); }; const oa = G.render.addShake.bind(G.render); G.render.addShake = (...a) => { window.__log.shake++; return oa(...a); }; }
@@ -89,7 +90,7 @@ const CFG = {
       if (key === 'brew') { G.sheet.bag.add('m_herb', 8); G.sheet.bag.add('m_meat', 2); G.sheet.bag.add('m_boar_tusk', 2); const rc = G.data.recipes.find(r => r.id === 'r_tonic'); const { craft } = await import('./js/skillsys.js'); const r = craft(G.data, G.sheet, G.sheet.book, rc, 2); H.make('brew', p, { n: r.made }); return { made: r.made }; }
       const e = castKey(key, dist ? window.__at(dist) : null); if (e) return 'cast error: ' + e;
       return { mult: eng.mult(G.data.skill2(id)), atk: p.stat('atk'), hp: p.hp, maxHp: p.maxHp };
-    }, [FPS, ID, DIST, KEY, PRE, !!process.env.DET]);
+    }, [FPS, ID, DIST, KEY, PRE, !!process.env.DET, !!process.env.CF]);
     if (typeof info === 'string') { console.log(KEY, info); continue; }
     const frames = [], total = Math.round(DUR * FPS);
     for (let i = 0; i < total; i++) {
@@ -99,7 +100,7 @@ const CFG = {
         const hp0 = p.hp; G.step(1 / fps, true); if (p.hp > hp0 + 0.5) L.heal.push([+window.__t.toFixed(2), Math.round(p.hp - hp0)]);
         window.__ds.forEach((q, qi) => { if (!q.removed && q.hp < q.__hp) { L.dmg.push([+window.__t.toFixed(2), qi, Math.round(q.__hp - q.hp)]); q.__hp = q.hp; } });
         if (i % 6 === 0) L.summons.push([+window.__t.toFixed(2), p.skills2.summons.filter(s => !s.dead).map(s => s.kind + (s.ready ? '' : '*') + (s.herbBuff ? '+' : '') + ':' + s.pos.x.toFixed(1) + ',' + s.pos.z.toFixed(1)).join(' ')]);
-        const f = window.__f, s = G.render.toScreen({ x: p.pos.x + f.x * 1.6, y: p.pos.y + 1.0, z: p.pos.z + f.z * 1.6 });
+        const f = window.__f, cf = window.__cf || 1.6, s = G.render.toScreen({ x: p.pos.x + f.x * cf, y: p.pos.y + 1.0, z: p.pos.z + f.z * cf });
         return [s.x, s.y];
       }, [i, FPS, shot]);
       const fn = `${dirOut}/${String(i).padStart(3, '0')}.png`, CW = Math.min(VW, 760), CH = Math.min(VH, 600);

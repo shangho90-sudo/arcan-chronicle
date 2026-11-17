@@ -25,7 +25,8 @@ export const SFX_NAMES = ['levelup', 'jobchange', 'dialog', 'warp', 'hit', 'heav
   'bs_wall', 'bs_block', 'bs_rivet', 'bs_rivet_pop', 'bs_rivet_shot', 'bs_forge', 'bs_break',
   'ck_flip', 'ck_board', 'ck_soup', 'ck_pepper', 'ck_flour', 'ck_skewer', 'ck_eat', 'ck_ball_toss', 'ck_ball_fly', 'ck_ball_hit', 'ck_ball_fin',
   'cf_wok_toss', 'cf_sizzle', 'cf_flame', 'cf_splash', 'cf_ignite', 'cf_steam', 'cf_place', 'cf_steam_hiss', 'cf_pop', 'cf_skewer', 'cf_whoosh', 'cf_knife', 'cf_cloche_fall', 'cf_cloche_slam', 'cf_scoop', 'cf_sorbet_hit', 'cf_frost_draw', 'cf_frost', 'cf_disc', 'cf_disc_hit', 'cf_disc_catch', 'cf_sugar', 'cf_shatter', 'cf_choux_pop', 'cf_serve', 'cf_cloche_open',   // 쉐프 2차 (tools/audio/chef_sfx.py)
-  'hb_simmer', 'hb_root', 'hb_needle', 'hb_resonance', 'hb_bloom',   // 한약사 2차 (tools/audio/herbal_sfx.py)
+  'hb_simmer', 'hb_root', 'hb_needle', 'hb_resonance', 'hb_bloom', 'hb_dragon', 'hb_phoenix', 'hb_flameburst', 'hb_quake', 'hb_wave', 'hb_spore', 'hb_stomp', 'hb_hop', 'hb_scroll', 'hb_armor', 'hb_drop',   // fx2 Runway (tools/audio/herbal_runway_sfx.py)
+    // 한약사 2차 (tools/audio/herbal_sfx.py)
   'ds_snip_open', 'ds_snip', 'ds_snip_silver', 'ds_needle', 'ds_thread', 'ds_pin', 'ds_silk', 'ds_silk_hit', 'ds_cloth', 'ds_ribbon', 'ds_whoosh', 'ds_spot', 'ds_unfold', 'ds_finale',   // 디자이너 2차 (tools/audio/designer_sfx.py)
   'pt_sketch', 'pt_brush', 'pt_wash', 'pt_dot', 'pt_mix', 'pt_ink', 'pt_frame', 'pt_fold', 'pt_bolt', 'pt_bite',   // 화가 2차 (tools/audio/painter_sfx.py)
   'mu_bow', 'mu_burst', 'mu_cello', 'mu_chord', 'mu_coda', 'mu_cymbal', 'mu_echo', 'mu_encore', 'mu_fanfare', 'mu_flute', 'mu_flute_tick', 'mu_harp', 'mu_harp_tick', 'mu_horn', 'mu_note', 'mu_pluck', 'mu_string', 'mu_symph', 'mu_trio', 'mu_tune', 'mu_wave_hit',   // 음악가 2차 (tools/audio/music_sfx.py)
