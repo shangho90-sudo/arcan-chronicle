@@ -302,7 +302,7 @@ export class EnFx extends CookFx {
       if (en.phase !== lastPh) {
         if (lastPh === 'fly') { this.puffs(at, 3, 0.6, { c1: 0xe8e0d0, c2: 0xa89880, a: 0.35, rise: 0.3 }); this.bang(at.clone().setY(at.y + 0.25), 'teal', 0.55, { stars: 0, bolts: 3, ground: at.y }); this.snd('en_deploy'); }
         lastPh = en.phase; }
-      if (en.phase === 'fly') { e.g.scale.setScalar(1.15); e.g.position.copy(this.arc(from, at, en.t / K.fly)); base.rotation.set(en.t * 9, en.t * 5, 0); legs.forEach(l => l.rotation.x = 0); head.position.y = 0.1; head.scale.setScalar(0.01); barP.rotation.x = 0;
+      if (en.phase === 'fly') { e.g.scale.setScalar(1.15); e.g.position.copy(this.arc(from, at, en.t / K.fly)); base.rotation.set(en.t * 9, en.t * 5, 0); legs.forEach(l => l.rotation.x = 0); head.position.y = 0.1; head.scale.setScalar(0.01); barP.rotation.x = 0; post.scale.z = 0.01;
         this.trail(rib, hist, e.g.position, 8, 0.07, 0.9); gT -= dt; if (gT <= 0) { gT = 0.04; this.emit('glint', e.g.position, 1, { col: [C.teal, C.gold], speed: [0.1, 0.4], up: [-0.3, 0.2], size: [0.12, 0.2], life: [0.2, 0.35], g: 0 }); } return; }
       if (!re.dead) rib.material.uniforms.uA.value = Math.max(0, rib.material.uniforms.uA.value - dt * 5);
       e.g.position.copy(at); e.g.scale.setScalar(SC); base.rotation.set(0, 0, 0);
@@ -311,6 +311,7 @@ export class EnFx extends CookFx {
       legs.forEach(l => l.rotation.x = -0.65 * kl);                           // 지지대 세 개가 펼쳐짐
       base.scale.set(1 - 0.25 * kl, 1 - 0.62 * kl, 1 - 0.25 * kl);              // fx2: 공구함이 납작한 받침으로 접혀 들어가 지지대가 보임
       head.position.y = 0.3 + 0.28 * kh; head.scale.setScalar(Math.max(0.01, kh));
+      post.scale.z = Math.max(0.01, (head.position.y - 0.08) / 0.3);
       head.rotation.y = yawRot(en.yaw);
       barP.rotation.x = d < 1 ? -1.4 * (1 - kb) : -en.pitch;                 // 포신: 접혀 있다가 들어 올려져 조준
       bar.position.z = -0.09 * (en.recoil || 0);                              // 반동
@@ -325,7 +326,8 @@ export class EnFx extends CookFx {
       halo.quaternion.copy(this.camQ); halo.material.uniforms.uA.value = (0.25 + 0.12 * Math.sin(e.t * 4)) * kb; halo.material.uniforms.uW.value.setHex(this.heatCol(kit));
     });
     rib.material.uniforms.uW.value.setHex(C.mint); rib.material.uniforms.uB.value.setHex(C.tealB);
-    const base = this.part(e, 'en_case', e.g), legs = [0, 1, 2].map(i => { const p = this.pivot(e.g, 0, 0.12, 0); p.rotation.y = i * 2.094; const q = this.pivot(p); this.part(e, 'en_leg', q); return q; });
+    const base = this.part(e, 'en_case', e.g), legs = [0, 1, 2].map(i => { const p = this.pivot(e.g, 0, 0.12, 0); p.rotation.y = i * 2.094; const q = this.pivot(p); this.part(e, 'en_leg', q, { s: [1.7, 1, 1.7] }); return q; });
+    const post = this.part(e, 'en_piston', e.g, { p: [0, 0.08, 0], s: [1.5, 1.5, 0.01] }); post.rotation.x = -Math.PI / 2;   // fx2: 받침 → 머리 기둥(전개 때 늘어남)
     const head = this.pivot(e.g, 0, 0.3, 0), hm = this.part(e, 'en_head', head, { tri: 'tripo_sentry', yaw: ENFX.tripo.sentry.yaw, s: TS ? ENFX.tripo.sentry.s : undefined });
     let bh = 0.16, bz = 0.08; if (TS) { const bb = this.tw.tripo_sentry.geo.boundingBox; bh = (bb.max.y - bb.min.y) * 0.42; bz = bb.max.z * 0.55; }
     const barP = this.pivot(head, 0, bh, bz), bar = this.pivot(barP), barM = this.part(e, 'en_barrel', bar); void barM;
