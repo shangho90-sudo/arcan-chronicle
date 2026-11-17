@@ -241,9 +241,25 @@ function gearWeapon(id, stand) {
   });
   return g;
 }
+/** dropped model of a job-line armour (ag_*, tools/blender/gear2_armor.py — vertex colours only, bottom at the origin, front +z):
+ *  the old procedural armour at once, swapped for the real model when it has loaded, fitted into the same box (the drop / icon
+ *  framing was measured on the placeholder) */
+function gearArmor(id, stand) {
+  const g = G(); g.add(BUILD.armor(stand ? stand[1] : 1));
+  loadGear(id).then(src => {
+    if (!src) return;
+    const old = new THREE.Box3().setFromObject(BUILD.armor(stand ? stand[1] : 1)), os = old.getSize(new THREE.Vector3()), oc = old.getCenter(new THREE.Vector3());
+    const m = src.clone(true), nb = new THREE.Box3().setFromObject(m), ns = nb.getSize(new THREE.Vector3()), nc = nb.getCenter(new THREE.Vector3());
+    const k = Math.max(os.x, os.y, os.z) / Math.max(ns.x, ns.y, ns.z, 1e-3);
+    m.scale.setScalar(k); m.position.set(oc.x - nc.x * k, old.min.y - nb.min.y * k, oc.z - nc.z * k);
+    g.clear(); g.add(m); g.userData.gearReady = true;
+  });
+  return g;
+}
 function gearModel(id) {
   if (GEAR_WEAPON.test(id)) return gearWeapon(id);
   const d = GEAR_DEFS.get(id);
+  if (d && d.type === 'armor' && d.model3d) return gearArmor(id, d.stand);
   if (d) return d.type === 'weapon' && d.model3d ? gearWeapon(id, d.stand) : BUILD[d.stand[0]](d.stand[1]);
   const a = GEAR_ARMOR.exec(id); if (a) return BUILD.armor(Math.min(3, 1 + Math.floor((+a[1] - 1) / 4)));
   return /^ac_g(1|8|10)$/.test(id) ? BUILD.ring(3) : BUILD.amulet(2);
