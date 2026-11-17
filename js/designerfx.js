@@ -38,9 +38,9 @@ export const DSFX = {
   pal: { silk: [0xffa8d8, 0xc0307a, 0xffe08a], lilac: [0xd8c0ff, 0x6a3ac0, 0xffe08a], gold: [0xffe6a0, 0xb07010, 0xfff4c8], plat: [0xf0f4ff, 0x5a6aa8, 0xffe08a],
          jewel: [0xa8f0ff, 0x1a7aa8, 0xffe08a], rose: [0xff9ac0, 0xa01858, 0xffd8a0] },
   ghost2: { a: 0.9, bob: 0.13, steps: 5 },       // 분신: 더 진하게 + 걷는 듯 통통(발걸음마다 반짝)
-  muse: { beamA: 0.75, coreA: 0.7 },             // 뮤즈 빛기둥(알파 혼합 몸통 + 가산 안쪽)
-  finale: { scH: 3.5, scA: 0.72 },               // 피날레 거대 가위: 시전자 머리 위(대상을 가리지 않게), 반투명
-  tripo: { mannequin: 1.75, brooch: 0.34, spool: 0.42 },   // Tripo 모델 높이(m) — assets/fx/fx_designer_tripo.glb.json, 없으면 절차 메시
+  muse: { beamA: 1.0, coreA: 0.95, h: 3.3 },             // 뮤즈 빛기둥(알파 혼합 몸통 + 가산 안쪽)
+  finale: { scH: 3.5, scA: 0.6, size: 2.0 },               // 피날레 거대 가위: 시전자 머리 위(대상을 가리지 않게), 반투명
+  tripo: { mannequin: 1.75, brooch: 0.5, spool: 0.42 },   // Tripo 모델 높이(m) — assets/fx/fx_designer_tripo.glb.json, 없으면 절차 메시
   sfxGap: { ds_sparkle: 0.14, ds_flashbulb: 0.5, ds_jewel: 0.3, ds_sigil: 0.5, ds_mannequin: 0.4 },
 };
 const P3 = (p) => new THREE.Vector3(p.x, p.y || 0, -p.z);
@@ -142,7 +142,9 @@ void main(){ float y = vUv.y, st = .55 + .45 * sin(vUv.x * 62.83 * 2. + y * 3. -
   float sp = smoothstep(.93, 1., sin(vUv.x * 62.83 * 3. + y * 40. - uT * 11.)) * (1. - y);   // 위로 흐르는 반짝 줄
   float edge = .3 + .7 * pow(1. - vF, 1.4), a = pow(1. - y, 1.2) * smoothstep(0., .05, y) * edge * (.55 + .45 * st);
   vec3 c = mix(uB, uW, clamp(.8 - y + .4 * st + sp, 0., 1.));
-  if (uMode < .5) gl_FragColor = vec4(c * (a + sp * .6) * uA * 1.5, 1.); else gl_FragColor = vec4(c, clamp(a * .9 + sp * .5, 0., 1.) * uA); }`;
+  if (uMode < .5) { gl_FragColor = vec4(c * (a + sp * .6) * uA * 1.5, 1.); return; }
+  float e2 = pow(1. - vF, 2.2), ab = pow(1. - y, 1.5) * smoothstep(0., .05, y) * (.06 + .94 * e2) * (.7 + .3 * st);   // 알파 몸통: 가장자리만 진하게(가운데 대상이 비쳐 보이게), 진한 바탕색 쪽으로
+  gl_FragColor = vec4(mix(uB, uW, .3 + .35 * st + sp), clamp(ab * .85 + sp * .4, 0., 1.) * uA); }`;
 // 피날레 부채꼴 절단 물결(CookFx.fan 지오메트리: uv.x 가로 0..1, uv.y 반지름 0..1): uP = 물결 앞(반지름 비율), 지나간 자리에 비단 결 잔광
 const SWEEP_FS = `uniform vec3 uW, uB, uG; uniform float uA, uP, uT; varying vec2 vUv;
 void main(){ float u = vUv.x, v = vUv.y, side = smoothstep(0., .04, u) * smoothstep(1., .96, u);
@@ -297,7 +299,7 @@ export class DesignerFx extends CookFx {
   beam(at, r, h, pal, o = {}) {
     if (!this.parts) return null; const life = o.life ?? 0.6;
     const e = this._fx('dsbeam', life, (e) => { const k = e.t / life, up = easeOut(clamp01(e.t / 0.12)), w = 1 - 0.6 * smooth(0.3, 1, k);
-      for (const [m, a, s] of [[m0, o.a ?? 1.0, 0.7], [m1, (o.a ?? 1.0) * 0.55, 1.0]]) { m.position.copy(at); m.scale.set(r * w * s, h * up, r * w * s); m.material.uniforms.uT.value = e.t; m.material.uniforms.uA.value = DSFX.intensity * a * (1 - smooth(0.45, 1, k)); } });
+      for (const [m, a, s] of [[m0, o.a ?? 1.0, 0.7], [m1, (o.a ?? 1.0) * 0.7, 1.0]]) { m.position.copy(at); m.scale.set(r * w * s, h * up, r * w * s); m.material.uniforms.uT.value = e.t; m.material.uniforms.uA.value = DSFX.intensity * a * (1 - smooth(0.45, 1, k)); } });
     const m0 = this._beamM(e, pal, 0, 6), m1 = this._beamM(e, pal, 1, 5);
     return e;
   }
@@ -461,7 +463,7 @@ export class DesignerFx extends CookFx {
     const NV = lite() ? 9 : 14, rs = [this.grid(e, 2, NV, C.pink, C.lilac, C.gold, 5), this.grid(e, 2, NV, C.lilac, C.pink, C.gold, 5)];
     const ring = this.spr(e, 1, C.pink, C.pinkB, 3); ring.material.uniforms.uP.value = 0.3; ring.position.copy(c).sub(e.g.position);
     // fx2: 조준 자리에 장미창 마법진(= 실제 반경 r) — 누른 순간 그려지고 핀 고정 뒤 잔광으로 사라짐
-    const sg = this.sigil(c, r, 'silk', { pat: 0, grow: pinT * 0.8, life: pinT + 0.9, a: 0.8, spin: 0.5, snd: true });
+    const sg = this.sigil(c, r, 'silk', { pat: 0, grow: pinT * 0.8, life: pinT + 0.9, a: 0.68, spin: 0.5, snd: true });
     return this._h(e, { pin: (hs) => {
       pinAt = e.t; hits = hs || [];
       if (!hits.length) { this.clothFall(c, r * 0.5); return; }
@@ -606,7 +608,7 @@ export class DesignerFx extends CookFx {
       cutAt[k] = e.t;
       for (const h of hits || []) { this.flash(P3(h).setY((h.y || 0) + 0.85), 0.36, k ? C.white : C.pink, k ? C.platB : C.pinkB, 0.1, 0.8); this.pang(P3(h).setY((h.y || 0) + 0.85), k ? 'plat' : 'silk', { r: 0.45, n: 6, stars: 1, noRing2: true, quiet: k === 0 }); }
       const at = c.clone().setY(gy + 1.0); if (this.parts) for (let i = 0; i < this._nk(6); i++) { const a = rnd(0, 6.283); this.spark(at, { v: new THREE.Vector3(Math.cos(a) * 2, rnd(0.5, 2), Math.sin(a) * 2), g: -2, drag: 2, life: 0.45, s0: 0.2, s1: 0.03, col: k ? C.plat : C.pink, k: 1 }); }
-      if (k === 1 && centre && centre.length) { this.flash(at, 0.8, C.white, C.gold, 0.12, 1.0); this.threadBurst(at, 8, 0.45); this.scraps(at, 6, gy); this.pang(at, 'gold', { r: Math.min(0.9, o.cr || 0.9), n: 14, ground: gy }); this.beam(c, Math.min(0.85, o.cr || 0.9), 3.0, 'plat', { life: 0.5 }); this.petals(at, 5, { r: 0.3 }); }
+      if (k === 1 && centre && centre.length) { this.flash(at, 0.8, C.white, C.gold, 0.12, 1.0); this.threadBurst(at, 8, 0.45); this.scraps(at, 6, gy); this.pang(at, 'gold', { r: Math.min(0.9, o.cr || 0.9), n: 14, ground: gy }); this.beam(c, Math.min(0.7, o.cr || 0.9), 3.0, 'silk', { life: 0.5, a: 0.8 }); this.petals(at, 5, { r: 0.3 }); }
     } });
   }
 
@@ -633,7 +635,7 @@ export class DesignerFx extends CookFx {
       if (this.parts && cutAt < 0 && e.t - lastSp > 0.05) { lastSp = e.t; const a = rnd(0, 6.283), rr = rnd(0.8, 1.5); this.spark(pp.clone().add(new THREE.Vector3(Math.cos(a) * rr, 0.1, Math.sin(a) * rr)), { to: null, v: new THREE.Vector3(-Math.cos(a) * 0.8, rnd(1.2, 2.4), -Math.sin(a) * 0.8), life: 0.6, s0: 0.22, s1: 0.04, col: rnd(0, 1) > 0.5 ? C.gold : C.pink, k: 1, a: 0.9 }); }
     });
     let lastSp = -1;
-    const sh = this.sheet(e, 6), sc = this.scissors(e, 2.5);
+    const sh = this.sheet(e, 6), sc = this.scissors(e, DSFX.finale.size);
     // fx2: 시전자 발밑 교차 가위 마법진(시전 0.8초 동안 그려짐) + 자르는 순간 부채꼴(= 실제 범위)을 쓸고 지나가는 비단 물결
     const sgl = this.parts ? this.sigil(P3(pc.pos), 1.15, 'silk', { pat: 1, grow: Math.max(0.2, dur * 0.8), life: dur + 1.2, a: 0.9, spin: 1.2, follow: () => P3(pc.pos), snd: true }) : null; void sgl;
     let sw = null;
@@ -734,8 +736,9 @@ export class DesignerFx extends CookFx {
       else for (const [m, k] of [[st, a1], [to, a2], [hd, a3]]) { m.position.copy(at); m.rotation.set(0, yaw, 0); m.scale.set(1, Math.max(0.01, k), 1); m.material.uniforms.uA.value = Math.min(1, k * 1.5) * (1 - out); m.material.uniforms.uGlow.value = 0.25 * (1 - smooth(0.3, 0.7, e.t)) + hitPulse * 0.3; }
       if (sg) { const u = sg.material.uniforms; sg.position.set(at.x, at.y + 0.06, at.z); sg.scale.setScalar(0.85); u.uP.value = easeOut(e.t / 0.4); u.uT.value = e.t; u.uA.value = (0.7 - 0.3 * smooth(0.6, 1.2, e.t) + 0.3 * hitPulse) * (1 - out) * (1 - (cloakAt >= 0 ? clamp01((e.t - cloakAt) / 0.3) : 0)); }
       const cl = cloakAt >= 0 ? clamp01((e.t - cloakAt) / 0.35) : 0;
-      cp.position.copy(at).setY(at.y + 1.48 + (1 - cape) * 0.8 + cl * 0.6); cp.rotation.set(0.06 * Math.sin(e.t * 2.2), yaw + cl * 3, 0.05 * Math.sin(e.t * 1.7)); cp.scale.set(1 + cl * 2.2, 1.0 - cl * 0.4, 1 + cl * 2.2);
-      cp.material.uniforms.uA.value = cape * (1 - cl) * (1 - out); bw.position.copy(at).setY(cp.position.y + 0.02).addScaledVector(f, 0.12); bw.quaternion.copy(this.camQ); bw.scale.setScalar(0.16 * cape * (1 - cl)); bw.material.uniforms.uA.value = cape * (1 - cl) * (1 - out);
+      const cs = tm ? 0.55 : 1;   // Tripo 마네킹은 드레스를 이미 입고 있음 — 어깨에 짧은 리본 망토만
+      cp.position.copy(at).setY(at.y + (tm ? 1.42 : 1.48) + (1 - cape) * 0.8 + cl * 0.6); cp.rotation.set(0.06 * Math.sin(e.t * 2.2), yaw + cl * 3, 0.05 * Math.sin(e.t * 1.7)); cp.scale.set(cs * (1 + cl * 2.2), cs * (1.0 - cl * 0.4), cs * (1 + cl * 2.2));
+      cp.material.uniforms.uA.value = cape * (1 - cl) * (1 - out); bw.position.copy(at).setY(cp.position.y + 0.02).addScaledVector(f, 0.12); bw.quaternion.copy(this.camQ); bw.scale.setScalar((tm ? 0.12 : 0.16) * cape * (1 - cl)); bw.material.uniforms.uA.value = cape * (1 - cl) * (1 - out);
       // 조립 실(나선) — 다 감기면 사라짐; 보호 체력이 줄면 금실 몇 가닥이 풀려 늘어짐
       ths.forEach((m, k) => { const pts = []; for (let j = 0; j < 14; j++) { const v = j / 13, a = v * 9 + k * 2.1 + e.t * 3; pts.push(new THREE.Vector3(at.x + Math.cos(a) * 0.32 * (1 - v * 0.5), at.y + v * 1.7 * clamp01(e.t / 0.4), at.z + Math.sin(a) * 0.32 * (1 - v * 0.5))); }
         this._ribbonSet(m, pts, 0.02); m.material.uniforms.uA.value = I * 0.9 * (1 - smooth(0.35, 0.6, e.t)); });
@@ -765,14 +768,16 @@ export class DesignerFx extends CookFx {
       const at = P3(t.pos), R = (t.radius || 0.5) + 0.35, inn = easeOut(e.t / 0.25), out = endAt >= 0 ? clamp01((e.t - endAt) / 0.3) : 0;
       // 얇은 조명: 위에서 대상 발치까지 세로 판 둘(엇갈림) — 가산, 낮은 밝기
       if (bA) {   // fx2: 알파 혼합 색 몸통(밝은 바닥에서도 보이는 따뜻한 분홍·금 조명) + 가산 안쪽 빛 — 대상 반지름 안팎, 위로 흐름
-        for (const [m, rr, a] of [[bA, R * 0.95, DSFX.muse.beamA], [bC, R * 0.62, DSFX.muse.coreA]]) { m.position.copy(at); m.scale.set(rr * inn, 4.6, rr * inn); m.material.uniforms.uT.value = e.t; m.material.uniforms.uA.value = I * a * inn * (1 - out) * (0.85 + 0.15 * Math.sin(e.t * 3)); }
-        if (e.t - lastG > 0.06 && out < 1) { lastG = e.t; const a = rnd(0, 6.283), rr = rnd(0, R * 0.8); this.spark(at.clone().add(new THREE.Vector3(Math.cos(a) * rr, rnd(2.4, 3.8), Math.sin(a) * rr)), { v: new THREE.Vector3(0, -rnd(0.8, 1.4), 0), life: 1.4, s0: 0.2, s1: 0.06, col: rnd(0, 1) > 0.4 ? C.gold : C.pink, k: rnd(0, 1) > 0.7 ? 3 : 1, a: 0.9, tw: 14, floor: at.y + 0.05 }); }
+        for (const [m, rr, a, fl] of [[bA, R * 0.95, DSFX.muse.beamA, 1], [bC, R * 0.62, DSFX.muse.coreA, 0]]) { m.position.copy(at); if (fl) m.position.y += DSFX.muse.h; m.scale.set(rr * inn, fl ? -DSFX.muse.h : DSFX.muse.h, rr * inn);   /* 색 몸통은 뒤집어 위(조명 쪽)가 진하게 — 아래는 대상이 가림 */ m.material.uniforms.uT.value = e.t; m.material.uniforms.uA.value = I * a * inn * (1 - out) * (0.85 + 0.15 * Math.sin(e.t * 3)); }
+        if (e.t - lastG > 0.07 && out < 1) { lastG = e.t; const a = rnd(0, 6.283), rr = rnd(0, R * 0.8), p0 = at.clone().add(new THREE.Vector3(Math.cos(a) * rr, rnd(2.2, 3.2), Math.sin(a) * rr)), v = new THREE.Vector3(0, -rnd(0.8, 1.3), 0);   // 위에서 내려오는 반짝이 + 작은 보석·별(불투명 — 밝은 바닥에서도 보임)
+          this.spark(p0, { v, life: 1.4, s0: 0.2, s1: 0.06, col: rnd(0, 1) > 0.4 ? C.gold : C.pink, k: 1, a: 0.9, tw: 14 });
+          if (lastG * 10 % 2 < 1) this.bit(rnd(0, 1) > 0.5 ? 'gem' : 'star', p0, { v: v.clone(), life: 1.6, s0: 0.05, s1: 0.04, col: rnd(0, 1) > 0.5 ? 0xffd0e8 : 0xfff0b0, wy: rnd(-4, 4), glow: 0.5, floor: at.y + 0.04, outK: 0.75 }); }
         if (sgM) { const u = sgM.material.uniforms; sgM.position.set(at.x, at.y + 0.06, at.z); sgM.scale.setScalar(R + 0.2); u.uP.value = inn; u.uT.value = e.t; u.uA.value = 0.85 * inn * (1 - out); }
       } else cones.forEach((m, k) => { m.position.copy(at).setY(at.y + 1.9); m.rotation.set(0, k * Math.PI / 2 + e.t * 0.3, 0); m.scale.set(R * 1.5 * inn, 4.2, 1); m.material.uniforms.uA.value = I * 0.32 * inn * (1 - out); });
       this._flat(st, R, 0.05); st.position.copy(at); st.material.uniforms.uA.value = I * 0.8 * inn * (1 - out);
       this._flat(st2, R * 0.65, 0.055); st2.position.copy(at); st2.rotation.z = e.t * 0.8; st2.material.uniforms.uA.value = I * 0.5 * inn * (1 - out);
       pins.forEach((p, k) => { const sg = k ? 1 : -1; p.position.copy(at).add(_a.copy(this.camR).multiplyScalar(sg * (R + 0.15))).setY(at.y); p.rotation.set(0, e.t, 0); p.scale.setScalar(1.0 * inn); p.material.uniforms.uA.value = inn * (1 - out); p.material.uniforms.uGlow.value = 0.15 + 0.1 * Math.sin(e.t * 4 + k); });
-      brs.forEach((b, k) => { const a = e.t * 1.6 + k * Math.PI; b.position.set(at.x + Math.cos(a) * (R + 0.3), at.y + 0.9 + 0.12 * Math.sin(e.t * 3 + k), at.z + Math.sin(a) * (R + 0.3)); b.quaternion.copy(this.camQ); b.rotateY(-Math.PI / 2); b.scale.setScalar(DSFX.tripo.brooch * inn);   // Tripo 브로치 앞면 = +X b.position.y -= DSFX.tripo.brooch * 0.5 * inn; b.material.uniforms.uA.value = inn * (1 - out); b.material.uniforms.uGlow.value = 0.12 + 0.12 * Math.sin(e.t * 5 + k); });
+      brs.forEach((b, k) => { const a = e.t * 1.6 + k * Math.PI; b.position.set(at.x + Math.cos(a) * (R + 0.3), at.y + 0.9 + 0.12 * Math.sin(e.t * 3 + k), at.z + Math.sin(a) * (R + 0.3)); b.quaternion.copy(this.camQ); b.rotateY(-Math.PI / 2); b.scale.setScalar(DSFX.tripo.brooch * inn); /* Tripo 브로치 앞면 = +X */ b.position.y -= DSFX.tripo.brooch * 0.5 * inn; b.material.uniforms.uA.value = inn * (1 - out); b.material.uniforms.uGlow.value = 0.12 + 0.12 * Math.sin(e.t * 5 + k); });
       if (endAt >= 0 && out >= 1) e.life = 0;
       if (t.dead || t.removed) { if (endAt < 0) endAt = e.t; }
     });
