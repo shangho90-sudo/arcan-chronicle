@@ -1,5 +1,5 @@
 // HTML/CSS user interface (ivory / teal / gold, Galmuri pixel font). Port of the Unity uGUI views.
-import { QS, QUEST_CAT, questCategory, Shop, jobBuffActive, isEquipment, slotOf, EQUIP_SLOTS, ATTRS, ATTR_KR, ATTR_BASE, ATTR_FX, warpTowns, warpPrice, townsKnown } from './core.js';
+import { QS, QUEST_CAT, questCategory, Shop, shopStockFor, jobBuffActive, isEquipment, slotOf, EQUIP_SLOTS, ATTRS, ATTR_KR, ATTR_BASE, ATTR_FX, warpTowns, warpPrice, townsKnown } from './core.js';
 import { showWorldMap } from './worldmap.js';
 import { THREE, tex, CAM } from './render.js';
 import { ModelBody, loadPlayerModel, loadActions } from './model.js';
@@ -56,7 +56,8 @@ function gearLines(item, job) {
     h += `<div class="gearbuff${on ? " on" : ""}">★ ${names} 전용 효과: ${item.jobBuff.text} <b>${on ? "(적용 중)" : "(지금 직업에는 적용 안 됨)"}</b></div>`;
   }
   if (item.dropFrom && item.dropFrom.length) h += `<div class="geardrop">얻는 곳: ${item.dropFrom.map(d => { const m = G.data.monsters[d.monster]; return (m ? m.name : d.monster) + " " + +(d.chance * 100).toFixed(1) + "%"; }).join(", ")}</div>`;
-  else if (item.gear) h += `<div class="geardrop">얻는 곳: 마을 상점</div>`;
+  else if (item.legacy) h += `<div class="geardrop">예전 장비 — 지금은 팔지 않아요</div>`;
+  else if (item.gear) h += `<div class="geardrop">얻는 곳: 마을 무기·방어구 상점${item.line ? " (" + G.data.job(item.line).name + "에게만 보임)" : ""}</div>`;
   return h;
 }
 function modText(m) {
@@ -139,8 +140,9 @@ export class UI {
   async load() {
     this.iconMeta = await (await fetch("assets/ui/icons.json")).json();
     // 3D item icons, rendered once from the item models (falls back to the pixel atlas for anything else)
-    try { this.itemIcons = renderItemIcons(G.data.itemList.filter(i => !i.gear).map(i => i.icon || i.id)); } catch (e) { console.warn("3d icons", e); this.itemIcons = {}; }
-    for (const i of G.data.itemList) if (i.gear) this.itemIcons[i.icon || i.id] = "assets/ui/items/" + i.id + ".png";      // 장비 40종: Blender로 그린 아이콘(tools/blender/gear.py)
+    // 장비(tools/gear/gear.py): 그린 아이콘이 있는 것(art)은 assets/ui/items/<id>.png, 아직 없는 새 계열은 임시로 3D 모델(item.stand)에서 찍음
+    try { this.itemIcons = renderItemIcons(G.data.itemList.filter(i => !i.gear || !i.art).map(i => i.icon || i.id)); } catch (e) { console.warn("3d icons", e); this.itemIcons = {}; }
+    for (const i of G.data.itemList) if (i.gear && i.art) this.itemIcons[i.icon || i.id] = "assets/ui/items/" + i.id + ".png";
   }
   icon(name, size = 48) {
     if (HUD_ICON[name]) return `<span class="icon svgic" style="width:${size}px;height:${size}px;display:flex">${HUD_ICON[name]}</span>`;
@@ -562,14 +564,16 @@ export class UI {
     const b = this.open("shop", shop.name, 1560, 860);
     const list = $("div", "shoplist slotbg", b, "<div class='sect'><b>구매</b> <small>아이템을 눌러 선택</small></div>");
     const rows = $("div", "shoprows", list);
-    for (const id of shop.items) {
+    const stock = shopStockFor(G.data, p.sheet.p, shop);      // 지금 직업 계보에 맞는 것만(core.js shopStockFor)
+    if (!stock.length) $("div", "small muted", rows, "지금 직업으로 살 수 있는 물건이 없습니다.");
+    for (const id of stock) {
       const d = G.data.item(id); const afford = p.sheet.p.gold >= d.price;
       const r = $("div", "shoprow" + (this.shopSel === id ? " sel" : ""), rows, this.icon(d.icon, 56) + `<div>${d.name}${isEquipment(d) && p.sheet.bag.canEquip(d) ? " <em>✕</em>" : ""}<br><span class="${afford ? "goldtxt" : "bad"}">${d.price} G</span></div>`);
       r.onclick = () => { this.shopSel = id; G.audio.sfx("ui"); this.showShop(shop); };
     }
     const sel = G.data.item(this.shopSel);
-    if (sel && shop.items.includes(sel.id)) {
-      const box = $("div", "buybox panel-dark", list, `<div><b>${sel.name}</b> <small>${TYPE_KR[sel.type]}${isEquipment(sel) ? " · Lv" + sel.levelReq : ""}${sel.job ? " · " + G.data.job(sel.job).name + " 전용" : ""}</small><div class="small">${sel.desc} <span class="mods">${(sel.stats || []).map(modText).join(" ")}</span></div>${gearLines(sel, p.sheet.p.job)}</div>`);
+    if (sel && stock.includes(sel.id)) {
+      const box = $("div", "buybox panel-dark", list, `<div><b>${sel.name}</b> <small>${TYPE_KR[sel.type]}${isEquipment(sel) ? " · Lv" + sel.levelReq : ""}${sel.job ? " · " + G.data.job(sel.job).name + " 전용" : sel.line && G.data.job(sel.line) ? " · " + G.data.job(sel.line).name + " 계열" : ""}</small><div class="small">${sel.desc} <span class="mods">${(sel.stats || []).map(modText).join(" ")}</span></div>${gearLines(sel, p.sheet.p.job)}</div>`);
       const bb = $("div", "dbtns", box);
       this.button(bb, "1개 구매", "gold", () => this.buy(shop, sel.id, 1));
       if (sel.maxStack > 1) this.button(bb, "5개 구매", "gold", () => this.buy(shop, sel.id, 5));

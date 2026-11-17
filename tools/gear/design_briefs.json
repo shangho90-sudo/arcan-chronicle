@@ -1,0 +1,2742 @@
+{
+ "nov": {
+  "family": "별씨앗",
+  "job": "novice",
+  "kind": "sword",
+  "kind_ko": "검",
+  "motif": "아르칸 들판의 반딧불 정령 「별씨앗」 — 작은 별 모양 씨앗이 빛나며 떠다니는 들판의 정령, 최종 단계에 아스텔의 용의 눈 문양",
+  "silhouette": "가는 곧은 칼날, 코등이가 새싹 잎 두 장처럼 벌어짐, 칼끝 쪽에 작은 별 구멍",
+  "palette": [
+   {
+    "name": "상아",
+    "hex": "#f3ead2"
+   },
+   {
+    "name": "하늘",
+    "hex": "#7cc6f0"
+   },
+   {
+    "name": "금",
+    "hex": "#e8b84a"
+   }
+  ],
+  "ornaments": "코등이의 새싹 잎, 별 모양 보석, 손잡이 끝 작은 방울",
+  "garment": "견습 모험가의 누비옷·가죽 조끼",
+  "evolution": [
+   {
+    "stage": 1,
+    "ko": "나무 손잡이·새싹 코등이",
+    "en": "plain wooden grip and a sprout-leaf crossguard"
+   },
+   {
+    "stage": 2,
+    "ko": "코등이 가운데 하늘색 별 구슬",
+    "en": "a small sky-blue star bead in the crossguard"
+   },
+   {
+    "stage": 3,
+    "ko": "손잡이에 짧은 하늘색 리본",
+    "en": "a short sky-blue ribbon tied to the grip"
+   },
+   {
+    "stage": 4,
+    "ko": "칼날에 금 별 문양과 빛 씨앗 구슬 줄 + 큰 별씨앗 보석과 잎 날개 코등이",
+    "en": "gold star engravings on the blade, a string of tiny glowing seed beads, a large star-seed gem and leaf-wing crossguard"
+   }
+  ],
+  "items": [
+   {
+    "id": "wg_nov_1",
+    "type": "weapon",
+    "name": "새싹 연습검",
+    "level": 1,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "나무 손잡이·새싹 코등이",
+    "tripo_prompt": "a short one-handed sword with a long slim blade, a decorative crossguard and a wrapped grip with a round pommel, inspired by a tiny meadow firefly spirit called the star-seed: a little glowing five-point star seed with leaf wings, slim straight blade, crossguard shaped like two sprouting leaves, a small star cut-out near the tip, colours 상아, 하늘, 금 (#f3ead2, #7cc6f0, #e8b84a), stage 1 of 4: plain wooden grip and a sprout-leaf crossguard, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_nov_1",
+    "type": "armor",
+    "name": "들판 누비옷",
+    "level": 1,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "나무 손잡이·새싹 코등이",
+    "tripo_prompt": "a young adventurer's padded tunic and short leather vest, decorated with motifs a tiny meadow firefly spirit called the star-seed: a little glowing five-point star seed with leaf wings, colours #f3ead2, #7cc6f0, #e8b84a, stage 1 of 4: plain wooden grip and a sprout-leaf crossguard, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_nov_2",
+    "type": "weapon",
+    "name": "반딧불 단검",
+    "level": 3,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "코등이 가운데 하늘색 별 구슬",
+    "tripo_prompt": "a short one-handed sword with a long slim blade, a decorative crossguard and a wrapped grip with a round pommel, inspired by a tiny meadow firefly spirit called the star-seed: a little glowing five-point star seed with leaf wings, slim straight blade, crossguard shaped like two sprouting leaves, a small star cut-out near the tip, colours 상아, 하늘, 금 (#f3ead2, #7cc6f0, #e8b84a), stage 2 of 4: a small sky-blue star bead in the crossguard, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_nov_2",
+    "type": "armor",
+    "name": "반딧불 가죽 조끼",
+    "level": 3,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "코등이 가운데 하늘색 별 구슬",
+    "tripo_prompt": "a young adventurer's padded tunic and short leather vest, decorated with motifs a tiny meadow firefly spirit called the star-seed: a little glowing five-point star seed with leaf wings, colours #f3ead2, #7cc6f0, #e8b84a, stage 2 of 4: a small sky-blue star bead in the crossguard, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_nov_3",
+    "type": "weapon",
+    "name": "새벽별 검",
+    "level": 5,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "손잡이에 짧은 하늘색 리본",
+    "tripo_prompt": "a short one-handed sword with a long slim blade, a decorative crossguard and a wrapped grip with a round pommel, inspired by a tiny meadow firefly spirit called the star-seed: a little glowing five-point star seed with leaf wings, slim straight blade, crossguard shaped like two sprouting leaves, a small star cut-out near the tip, colours 상아, 하늘, 금 (#f3ead2, #7cc6f0, #e8b84a), stage 3 of 4: a short sky-blue ribbon tied to the grip, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_nov_3",
+    "type": "armor",
+    "name": "새벽별 견습 외투",
+    "level": 5,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "손잡이에 짧은 하늘색 리본",
+    "tripo_prompt": "a young adventurer's padded tunic and short leather vest, decorated with motifs a tiny meadow firefly spirit called the star-seed: a little glowing five-point star seed with leaf wings, colours #f3ead2, #7cc6f0, #e8b84a, stage 3 of 4: a short sky-blue ribbon tied to the grip, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_nov_4",
+    "type": "weapon",
+    "name": "별씨앗 견습검",
+    "level": 8,
+    "stage": 4,
+    "stageName": "정령 완성",
+    "drop": true,
+    "ornament_ko": "칼날에 금 별 문양과 빛 씨앗 구슬 줄 + 큰 별씨앗 보석과 잎 날개 코등이",
+    "tripo_prompt": "a short one-handed sword with a long slim blade, a decorative crossguard and a wrapped grip with a round pommel, inspired by a tiny meadow firefly spirit called the star-seed: a little glowing five-point star seed with leaf wings, slim straight blade, crossguard shaped like two sprouting leaves, a small star cut-out near the tip, colours 상아, 하늘, 금 (#f3ead2, #7cc6f0, #e8b84a), stage 4 of 4: gold star engravings on the blade, a string of tiny glowing seed beads, a large star-seed gem and leaf-wing crossguard, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_nov_4",
+    "type": "armor",
+    "name": "별씨앗 순례 망토",
+    "level": 8,
+    "stage": 4,
+    "stageName": "정령 완성",
+    "drop": true,
+    "ornament_ko": "칼날에 금 별 문양과 빛 씨앗 구슬 줄 + 큰 별씨앗 보석과 잎 날개 코등이",
+    "tripo_prompt": "a young adventurer's padded tunic and short leather vest, decorated with motifs a tiny meadow firefly spirit called the star-seed: a little glowing five-point star seed with leaf wings, colours #f3ead2, #7cc6f0, #e8b84a, stage 4 of 4: gold star engravings on the blade, a string of tiny glowing seed beads, a large star-seed gem and leaf-wing crossguard, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   }
+  ]
+ },
+ "pharm": {
+  "family": "이슬꽃",
+  "job": "pharmacist",
+  "kind": "pestle",
+  "kind_ko": "유봉",
+  "motif": "속삭이는 숲의 영혼 사슴과 이슬 맺힌 은방울꽃 — 숲의 약초를 돌보는 정령",
+  "silhouette": "가는 연둣빛 자루, 머리 = 꽃봉오리 모양 둥근 공이 + 양옆으로 사슴뿔 같은 잔가지, 아래로 늘어진 은방울꽃",
+  "palette": [
+   {
+    "name": "연두",
+    "hex": "#a8d86a"
+   },
+   {
+    "name": "상아",
+    "hex": "#f5eedb"
+   },
+   {
+    "name": "금",
+    "hex": "#e0b04a"
+   }
+  ],
+  "ornaments": "이슬 보석, 은방울꽃 방울, 잎 리본, 사슴뿔 가지",
+  "garment": "약사의 긴 로브와 약초 앞치마",
+  "evolution": [
+   {
+    "stage": 1,
+    "ko": "꽃봉오리 머리·잎 새김",
+    "en": "a closed flower-bud head with carved leaves"
+   },
+   {
+    "stage": 2,
+    "ko": "봉오리 끝 이슬 보석",
+    "en": "a dewdrop gem at the tip of the bud"
+   },
+   {
+    "stage": 3,
+    "ko": "은방울꽃 방울 세 개 + 잎 리본",
+    "en": "three tiny bell-flower charms and a leaf ribbon"
+   },
+   {
+    "stage": 4,
+    "ko": "사슴뿔 잔가지가 머리를 감쌈 + 구슬 줄",
+    "en": "small antler twigs wrapping the head and a string of dew beads"
+   },
+   {
+    "stage": 5,
+    "ko": "머리가 활짝 핀 꽃 + 빛나는 이슬 핵",
+    "en": "the head opens into a blooming flower with a glowing dewdrop core"
+   },
+   {
+    "stage": 6,
+    "ko": "흰 꽃이 핀 큰 사슴뿔 + 금테 + 둘째 이슬 고리",
+    "en": "large white-blossom antlers, gold trim and a second ring of dew gems"
+   },
+   {
+    "stage": 7,
+    "ko": "꽃관과 빛 후광 + 여러 갈래 잎 리본 + 핵에 용의 눈 문양",
+    "en": "a flower crown with a soft halo, several flowing leaf ribbons and a dragon-eye sigil in the core gem"
+   }
+  ],
+  "items": [
+   {
+    "id": "wg_pharm_1",
+    "type": "weapon",
+    "name": "이슬잎 유봉",
+    "level": 10,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "꽃봉오리 머리·잎 새김",
+    "tripo_prompt": "a one-handed mace-like club: a long slim straight handle with a wrapped grip and small pommel at the bottom, and a large ornate rounded head at the top (no bowl, no cup, no mortar, no container), inspired by the spirit deer of the Whispering Forest and dew-covered lily-of-the-valley flowers, a gentle forest herb spirit, slim pale-green handle, the head is a round flower-bud-shaped club with small antler-like twigs branching to both sides and tiny bell flowers hanging down, colours 연두, 상아, 금 (#a8d86a, #f5eedb, #e0b04a), stage 1 of 7: a closed flower-bud head with carved leaves, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_pharm_1",
+    "type": "armor",
+    "name": "이슬잎 약사복",
+    "level": 10,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "꽃봉오리 머리·잎 새김",
+    "tripo_prompt": "a pharmacist's long robe with a herb-pouch apron, decorated with motifs the spirit deer of the Whispering Forest and dew-covered lily-of-the-valley flowers, a gentle forest herb spirit, colours #a8d86a, #f5eedb, #e0b04a, stage 1 of 7: a closed flower-bud chest emblem with carved leaves, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_pharm_2",
+    "type": "weapon",
+    "name": "은방울꽃 유봉",
+    "level": 13,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "봉오리 끝 이슬 보석",
+    "tripo_prompt": "a one-handed mace-like club: a long slim straight handle with a wrapped grip and small pommel at the bottom, and a large ornate rounded head at the top (no bowl, no cup, no mortar, no container), inspired by the spirit deer of the Whispering Forest and dew-covered lily-of-the-valley flowers, a gentle forest herb spirit, slim pale-green handle, the head is a round flower-bud-shaped club with small antler-like twigs branching to both sides and tiny bell flowers hanging down, colours 연두, 상아, 금 (#a8d86a, #f5eedb, #e0b04a), stage 2 of 7: a dewdrop gem at the tip of the bud, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_pharm_2",
+    "type": "armor",
+    "name": "은방울 약사 앞치마",
+    "level": 13,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "봉오리 끝 이슬 보석",
+    "tripo_prompt": "a pharmacist's long robe with a herb-pouch apron, decorated with motifs the spirit deer of the Whispering Forest and dew-covered lily-of-the-valley flowers, a gentle forest herb spirit, colours #a8d86a, #f5eedb, #e0b04a, stage 2 of 7: a dewdrop gem at the tip of the bud, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_pharm_3",
+    "type": "weapon",
+    "name": "숲사슴 유봉",
+    "level": 16,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "은방울꽃 방울 세 개 + 잎 리본",
+    "tripo_prompt": "a one-handed mace-like club: a long slim straight handle with a wrapped grip and small pommel at the bottom, and a large ornate rounded head at the top (no bowl, no cup, no mortar, no container), inspired by the spirit deer of the Whispering Forest and dew-covered lily-of-the-valley flowers, a gentle forest herb spirit, slim pale-green handle, the head is a round flower-bud-shaped club with small antler-like twigs branching to both sides and tiny bell flowers hanging down, colours 연두, 상아, 금 (#a8d86a, #f5eedb, #e0b04a), stage 3 of 7: three tiny bell-flower charms and a leaf ribbon, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_pharm_3",
+    "type": "armor",
+    "name": "숲사슴 망토 로브",
+    "level": 16,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "은방울꽃 방울 세 개 + 잎 리본",
+    "tripo_prompt": "a pharmacist's long robe with a herb-pouch apron, decorated with motifs the spirit deer of the Whispering Forest and dew-covered lily-of-the-valley flowers, a gentle forest herb spirit, colours #a8d86a, #f5eedb, #e0b04a, stage 3 of 7: three tiny bell-flower charms and a leaf ribbon, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_pharm_4",
+    "type": "weapon",
+    "name": "달이슬 유봉",
+    "level": 19,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "사슴뿔 잔가지가 머리를 감쌈 + 구슬 줄",
+    "tripo_prompt": "a one-handed mace-like club: a long slim straight handle with a wrapped grip and small pommel at the bottom, and a large ornate rounded head at the top (no bowl, no cup, no mortar, no container), inspired by the spirit deer of the Whispering Forest and dew-covered lily-of-the-valley flowers, a gentle forest herb spirit, slim pale-green handle, the head is a round flower-bud-shaped club with small antler-like twigs branching to both sides and tiny bell flowers hanging down, colours 연두, 상아, 금 (#a8d86a, #f5eedb, #e0b04a), stage 4 of 7: small antler twigs wrapping the head and a string of dew beads, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_pharm_4",
+    "type": "armor",
+    "name": "달이슬 약사 로브",
+    "level": 19,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "사슴뿔 잔가지가 머리를 감쌈 + 구슬 줄",
+    "tripo_prompt": "a pharmacist's long robe with a herb-pouch apron, decorated with motifs the spirit deer of the Whispering Forest and dew-covered lily-of-the-valley flowers, a gentle forest herb spirit, colours #a8d86a, #f5eedb, #e0b04a, stage 4 of 7: small antler twigs wrapping the chest emblem and a string of dew beads, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_pharm_5",
+    "type": "weapon",
+    "name": "녹엽 정령 유봉",
+    "level": 22,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "머리가 활짝 핀 꽃 + 빛나는 이슬 핵",
+    "tripo_prompt": "a one-handed mace-like club: a long slim straight handle with a wrapped grip and small pommel at the bottom, and a large ornate rounded head at the top (no bowl, no cup, no mortar, no container), inspired by the spirit deer of the Whispering Forest and dew-covered lily-of-the-valley flowers, a gentle forest herb spirit, slim pale-green handle, the head is a round flower-bud-shaped club with small antler-like twigs branching to both sides and tiny bell flowers hanging down, colours 연두, 상아, 금 (#a8d86a, #f5eedb, #e0b04a), stage 5 of 7: the head opens into a blooming flower with a glowing dewdrop core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_pharm_5",
+    "type": "armor",
+    "name": "녹엽 정령 로브",
+    "level": 22,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "머리가 활짝 핀 꽃 + 빛나는 이슬 핵",
+    "tripo_prompt": "a pharmacist's long robe with a herb-pouch apron, decorated with motifs the spirit deer of the Whispering Forest and dew-covered lily-of-the-valley flowers, a gentle forest herb spirit, colours #a8d86a, #f5eedb, #e0b04a, stage 5 of 7: the chest emblem opens into a blooming flower with a glowing dewdrop core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_pharm_6",
+    "type": "weapon",
+    "name": "백화 사슴뿔 유봉",
+    "level": 26,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "흰 꽃이 핀 큰 사슴뿔 + 금테 + 둘째 이슬 고리",
+    "tripo_prompt": "a one-handed mace-like club: a long slim straight handle with a wrapped grip and small pommel at the bottom, and a large ornate rounded head at the top (no bowl, no cup, no mortar, no container), inspired by the spirit deer of the Whispering Forest and dew-covered lily-of-the-valley flowers, a gentle forest herb spirit, slim pale-green handle, the head is a round flower-bud-shaped club with small antler-like twigs branching to both sides and tiny bell flowers hanging down, colours 연두, 상아, 금 (#a8d86a, #f5eedb, #e0b04a), stage 6 of 7: large white-blossom antlers, gold trim and a second ring of dew gems, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_pharm_6",
+    "type": "armor",
+    "name": "백화 사슴뿔 성의",
+    "level": 26,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "흰 꽃이 핀 큰 사슴뿔 + 금테 + 둘째 이슬 고리",
+    "tripo_prompt": "a pharmacist's long robe with a herb-pouch apron, decorated with motifs the spirit deer of the Whispering Forest and dew-covered lily-of-the-valley flowers, a gentle forest herb spirit, colours #a8d86a, #f5eedb, #e0b04a, stage 6 of 7: large white-blossom antlers, gold trim and a second ring of dew gems, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_pharm_7",
+    "type": "weapon",
+    "name": "숲 왕관 유봉",
+    "level": 31,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "꽃관과 빛 후광 + 여러 갈래 잎 리본 + 핵에 용의 눈 문양",
+    "tripo_prompt": "a one-handed mace-like club: a long slim straight handle with a wrapped grip and small pommel at the bottom, and a large ornate rounded head at the top (no bowl, no cup, no mortar, no container), inspired by the spirit deer of the Whispering Forest and dew-covered lily-of-the-valley flowers, a gentle forest herb spirit, slim pale-green handle, the head is a round flower-bud-shaped club with small antler-like twigs branching to both sides and tiny bell flowers hanging down, colours 연두, 상아, 금 (#a8d86a, #f5eedb, #e0b04a), stage 7 of 7: a flower crown with a soft halo, several flowing leaf ribbons and a dragon-eye sigil in the core gem, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_pharm_7",
+    "type": "armor",
+    "name": "숲 왕관 대약사 로브",
+    "level": 31,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "꽃관과 빛 후광 + 여러 갈래 잎 리본 + 핵에 용의 눈 문양",
+    "tripo_prompt": "a pharmacist's long robe with a herb-pouch apron, decorated with motifs the spirit deer of the Whispering Forest and dew-covered lily-of-the-valley flowers, a gentle forest herb spirit, colours #a8d86a, #f5eedb, #e0b04a, stage 7 of 7: a flower crown with a soft halo, several flowing leaf ribbons and a dragon-eye sigil in the core gem, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   }
+  ]
+ },
+ "smith": {
+  "family": "불씨 도마뱀",
+  "job": "blacksmith",
+  "kind": "hammer",
+  "kind_ko": "망치",
+  "motif": "그라벨 광산 용광로에 사는 불씨 도마뱀 정령 — 웅크린 도마뱀이 망치 머리, 불꽃 꼬리가 자루를 감음",
+  "silhouette": "굵은 흑철 자루, 머리 = 웅크린 도마뱀 몸통 모양 망치 머리(양쪽 타격면), 등 비늘 능선, 꼬리가 자루를 한 바퀴 감음",
+  "palette": [
+   {
+    "name": "흑철",
+    "hex": "#3a3438"
+   },
+   {
+    "name": "진홍",
+    "hex": "#c8302a"
+   },
+   {
+    "name": "주황 불빛",
+    "hex": "#ff9a3a"
+   }
+  ],
+  "ornaments": "불씨 보석(눈), 쇠사슬 고리, 불꽃 꼬리, 비늘 능선",
+  "garment": "대장장이의 두꺼운 가죽 앞치마와 흉갑",
+  "evolution": [
+   {
+    "stage": 1,
+    "ko": "단순한 흑철 머리·불씨 갈라짐",
+    "en": "a simple black-iron head with glowing ember cracks"
+   },
+   {
+    "stage": 2,
+    "ko": "타격면 가운데 주황 불씨 보석",
+    "en": "an orange ember gem in the centre of the striking face"
+   },
+   {
+    "stage": 3,
+    "ko": "자루에 짧은 쇠사슬과 붉은 천",
+    "en": "a short iron chain and a red cloth strip on the handle"
+   },
+   {
+    "stage": 4,
+    "ko": "도마뱀 머리·등 능선이 드러남 + 불씨 구슬 줄",
+    "en": "the salamander head and spiky back ridge emerge from the hammer head, a string of ember beads"
+   },
+   {
+    "stage": 5,
+    "ko": "도마뱀이 완성되고 꼬리가 자루를 감음 + 빛나는 불씨 핵",
+    "en": "the full salamander curled into the head, tail coiling the handle, glowing ember core"
+   },
+   {
+    "stage": 6,
+    "ko": "불꽃 날개 같은 볏 + 금테 + 둘째 불씨 고리",
+    "en": "a flaming wing-like crest, gold trim and a second ring of ember gems"
+   },
+   {
+    "stage": 7,
+    "ko": "용암 왕관 볏과 열기 후광 + 여러 갈래 불꽃 꼬리 + 핵에 용의 눈 문양",
+    "en": "a lava crown crest with a heat halo, several flame-tipped tails and a dragon-eye sigil in the core gem"
+   }
+  ],
+  "items": [
+   {
+    "id": "wg_smith_1",
+    "type": "weapon",
+    "name": "불씨 망치",
+    "level": 10,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "단순한 흑철 머리·불씨 갈라짐",
+    "tripo_prompt": "a one-handed war hammer: a long sturdy handle with a wrapped grip and pommel at the bottom, and a big chunky ornate hammer head with two broad striking faces at the top, inspired by an ember salamander spirit living in the forges of the Gravel mines, a thick black-iron handle, the hammer head shaped like a curled-up salamander body with spiky back ridges, its flame-tipped tail coiling once around the handle, colours 흑철, 진홍, 주황 불빛 (#3a3438, #c8302a, #ff9a3a), stage 1 of 7: a simple black-iron head with glowing ember cracks, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_smith_1",
+    "type": "armor",
+    "name": "불씨 가죽 앞치마",
+    "level": 10,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "단순한 흑철 머리·불씨 갈라짐",
+    "tripo_prompt": "a blacksmith's thick leather apron worn over a sturdy chest plate, decorated with motifs an ember salamander spirit living in the forges of the Gravel mines, colours #3a3438, #c8302a, #ff9a3a, stage 1 of 7: a simple black-iron chest emblem with glowing ember cracks, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_smith_2",
+    "type": "weapon",
+    "name": "숯불 도마뱀 망치",
+    "level": 13,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "타격면 가운데 주황 불씨 보석",
+    "tripo_prompt": "a one-handed war hammer: a long sturdy handle with a wrapped grip and pommel at the bottom, and a big chunky ornate hammer head with two broad striking faces at the top, inspired by an ember salamander spirit living in the forges of the Gravel mines, a thick black-iron handle, the hammer head shaped like a curled-up salamander body with spiky back ridges, its flame-tipped tail coiling once around the handle, colours 흑철, 진홍, 주황 불빛 (#3a3438, #c8302a, #ff9a3a), stage 2 of 7: an orange ember gem in the centre of the striking face, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_smith_2",
+    "type": "armor",
+    "name": "숯불 작업 조끼",
+    "level": 13,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "타격면 가운데 주황 불씨 보석",
+    "tripo_prompt": "a blacksmith's thick leather apron worn over a sturdy chest plate, decorated with motifs an ember salamander spirit living in the forges of the Gravel mines, colours #3a3438, #c8302a, #ff9a3a, stage 2 of 7: an orange ember gem in the centre of the striking face, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_smith_3",
+    "type": "weapon",
+    "name": "붉은 비늘 망치",
+    "level": 16,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "자루에 짧은 쇠사슬과 붉은 천",
+    "tripo_prompt": "a one-handed war hammer: a long sturdy handle with a wrapped grip and pommel at the bottom, and a big chunky ornate hammer head with two broad striking faces at the top, inspired by an ember salamander spirit living in the forges of the Gravel mines, a thick black-iron handle, the hammer head shaped like a curled-up salamander body with spiky back ridges, its flame-tipped tail coiling once around the handle, colours 흑철, 진홍, 주황 불빛 (#3a3438, #c8302a, #ff9a3a), stage 3 of 7: a short iron chain and a red cloth strip on the handle, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_smith_3",
+    "type": "armor",
+    "name": "붉은 비늘 흉갑",
+    "level": 16,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "자루에 짧은 쇠사슬과 붉은 천",
+    "tripo_prompt": "a blacksmith's thick leather apron worn over a sturdy chest plate, decorated with motifs an ember salamander spirit living in the forges of the Gravel mines, colours #3a3438, #c8302a, #ff9a3a, stage 3 of 7: a short iron chain and a red cloth strip on the handle, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_smith_4",
+    "type": "weapon",
+    "name": "화로꼬리 망치",
+    "level": 19,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "도마뱀 머리·등 능선이 드러남 + 불씨 구슬 줄",
+    "tripo_prompt": "a one-handed war hammer: a long sturdy handle with a wrapped grip and pommel at the bottom, and a big chunky ornate hammer head with two broad striking faces at the top, inspired by an ember salamander spirit living in the forges of the Gravel mines, a thick black-iron handle, the hammer head shaped like a curled-up salamander body with spiky back ridges, its flame-tipped tail coiling once around the handle, colours 흑철, 진홍, 주황 불빛 (#3a3438, #c8302a, #ff9a3a), stage 4 of 7: the salamander head and spiky back ridge emerge from the hammer head, a string of ember beads, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_smith_4",
+    "type": "armor",
+    "name": "화로꼬리 갑옷",
+    "level": 19,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "도마뱀 머리·등 능선이 드러남 + 불씨 구슬 줄",
+    "tripo_prompt": "a blacksmith's thick leather apron worn over a sturdy chest plate, decorated with motifs an ember salamander spirit living in the forges of the Gravel mines, colours #3a3438, #c8302a, #ff9a3a, stage 4 of 7: the salamander chest emblem and spiky back ridge emerge from the hammer chest emblem, a string of ember beads, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_smith_5",
+    "type": "weapon",
+    "name": "용광로 정령 망치",
+    "level": 22,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "도마뱀이 완성되고 꼬리가 자루를 감음 + 빛나는 불씨 핵",
+    "tripo_prompt": "a one-handed war hammer: a long sturdy handle with a wrapped grip and pommel at the bottom, and a big chunky ornate hammer head with two broad striking faces at the top, inspired by an ember salamander spirit living in the forges of the Gravel mines, a thick black-iron handle, the hammer head shaped like a curled-up salamander body with spiky back ridges, its flame-tipped tail coiling once around the handle, colours 흑철, 진홍, 주황 불빛 (#3a3438, #c8302a, #ff9a3a), stage 5 of 7: the full salamander curled into the head, tail coiling the handle, glowing ember core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_smith_5",
+    "type": "armor",
+    "name": "용광로 정령 갑옷",
+    "level": 22,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "도마뱀이 완성되고 꼬리가 자루를 감음 + 빛나는 불씨 핵",
+    "tripo_prompt": "a blacksmith's thick leather apron worn over a sturdy chest plate, decorated with motifs an ember salamander spirit living in the forges of the Gravel mines, colours #3a3438, #c8302a, #ff9a3a, stage 5 of 7: the full salamander curled into the chest emblem, tail coiling the handle, glowing ember core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_smith_6",
+    "type": "weapon",
+    "name": "화산심장 망치",
+    "level": 26,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "불꽃 날개 같은 볏 + 금테 + 둘째 불씨 고리",
+    "tripo_prompt": "a one-handed war hammer: a long sturdy handle with a wrapped grip and pommel at the bottom, and a big chunky ornate hammer head with two broad striking faces at the top, inspired by an ember salamander spirit living in the forges of the Gravel mines, a thick black-iron handle, the hammer head shaped like a curled-up salamander body with spiky back ridges, its flame-tipped tail coiling once around the handle, colours 흑철, 진홍, 주황 불빛 (#3a3438, #c8302a, #ff9a3a), stage 6 of 7: a flaming wing-like crest, gold trim and a second ring of ember gems, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_smith_6",
+    "type": "armor",
+    "name": "화산심장 갑주",
+    "level": 26,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "불꽃 날개 같은 볏 + 금테 + 둘째 불씨 고리",
+    "tripo_prompt": "a blacksmith's thick leather apron worn over a sturdy chest plate, decorated with motifs an ember salamander spirit living in the forges of the Gravel mines, colours #3a3438, #c8302a, #ff9a3a, stage 6 of 7: a flaming wing-like crest, gold trim and a second ring of ember gems, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_smith_7",
+    "type": "weapon",
+    "name": "불씨왕 대망치",
+    "level": 31,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "용암 왕관 볏과 열기 후광 + 여러 갈래 불꽃 꼬리 + 핵에 용의 눈 문양",
+    "tripo_prompt": "a one-handed war hammer: a long sturdy handle with a wrapped grip and pommel at the bottom, and a big chunky ornate hammer head with two broad striking faces at the top, inspired by an ember salamander spirit living in the forges of the Gravel mines, a thick black-iron handle, the hammer head shaped like a curled-up salamander body with spiky back ridges, its flame-tipped tail coiling once around the handle, colours 흑철, 진홍, 주황 불빛 (#3a3438, #c8302a, #ff9a3a), stage 7 of 7: a lava crown crest with a heat halo, several flame-tipped tails and a dragon-eye sigil in the core gem, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_smith_7",
+    "type": "armor",
+    "name": "불씨왕 장인 갑주",
+    "level": 31,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "용암 왕관 볏과 열기 후광 + 여러 갈래 불꽃 꼬리 + 핵에 용의 눈 문양",
+    "tripo_prompt": "a blacksmith's thick leather apron worn over a sturdy chest plate, decorated with motifs an ember salamander spirit living in the forges of the Gravel mines, colours #3a3438, #c8302a, #ff9a3a, stage 7 of 7: a lava crown crest with a heat halo, several flame-tipped tails and a dragon-eye sigil in the core gem, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   }
+  ]
+ },
+ "cook": {
+  "family": "은비늘",
+  "job": "cook",
+  "kind": "knife",
+  "kind_ko": "식칼",
+  "motif": "마르세온 강의 은비늘 잉어 정령과 물보라 — 칼날이 물고기 몸처럼 휘고 코등이가 지느러미",
+  "silhouette": "넓게 휜 칼날(물고기 옆모습), 칼등에 지느러미 능선, 코등이 = 펼친 가슴지느러미, 손잡이 끝 꼬리지느러미",
+  "palette": [
+   {
+    "name": "은",
+    "hex": "#dfe6ee"
+   },
+   {
+    "name": "청록",
+    "hex": "#2fb3a8"
+   },
+   {
+    "name": "산호",
+    "hex": "#ff7f6a"
+   }
+  ],
+  "ornaments": "물방울 보석, 비늘 새김, 산호 구슬, 물결 리본",
+  "garment": "요리사의 흰 조리복과 앞치마",
+  "evolution": [
+   {
+    "stage": 1,
+    "ko": "단순한 넓은 칼날·비늘 새김",
+    "en": "a plain broad blade with engraved scales"
+   },
+   {
+    "stage": 2,
+    "ko": "코등이 가운데 청록 물방울 보석",
+    "en": "a teal water-drop gem in the crossguard"
+   },
+   {
+    "stage": 3,
+    "ko": "손잡이 끝 산호색 물결 리본",
+    "en": "a coral-coloured wave ribbon on the pommel"
+   },
+   {
+    "stage": 4,
+    "ko": "칼등 지느러미 능선 + 산호 구슬 줄",
+    "en": "a fin ridge along the blade spine and a string of coral beads"
+   },
+   {
+    "stage": 5,
+    "ko": "칼날 전체가 잉어 모양 + 빛나는 물방울 핵(눈)",
+    "en": "the whole blade becomes a carp silhouette with a glowing water-drop eye core"
+   },
+   {
+    "stage": 6,
+    "ko": "긴 비단 지느러미가 흘러내림 + 금테 + 둘째 물방울 고리",
+    "en": "long silky trailing fins, gold trim and a second ring of water-drop gems"
+   },
+   {
+    "stage": 7,
+    "ko": "물보라 관과 물빛 후광 + 여러 갈래 지느러미 리본 + 핵에 용의 눈 문양",
+    "en": "a splashing water crown with a soft halo, several flowing fin ribbons and a dragon-eye sigil in the core gem"
+   }
+  ],
+  "items": [
+   {
+    "id": "wg_cook_1",
+    "type": "weapon",
+    "name": "물보라 식칼",
+    "level": 10,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "단순한 넓은 칼날·비늘 새김",
+    "tripo_prompt": "a large ornate chef's cleaver-knife weapon: a short wrapped handle at the bottom and a broad curved blade pointing up, inspired by a silver-scaled river carp spirit of the Marseon river and splashing water, a broad curved blade shaped like a fish in profile with a fin ridge along the spine, a crossguard of spread pectoral fins and a tail-fin pommel, colours 은, 청록, 산호 (#dfe6ee, #2fb3a8, #ff7f6a), stage 1 of 7: a plain broad blade with engraved scales, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_cook_1",
+    "type": "armor",
+    "name": "물보라 조리복",
+    "level": 10,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "단순한 넓은 칼날·비늘 새김",
+    "tripo_prompt": "a cook's white double-breasted kitchen jacket with an apron, decorated with motifs a silver-scaled river carp spirit of the Marseon river and splashing water, colours #dfe6ee, #2fb3a8, #ff7f6a, stage 1 of 7: a plain broad blade with engraved scales, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_cook_2",
+    "type": "weapon",
+    "name": "은비늘 식칼",
+    "level": 13,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "코등이 가운데 청록 물방울 보석",
+    "tripo_prompt": "a large ornate chef's cleaver-knife weapon: a short wrapped handle at the bottom and a broad curved blade pointing up, inspired by a silver-scaled river carp spirit of the Marseon river and splashing water, a broad curved blade shaped like a fish in profile with a fin ridge along the spine, a crossguard of spread pectoral fins and a tail-fin pommel, colours 은, 청록, 산호 (#dfe6ee, #2fb3a8, #ff7f6a), stage 2 of 7: a teal water-drop gem in the crossguard, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_cook_2",
+    "type": "armor",
+    "name": "은비늘 앞치마 조리복",
+    "level": 13,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "코등이 가운데 청록 물방울 보석",
+    "tripo_prompt": "a cook's white double-breasted kitchen jacket with an apron, decorated with motifs a silver-scaled river carp spirit of the Marseon river and splashing water, colours #dfe6ee, #2fb3a8, #ff7f6a, stage 2 of 7: a teal water-drop gem in the crossguard, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_cook_3",
+    "type": "weapon",
+    "name": "산호 지느러미 식칼",
+    "level": 16,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "손잡이 끝 산호색 물결 리본",
+    "tripo_prompt": "a large ornate chef's cleaver-knife weapon: a short wrapped handle at the bottom and a broad curved blade pointing up, inspired by a silver-scaled river carp spirit of the Marseon river and splashing water, a broad curved blade shaped like a fish in profile with a fin ridge along the spine, a crossguard of spread pectoral fins and a tail-fin pommel, colours 은, 청록, 산호 (#dfe6ee, #2fb3a8, #ff7f6a), stage 3 of 7: a coral-coloured wave ribbon on the pommel, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_cook_3",
+    "type": "armor",
+    "name": "산호 단추 조리복",
+    "level": 16,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "손잡이 끝 산호색 물결 리본",
+    "tripo_prompt": "a cook's white double-breasted kitchen jacket with an apron, decorated with motifs a silver-scaled river carp spirit of the Marseon river and splashing water, colours #dfe6ee, #2fb3a8, #ff7f6a, stage 3 of 7: a coral-coloured wave ribbon on the pommel, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_cook_4",
+    "type": "weapon",
+    "name": "청록 물결 식칼",
+    "level": 19,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "칼등 지느러미 능선 + 산호 구슬 줄",
+    "tripo_prompt": "a large ornate chef's cleaver-knife weapon: a short wrapped handle at the bottom and a broad curved blade pointing up, inspired by a silver-scaled river carp spirit of the Marseon river and splashing water, a broad curved blade shaped like a fish in profile with a fin ridge along the spine, a crossguard of spread pectoral fins and a tail-fin pommel, colours 은, 청록, 산호 (#dfe6ee, #2fb3a8, #ff7f6a), stage 4 of 7: a fin ridge along the blade spine and a string of coral beads, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_cook_4",
+    "type": "armor",
+    "name": "청록 물결 조리복",
+    "level": 19,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "칼등 지느러미 능선 + 산호 구슬 줄",
+    "tripo_prompt": "a cook's white double-breasted kitchen jacket with an apron, decorated with motifs a silver-scaled river carp spirit of the Marseon river and splashing water, colours #dfe6ee, #2fb3a8, #ff7f6a, stage 4 of 7: a fin ridge along the blade spine and a string of coral beads, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_cook_5",
+    "type": "weapon",
+    "name": "강의 정령 식칼",
+    "level": 22,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "칼날 전체가 잉어 모양 + 빛나는 물방울 핵(눈)",
+    "tripo_prompt": "a large ornate chef's cleaver-knife weapon: a short wrapped handle at the bottom and a broad curved blade pointing up, inspired by a silver-scaled river carp spirit of the Marseon river and splashing water, a broad curved blade shaped like a fish in profile with a fin ridge along the spine, a crossguard of spread pectoral fins and a tail-fin pommel, colours 은, 청록, 산호 (#dfe6ee, #2fb3a8, #ff7f6a), stage 5 of 7: the whole blade becomes a carp silhouette with a glowing water-drop eye core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_cook_5",
+    "type": "armor",
+    "name": "강의 정령 조리복",
+    "level": 22,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "칼날 전체가 잉어 모양 + 빛나는 물방울 핵(눈)",
+    "tripo_prompt": "a cook's white double-breasted kitchen jacket with an apron, decorated with motifs a silver-scaled river carp spirit of the Marseon river and splashing water, colours #dfe6ee, #2fb3a8, #ff7f6a, stage 5 of 7: the whole blade becomes a carp silhouette with a glowing water-drop eye core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_cook_6",
+    "type": "weapon",
+    "name": "용왕 잉어 식칼",
+    "level": 26,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "긴 비단 지느러미가 흘러내림 + 금테 + 둘째 물방울 고리",
+    "tripo_prompt": "a large ornate chef's cleaver-knife weapon: a short wrapped handle at the bottom and a broad curved blade pointing up, inspired by a silver-scaled river carp spirit of the Marseon river and splashing water, a broad curved blade shaped like a fish in profile with a fin ridge along the spine, a crossguard of spread pectoral fins and a tail-fin pommel, colours 은, 청록, 산호 (#dfe6ee, #2fb3a8, #ff7f6a), stage 6 of 7: long silky trailing fins, gold trim and a second ring of water-drop gems, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_cook_6",
+    "type": "armor",
+    "name": "용왕 잉어 조리 도포",
+    "level": 26,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "긴 비단 지느러미가 흘러내림 + 금테 + 둘째 물방울 고리",
+    "tripo_prompt": "a cook's white double-breasted kitchen jacket with an apron, decorated with motifs a silver-scaled river carp spirit of the Marseon river and splashing water, colours #dfe6ee, #2fb3a8, #ff7f6a, stage 6 of 7: long silky trailing fins, gold trim and a second ring of water-drop gems, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_cook_7",
+    "type": "weapon",
+    "name": "바다달 은칼",
+    "level": 31,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "물보라 관과 물빛 후광 + 여러 갈래 지느러미 리본 + 핵에 용의 눈 문양",
+    "tripo_prompt": "a large ornate chef's cleaver-knife weapon: a short wrapped handle at the bottom and a broad curved blade pointing up, inspired by a silver-scaled river carp spirit of the Marseon river and splashing water, a broad curved blade shaped like a fish in profile with a fin ridge along the spine, a crossguard of spread pectoral fins and a tail-fin pommel, colours 은, 청록, 산호 (#dfe6ee, #2fb3a8, #ff7f6a), stage 7 of 7: a splashing water crown with a soft halo, several flowing fin ribbons and a dragon-eye sigil in the core gem, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_cook_7",
+    "type": "armor",
+    "name": "바다달 요리장 복",
+    "level": 31,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "물보라 관과 물빛 후광 + 여러 갈래 지느러미 리본 + 핵에 용의 눈 문양",
+    "tripo_prompt": "a cook's white double-breasted kitchen jacket with an apron, decorated with motifs a silver-scaled river carp spirit of the Marseon river and splashing water, colours #dfe6ee, #2fb3a8, #ff7f6a, stage 7 of 7: a splashing water crown with a soft halo, several flowing fin ribbons and a dragon-eye sigil in the core gem, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   }
+  ]
+ },
+ "hair": {
+  "family": "바람깃",
+  "job": "hairdresser",
+  "kind": "scissors",
+  "kind_ko": "가위",
+  "motif": "실베른 영지의 바람 제비 정령 — 가위 날이 제비 꼬리깃, 고리가 둥근 날개",
+  "silhouette": "길고 가는 두 날(제비 꼬리깃), 축에 둥근 보석, 고리 = 접은 날개, 고리에서 깃털 장식이 흘러내림",
+  "palette": [
+   {
+    "name": "흰",
+    "hex": "#f7f5f2"
+   },
+   {
+    "name": "장밋빛",
+    "hex": "#e86a8e"
+   },
+   {
+    "name": "은",
+    "hex": "#c8ccd6"
+   }
+  ],
+  "ornaments": "축 보석, 깃털 술, 장미색 리본, 작은 방울",
+  "garment": "미용사의 짧은 스타일리스트 코트",
+  "evolution": [
+   {
+    "stage": 1,
+    "ko": "단순한 은 날·깃털 새김",
+    "en": "plain silver blades with engraved feathers"
+   },
+   {
+    "stage": 2,
+    "ko": "축에 장밋빛 보석",
+    "en": "a rose-pink gem at the pivot"
+   },
+   {
+    "stage": 3,
+    "ko": "고리에 짧은 깃털 술과 리본",
+    "en": "a short feather tassel and ribbon on the rings"
+   },
+   {
+    "stage": 4,
+    "ko": "고리가 제비 날개 모양 + 진주 구슬 줄",
+    "en": "the rings become swallow wings and a string of pearl beads"
+   },
+   {
+    "stage": 5,
+    "ko": "날·고리가 제비 정령으로 완성 + 빛나는 축 핵",
+    "en": "blades and rings form the full swallow spirit with a glowing pivot core"
+   },
+   {
+    "stage": 6,
+    "ko": "큰 날개깃과 금테 + 둘째 보석 고리",
+    "en": "large wing feathers, gold trim and a second ring of gems"
+   },
+   {
+    "stage": 7,
+    "ko": "깃털 관과 바람 후광 + 여러 갈래 깃털 리본 + 핵에 용의 눈 문양",
+    "en": "a feather crown with a wind halo, several trailing feather ribbons and a dragon-eye sigil in the core gem"
+   }
+  ],
+  "items": [
+   {
+    "id": "wg_hair_1",
+    "type": "weapon",
+    "name": "산들깃 가위",
+    "level": 10,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "단순한 은 날·깃털 새김",
+    "tripo_prompt": "a pair of giant ornate shears used as a weapon, closed, two long blades pointing up and two finger rings at the bottom, inspired by a wind swallow spirit of the Silvern estate: the blades are its long forked tail feathers and the finger rings its rounded wings, two long slender blades like forked swallow tail feathers, a round gem at the pivot, finger rings shaped like folded wings with feathers trailing down, colours 흰, 장밋빛, 은 (#f7f5f2, #e86a8e, #c8ccd6), stage 1 of 7: plain silver blades with engraved feathers, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_hair_1",
+    "type": "armor",
+    "name": "산들깃 작업복",
+    "level": 10,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "단순한 은 날·깃털 새김",
+    "tripo_prompt": "a hairdresser's stylish short tailored coat with tool pockets, decorated with motifs a wind swallow spirit of the Silvern estate: the blades are its long forked tail feathers and the finger rings its rounded wings, colours #f7f5f2, #e86a8e, #c8ccd6, stage 1 of 7: plain silver blades with engraved feathers, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_hair_2",
+    "type": "weapon",
+    "name": "제비꼬리 가위",
+    "level": 13,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "축에 장밋빛 보석",
+    "tripo_prompt": "a pair of giant ornate shears used as a weapon, closed, two long blades pointing up and two finger rings at the bottom, inspired by a wind swallow spirit of the Silvern estate: the blades are its long forked tail feathers and the finger rings its rounded wings, two long slender blades like forked swallow tail feathers, a round gem at the pivot, finger rings shaped like folded wings with feathers trailing down, colours 흰, 장밋빛, 은 (#f7f5f2, #e86a8e, #c8ccd6), stage 2 of 7: a rose-pink gem at the pivot, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_hair_2",
+    "type": "armor",
+    "name": "제비꼬리 조끼",
+    "level": 13,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "축에 장밋빛 보석",
+    "tripo_prompt": "a hairdresser's stylish short tailored coat with tool pockets, decorated with motifs a wind swallow spirit of the Silvern estate: the blades are its long forked tail feathers and the finger rings its rounded wings, colours #f7f5f2, #e86a8e, #c8ccd6, stage 2 of 7: a rose-pink gem at the pivot, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_hair_3",
+    "type": "weapon",
+    "name": "장미바람 가위",
+    "level": 16,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "고리에 짧은 깃털 술과 리본",
+    "tripo_prompt": "a pair of giant ornate shears used as a weapon, closed, two long blades pointing up and two finger rings at the bottom, inspired by a wind swallow spirit of the Silvern estate: the blades are its long forked tail feathers and the finger rings its rounded wings, two long slender blades like forked swallow tail feathers, a round gem at the pivot, finger rings shaped like folded wings with feathers trailing down, colours 흰, 장밋빛, 은 (#f7f5f2, #e86a8e, #c8ccd6), stage 3 of 7: a short feather tassel and ribbon on the rings, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_hair_3",
+    "type": "armor",
+    "name": "장미바람 코트",
+    "level": 16,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "고리에 짧은 깃털 술과 리본",
+    "tripo_prompt": "a hairdresser's stylish short tailored coat with tool pockets, decorated with motifs a wind swallow spirit of the Silvern estate: the blades are its long forked tail feathers and the finger rings its rounded wings, colours #f7f5f2, #e86a8e, #c8ccd6, stage 3 of 7: a short feather tassel and ribbon on the rings, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_hair_4",
+    "type": "weapon",
+    "name": "은깃 가위",
+    "level": 19,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "고리가 제비 날개 모양 + 진주 구슬 줄",
+    "tripo_prompt": "a pair of giant ornate shears used as a weapon, closed, two long blades pointing up and two finger rings at the bottom, inspired by a wind swallow spirit of the Silvern estate: the blades are its long forked tail feathers and the finger rings its rounded wings, two long slender blades like forked swallow tail feathers, a round gem at the pivot, finger rings shaped like folded wings with feathers trailing down, colours 흰, 장밋빛, 은 (#f7f5f2, #e86a8e, #c8ccd6), stage 4 of 7: the rings become swallow wings and a string of pearl beads, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_hair_4",
+    "type": "armor",
+    "name": "은깃 스타일리스트 코트",
+    "level": 19,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "고리가 제비 날개 모양 + 진주 구슬 줄",
+    "tripo_prompt": "a hairdresser's stylish short tailored coat with tool pockets, decorated with motifs a wind swallow spirit of the Silvern estate: the blades are its long forked tail feathers and the finger rings its rounded wings, colours #f7f5f2, #e86a8e, #c8ccd6, stage 4 of 7: the rings become swallow wings and a string of pearl beads, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_hair_5",
+    "type": "weapon",
+    "name": "바람 정령 가위",
+    "level": 22,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "날·고리가 제비 정령으로 완성 + 빛나는 축 핵",
+    "tripo_prompt": "a pair of giant ornate shears used as a weapon, closed, two long blades pointing up and two finger rings at the bottom, inspired by a wind swallow spirit of the Silvern estate: the blades are its long forked tail feathers and the finger rings its rounded wings, two long slender blades like forked swallow tail feathers, a round gem at the pivot, finger rings shaped like folded wings with feathers trailing down, colours 흰, 장밋빛, 은 (#f7f5f2, #e86a8e, #c8ccd6), stage 5 of 7: blades and rings form the full swallow spirit with a glowing pivot core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_hair_5",
+    "type": "armor",
+    "name": "바람 정령 코트",
+    "level": 22,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "날·고리가 제비 정령으로 완성 + 빛나는 축 핵",
+    "tripo_prompt": "a hairdresser's stylish short tailored coat with tool pockets, decorated with motifs a wind swallow spirit of the Silvern estate: the blades are its long forked tail feathers and the finger rings its rounded wings, colours #f7f5f2, #e86a8e, #c8ccd6, stage 5 of 7: blades and rings form the full swallow spirit with a glowing pivot core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_hair_6",
+    "type": "weapon",
+    "name": "폭풍 제비 가위",
+    "level": 26,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "큰 날개깃과 금테 + 둘째 보석 고리",
+    "tripo_prompt": "a pair of giant ornate shears used as a weapon, closed, two long blades pointing up and two finger rings at the bottom, inspired by a wind swallow spirit of the Silvern estate: the blades are its long forked tail feathers and the finger rings its rounded wings, two long slender blades like forked swallow tail feathers, a round gem at the pivot, finger rings shaped like folded wings with feathers trailing down, colours 흰, 장밋빛, 은 (#f7f5f2, #e86a8e, #c8ccd6), stage 6 of 7: large wing feathers, gold trim and a second ring of gems, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_hair_6",
+    "type": "armor",
+    "name": "폭풍 제비 롱코트",
+    "level": 26,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "큰 날개깃과 금테 + 둘째 보석 고리",
+    "tripo_prompt": "a hairdresser's stylish short tailored coat with tool pockets, decorated with motifs a wind swallow spirit of the Silvern estate: the blades are its long forked tail feathers and the finger rings its rounded wings, colours #f7f5f2, #e86a8e, #c8ccd6, stage 6 of 7: large wing feathers, gold trim and a second ring of gems, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_hair_7",
+    "type": "weapon",
+    "name": "하늘깃 여왕 가위",
+    "level": 31,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "깃털 관과 바람 후광 + 여러 갈래 깃털 리본 + 핵에 용의 눈 문양",
+    "tripo_prompt": "a pair of giant ornate shears used as a weapon, closed, two long blades pointing up and two finger rings at the bottom, inspired by a wind swallow spirit of the Silvern estate: the blades are its long forked tail feathers and the finger rings its rounded wings, two long slender blades like forked swallow tail feathers, a round gem at the pivot, finger rings shaped like folded wings with feathers trailing down, colours 흰, 장밋빛, 은 (#f7f5f2, #e86a8e, #c8ccd6), stage 7 of 7: a feather crown with a wind halo, several trailing feather ribbons and a dragon-eye sigil in the core gem, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_hair_7",
+    "type": "armor",
+    "name": "하늘깃 여왕 코트",
+    "level": 31,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "깃털 관과 바람 후광 + 여러 갈래 깃털 리본 + 핵에 용의 눈 문양",
+    "tripo_prompt": "a hairdresser's stylish short tailored coat with tool pockets, decorated with motifs a wind swallow spirit of the Silvern estate: the blades are its long forked tail feathers and the finger rings its rounded wings, colours #f7f5f2, #e86a8e, #c8ccd6, stage 7 of 7: a feather crown with a wind halo, several trailing feather ribbons and a dragon-eye sigil in the core gem, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   }
+  ]
+ },
+ "art": {
+  "family": "채색나비",
+  "job": "artist",
+  "kind": "brush",
+  "kind_ko": "붓",
+  "motif": "안개 골짜기의 무지개 나비 정령 — 날개 무늬가 팔레트, 붓털이 나비 몸",
+  "silhouette": "길고 가는 붓대, 쇠고리 위로 나비 날개 두 쌍이 펼쳐짐, 통통한 붓털 끝에 물감 방울",
+  "palette": [
+   {
+    "name": "보라",
+    "hex": "#8a5ad0"
+   },
+   {
+    "name": "금",
+    "hex": "#e6b54a"
+   },
+   {
+    "name": "무지개 끝",
+    "hex": "#5ad0e6"
+   }
+  ],
+  "ornaments": "물감 방울 보석, 나비 더듬이, 색 리본, 작은 방울",
+  "garment": "예술가의 물감 묻은 작업복과 짧은 망토",
+  "evolution": [
+   {
+    "stage": 1,
+    "ko": "단순한 붓·나비 새김",
+    "en": "a plain brush with an engraved butterfly"
+   },
+   {
+    "stage": 2,
+    "ko": "쇠고리에 보라 물감 방울 보석",
+    "en": "a purple paint-drop gem on the ferrule"
+   },
+   {
+    "stage": 3,
+    "ko": "붓대에 무지개 색 리본",
+    "en": "a rainbow ribbon tied to the shaft"
+   },
+   {
+    "stage": 4,
+    "ko": "쇠고리에서 작은 나비 날개가 펼쳐짐 + 물감 구슬 줄",
+    "en": "small butterfly wings opening from the ferrule and a string of paint beads"
+   },
+   {
+    "stage": 5,
+    "ko": "붓 머리가 나비 정령으로 완성 + 빛나는 물감 핵",
+    "en": "the brush head becomes the full butterfly spirit with a glowing paint-drop core"
+   },
+   {
+    "stage": 6,
+    "ko": "큰 극광 날개와 금테 + 둘째 물감 고리",
+    "en": "large aurora wings, gold trim and a second ring of paint gems"
+   },
+   {
+    "stage": 7,
+    "ko": "날개 관과 무지개 후광 + 여러 갈래 색 리본 + 핵에 용의 눈 문양",
+    "en": "a wing crown with a rainbow halo, several flowing colour ribbons and a dragon-eye sigil in the core gem"
+   }
+  ],
+  "items": [
+   {
+    "id": "wg_art_1",
+    "type": "weapon",
+    "name": "꽃물 붓",
+    "level": 10,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "단순한 붓·나비 새김",
+    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by a rainbow butterfly spirit of the Misty Valley whose wing patterns look like a painter palette, a long slim shaft, two pairs of butterfly wings spreading from the ferrule, a plump bristle tip with a paint droplet, colours 보라, 금, 무지개 끝 (#8a5ad0, #e6b54a, #5ad0e6), stage 1 of 7: a plain brush with an engraved butterfly, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_art_1",
+    "type": "armor",
+    "name": "꽃물 작업복",
+    "level": 10,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "단순한 붓·나비 새김",
+    "tripo_prompt": "an artist's paint-splattered smock with a short cape, decorated with motifs a rainbow butterfly spirit of the Misty Valley whose wing patterns look like a painter palette, colours #8a5ad0, #e6b54a, #5ad0e6, stage 1 of 7: a plain brush with an engraved butterfly, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_art_2",
+    "type": "weapon",
+    "name": "나비 날개 붓",
+    "level": 13,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "쇠고리에 보라 물감 방울 보석",
+    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by a rainbow butterfly spirit of the Misty Valley whose wing patterns look like a painter palette, a long slim shaft, two pairs of butterfly wings spreading from the ferrule, a plump bristle tip with a paint droplet, colours 보라, 금, 무지개 끝 (#8a5ad0, #e6b54a, #5ad0e6), stage 2 of 7: a purple paint-drop gem on the ferrule, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_art_2",
+    "type": "armor",
+    "name": "나비 날개 조끼",
+    "level": 13,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "쇠고리에 보라 물감 방울 보석",
+    "tripo_prompt": "an artist's paint-splattered smock with a short cape, decorated with motifs a rainbow butterfly spirit of the Misty Valley whose wing patterns look like a painter palette, colours #8a5ad0, #e6b54a, #5ad0e6, stage 2 of 7: a purple paint-drop gem on the ferrule, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_art_3",
+    "type": "weapon",
+    "name": "무지개 비늘 붓",
+    "level": 16,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "붓대에 무지개 색 리본",
+    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by a rainbow butterfly spirit of the Misty Valley whose wing patterns look like a painter palette, a long slim shaft, two pairs of butterfly wings spreading from the ferrule, a plump bristle tip with a paint droplet, colours 보라, 금, 무지개 끝 (#8a5ad0, #e6b54a, #5ad0e6), stage 3 of 7: a rainbow ribbon tied to the shaft, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_art_3",
+    "type": "armor",
+    "name": "무지개 비늘 망토",
+    "level": 16,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "붓대에 무지개 색 리본",
+    "tripo_prompt": "an artist's paint-splattered smock with a short cape, decorated with motifs a rainbow butterfly spirit of the Misty Valley whose wing patterns look like a painter palette, colours #8a5ad0, #e6b54a, #5ad0e6, stage 3 of 7: a rainbow ribbon tied to the shaft, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_art_4",
+    "type": "weapon",
+    "name": "안개 나비 붓",
+    "level": 19,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "쇠고리에서 작은 나비 날개가 펼쳐짐 + 물감 구슬 줄",
+    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by a rainbow butterfly spirit of the Misty Valley whose wing patterns look like a painter palette, a long slim shaft, two pairs of butterfly wings spreading from the ferrule, a plump bristle tip with a paint droplet, colours 보라, 금, 무지개 끝 (#8a5ad0, #e6b54a, #5ad0e6), stage 4 of 7: small butterfly wings opening from the ferrule and a string of paint beads, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_art_4",
+    "type": "armor",
+    "name": "안개 나비 망토",
+    "level": 19,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "쇠고리에서 작은 나비 날개가 펼쳐짐 + 물감 구슬 줄",
+    "tripo_prompt": "an artist's paint-splattered smock with a short cape, decorated with motifs a rainbow butterfly spirit of the Misty Valley whose wing patterns look like a painter palette, colours #8a5ad0, #e6b54a, #5ad0e6, stage 4 of 7: small butterfly wings opening from the ferrule and a string of paint beads, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_art_5",
+    "type": "weapon",
+    "name": "채색 정령 붓",
+    "level": 22,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "붓 머리가 나비 정령으로 완성 + 빛나는 물감 핵",
+    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by a rainbow butterfly spirit of the Misty Valley whose wing patterns look like a painter palette, a long slim shaft, two pairs of butterfly wings spreading from the ferrule, a plump bristle tip with a paint droplet, colours 보라, 금, 무지개 끝 (#8a5ad0, #e6b54a, #5ad0e6), stage 5 of 7: the brush head becomes the full butterfly spirit with a glowing paint-drop core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_art_5",
+    "type": "armor",
+    "name": "채색 정령 망토",
+    "level": 22,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "붓 머리가 나비 정령으로 완성 + 빛나는 물감 핵",
+    "tripo_prompt": "an artist's paint-splattered smock with a short cape, decorated with motifs a rainbow butterfly spirit of the Misty Valley whose wing patterns look like a painter palette, colours #8a5ad0, #e6b54a, #5ad0e6, stage 5 of 7: the brush chest emblem becomes the full butterfly spirit with a glowing paint-drop core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_art_6",
+    "type": "weapon",
+    "name": "극광 나비 붓",
+    "level": 26,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "큰 극광 날개와 금테 + 둘째 물감 고리",
+    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by a rainbow butterfly spirit of the Misty Valley whose wing patterns look like a painter palette, a long slim shaft, two pairs of butterfly wings spreading from the ferrule, a plump bristle tip with a paint droplet, colours 보라, 금, 무지개 끝 (#8a5ad0, #e6b54a, #5ad0e6), stage 6 of 7: large aurora wings, gold trim and a second ring of paint gems, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_art_6",
+    "type": "armor",
+    "name": "극광 나비 외투",
+    "level": 26,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "큰 극광 날개와 금테 + 둘째 물감 고리",
+    "tripo_prompt": "an artist's paint-splattered smock with a short cape, decorated with motifs a rainbow butterfly spirit of the Misty Valley whose wing patterns look like a painter palette, colours #8a5ad0, #e6b54a, #5ad0e6, stage 6 of 7: large aurora wings, gold trim and a second ring of paint gems, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_art_7",
+    "type": "weapon",
+    "name": "꿈빛 날개 붓",
+    "level": 31,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "날개 관과 무지개 후광 + 여러 갈래 색 리본 + 핵에 용의 눈 문양",
+    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by a rainbow butterfly spirit of the Misty Valley whose wing patterns look like a painter palette, a long slim shaft, two pairs of butterfly wings spreading from the ferrule, a plump bristle tip with a paint droplet, colours 보라, 금, 무지개 끝 (#8a5ad0, #e6b54a, #5ad0e6), stage 7 of 7: a wing crown with a rainbow halo, several flowing colour ribbons and a dragon-eye sigil in the core gem, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_art_7",
+    "type": "armor",
+    "name": "꿈빛 날개 대망토",
+    "level": 31,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "날개 관과 무지개 후광 + 여러 갈래 색 리본 + 핵에 용의 눈 문양",
+    "tripo_prompt": "an artist's paint-splattered smock with a short cape, decorated with motifs a rainbow butterfly spirit of the Misty Valley whose wing patterns look like a painter palette, colours #8a5ad0, #e6b54a, #5ad0e6, stage 7 of 7: a wing crown with a rainbow halo, several flowing colour ribbons and a dragon-eye sigil in the core gem, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   }
+  ]
+ },
+ "wpharm": {
+  "family": "수정 연금",
+  "job": "western_pharmacist",
+  "kind": "pestle",
+  "kind_ko": "유봉",
+  "motif": "서리 고원 수정 골렘의 심장 결정과 정밀한 유리 플라스크 — 차갑고 정확한 연금 정령",
+  "silhouette": "가는 백금 자루(눈금 고리), 머리 = 백금 틀 안 투명 유리 플라스크(안에 빛나는 액체), 위로 결정 기둥이 솟음",
+  "palette": [
+   {
+    "name": "투명 하늘",
+    "hex": "#aee6ff"
+   },
+   {
+    "name": "백금",
+    "hex": "#e4e7ec"
+   },
+   {
+    "name": "청록",
+    "hex": "#22b8b0"
+   }
+  ],
+  "ornaments": "결정 핵, 눈금 고리, 작은 시약병 구슬, 가는 체인",
+  "garment": "양약사의 긴 연구 백의(가운)",
+  "evolution": [
+   {
+    "stage": 1,
+    "ko": "백금 틀과 작은 유리 머리",
+    "en": "a platinum cage holding a small glass head"
+   },
+   {
+    "stage": 2,
+    "ko": "유리 안 청록 결정 핵",
+    "en": "a teal crystal core inside the glass"
+   },
+   {
+    "stage": 3,
+    "ko": "자루에 작은 시약병 구슬 체인",
+    "en": "a thin chain of tiny vial charms on the handle"
+   },
+   {
+    "stage": 4,
+    "ko": "플라스크 위 결정 기둥 + 눈금 고리 줄",
+    "en": "crystal spikes above the flask and a row of measuring rings"
+   },
+   {
+    "stage": 5,
+    "ko": "플라스크가 골렘 심장 결정 모양 + 빛나는 액체 핵",
+    "en": "the flask takes the shape of a golem heart crystal with glowing liquid core"
+   },
+   {
+    "stage": 6,
+    "ko": "큰 결정 날개와 금테 + 둘째 시약 고리",
+    "en": "large crystal wings, gold trim and a second ring of vial gems"
+   },
+   {
+    "stage": 7,
+    "ko": "결정 관과 서리 후광 + 여러 갈래 유리 체인 + 핵에 용의 눈 문양",
+    "en": "a crystal crown with a frost halo, several hanging glass chains and a dragon-eye sigil in the core"
+   }
+  ],
+  "items": [
+   {
+    "id": "wg_wpharm_1",
+    "type": "weapon",
+    "name": "유리관 연금 유봉",
+    "level": 30,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "백금 틀과 작은 유리 머리",
+    "tripo_prompt": "a one-handed mace-like club: a long slim straight handle with a wrapped grip and small pommel at the bottom, and a large ornate rounded head at the top (no bowl, no cup, no mortar, no container), inspired by the heart crystal of a frost-plateau crystal golem and precise alchemical glassware, a slim platinum handle with measuring rings, the head is a clear glass flask held in a platinum cage with glowing liquid inside, crystal spikes rising from the top, colours 투명 하늘, 백금, 청록 (#aee6ff, #e4e7ec, #22b8b0), stage 1 of 7: a platinum cage holding a small glass head, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_wpharm_1",
+    "type": "armor",
+    "name": "유리관 연구 백의",
+    "level": 30,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "백금 틀과 작은 유리 머리",
+    "tripo_prompt": "an alchemist pharmacist's long white lab coat with glass vial bandolier, decorated with motifs the heart crystal of a frost-plateau crystal golem and precise alchemical glassware, colours #aee6ff, #e4e7ec, #22b8b0, stage 1 of 7: a platinum cage holding a small glass chest emblem, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_wpharm_2",
+    "type": "weapon",
+    "name": "백금 눈금 유봉",
+    "level": 33,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "유리 안 청록 결정 핵",
+    "tripo_prompt": "a one-handed mace-like club: a long slim straight handle with a wrapped grip and small pommel at the bottom, and a large ornate rounded head at the top (no bowl, no cup, no mortar, no container), inspired by the heart crystal of a frost-plateau crystal golem and precise alchemical glassware, a slim platinum handle with measuring rings, the head is a clear glass flask held in a platinum cage with glowing liquid inside, crystal spikes rising from the top, colours 투명 하늘, 백금, 청록 (#aee6ff, #e4e7ec, #22b8b0), stage 2 of 7: a teal crystal core inside the glass, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_wpharm_2",
+    "type": "armor",
+    "name": "백금 단추 백의",
+    "level": 33,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "유리 안 청록 결정 핵",
+    "tripo_prompt": "an alchemist pharmacist's long white lab coat with glass vial bandolier, decorated with motifs the heart crystal of a frost-plateau crystal golem and precise alchemical glassware, colours #aee6ff, #e4e7ec, #22b8b0, stage 2 of 7: a teal crystal core inside the glass, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_wpharm_3",
+    "type": "weapon",
+    "name": "서리 결정 플라스크 유봉",
+    "level": 36,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "자루에 작은 시약병 구슬 체인",
+    "tripo_prompt": "a one-handed mace-like club: a long slim straight handle with a wrapped grip and small pommel at the bottom, and a large ornate rounded head at the top (no bowl, no cup, no mortar, no container), inspired by the heart crystal of a frost-plateau crystal golem and precise alchemical glassware, a slim platinum handle with measuring rings, the head is a clear glass flask held in a platinum cage with glowing liquid inside, crystal spikes rising from the top, colours 투명 하늘, 백금, 청록 (#aee6ff, #e4e7ec, #22b8b0), stage 3 of 7: a thin chain of tiny vial charms on the handle, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_wpharm_3",
+    "type": "armor",
+    "name": "서리 결정 연금 코트",
+    "level": 36,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "자루에 작은 시약병 구슬 체인",
+    "tripo_prompt": "an alchemist pharmacist's long white lab coat with glass vial bandolier, decorated with motifs the heart crystal of a frost-plateau crystal golem and precise alchemical glassware, colours #aee6ff, #e4e7ec, #22b8b0, stage 3 of 7: a thin chain of tiny vial charms on the handle, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_wpharm_4",
+    "type": "weapon",
+    "name": "수정 심장 유봉",
+    "level": 39,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "플라스크 위 결정 기둥 + 눈금 고리 줄",
+    "tripo_prompt": "a one-handed mace-like club: a long slim straight handle with a wrapped grip and small pommel at the bottom, and a large ornate rounded head at the top (no bowl, no cup, no mortar, no container), inspired by the heart crystal of a frost-plateau crystal golem and precise alchemical glassware, a slim platinum handle with measuring rings, the head is a clear glass flask held in a platinum cage with glowing liquid inside, crystal spikes rising from the top, colours 투명 하늘, 백금, 청록 (#aee6ff, #e4e7ec, #22b8b0), stage 4 of 7: crystal spikes above the flask and a row of measuring rings, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_wpharm_4",
+    "type": "armor",
+    "name": "수정 심장 백의",
+    "level": 39,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "플라스크 위 결정 기둥 + 눈금 고리 줄",
+    "tripo_prompt": "an alchemist pharmacist's long white lab coat with glass vial bandolier, decorated with motifs the heart crystal of a frost-plateau crystal golem and precise alchemical glassware, colours #aee6ff, #e4e7ec, #22b8b0, stage 4 of 7: crystal spikes above the flask and a row of measuring rings, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_wpharm_5",
+    "type": "weapon",
+    "name": "증류 정령 유봉",
+    "level": 42,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "플라스크가 골렘 심장 결정 모양 + 빛나는 액체 핵",
+    "tripo_prompt": "a one-handed mace-like club: a long slim straight handle with a wrapped grip and small pommel at the bottom, and a large ornate rounded head at the top (no bowl, no cup, no mortar, no container), inspired by the heart crystal of a frost-plateau crystal golem and precise alchemical glassware, a slim platinum handle with measuring rings, the head is a clear glass flask held in a platinum cage with glowing liquid inside, crystal spikes rising from the top, colours 투명 하늘, 백금, 청록 (#aee6ff, #e4e7ec, #22b8b0), stage 5 of 7: the flask takes the shape of a golem heart crystal with glowing liquid core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_wpharm_5",
+    "type": "armor",
+    "name": "증류 정령 코트",
+    "level": 42,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "플라스크가 골렘 심장 결정 모양 + 빛나는 액체 핵",
+    "tripo_prompt": "an alchemist pharmacist's long white lab coat with glass vial bandolier, decorated with motifs the heart crystal of a frost-plateau crystal golem and precise alchemical glassware, colours #aee6ff, #e4e7ec, #22b8b0, stage 5 of 7: the flask takes the shape of a golem heart crystal with glowing liquid core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_wpharm_6",
+    "type": "weapon",
+    "name": "절대영도 연금 유봉",
+    "level": 46,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "큰 결정 날개와 금테 + 둘째 시약 고리",
+    "tripo_prompt": "a one-handed mace-like club: a long slim straight handle with a wrapped grip and small pommel at the bottom, and a large ornate rounded head at the top (no bowl, no cup, no mortar, no container), inspired by the heart crystal of a frost-plateau crystal golem and precise alchemical glassware, a slim platinum handle with measuring rings, the head is a clear glass flask held in a platinum cage with glowing liquid inside, crystal spikes rising from the top, colours 투명 하늘, 백금, 청록 (#aee6ff, #e4e7ec, #22b8b0), stage 6 of 7: large crystal wings, gold trim and a second ring of vial gems, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_wpharm_6",
+    "type": "armor",
+    "name": "절대영도 연금 코트",
+    "level": 46,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "큰 결정 날개와 금테 + 둘째 시약 고리",
+    "tripo_prompt": "an alchemist pharmacist's long white lab coat with glass vial bandolier, decorated with motifs the heart crystal of a frost-plateau crystal golem and precise alchemical glassware, colours #aee6ff, #e4e7ec, #22b8b0, stage 6 of 7: large crystal wings, gold trim and a second ring of vial gems, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_wpharm_7",
+    "type": "weapon",
+    "name": "현자의 결정 유봉",
+    "level": 50,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "결정 관과 서리 후광 + 여러 갈래 유리 체인 + 핵에 용의 눈 문양",
+    "tripo_prompt": "a one-handed mace-like club: a long slim straight handle with a wrapped grip and small pommel at the bottom, and a large ornate rounded head at the top (no bowl, no cup, no mortar, no container), inspired by the heart crystal of a frost-plateau crystal golem and precise alchemical glassware, a slim platinum handle with measuring rings, the head is a clear glass flask held in a platinum cage with glowing liquid inside, crystal spikes rising from the top, colours 투명 하늘, 백금, 청록 (#aee6ff, #e4e7ec, #22b8b0), stage 7 of 7: a crystal crown with a frost halo, several hanging glass chains and a dragon-eye sigil in the core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_wpharm_7",
+    "type": "armor",
+    "name": "현자의 결정 대백의",
+    "level": 50,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "결정 관과 서리 후광 + 여러 갈래 유리 체인 + 핵에 용의 눈 문양",
+    "tripo_prompt": "an alchemist pharmacist's long white lab coat with glass vial bandolier, decorated with motifs the heart crystal of a frost-plateau crystal golem and precise alchemical glassware, colours #aee6ff, #e4e7ec, #22b8b0, stage 7 of 7: a crystal crown with a frost halo, several hanging glass chains and a dragon-eye sigil in the core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   }
+  ]
+ },
+ "herb": {
+  "family": "옥영지",
+  "job": "herbalist",
+  "kind": "pestle",
+  "kind_ko": "유봉",
+  "motif": "천년 영지와 녹각 사슴 수호령 — 나무·약초·비취의 본초 정령",
+  "silhouette": "흑단 자루, 머리 = 겹친 영지 버섯 갓 + 가운데 비취 구슬, 녹각 가지가 갓을 받침, 주홍 매듭 술이 늘어짐",
+  "palette": [
+   {
+    "name": "비취",
+    "hex": "#3fae7a"
+   },
+   {
+    "name": "흑단",
+    "hex": "#2e2420"
+   },
+   {
+    "name": "주홍 매듭",
+    "hex": "#e0442e"
+   }
+  ],
+  "ornaments": "비취 구슬, 주홍 매듭 술, 약초 잎, 엽전 같은 옥 고리",
+  "garment": "한약사의 넓은 소매 도포와 약초 띠",
+  "evolution": [
+   {
+    "stage": 1,
+    "ko": "나무 자루·작은 영지 갓",
+    "en": "a carved wooden handle with a small lingzhi cap head"
+   },
+   {
+    "stage": 2,
+    "ko": "갓 가운데 비취 구슬",
+    "en": "a jade orb in the middle of the cap"
+   },
+   {
+    "stage": 3,
+    "ko": "주홍 매듭 술",
+    "en": "a red knotted tassel"
+   },
+   {
+    "stage": 4,
+    "ko": "녹각 가지가 갓을 받침 + 옥 고리 줄",
+    "en": "antler branches holding the cap and a string of jade rings"
+   },
+   {
+    "stage": 5,
+    "ko": "겹친 영지 갓이 꽃처럼 핌 + 빛나는 비취 핵",
+    "en": "layered lingzhi caps bloom like a flower around a glowing jade core"
+   },
+   {
+    "stage": 6,
+    "ko": "큰 녹각과 금테 + 둘째 비취 고리",
+    "en": "large antlers, gold trim and a second ring of jade beads"
+   },
+   {
+    "stage": 7,
+    "ko": "영지 관과 약향 후광 + 여러 갈래 매듭 술 + 핵에 용의 눈 문양",
+    "en": "a lingzhi crown with a herbal halo, several red knotted tassels and a dragon-eye sigil in the core"
+   }
+  ],
+  "items": [
+   {
+    "id": "wg_herb_1",
+    "type": "weapon",
+    "name": "감초 나무 유봉",
+    "level": 30,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "나무 자루·작은 영지 갓",
+    "tripo_prompt": "a one-handed mace-like club: a long slim straight handle with a wrapped grip and small pommel at the bottom, and a large ornate rounded head at the top (no bowl, no cup, no mortar, no container), inspired by a thousand-year lingzhi mushroom and an antlered guardian deer spirit, wood, herbs and jade, a dark ebony handle, the head is a cluster of layered lingzhi mushroom caps around a jade orb, supported by antler branches, red knotted tassels hanging down, colours 비취, 흑단, 주홍 매듭 (#3fae7a, #2e2420, #e0442e), stage 1 of 7: a carved wooden handle with a small lingzhi cap head, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_herb_1",
+    "type": "armor",
+    "name": "감초빛 도포",
+    "level": 30,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "나무 자루·작은 영지 갓",
+    "tripo_prompt": "a herbalist's wide-sleeved traditional robe with a herb sash, decorated with motifs a thousand-year lingzhi mushroom and an antlered guardian deer spirit, wood, herbs and jade, colours #3fae7a, #2e2420, #e0442e, stage 1 of 7: a carved wooden handle with a small lingzhi cap chest emblem, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_herb_2",
+    "type": "weapon",
+    "name": "비취 매듭 유봉",
+    "level": 33,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "갓 가운데 비취 구슬",
+    "tripo_prompt": "a one-handed mace-like club: a long slim straight handle with a wrapped grip and small pommel at the bottom, and a large ornate rounded head at the top (no bowl, no cup, no mortar, no container), inspired by a thousand-year lingzhi mushroom and an antlered guardian deer spirit, wood, herbs and jade, a dark ebony handle, the head is a cluster of layered lingzhi mushroom caps around a jade orb, supported by antler branches, red knotted tassels hanging down, colours 비취, 흑단, 주홍 매듭 (#3fae7a, #2e2420, #e0442e), stage 2 of 7: a jade orb in the middle of the cap, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_herb_2",
+    "type": "armor",
+    "name": "비취 매듭 도포",
+    "level": 33,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "갓 가운데 비취 구슬",
+    "tripo_prompt": "a herbalist's wide-sleeved traditional robe with a herb sash, decorated with motifs a thousand-year lingzhi mushroom and an antlered guardian deer spirit, wood, herbs and jade, colours #3fae7a, #2e2420, #e0442e, stage 2 of 7: a jade orb in the middle of the cap, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_herb_3",
+    "type": "weapon",
+    "name": "영지 갓 유봉",
+    "level": 36,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "주홍 매듭 술",
+    "tripo_prompt": "a one-handed mace-like club: a long slim straight handle with a wrapped grip and small pommel at the bottom, and a large ornate rounded head at the top (no bowl, no cup, no mortar, no container), inspired by a thousand-year lingzhi mushroom and an antlered guardian deer spirit, wood, herbs and jade, a dark ebony handle, the head is a cluster of layered lingzhi mushroom caps around a jade orb, supported by antler branches, red knotted tassels hanging down, colours 비취, 흑단, 주홍 매듭 (#3fae7a, #2e2420, #e0442e), stage 3 of 7: a red knotted tassel, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_herb_3",
+    "type": "armor",
+    "name": "영지 무늬 도포",
+    "level": 36,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "주홍 매듭 술",
+    "tripo_prompt": "a herbalist's wide-sleeved traditional robe with a herb sash, decorated with motifs a thousand-year lingzhi mushroom and an antlered guardian deer spirit, wood, herbs and jade, colours #3fae7a, #2e2420, #e0442e, stage 3 of 7: a red knotted tassel, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_herb_4",
+    "type": "weapon",
+    "name": "녹각 옥유봉",
+    "level": 39,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "녹각 가지가 갓을 받침 + 옥 고리 줄",
+    "tripo_prompt": "a one-handed mace-like club: a long slim straight handle with a wrapped grip and small pommel at the bottom, and a large ornate rounded head at the top (no bowl, no cup, no mortar, no container), inspired by a thousand-year lingzhi mushroom and an antlered guardian deer spirit, wood, herbs and jade, a dark ebony handle, the head is a cluster of layered lingzhi mushroom caps around a jade orb, supported by antler branches, red knotted tassels hanging down, colours 비취, 흑단, 주홍 매듭 (#3fae7a, #2e2420, #e0442e), stage 4 of 7: antler branches holding the cap and a string of jade rings, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_herb_4",
+    "type": "armor",
+    "name": "녹각 수호 도포",
+    "level": 39,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "녹각 가지가 갓을 받침 + 옥 고리 줄",
+    "tripo_prompt": "a herbalist's wide-sleeved traditional robe with a herb sash, decorated with motifs a thousand-year lingzhi mushroom and an antlered guardian deer spirit, wood, herbs and jade, colours #3fae7a, #2e2420, #e0442e, stage 4 of 7: antler branches holding the cap and a string of jade rings, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_herb_5",
+    "type": "weapon",
+    "name": "천년삼 정령 유봉",
+    "level": 42,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "겹친 영지 갓이 꽃처럼 핌 + 빛나는 비취 핵",
+    "tripo_prompt": "a one-handed mace-like club: a long slim straight handle with a wrapped grip and small pommel at the bottom, and a large ornate rounded head at the top (no bowl, no cup, no mortar, no container), inspired by a thousand-year lingzhi mushroom and an antlered guardian deer spirit, wood, herbs and jade, a dark ebony handle, the head is a cluster of layered lingzhi mushroom caps around a jade orb, supported by antler branches, red knotted tassels hanging down, colours 비취, 흑단, 주홍 매듭 (#3fae7a, #2e2420, #e0442e), stage 5 of 7: layered lingzhi caps bloom like a flower around a glowing jade core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_herb_5",
+    "type": "armor",
+    "name": "천년삼 정령 도포",
+    "level": 42,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "겹친 영지 갓이 꽃처럼 핌 + 빛나는 비취 핵",
+    "tripo_prompt": "a herbalist's wide-sleeved traditional robe with a herb sash, decorated with motifs a thousand-year lingzhi mushroom and an antlered guardian deer spirit, wood, herbs and jade, colours #3fae7a, #2e2420, #e0442e, stage 5 of 7: layered lingzhi caps bloom like a flower around a glowing jade core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_herb_6",
+    "type": "weapon",
+    "name": "구전 영지 유봉",
+    "level": 46,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "큰 녹각과 금테 + 둘째 비취 고리",
+    "tripo_prompt": "a one-handed mace-like club: a long slim straight handle with a wrapped grip and small pommel at the bottom, and a large ornate rounded head at the top (no bowl, no cup, no mortar, no container), inspired by a thousand-year lingzhi mushroom and an antlered guardian deer spirit, wood, herbs and jade, a dark ebony handle, the head is a cluster of layered lingzhi mushroom caps around a jade orb, supported by antler branches, red knotted tassels hanging down, colours 비취, 흑단, 주홍 매듭 (#3fae7a, #2e2420, #e0442e), stage 6 of 7: large antlers, gold trim and a second ring of jade beads, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_herb_6",
+    "type": "armor",
+    "name": "구전 영지 도포",
+    "level": 46,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "큰 녹각과 금테 + 둘째 비취 고리",
+    "tripo_prompt": "a herbalist's wide-sleeved traditional robe with a herb sash, decorated with motifs a thousand-year lingzhi mushroom and an antlered guardian deer spirit, wood, herbs and jade, colours #3fae7a, #2e2420, #e0442e, stage 6 of 7: large antlers, gold trim and a second ring of jade beads, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_herb_7",
+    "type": "weapon",
+    "name": "신농 비취 유봉",
+    "level": 50,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "영지 관과 약향 후광 + 여러 갈래 매듭 술 + 핵에 용의 눈 문양",
+    "tripo_prompt": "a one-handed mace-like club: a long slim straight handle with a wrapped grip and small pommel at the bottom, and a large ornate rounded head at the top (no bowl, no cup, no mortar, no container), inspired by a thousand-year lingzhi mushroom and an antlered guardian deer spirit, wood, herbs and jade, a dark ebony handle, the head is a cluster of layered lingzhi mushroom caps around a jade orb, supported by antler branches, red knotted tassels hanging down, colours 비취, 흑단, 주홍 매듭 (#3fae7a, #2e2420, #e0442e), stage 7 of 7: a lingzhi crown with a herbal halo, several red knotted tassels and a dragon-eye sigil in the core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_herb_7",
+    "type": "armor",
+    "name": "신농 비취 대도포",
+    "level": 50,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "영지 관과 약향 후광 + 여러 갈래 매듭 술 + 핵에 용의 눈 문양",
+    "tripo_prompt": "a herbalist's wide-sleeved traditional robe with a herb sash, decorated with motifs a thousand-year lingzhi mushroom and an antlered guardian deer spirit, wood, herbs and jade, colours #3fae7a, #2e2420, #e0442e, stage 7 of 7: a lingzhi crown with a herbal halo, several red knotted tassels and a dragon-eye sigil in the core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   }
+  ]
+ },
+ "eng": {
+  "family": "뇌정 태엽",
+  "job": "engineer",
+  "kind": "hammer",
+  "kind_ko": "망치",
+  "motif": "용의 유적 고대 태엽 골렘과 번개 구름 정령 — 톱니·코일·번개",
+  "silhouette": "굵은 황동 자루(톱니 고리), 머리 = 톱니 원통 + 감긴 구리 코일, 뒤쪽 피스톤, 위로 번개 날개 핀",
+  "palette": [
+   {
+    "name": "황동",
+    "hex": "#d6a540"
+   },
+   {
+    "name": "남색",
+    "hex": "#24346e"
+   },
+   {
+    "name": "번개 청색",
+    "hex": "#6ad8ff"
+   }
+  ],
+  "ornaments": "번개 핵, 톱니바퀴, 구리 코일, 작은 볼트 체인",
+  "garment": "엔지니어의 공구 띠 작업 갑주",
+  "evolution": [
+   {
+    "stage": 1,
+    "ko": "렌치 같은 단순한 황동 머리",
+    "en": "a simple brass wrench-like head"
+   },
+   {
+    "stage": 2,
+    "ko": "머리 가운데 번개 청색 핵",
+    "en": "a lightning-blue core in the centre of the head"
+   },
+   {
+    "stage": 3,
+    "ko": "자루에 볼트 체인과 남색 천",
+    "en": "a bolt chain and a navy cloth strip on the handle"
+   },
+   {
+    "stage": 4,
+    "ko": "톱니 원통 머리 + 코일 + 톱니 구슬 줄",
+    "en": "a cogwheel drum head with copper coils and a string of tiny gear beads"
+   },
+   {
+    "stage": 5,
+    "ko": "골렘 얼굴 같은 엔진 머리 + 빛나는 번개 핵",
+    "en": "an engine head like a golem face with a glowing lightning core"
+   },
+   {
+    "stage": 6,
+    "ko": "번개 날개 핀과 금테 + 둘째 핵 고리",
+    "en": "lightning-wing fins, gold trim and a second ring of cores"
+   },
+   {
+    "stage": 7,
+    "ko": "톱니 관과 번개 후광 + 여러 갈래 케이블 + 핵에 용의 눈 문양",
+    "en": "a cogwheel crown with a lightning halo, several flowing cables and a dragon-eye sigil in the core"
+   }
+  ],
+  "items": [
+   {
+    "id": "wg_eng_1",
+    "type": "weapon",
+    "name": "태엽 렌치 망치",
+    "level": 30,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "렌치 같은 단순한 황동 머리",
+    "tripo_prompt": "a one-handed war hammer: a long sturdy handle with a wrapped grip and pommel at the bottom, and a big chunky ornate hammer head with two broad striking faces at the top, inspired by an ancient clockwork golem from the dragon ruins and a thundercloud spirit, a sturdy brass handle with gear rings, the head is a cogwheel drum wrapped in copper coils with a piston at the back and lightning-wing fins on top, colours 황동, 남색, 번개 청색 (#d6a540, #24346e, #6ad8ff), stage 1 of 7: a simple brass wrench-like head, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_eng_1",
+    "type": "armor",
+    "name": "태엽 작업복",
+    "level": 30,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "렌치 같은 단순한 황동 머리",
+    "tripo_prompt": "an engineer's work armor with tool belts, brass plates and goggles strap, decorated with motifs an ancient clockwork golem from the dragon ruins and a thundercloud spirit, colours #d6a540, #24346e, #6ad8ff, stage 1 of 7: a simple brass wrench-like chest emblem, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_eng_2",
+    "type": "weapon",
+    "name": "황동 톱니 망치",
+    "level": 33,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "머리 가운데 번개 청색 핵",
+    "tripo_prompt": "a one-handed war hammer: a long sturdy handle with a wrapped grip and pommel at the bottom, and a big chunky ornate hammer head with two broad striking faces at the top, inspired by an ancient clockwork golem from the dragon ruins and a thundercloud spirit, a sturdy brass handle with gear rings, the head is a cogwheel drum wrapped in copper coils with a piston at the back and lightning-wing fins on top, colours 황동, 남색, 번개 청색 (#d6a540, #24346e, #6ad8ff), stage 2 of 7: a lightning-blue core in the centre of the head, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_eng_2",
+    "type": "armor",
+    "name": "황동 톱니 조끼",
+    "level": 33,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "머리 가운데 번개 청색 핵",
+    "tripo_prompt": "an engineer's work armor with tool belts, brass plates and goggles strap, decorated with motifs an ancient clockwork golem from the dragon ruins and a thundercloud spirit, colours #d6a540, #24346e, #6ad8ff, stage 2 of 7: a lightning-blue core in the centre of the chest emblem, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_eng_3",
+    "type": "weapon",
+    "name": "남빛 코일 망치",
+    "level": 36,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "자루에 볼트 체인과 남색 천",
+    "tripo_prompt": "a one-handed war hammer: a long sturdy handle with a wrapped grip and pommel at the bottom, and a big chunky ornate hammer head with two broad striking faces at the top, inspired by an ancient clockwork golem from the dragon ruins and a thundercloud spirit, a sturdy brass handle with gear rings, the head is a cogwheel drum wrapped in copper coils with a piston at the back and lightning-wing fins on top, colours 황동, 남색, 번개 청색 (#d6a540, #24346e, #6ad8ff), stage 3 of 7: a bolt chain and a navy cloth strip on the handle, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_eng_3",
+    "type": "armor",
+    "name": "남빛 코일 갑옷",
+    "level": 36,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "자루에 볼트 체인과 남색 천",
+    "tripo_prompt": "an engineer's work armor with tool belts, brass plates and goggles strap, decorated with motifs an ancient clockwork golem from the dragon ruins and a thundercloud spirit, colours #d6a540, #24346e, #6ad8ff, stage 3 of 7: a bolt chain and a navy cloth strip on the handle, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_eng_4",
+    "type": "weapon",
+    "name": "뇌운 피스톤 망치",
+    "level": 39,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "톱니 원통 머리 + 코일 + 톱니 구슬 줄",
+    "tripo_prompt": "a one-handed war hammer: a long sturdy handle with a wrapped grip and pommel at the bottom, and a big chunky ornate hammer head with two broad striking faces at the top, inspired by an ancient clockwork golem from the dragon ruins and a thundercloud spirit, a sturdy brass handle with gear rings, the head is a cogwheel drum wrapped in copper coils with a piston at the back and lightning-wing fins on top, colours 황동, 남색, 번개 청색 (#d6a540, #24346e, #6ad8ff), stage 4 of 7: a cogwheel drum head with copper coils and a string of tiny gear beads, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_eng_4",
+    "type": "armor",
+    "name": "뇌운 피스톤 갑주",
+    "level": 39,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "톱니 원통 머리 + 코일 + 톱니 구슬 줄",
+    "tripo_prompt": "an engineer's work armor with tool belts, brass plates and goggles strap, decorated with motifs an ancient clockwork golem from the dragon ruins and a thundercloud spirit, colours #d6a540, #24346e, #6ad8ff, stage 4 of 7: a cogwheel drum chest emblem with copper coils and a string of tiny gear beads, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_eng_5",
+    "type": "weapon",
+    "name": "유적 골렘 망치",
+    "level": 42,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "골렘 얼굴 같은 엔진 머리 + 빛나는 번개 핵",
+    "tripo_prompt": "a one-handed war hammer: a long sturdy handle with a wrapped grip and pommel at the bottom, and a big chunky ornate hammer head with two broad striking faces at the top, inspired by an ancient clockwork golem from the dragon ruins and a thundercloud spirit, a sturdy brass handle with gear rings, the head is a cogwheel drum wrapped in copper coils with a piston at the back and lightning-wing fins on top, colours 황동, 남색, 번개 청색 (#d6a540, #24346e, #6ad8ff), stage 5 of 7: an engine head like a golem face with a glowing lightning core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_eng_5",
+    "type": "armor",
+    "name": "유적 골렘 갑주",
+    "level": 42,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "골렘 얼굴 같은 엔진 머리 + 빛나는 번개 핵",
+    "tripo_prompt": "an engineer's work armor with tool belts, brass plates and goggles strap, decorated with motifs an ancient clockwork golem from the dragon ruins and a thundercloud spirit, colours #d6a540, #24346e, #6ad8ff, stage 5 of 7: an engine chest emblem like a golem face with a glowing lightning core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_eng_6",
+    "type": "weapon",
+    "name": "천둥 엔진 망치",
+    "level": 46,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "번개 날개 핀과 금테 + 둘째 핵 고리",
+    "tripo_prompt": "a one-handed war hammer: a long sturdy handle with a wrapped grip and pommel at the bottom, and a big chunky ornate hammer head with two broad striking faces at the top, inspired by an ancient clockwork golem from the dragon ruins and a thundercloud spirit, a sturdy brass handle with gear rings, the head is a cogwheel drum wrapped in copper coils with a piston at the back and lightning-wing fins on top, colours 황동, 남색, 번개 청색 (#d6a540, #24346e, #6ad8ff), stage 6 of 7: lightning-wing fins, gold trim and a second ring of cores, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_eng_6",
+    "type": "armor",
+    "name": "천둥 엔진 갑주",
+    "level": 46,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "번개 날개 핀과 금테 + 둘째 핵 고리",
+    "tripo_prompt": "an engineer's work armor with tool belts, brass plates and goggles strap, decorated with motifs an ancient clockwork golem from the dragon ruins and a thundercloud spirit, colours #d6a540, #24346e, #6ad8ff, stage 6 of 7: lightning-wing fins, gold trim and a second ring of cores, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_eng_7",
+    "type": "weapon",
+    "name": "뇌정 태엽왕 망치",
+    "level": 50,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "톱니 관과 번개 후광 + 여러 갈래 케이블 + 핵에 용의 눈 문양",
+    "tripo_prompt": "a one-handed war hammer: a long sturdy handle with a wrapped grip and pommel at the bottom, and a big chunky ornate hammer head with two broad striking faces at the top, inspired by an ancient clockwork golem from the dragon ruins and a thundercloud spirit, a sturdy brass handle with gear rings, the head is a cogwheel drum wrapped in copper coils with a piston at the back and lightning-wing fins on top, colours 황동, 남색, 번개 청색 (#d6a540, #24346e, #6ad8ff), stage 7 of 7: a cogwheel crown with a lightning halo, several flowing cables and a dragon-eye sigil in the core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_eng_7",
+    "type": "armor",
+    "name": "뇌정 태엽왕 갑주",
+    "level": 50,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "톱니 관과 번개 후광 + 여러 갈래 케이블 + 핵에 용의 눈 문양",
+    "tripo_prompt": "an engineer's work armor with tool belts, brass plates and goggles strap, decorated with motifs an ancient clockwork golem from the dragon ruins and a thundercloud spirit, colours #d6a540, #24346e, #6ad8ff, stage 7 of 7: a cogwheel crown with a lightning halo, several flowing cables and a dragon-eye sigil in the core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   }
+  ]
+ },
+ "chef": {
+  "family": "홍염 여우",
+  "job": "chef",
+  "kind": "knife",
+  "kind_ko": "식칼",
+  "motif": "붉은숲 불꽃 여우와 설원 서리 여우 쌍둥이 — 불과 얼음의 주방(오픈 키친의 불꽃·파티스리의 서리)",
+  "silhouette": "칼등이 여우 꼬리처럼 말린 불꽃 곡선, 칼날 끝 쪽은 서리 결정, 손잡이 끝 여우 귀 모양 장식",
+  "palette": [
+   {
+    "name": "진홍",
+    "hex": "#d2283a"
+   },
+   {
+    "name": "흰",
+    "hex": "#f8f6f2"
+   },
+   {
+    "name": "금",
+    "hex": "#e9b440"
+   }
+  ],
+  "ornaments": "불꽃 보석, 서리 구슬, 여우 꼬리 털 술, 금 사슬",
+  "garment": "쉐프의 긴 더블 브레스트 셰프 코트",
+  "evolution": [
+   {
+    "stage": 1,
+    "ko": "단순한 곡선 칼·불꽃 새김",
+    "en": "a plain curved blade with engraved flames"
+   },
+   {
+    "stage": 2,
+    "ko": "코등이에 진홍 불꽃 보석",
+    "en": "a crimson flame gem in the crossguard"
+   },
+   {
+    "stage": 3,
+    "ko": "손잡이에 흰 여우 털 술",
+    "en": "a white fox-fur tassel on the handle"
+   },
+   {
+    "stage": 4,
+    "ko": "칼등이 여우 꼬리 곡선 + 서리 구슬 줄",
+    "en": "the spine curls like a fox tail and a string of frost beads"
+   },
+   {
+    "stage": 5,
+    "ko": "칼날이 불꽃·서리 여우 한 쌍으로 완성 + 빛나는 불꽃 핵",
+    "en": "the blade forms a flame fox and frost fox pair with a glowing flame core"
+   },
+   {
+    "stage": 6,
+    "ko": "꼬리 여러 갈래와 금테 + 둘째 서리 고리",
+    "en": "several fox tails, gold trim and a second ring of frost gems"
+   },
+   {
+    "stage": 7,
+    "ko": "여우불 관과 불꽃·서리 후광 + 여러 갈래 꼬리 술 + 핵에 용의 눈 문양",
+    "en": "a fox-fire crown with a flame-and-frost halo, many tail tassels and a dragon-eye sigil in the core"
+   }
+  ],
+  "items": [
+   {
+    "id": "wg_chef_1",
+    "type": "weapon",
+    "name": "불씨 여우 식칼",
+    "level": 30,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "단순한 곡선 칼·불꽃 새김",
+    "tripo_prompt": "a large ornate chef's cleaver-knife weapon: a short wrapped handle at the bottom and a broad curved blade pointing up, inspired by twin fox spirits of the Crimson Forest and the snowfields, one of flame and one of frost, a chef's blade whose spine curls like a flaming fox tail, frost crystals near the tip, a pommel with two little fox ears, colours 진홍, 흰, 금 (#d2283a, #f8f6f2, #e9b440), stage 1 of 7: a plain curved blade with engraved flames, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_chef_1",
+    "type": "armor",
+    "name": "불씨 여우 셰프복",
+    "level": 30,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "단순한 곡선 칼·불꽃 새김",
+    "tripo_prompt": "a head chef's long double-breasted chef coat with a neckerchief, decorated with motifs twin fox spirits of the Crimson Forest and the snowfields, one of flame and one of frost, colours #d2283a, #f8f6f2, #e9b440, stage 1 of 7: a plain curved blade with engraved flames, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_chef_2",
+    "type": "weapon",
+    "name": "홍염 꼬리 식칼",
+    "level": 33,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "코등이에 진홍 불꽃 보석",
+    "tripo_prompt": "a large ornate chef's cleaver-knife weapon: a short wrapped handle at the bottom and a broad curved blade pointing up, inspired by twin fox spirits of the Crimson Forest and the snowfields, one of flame and one of frost, a chef's blade whose spine curls like a flaming fox tail, frost crystals near the tip, a pommel with two little fox ears, colours 진홍, 흰, 금 (#d2283a, #f8f6f2, #e9b440), stage 2 of 7: a crimson flame gem in the crossguard, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_chef_2",
+    "type": "armor",
+    "name": "홍염 꼬리 셰프 코트",
+    "level": 33,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "코등이에 진홍 불꽃 보석",
+    "tripo_prompt": "a head chef's long double-breasted chef coat with a neckerchief, decorated with motifs twin fox spirits of the Crimson Forest and the snowfields, one of flame and one of frost, colours #d2283a, #f8f6f2, #e9b440, stage 2 of 7: a crimson flame gem in the crossguard, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_chef_3",
+    "type": "weapon",
+    "name": "서리불 쌍여우 칼",
+    "level": 36,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "손잡이에 흰 여우 털 술",
+    "tripo_prompt": "a large ornate chef's cleaver-knife weapon: a short wrapped handle at the bottom and a broad curved blade pointing up, inspired by twin fox spirits of the Crimson Forest and the snowfields, one of flame and one of frost, a chef's blade whose spine curls like a flaming fox tail, frost crystals near the tip, a pommel with two little fox ears, colours 진홍, 흰, 금 (#d2283a, #f8f6f2, #e9b440), stage 3 of 7: a white fox-fur tassel on the handle, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_chef_3",
+    "type": "armor",
+    "name": "서리불 셰프 코트",
+    "level": 36,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "손잡이에 흰 여우 털 술",
+    "tripo_prompt": "a head chef's long double-breasted chef coat with a neckerchief, decorated with motifs twin fox spirits of the Crimson Forest and the snowfields, one of flame and one of frost, colours #d2283a, #f8f6f2, #e9b440, stage 3 of 7: a white fox-fur tassel on the handle, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_chef_4",
+    "type": "weapon",
+    "name": "금빛 플람베 칼",
+    "level": 39,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "칼등이 여우 꼬리 곡선 + 서리 구슬 줄",
+    "tripo_prompt": "a large ornate chef's cleaver-knife weapon: a short wrapped handle at the bottom and a broad curved blade pointing up, inspired by twin fox spirits of the Crimson Forest and the snowfields, one of flame and one of frost, a chef's blade whose spine curls like a flaming fox tail, frost crystals near the tip, a pommel with two little fox ears, colours 진홍, 흰, 금 (#d2283a, #f8f6f2, #e9b440), stage 4 of 7: the spine curls like a fox tail and a string of frost beads, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_chef_4",
+    "type": "armor",
+    "name": "금빛 플람베 코트",
+    "level": 39,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "칼등이 여우 꼬리 곡선 + 서리 구슬 줄",
+    "tripo_prompt": "a head chef's long double-breasted chef coat with a neckerchief, decorated with motifs twin fox spirits of the Crimson Forest and the snowfields, one of flame and one of frost, colours #d2283a, #f8f6f2, #e9b440, stage 4 of 7: the spine curls like a fox tail and a string of frost beads, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_chef_5",
+    "type": "weapon",
+    "name": "여우불 정령 칼",
+    "level": 42,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "칼날이 불꽃·서리 여우 한 쌍으로 완성 + 빛나는 불꽃 핵",
+    "tripo_prompt": "a large ornate chef's cleaver-knife weapon: a short wrapped handle at the bottom and a broad curved blade pointing up, inspired by twin fox spirits of the Crimson Forest and the snowfields, one of flame and one of frost, a chef's blade whose spine curls like a flaming fox tail, frost crystals near the tip, a pommel with two little fox ears, colours 진홍, 흰, 금 (#d2283a, #f8f6f2, #e9b440), stage 5 of 7: the blade forms a flame fox and frost fox pair with a glowing flame core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_chef_5",
+    "type": "armor",
+    "name": "여우불 정령 코트",
+    "level": 42,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "칼날이 불꽃·서리 여우 한 쌍으로 완성 + 빛나는 불꽃 핵",
+    "tripo_prompt": "a head chef's long double-breasted chef coat with a neckerchief, decorated with motifs twin fox spirits of the Crimson Forest and the snowfields, one of flame and one of frost, colours #d2283a, #f8f6f2, #e9b440, stage 5 of 7: the blade forms a flame fox and frost fox pair with a glowing flame core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_chef_6",
+    "type": "weapon",
+    "name": "구미 홍염 칼",
+    "level": 46,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "꼬리 여러 갈래와 금테 + 둘째 서리 고리",
+    "tripo_prompt": "a large ornate chef's cleaver-knife weapon: a short wrapped handle at the bottom and a broad curved blade pointing up, inspired by twin fox spirits of the Crimson Forest and the snowfields, one of flame and one of frost, a chef's blade whose spine curls like a flaming fox tail, frost crystals near the tip, a pommel with two little fox ears, colours 진홍, 흰, 금 (#d2283a, #f8f6f2, #e9b440), stage 6 of 7: several fox tails, gold trim and a second ring of frost gems, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_chef_6",
+    "type": "armor",
+    "name": "구미 홍염 코트",
+    "level": 46,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "꼬리 여러 갈래와 금테 + 둘째 서리 고리",
+    "tripo_prompt": "a head chef's long double-breasted chef coat with a neckerchief, decorated with motifs twin fox spirits of the Crimson Forest and the snowfields, one of flame and one of frost, colours #d2283a, #f8f6f2, #e9b440, stage 6 of 7: several fox tails, gold trim and a second ring of frost gems, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_chef_7",
+    "type": "weapon",
+    "name": "왕실 만찬 여우칼",
+    "level": 50,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "여우불 관과 불꽃·서리 후광 + 여러 갈래 꼬리 술 + 핵에 용의 눈 문양",
+    "tripo_prompt": "a large ornate chef's cleaver-knife weapon: a short wrapped handle at the bottom and a broad curved blade pointing up, inspired by twin fox spirits of the Crimson Forest and the snowfields, one of flame and one of frost, a chef's blade whose spine curls like a flaming fox tail, frost crystals near the tip, a pommel with two little fox ears, colours 진홍, 흰, 금 (#d2283a, #f8f6f2, #e9b440), stage 7 of 7: a fox-fire crown with a flame-and-frost halo, many tail tassels and a dragon-eye sigil in the core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_chef_7",
+    "type": "armor",
+    "name": "왕실 만찬 그랑 코트",
+    "level": 50,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "여우불 관과 불꽃·서리 후광 + 여러 갈래 꼬리 술 + 핵에 용의 눈 문양",
+    "tripo_prompt": "a head chef's long double-breasted chef coat with a neckerchief, decorated with motifs twin fox spirits of the Crimson Forest and the snowfields, one of flame and one of frost, colours #d2283a, #f8f6f2, #e9b440, stage 7 of 7: a fox-fire crown with a flame-and-frost halo, many tail tassels and a dragon-eye sigil in the core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   }
+  ]
+ },
+ "design": {
+  "family": "월광 나방",
+  "job": "designer",
+  "kind": "scissors",
+  "kind_ko": "가위",
+  "motif": "달빛 아래 비단을 짓는 은빛 거미줄과 달나방 정령 — 오트쿠튀르의 밤",
+  "silhouette": "두 날 = 길게 펼친 나방 앞날개, 축 = 둥근 달 보석, 고리 = 초승달, 고리에서 비단실 리본이 흘러내림",
+  "palette": [
+   {
+    "name": "남보라",
+    "hex": "#4a3a8a"
+   },
+   {
+    "name": "은",
+    "hex": "#d8dce6"
+   },
+   {
+    "name": "장미금",
+    "hex": "#e8a88a"
+   }
+  ],
+  "ornaments": "달 보석, 비단실 리본, 진주 바늘 장식, 은 거미줄 체인",
+  "garment": "디자이너의 날렵한 드레스 코트",
+  "evolution": [
+   {
+    "stage": 1,
+    "ko": "단순한 은 날·실 새김",
+    "en": "plain silver blades with engraved thread lines"
+   },
+   {
+    "stage": 2,
+    "ko": "축에 달 보석",
+    "en": "a moon gem at the pivot"
+   },
+   {
+    "stage": 3,
+    "ko": "고리에 비단실 리본",
+    "en": "silk thread ribbons on the rings"
+   },
+   {
+    "stage": 4,
+    "ko": "고리가 초승달 + 진주 바늘 구슬 줄",
+    "en": "crescent-moon rings and a string of pearl needle beads"
+   },
+   {
+    "stage": 5,
+    "ko": "날이 달나방 날개로 완성 + 빛나는 달 핵",
+    "en": "the blades become full moth wings with a glowing moon core"
+   },
+   {
+    "stage": 6,
+    "ko": "큰 깃털 더듬이와 금테 + 둘째 달 고리",
+    "en": "large feathery antennae, gold trim and a second ring of moon gems"
+   },
+   {
+    "stage": 7,
+    "ko": "보름달 관과 은빛 후광 + 여러 갈래 비단 리본 + 핵에 용의 눈 문양",
+    "en": "a full-moon crown with a silver halo, many flowing silk ribbons and a dragon-eye sigil in the core"
+   }
+  ],
+  "items": [
+   {
+    "id": "wg_design_1",
+    "type": "weapon",
+    "name": "비단실 가위",
+    "level": 30,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "단순한 은 날·실 새김",
+    "tripo_prompt": "a pair of giant ornate shears used as a weapon, closed, two long blades pointing up and two finger rings at the bottom, inspired by a moonlight silk moth spirit and silver spider-silk threads, two long blades shaped like spread moth forewings, a round moon gem at the pivot, crescent-moon finger rings with silk thread ribbons trailing down, colours 남보라, 은, 장미금 (#4a3a8a, #d8dce6, #e8a88a), stage 1 of 7: plain silver blades with engraved thread lines, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_design_1",
+    "type": "armor",
+    "name": "비단실 재단 코트",
+    "level": 30,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "단순한 은 날·실 새김",
+    "tripo_prompt": "a fashion designer's elegant tailored dress coat with a high collar, decorated with motifs a moonlight silk moth spirit and silver spider-silk threads, colours #4a3a8a, #d8dce6, #e8a88a, stage 1 of 7: plain silver blades with engraved thread lines, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_design_2",
+    "type": "weapon",
+    "name": "초승달 고리 가위",
+    "level": 33,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "축에 달 보석",
+    "tripo_prompt": "a pair of giant ornate shears used as a weapon, closed, two long blades pointing up and two finger rings at the bottom, inspired by a moonlight silk moth spirit and silver spider-silk threads, two long blades shaped like spread moth forewings, a round moon gem at the pivot, crescent-moon finger rings with silk thread ribbons trailing down, colours 남보라, 은, 장미금 (#4a3a8a, #d8dce6, #e8a88a), stage 2 of 7: a moon gem at the pivot, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_design_2",
+    "type": "armor",
+    "name": "초승달 단추 코트",
+    "level": 33,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "축에 달 보석",
+    "tripo_prompt": "a fashion designer's elegant tailored dress coat with a high collar, decorated with motifs a moonlight silk moth spirit and silver spider-silk threads, colours #4a3a8a, #d8dce6, #e8a88a, stage 2 of 7: a moon gem at the pivot, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_design_3",
+    "type": "weapon",
+    "name": "달나방 가위",
+    "level": 36,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "고리에 비단실 리본",
+    "tripo_prompt": "a pair of giant ornate shears used as a weapon, closed, two long blades pointing up and two finger rings at the bottom, inspired by a moonlight silk moth spirit and silver spider-silk threads, two long blades shaped like spread moth forewings, a round moon gem at the pivot, crescent-moon finger rings with silk thread ribbons trailing down, colours 남보라, 은, 장미금 (#4a3a8a, #d8dce6, #e8a88a), stage 3 of 7: silk thread ribbons on the rings, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_design_3",
+    "type": "armor",
+    "name": "달나방 드레스 코트",
+    "level": 36,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "고리에 비단실 리본",
+    "tripo_prompt": "a fashion designer's elegant tailored dress coat with a high collar, decorated with motifs a moonlight silk moth spirit and silver spider-silk threads, colours #4a3a8a, #d8dce6, #e8a88a, stage 3 of 7: silk thread ribbons on the rings, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_design_4",
+    "type": "weapon",
+    "name": "은거미줄 가위",
+    "level": 39,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "고리가 초승달 + 진주 바늘 구슬 줄",
+    "tripo_prompt": "a pair of giant ornate shears used as a weapon, closed, two long blades pointing up and two finger rings at the bottom, inspired by a moonlight silk moth spirit and silver spider-silk threads, two long blades shaped like spread moth forewings, a round moon gem at the pivot, crescent-moon finger rings with silk thread ribbons trailing down, colours 남보라, 은, 장미금 (#4a3a8a, #d8dce6, #e8a88a), stage 4 of 7: crescent-moon rings and a string of pearl needle beads, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_design_4",
+    "type": "armor",
+    "name": "은거미줄 코트",
+    "level": 39,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "고리가 초승달 + 진주 바늘 구슬 줄",
+    "tripo_prompt": "a fashion designer's elegant tailored dress coat with a high collar, decorated with motifs a moonlight silk moth spirit and silver spider-silk threads, colours #4a3a8a, #d8dce6, #e8a88a, stage 4 of 7: crescent-moon rings and a string of pearl needle beads, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_design_5",
+    "type": "weapon",
+    "name": "월광 정령 가위",
+    "level": 42,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "날이 달나방 날개로 완성 + 빛나는 달 핵",
+    "tripo_prompt": "a pair of giant ornate shears used as a weapon, closed, two long blades pointing up and two finger rings at the bottom, inspired by a moonlight silk moth spirit and silver spider-silk threads, two long blades shaped like spread moth forewings, a round moon gem at the pivot, crescent-moon finger rings with silk thread ribbons trailing down, colours 남보라, 은, 장미금 (#4a3a8a, #d8dce6, #e8a88a), stage 5 of 7: the blades become full moth wings with a glowing moon core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_design_5",
+    "type": "armor",
+    "name": "월광 정령 코트",
+    "level": 42,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "날이 달나방 날개로 완성 + 빛나는 달 핵",
+    "tripo_prompt": "a fashion designer's elegant tailored dress coat with a high collar, decorated with motifs a moonlight silk moth spirit and silver spider-silk threads, colours #4a3a8a, #d8dce6, #e8a88a, stage 5 of 7: the blades become full moth wings with a glowing moon core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_design_6",
+    "type": "weapon",
+    "name": "만월 나방 가위",
+    "level": 46,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "큰 깃털 더듬이와 금테 + 둘째 달 고리",
+    "tripo_prompt": "a pair of giant ornate shears used as a weapon, closed, two long blades pointing up and two finger rings at the bottom, inspired by a moonlight silk moth spirit and silver spider-silk threads, two long blades shaped like spread moth forewings, a round moon gem at the pivot, crescent-moon finger rings with silk thread ribbons trailing down, colours 남보라, 은, 장미금 (#4a3a8a, #d8dce6, #e8a88a), stage 6 of 7: large feathery antennae, gold trim and a second ring of moon gems, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_design_6",
+    "type": "armor",
+    "name": "만월 나방 오트쿠튀르",
+    "level": 46,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "큰 깃털 더듬이와 금테 + 둘째 달 고리",
+    "tripo_prompt": "a fashion designer's elegant tailored dress coat with a high collar, decorated with motifs a moonlight silk moth spirit and silver spider-silk threads, colours #4a3a8a, #d8dce6, #e8a88a, stage 6 of 7: large feathery antennae, gold trim and a second ring of moon gems, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_design_7",
+    "type": "weapon",
+    "name": "달의 오트쿠튀르 가위",
+    "level": 50,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "보름달 관과 은빛 후광 + 여러 갈래 비단 리본 + 핵에 용의 눈 문양",
+    "tripo_prompt": "a pair of giant ornate shears used as a weapon, closed, two long blades pointing up and two finger rings at the bottom, inspired by a moonlight silk moth spirit and silver spider-silk threads, two long blades shaped like spread moth forewings, a round moon gem at the pivot, crescent-moon finger rings with silk thread ribbons trailing down, colours 남보라, 은, 장미금 (#4a3a8a, #d8dce6, #e8a88a), stage 7 of 7: a full-moon crown with a silver halo, many flowing silk ribbons and a dragon-eye sigil in the core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_design_7",
+    "type": "armor",
+    "name": "달의 여왕 드레스코트",
+    "level": 50,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "보름달 관과 은빛 후광 + 여러 갈래 비단 리본 + 핵에 용의 눈 문양",
+    "tripo_prompt": "a fashion designer's elegant tailored dress coat with a high collar, decorated with motifs a moonlight silk moth spirit and silver spider-silk threads, colours #4a3a8a, #d8dce6, #e8a88a, stage 7 of 7: a full-moon crown with a silver halo, many flowing silk ribbons and a dragon-eye sigil in the core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   }
+  ]
+ },
+ "paint": {
+  "family": "묵룡",
+  "job": "painter",
+  "kind": "brush",
+  "kind_ko": "붓",
+  "motif": "화룡점정 — 먹선으로 그린 용이 금빛 눈을 얻어 살아나는 그림 정령(흑룡이 아닌 그림 속 먹 용)",
+  "silhouette": "먹빛 붓대를 감은 가는 먹 용, 쇠고리 = 용머리, 붓털 = 용의 갈기, 끝에 금빛 눈 보석",
+  "palette": [
+   {
+    "name": "먹 검정",
+    "hex": "#1e1c22"
+   },
+   {
+    "name": "금",
+    "hex": "#e8b848"
+   },
+   {
+    "name": "주홍",
+    "hex": "#e04a2e"
+   }
+  ],
+  "ornaments": "금빛 눈 보석, 붉은 낙관 술, 구름 무늬, 먹방울 구슬",
+  "garment": "화가의 먹빛 화백 도포",
+  "evolution": [
+   {
+    "stage": 1,
+    "ko": "단순한 먹 붓·구름 새김",
+    "en": "a plain ink brush with carved clouds"
+   },
+   {
+    "stage": 2,
+    "ko": "쇠고리에 금빛 눈 보석",
+    "en": "a golden eye gem on the ferrule"
+   },
+   {
+    "stage": 3,
+    "ko": "붓대에 붉은 낙관 술",
+    "en": "a red seal-stamp tassel on the shaft"
+   },
+   {
+    "stage": 4,
+    "ko": "붓대를 감은 먹 용 몸 + 먹방울 구슬 줄",
+    "en": "an ink dragon body coiling the shaft and a string of ink-drop beads"
+   },
+   {
+    "stage": 5,
+    "ko": "쇠고리가 용머리로 완성 + 빛나는 금빛 눈 핵",
+    "en": "the ferrule becomes the full dragon head with a glowing golden eye core"
+   },
+   {
+    "stage": 6,
+    "ko": "구름 날개와 금테 + 둘째 금빛 고리",
+    "en": "cloud wings, gold trim and a second ring of golden gems"
+   },
+   {
+    "stage": 7,
+    "ko": "용 관과 먹구름 후광 + 여러 갈래 낙관 술 + 핵에 용의 눈 문양",
+    "en": "a dragon crown with an ink-cloud halo, many red tassels and a dragon-eye sigil in the core"
+   }
+  ],
+  "items": [
+   {
+    "id": "wg_paint_1",
+    "type": "weapon",
+    "name": "먹물 붓",
+    "level": 30,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "단순한 먹 붓·구름 새김",
+    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by an ink-painted dragon spirit that comes alive when its golden eye is dotted, a slender ink-black dragon coiling around the shaft, the ferrule is the dragon head, the bristles are its mane, a golden eye gem at the tip, colours 먹 검정, 금, 주홍 (#1e1c22, #e8b848, #e04a2e), stage 1 of 7: a plain ink brush with carved clouds, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_paint_1",
+    "type": "armor",
+    "name": "먹물 화실복",
+    "level": 30,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "단순한 먹 붓·구름 새김",
+    "tripo_prompt": "a master painter's ink-dyed long robe with wide sleeves, decorated with motifs an ink-painted dragon spirit that comes alive when its golden eye is dotted, colours #1e1c22, #e8b848, #e04a2e, stage 1 of 7: a plain ink brush with carved clouds, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_paint_2",
+    "type": "weapon",
+    "name": "묵향 용수염 붓",
+    "level": 33,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "쇠고리에 금빛 눈 보석",
+    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by an ink-painted dragon spirit that comes alive when its golden eye is dotted, a slender ink-black dragon coiling around the shaft, the ferrule is the dragon head, the bristles are its mane, a golden eye gem at the tip, colours 먹 검정, 금, 주홍 (#1e1c22, #e8b848, #e04a2e), stage 2 of 7: a golden eye gem on the ferrule, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_paint_2",
+    "type": "armor",
+    "name": "묵향 도포",
+    "level": 33,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "쇠고리에 금빛 눈 보석",
+    "tripo_prompt": "a master painter's ink-dyed long robe with wide sleeves, decorated with motifs an ink-painted dragon spirit that comes alive when its golden eye is dotted, colours #1e1c22, #e8b848, #e04a2e, stage 2 of 7: a golden eye gem on the ferrule, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_paint_3",
+    "type": "weapon",
+    "name": "금눈 먹용 붓",
+    "level": 36,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "붓대에 붉은 낙관 술",
+    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by an ink-painted dragon spirit that comes alive when its golden eye is dotted, a slender ink-black dragon coiling around the shaft, the ferrule is the dragon head, the bristles are its mane, a golden eye gem at the tip, colours 먹 검정, 금, 주홍 (#1e1c22, #e8b848, #e04a2e), stage 3 of 7: a red seal-stamp tassel on the shaft, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_paint_3",
+    "type": "armor",
+    "name": "금눈 먹용 도포",
+    "level": 36,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "붓대에 붉은 낙관 술",
+    "tripo_prompt": "a master painter's ink-dyed long robe with wide sleeves, decorated with motifs an ink-painted dragon spirit that comes alive when its golden eye is dotted, colours #1e1c22, #e8b848, #e04a2e, stage 3 of 7: a red seal-stamp tassel on the shaft, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_paint_4",
+    "type": "weapon",
+    "name": "구름 먹용 붓",
+    "level": 39,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "붓대를 감은 먹 용 몸 + 먹방울 구슬 줄",
+    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by an ink-painted dragon spirit that comes alive when its golden eye is dotted, a slender ink-black dragon coiling around the shaft, the ferrule is the dragon head, the bristles are its mane, a golden eye gem at the tip, colours 먹 검정, 금, 주홍 (#1e1c22, #e8b848, #e04a2e), stage 4 of 7: an ink dragon body coiling the shaft and a string of ink-drop beads, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_paint_4",
+    "type": "armor",
+    "name": "구름 먹용 외투",
+    "level": 39,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "붓대를 감은 먹 용 몸 + 먹방울 구슬 줄",
+    "tripo_prompt": "a master painter's ink-dyed long robe with wide sleeves, decorated with motifs an ink-painted dragon spirit that comes alive when its golden eye is dotted, colours #1e1c22, #e8b848, #e04a2e, stage 4 of 7: an ink dragon body coiling the shaft and a string of ink-drop beads, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_paint_5",
+    "type": "weapon",
+    "name": "화룡 정령 붓",
+    "level": 42,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "쇠고리가 용머리로 완성 + 빛나는 금빛 눈 핵",
+    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by an ink-painted dragon spirit that comes alive when its golden eye is dotted, a slender ink-black dragon coiling around the shaft, the ferrule is the dragon head, the bristles are its mane, a golden eye gem at the tip, colours 먹 검정, 금, 주홍 (#1e1c22, #e8b848, #e04a2e), stage 5 of 7: the ferrule becomes the full dragon head with a glowing golden eye core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_paint_5",
+    "type": "armor",
+    "name": "화룡 정령 도포",
+    "level": 42,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "쇠고리가 용머리로 완성 + 빛나는 금빛 눈 핵",
+    "tripo_prompt": "a master painter's ink-dyed long robe with wide sleeves, decorated with motifs an ink-painted dragon spirit that comes alive when its golden eye is dotted, colours #1e1c22, #e8b848, #e04a2e, stage 5 of 7: the ferrule becomes the full dragon chest emblem with a glowing golden eye core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_paint_6",
+    "type": "weapon",
+    "name": "점정 금룡 붓",
+    "level": 46,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "구름 날개와 금테 + 둘째 금빛 고리",
+    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by an ink-painted dragon spirit that comes alive when its golden eye is dotted, a slender ink-black dragon coiling around the shaft, the ferrule is the dragon head, the bristles are its mane, a golden eye gem at the tip, colours 먹 검정, 금, 주홍 (#1e1c22, #e8b848, #e04a2e), stage 6 of 7: cloud wings, gold trim and a second ring of golden gems, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_paint_6",
+    "type": "armor",
+    "name": "점정 금룡 도포",
+    "level": 46,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "구름 날개와 금테 + 둘째 금빛 고리",
+    "tripo_prompt": "a master painter's ink-dyed long robe with wide sleeves, decorated with motifs an ink-painted dragon spirit that comes alive when its golden eye is dotted, colours #1e1c22, #e8b848, #e04a2e, stage 6 of 7: cloud wings, gold trim and a second ring of golden gems, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_paint_7",
+    "type": "weapon",
+    "name": "천하 묵룡 붓",
+    "level": 50,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "용 관과 먹구름 후광 + 여러 갈래 낙관 술 + 핵에 용의 눈 문양",
+    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by an ink-painted dragon spirit that comes alive when its golden eye is dotted, a slender ink-black dragon coiling around the shaft, the ferrule is the dragon head, the bristles are its mane, a golden eye gem at the tip, colours 먹 검정, 금, 주홍 (#1e1c22, #e8b848, #e04a2e), stage 7 of 7: a dragon crown with an ink-cloud halo, many red tassels and a dragon-eye sigil in the core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_paint_7",
+    "type": "armor",
+    "name": "천하 묵룡 대도포",
+    "level": 50,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "용 관과 먹구름 후광 + 여러 갈래 낙관 술 + 핵에 용의 눈 문양",
+    "tripo_prompt": "a master painter's ink-dyed long robe with wide sleeves, decorated with motifs an ink-painted dragon spirit that comes alive when its golden eye is dotted, colours #1e1c22, #e8b848, #e04a2e, stage 7 of 7: a dragon crown with an ink-cloud halo, many red tassels and a dragon-eye sigil in the core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   }
+  ]
+ },
+ "music": {
+  "family": "별노래",
+  "job": "musician",
+  "kind": "brush",
+  "kind_ko": "붓",
+  "motif": "밤하늘을 나는 별노래 꾀꼬리 정령과 초승달 — 지휘봉처럼 가는 붓",
+  "silhouette": "지휘봉처럼 가늘고 긴 붓대, 쇠고리 위에 초승달과 접은 새 날개, 꼬리깃 리본이 흘러내림, 붓털 끝에 별",
+  "palette": [
+   {
+    "name": "남색",
+    "hex": "#22306a"
+   },
+   {
+    "name": "은",
+    "hex": "#d8dce8"
+   },
+   {
+    "name": "연보라",
+    "hex": "#b89ae8"
+   }
+  ],
+  "ornaments": "별 보석, 음표 방울, 꼬리깃 리본, 은 사슬",
+  "garment": "음악가의 지휘자 연미복",
+  "evolution": [
+   {
+    "stage": 1,
+    "ko": "단순한 가는 붓·음표 새김",
+    "en": "a plain slim brush with engraved music notes"
+   },
+   {
+    "stage": 2,
+    "ko": "쇠고리에 별 보석",
+    "en": "a star gem on the ferrule"
+   },
+   {
+    "stage": 3,
+    "ko": "붓대에 연보라 꼬리깃 리본",
+    "en": "a lilac tail-feather ribbon on the shaft"
+   },
+   {
+    "stage": 4,
+    "ko": "쇠고리 위 초승달 + 음표 방울 줄",
+    "en": "a crescent moon above the ferrule and a string of note-shaped bells"
+   },
+   {
+    "stage": 5,
+    "ko": "머리가 별노래 꾀꼬리로 완성 + 빛나는 별 핵",
+    "en": "the head becomes the full star-song nightingale with a glowing star core"
+   },
+   {
+    "stage": 6,
+    "ko": "큰 날개와 금테 + 둘째 별 고리",
+    "en": "large wings, gold trim and a second ring of star gems"
+   },
+   {
+    "stage": 7,
+    "ko": "별자리 관과 은하 후광 + 여러 갈래 꼬리깃 리본 + 핵에 용의 눈 문양",
+    "en": "a constellation crown with a galaxy halo, many tail-feather ribbons and a dragon-eye sigil in the core"
+   }
+  ],
+  "items": [
+   {
+    "id": "wg_music_1",
+    "type": "weapon",
+    "name": "은방울 지휘붓",
+    "level": 30,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "단순한 가는 붓·음표 새김",
+    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by a star-song nightingale spirit flying across the night sky with a crescent moon, a very slim conductor-baton-like shaft, a crescent moon and folded bird wings above the ferrule, tail-feather ribbons trailing down, a little star at the bristle tip, colours 남색, 은, 연보라 (#22306a, #d8dce8, #b89ae8), stage 1 of 7: a plain slim brush with engraved music notes, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_music_1",
+    "type": "armor",
+    "name": "은방울 연주복",
+    "level": 30,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "단순한 가는 붓·음표 새김",
+    "tripo_prompt": "a conductor musician's swallow-tailed coat with a cravat, decorated with motifs a star-song nightingale spirit flying across the night sky with a crescent moon, colours #22306a, #d8dce8, #b89ae8, stage 1 of 7: a plain slim brush with engraved music notes, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_music_2",
+    "type": "weapon",
+    "name": "별꾀꼬리 붓",
+    "level": 33,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "쇠고리에 별 보석",
+    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by a star-song nightingale spirit flying across the night sky with a crescent moon, a very slim conductor-baton-like shaft, a crescent moon and folded bird wings above the ferrule, tail-feather ribbons trailing down, a little star at the bristle tip, colours 남색, 은, 연보라 (#22306a, #d8dce8, #b89ae8), stage 2 of 7: a star gem on the ferrule, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_music_2",
+    "type": "armor",
+    "name": "별꾀꼬리 연미복",
+    "level": 33,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "쇠고리에 별 보석",
+    "tripo_prompt": "a conductor musician's swallow-tailed coat with a cravat, decorated with motifs a star-song nightingale spirit flying across the night sky with a crescent moon, colours #22306a, #d8dce8, #b89ae8, stage 2 of 7: a star gem on the ferrule, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_music_3",
+    "type": "weapon",
+    "name": "달노래 붓",
+    "level": 36,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "붓대에 연보라 꼬리깃 리본",
+    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by a star-song nightingale spirit flying across the night sky with a crescent moon, a very slim conductor-baton-like shaft, a crescent moon and folded bird wings above the ferrule, tail-feather ribbons trailing down, a little star at the bristle tip, colours 남색, 은, 연보라 (#22306a, #d8dce8, #b89ae8), stage 3 of 7: a lilac tail-feather ribbon on the shaft, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_music_3",
+    "type": "armor",
+    "name": "달노래 연미복",
+    "level": 36,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "붓대에 연보라 꼬리깃 리본",
+    "tripo_prompt": "a conductor musician's swallow-tailed coat with a cravat, decorated with motifs a star-song nightingale spirit flying across the night sky with a crescent moon, colours #22306a, #d8dce8, #b89ae8, stage 3 of 7: a lilac tail-feather ribbon on the shaft, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_music_4",
+    "type": "weapon",
+    "name": "은하 선율 붓",
+    "level": 39,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "쇠고리 위 초승달 + 음표 방울 줄",
+    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by a star-song nightingale spirit flying across the night sky with a crescent moon, a very slim conductor-baton-like shaft, a crescent moon and folded bird wings above the ferrule, tail-feather ribbons trailing down, a little star at the bristle tip, colours 남색, 은, 연보라 (#22306a, #d8dce8, #b89ae8), stage 4 of 7: a crescent moon above the ferrule and a string of note-shaped bells, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_music_4",
+    "type": "armor",
+    "name": "은하 선율 연미복",
+    "level": 39,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "쇠고리 위 초승달 + 음표 방울 줄",
+    "tripo_prompt": "a conductor musician's swallow-tailed coat with a cravat, decorated with motifs a star-song nightingale spirit flying across the night sky with a crescent moon, colours #22306a, #d8dce8, #b89ae8, stage 4 of 7: a crescent moon above the ferrule and a string of note-shaped bells, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_music_5",
+    "type": "weapon",
+    "name": "별노래 정령 붓",
+    "level": 42,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "머리가 별노래 꾀꼬리로 완성 + 빛나는 별 핵",
+    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by a star-song nightingale spirit flying across the night sky with a crescent moon, a very slim conductor-baton-like shaft, a crescent moon and folded bird wings above the ferrule, tail-feather ribbons trailing down, a little star at the bristle tip, colours 남색, 은, 연보라 (#22306a, #d8dce8, #b89ae8), stage 5 of 7: the head becomes the full star-song nightingale with a glowing star core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_music_5",
+    "type": "armor",
+    "name": "별노래 정령 연미복",
+    "level": 42,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "머리가 별노래 꾀꼬리로 완성 + 빛나는 별 핵",
+    "tripo_prompt": "a conductor musician's swallow-tailed coat with a cravat, decorated with motifs a star-song nightingale spirit flying across the night sky with a crescent moon, colours #22306a, #d8dce8, #b89ae8, stage 5 of 7: the chest emblem becomes the full star-song nightingale with a glowing star core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_music_6",
+    "type": "weapon",
+    "name": "천구 합창 붓",
+    "level": 46,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "큰 날개와 금테 + 둘째 별 고리",
+    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by a star-song nightingale spirit flying across the night sky with a crescent moon, a very slim conductor-baton-like shaft, a crescent moon and folded bird wings above the ferrule, tail-feather ribbons trailing down, a little star at the bristle tip, colours 남색, 은, 연보라 (#22306a, #d8dce8, #b89ae8), stage 6 of 7: large wings, gold trim and a second ring of star gems, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_music_6",
+    "type": "armor",
+    "name": "천구 합창 예복",
+    "level": 46,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "큰 날개와 금테 + 둘째 별 고리",
+    "tripo_prompt": "a conductor musician's swallow-tailed coat with a cravat, decorated with motifs a star-song nightingale spirit flying across the night sky with a crescent moon, colours #22306a, #d8dce8, #b89ae8, stage 6 of 7: large wings, gold trim and a second ring of star gems, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   },
+   {
+    "id": "wg_music_7",
+    "type": "weapon",
+    "name": "마에스트로 별왕관 붓",
+    "level": 50,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "별자리 관과 은하 후광 + 여러 갈래 꼬리깃 리본 + 핵에 용의 눈 문양",
+    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by a star-song nightingale spirit flying across the night sky with a crescent moon, a very slim conductor-baton-like shaft, a crescent moon and folded bird wings above the ferrule, tail-feather ribbons trailing down, a little star at the bristle tip, colours 남색, 은, 연보라 (#22306a, #d8dce8, #b89ae8), stage 7 of 7: a constellation crown with a galaxy halo, many tail-feather ribbons and a dragon-eye sigil in the core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "ag_music_7",
+    "type": "armor",
+    "name": "마에스트로 별왕관 예복",
+    "level": 50,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "별자리 관과 은하 후광 + 여러 갈래 꼬리깃 리본 + 핵에 용의 눈 문양",
+    "tripo_prompt": "a conductor musician's swallow-tailed coat with a cravat, decorated with motifs a star-song nightingale spirit flying across the night sky with a crescent moon, colours #22306a, #d8dce8, #b89ae8, stage 7 of 7: a constellation crown with a galaxy halo, many tail-feather ribbons and a dragon-eye sigil in the core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   }
+  ]
+ }
+}

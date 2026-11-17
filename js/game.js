@@ -13,6 +13,7 @@ import { bindSkillRt } from './skillrt.js';
 import { bindSkillUi } from './skillui.js';
 import { installDev } from './devtools.js';
 import { QuestWorld } from './questworld.js';
+import { registerGearDefs } from './items3d.js';
 
 const rnd = (a, b) => a + Math.random() * (b - a);
 const zoneJsonCache = new Map();
@@ -318,6 +319,7 @@ class Game {
       progress(Math.round(++dataDone / names.length * 15));
     }));
     this.data = new GameData(files);
+    registerGearDefs(this.data.itemList);            // 새 장비 계열의 임시 모델(items3d.js)
     const errs = this.data.validate(); for (const e of errs) console.error("[Arcan data]", e);
     this.store = new SaveStore();                          // slot 0 = 자동 저장 (same key as before)
     this.slots = [this.store]; for (let i = 1; i <= SAVE_SLOTS; i++) this.slots.push(new SaveStore(saveSlotKey(i)));

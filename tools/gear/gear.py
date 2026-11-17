@@ -11,8 +11,9 @@
   유봉  공격력 = round(10 + 2.2 L), 마법력 = round(공격력 × 0.45)       드롭 전용은 × 1.08 + 부가 효과
   갑옷  방어력 = round(4 + 1.8 L), 최대 체력 = round(20 + 10 L)          드롭 전용은 × 1.08 + 부가 효과
   값    무기 round(60 L^1.25, 10단위), 갑옷 × 0.9, 장신구 × 1.1, 되팔기 30 %
-Usage: python3 tools/gear/gear.py [--write]"""
+Usage: python3 tools/gear/gear.py [--write | --briefs]   (--briefs = 디자인 브리프 tools/gear/design_briefs.json만)"""
 import json, os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
 D = lambda *a: os.path.join(ROOT, 'assets', 'data', *a)
 USE = {"heal": 0, "healPercent": 0, "sp": 0, "cure": "", "status": "", "duration": 0, "value": 0, "cooldown": 1}
@@ -98,7 +99,6 @@ JOB_ACCS = [
     ('ac_j_muse', '거장의 별빛 음표', 34, '별과 음표가 반짝이는 귀걸이. 화가·음악가 전용 효과.', [st('matk', 14), st('maxSp', 50)], ['painter', 'musician'],
      [st('matk', 0, 0.14), st('cdr', 0.08), st('maxSp', 0, 0.10)], '마법력 +14%, 재사용 대기시간 -8%, 최대 기력 +10%', [('mon_crystal', 0.03), ('mon_crimson_boar', 0.02), ('mon_kreutz_wolf', 0.02)]),
 ]
-SHOP_WEAPONS_OLD = ['w_knife_1', 'w_hammer_1', 'w_scissors_1', 'w_brush_1', 'w_knife_2', 'w_hammer_2', 'w_scissors_2', 'w_brush_2']   # 예전부터 팔던 다른 직업의 1~2단계 무기(유봉은 새 5종만 팖)
 
 def item(id, name, typ, L, desc, stats, tier, k, job='', drops=None, jobbuff=None):
     d = {"id": id, "name": name, "desc": desc, "type": typ, "job": job, "tier": tier, "levelReq": L, "price": 0 if drops else price(L, k),
@@ -107,31 +107,150 @@ def item(id, name, typ, L, desc, stats, tier, k, job='', drops=None, jobbuff=Non
     if jobbuff: d["jobBuff"] = jobbuff
     return d
 
+def legacy(d):
+    """예전 장비: 수치는 원래 계산 그대로(드롭이던 것은 ×1.08), 이제 팔지도 떨어뜨리지도 않음"""
+    d.pop("dropFrom", None); d["price"] = 0; d["legacy"] = True; d["art"] = True
+    if d["type"] == "weapon": d["model3d"] = True; d["kind"] = "pestle"
+    return d
+
 def items():
     out = []
     for i, (id, name, L, desc, extra, drops) in enumerate(PESTLES):
-        a = W_ATK(L, drops); out.append(item(id, name, 'weapon', L, desc, [st('atk', a), st('matk', round(a * 0.45))] + extra, i + 1, 1.0, 'pharmacist', drops))
+        a = W_ATK(L, drops); out.append(legacy(item(id, name, 'weapon', L, desc, [st('atk', a), st('matk', round(a * 0.45))] + extra, i + 1, 1.0, 'pharmacist', drops)))
     for i, (id, name, L, desc, extra, drops) in enumerate(ARMORS):
-        out.append(item(id, name, 'armor', L, desc, [st('def', A_DEF(L, drops)), st('maxHp', A_HP(L, drops))] + extra, i + 1, 0.9, '', drops))
+        out.append(legacy(item(id, name, 'armor', L, desc, [st('def', A_DEF(L, drops)), st('maxHp', A_HP(L, drops))] + extra, i + 1, 0.9, '', drops)))
     for i, (id, name, L, desc, stats, drops) in enumerate(ACCS):
-        out.append(item(id, name, 'accessory', L, desc, stats, i + 1, 1.1, '', drops))
+        out.append(dict(item(id, name, 'accessory', L, desc, stats, i + 1, 1.1, '', drops), art=True))
     for i, (id, name, L, desc, stats, jobs, jstats, jtext, drops) in enumerate(JOB_ACCS):
-        out.append(item(id, name, 'accessory', L, desc, stats, i + 1, 1.1, '', drops, {"jobs": jobs, "stats": jstats, "text": jtext}))
+        out.append(dict(item(id, name, 'accessory', L, desc, stats, i + 1, 1.1, '', drops, {"jobs": jobs, "stats": jstats, "text": jtext}), art=True))
+    return out + line_items()
+
+# ---------------------------------------------------------------- 직업 계보별 무기·방어구 계열 (2026-11-17)
+# 이름·설명·디자인 브리프는 tools/gear/designs.py. id = wg_<계열>_<단계> (무기) / ag_<계열>_<단계> (방어구).
+# 단계 레벨: 견습생 Lv1~8(4단계: 3 판매 + 1 드롭), 1차 Lv10~31(7단계: 5 판매 + 2 드롭), 2차 Lv30~50(7단계: 5 + 2).
+# 수치는 기존 공식 그대로(직업 간 균형 = 같은 레벨 같은 힘 P = 10 + 2.2 L), Lv8 밑은 저레벨 보정 lowK(L) = min(1, 0.5 + L/16)
+#   (예전 1~3단계 장비 곡선 Lv1 6 · Lv5 14 · Lv8 26에 맞춤 — Lv8 이상은 기존 공식과 똑같음).
+#   무기 종류별 주 능력치: 검 공격 P / 유봉 공격 P + 마법 0.45P(기존 유봉) / 망치 공격 P + 방어 0.15P / 식칼 공격 P + 치명 2~6%
+#   / 가위 공격 P + 치명 3~8% / 붓 마법 P + 공격 0.45P(유봉의 거울). 3단계부터 계열 고유 효과(SIG)가 단계마다 한 칸씩, 드롭 2단계는 효과 하나 더(DROP2).
+#   방어구는 계열과 상관없이 같은 공식(방어 4 + 1.8L, 체력 20 + 10L) + 같은 자리의 같은 부가 효과(ARMOR_EXTRA) — 이름·디자인만 직업 맞춤.
+from designs import LINES, STAGE_KO, weapon_prompt, armor_prompt, KIND
+LV_NOVICE = [1, 3, 5, 8]
+LV_TIER1 = [10, 13, 16, 19, 22, 26, 31]
+LV_TIER2 = [30, 33, 36, 39, 42, 46, 50]
+SOLD = {4: 3, 7: 5}                    # 단계 수 -> 판매 단계 수 (나머지는 드롭 전용)
+lowK = lambda L: min(1.0, 0.5 + L / 16)
+POWER = lambda L, drop: (10 + 2.2 * L) * lowK(L) * (1.08 if drop else 1)
+# 계열 고유 효과: (능력치, 단계당 값, 곱하기?) — 3단계부터 (s-1)배, s = 0부터 센 단계
+SIG = {'nov': ('hit', 0.01, False), 'pharm': ('healPower', 0.03, False), 'smith': ('dmgReduce', 0.01, False), 'cook': ('foodPower', 0.04, False),
+       'hair': ('atkSpeed', 0.02, True), 'art': ('cdr', 0.01, False), 'wpharm': ('critDmg', 0.03, False), 'herb': ('healPower', 0.03, False),
+       'eng': ('crit', 0.01, False), 'chef': ('foodPower', 0.04, False), 'design': ('eva', 0.01, False), 'paint': ('cdr', 0.01, False),
+       'music': ('spRegen', 0.15, False)}
+DROP2 = {'nov': st('crit', 0.02), 'pharm': st('elemRes', 0.05), 'smith': st('crit', 0.03), 'cook': st('crit', 0.03), 'hair': st('eva', 0.03),
+         'art': st('maxSp', 40), 'wpharm': st('crit', 0.04), 'herb': st('elemRes', 0.06), 'eng': st('cdr', 0.04), 'chef': st('critDmg', 0.10),
+         'design': st('crit', 0.04), 'paint': st('critDmg', 0.10), 'music': st('cdr', 0.04)}
+def r3(x): return round(x, 3)
+def weapon_stats(L, kind, s, n, drop, key):
+    P = POWER(L, drop); f = L / 50
+    main = {'sword': [st('atk', round(P))],
+            'pestle': [st('atk', round(P)), st('matk', round(round(P) * 0.45))],
+            'hammer': [st('atk', round(P)), st('def', round(P * 0.15))],
+            'knife': [st('atk', round(P)), st('crit', r3(0.02 + 0.04 * f))],
+            'scissors': [st('atk', round(P)), st('crit', r3(0.03 + 0.05 * f))],
+            'brush': [st('matk', round(P)), st('atk', round(round(P) * 0.45))]}[kind]
+    if s >= 2:
+        stat, step, mul = SIG[key]; v = r3(step * (s - 1)); main.append(st(stat, 0, v) if mul else st(stat, v))
+    if drop: main.append(dict(DROP2[key]))
+    return main
+# 방어구 부가 효과: 자리(판매 마지막 단계 / 드롭 1 / 드롭 2) — 모든 계열 같음(직업 간 균형)
+def armor_stats(L, s, n, drop):
+    out = [st('def', round((4 + 1.8 * L) * lowK(L) * (1.08 if drop else 1))), st('maxHp', round((20 + 10 * L) * lowK(L) * (1.08 if drop else 1)))]
+    sold = SOLD[n]
+    if s == sold - 1 and n == 7: out.append(st('elemRes', 0.04))
+    if drop and s == n - 1 and n == 7: out += [st('dmgReduce', 0.06), st('elemRes', 0.08)]
+    elif drop and n == 7: out.append(st('dmgReduce', 0.04))
+    elif drop: out.append(st('eva', 0.02))
+    return out
+def levels_of(L): return LV_NOVICE if L['job'] == 'novice' else LV_TIER1 if L['job'] in TIER1 else LV_TIER2
+TIER1 = {'pharmacist', 'blacksmith', 'cook', 'hairdresser', 'artist'}
+STAND = {'sword': 'stick', 'pestle': 'pestle', 'hammer': 'hammer', 'knife': 'knife', 'scissors': 'scissors', 'brush': 'brush'}
+
+# 드롭 몬스터: 그 단계 레벨 근처([L-4, L+3])에 실제로 나오는 몬스터 중 가까운 순, 계열마다 돌려 가며 최대 3마리(이야기 보스 qb_* 제외)
+def spawn_levels():
+    import collections
+    M = {m['id']: m for m in json.load(open(D('monsters.json')))['monsters']}; lv = collections.defaultdict(set)
+    def scan(z):
+        for s in z.get('monsters', []): lv[s['monster']].add(s.get('level') or M[s['monster']]['level'])
+        b = z.get('boss')
+        if b and b.get('boss'): lv[b['boss']].add(M[b['boss']]['level'])
+    for z in json.load(open(D('zones.json')))['zones']:
+        if not z.get('file'): scan(z)
+    for f in sorted(os.listdir(D('world'))): scan(json.load(open(D('world', f))))
+    return {k: v for k, v in lv.items() if not k.startswith('qb_') and k in M}, M
+def pick_drops(L, salt, LV, M, legend):
+    c = []
+    for m, ls in LV.items():
+        d = min((0 if L - 4 <= l <= L + 3 else 99) + abs(l - L) for l in ls)
+        if d < 99: c.append((d, m))
+    c.sort(); assert c, 'no drop monster near Lv%d' % L
+    pool = [m for _, m in c[:8]]; k = salt % len(pool); pick = (pool[k:] + pool[:k])[:3]
+    return [(m, 0.15 if M[m].get('ai') == 'boss' else (0.015 if legend else 0.025)) for m in pick]
+
+def line_items():
+    LV, M = spawn_levels(); out = []
+    for li, L in enumerate(LINES):
+        lv = levels_of(L); n = len(lv); sold = SOLD[n]
+        assert len(L['weapons']) == len(L['armors']) == len(L['evo']) == len(L['evo_ko']) == n, L['key']
+        for s, Lv in enumerate(lv):
+            drop = s >= sold
+            for typ, names, pre in (('weapon', L['weapons'], 'wg'), ('armor', L['armors'], 'ag')):
+                id = '%s_%s_%d' % (pre, L['key'], s + 1); name, desc = names[s]
+                drops = pick_drops(Lv, li * 3 + s + (1 if typ == 'armor' else 0), LV, M, s == n - 1) if drop else None
+                stats = weapon_stats(Lv, L['kind'], s, n, drop, L['key']) if typ == 'weapon' else armor_stats(Lv, s, n, drop)
+                job = (L['job'] if L['job'] != 'novice' else '') if typ == 'weapon' else ''       # 착용 제한은 예전 규칙 그대로: 무기만 직업(+그 2차), 방어구는 누구나
+                it = item(id, name, typ, Lv, desc, stats, s + 1, 1.0 if typ == 'weapon' else 0.9, job, drops)
+                it['line'] = L['job']; it['kind'] = L['kind'] if typ == 'weapon' else 'armor'
+                # 임시 모델·아이콘(다음 단계가 assets/items/<id>.glb.json · assets/ui/items/<id>.png를 만들면 --write가 자동으로 켬)
+                it['stand'] = [STAND[L['kind']] if typ == 'weapon' else 'armor', 1 + s * 3 // n]
+                if os.path.exists(os.path.join(ROOT, 'assets', 'ui', 'items', id + '.png')): it['art'] = True
+                if os.path.exists(os.path.join(ROOT, 'assets', 'items', id + '.glb.json')): it['model3d'] = True
+                out.append(it)
     return out
 
+def briefs():
+    """아이템마다 디자인 브리프 (다음 단계: Tripo 3D·아이콘)"""
+    out = {}
+    for L in LINES:
+        lv = levels_of(L); n = len(lv); sold = SOLD[n]
+        fam = dict(family=L['family'], job=L['job'], kind=L['kind'], kind_ko=KIND[L['kind']]['ko'], motif=L['motif_ko'], silhouette=L['silhouette_ko'],
+                   palette=[{'name': a, 'hex': b} for a, b in L['palette']], ornaments=L['ornaments_ko'], garment=L['garment_ko'],
+                   evolution=[{'stage': i + 1, 'ko': L['evo_ko'][i], 'en': L['evo'][i]} for i in range(n)])
+        items = []
+        for s, Lv in enumerate(lv):
+            stage = STAGE_KO[s] if n == 7 else STAGE_KO[[0, 1, 2, 4][s]]
+            for typ, names, pre, prompt in (('weapon', L['weapons'], 'wg', weapon_prompt), ('armor', L['armors'], 'ag', armor_prompt)):
+                items.append(dict(id='%s_%s_%d' % (pre, L['key'], s + 1), type=typ, name=names[s][0], level=Lv, stage=s + 1, stageName=stage,
+                                  drop=s >= sold, ornament_ko=L['evo_ko'][s], tripo_prompt=prompt(L, s)))
+        out[L['key']] = dict(fam, items=items)
+    return out
+
+# 예전 장비(2026-11-11 유봉 10 · 갑옷 10): 저장 호환을 위해 아이템은 그대로 남김(같은 id·수치·아이콘·모델) — 팔지도 떨어뜨리지도 않음(legacy)
 def shop_ids(lst): return [x[0] for x in lst if x[5] is None]
-SHOPS = [
-    {"id": "shop_weapons", "name": "무기 상점", "items": SHOP_WEAPONS_OLD + shop_ids(PESTLES), "gear": True},
-    {"id": "shop_armor", "name": "방어구·장신구 상점", "items": shop_ids(ARMORS) + shop_ids(ACCS), "gear": True},
-    {"id": "shop_forge", "name": "철산의 대장간 (제작 재료)", "items": [], "gear": True},      # 철산은 무기·갑옷을 팔지 않음 — 제작 재료만(skills2 shopAdd가 채움)
-]
+def build_shops(its):
+    lw = [i['id'] for i in its if i.get('line') and i['type'] == 'weapon' and i['price']]
+    la = [i['id'] for i in its if i.get('line') and i['type'] == 'armor' and i['price']]
+    return [
+        # 목록에는 모든 계열이 들어 있고, 상점 창은 플레이어 직업 계보로 거름(core.js shopStockFor)
+        {"id": "shop_weapons", "name": "무기 상점", "items": lw, "gear": True},
+        {"id": "shop_armor", "name": "방어구·장신구 상점", "items": la + shop_ids(ACCS), "gear": True},
+        {"id": "shop_forge", "name": "철산의 대장간 (제작 재료)", "items": [], "gear": True},      # 철산은 무기·갑옷을 팔지 않음 — 제작 재료만(skills2 shopAdd가 채움)
+    ]
 # 아르칸 마을: 단오(기존 무기상)가 무기 상인, 그 옆에 새 방어구 상인. 다른 마을은 world.py GEAR_MERCHANTS.
 TOWN_NPC = {"id": "town_armor", "name": "보라", "title": "방어구·장신구 상인", "sheet": "npc_merchant", "model": "gear_armor", "role": "merchant", "shop": "shop_armor", "job": "",
             "lines": ["갑옷은 몸에 맞아야 제값을 하죠.", "귀한 장비는 몬스터가 품고 있답니다. 저는 기본만 팔아요."], "gear": True}
 TOWN_SPOT = {"npc": "town_armor", "pos": [14.4, -6.9], "rot": -90.0, "gear": True}
 
 def main():
-    its = items(); ids = [i['id'] for i in its]; assert len(ids) == len(set(ids)) == 40
+    its = items(); ids = [i['id'] for i in its]; assert len(ids) == len(set(ids)), 'duplicate id'; SHOPS = build_shops(its)
     I = json.load(open(D('items.json'))); N = json.load(open(D('npcs.json'))); Z = json.load(open(D('zones.json'))); M = json.load(open(D('monsters.json')))
     known = {m['id'] for m in M['monsters']}
     for it in its:
@@ -140,7 +259,7 @@ def main():
     N['npcs'] = [n for n in N['npcs'] if not n.get('gear')]
     at = next(k for k, n in enumerate(N['npcs']) if n['id'] == 'armorer'); N['npcs'].insert(at + 1, TOWN_NPC)
     for n in N['npcs']:
-        if n['id'] == 'armorer': n['title'] = '무기 상인'; n['shop'] = 'shop_weapons'; n['lines'] = ["검이든 유봉이든, 손에 맞아야 진짜 무기지.", "좋은 무기는 사냥터의 몬스터가 떨어뜨린다네. 여기선 기본만 팔아."]
+        if n['id'] == 'armorer': n['title'] = '무기 상인'; n['shop'] = 'shop_weapons'; n['lines'] = ["직업마다 손에 맞는 무기가 따로 있지. 자네 직업에 맞는 것만 꺼내 보여 주겠네.", "좋은 무기는 사냥터의 몬스터가 떨어뜨린다네. 여기선 기본만 팔아."]
         if n['id'] == 'master_blacksmith': n['shop'] = 'shop_forge'          # 무기·갑옷 판매는 무기·방어구 상인이 맡음(2026-11-11), 철산은 제작 재료만
     N['shops'] = [s for s in N['shops'] if not s.get('gear') and s['id'] != 'shop_arms'] + SHOPS
     town = next(z for z in Z['zones'] if z['id'] == 'town')
@@ -151,6 +270,9 @@ def main():
     n_shop = sum(1 for i in its if i['price']); print('items', len(its), 'shop', n_shop, 'drop', len(its) - n_shop)
     for i in its: print(' %-13s Lv%-2d %-14s %5s G  %s%s' % (i['id'], i['levelReq'], i['name'], i['price'] or '-', ' '.join('%s%+g%s' % (s['stat'], s['add'] or s['mul'], '%' if s['mul'] else '') for s in i['stats']),
                                                     '  <- ' + ', '.join('%s %g%%' % (d['monster'], d['chance'] * 100) for d in i.get('dropFrom', []))))
+    if '--write' in sys.argv or '--briefs' in sys.argv:
+        json.dump(briefs(), open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'design_briefs.json'), 'w'), ensure_ascii=False, indent=1)
+        print('wrote tools/gear/design_briefs.json')
     if '--write' in sys.argv:
         json.dump(I, open(D('items.json'), 'w'), ensure_ascii=False, indent=1)
         json.dump(N, open(D('npcs.json'), 'w'), ensure_ascii=False, indent=1)

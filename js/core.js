@@ -579,10 +579,34 @@ export class QuestLog {
 }
 
 // ======================================================================================= shop
+/** 직업 계보별 장비 계열(tools/gear/gear.py, item.line = 그 계열의 직업). 상점은 지금 직업 계보의 계열만 보여 줌(2026-11-17):
+ *  견습생 = 견습생 계열, 1차 = 그 1차 계열, 2차 = 그 2차 계열. 지금 레벨이 자기 계열의 가장 낮은 판매 단계보다 낮으면
+ *  (예: Lv10 전에 직업을 고른 예전 저장) 바로 위 계열(2차 → 1차, 1차 → 견습생)에서 그 단계보다 낮은 것을 함께 보여 줘 빈 구간이 없게 함.
+ *  다른 직업의 무기(item.job — 착용 규칙과 같은 판정)와 다른 직업 전용 장신구(jobBuff)도 숨김. 되팔기는 상관없음. */
+export function gearParentLine(data, job) { const j = data.job(job); if (!j || job === "novice") return null; return j.tier === 2 && j.parent ? j.parent : "novice"; }
+export function shopItemVisible(data, p, def, shop) {
+  if (!def) return false;
+  const job = p.job || "novice";
+  if (def.line) {
+    if (def.line === job) return true;
+    if (def.line !== gearParentLine(data, job)) return false;
+    const own = (shop ? shop.items : []).map(id => data.item(id)).filter(d => d && d.line === job && d.type === def.type);
+    const floor = own.length ? Math.min(...own.map(d => d.levelReq)) : Infinity;
+    return p.level < floor && def.levelReq < floor;
+  }
+  if (def.type === "weapon" && def.job && def.job !== job) { const cur = data.job(job); if (!(cur && cur.parent === def.job)) return false; }
+  if (def.jobBuff && !def.jobBuff.jobs.includes(job)) return false;
+  return true;
+}
+/** 이 플레이어에게 보이는 상점 목록(아이템 id, 원래 순서 — 장비는 레벨 순) */
+export function shopStockFor(data, p, shopOrId) {
+  const shop = typeof shopOrId === "string" ? data.shops[shopOrId] : shopOrId; if (!shop) return [];
+  return shop.items.filter(id => shopItemVisible(data, p, data.item(id), shop));
+}
 export const Shop = {
   buy(ch, shop, id, n) {
     if (!(n > 0)) return "수량이 올바르지 않습니다.";
-    if (!shop || !shop.items.includes(id)) return "이 상점에서 팔지 않는 물건입니다.";
+    if (!shop || !shop.items.includes(id) || !shopItemVisible(ch.data, ch.p, ch.data.item(id), shop)) return "이 상점에서 팔지 않는 물건입니다.";
     const d = ch.data.item(id); const cost = d.price * n;
     if (cost > ch.p.gold) return "골드가 부족합니다.";
     if (ch.bag.spaceFor(id) < n) return "가방에 빈 칸이 부족합니다.";

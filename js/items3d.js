@@ -208,7 +208,14 @@ function gun(len, wide) { const g = G(); add(g, box(0.04, 0.1, 0.04), DWOOD, 0, 
 // ---- 장비 40종 (tools/gear/gear.py): 유봉은 Tripo → Blender 모델(assets/items/<id>.glb.json, tools/blender/gear.py)을 손에 듦.
 // 갑옷·장신구는 가방·상점에서는 그림 아이콘(assets/ui/items)만 쓰고, 땅에 떨어진 모습은 기존 절차 모델을 빌림.
 const GEAR_WEAPON = /^w_pestle_g\d+$/, GEAR_ARMOR = /^a_armor_g(\d+)$/, GEAR_ACC = /^ac_(g\d+|j_\w+)$/;
-export const isGearItem = id => GEAR_WEAPON.test(id) || GEAR_ARMOR.test(id) || GEAR_ACC.test(id);
+// 직업 계보별 계열(2026-11-17, wg_<계열>_<단계> / ag_<계열>_<단계>): 아이템 데이터의 stand = [기존 절차 모델 종류, 단계 1~3] — 새 디자인 모델이
+// 나오기 전까지 쓰는 임시 모습. model3d = assets/items/<id>.glb.json이 있음(gear.py가 파일을 보고 켬). game.js가 registerGearDefs로 넘겨 줌.
+const GEAR_DEFS = new Map();
+export function registerGearDefs(list) { for (const d of list || []) if (d && d.gear && d.stand) GEAR_DEFS.set(d.id, d); }
+export const gearDef = id => GEAR_DEFS.get(id) || null;
+/** 미용사 큰 가위의 색 단계(1~3): 예전 w_scissors_N 또는 새 가위 계열의 stand 단계 */
+export function shearsTierOf(id) { const m = /^w_scissors_(\d)/.exec(id || ''); if (m) return +m[1]; const d = GEAR_DEFS.get(id); return d && d.kind === 'scissors' ? d.stand[1] : 0; }
+export const isGearItem = id => GEAR_WEAPON.test(id) || GEAR_ARMOR.test(id) || GEAR_ACC.test(id) || GEAR_DEFS.has(id);
 export const GEAR_SCALE = 0.86;                 // 손에 든 유봉 크기(모델 길이 0.46 m × 이 값 × 손 배율 1.3)
 const gearCache = new Map();                    // id -> Promise<Object3D | null>
 function loadGear(id) {
@@ -224,8 +231,8 @@ function loadGear(id) {
   return gearCache.get(id);
 }
 /** held / dropped model of a gear pestle: a simple pestle at once, swapped for the real model when it has loaded (grip at the origin, axis +z) */
-function gearWeapon(id) {
-  const g = G(); g.add(BUILD.pestle(2));
+function gearWeapon(id, stand) {
+  const g = G(); g.add(stand ? BUILD[stand[0]](stand[1]) : BUILD.pestle(2));
   loadGear(id).then(src => {
     if (!src) return;
     const m = src.clone(true); m.scale.setScalar(GEAR_SCALE); m.rotation.x = R;           // model: head up (+y) -> item axis +z
@@ -236,11 +243,13 @@ function gearWeapon(id) {
 }
 function gearModel(id) {
   if (GEAR_WEAPON.test(id)) return gearWeapon(id);
+  const d = GEAR_DEFS.get(id);
+  if (d) return d.type === 'weapon' && d.model3d ? gearWeapon(id, d.stand) : BUILD[d.stand[0]](d.stand[1]);
   const a = GEAR_ARMOR.exec(id); if (a) return BUILD.armor(Math.min(3, 1 + Math.floor((+a[1] - 1) / 4)));
   return /^ac_g(1|8|10)$/.test(id) ? BUILD.ring(3) : BUILD.amulet(2);
 }
 export const hasItemModel = id => !!(BY_ID[id] || EXTRA[id] || isGearItem(id));
-export function isWeaponModel(id) { if (/^w_(gun|hammer_c|axe_c)/.test(id) || GEAR_WEAPON.test(id)) return true; return BY_ID[id] && ['stick', 'pestle', 'knife', 'hammer', 'scissors', 'brush'].includes(BY_ID[id][0]); }
+export function isWeaponModel(id) { if (/^w_(gun|hammer_c|axe_c)/.test(id) || GEAR_WEAPON.test(id)) return true; const gd = GEAR_DEFS.get(id); if (gd) return gd.type === 'weapon'; return BY_ID[id] && ['stick', 'pestle', 'knife', 'hammer', 'scissors', 'brush'].includes(BY_ID[id][0]); }
 /** new Object3D for an item id (null when unknown) */
 export function itemModel(id) { if (isGearItem(id)) return gearModel(id); const b = BY_ID[id]; if (!b) return EXTRA[id] ? EXTRA[id]() : null; return BUILD[b[0]](b[1]); }
 

@@ -3,7 +3,7 @@
 // so actors.js keeps working; animation comes from the game's pose table, applied to the skeleton and
 // interpolated every frame, and the body turns smoothly to any angle.
 import { THREE, T, tex, paintMat, contactShadowTex, addOutline } from './render.js';
-import { itemModel, isWeaponModel, BRUSH_SCALE } from './items3d.js';
+import { itemModel, isWeaponModel, BRUSH_SCALE, shearsTierOf } from './items3d.js';
 
 const DEG = Math.PI / 180;
 export const PLAYER_MODELS = {
@@ -948,8 +948,8 @@ export class ModelBody {
     // stow actions (약사 약병 투구 ph_pitch): the weapon stays on the back for the whole motion and the thrown item sits in the
     // empty right hand (prop slot H) until the release key; other actions with `held` swap the weapon for the item as before
     // 미용사는 언제나 큰 가위를 듦(가위를 안 찼으면 1단계 모양)
-    const sw = shearsOn ? /^w_scissors_(\d)/.exec(wid || '') : null;
-    const stow = !!(ca && ca.stow) && !md.cfg.npc, wkind = shearsOn ? 'shears:' + (sw ? sw[1] : 1) : wid && isWeaponModel(wid) ? 'item:' + wid : this.weapon;
+    const sw = shearsOn ? shearsTierOf(wid) : 0;
+    const stow = !!(ca && ca.stow) && !md.cfg.npc, wkind = shearsOn ? 'shears:' + (sw || 1) : wid && isWeaponModel(wid) ? 'item:' + wid : this.weapon;
     if (stow) { const w0 = this.weaponId ? this.weaponId() : null; this.updateProp('R', w0 && isWeaponModel(w0) ? 'item:' + w0 : this.weapon, 0); this.updateProp('H', p.held || null, (p.wOff - 90) * (1 - (this.swingW || 0))); }
     else { this.updateProp('R', p.held || wkind, (p.wOff - 90 + (p.held ? 0 : (REST_TILT[this.weapon] || 0) + (RUN_TILT[this.weapon] || 0) * Math.min(1, this.gaitW || 0))) * (1 - (this.swingW || 0))); if (this.props.H) this.updateProp('H', null, 0); }
     this.updateProp('L', p.held && !stow ? null : this.armW > 0.5 && !(this.gripW > 0.4) && !(this.offGripW > 0.3) && !(this.ikLW > 0.3) ? this.off : null, p.offOff - 90 + (OFF_TILT[this.off] || 0));
