@@ -1,26 +1,116 @@
 {
- "note": "Synthesized in-repo (no Runway credit). Regenerate with python3 tools/audio/wp_sfx.py (fixed seed).",
- "generatedOn": "2026-11-16",
- "assets": [
-  {
-   "file": "sfx_wp_granule.mp3",
-   "description": "과립 명중: 작고 단단한 유리 '틱' + 짧은 탄산 쉭"
+ "model": "runway eleven_text_to_sound_v2",
+ "tool": "tools/audio/wp_runway_sfx.py",
+ "post": "ffmpeg trim / loudnorm -16 LUFS / mono mp3 96k",
+ "spentCredits": 25,
+ "sounds": {
+  "sfx_wp_granule": {
+   "prompt": "tiny glass bead hitting a target with a crisp sparkling tick and a soft fizzy pop, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.5,
+   "use": "A1 과립 명중, B3 이어진 용출",
+   "date": "2026-11-16"
   },
-  {
-   "file": "sfx_wp_ring.mp3",
-   "description": "반응 고리·연쇄 시작 폭발: 유리 '퐁' + 짧은 불꽃"
+  "sfx_wp_ring": {
+   "prompt": "small glass capsule bursting into a fiery red magic ring, quick glassy pop followed by a warm flame whoosh, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 1.0,
+   "use": "A1 반응 고리, B3 용출 시작",
+   "date": "2026-11-16"
   },
-  {
-   "file": "sfx_wp_crystal.mp3",
-   "description": "결정 폭발·복합 반응: 얼음 결정 '쨍' + 맑은 여운"
+  "sfx_wp_split": {
+   "prompt": "a magic medicine capsule clicking open in mid air, bright glassy snap with a quick rising sparkle, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.6,
+   "use": "A1 캡슐이 갈라짐(그림)",
+   "date": "2026-11-16"
   },
-  {
-   "file": "sfx_wp_ion.mp3",
-   "description": "이온 관통: 전기 '찌직' + 짧은 쿵"
+  "sfx_wp_crystal": {
+   "prompt": "ice crystals bursting and shattering with a bright ringing chime, frosty glass sparkle tail, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 1.2,
+   "use": "A2 결정 폭발, A4 복합 반응",
+   "date": "2026-11-16"
   },
-  {
-   "file": "sfx_wp_collapse.mp3",
-   "description": "궁극기 주 타격: 낮은 '쿵' + 결정 파쇄 + 맑은 여운"
+  "sfx_wp_frost": {
+   "prompt": "glass ampoule cracking on the ground and frost quickly spreading with crisp icy crackles, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 1.0,
+   "use": "A2 막이 퍼짐(그림)",
+   "date": "2026-11-16"
+  },
+  "sfx_wp_ion": {
+   "prompt": "sharp blue electric lightning zap piercing straight through, crackling arc with a bright snap, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.9,
+   "use": "A3 이온 관통, A4 전격",
+   "date": "2026-11-16"
+  },
+  "sfx_wp_align": {
+   "prompt": "three small metallic orbs humming and charging with rising electric whine, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.6,
+   "use": "A3 구슬 정렬(그림)",
+   "date": "2026-11-16"
+  },
+  "sfx_wp_triad": {
+   "prompt": "three magic potion orbs swirling into place with a soft magical whoosh and chime, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.7,
+   "use": "A4 셋이 자리 잡음(그림)",
+   "date": "2026-11-16"
+  },
+  "sfx_wp_charge": {
+   "prompt": "magical energy gathering into a glowing core, rising shimmering hum with sparkles converging, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 1.3,
+   "use": "A5 핵이 모임, B5 표식 흡수(그림)",
+   "date": "2026-11-16"
+  },
+  "sfx_wp_collapse": {
+   "prompt": "huge magical impact, deep heavy boom with a big glass crystal explosion and sparkling shards raining down, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 1.8,
+   "use": "A5·B5 궁극기 주 타격",
+   "date": "2026-11-16"
+  },
+  "sfx_wp_catalyst": {
+   "prompt": "golden catalyst activating, three ascending bright chimes with warm magical shimmer, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 1.2,
+   "use": "B1 촉매 활성화(그림)",
+   "date": "2026-11-16"
+  },
+  "sfx_wp_spark": {
+   "prompt": "single small golden spark chime ping, magical and bright, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.5,
+   "use": "B1 충전 하나 사용(그림)",
+   "date": "2026-11-16"
+  },
+  "sfx_wp_carrier": {
+   "prompt": "a soft glass bubble orb whooshing through the air and latching on with a gentle magical lock click, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.8,
+   "use": "B2 정밀 표적 전달(그림)",
+   "date": "2026-11-16"
+  },
+  "sfx_wp_chain": {
+   "prompt": "bubbling toxic potion splash bursting with a wet glassy pop and fizz, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.8,
+   "use": "B3 연쇄 고리마다(그림)",
+   "date": "2026-11-16"
+  },
+  "sfx_wp_spray": {
+   "prompt": "gentle healing mist spray hiss with soft sparkling chimes, soothing magic, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 1.4,
+   "use": "C3 생체 회복 분무(그림)",
+   "date": "2026-11-16"
+  },
+  "sfx_wp_coat": {
+   "prompt": "protective glassy magic barrier layers forming, smooth shimmering hum with a crystalline ring, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 1.0,
+   "use": "C4 다층 코팅막(그림)",
+   "date": "2026-11-16"
+  },
+  "sfx_wp_lastrx": {
+   "prompt": "miraculous golden revival, bright holy chime swell with a glass capsule pop and warm sparkles, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 1.6,
+   "use": "C5 최종 처방(그림)",
+   "date": "2026-11-16"
+  },
+  "sfx_wp_brew": {
+   "prompt": "alchemy potion brewing, quick bubbling glass flask and a bright completion ding, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 1.3,
+   "use": "C1·C2 조제 완성(그림)",
+   "date": "2026-11-16"
   }
- ]
+ }
 }

@@ -1,0 +1,95 @@
+{
+ "spent": 25,
+ "done": {
+  "wp_granule": {
+   "task": "040cbfe2-c51e-418d-b5b5-6c51bdc687f4",
+   "duration": 0.5,
+   "date": "2026-11-16"
+  },
+  "wp_ring": {
+   "task": "6cd113c9-e6a3-481f-9eff-513b5a893228",
+   "duration": 1.0,
+   "date": "2026-11-16"
+  },
+  "wp_split": {
+   "task": "54148b43-5709-4b58-9013-974ec9cfb578",
+   "duration": 0.6,
+   "date": "2026-11-16"
+  },
+  "wp_crystal": {
+   "task": "5ea6ba55-8f73-4859-adaa-2a343c99a99a",
+   "duration": 1.2,
+   "date": "2026-11-16"
+  },
+  "wp_frost": {
+   "task": "4d813cc2-4e62-4c45-a55f-1638e1a335b5",
+   "duration": 1.0,
+   "date": "2026-11-16"
+  },
+  "wp_ion": {
+   "task": "0c719a64-72f6-4941-9bdd-9dc9917bb3e5",
+   "duration": 0.9,
+   "date": "2026-11-16"
+  },
+  "wp_align": {
+   "task": "061d772b-d77f-4d1a-87c1-aee7ef3592eb",
+   "duration": 0.6,
+   "date": "2026-11-16"
+  },
+  "wp_triad": {
+   "task": "b7813e1a-e90a-4cb6-9850-27d8f1524be7",
+   "duration": 0.7,
+   "date": "2026-11-16"
+  },
+  "wp_charge": {
+   "task": "89bd5b02-64e6-430c-a376-25aa1fd71fa8",
+   "duration": 1.3,
+   "date": "2026-11-16"
+  },
+  "wp_collapse": {
+   "task": "742c7dcd-8ba8-4d4c-97ba-e5e1ff83ea84",
+   "duration": 1.8,
+   "date": "2026-11-16"
+  },
+  "wp_catalyst": {
+   "task": "7403e09e-930c-4bf6-9650-900d3628ef4d",
+   "duration": 1.2,
+   "date": "2026-11-16"
+  },
+  "wp_spark": {
+   "task": "39391947-854d-49c2-b824-47c6bd89223a",
+   "duration": 0.5,
+   "date": "2026-11-16"
+  },
+  "wp_carrier": {
+   "task": "2171652b-d94b-40c4-ad0a-131bf41f875a",
+   "duration": 0.8,
+   "date": "2026-11-16"
+  },
+  "wp_chain": {
+   "task": "32d922c3-74f7-4778-87c0-ade7994eeba1",
+   "duration": 0.8,
+   "date": "2026-11-16"
+  },
+  "wp_spray": {
+   "task": "570e3fed-bf34-4cf2-8a6e-c19364648b06",
+   "duration": 1.4,
+   "date": "2026-11-16"
+  },
+  "wp_coat": {
+   "task": "2451eed3-ab28-462e-8c15-c1d8ef5e75b1",
+   "duration": 1.0,
+   "date": "2026-11-16"
+  },
+  "wp_lastrx": {
+   "task": "c89251a2-1f52-4521-a779-329c241fa752",
+   "duration": 1.6,
+   "date": "2026-11-16"
+  },
+  "wp_brew": {
+   "task": "7b7ca8a5-f890-487a-adc5-a86e561a4532",
+   "duration": 1.3,
+   "date": "2026-11-16"
+  }
+ }
+}
