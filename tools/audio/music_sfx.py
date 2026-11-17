@@ -96,6 +96,26 @@ def S_symph():
     t = T(1.0); f = N['D4'] * 2 ** (t * 1.0); ph = 2 * np.pi * np.cumsum(f) / SR; x = lp(sum(np.sin(k * ph) / k for k in range(1, 9)), 3500) * (0.6 + 0.4 * np.sign(np.sin(2 * np.pi * 16 * t)))
     x *= np.minimum(1, t / 0.3) * np.exp(-np.maximum(0, t - 0.8) / 0.1); return fade(norm(x), 0.01, 0.15)
 
+# fx2(2026-11-17) 그림 순간 소리 임시 합성음 — Runway(tools/audio/music_runway_sfx.py)로 만들면 같은 이름으로 덮어씀. 만들기: python3 tools/audio/music_sfx.py sigil sparkle staff phantom
+def S_sigil():
+    t = T(0.9); x = np.zeros(len(t)); hum = np.sin(2 * np.pi * (N['D4'] * (1 + 0.5 * t)) * t) * np.minimum(1, t / 0.3) * np.exp(-np.maximum(0, t - 0.5) / 0.2) * 0.4
+    x += hum
+    for i, k in enumerate(('D5', 'Fs5', 'A5', 'D6')): place(x, bell(N[k], 0.5, 0.18), 0.08 + i * 0.1, 0.45)
+    return fade(norm(x), 0.01, 0.15)
+def S_sparkle():
+    x = np.zeros(int(SR * 0.5))
+    for i, k in enumerate(('A5', 'D6', 'Fs5')): place(x, bell(N[k] * 1.0, 0.35, 0.09), i * 0.035, 0.6)
+    x[:int(SR * 0.05)] += bp(rng.standard_normal(int(SR * 0.05)), 5000, 12000) * np.exp(-T(0.05) / 0.01) * 0.4
+    return fade(norm(x), 0.001, 0.1)
+def S_staff():
+    x = np.zeros(int(SR * 0.8))
+    for i, k in enumerate(('D5', 'E5', 'Fs5', 'A5', 'B4', 'D6')): place(x, bell(N[k], 0.3, 0.1), i * 0.07, 0.5)
+    return fade(norm(x), 0.001, 0.15)
+def S_phantom():
+    t = T(0.8); air = bp(rng.standard_normal(len(t)), 600, 3500) * np.sin(np.pi * t / 0.8) * 0.5
+    pad = sum(np.sin(2 * np.pi * N[k] * t * (1 + 0.003 * np.sin(2 * np.pi * 4 * t))) for k in ('D4', 'Fs4', 'A4')) * np.minimum(1, t / 0.2) * np.exp(-np.maximum(0, t - 0.5) / 0.15) * 0.3
+    return fade(norm(air + pad), 0.02, 0.15)
+
 ALL = {k[2:]: v for k, v in globals().items() if k.startswith('S_')}
 def save(name, x):
     wav = os.path.join(TMP, 'mu_' + name + '.wav'); mp3 = os.path.join(OUT, 'sfx_mu_' + name + '.mp3')

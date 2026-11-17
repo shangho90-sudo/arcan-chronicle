@@ -21,6 +21,8 @@ Meshes (game axes: +Y up, +Z forward, metres — 게임이 크기를 곱함)
   mu_player   환영 연주자 상체(허리 y 0 -> 머리 꼭대기 y 1, 연미복 깃·리본 타이, 앞 +z)
   mu_arm      연주자 팔(원점 = 어깨, -y 쪽으로 0.42, 손 끝 공)
   mu_shard    깨진 오선 조각(x -0.5..0.5 가는 판 5줄)
+  (fx2 2026-11-17) mu_beam 빛기둥 열린 원통(반지름 1, y 0..1, uv = 둘레·높이)   mu_star 통통한 오각 별(반지름 1, 금)
+  mu_npart 통통한 음표 ♪ 입자(머리 원점, 높이 1, 흰색 — 색은 instanceColor)   mu_petalw 꽃잎(흰색 — instanceColor)
 json: {b64}
 """
 import os, sys, math, json, base64
@@ -170,12 +172,42 @@ def shard(bm, col, uvl):
     for i in range(5):
         y = (i - 2) * 0.09; tube3(bm, col, [(-0.5, y, 0), (-0.1, y + 0.02 * (i % 2), 0), (0.5, y - 0.03, 0)], 0.008, lambda k, a: GOLD_HI, 4)
 
+# ------------------------------------------------------------------ fx2 (2026-11-17) 이펙트 메시: 빛기둥·별·음표 입자·흰 꽃잎
+WHITE = (1, 1, 1, 1)
+def beam(bm, col, uvl):
+    """열린 원통 빛기둥: 반지름 1, y 0..1, uv.x = 둘레 0..1, uv.y = 높이 0..1 (게임 셰이더가 줄무늬·위쪽 흐림을 그림)"""
+    seg, rows = 24, 4; vs = [[bm.verts.new(V(math.cos(2 * math.pi * i / seg), j / rows, math.sin(2 * math.pi * i / seg))) for i in range(seg + 1)] for j in range(rows + 1)]
+    for j in range(rows):
+        for i in range(seg):
+            q = (vs[j][i], vs[j][i + 1], vs[j + 1][i + 1], vs[j + 1][i]); uv = ((i / seg, j / rows), ((i + 1) / seg, j / rows), ((i + 1) / seg, (j + 1) / rows), (i / seg, (j + 1) / rows))
+            f = bm.faces.new(q)
+            for l, t in zip(f.loops, uv): l[uvl].uv = t; l[col] = WHITE
+def star(bm, col, uvl):
+    """통통한 오각 별('팡' 별): 반지름 1, 두께 ±0.3, 앞 +z, 가운데 흰 금 -> 끝 금"""
+    pts = []
+    for i in range(10):
+        a = math.pi / 2 + i * math.pi / 5; r = 1.0 if i % 2 == 0 else 0.5; pts.append((math.cos(a) * r, math.sin(a) * r))
+    fr, bk = bm.verts.new(V(0, 0, 0.3)), bm.verts.new(V(0, 0, -0.3)); rim = [bm.verts.new(V(x, y, 0)) for x, y in pts]
+    for i in range(10):
+        a, b = rim[i], rim[(i + 1) % 10]
+        for order in ((fr, a, b), (bk, b, a)):
+            f = bm.faces.new(order)
+            for l in f.loops: l[col] = (1.0, 0.98, 0.86, 1) if l.vert in (fr, bk) else (GOLD_HI if l.vert is rim[i] and i % 2 == 0 else GOLD)
+def npart(bm, col, uvl):
+    """통통한 음표 입자 ♪: 머리 원점(크게), 기둥 +y 1, 깃발 — 흰색(게임이 instanceColor 로 칠함)"""
+    ball(bm, col, (0, 0, 0), (0.26, 0.19, 0.12), lambda nx, ny, nz: WHITE if nz > -0.3 else (0.8, 0.8, 0.86, 1), 12, 7)
+    tube3(bm, col, [(0.22, 0.04, 0), (0.22, 1.0, 0)], 0.045, lambda k, a: WHITE, 6)
+    tube3(bm, col, [(0.22, 1.0, 0), (0.4, 0.84, 0), (0.46, 0.62, 0), (0.38, 0.46, 0)], [0.07, 0.05, 0.035, 0.018], lambda k, a: WHITE, 6)
+def petalw(bm, col, uvl):
+    leafshape(bm, col, (0, 0, 0), (0, 1, 0), (1, 0, 0), 1.0, 0.5, WHITE, (0.88, 0.88, 0.92, 1), th=0.02, curl=0.08)
+
 def main():
     FP.reset()
     spec = [('mu_violin', violin), ('mu_bow', bow), ('mu_cello', cello), ('mu_flute', flute), ('mu_horn', horn), ('mu_bell', bell), ('mu_cymbal', cymbal),
             ('mu_baton', baton), ('mu_harp', harp), ('mu_string', string), ('mu_note', note), ('mu_note2', note2), ('mu_moon', moon), ('mu_petal', petal),
-            ('mu_player', player), ('mu_arm', arm), ('mu_shard', shard)]
-    flat = {'mu_petal', 'mu_shard'}
+            ('mu_player', player), ('mu_arm', arm), ('mu_shard', shard),
+            ('mu_beam', beam), ('mu_star', star), ('mu_npart', npart), ('mu_petalw', petalw)]
+    flat = {'mu_petal', 'mu_shard', 'mu_beam', 'mu_star', 'mu_petalw'}
     obs = [new_obj(n, f, n not in flat) for n, f in spec]
     tris = {o.name: sum(len(p.vertices) - 2 for p in o.data.polygons) for o in obs}
     bpy.ops.object.select_all(action='DESELECT')
