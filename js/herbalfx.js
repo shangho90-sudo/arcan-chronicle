@@ -33,6 +33,16 @@ export const HERBFX = {
   deer: { size: 1.25 },
   root: { size: 1.0, n: 5 },
   scroll: { h: 3.6, w: 3.0, paper: 1.1 },
+  // fx2(2026-11-16 '더 화려하게'): 시전 마법진 -> 본체(큰 메시·리본·입자) -> 명중 섬광·별 -> 잔광 문양. 크기는 실제 판정 반경 안.
+  fx2: true,
+  cap: { spk: 700, p3: 180 },                    // 인스턴스 입자 상한(종류당 draw call 1)
+  liteK: 0.45,                                   // 휴대폰·그래픽 효과 끔: 입자 수 배율(마법진·빛기둥·소환물·리본은 그대로)
+  tripo: { ginseng: 1.5, dragon: 1.9, pot: 0.62, phoenix: 1.25 },   // Tripo 모델 크기(m) — assets/fx/fx_herbal_tripo.glb.json, 없으면 절차 메시
+  tripoYaw: { ginseng: 0, dragon: 0, pot: 0, phoenix: 0 },          // 모델 앞 방향 보정(라디안)
+  sfxGap: { hb_drop: 0.5, hb_hop: 0.35, hb_spore: 0.6, hb_stomp: 0.4, hb_armor: 0.5 },
+  // 원소 색: [선, 바탕, 금테] — 마법진·빛기둥·별
+  el: { wood: [0x7af0d0, 0x1a9a80, 0xffe08a], fire: [0xffb070, 0xff4018, 0xffd870], earth: [0xffd88a, 0xb07018, 0xfff0b0], metal: [0xf4f8ff, 0x8aa0c8, 0xffe08a],
+        water: [0x9ad8ff, 0x2a5ae0, 0xd8f4ff], heal: [0xffd08a, 0xd86a10, 0xfff0b0], poison: [0xe0a8ff, 0x7a28c0, 0xffd0f0], lotus: [0xffc8e8, 0xd86aa8, 0xffe08a] },
 };
 const H = HERBFX, C = HERBFX.col;
 const P3 = (p) => new THREE.Vector3(p.x, p.y || 0, -p.z);

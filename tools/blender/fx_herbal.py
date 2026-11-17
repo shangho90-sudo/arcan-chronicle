@@ -20,6 +20,8 @@ Meshes (game axes: +Y up, +Z forward, metres; 게임이 크기를 정함)
   hb_wing       주작 날개 하나(원점 = 어깨, +x 로 1, 깃털 끝 주황->노랑)   hb_bird 주작 몸(머리 +z, 꼬리깃)
   hb_pillar     낮은 육각 돌기둥(y 0..1, 황토)   hb_shell 거북 등껍질 판(반지름 1 낮은 돔, 육각 무늬 정점 색)
   hb_plate      약갑 판(나무껍질 + 잎맥, 휘어진 판 x ±0.5 y 0..1; 정점 색 A 채널 아님 — 잎맥은 밝은 옥색)
+  (fx2 2026-11-16) hb_beam 빛기둥 열린 원통(반지름 1, y 0..1, uv = 둘레·높이)   hb_star 통통한 오각 별(반지름 1)   hb_lotus 연꽃(밑 y 0, 지름 약 1)
+  hb_drop 물방울(y 0..1)   hb_flame 불꽃 혀(y 0..1, 노랑 -> 빨강)
 json: {b64}
 """
 import os, sys, math, json, base64, random
@@ -258,14 +260,55 @@ def plate(bm, col, uvl):
                 u, v = p[3], p[4]; vein = abs(u) < 0.04 or abs(abs(u) - (v - 0.15) * 0.45) < 0.035 and v > 0.2
                 l[col] = JADE_HI if vein else mix((0.20, 0.46, 0.34, 1), JADE, 0.4 + 0.6 * v)
 
+
+# ------------------------------------------------------------------ fx2 (2026-11-16) 이펙트 메시: 빛기둥·별·연꽃·물방울·불꽃 혀
+def beam(bm, col, uvl):
+    """열린 원통 빛기둥: 반지름 1, y 0..1, uv.x = 둘레 0..1, uv.y = 높이 0..1 (게임 셰이더가 줄무늬·위쪽 흐림을 그림)"""
+    seg, rows = 20, 4; vs = [[bm.verts.new(V(math.cos(2 * math.pi * i / seg), j / rows, math.sin(2 * math.pi * i / seg))) for i in range(seg + 1)] for j in range(rows + 1)]
+    for j in range(rows):
+        for i in range(seg):
+            q = (vs[j][i], vs[j][i + 1], vs[j + 1][i + 1], vs[j + 1][i]); uv = ((i / seg, j / rows), ((i + 1) / seg, j / rows), ((i + 1) / seg, (j + 1) / rows), (i / seg, (j + 1) / rows))
+            f = bm.faces.new(q)
+            for l, t in zip(f.loops, uv): l[uvl].uv = t; l[col] = WHITE
+
+def star(bm, col, uvl):
+    """통통한 오각 별(씰 느낌 '팡' 별): 반지름 1, 두께 ±0.28, 앞 +z, 가운데 밝은 금 -> 끝 주황빛 금"""
+    pts = []
+    for i in range(10):
+        a = math.pi / 2 + i * math.pi / 5; r = 1.0 if i % 2 == 0 else 0.48; pts.append((math.cos(a) * r, math.sin(a) * r))
+    fr, bk = bm.verts.new(V(0, 0, 0.28)), bm.verts.new(V(0, 0, -0.28)); rim = [bm.verts.new(V(x, y, 0)) for x, y in pts]
+    for i in range(10):
+        a, b = rim[i], rim[(i + 1) % 10]
+        for order in ((fr, a, b), (bk, b, a)):
+            f = bm.faces.new(order)
+            for l in f.loops: l[col] = GOLD_HI if l.vert in (fr, bk) else (GOLD if l.vert is rim[i] and i % 2 else (1.0, 0.62, 0.18, 1))
+
+def lotus(bm, col, uvl):
+    """연꽃 한 송이(백초귀원 빛의 꽃·신농백초원 가장자리): 바깥 꽃잎 8 + 안 꽃잎 6 + 금 꽃술, 밑 y 0, 지름 약 1"""
+    for ring, (n, L, W, tilt, c0, c1) in enumerate(((8, 0.5, 0.17, 0.95, (1.0, 0.86, 0.94, 1), (1.0, 0.62, 0.80, 1)), (6, 0.36, 0.14, 0.45, (1.0, 0.96, 0.98, 1), (1.0, 0.78, 0.88, 1)))):
+        for i in range(n):
+            a = 2 * math.pi * (i + 0.5 * ring) / n; ax = (math.cos(a) * math.sin(tilt), math.cos(tilt), math.sin(a) * math.sin(tilt)); side = (-math.sin(a), 0, math.cos(a))
+            leafshape(bm, col, (0, 0.04 + 0.03 * ring, 0), ax, side, L, W, c0, c1, th=0.012, curl=0.05, n=7)
+    ball(bm, col, (0, 0.1, 0), (0.1, 0.06, 0.1), lambda x, y, z: GOLD_HI if y > 0 else GOLD, 10, 6)
+
+def drop(bm, col, uvl):
+    """물방울(현무약해 물보라): 밑 y 0 둥근 몸 .. 끝 y 1 뾰족"""
+    lathe(bm, col, [(0.0, 0.0), (0.28, 0.06), (0.38, 0.2), (0.34, 0.38), (0.22, 0.58), (0.1, 0.8), (0.0, 1.0)], 12, lambda k, p: SAPH_HI if k > 3 else mix(SAPH, SAPH_HI, k / 3))
+
+def flame(bm, col, uvl):
+    """불꽃 혀(주작 날개 불꽃·불티): 밑 y 0 둥근 .. 끝 y 1 휘어진 끝, 노랑 -> 주홍 -> 빨강"""
+    pts = [(0, 0, 0), (0.02, 0.22, 0), (0.06, 0.45, 0), (0.12, 0.7, 0), (0.2, 1.0, 0)]
+    tube3(bm, col, pts, [0.2, 0.19, 0.14, 0.08, 0.005], lambda k, a: mix(FIRE_HI, FIRE, k * 1.4) if k < 0.7 else mix(FIRE, FIRE_LO, (k - 0.7) / 0.3), 9)
+
 def main():
     FP.reset()
     spec = [('hb_pot', pot), ('hb_lid', lid), ('hb_gourd', gourd), ('hb_pill', pill), ('hb_moxa', moxa), ('hb_scroll_rod', scroll_rod), ('hb_needle', needle),
             ('hb_root', root), ('hb_herb', herb), ('hb_leaf', leaf), ('hb_bud', bud), ('hb_petal', petal), ('hb_stem', stem),
             ('hb_gs_body', gs_body), ('hb_gs_leaf', gs_leaf), ('hb_gs_limb', gs_limb),
             ('hb_deer_body', deer_body), ('hb_deer_head', deer_head), ('hb_deer_leg', deer_leg), ('hb_deer_antler', deer_antler),
-            ('hb_dragon', dragon), ('hb_bird', bird), ('hb_wing', wing), ('hb_pillar', pillar), ('hb_shell', shell), ('hb_plate', plate)]
-    flat = {'hb_leaf', 'hb_petal', 'hb_wing', 'hb_plate', 'hb_pillar', 'hb_herb', 'hb_stem'}
+            ('hb_dragon', dragon), ('hb_bird', bird), ('hb_wing', wing), ('hb_pillar', pillar), ('hb_shell', shell), ('hb_plate', plate),
+            ('hb_beam', beam), ('hb_star', star), ('hb_lotus', lotus), ('hb_drop', drop), ('hb_flame', flame)]
+    flat = {'hb_leaf', 'hb_petal', 'hb_wing', 'hb_plate', 'hb_pillar', 'hb_herb', 'hb_stem', 'hb_star', 'hb_lotus'}
     obs = [new_obj(n, f, n not in flat) for n, f in spec]
     tris = {o.name: sum(len(p.vertices) - 2 for p in o.data.polygons) for o in obs}
     bpy.ops.object.select_all(action='DESELECT')
