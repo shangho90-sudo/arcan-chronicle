@@ -24,7 +24,7 @@ SOUNDS = {
     'cf_place':       (0.6, 'heavy copper pot set down on stone with a solid thunk and a metallic ring', 'A3 압력솥 놓기·B4 설탕 벽 놓기'),
     'cf_steam_hiss':  (0.6, 'pressure cooker valve hissing short sharp burst of steam', 'A3 김 뿜기'),
     'cf_pop':         (1.4, 'pressure cooker lid blowing off, big cartoon boom with a metallic lid clang flying away and steam blast', 'A3 폭발'),
-    'cf_skewer':      (0.5, 'metal skewer piercing through meat, quick stab with a juicy thunk', 'A4 꼬치 관통'),
+    'cf_skewer':      (0.8, 'loud metal skewer piercing through meat, quick stab with a juicy thunk', 'A4 꼬치 관통'),
     'cf_whoosh':      (0.5, 'fast thin object flying through the air, sharp short whoosh', 'A4 꼬치·B1 소르베 날아감'),
     'cf_knife':       (0.5, 'fast chef knife chopping on a cutting board, crisp double thock with a metallic shing', 'A5 손질'),
     'cf_cloche_fall': (0.9, 'giant golden dome falling from the sky, rising magical whoosh with sparkling shimmer', 'A5 클로슈 낙하'),
@@ -92,7 +92,7 @@ def run(names):
 
 def credits(st):
     c = {'note': '2026-11-17 Runway eleven_text_to_sound_v2 로 다시 만듦(예전 합성 26개를 같은 이름으로 대체 + 그림용 cf_sigil/cf_twinkle/cf_bless). 예전 합성 스크립트 tools/audio/chef_sfx.py 는 --force 일 때만 씀.', 'model': 'runway eleven_text_to_sound_v2', 'tool': 'tools/audio/chef_runway_sfx.py', 'post': 'ffmpeg trim / loudnorm -16 LUFS / mono mp3 96k',
-         'spentCredits': st['spent'], 'sounds': {('sfx_' + n): {'prompt': SOUNDS[n][1] + TAIL, 'duration': SOUNDS[n][0], 'use': SOUNDS[n][2], 'date': v['date']} for n, v in st['done'].items()}}
+         'spentCredits': st['spent'], 'synthesized': {('sfx_' + n): 'tools/audio/chef_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)' for n in SOUNDS if n not in st['done']}, 'sounds': {('sfx_' + n): {'prompt': SOUNDS[n][1] + TAIL, 'duration': SOUNDS[n][0], 'use': SOUNDS[n][2], 'date': v['date']} for n, v in st['done'].items()}}
     json.dump(c, open(CREDITS, 'w'), indent=1, ensure_ascii=False)
 
 if __name__ == '__main__':

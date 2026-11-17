@@ -115,9 +115,29 @@ def cloche_open():
     d = 0.8; t = T(d); x = lp(N(t), 2500) * np.exp(-t / 0.005) * 1.2 + bell(t, [(1046, 1, 0.5), (1568, 0.9, 0.4), (2093, 0.7, 0.35), (3136, 0.5, 0.25)], 0.3) * np.minimum(1, np.maximum(0, t - 0.04) / 0.04) * 0.7
     return norm(np.tanh(x), d, t, 0.15)
 
+# 2026-11-17 그림용 3개 — Runway(chef_runway_sfx.py) 일일 한도로 못 만든 동안 쓰는 합성 대체(`--new`: 파일이 없을 때만 씀)
+def sigil():
+    d = 1.1; t = T(d); sw = np.minimum(1, t / 0.5)
+    x = bell(t, [(784, 1, 0.5), (1175, 0.9, 0.45), (1568, 0.8, 0.4), (2349, 0.6, 0.3)], 0.6) * sw * np.exp(-np.maximum(0, t - 0.6) / 0.25) + bp(grains(d, 50, 0.05, 0.9, 0.35, 0.8), 4000, 11000) * 0.35
+    return norm(x, d, t, 0.2)
+def twinkle():
+    d = 0.55; t = T(d); x = np.zeros(len(t))
+    for i, f in enumerate((2093, 2637, 3136, 4186)): place(x, bell(T(0.35), [(f, 1, 1.0), (f * 2, 0.4, 0.3)], 0.12), 0.06 * i, 0.7)
+    return norm(x + bp(grains(d, 20, 0.0, 0.4, 0.2, 0.3), 5000, 12000) * 0.3, d, t, 0.1)
+def bless():
+    d = 1.3; t = T(d); x = np.zeros(len(t))
+    for i, f in enumerate((523, 659, 784, 1046)): place(x, bell(T(1.0), [(f, 1, 0.8), (f * 1.5, 0.6, 0.3), (f * 2, 0.5, 0.2)], 0.5), 0.12 * i, 0.6)
+    x += np.sin(2 * np.pi * 392 * t) * np.minimum(1, t / 0.3) * np.exp(-t / 0.6) * 0.25
+    return norm(x, d, t, 0.25)
+NEW = dict(sigil=sigil, twinkle=twinkle, bless=bless)
+
 ALL = dict(wok_toss=wok_toss, sizzle=sizzle, flame=flame, splash=splash, ignite=ignite, steam=steam, place=place_, steam_hiss=steam_hiss, pop=pop, skewer=skewer, whoosh=whoosh,
            knife=knife, cloche_fall=cloche_fall, cloche_slam=cloche_slam, scoop=scoop, sorbet_hit=sorbet_hit, frost_draw=frost_draw, frost=frost, disc=disc, disc_hit=disc_hit,
            disc_catch=disc_catch, sugar=sugar, shatter=shatter, choux_pop=choux_pop, serve=serve, cloche_open=cloche_open)
 if __name__ == '__main__':
-    if '--force' not in sys.argv: print('Runway 효과음을 덮어쓰지 않음 — 예전 합성음이 필요하면 --force'); sys.exit(0)
+    if '--new' in sys.argv:
+        for name, fn in NEW.items():
+            if not os.path.exists(os.path.join(S.OUT, 'sfx_cf_' + name + '.mp3')): S.save('sfx_cf_' + name, fn())
+        sys.exit(0)
+    if '--force' not in sys.argv: print('Runway 효과음을 덮어쓰지 않음 — 예전 합성음이 필요하면 --force (그림용 새 3개만은 --new)'); sys.exit(0)
     for name, fn in ALL.items(): S.save('sfx_cf_' + name, fn())

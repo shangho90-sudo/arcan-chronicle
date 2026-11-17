@@ -1,33 +1,115 @@
 {
-  "provider": "synthesized (tools/audio/chef_sfx.py, numpy + scipy, fixed seed)",
-  "generatedOn": "2026-11-16",
-  "note": "쉐프 2차 스킬. 직접 합성 — 같은 이름의 파일로 바꿔 넣으면 교체됨.",
-  "assets": [
-    "sfx_cf_choux_pop.mp3",
-    "sfx_cf_cloche_fall.mp3",
-    "sfx_cf_cloche_open.mp3",
-    "sfx_cf_cloche_slam.mp3",
-    "sfx_cf_disc.mp3",
-    "sfx_cf_disc_catch.mp3",
-    "sfx_cf_disc_hit.mp3",
-    "sfx_cf_flame.mp3",
-    "sfx_cf_frost.mp3",
-    "sfx_cf_frost_draw.mp3",
-    "sfx_cf_ignite.mp3",
-    "sfx_cf_knife.mp3",
-    "sfx_cf_place.mp3",
-    "sfx_cf_pop.mp3",
-    "sfx_cf_scoop.mp3",
-    "sfx_cf_serve.mp3",
-    "sfx_cf_shatter.mp3",
-    "sfx_cf_sizzle.mp3",
-    "sfx_cf_skewer.mp3",
-    "sfx_cf_sorbet_hit.mp3",
-    "sfx_cf_splash.mp3",
-    "sfx_cf_steam.mp3",
-    "sfx_cf_steam_hiss.mp3",
-    "sfx_cf_sugar.mp3",
-    "sfx_cf_whoosh.mp3",
-    "sfx_cf_wok_toss.mp3"
-  ]
+ "note": "2026-11-17 Runway eleven_text_to_sound_v2 로 다시 만듦(예전 합성 26개를 같은 이름으로 대체 + 그림용 cf_sigil/cf_twinkle/cf_bless). 예전 합성 스크립트 tools/audio/chef_sfx.py 는 --force 일 때만 씀.",
+ "model": "runway eleven_text_to_sound_v2",
+ "tool": "tools/audio/chef_runway_sfx.py",
+ "post": "ffmpeg trim / loudnorm -16 LUFS / mono mp3 96k",
+ "spentCredits": 18,
+ "synthesized": {
+  "sfx_cf_skewer": "tools/audio/chef_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_cf_frost_draw": "tools/audio/chef_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_cf_frost": "tools/audio/chef_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_cf_disc": "tools/audio/chef_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_cf_disc_hit": "tools/audio/chef_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_cf_disc_catch": "tools/audio/chef_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_cf_sugar": "tools/audio/chef_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_cf_shatter": "tools/audio/chef_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_cf_choux_pop": "tools/audio/chef_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_cf_serve": "tools/audio/chef_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_cf_cloche_open": "tools/audio/chef_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_cf_sigil": "tools/audio/chef_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_cf_twinkle": "tools/audio/chef_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
+  "sfx_cf_bless": "tools/audio/chef_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)"
+ },
+ "sounds": {
+  "sfx_cf_wok_toss": {
+   "prompt": "heavy iron wok tossing food, metallic clang with a quick sizzle whoosh of vegetables flipping in the air, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.6,
+   "use": "A1 웍 뒤집기",
+   "date": "2026-11-17"
+  },
+  "sfx_cf_sizzle": {
+   "prompt": "hot wok sizzle burst, oil crackling loudly with a short fiery whoosh, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.8,
+   "use": "A1 1타 불꽃",
+   "date": "2026-11-17"
+  },
+  "sfx_cf_flame": {
+   "prompt": "big flame burst whoosh from a wok, roaring fire puff with crackling embers, magical cooking fire, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 1.0,
+   "use": "A1 2타·A2 점화 불길·A5 볶음",
+   "date": "2026-11-17"
+  },
+  "sfx_cf_splash": {
+   "prompt": "thick sauce splashing onto the ground, wet liquid splash with a glossy splat, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.6,
+   "use": "A2 소스 줄기",
+   "date": "2026-11-17"
+  },
+  "sfx_cf_ignite": {
+   "prompt": "flambe ignition, alcohol catching fire with a deep whoomp and blue flame rush, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.9,
+   "use": "A2 점화",
+   "date": "2026-11-17"
+  },
+  "sfx_cf_steam": {
+   "prompt": "scalding steam burst explosion, sharp hiss with a puffy pop, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.9,
+   "use": "A2 증기 폭발·B2 열충격",
+   "date": "2026-11-17"
+  },
+  "sfx_cf_place": {
+   "prompt": "heavy copper pot set down on stone with a solid thunk and a metallic ring, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.6,
+   "use": "A3 압력솥 놓기·B4 설탕 벽 놓기",
+   "date": "2026-11-17"
+  },
+  "sfx_cf_steam_hiss": {
+   "prompt": "pressure cooker valve hissing short sharp burst of steam, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.6,
+   "use": "A3 김 뿜기",
+   "date": "2026-11-17"
+  },
+  "sfx_cf_pop": {
+   "prompt": "pressure cooker lid blowing off, big cartoon boom with a metallic lid clang flying away and steam blast, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 1.4,
+   "use": "A3 폭발",
+   "date": "2026-11-17"
+  },
+  "sfx_cf_whoosh": {
+   "prompt": "fast thin object flying through the air, sharp short whoosh, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.5,
+   "use": "A4 꼬치·B1 소르베 날아감",
+   "date": "2026-11-17"
+  },
+  "sfx_cf_knife": {
+   "prompt": "fast chef knife chopping on a cutting board, crisp double thock with a metallic shing, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.5,
+   "use": "A5 손질",
+   "date": "2026-11-17"
+  },
+  "sfx_cf_cloche_fall": {
+   "prompt": "giant golden dome falling from the sky, rising magical whoosh with sparkling shimmer, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.9,
+   "use": "A5 클로슈 낙하",
+   "date": "2026-11-17"
+  },
+  "sfx_cf_cloche_slam": {
+   "prompt": "huge golden cloche slamming down, massive deep boom with a bright bell ring and sparkling magical shimmer tail, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 1.8,
+   "use": "A5 마무리",
+   "date": "2026-11-17"
+  },
+  "sfx_cf_scoop": {
+   "prompt": "ice cream scoop scraping frozen sorbet with a soft icy swish and a cute pop, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.5,
+   "use": "B1 소르베 뜨기",
+   "date": "2026-11-17"
+  },
+  "sfx_cf_sorbet_hit": {
+   "prompt": "small frozen sorbet ball hitting and shattering with an icy crunch and a cute sparkle ping, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.5,
+   "use": "B1 명중",
+   "date": "2026-11-17"
+  }
+ }
 }

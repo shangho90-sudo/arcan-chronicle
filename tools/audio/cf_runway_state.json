@@ -46,11 +46,6 @@
    "duration": 1.4,
    "date": "2026-11-17"
   },
-  "cf_skewer": {
-   "task": "a620cf25-bfb5-4444-a627-da0bb3a6be65",
-   "duration": 0.5,
-   "date": "2026-11-17"
-  },
   "cf_whoosh": {
    "task": "69a314d4-a8f0-4175-8788-152c8ddb3b1d",
    "duration": 0.5,
@@ -80,6 +75,14 @@
    "task": "54a43781-dd29-49c0-b845-c8dc632ae50d",
    "duration": 0.5,
    "date": "2026-11-17"
+  }
+ },
+ "rejected": {
+  "cf_skewer": {
+   "task": "a620cf25-bfb5-4444-a627-da0bb3a6be65",
+   "duration": 0.5,
+   "date": "2026-11-17",
+   "why": "거의 무음(RMS -60 dB) — 합성음 유지"
   }
  }
 }

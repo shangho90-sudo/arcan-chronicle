@@ -184,6 +184,8 @@ export class ChefFx extends CookFx {
     if (kind === 'helix') return new THREE.ShaderMaterial({ uniforms: U({ uW: C(), uB: C(), uA: 0, uP: 0 }), vertexShader: FLAT_VS, fragmentShader: HELIX_FS, ...ADD });
     return super._mat(kind);
   }
+  /** Tripo 소품(있으면, this.tri) 또는 절차 메시 — 같은 규격(tools/blender/fx_chef_tripo.py). 둘 다 uA·uGlow 가 있음 */
+  propC(e, tri, proc, o = {}) { return this.prop(e, tri, proc, o); }
   /** 그림에만 있는 순간의 효과음(판정 순간 소리는 js/chef.js 가 냄) — 같은 소리 0.08초 안 겹침 막음 */
   sfxq(name) { const t = performance.now(), k = this._sndT || (this._sndT = {}); if (k[name] && t - k[name] < 80) return; k[name] = t; this.sfx(name); }
   /** 마법진: 바닥 판(일반 블렌딩) + 같은 무늬의 가산 빛 층. r = 반지름(판정 반경 이하). o: col [안쪽 빛, 몸, 금테], v 무늬, life, draw(그려지는 초), hold, out,
@@ -232,7 +234,9 @@ export class ChefFx extends CookFx {
   }
   /** 불꽃 덩어리가 땅에서 솟아오름(인스턴스 'flame', 노랑 → 주홍) — 반지름 r 안 */
   fireUp(at, r, n, o = {}) {
-    this.emit('flame', at, n, { col: o.col || [0xffb030, 0xff7a20, 0xff5020], spread: r, speed: [0, 0.3], up: o.up || [1.2, 2.4], size: o.size || [0.22, 0.4], end: 0.15, life: o.life || [0.35, 0.6], g: -1.5, drag: 2, glow: 1.0, spin: 1.5, upright: true, sy: 1.5, a: 0.95, fo: 0.4, keep: o.keep });
+    const sz = o.size || [0.22, 0.4], k = 1.25;
+    this.emit('flame', at, n, { col: o.col || [0xffc040, 0xff8a20, 0xff5a20], spread: r, speed: [0, 0.3], up: o.up ? [o.up[0] * 1.3, o.up[1] * 1.3] : [2.0, 3.2], size: [sz[0] * k, sz[1] * k], end: 0.1, life: o.life || [0.26, 0.44], g: -2.5, drag: 2, glow: 1.15, spin: 2.5, upright: true, sy: 2.2, a: 0.95, fin: 0.04, fo: 0.3, keep: o.keep });
+    this.emit('glint', at, Math.max(1, n >> 1), { col: [0xffd060, 0xff8a30], spread: r, speed: [0, 0.2], up: [1.0, 2.0], size: [sz[0] * 2.2, sz[1] * 2.2], life: [0.2, 0.32], g: 0, drag: 1, a: 0.7, keep: o.keep });
   }
   /** 수직 불꽃 혀: 세로로 늘인 가산 원판(빌보드) */
   flameTongue(e, order = 6) { return this.puff(e, CHEFFX.col.fireB, CHEFFX.col.ember, order); }   // 알파 혼합(밝은 바닥에서도 읽힘): 아래 노랑 -> 위 주홍
@@ -430,7 +434,7 @@ export class ChefFx extends CookFx {
     });
     e.g.position.copy(g0);
     const board = this.solid(e, this.geo.chef_tray, { tint: 0xd8e4f4, rim: 0xffffff, spec: 0.8 }), knives = [0, 1].map(() => this.solid(e, this.geo.cook_knife, { rim: 0xc8e0ff, spec: 1.3 }));
-    const wk = this.propC(e, 'tripo_wok', 'chef_wok', { rim: 0xffb070, spec: 0.9 }), cloche = this.propC(e, 'tripo_cloche', 'chef_cloche', { tint: 0xffb22a, rim: 0xffe090, spec: 1.6 }), sh = this.puff(e, 0x402010, 0x201008, 1);
+    const wk = this.propC(e, 'tripo_wok', 'chef_wok', { rim: 0xffb070, spec: 0.9 }), cloche = this.propC(e, 'tripo_cloche', 'chef_cloche', { tint: 0xffb22a, rim: 0xffe090, spec: 1.6, gain: 1.3 }), sh = this.puff(e, 0x402010, 0x201008, 1);
     board.renderOrder = 1; cloche.renderOrder = 7;
     // (1) 무대 마법진: 클로슈 반경(cl.r) 금빛 레스토랑 문양이 쇼 내내 돌고, 단계마다 밝아짐 → 마무리 뒤 잔광
     const sig = this.circle(g0, cl.r * 0.98, { v: 5, col: [C.cream, C.fire, C.gold], life: life + 0.6, draw: 0.35, out: 0.6, spin: 0.8, a: 0.7, glowA: 0.45 }); this.sfxq('cf_sigil');
@@ -566,7 +570,7 @@ export class ChefFx extends CookFx {
     return this._h(e, {
       crack: (k) => { const k2 = clamp01(k); if (k2 > crack + 0.05) this.emit('shard', g0.clone().setY(g0.y + K.h * 0.6), 3, { col: [0xffe0a0, C.sugar], spread: w * 0.35, speed: [0.6, 1.4], up: [0.6, 1.4], size: [0.06, 0.1], life: [0.4, 0.6], g: 9, ground: g0.y, glow: 0.4 }); crack = k2; },
       shatter: () => { shattered = true; const at = g0.clone().setY(g0.y + K.h / 2); this.flash(at, 1.4, 0xfff4d0, C.sugar, 0.14, 1.1);
-        this.bang(at, 1.2, [0xfff4d0, C.sugar, C.gold, C.sugar, 0xffffff], { stars: 8, glints: 12, shards: 22, shardCol: [0xffe0a0, C.sugar, 0xfff0c0], ground: g0.y }); this.vring(at, 2.4, 0xfff4d0, C.sugar, 0.3, 0.8);
+        this.bang(at, 1.2, [0xfff4d0, C.sugar, C.gold, C.sugar, 0xffffff], { stars: 8, glints: 12, shards: 22, shardCol: [0xffe0a0, C.sugar, 0xfff0c0], ground: g0.y }); this.vring(at, 2.4, 0xfff4d0, C.sugar, 0.3, 0.8); this.emit('shard', at, 14, { col: [0xffe0a0, C.sugar, 0xfff4d0], spread: w * 0.3, speed: [1.2, 2.8], up: [1.4, 2.8], size: [0.14, 0.26], life: [0.6, 0.9], g: 9, glow: 0.5, ground: g0.y, bounce: 0.25 });
         this._bits(at, lite() ? 6 : 14, { geo: this.geo.chef_shard, tint: 0xffe0a0, size: [0.12, 0.22], speed: [1.6, 3.4], up: [1.4, 2.8], ground: g0.y, life: 0.7 }); this.ring(g0, 2.4, 0xfff0c0, C.sugar, 0.3, 1.2); },
       dispose: () => { if (!shattered) this._puffs(g0.clone().setY(g0.y + 0.4), 2, 0.6, { c1: C.cream, c2: C.sugar, a: 0.3, life: 0.4 }); this._free(e); },
     });
