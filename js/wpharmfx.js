@@ -86,7 +86,7 @@ void main(){ vec2 p = vUv * 2. - 1.; float r = length(p); if (r > 1.) discard;
     lines += poly(p, 6., .62, rot, .012); float sb = mod(ang + rot + PI / 6., PI / 3.) - PI / 6.; lines += smoothstep(.012, .003, r * abs(sin(sb))) * step(.36, r) * step(r, .58) * .6; }
   else { lines += poly(p, 4., .86, rot, .016) + poly(p, 4., .86, rot + PI / 4., .016) + poly(p, 8., .5, -rot, .01) * .6; }
   float wave = band(r, fract(uT * .55), .05) * .35 * step(r, .95), core = exp(-r * r * 22.) * .5, fill = .07 + .12 * smoothstep(.25, .95, r);
-  vec3 c = mix(uB, uW, clamp(lines + wave, 0., 1.) * .7); c = mix(c, uG, clamp(gold, 0., 1.)); c = mix(c, uW, core);
+  vec3 c = mix(uB, uW, clamp(lines + wave, 0., 1.) * .45); c = mix(c, uG, clamp(gold, 0., 1.)); c = mix(c, uW, core);
   float a = (fill + lines * .85 + gold + wave + core) * drawn * uA;
   if (uAdd > .5) gl_FragColor = vec4(c * clamp(a, 0., 1.2) * .7, 1.); else gl_FragColor = vec4(c, clamp(a, 0., .92)); }`;
 // 빛기둥(열린 원통, u 둘레 / v 높이): 아래가 밝고 위로 흐려짐, 세로 줄무늬가 돌고 위로 흐름 — 가산
@@ -541,7 +541,7 @@ export class WpFx extends CookFx {
       const w = this._fx('shock', 0.5, (w) => { const k = w.t / 0.5; m.material.uniforms.uP.value = 0.1 + 0.9 * easeOut(k); m.material.uniforms.uA.value = 1.8 * (1 - smooth(0.4, 1, k)); m2.material.uniforms.uP.value = 0.05 + 0.75 * easeOut(k); m2.material.uniforms.uA.value = 1.0 * (1 - k); });
       w.g.position.copy(p).setY(p.y + 0.07); const m = this.disc(w, 2, C.white, C.iceB, true, 3); m.scale.set(o.r * 2, o.r * 2, 1); const m2 = this.disc(w, 2, C.white, C.teal, true, 3); m2.scale.set(o.r * 2, o.r * 2, 1);
       this.groundRing(p, o.r * 0.55, C.gold, C.goldB, 0.4, 1.1);
-      this.circle(p, o.r, { col: [C.white, C.ice, C.gold], v: 0, life: 1.3, draw: 0.01, out: 1.1, spin: 0.8, a: 0.55, glowA: 0.7 });   // 잔광
+      this.circle(p, o.r, { col: [C.white, C.ice, C.gold], v: 0, life: 1.3, draw: 0.01, out: 1.1, spin: 0.8, a: 0.5, glowA: 0.45 });   // 잔광
       this.pillar(p, Math.min(1.5, o.r * 0.38), 4.5, { col: [C.white, C.teal], life: 0.6 });
       this.flash(_a.copy(p).setY(p.y + 0.5), C.white, C.iceB, 2.4, 0.16, 1.0); this.vring(_a.copy(p).setY(p.y + 0.9), 3.2, C.white, C.teal, 0.36, 0.9);
       const up = _a.copy(p).setY(p.y + 0.4);
@@ -687,7 +687,7 @@ export class WpFx extends CookFx {
       burst: (u) => { burst = e.t; const top = at.clone().setY(at.y + H), R = o.r; big.end(); inner.end();
         const w = this._fx('shock', 0.5, (w) => { const k = w.t / 0.5; m.material.uniforms.uP.value = 0.08 + 0.92 * easeOut(k); m.material.uniforms.uA.value = (1.4 + 0.08 * u) * (1 - smooth(0.4, 1, k)); m2.material.uniforms.uP.value = 0.05 + 0.6 * easeOut(k); m2.material.uniforms.uA.value = 1.0 * (1 - k); });
         w.g.position.copy(at).setY(at.y + 0.08); const m = this.disc(w, 2, C.white, C.iceB, true, 3); m.scale.set(R * 2, R * 2, 1); const m2 = this.disc(w, 2, C.white, C.gold, true, 3); m2.scale.set(R * 2, R * 2, 1);
-        this.circle(at, R, { col: [C.white, C.ice, C.gold], v: 0, life: 1.3, draw: 0.01, out: 1.1, spin: 0.7, a: 0.5, glowA: 0.6 });
+        this.circle(at, R, { col: [C.white, C.ice, C.gold], v: 0, life: 1.3, draw: 0.01, out: 1.1, spin: 0.7, a: 0.5, glowA: 0.45 });
         this.pillar(at, 1.0 + 0.04 * u, 5.0, { col: [C.white, C.sky], life: 0.6 });
         this.flash(top, C.white, C.iceB, 1.5 + 0.12 * u, 0.18, 0.95); this.vring(top, 2.6 + 0.15 * u, C.white, C.sky, 0.36, 0.9);
         this.shards(top, (low ? 4 : 8) + Math.min(8, u), C.ice, { ground: at.y + 0.02, speed: [2, 4.5] });

@@ -75,7 +75,7 @@ def run(names):
     credits(st)
 
 def credits(st):
-    c = {'model': 'runway eleven_text_to_sound_v2', 'tool': 'tools/audio/wp_runway_sfx.py', 'post': 'ffmpeg trim / loudnorm -16 LUFS / mono mp3 96k',
+    c = {'note': '2026-11-16 Runway eleven_text_to_sound_v2 로 다시 만듦(이전 합성음 5개를 같은 이름으로 대체). 예전 합성 스크립트 tools/audio/wp_sfx.py 는 --force 일 때만 씀.', 'model': 'runway eleven_text_to_sound_v2', 'tool': 'tools/audio/wp_runway_sfx.py', 'post': 'ffmpeg trim / loudnorm -16 LUFS / mono mp3 96k',
          'spentCredits': st['spent'], 'sounds': {('sfx_' + n): {'prompt': SOUNDS[n][1] + TAIL, 'duration': SOUNDS[n][0], 'use': SOUNDS[n][2], 'date': v['date']} for n, v in st['done'].items()}}
     json.dump(c, open(CREDITS, 'w'), indent=1, ensure_ascii=False)
 

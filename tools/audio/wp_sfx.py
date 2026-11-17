@@ -1,4 +1,6 @@
-"""양약사 2차 스킬 효과음 5개를 합성한다 (numpy + scipy, ffmpeg로 MP3). 2026-11-16.
+"""(2026-11-16 저녁부터 안 씀 — 게임의 sfx_wp_*.mp3 는 Runway 생성물: tools/audio/wp_runway_sfx.py. 이 스크립트는 예전 합성음 보관용,
+ --force 를 줘야 assets/audio 를 덮어씀.)
+양약사 2차 스킬 효과음 5개를 합성한다 (numpy + scipy, ffmpeg로 MP3). 2026-11-16.
 
 Usage:  python3 tools/audio/wp_sfx.py  ->  assets/audio/sfx_wp_*.mp3 (+ /tmp/wp_sfx/*.wav)
 
@@ -43,4 +45,5 @@ def wp_collapse():
 
 NAMES = ['wp_granule', 'wp_ring', 'wp_crystal', 'wp_ion', 'wp_collapse']
 if __name__ == '__main__':
+    if '--force' not in sys.argv: print('Runway 효과음을 덮어쓰지 않음 — 예전 합성음이 필요하면 --force'); sys.exit(0)
     for n in NAMES: save('sfx_' + n, globals()[n]())

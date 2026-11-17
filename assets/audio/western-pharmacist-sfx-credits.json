@@ -112,5 +112,6 @@
    "use": "C1·C2 조제 완성(그림)",
    "date": "2026-11-16"
   }
- }
+ },
+ "note": "2026-11-16 Runway eleven_text_to_sound_v2 로 다시 만듦(18개, 이전 합성음 5개를 같은 이름으로 대체). 예전 합성 스크립트 tools/audio/wp_sfx.py 는 --force 일 때만 씀."
 }
