@@ -1067,8 +1067,8 @@ small { font-size:.8em; }
 .vn-skip span { color:#ffd98a; }
 .vn-kicker { position:absolute; top:max(20px, env(safe-area-inset-top)); left:22px; z-index:4; color:#ffe2a0; font-size:17px; letter-spacing:.5px; text-shadow:0 2px 6px rgba(0,0,0,.8); }
 @media (max-aspect-ratio: 3/4) {   /* 휴대폰 세로: 초상은 상자 위, 상자는 화면 폭 */
-  .vn-por { height:50vh; bottom:calc(min(22vh, 200px) + 4vh); }
-  .vn-por.left { left:-7vw; } .vn-por.right { right:-7vw; }
+  .vn-por { height:46vh; bottom:calc(min(22vh, 200px) + 4vh); }   /* 2D 일러스트는 그림 폭을 다 채우므로 두 자리를 화면 밖으로 더 밀어 겹침을 줄임(등·어깨만 잘리고 얼굴은 화면 가운데 쪽) */
+  .vn-por.left { left:-16vw; } .vn-por.right { right:-16vw; }
   .vn-por.listen { --s:.84; }
   .vn-box { width:calc(100vw - 16px); bottom:max(8px, env(safe-area-inset-bottom)); min-height:min(22vh, 200px); padding:24px 18px 20px; font-size:18px; }
   .vn-name { left:14px; padding:6px 18px 5px; } .vn-box:not(.left) .vn-name { right:14px; }

@@ -10,7 +10,7 @@
 
 키: ~/.runway/key (절대 출력·커밋하지 말 것). 참고 그림(같은 인물의 3D 반신 렌더, 색·옷 일관성 — USE_REF 인물만): REFS 폴더의 <key>.png
 (브라우저에서 만들기: NODE_PATH=$(npm root -g) node tools/story/refs.js → /tmp/story_refs). 없으면 글만으로 만듦.
-환경 변수: MODEL(기본 gpt_image_2_6_sunburst — 투명 배경을 지원하는 모델), RATIO(기본 1080:1440), COST(그림 한 장 크레딧, 기본 8 —
+환경 변수: MODEL(기본 gpt_image_2_6_sunburst — 투명 배경을 지원하는 모델), RATIO(기본 1440:1920), COST(그림 한 장 크레딧, 기본 8 —
 실제 값은 https://docs.dev.runwayml.com/ 가격표로 확인), EXTRA(요청에 덧붙일 JSON, 예 '{"background":"transparent"}'),
 API(기본 https://api.dev.runwayml.com), VERSION(X-Runway-Version, 기본 2024-11-06).
 모델이 투명 배경을 주지 않으면 프롬프트대로 '아무것도 없는 연한 단색 배경'을 네 귀퉁이에서 채우기로 지움(PIL, 도구 전용).
@@ -26,7 +26,7 @@ REFS = Path(os.environ.get('REFS', '/tmp/story_refs'))
 API = os.environ.get('API', 'https://api.dev.runwayml.com')
 VERSION = os.environ.get('VERSION', '2024-11-06')
 MODEL = os.environ.get('MODEL', 'gpt_image_2_6_sunburst')
-RATIO = os.environ.get('RATIO', '1080:1440')
+RATIO = os.environ.get('RATIO', '1440:1920')
 COST = float(os.environ.get('COST', '8'))
 EXTRA = json.loads(os.environ.get('EXTRA', '{}'))
 
@@ -35,9 +35,9 @@ STYLE = ("Half-body character portrait for a premium Korean fantasy RPG visual-n
          "Exquisite hand-painted anime-fantasy illustration, refined painterly brushwork, soft volumetric rim light, restrained jewel tones "
          "(antique gold, midnight navy, violet accents), warm key light from the upper left. Single character only, from the top of the head "
          "down to the hips, centered, facing three-quarter toward the viewer's right, natural dignified pose, expressive eyes, cute but not "
-         "childish proportions matching a stylized chibi-leaning 3D game model. Transparent background (if not possible: a completely plain flat "
-         "very light grey background with nothing on it). NO text, NO lettering, NO frame, NO border, NO UI, NO watermark, NO other people, "
-         "NO background scenery. Original character design — do not imitate any existing game's characters.")
+         "childish proportions matching a stylized chibi-leaning 3D game model. Transparent background. NO text, frame, border, UI, watermark, "
+         "other people or scenery. Original design, not imitating any existing game character.")
+# 프롬프트는 1000자에서 잘림(promptText 한도) — 금지 조건이 잘리지 않게 STYLE 끝을 짧게 씀(2026-11-16, 시안 2장 뒤)
 
 # key: (이름, 직함, 화자 이름들, 인물 설명). 색·옷은 게임 3D 모델(참고 그림)을 따르라고 지시.
 CAST = {
@@ -49,8 +49,8 @@ CAST = {
                   "navy surcoat and a kite shield, protective posture."),
     'kerin':     ('케린', '노기사', ['케린'], "KERIN, a legendary old knight of Baltern, about 65. Grey hair and short beard, scarred weathered face, worn but polished "
                   "armor with a dark green cloak, stern yet warm eyes, hand on a long sword."),
-    'justina':   ('저스티나', '대사제', ['저스티나'], "JUSTINA, the young high priestess of the Lumiere temple. Long pale silver hair, gentle sorrowful eyes, ivory and gold "
-                  "layered priestly robes, a small golden circlet, holding a slender staff with a star crest."),
+    'justina':   ('저스티나', '대사제', ['저스티나'], "A serene, kind-hearted head priestess of a temple of light, a woman in her twenties. Long pale silver hair, calm gentle eyes, "
+                  "layered white and gold ceremonial vestments, a small golden circlet, a slender staff topped with a star emblem."),
     'malachion': ('말라키온', '대사제', ['말라키온'], "MALACHION, Justina's elder brother, a fallen high priest. Shoulder-length dark hair, pale face, cold violet eyes, elegant "
                   "layered ivory robe under a midnight-black cloak with gold embroidered trim, faint purple shadow aura, aloof and tragic."),
     'grace':     ('그레이스', '찬탈왕', ['그레이스'], "GRACE, Astel's younger brother, the usurper king, about 17. Neat black hair, beautiful but hollow black eyes with a faint "
@@ -129,7 +129,7 @@ def save_out(key, url):
     raw = urllib.request.urlopen(url, timeout=120).read()
     img = cut_background(Image.open(io.BytesIO(raw)))
     img.thumbnail((1152, 1536))
-    out = OUT / f'{key}.webp'; img.save(out, 'WEBP', quality=88, method=6)
+    out = OUT / f'{key}.webp'; img.save(out, 'WEBP', quality=int(os.environ.get('Q', '78')), method=6)   # 장당 ≤ 400 KB 목표
     man = json.loads(MANIFEST.read_text()); man.setdefault('portraits', {})
     n, t, names, _ = CAST[key]
     man['portraits'][key] = {'file': out.name, 'facing': 'right', 'names': names}

@@ -1,4 +1,145 @@
 {
   "about": "메인 스토리 대화 장면(js/storyscene.js)의 2D 반신 일러스트. 키 = 화자 키(npcs.json id, 몬스터는 'mon:<id>', 플레이어는 'player'). file = 이 폴더의 그림(세로 3:4(예: 1152×1536), 배경 투명 webp/png), facing = 얼굴이 향한 쪽(right = 보는 사람의 오른쪽, 화면 가운데를 보도록 자동으로 뒤집음), expr = 표정별 그림(대사 <b class='gold' data-expr='angry'>), names = 같은 그림을 쓸 다른 이름. 여기 없는 화자는 3D 모델 반신 렌더. 만들기: python3 tools/story/portraits.py",
-  "portraits": {}
+  "portraits": {
+    "astel": {
+      "file": "astel.webp",
+      "facing": "right",
+      "names": [
+        "아스텔"
+      ]
+    },
+    "castilla": {
+      "file": "castilla.webp",
+      "facing": "right",
+      "names": [
+        "카스티야"
+      ]
+    },
+    "kylus": {
+      "file": "kylus.webp",
+      "facing": "right",
+      "names": [
+        "카일러스"
+      ]
+    },
+    "kerin": {
+      "file": "kerin.webp",
+      "facing": "right",
+      "names": [
+        "케린"
+      ]
+    },
+    "malachion": {
+      "file": "malachion.webp",
+      "facing": "right",
+      "names": [
+        "말라키온"
+      ]
+    },
+    "grace": {
+      "file": "grace.webp",
+      "facing": "right",
+      "names": [
+        "그레이스"
+      ]
+    },
+    "roderick": {
+      "file": "roderick.webp",
+      "facing": "right",
+      "names": [
+        "로데릭"
+      ]
+    },
+    "elder": {
+      "file": "elder.webp",
+      "facing": "right",
+      "names": [
+        "하람"
+      ]
+    },
+    "capital_merchant": {
+      "file": "capital_merchant.webp",
+      "facing": "right",
+      "names": [
+        "베아"
+      ]
+    },
+    "yoisen": {
+      "file": "yoisen.webp",
+      "facing": "right",
+      "names": [
+        "요이센"
+      ]
+    },
+    "daisen": {
+      "file": "daisen.webp",
+      "facing": "right",
+      "names": [
+        "다이센"
+      ]
+    },
+    "chirzen": {
+      "file": "chirzen.webp",
+      "facing": "right",
+      "names": [
+        "치르젠"
+      ]
+    },
+    "chirkai": {
+      "file": "chirkai.webp",
+      "facing": "right",
+      "names": [
+        "치르카이"
+      ]
+    },
+    "derkai": {
+      "file": "derkai.webp",
+      "facing": "right",
+      "names": [
+        "데르카이"
+      ]
+    },
+    "yanber": {
+      "file": "yanber.webp",
+      "facing": "right",
+      "names": [
+        "얀베르"
+      ]
+    },
+    "berion": {
+      "file": "berion.webp",
+      "facing": "right",
+      "names": [
+        "베리온"
+      ]
+    },
+    "boldran": {
+      "file": "boldran.webp",
+      "facing": "right",
+      "names": [
+        "볼드란"
+      ]
+    },
+    "erdin": {
+      "file": "erdin.webp",
+      "facing": "right",
+      "names": [
+        "에르딘"
+      ]
+    },
+    "ruin_monk": {
+      "file": "ruin_monk.webp",
+      "facing": "right",
+      "names": [
+        "유디트"
+      ]
+    },
+    "justina": {
+      "file": "justina.webp",
+      "facing": "right",
+      "names": [
+        "저스티나"
+      ]
+    }
+  }
 }
