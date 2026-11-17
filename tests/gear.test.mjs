@@ -1,4 +1,4 @@
-// 장비(tools/gear/gear.py) 검사: 직업 계보별 무기·방어구 13계열(2026-11-17) + 장신구 20 + 예전 장비(legacy).
+// 장비(tools/gear/gear.py) 검사: 직업 계보별 무기·방어구 13계열(2026-11-17) + 예술가 악기 계열(무기만) + 장신구 20 + 예전 장비(legacy).
 // 계열·단계 수·수치 공식·판매/드롭·드롭 몬스터 레벨·상점 직업 필터(견습생/1차/2차, 전직하면 바뀜)·착용 규칙·예전 저장·상인 배치.
 // Run: node tests/gear.test.mjs
 import assert from 'node:assert/strict';
@@ -12,18 +12,19 @@ let n = 0; const ok = (c, m) => { assert.ok(c, m); n++; }; const eq = (a, b, m) 
 const gear = d.itemList.filter(i => i.gear);
 
 // ---------------------------------------------------------------- 계열
-const LINES = { novice: ['sword', 4], pharmacist: ['pestle', 7], blacksmith: ['hammer', 7], cook: ['knife', 7], hairdresser: ['scissors', 7], artist: ['brush', 7],
-  western_pharmacist: ['pestle', 7], herbalist: ['pestle', 7], engineer: ['hammer', 7], chef: ['knife', 7], designer: ['scissors', 7], painter: ['brush', 7], musician: ['brush', 7] };
+// 직업 -> 무기 종류들(계열마다 하나), 단계 수. 예술가는 붓(art) + 악기(artm, 무기만), 음악가는 악기(2026-11-17 사용자 요청)
+const LINES = { novice: [['sword'], 4], pharmacist: [['pestle'], 7], blacksmith: [['hammer'], 7], cook: [['knife'], 7], hairdresser: [['scissors'], 7], artist: [['brush', 'instrument'], 7],
+  western_pharmacist: [['pestle'], 7], herbalist: [['pestle'], 7], engineer: [['hammer'], 7], chef: [['knife'], 7], designer: [['scissors'], 7], painter: [['brush'], 7], musician: [['instrument'], 7] };
 const LV = { 4: [1, 3, 5, 8], 1: [10, 13, 16, 19, 22, 26, 31], 2: [30, 33, 36, 39, 42, 46, 50] };
-const line = (job, type) => gear.filter(i => i.line === job && i.type === type).sort((a, b) => a.levelReq - b.levelReq);
+const line = (job, type, kind) => gear.filter(i => i.line === job && i.type === type && (!kind || i.kind === kind)).sort((a, b) => a.levelReq - b.levelReq);
 eq(Object.keys(LINES).sort(), [...new Set(gear.filter(i => i.line).map(i => i.line))].sort(), '계열 13개 = 견습생 + 1차 5 + 2차 7');
 ok(d.jobList.every(j => LINES[j.id]), '모든 직업에 계열');
 const lowK = L => Math.min(1, 0.5 + L / 16), P = (L, drop) => (10 + 2.2 * L) * lowK(L) * (drop ? 1.08 : 1);
 const stat = (it, k) => (it.stats.find(s => s.stat === k) || {}).add;
-for (const [job, [kind, cnt]] of Object.entries(LINES)) {
+for (const [job, [kinds, cnt]] of Object.entries(LINES)) {
   const tier = d.job(job).tier, lv = cnt === 4 ? LV[4] : LV[tier];
-  for (const type of ['weapon', 'armor']) {
-    const L = line(job, type); eq(L.length, cnt, job + ' ' + type + ' 단계 수');
+  for (const [type, kind] of [...kinds.map(k => ['weapon', k]), ['armor', 'armor']]) {
+    const L = line(job, type, kind); eq(L.length, cnt, job + ' ' + type + ' ' + kind + ' 단계 수');
     eq(L.map(i => i.levelReq), lv, job + ' ' + type + ' 레벨');
     const sold = cnt === 4 ? 3 : 5;
     L.forEach((it, s) => {
@@ -34,10 +35,10 @@ for (const [job, [kind, cnt]] of Object.entries(LINES)) {
       ok(Array.isArray(it.stand) && it.stand[1] >= 1 && it.stand[1] <= 3, it.id + ' 임시 모델');
       if (type === 'weapon') {
         eq(it.kind, kind, it.id + ' 무기 종류 = 1차 무기 종류'); eq(it.job, job === 'novice' ? '' : job, it.id + ' 착용 직업');
-        const main = kind === 'brush' ? stat(it, 'matk') : stat(it, 'atk');
+        const main = kind === 'brush' || kind === 'instrument' ? stat(it, 'matk') : stat(it, 'atk');
         eq(main, Math.round(P(it.levelReq, drop)), it.id + ' 주 능력치 = round((10 + 2.2L)·lowK·드롭)');
         if (kind === 'pestle') eq(stat(it, 'matk'), Math.round(main * 0.45), it.id + ' 유봉 마법력 45%');
-        if (kind === 'brush') eq(stat(it, 'atk'), Math.round(main * 0.45), it.id + ' 붓 공격력 45%');
+        if (kind === 'brush' || kind === 'instrument') eq(stat(it, 'atk'), Math.round(main * 0.45), it.id + ' 붓·악기 공격력 45%');
       } else {
         eq(it.job, '', it.id + ' 방어구는 누구나(예전 규칙)');
         eq(stat(it, 'def'), Math.round((4 + 1.8 * it.levelReq) * lowK(it.levelReq) * (drop ? 1.08 : 1)), it.id + ' 방어');
@@ -98,7 +99,7 @@ for (const [job] of Object.entries(LINES)) {
   for (const shop of ['shop_weapons', 'shop_armor']) {
     const p = prof(job, lv), got = gearIn(p, shop);
     eq(linesIn(p, shop), [job], job + ' Lv' + lv + ' ' + shop + ' = 자기 계열만');
-    eq(got.map(x => x.id), line(job, shop === 'shop_weapons' ? 'weapon' : 'armor').filter(x => !x.dropFrom).map(x => x.id), job + ' ' + shop + ' 판매 단계 전부');
+    eq(got.map(x => x.id).sort(), line(job, shop === 'shop_weapons' ? 'weapon' : 'armor').filter(x => !x.dropFrom).map(x => x.id).sort(), job + ' ' + shop + ' 판매 단계 전부');
   }
   // 다른 직업 무기는 다른 상점(예전 shop_smithy)에서도 안 보임 — 착용 규칙과 같은 판정
   const sm = shopStockFor(d, prof(job, lv), 'shop_smithy').map(id => d.item(id)).filter(x => x.type === 'weapon');
@@ -132,6 +133,24 @@ eq(shopStockFor(d, prof('novice', 5), fakeShop), ['ac_g1'], '견습생 장신구
   s.bag.add('wg_chef_2', 1); const k = s.p.inventory.findIndex(x => x.id === 'wg_chef_2'); const g0 = s.p.gold;
   eq(Shop.sell(s, k, 1), null, '다른 계열 장비 되팔기'); eq(s.p.gold - g0, d.item('wg_chef_2').sellPrice); }
 
+// ---------------------------------------------------------------- 악기(2026-11-17 사용자: '예술가는 붓에 악기 추가, 음악가는 붓 말고 악기')
+{ const wk = (p) => [...new Set(gearIn(p, 'shop_weapons').filter(x => x.type === 'weapon').map(x => x.kind))].sort();
+  eq(wk(prof('artist', 20)), ['brush', 'instrument'], '예술가 상점 = 붓 + 악기');
+  eq(wk(prof('musician', 40)), ['instrument'], '음악가 상점 = 악기만');
+  eq(wk(prof('painter', 40)), ['brush'], '화가 상점 = 붓만');
+  eq(wk(prof('musician', 28)), ['instrument'], 'Lv28 음악가(1차 계열을 빌려도 악기만)');
+  ok(gearIn(prof('musician', 28), 'shop_weapons').some(x => x.line === 'artist' && x.kind === 'instrument'), 'Lv28 음악가는 예술가 악기(Lv30 아래)를 빌림');
+  eq(wk(prof('painter', 28)), ['brush'], 'Lv28 화가 = 붓만');
+  ok(line('artist', 'armor').every(x => !/artm/.test(x.id)), '예술가 악기 계열은 무기만(방어구 계열은 하나)');
+  for (const [job, id, okk] of [['artist', 'wg_artm_3', true], ['artist', 'wg_art_3', true], ['musician', 'wg_artm_3', true], ['musician', 'wg_music_3', true],
+                                ['painter', 'wg_music_3', false], ['artist', 'wg_music_3', false], ['cook', 'wg_artm_3', false]])
+    eq(sheet(job, 40).bag.canEquip(d.item(id)) === null, okk, job + ' 착용 ' + id);
+  // 음악가 무기는 같은 id 그대로 악기로(수치 공식이 붓과 같아 예전 저장의 능력치 그대로)
+  for (let s = 1; s <= 7; s++) { const it = d.item('wg_music_' + s); eq(it.kind, 'instrument', it.id + ' 악기'); }
+  const art = line('artist', 'weapon', 'brush'), artm = line('artist', 'weapon', 'instrument');
+  artm.forEach((it, s) => eq(it.stats, art[s].stats, '예술가 악기 = 붓과 같은 능력치 ' + it.id));
+}
+
 // ---------------------------------------------------------------- 예전 저장(장비 40종 시절)
 { const old = { version: 4, name: '예전', gender: 'f', job: 'western_pharmacist', level: 41, exp: 0, gold: 500, weapon: 'w_pestle_g9', armor: 'a_armor_g8', accessory: 'ac_j_herb',
     inventory: [{ id: 'w_pestle_g3', count: 1 }, { id: 'a_armor_g1', count: 1 }, { id: 'w_knife_2', count: 1 }, { id: 'w_pestle_2', count: 1 }], learnedSkills: [], jobsUnlocked: ['pharmacist', 'western_pharmacist'],
@@ -159,11 +178,11 @@ eq(d.weaponFor('pharmacist', 1), 'w_pestle_1', '직업 무기 드롭(@jobweapon)
 
 // ---------------------------------------------------------------- 디자인 브리프
 const B = JSON.parse(readFileSync(new URL('../tools/gear/design_briefs.json', import.meta.url), 'utf8'));
-eq(Object.keys(B).length, 13, '브리프 13계열');
+eq(Object.keys(B).length, 14, '브리프 14계열(13 + 예술가 악기)');
 const bIds = Object.values(B).flatMap(f => f.items.map(x => x.id)).sort();
 eq(bIds, gear.filter(i => i.line).map(i => i.id).sort(), '아이템마다 브리프');
 for (const f of Object.values(B)) {
-  ok(f.palette.length >= 2 && f.palette.length <= 3 && f.motif && f.silhouette && f.evolution.length === f.items.length / 2, f.family + ' 브리프 항목');
+  ok(f.palette.length >= 2 && f.palette.length <= 3 && f.motif && f.silhouette && f.evolution.length === f.items.length / (f.weapon_only ? 1 : 2), f.family + ' 브리프 항목');
   for (const x of f.items) {
     ok(/one single (weapon|body garment)/.test(x.tripo_prompt) && /no background/.test(x.tripo_prompt), x.id + ' 프롬프트 규칙');
     ok(!/pokemon|pok[eé]mon/i.test(x.tripo_prompt), x.id + ' 포켓몬 언급 없음');
@@ -178,4 +197,4 @@ for (const t of towns) {
   const shops = t.npcs.map(x => d.npcs[x.npc] && d.npcs[x.npc].shop);
   ok(shops.includes('shop_weapons'), t.id + ' 무기 상인'); ok(shops.includes('shop_armor'), t.id + ' 방어구 상인');
 }
-console.log(`gear: ${n} passed — 13 lines, ${gear.filter(i => i.line).length} line items (${gear.filter(i => i.line && !i.dropFrom).length} sold / ${gear.filter(i => i.line && i.dropFrom).length} drop), legacy 20, shop filter, old save`);
+console.log(`gear: ${n} passed — 13 lines + artist instruments, ${gear.filter(i => i.line).length} line items (${gear.filter(i => i.line && !i.dropFrom).length} sold / ${gear.filter(i => i.line && i.dropFrom).length} drop), legacy 20, shop filter, old save`);

@@ -12828,8 +12828,8 @@
   },
   {
    "id": "wg_music_1",
-   "name": "은방울 지휘붓",
-   "desc": "붓대에 음표를 새긴 가는 붓. 음악가의 첫 지휘붓.",
+   "name": "은방울 초승 리라",
+   "desc": "초승달 모양 머리에 음표를 새긴 리라. 음악가의 첫 악기.",
    "type": "weapon",
    "job": "musician",
    "tier": 1,
@@ -12862,7 +12862,7 @@
    },
    "gear": true,
    "line": "musician",
-   "kind": "brush",
+   "kind": "instrument",
    "stand": [
     "brush",
     1
@@ -12914,8 +12914,8 @@
   },
   {
    "id": "wg_music_2",
-   "name": "별꾀꼬리 붓",
-   "desc": "쇠고리에 별 보석을 박은 붓.",
+   "name": "별꾀꼬리 리라",
+   "desc": "리라 가운데 별 보석을 박았다. 현을 튕기면 별빛이 번진다.",
    "type": "weapon",
    "job": "musician",
    "tier": 2,
@@ -12948,7 +12948,7 @@
    },
    "gear": true,
    "line": "musician",
-   "kind": "brush",
+   "kind": "instrument",
    "stand": [
     "brush",
     1
@@ -13000,8 +13000,8 @@
   },
   {
    "id": "wg_music_3",
-   "name": "달노래 붓",
-   "desc": "붓대에 연보라 꼬리깃 리본을 단 붓. 휘두르면 노랫소리가 난다.",
+   "name": "달노래 리라",
+   "desc": "자루에 연보라 꼬리깃 리본을 단 리라. 휘두르면 노랫소리가 난다.",
    "type": "weapon",
    "job": "musician",
    "tier": 3,
@@ -13039,7 +13039,7 @@
    },
    "gear": true,
    "line": "musician",
-   "kind": "brush",
+   "kind": "instrument",
    "stand": [
     "brush",
     1
@@ -13091,8 +13091,8 @@
   },
   {
    "id": "wg_music_4",
-   "name": "은하 선율 붓",
-   "desc": "쇠고리 위에 초승달이 뜬 붓. 음표 방울이 울린다.",
+   "name": "은하 선율 리라",
+   "desc": "리라 위에 꾀꼬리가 앉았다. 음표 방울이 울린다.",
    "type": "weapon",
    "job": "musician",
    "tier": 4,
@@ -13130,7 +13130,7 @@
    },
    "gear": true,
    "line": "musician",
-   "kind": "brush",
+   "kind": "instrument",
    "stand": [
     "brush",
     2
@@ -13182,8 +13182,8 @@
   },
   {
    "id": "wg_music_5",
-   "name": "별노래 정령 붓",
-   "desc": "머리가 별노래 꾀꼬리가 된 붓. 별 핵이 빛난다.",
+   "name": "별노래 정령 리라",
+   "desc": "리라가 별노래 꾀꼬리 정령이 되었다. 별 핵이 빛난다.",
    "type": "weapon",
    "job": "musician",
    "tier": 5,
@@ -13221,7 +13221,7 @@
    },
    "gear": true,
    "line": "musician",
-   "kind": "brush",
+   "kind": "instrument",
    "stand": [
     "brush",
     2
@@ -13278,8 +13278,8 @@
   },
   {
    "id": "wg_music_6",
-   "name": "천구 합창 붓",
-   "desc": "큰 날개와 금테를 두른 귀한 붓. 밤하늘 아래 몬스터가 품고 있다.",
+   "name": "천구 합창 하프",
+   "desc": "큰 날개와 금테를 두른 귀한 하프. 밤하늘 아래 몬스터가 품고 있다.",
    "type": "weapon",
    "job": "musician",
    "tier": 6,
@@ -13336,7 +13336,7 @@
     }
    ],
    "line": "musician",
-   "kind": "brush",
+   "kind": "instrument",
    "stand": [
     "brush",
     3
@@ -13407,8 +13407,8 @@
   },
   {
    "id": "wg_music_7",
-   "name": "마에스트로 별왕관 붓",
-   "desc": "별자리 관을 쓴 꾀꼬리 정령의 붓. 핵 속에 용의 눈 문양이 반짝인다.",
+   "name": "마에스트로 별왕관 하프",
+   "desc": "별자리 관을 쓴 꾀꼬리 정령의 하프. 핵 속에 용의 눈 문양이 반짝인다.",
    "type": "weapon",
    "job": "musician",
    "tier": 7,
@@ -13465,7 +13465,7 @@
     }
    ],
    "line": "musician",
-   "kind": "brush",
+   "kind": "instrument",
    "stand": [
     "brush",
     3
@@ -13538,6 +13538,363 @@
    ],
    "art": true,
    "model3d": true
+  },
+  {
+   "id": "wg_artm_1",
+   "name": "갈대 류트",
+   "desc": "갈대 무늬를 새긴 작은 류트. 예술가가 처음 잡는 악기.",
+   "type": "weapon",
+   "job": "artist",
+   "tier": 1,
+   "levelReq": 10,
+   "price": 1070,
+   "sellPrice": 321,
+   "maxStack": 1,
+   "icon": "wg_artm_1",
+   "stats": [
+    {
+     "stat": "matk",
+     "add": 32,
+     "mul": 0.0
+    },
+    {
+     "stat": "atk",
+     "add": 14,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "line": "artist",
+   "kind": "instrument",
+   "stand": [
+    "brush",
+    1
+   ]
+  },
+  {
+   "id": "wg_artm_2",
+   "name": "호박빛 류트",
+   "desc": "울림 구멍 위에 호박 보석을 박은 류트. 맑은 저음이 난다.",
+   "type": "weapon",
+   "job": "artist",
+   "tier": 2,
+   "levelReq": 13,
+   "price": 1480,
+   "sellPrice": 444,
+   "maxStack": 1,
+   "icon": "wg_artm_2",
+   "stats": [
+    {
+     "stat": "matk",
+     "add": 39,
+     "mul": 0.0
+    },
+    {
+     "stat": "atk",
+     "add": 18,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "line": "artist",
+   "kind": "instrument",
+   "stand": [
+    "brush",
+    1
+   ]
+  },
+  {
+   "id": "wg_artm_3",
+   "name": "노을바람 류트",
+   "desc": "자루에 청록 갈대 리본을 맨 류트. 휘두르면 바람 소리가 울린다.",
+   "type": "weapon",
+   "job": "artist",
+   "tier": 3,
+   "levelReq": 16,
+   "price": 1920,
+   "sellPrice": 576,
+   "maxStack": 1,
+   "icon": "wg_artm_3",
+   "stats": [
+    {
+     "stat": "matk",
+     "add": 45,
+     "mul": 0.0
+    },
+    {
+     "stat": "atk",
+     "add": 20,
+     "mul": 0.0
+    },
+    {
+     "stat": "cdr",
+     "add": 0.01,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "line": "artist",
+   "kind": "instrument",
+   "stand": [
+    "brush",
+    1
+   ]
+  },
+  {
+   "id": "wg_artm_4",
+   "name": "잠자리 날개 류트",
+   "desc": "류트 몸통에 반투명 잠자리 날개가 돋았다. 방울 줄이 찰랑인다.",
+   "type": "weapon",
+   "job": "artist",
+   "tier": 4,
+   "levelReq": 19,
+   "price": 2380,
+   "sellPrice": 714,
+   "maxStack": 1,
+   "icon": "wg_artm_4",
+   "stats": [
+    {
+     "stat": "matk",
+     "add": 52,
+     "mul": 0.0
+    },
+    {
+     "stat": "atk",
+     "add": 23,
+     "mul": 0.0
+    },
+    {
+     "stat": "cdr",
+     "add": 0.02,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "line": "artist",
+   "kind": "instrument",
+   "stand": [
+    "brush",
+    2
+   ]
+  },
+  {
+   "id": "wg_artm_5",
+   "name": "노을 정령 류트",
+   "desc": "머리가 노을 잠자리 정령이 된 류트. 호박 핵이 빛난다.",
+   "type": "weapon",
+   "job": "artist",
+   "tier": 5,
+   "levelReq": 22,
+   "price": 2860,
+   "sellPrice": 858,
+   "maxStack": 1,
+   "icon": "wg_artm_5",
+   "stats": [
+    {
+     "stat": "matk",
+     "add": 58,
+     "mul": 0.0
+    },
+    {
+     "stat": "atk",
+     "add": 26,
+     "mul": 0.0
+    },
+    {
+     "stat": "cdr",
+     "add": 0.03,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "line": "artist",
+   "kind": "instrument",
+   "stand": [
+    "brush",
+    2
+   ]
+  },
+  {
+   "id": "wg_artm_6",
+   "name": "해질녘 군무 류트",
+   "desc": "큰 노을 날개와 금테를 두른 귀한 류트. 갈대밭의 몬스터가 품고 있다.",
+   "type": "weapon",
+   "job": "artist",
+   "tier": 6,
+   "levelReq": 26,
+   "price": 0,
+   "sellPrice": 1056,
+   "maxStack": 1,
+   "icon": "wg_artm_6",
+   "stats": [
+    {
+     "stat": "matk",
+     "add": 73,
+     "mul": 0.0
+    },
+    {
+     "stat": "atk",
+     "add": 33,
+     "mul": 0.0
+    },
+    {
+     "stat": "cdr",
+     "add": 0.04,
+     "mul": 0.0
+    },
+    {
+     "stat": "maxSp",
+     "add": 40,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "mon_mist_wolf",
+     "chance": 0.025
+    },
+    {
+     "monster": "mon_wisp",
+     "chance": 0.025
+    },
+    {
+     "monster": "mon_ash_toad",
+     "chance": 0.025
+    }
+   ],
+   "line": "artist",
+   "kind": "instrument",
+   "stand": [
+    "brush",
+    3
+   ]
+  },
+  {
+   "id": "wg_artm_7",
+   "name": "황혼 여왕 류트",
+   "desc": "노을 관을 쓴 잠자리 여왕의 류트. 핵 속에 용의 눈 문양이 비친다.",
+   "type": "weapon",
+   "job": "artist",
+   "tier": 7,
+   "levelReq": 31,
+   "price": 0,
+   "sellPrice": 1317,
+   "maxStack": 1,
+   "icon": "wg_artm_7",
+   "stats": [
+    {
+     "stat": "matk",
+     "add": 84,
+     "mul": 0.0
+    },
+    {
+     "stat": "atk",
+     "add": 38,
+     "mul": 0.0
+    },
+    {
+     "stat": "cdr",
+     "add": 0.05,
+     "mul": 0.0
+    },
+    {
+     "stat": "maxSp",
+     "add": 40,
+     "mul": 0.0
+    }
+   ],
+   "use": {
+    "heal": 0,
+    "healPercent": 0,
+    "sp": 0,
+    "cure": "",
+    "status": "",
+    "duration": 0,
+    "value": 0,
+    "cooldown": 1
+   },
+   "gear": true,
+   "dropFrom": [
+    {
+     "monster": "mon_frost_wolf",
+     "chance": 0.015
+    },
+    {
+     "monster": "mon_lantern_ghost",
+     "chance": 0.015
+    },
+    {
+     "monster": "mon_bog_boar",
+     "chance": 0.015
+    }
+   ],
+   "line": "artist",
+   "kind": "instrument",
+   "stand": [
+    "brush",
+    3
+   ]
   }
  ]
 }

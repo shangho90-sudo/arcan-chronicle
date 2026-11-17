@@ -592,6 +592,8 @@ export function shopItemVisible(data, p, def, shop) {
     if (def.line !== gearParentLine(data, job)) return false;
     const own = (shop ? shop.items : []).map(id => data.item(id)).filter(d => d && d.line === job && d.type === def.type);
     const floor = own.length ? Math.min(...own.map(d => d.levelReq)) : Infinity;
+    // 2차가 1차 계열을 빌릴 때는 자기 무기 종류만(2026-11-17: 음악가 = 악기만 — 예술가 붓 계열은 안 보임, 화가 = 붓만). 견습생 검은 종류와 상관없이
+    if (def.type === "weapon" && def.line !== "novice" && own.length && !own.some(d => d.kind === def.kind)) return false;
     return p.level < floor && def.levelReq < floor;
   }
   if (def.type === "weapon" && def.job && def.job !== job) { const cur = data.job(job); if (!(cur && cur.parent === def.job)) return false; }

@@ -144,10 +144,11 @@ POWER = lambda L, drop: (10 + 2.2 * L) * lowK(L) * (1.08 if drop else 1)
 SIG = {'nov': ('hit', 0.01, False), 'pharm': ('healPower', 0.03, False), 'smith': ('dmgReduce', 0.01, False), 'cook': ('foodPower', 0.04, False),
        'hair': ('atkSpeed', 0.02, True), 'art': ('cdr', 0.01, False), 'wpharm': ('critDmg', 0.03, False), 'herb': ('healPower', 0.03, False),
        'eng': ('crit', 0.01, False), 'chef': ('foodPower', 0.04, False), 'design': ('eva', 0.01, False), 'paint': ('cdr', 0.01, False),
-       'music': ('spRegen', 0.15, False)}
+       'music': ('spRegen', 0.15, False), 'artm': ('cdr', 0.01, False)}
 DROP2 = {'nov': st('crit', 0.02), 'pharm': st('elemRes', 0.05), 'smith': st('crit', 0.03), 'cook': st('crit', 0.03), 'hair': st('eva', 0.03),
          'art': st('maxSp', 40), 'wpharm': st('crit', 0.04), 'herb': st('elemRes', 0.06), 'eng': st('cdr', 0.04), 'chef': st('critDmg', 0.10),
-         'design': st('crit', 0.04), 'paint': st('critDmg', 0.10), 'music': st('cdr', 0.04)}
+         'design': st('crit', 0.04), 'paint': st('critDmg', 0.10), 'music': st('cdr', 0.04),
+         'artm': st('maxSp', 40)}     # artm = 예술가 악기 계열: 붓 계열(art)과 같은 효과(균형)
 def r3(x): return round(x, 3)
 def rnd(x): return int(x + 0.5)          # JS Math.round과 같게(파이썬 round는 .5를 짝수로)
 def weapon_stats(L, kind, s, n, drop, key):
@@ -157,7 +158,8 @@ def weapon_stats(L, kind, s, n, drop, key):
             'hammer': [st('atk', rnd(P)), st('def', rnd(P * 0.15))],
             'knife': [st('atk', rnd(P)), st('crit', r3(0.02 + 0.04 * f))],
             'scissors': [st('atk', rnd(P)), st('crit', r3(0.03 + 0.05 * f))],
-            'brush': [st('matk', rnd(P)), st('atk', rnd(rnd(P) * 0.45))]}[kind]
+            'brush': [st('matk', rnd(P)), st('atk', rnd(rnd(P) * 0.45))],
+            'instrument': [st('matk', rnd(P)), st('atk', rnd(rnd(P) * 0.45))]}[kind]      # 악기 = 붓과 같은 공식(2026-11-17)
     if s >= 2:
         stat, step, mul = SIG[key]; v = r3(step * (s - 1)); main.append(st(stat, 0, v) if mul else st(stat, v))
     if drop: main.append(dict(DROP2[key]))
@@ -173,7 +175,7 @@ def armor_stats(L, s, n, drop):
     return out
 def levels_of(L): return LV_NOVICE if L['job'] == 'novice' else LV_TIER1 if L['job'] in TIER1 else LV_TIER2
 TIER1 = {'pharmacist', 'blacksmith', 'cook', 'hairdresser', 'artist'}
-STAND = {'sword': 'stick', 'pestle': 'pestle', 'hammer': 'hammer', 'knife': 'knife', 'scissors': 'scissors', 'brush': 'brush'}
+STAND = {'sword': 'stick', 'pestle': 'pestle', 'hammer': 'hammer', 'knife': 'knife', 'scissors': 'scissors', 'brush': 'brush', 'instrument': 'brush'}
 
 # 드롭 몬스터: 그 단계 레벨 근처([L-4, L+3])에 실제로 나오는 몬스터 중 가까운 순, 계열마다 돌려 가며 최대 3마리(이야기 보스 qb_* 제외)
 def spawn_levels():
@@ -200,10 +202,11 @@ def line_items():
     LV, M = spawn_levels(); out = []
     for li, L in enumerate(LINES):
         lv = levels_of(L); n = len(lv); sold = SOLD[n]
-        assert len(L['weapons']) == len(L['armors']) == len(L['evo']) == len(L['evo_ko']) == n, L['key']
+        assert len(L['weapons']) == len(L['evo']) == len(L['evo_ko']) == n and (L['armors'] is None or len(L['armors']) == n), L['key']
         for s, Lv in enumerate(lv):
             drop = s >= sold
             for typ, names, pre in (('weapon', L['weapons'], 'wg'), ('armor', L['armors'], 'ag')):
+                if names is None: continue           # 무기만 있는 계열(예술가 악기 artm)
                 id = '%s_%s_%d' % (pre, L['key'], s + 1); name, desc = names[s]
                 drops = pick_drops(Lv, li * 3 + s + (1 if typ == 'armor' else 0), LV, M, s == n - 1) if drop else None
                 stats = weapon_stats(Lv, L['kind'], s, n, drop, L['key']) if typ == 'weapon' else armor_stats(Lv, s, n, drop)
@@ -223,14 +226,18 @@ def briefs():
     for L in LINES:
         lv = levels_of(L); n = len(lv); sold = SOLD[n]
         fam = dict(family=L['family'], job=L['job'], kind=L['kind'], kind_ko=KIND[L['kind']]['ko'], motif=L['motif_ko'], silhouette=L['silhouette_ko'],
-                   palette=[{'name': a, 'hex': b} for a, b in L['palette']], ornaments=L['ornaments_ko'], garment=L['garment_ko'],
+                   palette=[{'name': a, 'hex': b} for a, b in L['palette']], ornaments=L['ornaments_ko'], garment=L.get('garment_ko', ''),
                    evolution=[{'stage': i + 1, 'ko': L['evo_ko'][i], 'en': L['evo'][i]} for i in range(n)])
+        if 'wevo' in L: fam['weapon_evolution'] = [{'stage': i + 1, 'ko': L['wevo_ko'][i], 'en': L['wevo'][i]} for i in range(n)]
+        if L['armors'] is None: fam['weapon_only'] = True; fam.pop('garment')
         items = []
         for s, Lv in enumerate(lv):
             stage = STAGE_KO[s] if n == 7 else STAGE_KO[[0, 1, 2, 4][s]]
             for typ, names, pre, prompt in (('weapon', L['weapons'], 'wg', weapon_prompt), ('armor', L['armors'], 'ag', armor_prompt)):
+                if names is None: continue
+                ev = L.get('wevo_ko', L['evo_ko']) if typ == 'weapon' else L['evo_ko']
                 items.append(dict(id='%s_%s_%d' % (pre, L['key'], s + 1), type=typ, name=names[s][0], level=Lv, stage=s + 1, stageName=stage,
-                                  drop=s >= sold, ornament_ko=L['evo_ko'][s], tripo_prompt=prompt(L, s)))
+                                  drop=s >= sold, ornament_ko=ev[s], tripo_prompt=prompt(L, s)))
         out[L['key']] = dict(fam, items=items)
     return out
 

@@ -10,7 +10,7 @@ tools/gear/design_briefs.json으로 씀 — 다음 단계(Tripo 3D 모델·아�
   Tripo/Runway에는 텍스트 프롬프트만(참고 그림을 입력 이미지로 넣지 말 것).
 
 계열 = 직업 계보 13개(견습생 · 1차 5 · 2차 7). 2차 무기는 1차 무기 종류(손에 든 모델·동작)를 그대로 따름:
-  유봉 = 약사·양약사·한약사, 망치 = 대장장이·엔지니어, 식칼 = 요리사·쉐프, 가위 = 미용사·디자이너, 붓 = 예술가·화가·음악가, 검 = 견습생.
+  유봉 = 약사·양약사·한약사, 망치 = 대장장이·엔지니어, 식칼 = 요리사·쉐프, 가위 = 미용사·디자이너, 붓 = 예술가·화가, 검 = 견습생, 악기 = 예술가(둘째 계열 artm)·음악가(2026-11-17 — 붓과 같은 양손 동작·길이).
 단계 진화(모든 계열 공통 뼈대, 계열마다 evo가 구체화): 1 기본 모양 + 모티프 암시 → 2 작은 보석 → 3 흘러내리는 장식 →
   4 머리가 모티프 실루엣 + 구슬 줄 → 5 정령이 완성된 머리 + 빛나는 핵 → 6(드롭) 날개·깃·금테가 커짐, 둘째 보석 고리 →
   7(드롭, 전설) 관·후광 + 여러 갈래 리본 + 핵에 아스텔의 '용의 눈' 문양."""
@@ -24,6 +24,9 @@ KIND = {
                                'and a big chunky ornate hammer head with two broad striking faces at the top'),
     'knife': dict(ko='식칼', en="a large ornate chef's cleaver-knife weapon: a short wrapped handle at the bottom and a broad curved blade pointing up"),
     'scissors': dict(ko='가위', en='a pair of giant ornate shears used as a weapon, closed, two long blades pointing up and two finger rings at the bottom'),
+    # 악기(2026-11-17 사용자 '예술가는 붓에 악기 무기 추가, 음악가는 붓 말고 악기'): 붓과 같은 양손 동작·길이 — 긴 자루 + 큰 악기 머리
+    'instrument': dict(ko='악기', en='a long ornate magic staff-like musical instrument weapon: a long slim neck-shaft with a wrapped grip at the bottom '
+                                  'and a large ornate musical instrument head at the top (lute, lyre or harp body)'),
     'brush': dict(ko='붓', en='a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top'),
 }
 STYLE_EN = ('stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, '
@@ -334,11 +337,17 @@ LINES = [
                  ('화룡 정령 도포', '가슴의 용머리 문장 한가운데 금빛 눈 핵이 빛나는 도포.'), ('점정 금룡 도포', '구름 날개 자락과 금테를 두른 귀한 도포.'),
                  ('천하 묵룡 대도포', '용 관 자수와 낙관 술, 용의 눈 브로치를 단 전설의 도포.')]),
 
-    dict(key='music', job='musician', kind='brush', family='별노래',
-         motif_ko='밤하늘을 나는 별노래 꾀꼬리 정령과 초승달 — 지휘봉처럼 가는 붓',
+    # 음악가 무기: 2026-11-17 붓 → 악기(같은 id wg_music_* — 수치 공식이 붓과 같아 예전 저장 그대로). 방어구 브리프는 evo 그대로, 무기는 wevo.
+    dict(key='music', job='musician', kind='instrument', family='별노래',
+         motif_ko='밤하늘을 나는 별노래 꾀꼬리 정령과 초승달 — 초승달 리라',
          motif_en='inspired by a star-song nightingale spirit flying across the night sky with a crescent moon',
-         silhouette_ko='지휘봉처럼 가늘고 긴 붓대, 쇠고리 위에 초승달과 접은 새 날개, 꼬리깃 리본이 흘러내림, 붓털 끝에 별',
-         silhouette_en='a very slim conductor-baton-like shaft, a crescent moon and folded bird wings above the ferrule, tail-feather ribbons trailing down, a little star at the bristle tip',
+         silhouette_ko='가늘고 긴 은 자루, 머리 = 초승달 모양 리라(빛나는 현), 위에 꾀꼬리가 앉고 꼬리깃 리본이 흘러내림, 가운데 별 보석',
+         silhouette_en='a slim silver neck-shaft, the head is a crescent-moon-shaped lyre with glowing strings, a nightingale perched on top, tail-feather ribbons trailing down, a star gem in the centre',
+         wevo_ko=['단순한 초승달 리라·음표 새김', '리라 가운데 별 보석', '자루에 연보라 꼬리깃 리본', '리라 위에 꾀꼬리 + 음표 방울 줄',
+                  '리라가 별노래 꾀꼬리 정령으로 완성 + 빛나는 별 핵', '큰 날개와 금테 + 둘째 별 고리', '별자리 관과 은하 후광 + 여러 갈래 꼬리깃 리본 + 핵에 용의 눈 문양'],
+         wevo=['a plain crescent-moon lyre with engraved music notes', 'a star gem in the middle of the lyre', 'a lilac tail-feather ribbon on the shaft',
+               'a nightingale perched on the lyre and a string of note-shaped bells', 'the lyre becomes the full star-song nightingale spirit with a glowing star core',
+               'large wings, gold trim and a second ring of star gems', 'a constellation crown with a galaxy halo, many tail-feather ribbons and a dragon-eye sigil in the core'],
          palette=[('남색', '#22306a'), ('은', '#d8dce8'), ('연보라', '#b89ae8')],
          ornaments_ko='별 보석, 음표 방울, 꼬리깃 리본, 은 사슬',
          evo_ko=['단순한 가는 붓·음표 새김', '쇠고리에 별 보석', '붓대에 연보라 꼬리깃 리본', '쇠고리 위 초승달 + 음표 방울 줄',
@@ -346,25 +355,47 @@ LINES = [
          evo=['a plain slim brush with engraved music notes', 'a star gem on the ferrule', 'a lilac tail-feather ribbon on the shaft',
               'a crescent moon above the ferrule and a string of note-shaped bells', 'the head becomes the full star-song nightingale with a glowing star core',
               'large wings, gold trim and a second ring of star gems', 'a constellation crown with a galaxy halo, many tail-feather ribbons and a dragon-eye sigil in the core'],
-         weapons=[('은방울 지휘붓', '붓대에 음표를 새긴 가는 붓. 음악가의 첫 지휘붓.'),
-                  ('별꾀꼬리 붓', '쇠고리에 별 보석을 박은 붓.'),
-                  ('달노래 붓', '붓대에 연보라 꼬리깃 리본을 단 붓. 휘두르면 노랫소리가 난다.'),
-                  ('은하 선율 붓', '쇠고리 위에 초승달이 뜬 붓. 음표 방울이 울린다.'),
-                  ('별노래 정령 붓', '머리가 별노래 꾀꼬리가 된 붓. 별 핵이 빛난다.'),
-                  ('천구 합창 붓', '큰 날개와 금테를 두른 귀한 붓. 밤하늘 아래 몬스터가 품고 있다.'),
-                  ('마에스트로 별왕관 붓', '별자리 관을 쓴 꾀꼬리 정령의 붓. 핵 속에 용의 눈 문양이 반짝인다.')],
+         weapons=[('은방울 초승 리라', '초승달 모양 머리에 음표를 새긴 리라. 음악가의 첫 악기.'),
+                  ('별꾀꼬리 리라', '리라 가운데 별 보석을 박았다. 현을 튕기면 별빛이 번진다.'),
+                  ('달노래 리라', '자루에 연보라 꼬리깃 리본을 단 리라. 휘두르면 노랫소리가 난다.'),
+                  ('은하 선율 리라', '리라 위에 꾀꼬리가 앉았다. 음표 방울이 울린다.'),
+                  ('별노래 정령 리라', '리라가 별노래 꾀꼬리 정령이 되었다. 별 핵이 빛난다.'),
+                  ('천구 합창 하프', '큰 날개와 금테를 두른 귀한 하프. 밤하늘 아래 몬스터가 품고 있다.'),
+                  ('마에스트로 별왕관 하프', '별자리 관을 쓴 꾀꼬리 정령의 하프. 핵 속에 용의 눈 문양이 반짝인다.')],
          garment_ko='음악가의 지휘자 연미복', garment_en="a conductor musician's swallow-tailed coat with a cravat",
          armors=[('은방울 연주복', '음표 자수를 놓은 연주복.'), ('별꾀꼬리 연미복', '별 보석 단추를 단 연미복.'),
                  ('달노래 연미복', '꼬리깃 리본을 늘어뜨린 연미복.'), ('은하 선율 연미복', '어깨에 초승달 장식과 음표 방울 줄을 단 연미복.'),
                  ('별노래 정령 연미복', '가슴의 꾀꼬리 문장 한가운데 별 핵이 빛나는 연미복.'), ('천구 합창 예복', '날개 자락과 금테를 두른 귀한 예복.'),
                  ('마에스트로 별왕관 예복', '별자리 관 자수와 꼬리깃 리본, 용의 눈 브로치를 단 전설의 예복.')]),
+    # (맨 끝에 둠 — 앞 계열들의 드롭 몬스터 고르기(순번 salt)가 바뀌지 않게)
+    # 예술가 둘째 무기 계열(2026-11-17 사용자 요청): 악기 — 붓 계열 채색나비와 함께 예술가 상점에 보임. 방어구는 없음(무기만, armors=None).
+    dict(key='artm', job='artist', kind='instrument', family='노을 잠자리',
+         motif_ko='안개 골짜기 갈대밭의 노을 잠자리 정령 — 해 질 녘 갈대 피리 소리에 맞춰 춤추는 잠자리, 날개가 류트 몸통을 감쌈',
+         motif_en='inspired by a twilight dragonfly spirit of the reed marshes of the Misty Valley that dances to the sound of reed pipes at sunset',
+         silhouette_ko='가늘고 긴 갈대빛 자루, 머리 = 둥근 호박색 류트 몸통, 울림 구멍을 반투명 잠자리 날개 네 장이 감쌈, 줄감개 끝에 갈대 이삭',
+         silhouette_en='a long slim reed-coloured neck-shaft, the head is a rounded amber lute body whose sound hole is framed by four translucent dragonfly wings, reed tufts at the pegbox',
+         palette=[('호박', '#e89a3a'), ('청록', '#3ab8a8'), ('크림', '#f6ead0')],
+         ornaments_ko='호박 보석, 잠자리 날개, 갈대 이삭 술, 작은 방울',
+         evo_ko=['단순한 작은 류트·갈대 새김', '울림 구멍 위 호박 보석', '자루에 청록 갈대 리본', '류트에 잠자리 날개 한 쌍 + 방울 줄',
+                 '머리가 노을 잠자리 정령으로 완성 + 빛나는 호박 핵', '큰 노을 날개와 금테 + 둘째 호박 고리', '노을 관과 해무리 후광 + 여러 갈래 갈대 리본 + 핵에 용의 눈 문양'],
+         evo=['a plain small lute with engraved reeds', 'an amber gem above the sound hole', 'a teal reed ribbon tied to the shaft',
+              'a pair of dragonfly wings on the lute and a string of little bells', 'the head becomes the full twilight dragonfly spirit with a glowing amber core',
+              'large sunset wings, gold trim and a second ring of amber gems', 'a sunset crown with a sun-halo, several flowing reed ribbons and a dragon-eye sigil in the core'],
+         weapons=[('갈대 류트', '갈대 무늬를 새긴 작은 류트. 예술가가 처음 잡는 악기.'),
+                  ('호박빛 류트', '울림 구멍 위에 호박 보석을 박은 류트. 맑은 저음이 난다.'),
+                  ('노을바람 류트', '자루에 청록 갈대 리본을 맨 류트. 휘두르면 바람 소리가 울린다.'),
+                  ('잠자리 날개 류트', '류트 몸통에 반투명 잠자리 날개가 돋았다. 방울 줄이 찰랑인다.'),
+                  ('노을 정령 류트', '머리가 노을 잠자리 정령이 된 류트. 호박 핵이 빛난다.'),
+                  ('해질녘 군무 류트', '큰 노을 날개와 금테를 두른 귀한 류트. 갈대밭의 몬스터가 품고 있다.'),
+                  ('황혼 여왕 류트', '노을 관을 쓴 잠자리 여왕의 류트. 핵 속에 용의 눈 문양이 비친다.')],
+         armors=None),
 ]
 
 
 def weapon_prompt(L, s):
-    """Tripo 텍스트 프롬프트 초안(무기). s = 0부터 센 단계."""
+    """Tripo 텍스트 프롬프트 초안(무기). s = 0부터 센 단계. 무기만의 진화(wevo)가 있으면 그것(음악가: 무기는 악기, 방어구 evo는 그대로)."""
     return (f"{KIND[L['kind']]['en']}, {L['motif_en']}, {L['silhouette_en']}, colours {', '.join(c[0] for c in L['palette'])} "
-            f"({', '.join(c[1] for c in L['palette'])}), stage {s + 1} of {len(L['weapons'])}: {L['evo'][s]}, {STYLE_EN}, {WEAPON_RULE_EN}")
+            f"({', '.join(c[1] for c in L['palette'])}), stage {s + 1} of {len(L['weapons'])}: {L.get('wevo', L['evo'])[s]}, {STYLE_EN}, {WEAPON_RULE_EN}")
 
 
 def armor_prompt(L, s):

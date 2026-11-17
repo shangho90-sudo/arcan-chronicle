@@ -2521,7 +2521,12 @@
     "wg_music_2",
     "wg_music_3",
     "wg_music_4",
-    "wg_music_5"
+    "wg_music_5",
+    "wg_artm_1",
+    "wg_artm_2",
+    "wg_artm_3",
+    "wg_artm_4",
+    "wg_artm_5"
    ],
    "gear": true
   },

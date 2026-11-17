@@ -2525,10 +2525,10 @@
  "music": {
   "family": "별노래",
   "job": "musician",
-  "kind": "brush",
-  "kind_ko": "붓",
-  "motif": "밤하늘을 나는 별노래 꾀꼬리 정령과 초승달 — 지휘봉처럼 가는 붓",
-  "silhouette": "지휘봉처럼 가늘고 긴 붓대, 쇠고리 위에 초승달과 접은 새 날개, 꼬리깃 리본이 흘러내림, 붓털 끝에 별",
+  "kind": "instrument",
+  "kind_ko": "악기",
+  "motif": "밤하늘을 나는 별노래 꾀꼬리 정령과 초승달 — 초승달 리라",
+  "silhouette": "가늘고 긴 은 자루, 머리 = 초승달 모양 리라(빛나는 현), 위에 꾀꼬리가 앉고 꼬리깃 리본이 흘러내림, 가운데 별 보석",
   "palette": [
    {
     "name": "남색",
@@ -2582,17 +2582,54 @@
     "en": "a constellation crown with a galaxy halo, many tail-feather ribbons and a dragon-eye sigil in the core"
    }
   ],
+  "weapon_evolution": [
+   {
+    "stage": 1,
+    "ko": "단순한 초승달 리라·음표 새김",
+    "en": "a plain crescent-moon lyre with engraved music notes"
+   },
+   {
+    "stage": 2,
+    "ko": "리라 가운데 별 보석",
+    "en": "a star gem in the middle of the lyre"
+   },
+   {
+    "stage": 3,
+    "ko": "자루에 연보라 꼬리깃 리본",
+    "en": "a lilac tail-feather ribbon on the shaft"
+   },
+   {
+    "stage": 4,
+    "ko": "리라 위에 꾀꼬리 + 음표 방울 줄",
+    "en": "a nightingale perched on the lyre and a string of note-shaped bells"
+   },
+   {
+    "stage": 5,
+    "ko": "리라가 별노래 꾀꼬리 정령으로 완성 + 빛나는 별 핵",
+    "en": "the lyre becomes the full star-song nightingale spirit with a glowing star core"
+   },
+   {
+    "stage": 6,
+    "ko": "큰 날개와 금테 + 둘째 별 고리",
+    "en": "large wings, gold trim and a second ring of star gems"
+   },
+   {
+    "stage": 7,
+    "ko": "별자리 관과 은하 후광 + 여러 갈래 꼬리깃 리본 + 핵에 용의 눈 문양",
+    "en": "a constellation crown with a galaxy halo, many tail-feather ribbons and a dragon-eye sigil in the core"
+   }
+  ],
   "items": [
    {
     "id": "wg_music_1",
     "type": "weapon",
-    "name": "은방울 지휘붓",
+    "name": "은방울 초승 리라",
     "level": 30,
     "stage": 1,
     "stageName": "기본형",
     "drop": false,
-    "ornament_ko": "단순한 가는 붓·음표 새김",
-    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by a star-song nightingale spirit flying across the night sky with a crescent moon, a very slim conductor-baton-like shaft, a crescent moon and folded bird wings above the ferrule, tail-feather ribbons trailing down, a little star at the bristle tip, colours 남색, 은, 연보라 (#22306a, #d8dce8, #b89ae8), stage 1 of 7: a plain slim brush with engraved music notes, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+    "ornament_ko": "단순한 초승달 리라·음표 새김",
+    "tripo_prompt": "a long ornate magic staff-like musical instrument weapon: a long slim neck-shaft with a wrapped grip at the bottom and a large ornate musical instrument head at the top (lute, lyre or harp body), inspired by a star-song nightingale spirit flying across the night sky with a crescent moon, a slim silver neck-shaft, the head is a crescent-moon-shaped lyre with glowing strings, a nightingale perched on top, tail-feather ribbons trailing down, a star gem in the centre, colours 남색, 은, 연보라 (#22306a, #d8dce8, #b89ae8), stage 1 of 7: a plain crescent-moon lyre with engraved music notes, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
    },
    {
     "id": "ag_music_1",
@@ -2608,13 +2645,13 @@
    {
     "id": "wg_music_2",
     "type": "weapon",
-    "name": "별꾀꼬리 붓",
+    "name": "별꾀꼬리 리라",
     "level": 33,
     "stage": 2,
     "stageName": "보석",
     "drop": false,
-    "ornament_ko": "쇠고리에 별 보석",
-    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by a star-song nightingale spirit flying across the night sky with a crescent moon, a very slim conductor-baton-like shaft, a crescent moon and folded bird wings above the ferrule, tail-feather ribbons trailing down, a little star at the bristle tip, colours 남색, 은, 연보라 (#22306a, #d8dce8, #b89ae8), stage 2 of 7: a star gem on the ferrule, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+    "ornament_ko": "리라 가운데 별 보석",
+    "tripo_prompt": "a long ornate magic staff-like musical instrument weapon: a long slim neck-shaft with a wrapped grip at the bottom and a large ornate musical instrument head at the top (lute, lyre or harp body), inspired by a star-song nightingale spirit flying across the night sky with a crescent moon, a slim silver neck-shaft, the head is a crescent-moon-shaped lyre with glowing strings, a nightingale perched on top, tail-feather ribbons trailing down, a star gem in the centre, colours 남색, 은, 연보라 (#22306a, #d8dce8, #b89ae8), stage 2 of 7: a star gem in the middle of the lyre, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
    },
    {
     "id": "ag_music_2",
@@ -2630,13 +2667,13 @@
    {
     "id": "wg_music_3",
     "type": "weapon",
-    "name": "달노래 붓",
+    "name": "달노래 리라",
     "level": 36,
     "stage": 3,
     "stageName": "흘림 장식",
     "drop": false,
-    "ornament_ko": "붓대에 연보라 꼬리깃 리본",
-    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by a star-song nightingale spirit flying across the night sky with a crescent moon, a very slim conductor-baton-like shaft, a crescent moon and folded bird wings above the ferrule, tail-feather ribbons trailing down, a little star at the bristle tip, colours 남색, 은, 연보라 (#22306a, #d8dce8, #b89ae8), stage 3 of 7: a lilac tail-feather ribbon on the shaft, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+    "ornament_ko": "자루에 연보라 꼬리깃 리본",
+    "tripo_prompt": "a long ornate magic staff-like musical instrument weapon: a long slim neck-shaft with a wrapped grip at the bottom and a large ornate musical instrument head at the top (lute, lyre or harp body), inspired by a star-song nightingale spirit flying across the night sky with a crescent moon, a slim silver neck-shaft, the head is a crescent-moon-shaped lyre with glowing strings, a nightingale perched on top, tail-feather ribbons trailing down, a star gem in the centre, colours 남색, 은, 연보라 (#22306a, #d8dce8, #b89ae8), stage 3 of 7: a lilac tail-feather ribbon on the shaft, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
    },
    {
     "id": "ag_music_3",
@@ -2652,13 +2689,13 @@
    {
     "id": "wg_music_4",
     "type": "weapon",
-    "name": "은하 선율 붓",
+    "name": "은하 선율 리라",
     "level": 39,
     "stage": 4,
     "stageName": "모티프 실루엣",
     "drop": false,
-    "ornament_ko": "쇠고리 위 초승달 + 음표 방울 줄",
-    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by a star-song nightingale spirit flying across the night sky with a crescent moon, a very slim conductor-baton-like shaft, a crescent moon and folded bird wings above the ferrule, tail-feather ribbons trailing down, a little star at the bristle tip, colours 남색, 은, 연보라 (#22306a, #d8dce8, #b89ae8), stage 4 of 7: a crescent moon above the ferrule and a string of note-shaped bells, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+    "ornament_ko": "리라 위에 꾀꼬리 + 음표 방울 줄",
+    "tripo_prompt": "a long ornate magic staff-like musical instrument weapon: a long slim neck-shaft with a wrapped grip at the bottom and a large ornate musical instrument head at the top (lute, lyre or harp body), inspired by a star-song nightingale spirit flying across the night sky with a crescent moon, a slim silver neck-shaft, the head is a crescent-moon-shaped lyre with glowing strings, a nightingale perched on top, tail-feather ribbons trailing down, a star gem in the centre, colours 남색, 은, 연보라 (#22306a, #d8dce8, #b89ae8), stage 4 of 7: a nightingale perched on the lyre and a string of note-shaped bells, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
    },
    {
     "id": "ag_music_4",
@@ -2674,13 +2711,13 @@
    {
     "id": "wg_music_5",
     "type": "weapon",
-    "name": "별노래 정령 붓",
+    "name": "별노래 정령 리라",
     "level": 42,
     "stage": 5,
     "stageName": "정령 완성",
     "drop": false,
-    "ornament_ko": "머리가 별노래 꾀꼬리로 완성 + 빛나는 별 핵",
-    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by a star-song nightingale spirit flying across the night sky with a crescent moon, a very slim conductor-baton-like shaft, a crescent moon and folded bird wings above the ferrule, tail-feather ribbons trailing down, a little star at the bristle tip, colours 남색, 은, 연보라 (#22306a, #d8dce8, #b89ae8), stage 5 of 7: the head becomes the full star-song nightingale with a glowing star core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+    "ornament_ko": "리라가 별노래 꾀꼬리 정령으로 완성 + 빛나는 별 핵",
+    "tripo_prompt": "a long ornate magic staff-like musical instrument weapon: a long slim neck-shaft with a wrapped grip at the bottom and a large ornate musical instrument head at the top (lute, lyre or harp body), inspired by a star-song nightingale spirit flying across the night sky with a crescent moon, a slim silver neck-shaft, the head is a crescent-moon-shaped lyre with glowing strings, a nightingale perched on top, tail-feather ribbons trailing down, a star gem in the centre, colours 남색, 은, 연보라 (#22306a, #d8dce8, #b89ae8), stage 5 of 7: the lyre becomes the full star-song nightingale spirit with a glowing star core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
    },
    {
     "id": "ag_music_5",
@@ -2696,13 +2733,13 @@
    {
     "id": "wg_music_6",
     "type": "weapon",
-    "name": "천구 합창 붓",
+    "name": "천구 합창 하프",
     "level": 46,
     "stage": 6,
     "stageName": "드롭: 날개·금테",
     "drop": true,
     "ornament_ko": "큰 날개와 금테 + 둘째 별 고리",
-    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by a star-song nightingale spirit flying across the night sky with a crescent moon, a very slim conductor-baton-like shaft, a crescent moon and folded bird wings above the ferrule, tail-feather ribbons trailing down, a little star at the bristle tip, colours 남색, 은, 연보라 (#22306a, #d8dce8, #b89ae8), stage 6 of 7: large wings, gold trim and a second ring of star gems, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+    "tripo_prompt": "a long ornate magic staff-like musical instrument weapon: a long slim neck-shaft with a wrapped grip at the bottom and a large ornate musical instrument head at the top (lute, lyre or harp body), inspired by a star-song nightingale spirit flying across the night sky with a crescent moon, a slim silver neck-shaft, the head is a crescent-moon-shaped lyre with glowing strings, a nightingale perched on top, tail-feather ribbons trailing down, a star gem in the centre, colours 남색, 은, 연보라 (#22306a, #d8dce8, #b89ae8), stage 6 of 7: large wings, gold trim and a second ring of star gems, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
    },
    {
     "id": "ag_music_6",
@@ -2718,13 +2755,13 @@
    {
     "id": "wg_music_7",
     "type": "weapon",
-    "name": "마에스트로 별왕관 붓",
+    "name": "마에스트로 별왕관 하프",
     "level": 50,
     "stage": 7,
     "stageName": "드롭 전설: 관·용의 눈",
     "drop": true,
     "ornament_ko": "별자리 관과 은하 후광 + 여러 갈래 꼬리깃 리본 + 핵에 용의 눈 문양",
-    "tripo_prompt": "a long ornate calligraphy paintbrush used as a magic weapon: a long slim shaft, a decorated ferrule and a plump pointed bristle tip at the top, inspired by a star-song nightingale spirit flying across the night sky with a crescent moon, a very slim conductor-baton-like shaft, a crescent moon and folded bird wings above the ferrule, tail-feather ribbons trailing down, a little star at the bristle tip, colours 남색, 은, 연보라 (#22306a, #d8dce8, #b89ae8), stage 7 of 7: a constellation crown with a galaxy halo, many tail-feather ribbons and a dragon-eye sigil in the core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+    "tripo_prompt": "a long ornate magic staff-like musical instrument weapon: a long slim neck-shaft with a wrapped grip at the bottom and a large ornate musical instrument head at the top (lute, lyre or harp body), inspired by a star-song nightingale spirit flying across the night sky with a crescent moon, a slim silver neck-shaft, the head is a crescent-moon-shaped lyre with glowing strings, a nightingale perched on top, tail-feather ribbons trailing down, a star gem in the centre, colours 남색, 은, 연보라 (#22306a, #d8dce8, #b89ae8), stage 7 of 7: a constellation crown with a galaxy halo, many tail-feather ribbons and a dragon-eye sigil in the core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
    },
    {
     "id": "ag_music_7",
@@ -2736,6 +2773,146 @@
     "drop": true,
     "ornament_ko": "별자리 관과 은하 후광 + 여러 갈래 꼬리깃 리본 + 핵에 용의 눈 문양",
     "tripo_prompt": "a conductor musician's swallow-tailed coat with a cravat, decorated with motifs a star-song nightingale spirit flying across the night sky with a crescent moon, colours #22306a, #d8dce8, #b89ae8, stage 7 of 7: a constellation crown with a galaxy halo, many tail-feather ribbons and a dragon-eye sigil in the core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single body garment displayed alone as if on an invisible mannequin, front view, no person, no head, no arms, no legs, no stand, no background, no text"
+   }
+  ]
+ },
+ "artm": {
+  "family": "노을 잠자리",
+  "job": "artist",
+  "kind": "instrument",
+  "kind_ko": "악기",
+  "motif": "안개 골짜기 갈대밭의 노을 잠자리 정령 — 해 질 녘 갈대 피리 소리에 맞춰 춤추는 잠자리, 날개가 류트 몸통을 감쌈",
+  "silhouette": "가늘고 긴 갈대빛 자루, 머리 = 둥근 호박색 류트 몸통, 울림 구멍을 반투명 잠자리 날개 네 장이 감쌈, 줄감개 끝에 갈대 이삭",
+  "palette": [
+   {
+    "name": "호박",
+    "hex": "#e89a3a"
+   },
+   {
+    "name": "청록",
+    "hex": "#3ab8a8"
+   },
+   {
+    "name": "크림",
+    "hex": "#f6ead0"
+   }
+  ],
+  "ornaments": "호박 보석, 잠자리 날개, 갈대 이삭 술, 작은 방울",
+  "evolution": [
+   {
+    "stage": 1,
+    "ko": "단순한 작은 류트·갈대 새김",
+    "en": "a plain small lute with engraved reeds"
+   },
+   {
+    "stage": 2,
+    "ko": "울림 구멍 위 호박 보석",
+    "en": "an amber gem above the sound hole"
+   },
+   {
+    "stage": 3,
+    "ko": "자루에 청록 갈대 리본",
+    "en": "a teal reed ribbon tied to the shaft"
+   },
+   {
+    "stage": 4,
+    "ko": "류트에 잠자리 날개 한 쌍 + 방울 줄",
+    "en": "a pair of dragonfly wings on the lute and a string of little bells"
+   },
+   {
+    "stage": 5,
+    "ko": "머리가 노을 잠자리 정령으로 완성 + 빛나는 호박 핵",
+    "en": "the head becomes the full twilight dragonfly spirit with a glowing amber core"
+   },
+   {
+    "stage": 6,
+    "ko": "큰 노을 날개와 금테 + 둘째 호박 고리",
+    "en": "large sunset wings, gold trim and a second ring of amber gems"
+   },
+   {
+    "stage": 7,
+    "ko": "노을 관과 해무리 후광 + 여러 갈래 갈대 리본 + 핵에 용의 눈 문양",
+    "en": "a sunset crown with a sun-halo, several flowing reed ribbons and a dragon-eye sigil in the core"
+   }
+  ],
+  "weapon_only": true,
+  "items": [
+   {
+    "id": "wg_artm_1",
+    "type": "weapon",
+    "name": "갈대 류트",
+    "level": 10,
+    "stage": 1,
+    "stageName": "기본형",
+    "drop": false,
+    "ornament_ko": "단순한 작은 류트·갈대 새김",
+    "tripo_prompt": "a long ornate magic staff-like musical instrument weapon: a long slim neck-shaft with a wrapped grip at the bottom and a large ornate musical instrument head at the top (lute, lyre or harp body), inspired by a twilight dragonfly spirit of the reed marshes of the Misty Valley that dances to the sound of reed pipes at sunset, a long slim reed-coloured neck-shaft, the head is a rounded amber lute body whose sound hole is framed by four translucent dragonfly wings, reed tufts at the pegbox, colours 호박, 청록, 크림 (#e89a3a, #3ab8a8, #f6ead0), stage 1 of 7: a plain small lute with engraved reeds, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "wg_artm_2",
+    "type": "weapon",
+    "name": "호박빛 류트",
+    "level": 13,
+    "stage": 2,
+    "stageName": "보석",
+    "drop": false,
+    "ornament_ko": "울림 구멍 위 호박 보석",
+    "tripo_prompt": "a long ornate magic staff-like musical instrument weapon: a long slim neck-shaft with a wrapped grip at the bottom and a large ornate musical instrument head at the top (lute, lyre or harp body), inspired by a twilight dragonfly spirit of the reed marshes of the Misty Valley that dances to the sound of reed pipes at sunset, a long slim reed-coloured neck-shaft, the head is a rounded amber lute body whose sound hole is framed by four translucent dragonfly wings, reed tufts at the pegbox, colours 호박, 청록, 크림 (#e89a3a, #3ab8a8, #f6ead0), stage 2 of 7: an amber gem above the sound hole, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "wg_artm_3",
+    "type": "weapon",
+    "name": "노을바람 류트",
+    "level": 16,
+    "stage": 3,
+    "stageName": "흘림 장식",
+    "drop": false,
+    "ornament_ko": "자루에 청록 갈대 리본",
+    "tripo_prompt": "a long ornate magic staff-like musical instrument weapon: a long slim neck-shaft with a wrapped grip at the bottom and a large ornate musical instrument head at the top (lute, lyre or harp body), inspired by a twilight dragonfly spirit of the reed marshes of the Misty Valley that dances to the sound of reed pipes at sunset, a long slim reed-coloured neck-shaft, the head is a rounded amber lute body whose sound hole is framed by four translucent dragonfly wings, reed tufts at the pegbox, colours 호박, 청록, 크림 (#e89a3a, #3ab8a8, #f6ead0), stage 3 of 7: a teal reed ribbon tied to the shaft, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "wg_artm_4",
+    "type": "weapon",
+    "name": "잠자리 날개 류트",
+    "level": 19,
+    "stage": 4,
+    "stageName": "모티프 실루엣",
+    "drop": false,
+    "ornament_ko": "류트에 잠자리 날개 한 쌍 + 방울 줄",
+    "tripo_prompt": "a long ornate magic staff-like musical instrument weapon: a long slim neck-shaft with a wrapped grip at the bottom and a large ornate musical instrument head at the top (lute, lyre or harp body), inspired by a twilight dragonfly spirit of the reed marshes of the Misty Valley that dances to the sound of reed pipes at sunset, a long slim reed-coloured neck-shaft, the head is a rounded amber lute body whose sound hole is framed by four translucent dragonfly wings, reed tufts at the pegbox, colours 호박, 청록, 크림 (#e89a3a, #3ab8a8, #f6ead0), stage 4 of 7: a pair of dragonfly wings on the lute and a string of little bells, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "wg_artm_5",
+    "type": "weapon",
+    "name": "노을 정령 류트",
+    "level": 22,
+    "stage": 5,
+    "stageName": "정령 완성",
+    "drop": false,
+    "ornament_ko": "머리가 노을 잠자리 정령으로 완성 + 빛나는 호박 핵",
+    "tripo_prompt": "a long ornate magic staff-like musical instrument weapon: a long slim neck-shaft with a wrapped grip at the bottom and a large ornate musical instrument head at the top (lute, lyre or harp body), inspired by a twilight dragonfly spirit of the reed marshes of the Misty Valley that dances to the sound of reed pipes at sunset, a long slim reed-coloured neck-shaft, the head is a rounded amber lute body whose sound hole is framed by four translucent dragonfly wings, reed tufts at the pegbox, colours 호박, 청록, 크림 (#e89a3a, #3ab8a8, #f6ead0), stage 5 of 7: the head becomes the full twilight dragonfly spirit with a glowing amber core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "wg_artm_6",
+    "type": "weapon",
+    "name": "해질녘 군무 류트",
+    "level": 26,
+    "stage": 6,
+    "stageName": "드롭: 날개·금테",
+    "drop": true,
+    "ornament_ko": "큰 노을 날개와 금테 + 둘째 호박 고리",
+    "tripo_prompt": "a long ornate magic staff-like musical instrument weapon: a long slim neck-shaft with a wrapped grip at the bottom and a large ornate musical instrument head at the top (lute, lyre or harp body), inspired by a twilight dragonfly spirit of the reed marshes of the Misty Valley that dances to the sound of reed pipes at sunset, a long slim reed-coloured neck-shaft, the head is a rounded amber lute body whose sound hole is framed by four translucent dragonfly wings, reed tufts at the pegbox, colours 호박, 청록, 크림 (#e89a3a, #3ab8a8, #f6ead0), stage 6 of 7: large sunset wings, gold trim and a second ring of amber gems, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
+   },
+   {
+    "id": "wg_artm_7",
+    "type": "weapon",
+    "name": "황혼 여왕 류트",
+    "level": 31,
+    "stage": 7,
+    "stageName": "드롭 전설: 관·용의 눈",
+    "drop": true,
+    "ornament_ko": "노을 관과 해무리 후광 + 여러 갈래 갈대 리본 + 핵에 용의 눈 문양",
+    "tripo_prompt": "a long ornate magic staff-like musical instrument weapon: a long slim neck-shaft with a wrapped grip at the bottom and a large ornate musical instrument head at the top (lute, lyre or harp body), inspired by a twilight dragonfly spirit of the reed marshes of the Misty Valley that dances to the sound of reed pipes at sunset, a long slim reed-coloured neck-shaft, the head is a rounded amber lute body whose sound hole is framed by four translucent dragonfly wings, reed tufts at the pegbox, colours 호박, 청록, 크림 (#e89a3a, #3ab8a8, #f6ead0), stage 7 of 7: a sunset crown with a sun-halo, several flowing reed ribbons and a dragon-eye sigil in the core, stylized cute fantasy RPG game item, hand-painted brush-stroke texture look, thin dark outlines feel, chunky readable silhouette, strong two-to-three colour contrast, one glowing gem as the focal point, one single weapon only, standing upright, handle at the bottom and head at the top, centered, no character, no hand, no stand, no background, no text"
    }
   ]
  }
