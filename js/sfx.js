@@ -33,7 +33,7 @@ export const SFX_NAMES = ['levelup', 'jobchange', 'dialog', 'warp', 'hit', 'heav
   'hd_snip', 'hd_dryer', 'hd_style', 'hd_gust', 'hd_hot', 'hd_cold',
   'wp_granule', 'wp_ring', 'wp_crystal', 'wp_ion', 'wp_collapse',   // 양약사 2차 (Runway — tools/audio/wp_runway_sfx.py)
   'wp_split', 'wp_frost', 'wp_align', 'wp_triad', 'wp_charge', 'wp_catalyst', 'wp_spark', 'wp_carrier', 'wp_chain', 'wp_spray', 'wp_coat', 'wp_lastrx', 'wp_brew',
-  'en_lock', 'en_motor', 'en_shot', 'en_pile', 'en_cannon', 'en_missile', 'en_pop', 'en_charge', 'en_rail', 'en_zap', 'en_weld', 'en_exhaust', 'en_drop',   // 엔지니어 2차 (tools/audio/en_sfx.py)
+  'en_lock', 'en_motor', 'en_shot', 'en_pile', 'en_cannon', 'en_missile', 'en_pop', 'en_charge', 'en_rail', 'en_zap', 'en_weld', 'en_exhaust', 'en_drop', 'en_deploy', 'en_assemble', 'en_vent', 'en_target', 'en_whistle', 'en_core', 'en_alarm', 'en_craft',   // 엔지니어 2차 (tools/audio/en_sfx.py)
   'nv_sal_cast', 'nv_sal_hit', 'nv_yeon_cast', 'nv_yeon_hit',
   'nv_biyeon_cast', 'nv_biyeon_hit', 'nv_bash_cast', 'nv_bash_hit',
   'heal', 'shield', 'dodge', 'throw', 'boss_slam', 'monster_attack', 'monster_die',

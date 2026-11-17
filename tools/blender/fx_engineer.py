@@ -23,6 +23,7 @@ Usage:  python3 tools/blender/fx_engineer.py   ->  assets/fx/fx_engineer.glb.jso
   en_pile      파일 벙커 몸통(팔 옆, +Z 0.5, 피벗 = 뒤)       en_piston  피스톤(+Z 0.3)   en_stake  강철 말뚝(+Z 0.7, 끝 뾰족)
   en_breach    브리치 캐논(+Z 0.55 짧고 굵게, 탄약실 띠)       en_pod     벌집 포드(바닥 원점, 구멍 6)    en_pod_lid  벌집 덮개(피벗 = 윗뒷변)
   en_rail      레일 한 쪽(+Z 1.0, 피벗 = 뒤 가운데)            en_ring    코일 고리(축 Z, r 1)
+  fx2 이펙트: en_fx_star 별·en_fx_gear 톱니·en_fx_nut 너트·en_fx_shard 파편(인스턴스 입자, 흰 정점 색) / en_fx_pillar 빛기둥(열린 원통 UV)·en_fx_helix 나선 띠
   en_beacon    정비 비콘(바닥 원점, 위 0.9 + 등 자리)          en_wrist   손목 단말(작은 판)   en_wrench  정비 드론 집게 팔(작은)
 json: {b64}
 """
@@ -181,12 +182,72 @@ def beacon(bm, col, uvl):
 def wrist(bm, col, uvl): box(bm, col, (0, 0, 0), (0.12, 0.03, 0.09), DARK); box(bm, col, (0, 0.017, 0), (0.09, 0.006, 0.065), (0.4, 0.9, 1, 1))
 def wrench(bm, col, uvl): tube(bm, col, (0, 0, 0), (0, 0, 0.22), 0.012, 0.012, 6, STEEL); box(bm, col, (0, 0, 0.24), (0.06, 0.02, 0.05), LIGHT)
 
+# --- fx2(2026-11-17) 이펙트 메시: 인스턴스 입자(정점 색 흰색 — 색은 셰이더 aC) + 빛기둥
+WLO = (0.72, 0.74, 0.78, 1)
+def fxstar(bm, col, uvl):
+    """통통한 다섯 꼭지 별: 반지름 1, 두께 ±0.32"""
+    c_top = bm.verts.new(V(0, 0.32, 0)); c_bot = bm.verts.new(V(0, -0.32, 0)); rg = []
+    for i in range(10):
+        a = math.pi / 2 + i * math.pi / 5; r = 1.0 if i % 2 == 0 else 0.46
+        rg.append(bm.verts.new(V(math.cos(a) * r, 0, math.sin(a) * r)))
+    for i in range(10):
+        j = (i + 1) % 10
+        for f in (bm.faces.new((c_top, rg[i], rg[j])), bm.faces.new((c_bot, rg[j], rg[i]))):
+            for l in f.loops: l[col] = W if l.vert in (c_top, c_bot) else WLO
+def fxgear(bm, col, uvl):
+    """톱니바퀴 조각: 바깥 반지름 1(톱니 끝), 안 구멍 0.36, 두께 0.3, 톱니 8"""
+    N = 32; h = 0.15; outer = []; inner = []
+    for i in range(N):
+        a = 2 * math.pi * i / N; tooth = (i // 2) % 2 == 0; r = 1.0 if tooth else 0.78
+        outer.append((math.cos(a) * r, math.sin(a) * r)); inner.append((math.cos(a) * 0.36, math.sin(a) * 0.36))
+    vo = [[bm.verts.new(V(x, y_, z)) for (x, z) in outer] for y_ in (-h, h)]; vi = [[bm.verts.new(V(x, y_, z)) for (x, z) in inner] for y_ in (-h, h)]
+    for i in range(N):
+        j = (i + 1) % N
+        for f, c in ((bm.faces.new((vo[0][i], vo[0][j], vo[1][j], vo[1][i])), WLO), (bm.faces.new((vi[0][j], vi[0][i], vi[1][i], vi[1][j])), WLO),
+                     (bm.faces.new((vo[1][i], vo[1][j], vi[1][j], vi[1][i])), W), (bm.faces.new((vo[0][j], vo[0][i], vi[0][i], vi[0][j])), W)):
+            paint(f, col, c)
+def fxnut(bm, col, uvl):
+    """육각 너트: 바깥 1, 구멍 0.45, 두께 0.5"""
+    N = 6; h = 0.25
+    vo = [[bm.verts.new(V(math.cos(2 * math.pi * i / N), y_, math.sin(2 * math.pi * i / N))) for i in range(N)] for y_ in (-h, h)]
+    vi = [[bm.verts.new(V(0.45 * math.cos(2 * math.pi * i / N), y_, 0.45 * math.sin(2 * math.pi * i / N))) for i in range(N)] for y_ in (-h, h)]
+    for i in range(N):
+        j = (i + 1) % N
+        for f, c in ((bm.faces.new((vo[0][i], vo[0][j], vo[1][j], vo[1][i])), WLO), (bm.faces.new((vi[0][j], vi[0][i], vi[1][i], vi[1][j])), WLO),
+                     (bm.faces.new((vo[1][i], vo[1][j], vi[1][j], vi[1][i])), W), (bm.faces.new((vo[0][j], vo[0][i], vi[0][i], vi[0][j])), W)):
+            paint(f, col, c)
+def fxshard(bm, col, uvl):
+    """금속 파편: 납작한 쐐기, 길이 1"""
+    P = [(0, 0, 0), (0.32, 0.05, 0.25), (0.1, 0.0, 1.0), (-0.22, 0.04, 0.5)]
+    a = [bm.verts.new(V(*p)) for p in P]; b = [bm.verts.new(V(p[0], p[1] + 0.09, p[2])) for p in P]
+    paint(bm.faces.new(a[::-1]), col, WLO); paint(bm.faces.new(b), col, W)
+    for i in range(4):
+        j = (i + 1) % 4; paint(bm.faces.new((a[i], a[j], b[j], b[i])), col, WLO)
+def fxpillar(bm, col, uvl):
+    """빛기둥: 열린 원통 반지름 1, y 0 .. 1, UV u = 둘레, v = 높이"""
+    S = 32; lo = [bm.verts.new(V(math.cos(2 * math.pi * i / S), 0, math.sin(2 * math.pi * i / S))) for i in range(S)]
+    hi = [bm.verts.new(V(math.cos(2 * math.pi * i / S), 1, math.sin(2 * math.pi * i / S))) for i in range(S)]
+    for i in range(S):
+        j = (i + 1) % S; f = bm.faces.new((lo[i], lo[j], hi[j], hi[i])); u0, u1 = i / S, (i + 1) / S
+        for l, uv in zip(f.loops, ((u0, 0), (u1, 0), (u1, 1), (u0, 1))): l[col] = W; l[uvl].uv = uv
+def fxhelix(bm, col, uvl):
+    """나선 띠: 반지름 1, y 0 .. 1, 2바퀴, UV u = 길이, v = 폭"""
+    N = 64; turns = 2.0; w = 0.06; prev = None
+    for i in range(N + 1):
+        t = i / N; a = t * turns * 2 * math.pi; x, z = math.cos(a), math.sin(a)
+        cur = (bm.verts.new(V(x, t - w, z)), bm.verts.new(V(x, t + w, z)))
+        if prev:
+            f = bm.faces.new((prev[0], cur[0], cur[1], prev[1])); t0 = (i - 1) / N
+            for l, uv in zip(f.loops, ((t0, 0), (t, 0), (t, 1), (t0, 1))): l[col] = W; l[uvl].uv = uv
+        prev = cur
+
 PARTS = [('en_case', case), ('en_leg', leg), ('en_head', head), ('en_barrel', barrel), ('en_drum', drum), ('en_muzzle', muzzle), ('en_fin', fin), ('en_lens', lens),
          ('en_casing', casing), ('en_slug', slug), ('en_spider', spider), ('en_sleg', sleg), ('en_drone', drone), ('en_wing', wing), ('en_pylon', pylon), ('en_coil', coil),
          ('en_core', core), ('en_w_hull', w_hull), ('en_w_plate', w_plate), ('en_w_thigh', w_thigh), ('en_w_shin', w_shin), ('en_w_gun', w_gun), ('en_w_rack', w_rack),
          ('en_w_lid', w_lid), ('en_w_cannon', w_cannon), ('en_missile', missile), ('en_pile', pile), ('en_piston', piston), ('en_stake', stake), ('en_breach', breach),
-         ('en_pod', pod), ('en_pod_lid', pod_lid), ('en_rail', rail), ('en_ring', ring), ('en_beacon', beacon), ('en_wrist', wrist), ('en_wrench', wrench)]
-FLAT = {'en_case', 'en_head', 'en_barrel', 'en_fin', 'en_drone', 'en_wing', 'en_w_hull', 'en_w_plate', 'en_w_thigh', 'en_w_shin', 'en_w_rack', 'en_w_lid', 'en_pile', 'en_pod', 'en_pod_lid', 'en_rail', 'en_beacon', 'en_wrist', 'en_core', 'en_case', 'en_w_gun', 'en_w_cannon', 'en_breach', 'en_missile'}
+         ('en_pod', pod), ('en_pod_lid', pod_lid), ('en_rail', rail), ('en_ring', ring), ('en_beacon', beacon), ('en_wrist', wrist), ('en_wrench', wrench),
+         ('en_fx_star', fxstar), ('en_fx_gear', fxgear), ('en_fx_nut', fxnut), ('en_fx_shard', fxshard), ('en_fx_pillar', fxpillar), ('en_fx_helix', fxhelix)]
+FLAT = {'en_case', 'en_head', 'en_barrel', 'en_fin', 'en_drone', 'en_wing', 'en_w_hull', 'en_w_plate', 'en_w_thigh', 'en_w_shin', 'en_w_rack', 'en_w_lid', 'en_pile', 'en_pod', 'en_pod_lid', 'en_rail', 'en_beacon', 'en_wrist', 'en_core', 'en_case', 'en_w_gun', 'en_w_cannon', 'en_breach', 'en_missile', 'en_fx_star', 'en_fx_gear', 'en_fx_nut', 'en_fx_shard', 'en_fx_pillar', 'en_fx_helix'}
 
 def main():
     FP.reset()

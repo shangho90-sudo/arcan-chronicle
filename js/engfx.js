@@ -1,10 +1,19 @@
-// 엔지니어 2차 스킬 이펙트 (2026-11-16). 규칙은 js/engineer.js, 부품 메시는 tools/blender/fx_engineer.py -> assets/fx/fx_engineer.glb.json
-// (부품마다 피벗이 실제 관절·회전축 — 전개·조준·반동·코일 점등·덮개 개방·냉각판은 여기서 런타임으로 움직임).
+// 엔지니어 2차 스킬 이펙트 (2026-11-16, 2026-11-17 fx2 '화려하게' 개편). 규칙은 js/engineer.js, 부품 메시는 tools/blender/fx_engineer.py -> assets/fx/fx_engineer.glb.json
+// (부품마다 피벗이 실제 관절·회전축 — 전개·조준·반동·코일 점등·덮개 개방·냉각판은 여기서 런타임으로 움직임)
+// + Tripo 덩어리 tools/tripo/en_assets.py -> tools/blender/fx_engineer_tripo.py -> assets/fx/fx_engineer_tripo.glb.json
+//   (tripo_w_hull 워커 몸통 · tripo_w_thigh/_shin 워커 다리를 무릎에서 나눔 · tripo_sentry 센트리 머리 · tripo_drone 드론 몸통 — 피벗은 절차 부품과 같은 자리,
+//    움직이는 부품(포신·날개·덮개·냉각판·장갑판)은 그대로 절차 부품. 파일이 없으면 모두 절차 부품).
 // 시각 정체성: 동화풍 마도공학 — 강철 몸체 + 구리 코일 + 작은 동력 결정 + 가죽 끈. 색 역할(빛보다 부품의 움직임이 먼저):
 //   일반 가동 청색·청록 / 실탄·폭발 주황·금 / 전자기 청백 / 과부하 주황 코어 + 붉은 경고등 + 냉각판 열림 / 정비 작은 청록 불빛 + 용접 불꽃.
+// 층(fx2, 모든 스킬): (1) 시전 준비 = 발밑 '설계 마법진'(sigil: 톱니 고리·눈금·금테 + 무늬 0 톱니·육각 / 1 조준경 / 2 회로·삼각 / 3 설계도 격자, 일반 블렌딩 + 가산 빛 두 장)
+//   + 손 모임 빛 (2) 본체 = 병기 메시(Tripo 덩어리 + 절차 부품) + 꼬리 리본·불티 (3) 명중 = bang(섬광·세운 고리·별·너트·톱니·불티) + 바닥 고리 + 빛기둥(en_fx_pillar)
+//   (4) 잔광 = 천천히 사라지는 마법진·연기. 큰 것(마법진·고리·빛기둥·부채꼴·삼각형)은 실제 판정 크기 안.
 // 병기 핸들은 규칙의 상태(s.en: phase·t·yaw·pitch·recoil·walking…)를 매 프레임 읽어 그림 — 규칙은 그림을 기다리지 않음.
-// 가장 밝은 순간 = 실제 피해 순간(규칙이 그 순간 handle 메서드를 부름). 고리·부채꼴·삼각형은 실제 판정 크기 그대로. 전역 블룸·노출·정지는 안 건드림.
-// 메시·재질은 종류별 풀(CookFx)에서 재사용, 탄·미사일·탄피·연기·파편도 풀. 저사양(휴대폰 / 그래픽 효과 끔)은 탄피·연기·파편·불꽃 수만 줄임.
+// 가장 밝은 순간 = 실제 피해 순간(규칙이 그 순간 handle 메서드를 부름). 전역 블룸·노출·정지는 안 건드림(가산 색 ≤ 1 — 블룸 문턱 2.6 아래).
+// 성능: 별·톱니·너트·파편·불티·탄피·반짝이·연기는 종류마다 InstancedMesh 하나(Parts, draw call 1, 상한 ENFX.cap — 차면 새 입자를 버림).
+// 메시·재질은 종류별 풀(CookFx)에서 재사용. 난수는 자기 것(rand)만 — 게임 Math.random(명중·치명 굴림)을 건드리지 않음.
+// 저사양(휴대폰 / 그래픽 효과 끔): 입자 수만 ENFX.liteK배 — 마법진·빛기둥·병기·탄·리본은 그대로.
+// 소리: 판정 순간 소리(en_shot/pile/cannon/…)는 규칙이 내고, 그림에만 있는 순간(전개·조립·냉각판·조준 고정·낙하·코어 회수·경보·제작)은 여기서 snd() — Runway(tools/audio/en_runway_sfx.py).
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { CookFx, cookTop } from './cookfx.js';
@@ -12,56 +21,198 @@ import { CookFx, cookTop } from './cookfx.js';
 export const ENFX = {
   intensity: 1.0,
   col: { teal: 0x5ae6d2, tealB: 0x1a8a9a, blue: 0x5aaaff, blueB: 0x1a4aa0, ice: 0xd8f0ff, iceB: 0x5a9aff, gold: 0xffd27a, goldB: 0xff8a2a, orange: 0xff9a3a, orangeB: 0xd84a10,
-    red: 0xff3a2a, redB: 0x9a1008, steam: 0xf0f4f8, steamB: 0xb0bccc, smoke: 0x9aa0aa, smokeB: 0x5a5f68, spark: 0xffe0a0 },
+    red: 0xff3a2a, redB: 0x9a1008, steam: 0xf0f4f8, steamB: 0xb0bccc, smoke: 0x9aa0aa, smokeB: 0x5a5f68, spark: 0xffe0a0,
+    mint: 0x9affe8, sky: 0x9ad8ff, white: 0xf4fbff, navy: 0x163a78, brass: 0xffc860, copper: 0xff9a5a, steel: 0xc8d4e4, pink: 0xffb0c8 },
   tint: 0x9aa8bc,          // 금속 부품 색을 조금 눌러 줌(밝은 바닥에서 하얗게 뜨지 않게) — 빛나는 부품은 glowM 이 따로 정함
   walkerScale: 1.18,       // 워커 높이 약 2.7 m (캐릭터의 약 1.6배)
+  sentryScale: 1.5,        // fx2: '작게 보임' — 1.3 → 1.5 (Tripo 머리 0.5 m 폭 × 1.5)
+  droneScale: 1.6, spiderScale: 1.45,
+  // Tripo 덩어리 크기·앞 방향(도) 보정 — 파일 원점 = 절차 부품의 피벗
+  tripo: { hull: { s: 1.0, yaw: 0, y: 0 }, thigh: { s: 1.0, yaw: 0 }, shin: { s: 1.0, yaw: 0 }, sentry: { s: 1.0, yaw: 0 }, drone: { s: 1.0, yaw: 0 } },
   casings: 1, casingsLite: 0, sparks: 6, sparksLite: 3, puffs: 4, puffsLite: 2, helix: 26, helixLite: 12,
+  liteK: 0.45,                                                           // 저사양 입자 배율
+  cap: { star: 120, gear: 90, nut: 90, shard: 120, spark: 260, casing: 40, glint: 240, mist: 90 },   // 종류별 동시 입자 상한(인스턴스 수)
+  sfxGap: 0.07,
 };
 const C = ENFX.col;
+// 색 묶음 [밝은 선, 몸, 금테] — 설계 마법진·bang·빛기둥
+const PAL = {
+  teal: [0xc8fff4, 0x1a7a8a, 0xffd27a], blue: [0xd8f0ff, 0x1a3f8a, 0xffd27a], ice: [0xeef8ff, 0x2a5ab8, 0xbfe4ff], orange: [0xffe6b0, 0xa8400e, 0xffd27a],
+  red: [0xffc0b0, 0x8a1208, 0xffb060], gold: [0xfff0c0, 0x8a5a10, 0xffe090], mint: [0xd8fff2, 0x137a64, 0xffd27a],
+};
 const P3 = (p) => new THREE.Vector3(p.x, p.y || 0, -p.z);
 const lite = () => { const G = window.G; return !!(G && ((G.input && G.input.mobile) || (G.settings && G.settings.graphicsFx === false))); };
 const clamp01 = (x) => Math.min(1, Math.max(0, x));
 const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
 const easeOut = (x) => 1 - Math.pow(1 - clamp01(x), 3);
-const rnd = (a, b) => a + Math.random() * (b - a);
+let _s = 0x5e17a3c | 0;                                                  // 자기 난수(xorshift) — 게임의 Math.random 을 건드리지 않음
+const rand = () => { _s ^= _s << 13; _s ^= _s >>> 17; _s ^= _s << 5; return (_s >>> 0) / 4294967296; };
+const rnd = (a, b) => a + rand() * (b - a);
+const pick = (a) => (Array.isArray(a) ? a[(rand() * a.length) | 0] : a);
 const yawRot = (yaw) => Math.atan2(Math.sin(yaw), -Math.cos(yaw));   // game yaw (atan2(fx, fz)) -> three rotation.y so local +Z looks along the facing
-const _a = new THREE.Vector3(), _b = new THREE.Vector3(), _c = new THREE.Vector3(), _q = new THREE.Quaternion(), _z = new THREE.Vector3(0, 0, 1), _m4 = new THREE.Matrix4();
+const _a = new THREE.Vector3(), _b = new THREE.Vector3(), _c = new THREE.Vector3(), _d = new THREE.Vector3(), _q = new THREE.Quaternion(), _z = new THREE.Vector3(0, 0, 1), _m4 = new THREE.Matrix4(), _e = new THREE.Euler(), _s3 = new THREE.Vector3(), _col = new THREE.Color();
 const FLAT_VS = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`;
-// 바닥 가산 층 uK: 0 부채꼴 파동(uv.x 가로 0..1, uv.y 반지름 0..1, uP = 파동 앞) / 1 삼각형 장판(uv.x = 0 가운데 .. 1 변) / 2 조준선(uv.x 길이, uv.y 가로 — 가장자리 두 줄)
+// 바닥 가산 층 uK: 0 부채꼴 파동(uv.x 가로 0..1, uv.y 반지름 0..1, uP = 파동 앞) / 1 삼각형 장판(uv.x = 0 가운데 .. 1 변; fx2: 회로 결) / 2 조준선(uv.x 길이, uv.y 가로 — 가장자리 두 줄)
 const EN_FS = `uniform vec3 uW, uB; uniform float uA, uK, uP, uT; varying vec2 vUv;
 void main(){ float a = 0., core = 0.;
-  if (uK < .5) { float v = vUv.y, u = vUv.x, fr = uP; a = smoothstep(fr - .22, fr, v) * smoothstep(fr + .03, fr, v) * smoothstep(0., .12, u) * smoothstep(1., .88, u); core = smoothstep(fr - .06, fr, v) * smoothstep(fr + .02, fr, v); }
-  else if (uK < 1.5) { float e = vUv.x; a = .10 + .08 * sin(uT * 9. + e * 20.) * .5 + smoothstep(.86, .99, e) * .8; core = smoothstep(.93, 1., e); }
-  else { float e = abs(vUv.y - .5) * 2.; a = smoothstep(.75, .98, e) * smoothstep(1., .98, e) * (.6 + .4 * sin(vUv.x * 40. - uT * 14.)) + .05; core = smoothstep(.9, .98, e); a *= smoothstep(1., .9, vUv.x); }
+  if (uK < .5) { float v = vUv.y, u = vUv.x, fr = uP; a = smoothstep(fr - .22, fr, v) * smoothstep(fr + .03, fr, v) * smoothstep(0., .12, u) * smoothstep(1., .88, u); core = smoothstep(fr - .06, fr, v) * smoothstep(fr + .02, fr, v);
+    a += smoothstep(fr, fr - .5, v) * smoothstep(0., .3, v) * .14 * step(v, fr) * smoothstep(0., .12, u) * smoothstep(1., .88, u); }
+  else if (uK < 1.5) { float e = vUv.x; float tr = smoothstep(.06, .0, abs(fract(e * 4. - uT * 1.3) - .5) - .44);
+    a = .10 + .08 * sin(uT * 9. + e * 20.) * .5 + smoothstep(.86, .99, e) * .8 + tr * .35; core = smoothstep(.93, 1., e) + tr * .5; }
+  else { float e = abs(vUv.y - .5) * 2.; a = smoothstep(.75, .98, e) * smoothstep(1., .98, e) * (.6 + .4 * sin(vUv.x * 40. - uT * 14.)) + .05; core = smoothstep(.9, .98, e); a *= smoothstep(1., .9, vUv.x);
+    a += smoothstep(.12, 0., abs(fract(vUv.x * 9. - uT * 2.) - .5) - .38) * smoothstep(.7, .2, e) * .35 * smoothstep(1., .9, vUv.x); }
   gl_FragColor = vec4(mix(uB, uW, clamp(core, 0., 1.)) * a * uA, 1.); }`;
+// 설계 마법진(바닥 판, 반지름 1 = 판정 반경 이하): 금테 이중 고리 + 도는 톱니 고리 + 반대로 도는 눈금 + 안쪽 무늬(uV 0 톱니·육각 / 1 조준경 / 2 회로·삼각 / 3 설계도 격자)
+// uP = 그려진 각도(0..1, 위에서 시계 방향으로), uT = 시간, 가운데는 옅게(적·경고가 보이게). uAdd 1 = 가산 빛 층
+const ESIG_FS = `uniform vec3 uW, uB, uG; uniform float uA, uP, uT, uV, uAdd; varying vec2 vUv;
+#define PI 3.14159265
+float band(float r, float c, float w){ return smoothstep(w, w * .3, abs(r - c)); }
+float poly(vec2 p, float n, float R, float rot, float w){ float a = atan(p.y, p.x) + rot, s = 2. * PI / n; float d = length(p) * cos(mod(a, s) - s * .5) - R * cos(s * .5); return smoothstep(w, w * .3, abs(d)); }
+float seg(vec2 p, vec2 a, vec2 b, float w){ vec2 pa = p - a, ba = b - a; float h = clamp(dot(pa, ba) / dot(ba, ba), 0., 1.); return smoothstep(w, w * .3, length(pa - ba * h)); }
+vec2 rot2(vec2 p, float a){ float c = cos(a), s = sin(a); return vec2(c * p.x - s * p.y, s * p.x + c * p.y); }
+void main(){ vec2 p = vUv * 2. - 1.; float r = length(p); if (r > 1.) discard;
+  float ang = atan(p.y, p.x), a01 = fract(.25 - ang / (2. * PI)); float drawn = smoothstep(uP + .004, uP - .004, a01) * step(.001, uP);
+  float gold = band(r, .968, .022) + band(r, .905, .01) * .8;
+  float tooth = step(.5, fract((ang + uT * .5) / (2. * PI) * 28.));
+  float gear = band(r, .8, .012) + smoothstep(.812, .822, r) * smoothstep(.872, .862, r) * tooth * .85;
+  float ta = (ang - uT * .3) / (2. * PI) * 72., tk = step(fract(ta), .16) * (mod(floor(ta), 6.) < .5 ? 1. : .55);
+  float ticks = smoothstep(.912, .918, r) * smoothstep(.95 , .944, r) * tk;
+  float lines = gear * .9 + ticks * .8, rot = -uT * .4; vec2 q = rot2(p, rot);
+  if (uV < .5) { lines += poly(p, 6., .56, rot, .014) + poly(p, 6., .34, -rot * 1.5, .01) * .7;
+    for (int i = 0; i < 6; i++) { float a = float(i) * PI / 3.; lines += seg(q, vec2(cos(a), sin(a)) * .36, vec2(cos(a), sin(a)) * .74, .009) * .7; } }
+  else if (uV < 1.5) { lines += band(r, .62, .01) + band(r, .3, .008) * (.5 + .5 * step(.5, fract((ang - uT) / (2. * PI) * 12.)));
+    lines += seg(q, vec2(.14, 0.), vec2(.52, 0.), .01) + seg(q, vec2(-.14, 0.), vec2(-.52, 0.), .01) + seg(q, vec2(0., .14), vec2(0., .52), .01) + seg(q, vec2(0., -.14), vec2(0., -.52), .01);
+    float br = band(r, .72, .016) * smoothstep(.16, .1, abs(mod(ang - uT * .7 + PI / 4., PI / 2.) - PI / 4.)); lines += br * 1.2; }
+  else if (uV < 2.5) { lines += poly(p, 3., .84, rot - PI / 2., .016) + poly(p, 3., .42, -rot * 1.6 + PI / 2., .011) * .8;
+    for (int i = 0; i < 9; i++) { float a = float(i) * 2. * PI / 9. + .2; vec2 d = vec2(cos(a), sin(a)); float L = .5 + .2 * mod(float(i), 2.); lines += seg(q, d * .3, d * L, .007) * .6 + smoothstep(.04, .02, length(q - d * L)) * .9; } }
+  else { vec2 g = abs(fract(p * 5. + .5) - .5); lines += (smoothstep(.03, .0, min(g.x, g.y)) * .35) * step(r, .78) + band(r, .64, .009) + poly(p, 4., .6, rot, .012) * .8 + poly(p, 8., .44, -rot, .009) * .5; }
+  float wave = band(r, fract(uT * .55), .05) * .35 * step(r, .95), core = exp(-r * r * 22.) * .45, fill = .07 + .12 * smoothstep(.25, .95, r);
+  vec3 c = mix(uB, uW, clamp(lines + wave, 0., 1.) * .5); c = mix(c, uG, clamp(gold, 0., 1.)); c = mix(c, uW, core);
+  float a = (fill + lines * .85 + gold + wave + core) * drawn * uA;
+  if (uAdd > .5) gl_FragColor = vec4(c * clamp(a, 0., 1.2) * .7, 1.); else gl_FragColor = vec4(c, clamp(a, 0., .92)); }`;
+// 빛기둥(열린 원통, u 둘레 / v 높이): 아래가 밝고 위로 흐려짐, 세로 줄무늬가 돌고 위로 흐름 + 가로 눈금(기계 느낌) — 가산
+const PILLAR_FS = `uniform vec3 uW, uB; uniform float uA, uT; varying vec2 vUv;
+void main(){ float v = vUv.y, fade = pow(1. - v, 1.5) * smoothstep(0., .05, v);
+  float st = .55 + .45 * sin(vUv.x * 43.98 + uT * 3.) * sin(vUv.x * 18.85 - uT * 2.), fl = .7 + .3 * sin((v - uT * 1.4) * 17.), tk = 1. + .6 * smoothstep(.08, 0., abs(fract(v * 6. - uT * 2.) - .5) - .42);
+  gl_FragColor = vec4(mix(uW, uB, clamp(v * 1.3, 0., 1.)) * fade * st * fl * tk * uA, 1.); }`;
+// 나선 띠(u 길이 0..1 / v 폭): uP = 머리 위치, 머리 뒤 0.5 길이만 보임 — 가산
+const HELIX_FS = `uniform vec3 uW, uB; uniform float uA, uP; varying vec2 vUv;
+void main(){ float e = 1. - abs(vUv.y * 2. - 1.), k = (uP - vUv.x) / .5; if (k < 0. || k > 1.) discard;
+  float a = smoothstep(0., .7, e) * pow(1. - k, 1.3) * smoothstep(0., .04, k + .02); gl_FragColor = vec4(mix(uW, uB, k) * a * uA, 1.); }`;
+// 인스턴스 입자: 메시(별·톱니·너트·파편·불티·탄피 — 빛 받는 몸 + 자체 빛) / 빌보드(반짝이 = 가산 네 꼭지 별, 연기 = 부드러운 덩어리)
+const PM_VS = `attribute vec3 color; attribute vec3 aC; attribute vec2 aA; varying vec3 vC, vN, vV; varying vec2 vA;
+void main(){ vC = aC * color; vA = aA; mat3 im = mat3(instanceMatrix); vN = normalize(normalMatrix * (im * normal)); vec4 mv = modelViewMatrix * instanceMatrix * vec4(position, 1.); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }`;
+const PM_FS = `varying vec3 vC, vN, vV; varying vec2 vA;
+void main(){ vec3 n = normalize(vN); if (!gl_FrontFacing) n = -n; vec3 L = normalize(vec3(-.4, .8, .5)); float d = max(0., dot(n, L)), fr = pow(1. - abs(dot(n, vV)), 2.), sp = pow(max(0., dot(reflect(-L, n), vV)), 24.);
+  vec3 c = vC * (.55 + .55 * d) + mix(vC, vec3(1.), .5) * fr * .5 + vec3(1.) * sp * .6 + vC * vA.y; gl_FragColor = vec4(c, vA.x); }`;
+const BB_VS = `attribute vec3 aC; attribute vec2 aA; varying vec2 vUv; varying vec3 vC; varying vec2 vA;
+void main(){ vUv = uv; vC = aC; vA = aA; vec3 c = vec3(instanceMatrix[3]); float s = length(vec3(instanceMatrix[0])); vec4 mv = modelViewMatrix * vec4(c, 1.); mv.xy += position.xy * s; gl_Position = projectionMatrix * mv; }`;
+const GLINT_FS = `varying vec2 vUv; varying vec3 vC; varying vec2 vA;
+void main(){ vec2 p = vUv * 2. - 1.; float r = length(p); float s = exp(-abs(p.x) * 13.) * clamp(1. - abs(p.y), 0., 1.) + exp(-abs(p.y) * 13.) * clamp(1. - abs(p.x), 0., 1.);
+  float a = s + pow(clamp(1. - r, 0., 1.), 3.) * .8, core = pow(clamp(1. - r * 2.4, 0., 1.), 1.5); gl_FragColor = vec4(mix(vC, vec3(1.), core) * a * vA.x, 1.); }`;
+const MIST_FS = `varying vec2 vUv; varying vec3 vC; varying vec2 vA;
+void main(){ vec2 p = vUv * 2. - 1.; float r = length(p); gl_FragColor = vec4(vC, pow(clamp(1. - r, 0., 1.), 1.6) * vA.x); }`;
 const ADD = { transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide };
+
+/** 한 종류의 입자 묶음 = InstancedMesh 하나. 입자: 위치·속도·중력·끌림·땅·회전·크기(시작→끝)·색·알파·자체 빛, 수명 동안 페이드 */
+class Parts {
+  constructor(root, geo, mat, cap, bb) {
+    const g = geo.clone(); this.cap = cap; this.bb = bb; this.p = [];
+    if (!g.attributes.color) g.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(g.attributes.position.count * 3).fill(1), 3));
+    this.aC = new THREE.InstancedBufferAttribute(new Float32Array(cap * 3), 3); this.aA = new THREE.InstancedBufferAttribute(new Float32Array(cap * 2), 2);
+    this.aC.setUsage(THREE.DynamicDrawUsage); this.aA.setUsage(THREE.DynamicDrawUsage); g.setAttribute('aC', this.aC); g.setAttribute('aA', this.aA);
+    this.m = new THREE.InstancedMesh(g, mat, cap); this.m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); this.m.count = 0; this.m.frustumCulled = false; this.m.renderOrder = bb === 'mist' ? 4 : 6; root.add(this.m);
+  }
+  add(o) { if (this.p.length >= this.cap) return null; this.p.push(o); return o; }
+  update(dt) {
+    let n = 0; const P = this.p;
+    for (let i = 0; i < P.length; i++) {
+      const q = P[i]; q.t += dt; if (q.t >= q.life) continue;
+      const dr = Math.exp(-q.drag * dt); q.vx *= dr; q.vz *= dr; q.vy = q.vy * dr - q.g * dt;
+      q.x += q.vx * dt; q.y += q.vy * dt; q.z += q.vz * dt;
+      if (q.y < q.ground) { q.y = q.ground; q.vy = -q.vy * q.bounce; q.vx *= 0.5; q.vz *= 0.5; q.wx *= 0.5; q.wz *= 0.5; }
+      q.rx += q.wx * dt; q.ry += q.wy * dt; q.rz += q.wz * dt;
+      const k = q.t / q.life, s = q.s0 + (q.s1 - q.s0) * k, a = q.a * smooth(0, q.fin, q.t) * (1 - smooth(q.fo, 1, k));
+      _e.set(q.rx, q.ry, q.rz); _q.setFromEuler(_e); _s3.set(s, s * (q.sy || 1), s); _a.set(q.x, q.y, q.z); _m4.compose(_a, _q, _s3); this.m.setMatrixAt(n, _m4);
+      this.aC.setXYZ(n, q.r, q.gc, q.b); this.aA.setXY(n, a, q.glow); P[n] = q; n++;
+    }
+    P.length = n; this.m.count = n;
+    if (n) { this.m.instanceMatrix.needsUpdate = true; this.aC.needsUpdate = true; this.aA.needsUpdate = true; }
+  }
+  clear() { this.p.length = 0; this.m.count = 0; }
+}
 
 export class EnFx extends CookFx {
   load() {
     if (this.loading) return this.loading;
     this.loading = (async () => {
-      const j = await (await fetch('assets/fx/fx_engineer.glb.json')).json(), raw = atob(j.b64), u8 = new Uint8Array(raw.length);
-      for (let i = 0; i < raw.length; i++) u8[i] = raw.charCodeAt(i);
-      const g = await new Promise((res, rej) => new GLTFLoader().parse(u8.buffer, '', res, rej));
+      const parse = async (url) => { const j = await (await fetch(url)).json(), raw = atob(j.b64), u8 = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) u8[i] = raw.charCodeAt(i); return new Promise((res, rej) => new GLTFLoader().parse(u8.buffer, '', res, rej)); };
+      const g = await parse('assets/fx/fx_engineer.glb.json');
       g.scene.traverse(o => { if (o.isMesh) this.geo[o.name] = o.geometry; });
       this.chips = [this.geo.en_casing].filter(Boolean);
-      this.tri3 = new THREE.BufferGeometry();
+      this.tri3 = new THREE.BufferGeometry(); this._parts(); this.clock = 0; this._sndT = {};
+      this.tw = {};
+      try {   // Tripo 덩어리(있으면): 워커 몸통·다리, 센트리 머리, 드론 몸통 — 없으면 절차 부품
+        const t = await parse('assets/fx/fx_engineer_tripo.glb.json');
+        t.scene.traverse(o => { if (o.isMesh && o.material && o.material.map) { o.geometry.computeBoundingBox(); this.tw[o.name] = { geo: o.geometry, map: o.material.map }; } });
+      } catch (err) { console.warn('engfx: no Tripo parts', err && err.message); }
       this.ready = true;
     })().catch(e => console.warn('engfx load', e));
     return this.loading;
   }
+  _parts() {
+    const Cp = ENFX.cap, mesh = () => new THREE.ShaderMaterial({ uniforms: {}, vertexShader: PM_VS, fragmentShader: PM_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide });
+    const bb = (fs, add) => new THREE.ShaderMaterial({ uniforms: {}, vertexShader: BB_VS, fragmentShader: fs, ...(add ? ADD : { transparent: true, depthWrite: false, side: THREE.DoubleSide }) });
+    const quad = this.quad.clone(), G = this.geo;
+    this.ps = {};
+    for (const [k, gname] of [['star', 'en_fx_star'], ['gear', 'en_fx_gear'], ['nut', 'en_fx_nut'], ['shard', 'en_fx_shard'], ['spark', 'en_lens'], ['casing', 'en_casing']]) if (G[gname]) this.ps[k] = new Parts(this.root, G[gname], mesh(), Cp[k]);
+    this.ps.glint = new Parts(this.root, quad, bb(GLINT_FS, true), Cp.glint, 'glint'); this.ps.mist = new Parts(this.root, quad, bb(MIST_FS, false), Cp.mist, 'mist');
+  }
+  /** 입자 n개: kind star|gear|nut|shard|spark|casing|glint|mist, at = three 좌표. o: col(색 또는 배열), speed[], up[], size[], end(크기 배율), life[], g(중력), drag,
+   *  ground(y), bounce, spin, glow, a, cone(방향 벡터), jit, spread(시작 반지름), dy[], fin/fo(페이드), sy(세로 늘림), keep(저사양에도 그대로) */
+  emit(kind, at, n, o = {}) {
+    const P = this.ps && this.ps[kind]; if (!P || n <= 0) return;
+    if (lite() && !o.keep) n = Math.max(1, Math.round(n * ENFX.liteK));
+    const sp = o.speed || [0.6, 1.8], up = o.up || [0.6, 1.8], sz = o.size || [0.05, 0.09], lf = o.life || [0.45, 0.7];
+    for (let i = 0; i < n; i++) {
+      const a = rnd(0, Math.PI * 2), v = rnd(sp[0], sp[1]), r0 = o.spread ? Math.sqrt(rand()) * o.spread : 0; let vx = Math.cos(a) * v, vz = Math.sin(a) * v;
+      if (o.cone) { const c = o.cone, j = o.jit ?? 0.35; vx = (c.x + rnd(-j, j)) * v; vz = (c.z + rnd(-j, j)) * v; }
+      _col.setHex(pick(o.col ?? 0xffffff)); const s = rnd(sz[0], sz[1]);
+      if (!P.add({ x: at.x + Math.cos(a) * r0, y: at.y + (o.dy ? rnd(o.dy[0], o.dy[1]) : 0), z: at.z + Math.sin(a) * r0, vx, vy: rnd(up[0], up[1]) + (o.cone ? (o.cone.y || 0) * v : 0), vz,
+        g: o.g ?? 6, drag: o.drag ?? 1.2, ground: o.ground ?? -1e9, bounce: o.bounce ?? 0.25, rx: rnd(0, 6.28), ry: rnd(0, 6.28), rz: rnd(0, 6.28),
+        wx: rnd(-1, 1) * (o.spin ?? 8), wy: rnd(-1, 1) * (o.spin ?? 8), wz: rnd(-1, 1) * (o.spin ?? 8), s0: s, s1: s * (o.end ?? 0.4), sy: o.sy, r: _col.r, gc: _col.g, b: _col.b,
+        a: o.a ?? 1, glow: o.glow ?? 0.5, t: 0, life: rnd(lf[0], lf[1]), fin: o.fin ?? 0.03, fo: o.fo ?? 0.55 })) break;
+    }
+  }
+  update(dt) { super.update(dt); this.clock = (this.clock || 0) + dt; if (this.ps) for (const k in this.ps) this.ps[k].update(dt); }
+  clear() { super.clear(); if (this.ps) for (const k in this.ps) this.ps[k].clear(); }
+  /** 그림에만 있는 순간의 소리(같은 소리 ENFX.sfxGap 안 겹침 막음) */
+  snd(name, gap = ENFX.sfxGap, o) { const t = this.clock || 0; if (this._sndT && t - (this._sndT[name] ?? -9) < gap) return; if (this._sndT) this._sndT[name] = t; try { const G = window.G; if (G && G.audio) G.audio.sfx(name, o); } catch (er) { /* no audio */ } }
+  /** 타격감 문구(ui.impactText, 게임 좌표) — 강한 순간에만 */
+  shout(pg, text, col = '#ffe7a0', edge = '#5a3a10', size = 1.4) { try { const G = window.G; if (G && G.ui && G.ui.impactText && pg) G.ui.impactText({ x: pg.x, y: pg.y || 0, z: pg.z }, text, { col, edge, size, top: 1.2 }); } catch (er) { /* no ui */ } }
+
   _mat(kind) {
     const U = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, { value: v }])), Cc = () => new THREE.Color(1, 1, 1);
     if (kind === 'enflat') return new THREE.ShaderMaterial({ uniforms: U({ uW: Cc(), uB: Cc(), uA: 0, uK: 0, uP: 0, uT: 0 }), vertexShader: FLAT_VS, fragmentShader: EN_FS, ...ADD });
+    if (kind === 'esig') return new THREE.ShaderMaterial({ uniforms: U({ uW: Cc(), uB: Cc(), uG: Cc(), uA: 0, uP: 0, uT: 0, uV: 0, uAdd: 0 }), vertexShader: FLAT_VS, fragmentShader: ESIG_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+    if (kind === 'esigA') return new THREE.ShaderMaterial({ uniforms: U({ uW: Cc(), uB: Cc(), uG: Cc(), uA: 0, uP: 0, uT: 0, uV: 0, uAdd: 1 }), vertexShader: FLAT_VS, fragmentShader: ESIG_FS, ...ADD });
+    if (kind === 'epillar') return new THREE.ShaderMaterial({ uniforms: U({ uW: Cc(), uB: Cc(), uA: 0, uT: 0 }), vertexShader: FLAT_VS, fragmentShader: PILLAR_FS, ...ADD });
+    if (kind === 'ehelix') return new THREE.ShaderMaterial({ uniforms: U({ uW: Cc(), uB: Cc(), uA: 0, uP: 0 }), vertexShader: FLAT_VS, fragmentShader: HELIX_FS, ...ADD });
     return super._mat(kind);
   }
   _h(e, o = {}) { e.dispose = () => this._free(e); return Object.assign(e, o); }
+  /** 부품 하나: o.tri 가 있고 Tripo 덩어리가 받아졌으면 그것(텍스처), 아니면 절차 메시 */
   part(e, name, parent, o = {}) {
-    const m = this.solid(e, this.geo[name], { tint: o.tint ?? ENFX.tint, rim: o.rim ?? 0xd8ecff, spec: o.spec ?? 0.7 }); m.renderOrder = o.order ?? 1;
+    const t = o.tri && this.tw && this.tw[o.tri]; let m;
+    if (t) { m = this._m(e, 'tex', t.geo, o.order ?? 1); const u = m.material.uniforms; u.uMap.value = t.map; u.uRim.value.setHex(o.rim ?? 0xd8ecff); u.uA.value = 1; u.uGlow.value = 0; u.uGain.value = o.gain ?? 1.05; m.userData.tex = true; }
+    else { m = this.solid(e, this.geo[name], { tint: o.tint ?? ENFX.tint, rim: o.rim ?? 0xd8ecff, spec: o.spec ?? 0.7 }); m.renderOrder = o.order ?? 1; m.userData.tex = false; }
     if (parent && parent !== e.g) parent.add(m);
     if (o.p) m.position.set(...o.p); if (o.s != null) (Array.isArray(o.s) ? m.scale.set(...o.s) : m.scale.setScalar(o.s));
+    if (t && o.yaw) m.rotation.y = o.yaw * Math.PI / 180;
     return m;
   }
+  /** Tripo 덩어리가 있는지(그 이름) */
+  hasT(n) { return !!(this.tw && this.tw[n]); }
   /** quad (spr) stretched from A to B (three coords), facing the camera, width w (same as js/wpharmfx.js seg) */
   seg(m, A, B, w) {
     _a.subVectors(B, A); const L = _a.length() || 1e-4; _a.multiplyScalar(1 / L);
@@ -69,7 +220,7 @@ export class EnFx extends CookFx {
     _m4.makeBasis(_a, _b, _c); m.quaternion.setFromRotationMatrix(_m4); m.position.addVectors(A, B).multiplyScalar(0.5); m.scale.set(L, w, 1);
   }
   pivot(parent, x = 0, y = 0, z = 0) { const g = new THREE.Group(); g.position.set(x, y, z); parent.add(g); return g; }
-  glowM(m, col, k) { const u = m.material.uniforms; u.uTint.value.setHex(col); u.uGlow.value = k; }
+  glowM(m, col, k) { const u = m.material.uniforms; if (u.uTint) u.uTint.value.setHex(col); else if (u.uRim) u.uRim.value.setHex(col); u.uGlow.value = k; }
   flat(e, k, w, b, order = 2) { const m = this._m(e, 'enflat', this.quad, order), u = m.material.uniforms; u.uK.value = k; u.uP.value = 0; u.uT.value = 0; u.uW.value.setHex(w); u.uB.value.setHex(b); u.uA.value = 0; return m; }
   flash(at, w, b, size, life = 0.08, a = 1.2, k = 3) {
     const e = this._fx('enflash', life, (e) => { const t = e.t / life; f.quaternion.copy(this.camQ); f.scale.setScalar(size * (0.6 + 0.6 * easeOut(t))); f.material.uniforms.uA.value = ENFX.intensity * a * (1 - smooth(0.2, 1, t)); });
@@ -79,26 +230,84 @@ export class EnFx extends CookFx {
     const e = this._fx('enring', life, (e) => { const t = e.t / life, s = r * 2 * (grow ? 0.3 + 0.7 * easeOut(t) : 1); m.scale.set(s, s, 1); m.material.uniforms.uA.value = ENFX.intensity * a * (1 - smooth(0.35, 1, t)); });
     e.g.position.copy(at); e.g.position.y += 0.06; const m = this.spr(e, 1, w, b, 3); m.rotation.set(-Math.PI / 2, 0, 0); return e;
   }
-  puffs(at, n, r, o = {}) { this._puffs(at, lite() ? Math.min(n, ENFX.puffsLite) : n, r, { c1: o.c1 ?? C.steam, c2: o.c2 ?? C.steamB, a: o.a ?? 0.45, life: o.life ?? 0.55, rise: o.rise ?? 0.6 }); }
-  sparks(at, n, o = {}) { if (!this.geo.en_lens) return; this._bits(at, lite() ? Math.min(n, ENFX.sparksLite) : n, { geo: this.geo.en_lens, tint: o.tint ?? C.spark, size: o.size || [0.012, 0.025], speed: o.speed || [1.5, 3.4], up: o.up || [1.2, 2.6], ground: o.ground ?? at.y - 1, life: o.life || 0.35 }); }
-  casing(at, yaw) { if (!this.geo.en_casing || (lite() ? ENFX.casingsLite : ENFX.casings) <= 0) return; const side = new THREE.Vector3(Math.cos(yaw), 0, Math.sin(yaw)); this._bits(at.clone().addScaledVector(side, 0.12), 1, { geo: this.geo.en_casing, size: [0.9, 1.1], speed: [0.8, 1.4], up: [1.4, 2.0], ground: at.y - 0.9, life: 0.5 }); }
+  /** 세운 고리(카메라를 보는 얇은 고리)가 퍼짐 — 명중 순간 */
+  vring(at, size, w, b, life = 0.26, a = 1.0) {
+    const e = this._fx('envring', life, (e) => { const k = e.t / life; m.quaternion.copy(this.camQ); m.scale.setScalar(size * (0.3 + 0.9 * easeOut(k))); m.material.uniforms.uA.value = ENFX.intensity * a * (1 - smooth(0.35, 1, k)); });
+    e.g.position.copy(at); const m = this.spr(e, 1, w, b, 6); return e;
+  }
+  /** 설계 마법진: 바닥 판(일반 블렌딩) + 같은 무늬의 가산 빛 층. r = 반지름(판정 반경 이하). o: pal(PAL 키 또는 [선, 몸, 금테]), v 무늬, life, draw, hold, out,
+   *  follow() -> three 좌표, spin, a, glowA, y. handle {end(), setA(k)} — end() = 지금부터 out 초에 사라짐 */
+  sigil(at, r, o = {}) {
+    const cs = Array.isArray(o.pal) ? o.pal : PAL[o.pal || 'teal'], life = o.life ?? 1.0, dr = o.draw ?? 0.18, out = o.out ?? 0.4; let endT = -1, k2 = 1;
+    const e = this._fx('sigil', o.hold ? 1e9 : life, (e, dt) => {
+      if (endT >= 0) { endT += dt; if (endT >= out) { e.t = e.life; return; } }
+      if (o.follow) { const p = o.follow(); if (p) e.g.position.set(p.x, p.y + (o.y ?? 0.05), p.z); }
+      const t = e.t, fade = endT >= 0 ? 1 - endT / out : (o.hold ? 1 : 1 - smooth(life - out, life, t)), pop = 1 + 0.1 * (1 - easeOut(smooth(0, dr + 0.1, t)));
+      for (const m of [base, glow]) { const u = m.material.uniforms; u.uP.value = easeOut(smooth(0, dr, t)); u.uT.value = t * (o.spin ?? 1); m.scale.set(r * 2 * pop, r * 2 * pop, 1); }
+      base.material.uniforms.uA.value = (o.a ?? 0.85) * fade * k2; glow.material.uniforms.uA.value = (o.glowA ?? 0.6) * fade * k2 * (1 + 0.5 * (1 - smooth(dr, dr + 0.35, t)));
+    });
+    const p0 = (o.follow && o.follow()) || at || _d.set(0, 0, 0); e.g.position.set(p0.x, p0.y + (o.y ?? 0.05), p0.z);
+    const mk = (kind, order) => { const m = this._m(e, kind, this.quad, order), u = m.material.uniforms; u.uW.value.setHex(cs[0]); u.uB.value.setHex(cs[1]); u.uG.value.setHex(cs[2]); u.uV.value = o.v ?? 0; u.uA.value = 0; u.uP.value = 0; m.rotation.set(-Math.PI / 2, 0, o.rot ?? 0); return m; };
+    const base = mk('esig', 1), glow = mk('esigA', 2);
+    return this._h(e, { end: () => { if (endT < 0) endT = 0; }, setA: (k) => { k2 = k; }, dispose: () => { if (endT < 0) endT = 0; } });
+  }
+  /** 빛기둥: 바닥 at 에서 위로, 반지름 r, 높이 h — 빠르게 솟았다가 가늘어지며 사라짐 */
+  pillar(at, r, h, o = {}) {
+    if (!this.geo.en_fx_pillar) return null; const life = o.life ?? 0.5, cs = Array.isArray(o.pal) ? o.pal : PAL[o.pal || 'teal'];
+    const e = this._fx('pillar', life, (e) => { const k = e.t / life, rise = easeOut(smooth(0, 0.25, k)); m.scale.set(r * (1 - 0.55 * smooth(0.3, 1, k)), h * (0.25 + 0.75 * rise), r * (1 - 0.55 * smooth(0.3, 1, k)));
+      m.material.uniforms.uA.value = (o.a ?? 0.9) * ENFX.intensity * smooth(0, 0.08, k) * (1 - smooth(0.45, 1, k)); m.material.uniforms.uT.value = e.t; });
+    e.g.position.copy(at); const m = this._m(e, 'epillar', this.geo.en_fx_pillar, 5); m.material.uniforms.uW.value.setHex(cs[0]); m.material.uniforms.uB.value.setHex(cs[1]); return e;
+  }
+  /** 나선 띠: follow() (three, 발밑) 둘레로 아래에서 위로 감아 오름 */
+  helix(follow, r, h, o = {}) {
+    if (!this.geo.en_fx_helix) return null; const life = o.life ?? 0.9, cs = Array.isArray(o.pal) ? o.pal : PAL[o.pal || 'teal'];
+    const e = this._fx('helix', life, (e) => { const p = follow(); if (p) e.g.position.copy(p); const k = e.t / life; m.material.uniforms.uP.value = easeOut(k) * 1.5; m.rotation.y = e.t * (o.spin ?? 2.5);
+      m.material.uniforms.uA.value = (o.a ?? 1) * ENFX.intensity * (1 - smooth(0.7, 1, k)); });
+    const m = this._m(e, 'ehelix', this.geo.en_fx_helix, 5); m.scale.set(r, h, r); m.material.uniforms.uW.value.setHex(cs[0]); m.material.uniforms.uB.value.setHex(cs[1]); const p = follow(); if (p) e.g.position.copy(p); return e;
+  }
+  /** 명중 '팡': 섬광 + 세운 고리 + 반짝이 + 통통한 별 + 너트·톱니(size = 크기 배율, pal) */
+  bang(at, pal, size = 1, o = {}) {
+    const cs = Array.isArray(pal) ? pal : PAL[pal || 'gold'];
+    this.flash(at, 0xffffff, cs[0], 0.85 * size, 0.1 + 0.03 * size, 1.15);
+    this.vring(at, 1.0 * size, 0xffffff, cs[1], 0.24 + 0.04 * size, 0.9);
+    this.emit('glint', at, Math.round(5 * size), { col: [cs[0], cs[2]], speed: [1.2, 2.6 * size], up: [0.4, 2.0], size: [0.14, 0.28], life: [0.3, 0.5], g: 2, drag: 3 });
+    if (o.stars !== 0) this.emit('star', at, Math.round((o.stars ?? 2) * size), { col: [cs[2], cs[0]], speed: [1.4, 3.0], up: [1.5, 3.0], size: [0.05, 0.08], life: [0.45, 0.7], g: 8, glow: 0.7, ground: o.ground ?? at.y - 1.4, spin: 10 });
+    if (o.bolts) { this.emit('nut', at, o.bolts, { col: [C.steel, C.brass], speed: [1.4, 3.2], up: [1.6, 3.2], size: [0.035, 0.055], life: [0.6, 0.85], g: 11, glow: 0.05, ground: o.ground ?? at.y - 1.4, bounce: 0.35, spin: 14, fo: 0.75 });
+      this.emit('gear', at, Math.max(1, o.bolts >> 1), { col: [C.brass, C.copper], speed: [1.2, 2.8], up: [1.8, 3.4], size: [0.05, 0.08], life: [0.6, 0.85], g: 11, glow: 0.08, ground: o.ground ?? at.y - 1.4, bounce: 0.3, spin: 12, fo: 0.75 }); }
+  }
+  /** 연기·증기(인스턴스, 일반 블렌딩) */
+  puffs(at, n, r, o = {}) { this.emit('mist', at.clone ? at.clone().setY(at.y + 0.1) : at, n, { col: [o.c1 ?? C.steam, o.c2 ?? C.steamB], spread: r * 0.4, speed: [0.3 * r + 0.2, 0.8 * r + 0.3], up: [0.2, (o.rise ?? 0.6) + 0.2], size: [0.32, 0.55].map(x => x * Math.max(0.7, r)), end: 1.8, life: [(o.life ?? 0.55) * 0.8, (o.life ?? 0.55) * 1.2], g: 0, drag: 2.2, a: o.a ?? 0.45, fin: 0.08, fo: 0.4 }); }
+  /** 불티(빛나는 작은 구, 인스턴스) */
+  sparks(at, n, o = {}) { this.emit('spark', at, n, { col: o.tint ?? [C.spark, C.gold], size: o.size || [0.014, 0.028], speed: o.speed || [1.5, 3.4], up: o.up || [1.2, 2.6], ground: o.ground ?? at.y - 1, life: [o.life || 0.35, (o.life || 0.35) * 1.4], g: 9, glow: 1.4, bounce: 0.4, spin: 0, sy: o.sy, fo: 0.5 }); }
+  casing(at, yaw) { if (lite() ? ENFX.casingsLite <= 0 : ENFX.casings <= 0) return; const side = new THREE.Vector3(Math.cos(yaw), 0, Math.sin(yaw)); this.emit('casing', at.clone().addScaledVector(side, 0.12), 1, { col: C.brass, cone: side, jit: 0.3, speed: [0.8, 1.4], up: [1.4, 2.0], size: [1.0, 1.15], end: 1, ground: at.y - 0.9, life: [0.5, 0.6], g: 10, glow: 0.1, spin: 14, bounce: 0.3, keep: true }); }
   /** ground line quad from A to B (three coords), width w, lying flat */
   groundLine(m, A, B, w) { _a.subVectors(B, A); const L = Math.hypot(_a.x, _a.z) || 1e-4; m.position.set((A.x + B.x) / 2, Math.max(A.y, B.y) + 0.05, (A.z + B.z) / 2); m.rotation.set(-Math.PI / 2, 0, Math.atan2(-_a.z, _a.x)); m.scale.set(L, w, 1); }
   /** heat colour of the machines' core: 1 = redline (orange), -1 = cooling (grey-blue), 0 = normal teal */
   heatCol(kit) { const h = kit && kit.heat ? kit.heat() : 0; return h > 0 ? C.orange : h < 0 ? 0x8aa0c0 : C.teal; }
   /** device thrown along an arc from the hand to the ground point: returns the current position (three) */
   arc(from, to, k, h = 1.1) { return _b.copy(from).lerp(to, k).setY(from.y + (to.y - from.y) * k + Math.sin(k * Math.PI) * h); }
+  /** 꼬리 리본: 매 프레임 머리 점을 넣음(hist) — CookFx _ribbon */
+  trail(rib, hist, p, n, w, a) { hist.unshift(p.clone()); if (hist.length > n) hist.length = n; this._ribbonSet(rib, hist, w); rib.material.uniforms.uA.value = a; }
 
   // ------------------------------------------------------------------ A1 전개식 센트리 (s.en: fly → deploy → on; yaw/pitch/recoil from the rules)
+  // fx2: 날아가는 동안 착지점에 톱니 설계 마법진이 그려짐 + 공구함 꼬리 반짝이 → 착지 '철컥' 먼지·너트 → 전개 끝 청록 빛기둥·고리 →
+  //      사격 = 큰 총구 섬광 + 불티 + 탄피 / 집중 사격 = 주황 조준경 마법진 / 끝 = 연기·톱니. 머리는 Tripo(있으면).
   sentry(s, o) {
-    if (!this._ok()) return null; const kit = o.kit, K = { fly: 0.36, deploy: 0.55 };
-    let endT = -1; const from = s.en.from ? P3(s.en.from) : P3(s.pos).setY(1.2);
+    if (!this._ok()) return null; const kit = o.kit, K = { fly: 0.36, deploy: 0.55 }, SC = ENFX.sentryScale, TS = this.hasT('tripo_sentry');
+    let endT = -1, lastPh = '', lit = false, gT = 0; const from = s.en.from ? P3(s.en.from) : P3(s.pos).setY(1.2), re = this._fx('entrail', K.fly + 0.5, () => { }), rib = this._ribbon(re, 8), hist = [];
+    const land = P3(s.pos), sig = this.sigil(land, 0.95, { pal: 'teal', v: 0, life: K.fly + K.deploy + 0.7, draw: K.fly, out: 0.45, spin: 1.6 });
     const e = this._fx('sentry', 1e9, (e, dt) => {
       const en = s.en, at = P3(s.pos);
-      if (endT >= 0) { endT += dt; const k = clamp01(endT / 0.4); e.g.scale.setScalar(1 - 0.6 * k); for (const m of e.items) if (m.material.uniforms.uA) m.material.uniforms.uA.value = 1 - k; if (k >= 1) e.t = e.life; return; }
-      if (en.phase === 'fly') { e.g.scale.setScalar(1); e.g.position.copy(this.arc(from, at, en.t / K.fly)); base.rotation.set(en.t * 9, en.t * 5, 0); legs.forEach(l => l.rotation.x = 0); head.position.y = 0.1; head.scale.setScalar(0.01); barP.rotation.x = 0; return; }
-      e.g.position.copy(at); e.g.scale.setScalar(1.3); base.rotation.set(0, 0, 0);
+      if (endT >= 0) { endT += dt; const k = clamp01(endT / 0.4); e.g.scale.setScalar(SC * (1 - 0.6 * k)); for (const m of e.items) if (m.material.uniforms.uA) m.material.uniforms.uA.value = 1 - k; if (k >= 1) e.t = e.life; return; }
+      if (en.phase !== lastPh) {
+        if (lastPh === 'fly') { this.puffs(at, 3, 0.6, { c1: 0xe8e0d0, c2: 0xa89880, a: 0.35, rise: 0.3 }); this.bang(at.clone().setY(at.y + 0.25), 'teal', 0.55, { stars: 0, bolts: 3, ground: at.y }); this.snd('en_deploy'); }
+        lastPh = en.phase; }
+      if (en.phase === 'fly') { e.g.scale.setScalar(1.15); e.g.position.copy(this.arc(from, at, en.t / K.fly)); base.rotation.set(en.t * 9, en.t * 5, 0); legs.forEach(l => l.rotation.x = 0); head.position.y = 0.1; head.scale.setScalar(0.01); barP.rotation.x = 0;
+        this.trail(rib, hist, e.g.position, 8, 0.07, 0.9); gT -= dt; if (gT <= 0) { gT = 0.04; this.emit('glint', e.g.position, 1, { col: [C.teal, C.gold], speed: [0.1, 0.4], up: [-0.3, 0.2], size: [0.12, 0.2], life: [0.2, 0.35], g: 0 }); } return; }
+      if (!re.dead) rib.material.uniforms.uA.value = Math.max(0, rib.material.uniforms.uA.value - dt * 5);
+      e.g.position.copy(at); e.g.scale.setScalar(SC); base.rotation.set(0, 0, 0);
       const d = en.phase === 'deploy' ? en.t / K.deploy : 1, kl = easeOut(d / 0.55), kh = easeOut((d - 0.25) / 0.5), kb = easeOut((d - 0.55) / 0.45);
+      if (d >= 1 && !lit) { lit = true; this.pillar(at, 0.42, 1.7, { pal: 'teal', life: 0.5, a: 0.8 }); this.ring(at, 0.9, C.mint, C.tealB, 0.35, 1.1); this.emit('glint', at.clone().setY(at.y + 0.9), 6, { col: [C.teal, C.gold, C.white], speed: [0.6, 1.6], up: [0.4, 1.4], size: [0.14, 0.24], life: [0.3, 0.5], g: 1 }); }
       legs.forEach(l => l.rotation.x = -0.65 * kl);                           // 지지대 세 개가 펼쳐짐
       head.position.y = 0.3 + 0.28 * kh; head.scale.setScalar(Math.max(0.01, kh));
       head.rotation.y = yawRot(en.yaw);
@@ -109,39 +318,56 @@ export class EnFx extends CookFx {
       drum.visible = mod === 'speed'; if (drum.visible) drum.rotation.x += dt * (6 + 30 * (en.recoil || 0));
       muz.visible = mod === 'power';
       this.glowM(lens, this.heatCol(kit), 0.5 + 0.6 * kb + (h > 0 ? 0.3 * Math.sin(e.t * 18) : 0)); lens.visible = d > 0.7;
-      hm.material.uniforms.uTint.value.setHex(h > 0 ? 0xd8a088 : h < 0 ? 0x8898b8 : ENFX.tint); hm.material.uniforms.uGlow.value = h > 0 ? 0.08 + 0.06 * Math.sin(e.t * 9) : 0;   // 과부하: 몸체가 달아오름 / 냉각: 푸르게
+      const hu = hm.material.uniforms; if (hu.uTint) hu.uTint.value.setHex(h > 0 ? 0xd8a088 : h < 0 ? 0x8898b8 : ENFX.tint); else hu.uRim.value.setHex(h > 0 ? 0xffa060 : h < 0 ? 0x8898c8 : 0xd8ecff);
+      hu.uGlow.value = h > 0 ? 0.08 + 0.06 * Math.sin(e.t * 9) : 0;   // 과부하: 몸체가 달아오름 / 냉각: 푸르게
       warn.visible = h > 0; if (warn.visible) { warn.quaternion.copy(this.camQ); warn.material.uniforms.uA.value = 0.9 * (0.5 + 0.5 * Math.sin(e.t * 14)); }
+      halo.quaternion.copy(this.camQ); halo.material.uniforms.uA.value = (0.25 + 0.12 * Math.sin(e.t * 4)) * kb; halo.material.uniforms.uW.value.setHex(this.heatCol(kit));
     });
+    rib.material.uniforms.uW.value.setHex(C.mint); rib.material.uniforms.uB.value.setHex(C.tealB);
     const base = this.part(e, 'en_case', e.g), legs = [0, 1, 2].map(i => { const p = this.pivot(e.g, 0, 0.12, 0); p.rotation.y = i * 2.094; const q = this.pivot(p); this.part(e, 'en_leg', q); return q; });
-    const head = this.pivot(e.g, 0, 0.3, 0), hm = this.part(e, 'en_head', head);
-    const barP = this.pivot(head, 0, 0.16, 0.08), bar = this.pivot(barP), barM = this.part(e, 'en_barrel', bar); void barM;
+    const head = this.pivot(e.g, 0, 0.3, 0), hm = this.part(e, 'en_head', head, { tri: 'tripo_sentry', yaw: ENFX.tripo.sentry.yaw, s: TS ? ENFX.tripo.sentry.s : undefined });
+    let bh = 0.16, bz = 0.08; if (TS) { const bb = this.tw.tripo_sentry.geo.boundingBox; bh = (bb.max.y - bb.min.y) * 0.42; bz = bb.max.z * 0.55; }
+    const barP = this.pivot(head, 0, bh, bz), bar = this.pivot(barP), barM = this.part(e, 'en_barrel', bar); void barM;
     const drum = this.part(e, 'en_drum', bar, { p: [0, 0.1, 0.12] }), muz = this.part(e, 'en_muzzle', bar, { p: [0, 0, 0.62] });
-    const fins = [-1, 1].map(sx => { const p = this.pivot(head, sx * 0.18, 0.26, -0.1); this.part(e, 'en_fin', p, { s: 1.15 }); return p; });
-    const lens = this.part(e, 'en_lens', head, { p: [0, 0.16, 0.17], s: 0.045 });
-    const warn = this.spr(e, 0, 0xffffff, C.red, 6); head.add(warn); warn.position.set(0, 0.36, -0.12); warn.scale.setScalar(0.26);
+    const fins = [-1, 1].map(sx => { const p = this.pivot(head, sx * (TS ? 0.24 : 0.18), TS ? bh * 1.6 : 0.26, -0.1); this.part(e, 'en_fin', p, { s: 1.15 }); return p; });
+    const lens = this.part(e, 'en_lens', head, { p: [0, TS ? bh * 1.9 : 0.16, TS ? 0.06 : 0.17], s: TS ? 0.035 : 0.045 });
+    const warn = this.spr(e, 0, 0xffffff, C.red, 6); head.add(warn); warn.position.set(0, TS ? bh * 2.5 : 0.36, -0.12); warn.scale.setScalar(0.26);
+    const halo = this.spr(e, 0, C.teal, C.tealB, 4); head.add(halo); halo.position.set(0, bh, 0); halo.scale.setScalar(0.6);   // 머리 둘레 옅은 동력 빛
     const self = this;
     return this._h(e, {
       fire(o2 = {}) { if (e.dead) return; bar.updateMatrixWorld(true); const tip = new THREE.Vector3(0, 0, 0.66).applyMatrix4(bar.matrixWorld);
-        self.flash(tip, 0xffffff, o2.burst ? C.orange : C.gold, o2.burst ? 0.42 : 0.32, 0.06, 1.3); self.casing(tip.clone().setY(tip.y - 0.05), -(s.en.yaw)); },
-      focus() { if (e.dead) return; head.updateMatrixWorld(true); const p = new THREE.Vector3(0, 0.3, 0).applyMatrix4(head.matrixWorld); self.ring(p, 0.35, C.orange, C.red, 0.25, 1.0); },
-      end(why) { if (endT < 0) endT = 0; if (why !== 'clear') self.puffs(P3(s.pos).setY(0.3), 3, 0.5); },
+        self.flash(tip, 0xffffff, o2.burst ? C.orange : C.gold, o2.burst ? 0.55 : 0.42, 0.07, 1.25); self.casing(tip.clone().setY(tip.y - 0.05), -(s.en.yaw));
+        _a.set(Math.sin(s.en.yaw), 0, -Math.cos(s.en.yaw)); self.sparks(tip, o2.burst ? 4 : 2, { tint: o2.burst ? [C.orange, C.gold] : [C.gold, C.spark], speed: [1.5, 3], up: [0.2, 1.0], ground: tip.y - 1.2, life: 0.22 });
+        if (o2.burst) self.emit('glint', tip, 2, { col: [C.orange, C.gold], speed: [0.4, 1.0], up: [0, 0.6], size: [0.18, 0.3], life: [0.15, 0.25], g: 0 }); },
+      focus(t) { if (e.dead) return; head.updateMatrixWorld(true); const p = new THREE.Vector3(0, 0.3, 0).applyMatrix4(head.matrixWorld); self.ring(p, 0.35, C.orange, C.red, 0.25, 1.0);
+        if (t && t.pos) self.sigil(P3(t.pos), Math.min(1.0, (t.radius || 0.5) + 0.35), { pal: 'orange', v: 1, life: 0.7, draw: 0.12, out: 0.3, spin: 3, a: 0.7, glowA: 0.7 }); },
+      end(why) { if (endT < 0) endT = 0; sig.end(); if (why !== 'clear') { const q = P3(s.pos); self.puffs(q.clone().setY(q.y + 0.3), 3, 0.5); self.emit('gear', q.clone().setY(q.y + 0.4), 3, { col: [C.brass, C.steel], speed: [1, 2], up: [1.5, 2.6], size: [0.05, 0.08], life: [0.5, 0.7], g: 10, glow: 0.1, ground: q.y, bounce: 0.3, spin: 12 }); } },
     });
   }
 
   // ------------------------------------------------------------------ A2 스파이더 마인
+  // fx2: 착지점 붉은 회로 마법진 → 다리 전개 '철컥' → 추적 중 발밑 붉은 조준경(따라감)·다리 끝 불티 → 도약 꼬리 → 폭발(blast mine: 주황 빛기둥·고리·파편·연기·'펑!')
   spider(s) {
-    if (!this._ok()) return null; const K = { fly: 0.32, unfold: 0.4 }; let endT = -1, last = { ...s.pos }, gait = 0, yaw = Math.atan2(s.en.yaw ? Math.sin(s.en.yaw) : 0, 1);
-    const from = s.en.from ? P3(s.en.from) : P3(s.pos).setY(1.2);
+    if (!this._ok()) return null; const K = { fly: 0.32, unfold: 0.4 }; let endT = -1, last = { ...s.pos }, gait = 0, yaw = Math.atan2(s.en.yaw ? Math.sin(s.en.yaw) : 0, 1), lastPh = '', aim = null, sT = 0;
+    const from = s.en.from ? P3(s.en.from) : P3(s.pos).setY(1.2), SC = ENFX.spiderScale;
+    const sig = this.sigil(P3(s.pos), 0.75, { pal: 'red', v: 2, life: K.fly + K.unfold + 0.6, draw: K.fly, out: 0.4, spin: 2, a: 0.75 });
+    const re = this._fx('entrail', 30, () => { }), rib = this._ribbon(re, 8), hist = []; rib.material.uniforms.uW.value.setHex(C.orange); rib.material.uniforms.uB.value.setHex(C.redB);
     const e = this._fx('spider', 1e9, (e, dt) => {
       const en = s.en, at = P3(s.pos);
-      if (endT >= 0) { endT += dt; const k = clamp01(endT / 0.3); for (const m of e.items) if (m.material.uniforms.uA) m.material.uniforms.uA.value = 1 - k; if (k >= 1) e.t = e.life; return; }
+      if (endT >= 0) { endT += dt; const k = clamp01(endT / 0.3); for (const m of e.items) if (m.material.uniforms.uA) m.material.uniforms.uA.value = 1 - k; rib.material.uniforms.uA.value *= 0.8; if (k >= 1) { e.t = e.life; re.t = re.life; } return; }
+      if (en.phase !== lastPh) {
+        if (lastPh === 'fly') { this.puffs(at, 2, 0.4, { c1: 0xe8e0d0, c2: 0xa89880, a: 0.3, rise: 0.25 }); this.emit('nut', at.clone().setY(at.y + 0.2), 2, { col: [C.steel, C.brass], speed: [0.8, 1.6], up: [1.2, 2], size: [0.03, 0.045], life: [0.5, 0.7], g: 10, ground: at.y, bounce: 0.35, spin: 12, glow: 0.05 }); this.snd('en_deploy'); }
+        if (en.phase === 'chase' && !aim) aim = this.sigil(null, 0.55, { pal: 'red', v: 1, hold: true, follow: () => P3(s.pos), draw: 0.12, out: 0.2, spin: 4, a: 0.7, glowA: 0.8 });
+        if (en.phase !== 'chase' && en.phase !== 'leap' && aim) { aim.end(); aim = null; }
+        lastPh = en.phase; }
       const mv = Math.hypot(s.pos.x - last.x, s.pos.z - last.z); if (mv > 1e-4) { yaw = Math.atan2(s.pos.x - last.x, s.pos.z - last.z); gait += mv * 9; } last = { ...s.pos };
-      if (en.phase === 'fly') { e.g.position.copy(this.arc(from, at, en.t / K.fly, 0.9)); body.rotation.set(en.t * 12, 0, 0); legs.forEach(l => l.rotation.z = 1.3); return; }
-      e.g.position.copy(at); e.g.scale.setScalar(1.3); body.rotation.set(0, yawRot(yaw), 0);
+      if (en.phase === 'fly') { e.g.scale.setScalar(SC * 0.9); e.g.position.copy(this.arc(from, at, en.t / K.fly, 0.9)); body.rotation.set(en.t * 12, 0, 0); legs.forEach(l => l.rotation.z = 1.3); this.trail(rib, hist, e.g.position, 8, 0.06, 0.8); return; }
+      e.g.position.copy(at); e.g.scale.setScalar(SC); body.rotation.set(0, yawRot(yaw), 0);
       const ku = en.phase === 'unfold' ? easeOut(en.t / K.unfold) : 1;
       let lift = 0.16 * ku, bob = 0;
-      if (en.phase === 'chase') { bob = Math.abs(Math.sin(gait)) * 0.04; }
-      if (en.phase === 'leap') { const k = clamp01(en.t / 0.24); lift += Math.sin(k * Math.PI) * 0.7; }
+      if (en.phase === 'chase') { bob = Math.abs(Math.sin(gait)) * 0.04; sT -= dt; if (sT <= 0 && mv > 1e-3) { sT = 0.09; this.sparks(at.clone().setY(at.y + 0.05), 1, { tint: [C.orange, C.spark], speed: [0.4, 1], up: [0.4, 0.9], ground: at.y, life: 0.2 }); } }
+      if (en.phase === 'leap') { const k = clamp01(en.t / 0.24); lift += Math.sin(k * Math.PI) * 0.7; _c.copy(at).setY(at.y + lift + 0.2); this.trail(rib, hist, _c, 8, 0.08, 1.0); }
+      else rib.material.uniforms.uA.value = Math.max(0, rib.material.uniforms.uA.value - dt * 5);
       body.position.y = lift + bob;
       legs.forEach((l, i) => { const ph = gait + (i % 2) * Math.PI; l.rotation.z = 1.3 * (1 - ku) + (en.phase === 'chase' ? 0.35 * Math.sin(ph) : 0) + (en.phase === 'leap' ? 0.8 : 0); });
       const alarm = en.phase === 'chase' || en.phase === 'leap';
@@ -152,30 +378,47 @@ export class EnFx extends CookFx {
     const legs = [0.6, 2.54, 3.74, 5.68].map(a => { const p = this.pivot(body, Math.sin(a) * 0.26, 0.1, Math.cos(a) * 0.26); p.rotation.y = a - Math.PI / 2; const q = this.pivot(p); this.part(e, 'en_sleg', q); return q; });
     const lamp = this.part(e, 'en_lens', body, { p: [0, 0.22, 0], s: 0.06 });
     const halo = this.spr(e, 0, 0xffffff, C.red, 6); body.add(halo); halo.position.set(0, 0.3, 0); halo.scale.setScalar(0.4);
-    return this._h(e, { alert() { }, leap() { }, end(why) { if (endT < 0) endT = why === 'spent' ? 0.29 : 0; } });
+    const self = this;
+    return this._h(e, { alert() { self.emit('glint', P3(s.pos).setY((s.pos.y || 0) + 0.5), 3, { col: [C.red, C.orange], speed: [0.3, 0.8], up: [0.5, 1.2], size: [0.14, 0.22], life: [0.25, 0.4], g: 0 }); },
+      leap() { }, end(why) { if (endT < 0) endT = why === 'spent' ? 0.29 : 0; sig.end(); if (aim) { aim.end(); aim = null; } } });
   }
 
   // ------------------------------------------------------------------ A3 트라이윙 드론 (s.en.h = 높이, eject = 등 뒤에서 솟아 날개를 폄)
+  // fx2: 사출 = 등 뒤 섬광·청록 꼬리 리본·반짝이 → 날개 펼침 / 정렬 = 세 드론을 잇는 금빛 삼각 선 + 고리 / 일제 사격 = 큰 금빛 섬광. 몸통은 Tripo(있으면).
   drone(s, o) {
-    if (!this._ok()) return null; const kit = o.kit; let endT = -1;
+    if (!this._ok()) return null; const kit = o.kit, TD = this.hasT('tripo_drone'); let endT = -1, lastPh = '', jT = 0;
+    const re = this._fx('entrail', 1e9, () => { }), rib = this._ribbon(re, 10), hist = []; rib.material.uniforms.uW.value.setHex(C.mint); rib.material.uniforms.uB.value.setHex(C.blueB);
     const e = this._fx('drone', 1e9, (e, dt) => {
       const en = s.en, at = P3(s.pos).setY((s.pos.y || 0) + en.h);
-      if (endT >= 0) { endT += dt; const k = clamp01(endT / 0.4); e.g.position.y += dt * 1.2; for (const m of e.items) if (m.material.uniforms.uA) m.material.uniforms.uA.value = 1 - k; if (k >= 1) e.t = e.life; return; }
+      if (endT >= 0) { endT += dt; const k = clamp01(endT / 0.4); e.g.position.y += dt * 1.2; for (const m of e.items) if (m.material.uniforms.uA) m.material.uniforms.uA.value = 1 - k; rib.material.uniforms.uA.value *= 0.85; if (k >= 1) { e.t = e.life; re.t = re.life; } return; }
       e.g.visible = en.phase !== 'wait'; if (!e.g.visible) return;
+      if (en.phase !== lastPh) { if (en.phase === 'eject') { this.flash(at, 0xffffff, C.teal, 0.45, 0.1, 1.0); this.emit('glint', at, 4, { col: [C.teal, C.white], speed: [0.6, 1.4], up: [0.6, 1.4], size: [0.12, 0.22], life: [0.25, 0.4], g: 1 }); } lastPh = en.phase; }
       const ke = en.phase === 'eject' ? easeOut(en.t / 0.35) : 1;
-      e.g.scale.setScalar(1.6); e.g.position.copy(at); e.g.position.y += Math.sin(e.t * 4 + en.idx) * 0.05 + (en.phase === 'eject' ? (1 - ke) * -0.3 : 0);
+      e.g.scale.setScalar(ENFX.droneScale); e.g.position.copy(at); e.g.position.y += Math.sin(e.t * 4 + en.idx) * 0.05 + (en.phase === 'eject' ? (1 - ke) * -0.3 : 0);
       e.g.rotation.set(0.12 * (en.recoil || 0), yawRot(en.yaw), 0); en.recoil = Math.max(0, (en.recoil || 0) - dt * 6);
       wings.forEach((w, i) => w.rotation.z = (i ? -1 : 1) * (1.4 * (1 - ke)) + (i ? 1 : -1) * 0.08 * Math.sin(e.t * 30));
       const al = en.aligning > 0; this.glowM(eye, al ? C.gold : this.heatCol(kit), al ? 1.2 : 0.7);
-      jet.quaternion.copy(this.camQ); jet.material.uniforms.uA.value = 0.5 + 0.2 * Math.sin(e.t * 40); jet.material.uniforms.uW.value.setHex(kit.heat() > 0 ? C.orange : C.teal);
+      const hot = kit.heat() > 0; jet.quaternion.copy(this.camQ); jet.material.uniforms.uA.value = 0.5 + 0.2 * Math.sin(e.t * 40); jet.material.uniforms.uW.value.setHex(hot ? C.orange : C.teal);
+      // 꼬리: 사출 중엔 진하게, 날 때는 옅게(움직일 때만)
+      e.g.updateMatrixWorld(true); _c.set(0, -0.02, -0.16).applyMatrix4(e.g.matrixWorld); const moving = hist.length && hist[0].distanceTo(_c) > 0.01;
+      this.trail(rib, hist, _c, 10, en.phase === 'eject' ? 0.07 : 0.045, en.phase === 'eject' ? 0.9 : moving ? 0.45 : Math.max(0, rib.material.uniforms.uA.value - dt * 2));
+      jT -= dt; if (jT <= 0) { jT = lite() ? 0.3 : 0.14; this.emit('glint', _c, 1, { col: hot ? [C.orange, C.gold] : [C.teal, C.mint], speed: [0.05, 0.2], up: [-0.6, -0.2], size: [0.08, 0.14], life: [0.2, 0.3], g: 0 }); }
+      // 정렬: 다음 드론까지 금빛 선(셋이 삼각형)
+      const nx = al && en.squad ? en.squad[(en.idx + 1) % en.squad.length] : null;
+      if (nx && !nx.dead && nx.en && nx.en.phase === 'on') { this.seg(tri, at, P3(nx.pos).setY((nx.pos.y || 0) + nx.en.h), 0.06); tri.material.uniforms.uA.value = 1.0 * Math.sin(Math.PI * clamp01(1 - en.aligning / 0.3)) + 0.25; }
+      else tri.material.uniforms.uA.value = 0;
     });
-    this.part(e, 'en_drone', e.g); const wings = [1, -1].map(sx => { const p = this.pivot(e.g, sx * 0.1, 0.02, 0); p.rotation.y = sx > 0 ? 0 : Math.PI; const q = this.pivot(p); this.part(e, 'en_wing', q); return q; });
-    const eye = this.part(e, 'en_lens', e.g, { p: [0, 0.02, 0.18], s: 0.035 });
+    const dB = this.part(e, 'en_drone', e.g, { tri: 'tripo_drone', yaw: ENFX.tripo.drone.yaw, s: TD ? ENFX.tripo.drone.s : undefined }); void dB;
+    const wings = [1, -1].map(sx => { const p = this.pivot(e.g, sx * (TD ? 0.17 : 0.1), 0.02, 0); p.rotation.y = sx > 0 ? 0 : Math.PI; const q = this.pivot(p); this.part(e, 'en_wing', q); return q; });
+    const eye = this.part(e, 'en_lens', e.g, { p: [0, TD ? 0.04 : 0.02, TD ? 0.24 : 0.18], s: 0.035 });
     const jet = this.spr(e, 0, C.teal, C.tealB, 5); e.g.add(jet); jet.position.set(0, -0.12, -0.12); jet.scale.setScalar(0.22);
+    const tri = this.spr(re, 2, C.gold, C.goldB, 6);   // 세계 좌표 선(re 그룹 = 원점)
     const self = this;
     return this._h(e, {
-      fire(o2 = {}) { if (e.dead) return; e.g.updateMatrixWorld(true); const tip = new THREE.Vector3(0, 0, 0.32).applyMatrix4(e.g.matrixWorld); self.flash(tip, 0xffffff, o2.salvo ? C.gold : C.teal, o2.salvo ? 0.3 : 0.2, 0.05, 1.1); },
-      align() { if (e.dead) return; self.ring(e.g.position.clone().setY(e.g.position.y - 0.06), 0.28, C.gold, C.goldB, 0.3, 0.9); },
+      fire(o2 = {}) { if (e.dead) return; e.g.updateMatrixWorld(true); const tip = new THREE.Vector3(0, 0, 0.32).applyMatrix4(e.g.matrixWorld);
+        self.flash(tip, 0xffffff, o2.salvo ? C.gold : C.teal, o2.salvo ? 0.42 : 0.24, 0.06, 1.1);
+        if (o2.salvo) { self.vring(tip, 0.5, 0xffffff, C.goldB, 0.2, 0.8); self.emit('glint', tip, 3, { col: [C.gold, C.white], speed: [0.6, 1.4], up: [0, 0.8], size: [0.14, 0.24], life: [0.2, 0.32], g: 0 }); } },
+      align() { if (e.dead) return; const p = e.g.position.clone().setY(e.g.position.y - 0.06); self.ring(p, 0.32, C.gold, C.goldB, 0.3, 0.9); self.emit('glint', p, 2, { col: [C.gold], speed: [0.2, 0.5], up: [0.2, 0.6], size: [0.14, 0.22], life: [0.25, 0.35], g: 0 }); },
       end() { if (endT < 0) endT = 0; },
     });
   }

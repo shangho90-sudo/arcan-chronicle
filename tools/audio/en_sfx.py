@@ -75,6 +75,41 @@ def en_drop():
     d = 1.0; t = T(d); x = thud(t, 80, 30, 0.25, 1.7) + metal(t, 330, 0.5, 0.5) + click(t, 900, 6000, 0.02, 0.7) + lp(noise(len(t)), 500) * np.exp(-t / 0.2) * 0.5
     return fin(x, d)
 
-NAMES = ['en_lock', 'en_motor', 'en_shot', 'en_pile', 'en_cannon', 'en_missile', 'en_pop', 'en_charge', 'en_rail', 'en_zap', 'en_weld', 'en_exhaust', 'en_drop']
+# --- fx2(2026-11-17): 그림에만 있는 순간(js/engfx.js snd). Runway 일일 작업 한도에 걸려 합성으로 먼저 만듦 — tools/audio/en_runway_sfx.py --run 이 같은 이름을 덮어씀
+def en_deploy():   # 접힌 장치가 펼쳐짐: 스프링 '팅' + 철컥 세 번
+    d = 0.5; t = T(d); x = sweep(t, 900, 1700, 0.08) * np.exp(-t / 0.05) * 0.25
+    for k, at in enumerate((0.04, 0.16, 0.27)): place(x, click(T(0.1), 1800 + 300 * k, 9000, 0.008, 0.9) + metal(T(0.1), 1500 + 250 * k, 0.05, 0.35), at, 1.0)
+    return fin(x, d) * 0.75
+def en_assemble():  # 장갑·다리가 차례로 결합: 쿵·철컥 네 번 + 유압 위잉
+    d = 1.3; t = T(d); s = sweep(t, 90, 260, 1.2); x = bp(s + 0.3 * np.sign(s), 80, 1500) * 0.18 * np.minimum(1, t / 0.1) * np.exp(-np.maximum(0, t - 1.1) / 0.08)
+    for k, at in enumerate((0.05, 0.35, 0.65, 0.95)): place(x, thud(T(0.3), 140 - 15 * k, 60, 0.06, 0.8) + click(T(0.3), 1200, 7000, 0.012, 0.7) + metal(T(0.3), 520 + 80 * k, 0.12, 0.35), at, 1.0)
+    return fin(x, d) * 0.8
+def en_vent():      # 냉각판 열림: 철컥 + 짧은 증기 + 삑
+    d = 0.6; t = T(d); x = click(t, 1500, 8000, 0.01, 0.8) + bp(noise(len(t)), 1500, 8000) * np.minimum(1, t / 0.02) * np.exp(-t / 0.16) * 0.6
+    place(x, np.sin(2 * np.pi * 1760 * T(0.09)) * 0.25, 0.32, 1.0)
+    return fin(x, d) * 0.7
+def en_target():    # 조준 고정: 삑삑 + 확정음
+    d = 0.5; t = T(d); x = np.zeros_like(t)
+    for k, (at, f) in enumerate(((0.0, 1500), (0.09, 1900), (0.2, 2400))): place(x, np.sin(2 * np.pi * f * T(0.07 if k < 2 else 0.2)) * np.exp(-T(0.07 if k < 2 else 0.2) / (0.03 if k < 2 else 0.09)) * 0.4, at, 1.0)
+    return fin(x, d) * 0.7
+def en_whistle():   # 궤도 포탄 낙하: 내려가는 휘파람 + 낮은 전기 웅
+    d = 1.0; t = T(d); s = sweep(t, 2400, 700, 0.95); x = s * 0.25 * np.minimum(1, t / 0.2) * np.exp(-np.maximum(0, t - 0.85) / 0.05) + np.sin(2 * np.pi * 110 * t) * 0.08 * np.minimum(1, t / 0.5)
+    return fin(x, d) * 0.6
+def en_core():      # 작은 청색 코어가 날아와 들어감: 쉭 + 맑은 딩
+    d = 0.5; t = T(d); x = bp(noise(len(t)), 2000, 8000) * np.minimum(1, t / 0.15) * np.exp(-t / 0.2) * 0.25
+    place(x, metal(T(0.35), 1320, 0.18, 0.5, ratios=(1.0, 2.0, 3.0)), 0.18, 1.0)
+    return fin(x, d) * 0.7
+def en_alarm():     # 과부하 경보: 삐-삐 + 엔진 회전
+    d = 0.9; t = T(d); s = sweep(t, 150, 520, 0.8); x = bp(s + 0.4 * np.sign(s), 100, 2500) * 0.25 * np.minimum(1, t / 0.05)
+    for at in (0.0, 0.28): place(x, np.sign(np.sin(2 * np.pi * 980 * T(0.18))) * 0.18 * np.exp(-T(0.18) / 0.12), at, 1.0)
+    return fin(x, d) * 0.7
+def en_craft():     # 설계도 위에서 부품 결합: 미끄러짐·딸깍 셋 + 반짝 종소리
+    d = 1.3; t = T(d); x = np.zeros_like(t)
+    for k, at in enumerate((0.1, 0.35, 0.6)): place(x, bp(noise(int(B.SR * 0.12)), 1500, 5000) * np.exp(-T(0.12) / 0.05) * 0.3 + click(T(0.12), 2200, 9000, 0.008, 0.8), at, 1.0)
+    place(x, metal(T(0.6), 1568, 0.3, 0.45, ratios=(1.0, 2.0, 2.99, 4.01)), 0.72, 1.0)
+    return fin(x, d) * 0.75
+
+NAMES = ['en_lock', 'en_motor', 'en_shot', 'en_pile', 'en_cannon', 'en_missile', 'en_pop', 'en_charge', 'en_rail', 'en_zap', 'en_weld', 'en_exhaust', 'en_drop',
+         'en_deploy', 'en_assemble', 'en_vent', 'en_target', 'en_whistle', 'en_core', 'en_alarm', 'en_craft']
 if __name__ == '__main__':
     for n in (sys.argv[1:] or NAMES): save('sfx_' + n, globals()[n]())

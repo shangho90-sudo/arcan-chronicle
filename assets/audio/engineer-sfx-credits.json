@@ -1,5 +1,5 @@
 {
- "note": "Synthesized in-repo (no Runway credit). Regenerate with python3 tools/audio/en_sfx.py (fixed seed).",
+ "note": "Synthesized in-repo (no Runway credit). Regenerate with python3 tools/audio/en_sfx.py (fixed seed). 2026-11-17 fx2: 그림 순간 소리 8개(en_deploy/assemble/vent/target/whistle/core/alarm/craft) 추가 — Runway(tools/audio/en_runway_sfx.py)로 만들 예정이었으나 그날 Runway 일일 작업 한도에 걸려 같은 합성 도구로 먼저 만듦(이어받기로 나중에 덮어쓸 수 있음).",
  "generatedOn": "2026-11-16",
  "assets": [
   {
@@ -53,6 +53,38 @@
   {
    "file": "sfx_en_drop.mp3",
    "description": "워커 동력 코어 착지: 묵직한 '쿵' + 금속 울림"
+  },
+  {
+   "file": "sfx_en_deploy.mp3",
+   "description": "전개: 스프링 팅 + 철컥 세 번 (2026-11-17 fx2, js/engfx.js)"
+  },
+  {
+   "file": "sfx_en_assemble.mp3",
+   "description": "워커 조립: 쿵·철컥 네 번 + 유압 위잉 (2026-11-17 fx2, js/engfx.js)"
+  },
+  {
+   "file": "sfx_en_vent.mp3",
+   "description": "냉각판 열림: 철컥 + 증기 + 삑 (2026-11-17 fx2, js/engfx.js)"
+  },
+  {
+   "file": "sfx_en_target.mp3",
+   "description": "조준 고정: 삑삑 + 확정음 (2026-11-17 fx2, js/engfx.js)"
+  },
+  {
+   "file": "sfx_en_whistle.mp3",
+   "description": "궤도 포탄 낙하 휘파람 (2026-11-17 fx2, js/engfx.js)"
+  },
+  {
+   "file": "sfx_en_core.mp3",
+   "description": "코어 회수: 쉭 + 딩 (2026-11-17 fx2, js/engfx.js)"
+  },
+  {
+   "file": "sfx_en_alarm.mp3",
+   "description": "과부하 경보: 삐-삐 + 엔진 회전 (2026-11-17 fx2, js/engfx.js)"
+  },
+  {
+   "file": "sfx_en_craft.mp3",
+   "description": "설계도 부품 결합 + 반짝 종소리 (2026-11-17 fx2, js/engfx.js)"
   }
  ]
 }
