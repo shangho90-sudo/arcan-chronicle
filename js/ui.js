@@ -1,4 +1,5 @@
 // HTML/CSS user interface (ivory / teal / gold, Galmuri pixel font). Port of the Unity uGUI views.
+import { gfxQ, GFX_LEVELS, GFX_NAMES } from './gfxq.js';
 import { QS, QUEST_CAT, questCategory, Shop, shopStockFor, jobBuffActive, isEquipment, slotOf, EQUIP_SLOTS, ATTRS, ATTR_KR, ATTR_BASE, ATTR_FX, warpTowns, warpPrice, townsKnown } from './core.js';
 import { showWorldMap } from './worldmap.js';
 import { THREE, tex, CAM } from './render.js';
@@ -692,6 +693,7 @@ export class UI {
     tog("피해 숫자 표시", () => s.damageNumbers ? "켜짐" : "꺼짐", () => s.damageNumbers = !s.damageNumbers);
     tog("섬광 효과 줄이기", () => s.reduceFlash ? "켜짐" : "꺼짐", () => { s.reduceFlash = !s.reduceFlash; G.reduceFlash = s.reduceFlash; if (G.skillFx) G.skillFx.constructor.reduceFlash = s.reduceFlash; });
     tog("그래픽 효과 (빛 번짐·색감)", () => s.graphicsFx !== false ? "켜짐" : "꺼짐", () => s.graphicsFx = s.graphicsFx === false);
+    tog("그래픽 품질 (리마스터)", () => GFX_NAMES[gfxQ()], () => { const L = GFX_LEVELS; s.gfxQuality = L[(L.indexOf(gfxQ()) + 1) % L.length]; });
     tog("모바일 조작 버튼", () => ["자동", "항상 표시", "숨김"][s.mobileControls], () => s.mobileControls = (s.mobileControls + 1) % 3);
   }
   /** title screen 환경 설정 */

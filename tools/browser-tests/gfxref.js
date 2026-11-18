@@ -18,7 +18,7 @@ const ZONE = process.env.ZONE || '';
   const ev = (f, a) => pg.evaluate(f, a);
   await pg.goto(process.env.URL || 'http://localhost:8817/index.html');
   const click = async t => { await pg.waitForFunction(t => [...document.querySelectorAll('button,[aria-label]')].some(b => (b.getAttribute('aria-label') || b.textContent || '').trim() === t), t, { timeout: 300000 }); await ev(t => [...document.querySelectorAll('button,[aria-label]')].find(b => (b.getAttribute('aria-label') || b.textContent || '').trim() === t).click(), t); await pg.waitForTimeout(400); };
-  await ev(() => localStorage.clear()); await pg.reload(); await click('새 게임'); await click('모험 시작');
+  await ev(() => localStorage.clear()); await pg.reload(); await click('게임 시작 (새 게임)'); await click('모험 시작');
   await pg.waitForSelector('.prologue.on', { timeout: 60000 }).then(() => click('건너뛰기')).catch(() => {});
   await pg.waitForFunction(() => window.G && G.inWorld && G.player && !G.loading && G.player.body && G.player.body.md, null, { timeout: 300000 });
   if (ZONE) { await ev(z => G.loadZone(z, null, false), ZONE); await pg.waitForFunction(() => !G.loading && G.player.body && G.player.body.md, null, { timeout: 300000 }); }
@@ -99,7 +99,7 @@ const ZONE = process.env.ZONE || '';
         out.push({ ms: +((performance.now() - t0) / N).toFixed(1), calls: Math.round(r.info.render.calls / N), tris: Math.round(r.info.render.triangles / N) });
       }
       r.info.autoReset = true;
-      return { runs: out, geometries: r.info.memory.geometries, textures: r.info.memory.textures, programs: r.info.programs ? r.info.programs.length : null, dpr: r.getPixelRatio() };
+      return { runs: out, heapMB: performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576) : null, geometries: r.info.memory.geometries, textures: r.info.memory.textures, programs: r.info.programs ? r.info.programs.length : null, dpr: r.getPixelRatio() };
     });
   }
   fs.writeFileSync(`${OUT}/${base}.json`, JSON.stringify(res, null, 1));

@@ -2,6 +2,7 @@
 // same style (cream stone ground floor, timber-framed plaster, blue slate roofs, gold finials), castle walls,
 // towers, gatehouse, keep, flagstone courtyard with cobbled roads. Layout / collision come from
 // tools/town_castle.py (zone.town3d + zone.blockPolys); everything here is in game (Unity) metres, T() maps to three.
+import { gfxOn } from './gfxq.js';
 import { THREE, T } from './render.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
@@ -569,8 +570,15 @@ function loadGLB(file) {
 // large flagstone courtyard (2026-11-13): breaks the 4.2 m texture repeat with soft world-space colour patches (a few cool
 // grey-violet stones, a few warmer ones, slightly worn / darker toward the walls of the patch) and pulls the plaza a touch
 // down in value so the characters (outlined, saturated) stand out. Colour only - no extra texture, one material.
+// 2026-11-19 리마스터(js/remaster.js, 품질 높음·보통 + 아르칸만 — RM_GROUND): 같은 텍스처에서 돌 틈(어두운 줄눈)을 찾아 그늘을 깊게,
+// 돌 윗면은 거칠기를 낮춰 해에 은은한 광택(젖은 돌 같은 PBR 느낌), 줄눈은 더 거칠게. 텍스처·draw call 추가 없음.
+export const RM_U = { value: 0 };                 // 분수 물 빛 무늬 켜기 (fountainMats uRm)
+export const rmMaterials = new Set();            // 품질이 바뀌면 다시 컴파일할 재질
+let RM_GROUND = false;
 function groundVary(m) {
+  const rm = RM_GROUND; if (rm) rmMaterials.add(m);
   m.onBeforeCompile = sh => {
+    const RM = rm && gfxOn();
     sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 vGW;').replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvGW = (modelMatrix * vec4(transformed, 1.0)).xz;');
     sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>
 varying vec2 vGW;
@@ -579,9 +587,15 @@ float gvN(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
   return mix(mix(gvH(i), gvH(i + vec2(1, 0)), f.x), mix(gvH(i + vec2(0, 1)), gvH(i + vec2(1, 1)), f.x), f.y); }`).replace('#include <map_fragment>', `#include <map_fragment>
   { float a = gvN(vGW * 0.07), b = gvN(vGW * 0.23 + 7.3), c = gvN(vGW * 0.6 + 3.1);
     vec3 cool = vec3(0.88, 0.89, 0.97), warm = vec3(1.04, 1.0, 0.93);
-    diffuseColor.rgb *= mix(cool, warm, smoothstep(0.25, 0.75, a * 0.65 + b * 0.35)) * (0.93 + 0.07 * c); }`);
+    diffuseColor.rgb *= mix(cool, warm, smoothstep(0.25, 0.75, a * 0.65 + b * 0.35)) * (0.93 + 0.07 * c); }` + (RM ? `
+  float rmL = dot(diffuseColor.rgb, vec3(0.299, 0.587, 0.114));
+  float rmCav = smoothstep(0.42, 0.26, rmL), rmTop = smoothstep(0.5, 0.7, rmL);
+  diffuseColor.rgb *= mix(vec3(1.0), vec3(0.74, 0.70, 0.80), rmCav);                  // deeper, slightly violet grout
+  diffuseColor.rgb *= 0.97 + 0.06 * gvN(vGW * 2.3 + 11.0);                             // per-stone tone variation` : ''));
+    if (RM) sh.fragmentShader = sh.fragmentShader.replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
+  roughnessFactor = mix(0.66, 0.98, rmCav) - 0.06 * rmTop;`);
   };
-  m.customProgramCacheKey = () => 'groundVary'; return m;
+  m.customProgramCacheKey = () => 'groundVary' + (rm && gfxOn() ? '|rm' : ''); return m;
 }
 
 // cloth in the wind (2026-11-14): flags / banners ripple instead of turning as one stiff board - a travelling wave along
@@ -638,8 +652,8 @@ void main(){
 // translucent streaks flowing down with foam at the foot. Restrained: no fill brighter than the stone, no bloom.
 const FNT_VS = 'varying vec2 vU; varying vec3 vL; void main(){ vU = uv; vL = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }';
 function fountainMats(obj, scale) {
-  const water = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uT: WIND, uS: { value: scale } }, vertexShader: FNT_VS,
-    fragmentShader: `uniform float uT, uS; varying vec2 vU; varying vec3 vL;
+  const water = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uT: WIND, uS: { value: scale }, uRm: RM_U }, vertexShader: FNT_VS,
+    fragmentShader: `uniform float uT, uS, uRm; varying vec2 vU; varying vec3 vL;
 float h(vec2 p){ return fract(sin(dot(p, vec2(41.3, 289.1))) * 43758.5); }
 void main(){
   float r = length(vU), a = atan(vU.y, vU.x); vec2 P = vL.xz * uS; float R = length(P), y = vL.y * uS;
@@ -656,6 +670,11 @@ void main(){
   vec2 gp = P * 2.2, gi = floor(gp); float tw = floor(uT * 1.5);                 // a few tiny round glints (not cells)
   float sp = step(0.93, h(gi + tw)) * smoothstep(0.12, 0.0, length(fract(gp) - 0.5 - (vec2(h(gi + 3.1), h(gi + 7.7)) - 0.5) * 0.6)) * 0.5;
   c += vec3(0.75, 0.88, 0.95) * (streak + rip + sp);
+  if (uRm > 0.5) {                                                         // 리마스터: 물속 바닥에 일렁이는 빛 무늬(코스틱) + 가장자리 하늘 반사
+    vec2 q = P * 1.6; float w1 = sin(q.x * 2.1 + sin(q.y * 1.7 + uT * 0.9) * 1.6 + uT * 0.7), w2 = sin(q.y * 2.4 + sin(q.x * 1.3 - uT * 0.8) * 1.8 - uT * 0.6);
+    float caus = pow(1.0 - abs(w1 * w2), 6.0) * smoothstep(0.15, 0.55, r) * (1.0 - smoothstep(0.92, 1.0, r));
+    c += vec3(0.62, 0.86, 0.9) * caus * 0.22 + vec3(0.7, 0.8, 0.95) * smoothstep(0.78, 1.0, r) * 0.07;
+  }
   gl_FragColor = vec4(pow(c, vec3(2.2)), 0.9 + 0.08 * smoothstep(0.6, 1.0, r));
 }` });
   const fall = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide, uniforms: { uT: WIND }, vertexShader: FNT_VS,
@@ -680,7 +699,8 @@ void main(){
 
 // ---------------------------------------------------------------- build the whole town
 /** returns { root, fadeGroups:[{name, occ, meshes}], smoke:[[x,y,z]], update(dt) } */
-export async function buildTown3D(spec, renderer) {
+export async function buildTown3D(spec, renderer, opts = {}) {
+  RM_GROUND = !!opts.remaster;
   ANISO = Math.min(8, renderer.capabilities.getMaxAnisotropy());
   PALETTE = spec.palette || {}; PAL_ID = Object.keys(PALETTE).length ? '|' + JSON.stringify(PALETTE) : '';
   const gates = spec.gates || [spec.gate];

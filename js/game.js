@@ -1,4 +1,5 @@
 // Game orchestrator + zone runtime. Port of Boot/ArcanGame.cs and World/ZoneRuntime.cs.
+import { applyGfxQuality, buildPlazaRemaster } from './remaster.js';
 import { GameData, SaveStore, SAVE_SLOTS, saveSlotKey, CharacterSheet, QuestLog, QS, ZoneGeometry, NavGrid, newProfile, DEG, clamp, HitShape, levelGapExp, monsterAtLevel, discoverTown, payWarp, warpPrice, zoneLock, questCategory, questTitle } from './core.js';
 import { Renderer, Fx, TelegraphView, TG_TIME, loadSheet, preloadTextures, THREE, T } from './render.js';
 import { Player, Monster, Boss, Npc, Loot, bindGame as bindActors } from './actors.js';
@@ -61,17 +62,21 @@ class Zone {
   async build() {
     G.render.buildZone(this.json); G.render.setZoneLight(this.def);
     if (G.render.post) Object.assign(G.render.post.params, G.render.post.defaults, this.def.post || {});
+    this.plazaRM = null;
     await G.render.buildImageArt(this.def.imageArt || []);
     if (this.def.town3d) {
       // 3D castle town: user's models + modelled shops, walls, courtyard ground (replaces the builder's grass ground)
-      const t3 = await buildTown3D(this.def.town3d, G.render.r);
+      const rmZone = this.def.id === 'town';                 // 리마스터 파일럿: 아르칸 분수 광장만 (js/remaster.js)
+      const t3 = await buildTown3D(this.def.town3d, G.render.r, { remaster: rmZone });
       G.render.zoneRoot.add(t3.root);
+      if (rmZone) { this.plazaRM = buildPlazaRemaster(this.def.town3d); G.render.zoneRoot.add(this.plazaRM.group); }
       // the old builder's ground, bushes, flowers and crates are replaced by the 3D town
       for (const g of G.render.groups) if (['ground', 'patches', 'props', 'tree'].includes(g.name)) for (const m of g.meshes) m.visible = false;
       G.render.groups.push(...t3.fade);
       this.json.smoke = [...(this.json.smoke || []), ...t3.smoke]; this.json.fountain = [];   // no 2D splash sprites over the 3D fountain
       this.town3d = t3;
     }
+    applyGfxQuality(G, this);                                 // 품질에 따라 광장 장식·대기 (낮음이면 예전 그대로)
     if (this.def.nature) {
       // storybook forest: painted ground, Tripo trees / shrubs / rocks, grass and flower cards (js/nature.js)
       // patches: roads / dirt / forest floor are painted by the nature ground; water, ice, stone floors stay
@@ -193,6 +198,7 @@ class Zone {
     for (const a of this.actors) if (a.body) { a.body.place(a.pos); let bd = dt; if (a.freezeT > 0) { a.freezeT -= dt; bd = dt * 0.05; } a.body.update(bd); }
     this.updatePortals(); this.updateArena();
     if (this.town3d) this.town3d.update(dt);
+    if (this.plazaRM) this.plazaRM.update(dt);
     if (this.nature) this.nature.update(dt);
     for (const w of this.warps || []) w.update(dt);
     this.smokeT -= dt; if (this.smokeT <= 0) { this.smokeT = 0.7; for (const s of this.json.smoke || []) G.fx.play("smoke", { x: s[0], y: s[1], z: s[2] }, 1.2, false, [0.9, 0.9, 0.9, 0.8]); }
@@ -366,6 +372,7 @@ class Game {
     const s = this.settings;
     this.audio.music = s.music; this.audio.sfxVol = s.sfx; this.audio.apply();
     this.render.shakeScale = s.shake; if (this.render.post) this.render.post.enabled = s.graphicsFx !== false; this.ui.mobileSetting = s.mobileControls;
+    applyGfxQuality(this);                                 // 그래픽 품질 (js/remaster.js): 캐릭터 재질 다시 컴파일·광장 장식 켜고 끔
     try { localStorage.setItem("arcan_settings", JSON.stringify(s)); } catch (e) { }
   }
 
@@ -724,7 +731,7 @@ class Game {
       } else if (!this.inWorld) {
         const t = performance.now() / 1000;
         for (const n of z.npcs) n.update(rdt);
-        for (const w of z.warps || []) w.update(rdt); if (z.town3d) z.town3d.update(rdt); if (z.nature) z.nature.update(rdt);
+        for (const w of z.warps || []) w.update(rdt); if (z.town3d) z.town3d.update(rdt); if (z.plazaRM) z.plazaRM.update(rdt); if (z.nature) z.nature.update(rdt);
         this.render.setFocus({ x: Math.sin(t * 0.12) * 6, y: 0, z: Math.cos(t * 0.12) * 5 - 2 }, false, rdt, 2);
         z.smokeT -= rdt; if (z.smokeT <= 0) { z.smokeT = 0.7; for (const s of z.json.smoke || []) this.fx.play("smoke", { x: s[0], y: s[1], z: s[2] }, 1.2, false, [0.9, 0.9, 0.9, 0.8]); }
         z.sprayT -= rdt; if (z.sprayT <= 0) { z.sprayT = 0.35; for (const f of z.json.fountain || []) this.fx.play("potion_splash", { x: f[0] + rnd(-0.3, 0.3), y: f[1], z: f[2] + rnd(-0.3, 0.3) }, 0.9, false, [0.7, 0.9, 1]); }

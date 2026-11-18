@@ -9,6 +9,7 @@
 // 종류마다 속도·중력·저항이 다름: 유리 조각 빠르고 무거움, 큰 방울은 포물선, 연기는 천천히 부풀고 위로, 불티는 가볍게 위로 휘날림.
 // 조명·후처리 추가 없음(폭발마다 PointLight 없음, 전역 블룸·노출 그대로). 저사양(휴대폰·그래픽 효과 끔): 입자 수만 줄이고 약병·섬광·얼룩·실제 범위는 유지.
 import * as THREE from 'three';
+import { gfxOn, gfxQ } from './gfxq.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 export const FLASK = {
@@ -186,6 +187,33 @@ const TRAIL_VS = `attribute float aU, aS; varying float vU, vS; void main(){ vU 
 const TRAIL_FS = `uniform vec3 uCol, uW; uniform float uA; varying float vU, vS;
 void main(){ float across = 1. - vS * vS; float k = across * smoothstep(0., .85, vU) * uA; gl_FragColor = vec4(mix(uCol, uW, across * across * vU * .6) * k, 1.); }`;
 
+// 2026-11-19 리마스터(약병폭격 5단계): 연금술 마법진 — uKind 0 = 땅의 낙하 구역(실제 낙하 반경), 1 = 하늘의 차원문(아래로 소용돌이).
+// 일반 블렌딩 판(진한 바탕 + 색 선, 밝은 마을 바닥에서도 읽힘) + 같은 셰이더의 가산 빛 판(uAdd). uDraw = 그려진 각도 비율(0..1),
+// uErode = 잡음 경계로 녹아 사라짐, uPulse = 착탄 때 잠깐 밝아짐.
+const SIGIL_FS = `
+uniform float uA, uT, uDraw, uErode, uAdd, uKind, uPulse; uniform vec3 uCol, uHi, uDark; varying vec3 vP;
+${NOISE}
+void main(){
+  vec2 q = vP.xz; float r = length(q), an = atan(q.y, q.x), ang = fract(an / 6.28318 + .75);
+  if (r > 1.) discard;
+  float drawn = smoothstep(uDraw, uDraw - .02, ang);
+  float l1 = exp(-pow((r - .955) / .013, 2.)), l2 = exp(-pow((r - .86) / .01, 2.));
+  float ra = an + uT * (uKind > .5 ? -.9 : .35);
+  float band = smoothstep(.872, .882, r) * (1. - smoothstep(.935, .945, r));
+  float tick = band * step(.55, fract(ra * 40. / 6.28318)) * (.55 + .45 * sin(ra * 5.));
+  float star = 0.; for (int i = 0; i < 6; i++) { float b = float(i) * 1.0472 - uT * .22 * (uKind > .5 ? -1. : 1.); vec2 nn = vec2(cos(b), sin(b)); star += exp(-pow((dot(q, nn) - .43) / .011, 2.)) * step(r, .83); }
+  float l3 = exp(-pow((r - .43) / .011, 2.)) + exp(-pow((r - .2) / .01, 2.)) * .8;
+  float dots = 0.; for (int i = 0; i < 6; i++) { float b = float(i) * 1.0472 + .5236 - uT * .22; dots += 1. - smoothstep(.028, .048, length(q - vec2(cos(b), sin(b)) * .66)); }
+  float swirl = uKind > .5 ? smoothstep(.55, 1., sin(an * 3. + r * 11. - uT * 5.)) * (1. - smoothstep(.25, .8, r)) * .9 : 0.;
+  float line = (l1 + l2 * .8 + tick * .8 + star * .75 + l3 * .7 + dots + swirl) * drawn;
+  float er = vn(vec3(q * 3.5, 4.)) * .7 + vn(vec3(q * 9., 9.)) * .3;
+  float keep = smoothstep(uErode, uErode + .08, er + (1. - r) * .25 * (1. - uKind));
+  line *= keep;
+  float fill = (uKind > .5 ? (1. - smoothstep(.2, .95, r)) * .55 : smoothstep(.98, .6, r) * .12) * drawn * keep;
+  float k = clamp(line, 0., 1.) * (1. + uPulse);
+  if (uAdd > .5) gl_FragColor = vec4((uCol * k * .55 + uHi * k * k * .25) * uA, 1.);
+  else { if (k + fill < .01) discard; gl_FragColor = vec4(mix(uDark, uCol, clamp(k, 0., 1.)), clamp(k * .85 + fill, 0., 1.) * uA); }
+}`;
 const U = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, { value: v }]));
 const ADD = { transparent: true, depthWrite: false, blending: THREE.AdditiveBlending };
 
@@ -279,6 +307,8 @@ export class FlaskKit {
       case 'kdisc': return new THREE.ShaderMaterial({ uniforms: U({ uMode: 0, uA: 0, uGrow: 1, uErode: 0, uSeed: 0, uT: 0, uFront: 0, uR: 1, uRing: 1, uCol: new THREE.Color(), uDeep: new THREE.Color(), uHi: new THREE.Color(1, 1, 1) }),
         vertexShader: DISC_VS, fragmentShader: DISC_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
       case 'kdiscA': { const m = this.mat('kdisc'); m.blending = THREE.AdditiveBlending; return m; }
+      case 'ksigil': case 'ksigilA': return new THREE.ShaderMaterial({ uniforms: U({ uA: 0, uT: 0, uDraw: 0, uErode: 0, uAdd: kind === 'ksigilA' ? 1 : 0, uKind: 0, uPulse: 0, uCol: new THREE.Color(), uHi: new THREE.Color(1, 1, 1), uDark: new THREE.Color() }),
+        vertexShader: DISC_VS, fragmentShader: SIGIL_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: kind === 'ksigilA' ? THREE.AdditiveBlending : THREE.NormalBlending, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
       case 'kflash': return new THREE.ShaderMaterial({ uniforms: U({ uA: 0, uSeed: 0, uW: new THREE.Color(1, 1, 1), uC: new THREE.Color() }), vertexShader: FLAT_VS, fragmentShader: FLASH_FS, ...ADD, depthTest: false });
       case 'kglass': return new THREE.ShaderMaterial({ uniforms: U({ uMode: 0, uA: 1, uGlow: 0, uCol: new THREE.Color(), uDeep: new THREE.Color() }), vertexShader: FLASK_VS, fragmentShader: FLASK_FS, transparent: true, depthWrite: false });
       case 'kliq': return new THREE.ShaderMaterial({ uniforms: U({ uMode: 1, uA: 1, uGlow: 0, uCol: new THREE.Color(), uDeep: new THREE.Color() }), vertexShader: FLASK_VS, fragmentShader: FLASK_FS });
@@ -461,6 +491,16 @@ Object.assign(FlaskKit.prototype, {
     // ---- 약병폭격: a couple of tiny secondary pops inside the cloud (visual only — small, dim, no flash, no sound: they never read as extra hits)
     if (rain && !this.o.low()) for (let i = 0, N = big ? 3 : 1 + (rnd(0, 1) < 0.5 ? 1 : 0); i < N; i++) { const a = rnd(0, 6.283), rr = r * rnd(0.25, 0.5), s = r * rnd(0.06, 0.09);
       this.P('core', { x: c.x + Math.cos(a) * rr, y: gy + rnd(0.5, 0.9), z: c.z - Math.sin(a) * rr, sx: s, sy: s, sz: s, grow: 0.03, life: 0.12, glow: fire ? 0.6 : 0, col: pal.accent, erode: [0.2, 1], q: new THREE.Quaternion(), delay: rnd(0.1, 0.24) }); }
+    // ---- 2026-11-19 리마스터 ③ 명중(약병폭격만, 품질 높음·보통): 착탄점에서 짧게 솟는 액체 기둥 + 반짝이는 유리 빛 + 땅에 퍼지는 작은 연금술 고리
+    if (rain && gfxOn()) {
+      for (let i = 0, N = n(5); i < N; i++) { const a = rnd(0, 6.283), rr = r * rnd(0, 0.12), s = rnd(0.06, 0.1) * Math.min(1.25, S);
+        this.P('drop', { x: c.x + Math.cos(a) * rr, y: gy + 0.1, z: c.z - Math.sin(a) * rr, vx: Math.cos(a) * 0.3, vz: -Math.sin(a) * 0.3, vy: rnd(5.2, 7.2), g: G9 * 1.4, gy: gy + 0.03, orient: 'vel', stretch: 0.14, sx: s, sy: s * 1.3, sz: s, col: i % 2 ? pal.liq : pal.hot, glow: 0.2, life: rnd(0.55, 0.75), shrink: 0.3, delay: i * 0.015 }); }
+      for (let i = 0, N = n(6); i < N; i++) { const a = rnd(0, 6.283), rr = r * rnd(0.2, 0.8), s = rnd(0.035, 0.06);
+        this.P('spark', { x: c.x + Math.cos(a) * rr, y: gy + rnd(0.2, 0.9), z: c.z - Math.sin(a) * rr, vy: rnd(0.3, 0.8), orient: 'cam', sx: s, sy: s, sz: s, col: i % 2 ? 0xffffff : pal.accent, glow: 0.35, fade: 0.6, life: rnd(0.35, 0.55), delay: rnd(0.02, 0.15) }); }
+      const gl = this.o._m(e, 'ksigilA', this.geo.disc, 3), gu = gl.material.uniforms; gl.position.set(c.x, gy + 0.06, c.z); gl.quaternion.copy(gq); gl.scale.setScalar(r * 0.9);
+      gu.uCol.value.setHex(pal.liq); gu.uHi.value.setHex(pal.hot); gu.uDark.value.setHex(pal.deep); gu.uDraw.value = 1; gu.uKind.value = 0; gu.uA.value = 0; gu.uErode.value = 0;
+      const up0 = e.update; e.update = (e, dt) => { up0(e, dt); const t = e.t; gu.uT.value = t; gu.uA.value = 0.9 * smooth(0, 0.04, t) * (1 - smooth(0.12, 0.45, t)); gl.scale.setScalar(r * (0.55 + 0.4 * easeOut(t / 0.3))); gl.visible = t < 0.46; };
+    }
     // ---- poison / rain accent: a few pink motes
     if (poison) for (let i = 0, N = n(6); i < N; i++) { const a = rnd(0, 6.283), hs = rnd(0.6, 2), s = rnd(0.03, 0.05);
       this.P('spark', { x: c.x, y: y0 + 0.1, z: c.z, vx: Math.cos(a) * hs, vz: -Math.sin(a) * hs, vy: rnd(1.5, 3), g: 2, drag: 2.5, dragY: true, orient: 'cam', sx: s, sy: s, sz: s, col: pal.accent, glow: 0.3, a: 1, fade: 0.5, life: rnd(0.35, 0.6), delay: rnd(0.02, 0.12) }); }
@@ -468,6 +508,74 @@ Object.assign(FlaskKit.prototype, {
   },
 });
 const _v2 = new THREE.Vector3();
+
+// ================================================================================================ 2026-11-19 리마스터: 약병폭격 5단계
+// rain(aim, o): 누른 순간 skillrt가 부름(품질 높음·보통만 — 낮음이면 만들지 않아 예전 연출 그대로). 그림만: 피해·시각·판정은 skillrt flask_rain.
+//   ① 시전 준비 (누름 → 손을 떠남 ht): 발밑 작은 연금술 문양 + 손의 약병으로 빨려 드는 방울 + 조준점에 낙하 구역 마법진이 그려지기 시작
+//   ② 발사 (ht → 첫 병이 나타남): 손에서 '퐁' 반짝임, 위로 솟는 빛, 조준점 위 하늘(병이 떨어져 나오는 높이)에 차원문 소용돌이가 열림
+//   ③ 명중 (병마다, kit.burst의 리마스터 층 + impact()): 낙하 구역 마법진이 잠깐 밝아지고 차원문이 떨림
+//   ④ 지속 (첫 병 ~ 마지막 착탄): 낙하 구역 마법진(= 실제 낙하 반경 op.r)이 돌고, 차원문 둘레 구름이 감돌고, 가는 빛 이슬이 내림
+//   ⑤ 종료 (마지막 착탄 뒤 ~0.9 s): 차원문이 반짝임을 흩뿌리며 닫히고, 땅의 마법진은 안에서 밖으로 녹아 사라짐
+// 크기: 땅 마법진 = 낙하 반경 op.r(실제 병이 떨어지는 범위), 차원문 반지름 = op.r × FLASK.rain.portal. 높이 = fall()의 시작 높이(6.5 m + 0.32).
+FLASK.rain = { portal: 0.62, H: 6.82, zoneA: 0.7, portalA: 0.85, motes: 14, drizzle: 0.05 };
+Object.assign(FlaskKit.prototype, {
+  rain(aim, o = {}) {
+    const O = this.o, pal = PAL.poison, R = o.r || 3.4, c = P3(aim), gy = c.y, pc = o.pc, med = gfxQ() === 'medium', K = med ? 0.55 : 1;
+    const ht = o.ht ?? 0.24, t1 = ht + (o.at ?? 0.05), n = o.n || 10, gap = o.gap ?? 0.2, fall = o.fall ?? 0.5, tLast = t1 + (n - 1) * gap + fall, RF = FLASK.rain;
+    let tEnd = tLast, ended = false, pulse = 0, shake = 0, nextMote = 0, nextDrip = t1;
+    const life = tLast + 1.6;
+    const tone = (m, col, hi, dark, kind, add) => { const u = m.material.uniforms; u.uCol.value.setHex(col); u.uHi.value.setHex(hi); u.uDark.value.setHex(dark); u.uKind.value = kind; u.uAdd.value = add ? 1 : 0; u.uA.value = 0; u.uDraw.value = 0; u.uErode.value = 0; u.uPulse.value = 0; return m; };
+    const e = O._fx('frain', life, (e, dt) => {
+      const t = e.t; if (pc && pc.dead && !ended) { ended = true; tEnd = Math.min(tEnd, t); }
+      pulse = Math.max(0, pulse - dt * 4); shake = Math.max(0, shake - dt * 5);
+      // ① caster glyph at the feet (press -> a little after the release)
+      if (pc && pc.pos) { const P = P3(pc.pos); cg.position.set(P.x, P.y + 0.05, P.z); }
+      const cu = cg.material.uniforms; cu.uT.value = t * 1.2; cu.uDraw.value = smooth(0, ht * 0.9, t); cu.uA.value = 0.9 * (1 - smooth(ht + 0.15, ht + 0.45, t)); cg.visible = t < ht + 0.46;
+      // liquid motes drawn into the flask in the hand
+      if (t < ht && t >= nextMote && pc && pc.body && pc.body.handPoint) { nextMote = t + ht / (RF.motes * K); let h = null; try { h = pc.body.handPoint(); } catch (err) { h = null; }
+        if (h) { const a = rnd(0, 6.283), d = rnd(0.5, 0.8), hx = h.x, hy = h.y, hz = h.z, ox = Math.cos(a) * d, oz = Math.sin(a) * d, oy = rnd(-0.3, 0.4), L = rnd(0.16, 0.22);
+          this.P('spark', { col: rnd(0, 1) < 0.5 ? pal.liq : pal.accent, glow: 0.4, orient: 'cam', sx: 0.05, sy: 0.05, sz: 0.05, life: L, a: 1, fade: 0.2, fn: (p, dt, u) => { const k = easeOut(u); p.x = hx + ox * (1 - k); p.y = hy + oy * (1 - k); p.z = hz + oz * (1 - k); p.sx = p.sy = p.sz = 0.05 * (1 - 0.6 * u); } }); } }
+      // ①→④ ground zone sigil: starts drawing at the press, full during the rain, erodes at the end
+      const endK = smooth(tEnd + 0.05, tEnd + 0.85, t);
+      for (const [m, a] of [[zs, RF.zoneA], [za, RF.zoneA * 0.9]]) { const u = m.material.uniforms; u.uT.value = t; u.uDraw.value = smooth(0, t1 + 0.1, t); u.uA.value = a * smooth(0, 0.12, t) * (0.55 + 0.45 * smooth(ht, t1 + 0.2, t)); u.uErode.value = endK * 1.05; u.uPulse.value = pulse; }
+      zs.visible = za.visible = endK < 0.999;
+      // ② launch: pop of light at the hand at ht
+      if (!popped && t >= ht) { popped = true; let h = null; try { h = pc && pc.body && pc.body.handPoint && pc.body.handPoint(); } catch (err) { h = null; }
+        if (h) { for (let i = 0, N = Math.round(10 * K); i < N; i++) { const a = rnd(0, 6.283), sp = rnd(1, 2.4); this.P('spark', { x: h.x, y: h.y, z: h.z, vx: Math.cos(a) * sp, vz: Math.sin(a) * sp, vy: rnd(1.5, 4), g: 2, drag: 3, dragY: true, orient: 'cam', sx: 0.045, sy: 0.045, sz: 0.045, col: i % 2 ? pal.accent : 0xffffff, glow: 0.4, fade: 0.6, life: rnd(0.25, 0.45) }); }
+          pf.position.set(h.x, h.y, h.z); pfT = t; }
+        for (let i = 0, N = Math.round(8 * K); i < N; i++) { const a = rnd(0, 6.283), rr = rnd(0.2, R * RF.portal); this.P('spark', { x: c.x + Math.cos(a) * rr, y: gy + RF.H - 0.1, z: c.z - Math.sin(a) * rr, vy: rnd(-0.2, 0.3), orient: 'cam', sx: 0.06, sy: 0.06, sz: 0.06, col: pal.accent, glow: 0.4, fade: 0.5, life: rnd(0.35, 0.6), delay: rnd(0.05, 0.3) }); } }
+      pf.visible = pfT != null && t - pfT < 0.12; if (pf.visible) { const k = (t - pfT) / 0.12; pf.quaternion.copy(O.camQ); pf.scale.setScalar(0.5 + 0.5 * k); pf.material.uniforms.uA.value = 1.1 * (1 - k); }
+      // ②→⑤ the sky portal: opens at the release, swirls during the rain, collapses at the end
+      const open = smooth(ht, t1 + 0.12, t), close = smooth(tEnd + 0.05, tEnd + 0.5, t), ps = R * RF.portal * (0.35 + 0.65 * easeOut(open)) * (1 - 0.9 * close) * (1 + 0.04 * shake * Math.sin(t * 60));
+      for (const [m, a] of [[po, RF.portalA], [pa, RF.portalA]]) { const u = m.material.uniforms; u.uT.value = t; u.uDraw.value = open; u.uA.value = a * open * (1 - close); u.uPulse.value = pulse * 0.6; m.scale.setScalar(Math.max(0.01, ps)); m.visible = open > 0 && close < 1; }
+      // ④ swirling cloud puffs around the portal rim + a fine drizzle of light while the flasks fall
+      if (open > 0.5 && t < tEnd && t >= nextDrip) { nextDrip = t + 0.11 / K;
+        const a = rnd(0, 6.283), rr = R * RF.portal * rnd(0.85, 1.05), s = R * rnd(0.09, 0.14);
+        this.P('cloud', { x: c.x + Math.cos(a) * rr, y: gy + RF.H + rnd(-0.1, 0.15), z: c.z - Math.sin(a) * rr, q: this.q(this.randAx(), rnd(0, 6)), sx: s, sy: s * 0.6, sz: s, grow: 0.15, sk: (u) => 1 + 0.4 * u, erode: [0.3, 1], a: 0.55, col: rnd(0, 1) < 0.5 ? pal.cloud : 0xc08ae8, life: rnd(0.6, 0.9),
+          fn0: null, vx: -Math.sin(a) * 1.4, vz: -Math.cos(a) * 1.4, drag: 1 });
+        for (let i = 0; i < 2; i++) { const b = rnd(0, 6.283), r2 = Math.sqrt(rnd(0, 1)) * R * 0.9; this.P('spark', { x: c.x + Math.cos(b) * r2, y: gy + RF.H - 0.2, z: c.z - Math.sin(b) * r2, vy: -rnd(7, 9), orient: 'vel', stretch: 0.05, sx: 0.022, sy: 0.05, sz: 0.022, col: i ? pal.liq : 0xf0e0ff, glow: 0.25, a: 0.8, gy: gy + 0.05, life: 0.85, fade: 0.25 }); } }
+      // ⑤ end: sparkle shower out of the closing portal + one soft ring sweeping the zone
+      if (!burstEnd && t >= tEnd + 0.08) { burstEnd = true;
+        for (let i = 0, N = Math.round(18 * K); i < N; i++) { const a = rnd(0, 6.283), sp = rnd(0.8, 2.6); this.P('spark', { x: c.x, y: gy + RF.H, z: c.z, vx: Math.cos(a) * sp, vz: Math.sin(a) * sp, vy: rnd(-3, 0.5), g: 3.5, drag: 1.2, orient: 'cam', sx: 0.05, sy: 0.05, sz: 0.05, col: i % 3 ? pal.accent : 0xffffff, glow: 0.4, fade: 0.5, life: rnd(0.6, 1.0) }); }
+        wvT = t; }
+      wv.visible = wvT != null && t - wvT < 0.6; if (wv.visible) { const k = (t - wvT) / 0.6, u = wv.material.uniforms; u.uFront.value = 0.15 + 0.82 * easeOut(k); u.uA.value = 0.55 * (1 - smooth(0.3, 1, k)); }
+    });
+    let popped = false, pfT = null, burstEnd = false, wvT = null;
+    const gq = this.groundQ(aim, R);
+    const cg = tone(O._m(e, 'ksigilA', this.geo.disc, 3), pal.accent, 0xffffff, pal.deep, 0, true); cg.scale.setScalar(0.85);
+    const zs = tone(O._m(e, 'ksigil', this.geo.disc, 2), pal.liq, pal.hot, 0x2a1048, 0, false); zs.position.set(c.x, gy + 0.045, c.z); zs.quaternion.copy(gq); zs.scale.setScalar(R);
+    const za = tone(O._m(e, 'ksigilA', this.geo.disc, 3), pal.liq, pal.hot, pal.deep, 0, true); za.position.copy(zs.position); za.quaternion.copy(gq); za.scale.setScalar(R);
+    const po = tone(O._m(e, 'ksigil', this.geo.disc, 6), 0xd8a0ff, 0xffffff, 0x1a0830, 1, false); po.position.set(c.x, gy + RF.H, c.z);
+    const pa = tone(O._m(e, 'ksigilA', this.geo.disc, 7), pal.accent, 0xffffff, pal.deep, 1, true); pa.position.copy(po.position);
+    const pf = this.flashQuad(e, pal); pf.visible = false;
+    const wv = this.disc(e, 1, true, 3); wv.position.set(c.x, gy + 0.06, c.z); wv.quaternion.copy(gq); wv.scale.setScalar(R); wv.material.uniforms.uCol.value.setHex(pal.liq); wv.material.uniforms.uHi.value.setHex(0xfff8e0); wv.visible = false;
+    return {
+      /** ③ a flask landed (the real blast): the zone sigil flashes, the portal trembles; last = the last flask -> ⑤ starts now */
+      impact: (p, last) => { pulse = 0.8; shake = 1; if (last) tEnd = Math.min(tEnd, e.t); },
+      dispose: () => O._free(e),
+    };
+  },
+});
 
 // ------------------------------------------------------------------------------------------------ heal / buff (회복진 맥동, 주사·보호막 모으기)
 Object.assign(FlaskKit.prototype, {

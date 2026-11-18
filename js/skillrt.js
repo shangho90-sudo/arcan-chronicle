@@ -280,6 +280,9 @@ export class SkillEngine {
             else { if (!this.pos || this.t > ht + 0.3) return this.dispose(); fx.release && fx.release(); this.pos = { x: this.pos.x + f.x * 3 * dt, y: this.pos.y + 16 * dt, z: this.pos.z + f.z * 3 * dt }; fx.set(this.pos); } },
           dispose() { if (this.dead) return; this.dead = true; fx.dispose && fx.dispose(); } };
         this.things.push(h); }
+      // 2026-11-19 리마스터: 약병폭격 5단계(시전 준비·발사·명중·지속·종료) 연출 — 그림만, 품질 낮음이면 null (js/flaskfx.js rain)
+      const rop = !pop && d.ops.find(o => o.op === 'custom' && o.fn === 'flask_rain');
+      if (rop && ctx.aim) ctx.rainFx = FX.pharm('rain', { x: ctx.aim.x, y: pc.zone.geo.ground(ctx.aim.x, ctx.aim.z).y, z: ctx.aim.z }, { pc, ht, at: rop.at || 0, n: rop.n, gap: rop.gap, fall: rop.fall, r: rop.r });
     }
     let span = 0; for (const op of d.ops) { if (op.op === 'lunge') continue; const n = (op.hits || 1) + (op.hitsPerLv ? Math.floor(op.hitsPerLv * (ctx.L - 1)) : 0); span = Math.max(span, (op.at || 0) + (cb && op.hitsPerLv ? cb.hitTimes[n - 1] - cb.hitTimes[0] : (n - 1) * (op.gap || 0.13))); }
     pc.skills.lock = Math.max(pc.skills.lock, ht + span + Math.max(d.recover || 0.3, cb && cb.recover || 0));
@@ -1112,6 +1115,7 @@ export const CUSTOM = {
           const last = i === op.n - 1;
           const ts = eng.blast(p, { r: op.blast, coef: op.coef, burst: 'none', pharm: 'burst', st: k.st, tag: op.tag, elem: k.elem, sfx: op.sfx, rain: true, big: last, vscale: vs }, ctx);   // 깨짐 -> 액체 -> 반응 구름 -> 얼룩 (js/flaskfx.js burst)
           ctx.flaskLog.push({ elem: k.elem, n: ts.length });
+          if (ctx.rainFx && ctx.rainFx.impact) ctx.rainFx.impact(p, last);   // 리마스터 ③ (그림만)
           // 2026-11-14: 병마다 흔들던 화면(addShake)을 없애고, 마지막 병이 실제로 맞혔을 때만 약한 카메라 킥 한 번
           if (last && ts.length && G.render.kick && !G.reduceFlash) G.render.kick(p.x - pc.pos.x, p.z - pc.pos.z, RAIN_KICK[0], RAIN_KICK[1]);
         } }, ctx });

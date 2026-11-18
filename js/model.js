@@ -137,6 +137,10 @@ async function loadModelCfg(cfg) {
     g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
     g.setAttribute('skinIndex', new THREE.BufferAttribute(SI, 4));
     g.setAttribute('skinWeight', new THREE.BufferAttribute(SW, 4));
+    // 2026-11-19 리마스터: 머리 뼈(Head·눈·머리카락 뼈) 가중치 = 재질 구분의 '머리카락 자리' (render.js REMASTER_CHAR)
+    { const HB = new Set(meta.bones.map((b, i) => /^(Head|Left_Eye|Right_Eye)$|Hair/i.test(b.name) ? i : -1).filter(i => i >= 0)), AH = new Float32Array(n);
+      for (let k = 0; k < n; k++) { let w = 0; for (let j = 0; j < 4; j++) if (HB.has(SI[k * 4 + j])) w += SW[k * 4 + j]; AH[k] = w; }
+      g.setAttribute('aHead', new THREE.BufferAttribute(AH, 1)); }
     g.computeBoundingSphere();
     const texture = new THREE.TextureLoader().load(cfg.tex ? 'assets/models/' + cfg.tex + '.jpg' : base + '.jpg');
     texture.colorSpace = THREE.SRGBColorSpace; texture.anisotropy = 4;
@@ -583,6 +587,8 @@ class SwingTrail {
   dispose() { if (this.mesh) { this.scene.remove(this.mesh); this.mesh.geometry.dispose(); this.mesh.material.dispose(); } }
 }
 
+// 리마스터 파일럿(2026-11-19): 재질 구분 셰이더를 쓰는 플레이어 모델 — 지금은 약사 남녀만(사용자 확인 뒤 넓힘)
+export const REMASTER_MODELS = /^pharmacist_[mf]$/;
 let shadowMat = null;
 const shadowGeo = new THREE.PlaneGeometry(1, 0.85);
 
@@ -596,7 +602,7 @@ export class ModelBody {
     this.root = new THREE.Group();
     this.mat = new THREE.MeshLambertMaterial({ map: md.texture, emissive: 0xffffff, emissiveIntensity: 0 });
     // 2026-11-13: rim cooler and weaker (the warm rim on a warm plaza did not separate); the outline hull does that now
-    paintMat(this.mat, md.cfg.npc ? { rim: [1.0, 0.9, 0.74], rimK: 0.16, sat: 1.08, soft: true } : { rim: [0.92, 0.94, 1.0], rimK: 0.14, sat: 1.08, soft: true });   // soft volume, weak rim (2026-11-14)
+    paintMat(this.mat, md.cfg.npc ? { rim: [1.0, 0.9, 0.74], rimK: 0.16, sat: 1.08, soft: true } : { rim: [0.92, 0.94, 1.0], rimK: 0.14, sat: 1.08, soft: true, remaster: REMASTER_MODELS.test(md.cfg.file) });   // soft volume, weak rim (2026-11-14)
     this.mesh = new THREE.SkinnedMesh(md.geometry, this.mat);
     this.mesh.castShadow = true; this.mesh.frustumCulled = false;
     this.mesh.scale.setScalar(md.scale);

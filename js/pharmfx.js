@@ -35,6 +35,7 @@
 // Meshes come from small pools (one material each, reused); cleared on zone change. Low spec (phone / 그래픽 효과 끔): fewer
 // particles, chunks and translucent layers, the core read (ring, ribbon, flash, dome, circle) stays.
 import * as THREE from 'three';
+import { gfxOn } from './gfxq.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { FlaskKit } from './flaskfx.js';   // 2026-11-14 약병 연출 공용 모듈 (약병·유리·액체·반응·잔여물)
 
@@ -440,6 +441,8 @@ export class PharmFx {
   }
 
   // ------------------------------------------------------------------ 약병 (falling flask) + ⑥ burst
+  /** 2026-11-19 리마스터: 약병폭격 5단계 연출(js/flaskfx.js rain). 품질 낮음·모듈 없음 = null (예전 연출 그대로) */
+  rain(pos, o = {}) { if (!this._ok() || !this.kit.ready || !gfxOn()) return null; return this.kit.rain(pos, o); }
   flask(pos, o = {}) {
     if (!this._ok()) return null;
     if (this.kit.ready) return this.kit.fall(pos, o);   // 2026-11-14: js/flaskfx.js (아래는 모듈이 없을 때의 예전 연출)

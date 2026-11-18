@@ -1,5 +1,6 @@
 // Rendering: three.js scene, zone meshes, upright pixel sprites, effects, telegraphs, camera, occlusion.
 // Logic uses Unity coordinates (x east, y up, z north). three.js is right-handed -> z is mirrored here.
+import { gfxOn } from './gfxq.js';
 import { Post } from './post.js';
 import * as THREE from 'three';
 import { clamp01, DEG, artBasis, artWorldToImage, artImageToGround, artFootprint } from './core.js';
@@ -744,6 +745,59 @@ export class TelegraphView {
   dispose() { this.scene.remove(this.mesh); this.mesh.geometry.dispose(); this.mesh.material.dispose(); }
 }
 
+// ---------------------------------------------------------------- 2026-11-19 리마스터: 캐릭터 재질 구분 (paintMat({remaster: true}))
+// 텍스처에 재질 마스크가 없어(Tripo 아틀라스) 화소의 색 + 머리 뼈 가중치(aHead, model.js loadModelCfg)로 나눔:
+//   피부(살구색, 채도 낮고 밝음) = 따뜻한 위→아래 그라데이션 + 빛 경계에 붉은 산란 / 머리카락(머리 뼈 + 피부 아님) = 천사 고리
+//   하이라이트(Kajiya 띠, 가닥 흔들림) / 가죽(머리 밖 갈색) = 짧은 광택 + 가장자리 결 / 금속(금빛) = 하이라이트 + 가짜 하늘 반사 /
+//   천(나머지) = 가장자리 보풀 빛 + 그늘을 조금 올림. 빛은 장면의 해(directionalLights[0]) 하나 — 따로 조명을 두지 않음.
+// 값은 RMC(조절값), 품질 '낮음'이면 이 코드가 아예 들어가지 않음(예전 셰이더와 똑같음).
+export const RMC = { skin: 0.55, hair: 0.42, leather: 0.24, metal: 0.8, cloth: 0.10 };
+const REMASTER_CHAR = `
+  {
+    vec3 al = diffuseColor.rgb, sr = pow(max(al, vec3(1e-4)), vec3(1. / 2.2));
+    float mx = max(sr.r, max(sr.g, sr.b)), mn = min(sr.r, min(sr.g, sr.b)), ch = mx - mn, sa = ch / max(mx, 1e-3);
+    float hu = 0.;
+    if (ch > 1e-3) { if (mx == sr.r) hu = mod((sr.g - sr.b) / ch, 6.); else if (mx == sr.g) hu = (sr.b - sr.r) / ch + 2.; else hu = (sr.r - sr.g) / ch + 4.; }
+    hu *= 60.;
+    float warmHue = smoothstep(2., 10., hu) * (1. - smoothstep(38., 46., hu));
+    float skin = warmHue * smoothstep(.12, .2, sa) * (1. - smoothstep(.52, .64, sa)) * smoothstep(.58, .7, mx);
+    float head = clamp(vHead, 0., 1.);
+    float hair = head * (1. - skin) * (1. - smoothstep(.9, .97, mx));
+    float brown = warmHue * smoothstep(.3, .42, sa) * (1. - smoothstep(.66, .8, mx));
+    float leather = (1. - head) * brown * (1. - skin);
+    float metal = (1. - head) * smoothstep(38., 44., hu) * (1. - smoothstep(58., 66., hu)) * smoothstep(.42, .55, sa) * smoothstep(.55, .7, mx);
+    float cloth = clamp(1. - skin - hair - leather - metal, 0., 1.);
+    vec3 Ld = vec3(0., 1., 0.), Lc = vec3(1.);
+    #if NUM_DIR_LIGHTS > 0
+      Ld = directionalLights[0].direction; Lc = directionalLights[0].color;
+    #endif
+    vec3 Lcn = Lc / max(max(Lc.r, max(Lc.g, Lc.b)), 1e-3);
+    float nl2 = dot(vN, Ld), ndv2 = clamp(dot(vN, vV), 0., 1.);
+    vec3 Hh = normalize(Ld + vV); float ndh = max(dot(vN, Hh), 0.);
+    // skin: warm top-down gradient, red scatter at the light terminator, a soft warm lift in the shade
+    float term = smoothstep(-.35, .05, nl2) * (1. - smoothstep(.05, .5, nl2));
+    vec3 sk = outgoingLight * mix(vec3(.97, .92, .95), vec3(1.05, 1.01, .97), smoothstep(-.5, .8, wN.y)) + al * vec3(.42, .12, .07) * term * ${RMC.skin.toFixed(2)};
+    outgoingLight = mix(outgoingLight, sk, skin);
+    // hair: anisotropic 'angel ring' along the strands (strand direction ~ the surface's up), jittered per texel
+    vec3 upV = normalize((viewMatrix * vec4(0., 1., 0., 0.)).xyz);
+    vec3 Ts = normalize(upV - vN * dot(vN, upV) + 1e-4);
+    float jit = 0.;
+    #ifdef USE_MAP
+      jit = (fract(sin(dot(floor(vMapUv * 512.), vec2(12.9898, 78.233))) * 43758.5453) - .5) * .35;
+    #endif
+    float tdh = dot(normalize(Ts + vN * jit), Hh), aniso = pow(sqrt(max(0., 1. - tdh * tdh)), 48.);
+    outgoingLight += (Lcn * .9 + al * .6) * aniso * hair * ${RMC.hair.toFixed(2)} * smoothstep(-.1, .4, nl2);
+    // leather: short soft gloss + darker, richer body
+    outgoingLight = mix(outgoingLight, outgoingLight * vec3(.94, .9, .88), leather * .5);
+    outgoingLight += Lcn * pow(ndh, 22.) * leather * ${RMC.leather.toFixed(2)} * smoothstep(0., .3, nl2);
+    // metal (gold trims): bright tight highlight + fake sky / ground reflection tinted by the metal
+    vec3 rW = reflect(-normalize((vec4(vV, 0.) * viewMatrix).xyz), wN);
+    vec3 env = mix(vec3(.30, .26, .34), vec3(1.05, 1.0, .92), smoothstep(-.25, .55, rW.y));
+    outgoingLight = mix(outgoingLight, al * env * 1.35 + al * Lcn * pow(ndh, 60.) * 2.2, metal * ${RMC.metal.toFixed(2)});
+    // cloth: fuzzy edge sheen, shade lifted a touch (soft fabric)
+    outgoingLight += al * pow(1. - ndv2, 2.) * cloth * ${RMC.cloth.toFixed(2)} + al * .035 * cloth * (1. - band);
+  }`;
+
 // ---------------------------------------------------------------- painterly character / creature shading
 // Chained onto a lit material (Standard or Lambert): soft 3-tone banding from the sun direction, shadows tinted
 // violet-blue instead of grey, warm reddish occlusion on down-facing surfaces, light saturation lift and a fresnel
@@ -756,8 +810,14 @@ export function paintMat(m, o = {}) {
   const shade = soft ? 'vec3(.88, .86, 1.0), vec3(1.03, 1.0, .96)' : 'vec3(.80, .78, 1.0), vec3(1.05, 1.0, .94)', occ = soft ? 'vec3(.94, .88, .9)' : 'vec3(.9, .82, .84)';
   if (m.isMeshStandardMaterial) { m.roughness = Math.max(m.roughness ?? 1, 0.85); m.metalness = 0; }
   const prev = m.onBeforeCompile, key = m.customProgramCacheKey ? m.customProgramCacheKey() : '';
+  const rm = !!o.remaster; if (rm) m.userData.remaster = true;   // 2026-11-19 리마스터 파일럿: 품질 높음·보통이면 재질 구분(REMASTER_CHAR), 낮음 = 예전 셰이더 그대로
   m.onBeforeCompile = (sh, r) => {
     if (prev) prev.call(m, sh, r);
+    const RM = rm && gfxOn();
+    if (RM) {
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute float aHead; varying float vHead;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvHead = aHead;');
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying float vHead;');
+    }
     sh.fragmentShader = sh.fragmentShader.replace('#include <opaque_fragment>', `{
   vec3 vN = normalize(normal), vV = normalize(vViewPosition);
   vec3 wN = normalize((vec4(vN, 0.) * viewMatrix).xyz);
@@ -771,10 +831,11 @@ export function paintMat(m, o = {}) {
   outgoingLight = mix(vec3(dot(outgoingLight, vec3(.299, .587, .114))), outgoingLight, ${sat});
   float fr = pow(1. - clamp(dot(vN, vV), 0., 1.), 3.);
   outgoingLight += vec3(${rim.map(v => v.toFixed(3)).join(', ')}) * fr * ${rk} * (.4 + .6 * smoothstep(-.2, .6, wN.y));
+${RM ? REMASTER_CHAR : ''}
 }
 #include <opaque_fragment>`);
   };
-  m.customProgramCacheKey = () => key + '|paint' + rk + sat + rim.join(',') + (soft ? 's' : '');
+  m.customProgramCacheKey = () => key + '|paint' + rk + sat + rim.join(',') + (soft ? 's' : '') + (rm && gfxOn() ? '|rm1' : '');
   m.needsUpdate = true; return m;
 }
 
