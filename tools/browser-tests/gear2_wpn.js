@@ -39,7 +39,7 @@ const IDS = (process.env.IDS || 'wg_nov_4,wg_pharm_5,wg_smith_7,wg_cook_5,wg_hai
     const job = await ev(id => { const d = G.data.item(id); return d.job || 'novice'; }, id);
     await ev(async ([id, job]) => { G.dev.level(50); if (G.sheet.p.job !== job) { G.dev.job(job); G.sheet.p.job = job; } G.sheet.recalc(); G.sheet.bag.add(id, 1);
       const s = G.sheet.p.inventory.findIndex(s => s.id === id && s.count > 0); G.__eqErr = G.sheet.bag.equipFromSlot(s); await G.player.attachBody(); G.player.body.place(G.player.pos); G.player.resetArms && G.player.resetArms(); }, [id, job]);
-    await step(3);
+    await step(420, false); await step(2);           // 전직 연출(빛기둥·날개)이 끝날 때까지
     if (!/^wg_(hair|design)_/.test(id)) await pg.waitForFunction(() => { const h = G.player.body.props && G.player.body.props.R; let ok = false; h && h.traverse(o => { if (o.userData.gearReady) ok = true; }); return ok; }, null, { timeout: 120000 }).catch(() => errs.push(id + ' model not ready'));
     const r = { job, equipErr: await ev(() => G.__eqErr) };
     await face(160); await step(30); const s1 = await grab(); r.back = await st();
