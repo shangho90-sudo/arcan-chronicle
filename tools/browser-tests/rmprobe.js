@@ -1,5 +1,6 @@
 // 리마스터 캐릭터 재질 확인(2026-11-19): 같은 세션·같은 프레임에서 품질만 바꿔 찍음 — 예전(low) / 높음(high) / 재질 구분 색(debug:
 // 빨강 = 피부, 초록 = 머리카락, 파랑 = 가죽, 노랑 = 금속, 회색 = 천). 약사(남·여)를 분수 광장에서 카메라 쪽으로 세움.
+// SPOT=x,z (player spot), FULL=1 (whole view instead of a crop round the player)
 // Usage: GENDER=m|f SIZE=1280x720 ZOOM=3.2 DIR=200 VARIANTS=low,high,debug URL=http://localhost:8943/index.html OUT=/tmp/remaster/probe node rmprobe.js
 const { chromium } = require('playwright'); const fs = require('fs'); const { execSync } = require('child_process');
 const SIZE = process.env.SIZE || '1280x720', TOUCH = SIZE.endsWith('t'), [VW, VH] = SIZE.replace('t', '').split('x').map(Number);
@@ -16,22 +17,22 @@ const VARS = (process.env.VARIANTS || 'low,high,debug').split(','), JOB = proces
   await ev(() => { localStorage.clear(); localStorage.setItem('arcan_settings', JSON.stringify({ gfxQuality: 'low' })); }); await pg.reload(); await click('게임 시작 (새 게임)'); await click('모험 시작');
   await pg.waitForSelector('.prologue.on', { timeout: 60000 }).then(() => click('건너뛰기')).catch(() => {});
   await pg.waitForFunction(() => window.G && G.inWorld && G.player && !G.loading && G.player.body && G.player.body.md, null, { timeout: 300000 });
-  await ev(async ([g, job, z, dir]) => {
+  await ev(async ([g, job, z, dir, sp]) => {
     G.frame = () => {}; document.querySelectorAll('.hud,.controls,.toasts,.qhud,.qh-reopen,.plates,.layer:not(.controls)').forEach(e => e.style.display = 'none');
     if (G.reward) { G.reward.jobChange = sw => sw && sw(); G.reward.levelUp = () => {}; }
     G.dev.level(12); G.sheet.p.gender = g; G.dev.job(job); G.sheet.bag.add('w_pestle_1', 1); G.sheet.p.weapon = 'w_pestle_1'; G.sheet.recalc();
     await G.player.attachBody(); const p = G.player, a = dir * Math.PI / 180;
-    const spot = G.zone.geo.nearestFree(-6.2, -6.6, 0.4); p.teleport(spot); p.body.place(p.pos); p.setFacing(Math.sin(a), Math.cos(a)); p.body.play('idle', 1, true);
+    const spot = G.zone.geo.nearestFree(sp[0], sp[1], 0.4); p.teleport(spot); p.body.place(p.pos); p.setFacing(Math.sin(a), Math.cos(a)); p.body.play('idle', 1, true);
     for (const n of G.zone.npcs) if (n.body && n.pos && Math.hypot(n.pos.x - spot.x, n.pos.z - spot.z) < 3) n.body.setVisible && n.body.setVisible(false);
     for (let i = 0; i < 40; i++) G.step(1 / 60, false);
     const c = G.render.cam; c.zoom = z; c.updateProjectionMatrix(); G.render.setFocus({ x: p.pos.x, y: 0, z: p.pos.z }, true);
-  }, [G_, JOB, ZOOM, DIR]);
+  }, [G_, JOB, ZOOM, DIR, (process.env.SPOT || '-6.2,-6.6').split(',').map(Number)]);
   await pg.waitForTimeout(3000);
   const files = [];
   for (const v of VARS) {
     await ev(async v => { const R = await import('/js/render.js'); R.RMC.debug = v === 'debug'; G.settings.gfxQuality = v === 'debug' ? 'high' : v; G.applySettings(); G.render.render(0); }, v);
     const s = await ev((fy) => { const p = G.player; return G.render.toScreen({ x: p.pos.x, y: (p.pos.y || 0) + fy, z: p.pos.z }); }, +(process.env.FOCUSY || 0.8));
-    const W = Math.min(VW, 520), H = Math.min(VH, 640), fn = `${OUT}/probe_${JOB}_${G_}_${SIZE}_${v}.png`;
+    const W = process.env.FULL ? VW : Math.min(VW, 520), H = process.env.FULL ? VH : Math.min(VH, 640), fn = `${OUT}/probe_${JOB}_${G_}_${SIZE}_${v}.png`;
     await ev(() => G.render.render(0));
     await pg.screenshot({ path: fn, clip: { x: Math.max(0, Math.min(VW - W, Math.round(s.x - W / 2))), y: Math.max(0, Math.min(VH - H, Math.round(s.y - H / 2))), width: W, height: H }, timeout: 300000 });
     files.push(fn);

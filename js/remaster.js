@@ -15,10 +15,10 @@ import { RM_U, rmMaterials } from './town3d.js';
 
 export const PLAZA = {
   R: 22,                         // 리마스터 구역 반지름 m (분수 중심 0,0)
-  fountainR: 5.25,               // 분수 바깥 계단 가장자리 (충돌 원 5.3)
-  ao: { a: 0.34, col: [0.16, 0.10, 0.20] },   // 접촉 그늘 진하기·색 (어두운 보라 갈색 — 검정 아님)
+  fountainR: 5.6,                // 분수 바깥 계단 가장자리 (충돌 원 5.3)
+  ao: { a: 0.4, col: [0.16, 0.10, 0.20] },   // 접촉 그늘 진하기·색 (어두운 보라 갈색 — 검정 아님)
   pool: { a: 0.16, col: [1.0, 0.72, 0.42], r: 2.3 },   // 가로등 빛 웅덩이 (가산, 블룸 문턱 아래)
-  grass: 520, pebble: 260, leaf: 170,                  // 높음 기준 개수 (보통 = 절반)
+  grass: 900, pebble: 200, leaf: 120,                  // 높음 기준 개수 (보통 = 절반)
   haze: 0.045,                  // 높음일 때만 더하는 대기 원근(화면 위쪽 옅은 보라) — 과하지 않게
 };
 const mulberry = (a) => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
@@ -30,7 +30,7 @@ const grassTex = () => canvas(128, (g, n) => {
   const r = mulberry(11);
   for (let i = 0; i < 13; i++) {
     const x0 = n * (0.32 + r() * 0.36), lean = (r() - 0.5) * n * 0.55, h = n * (0.45 + r() * 0.5), w = n * (0.028 + r() * 0.03);
-    const gr = g.createLinearGradient(0, n, 0, n - h); gr.addColorStop(0, '#3f6a2c'); gr.addColorStop(0.55, '#6f9c3e'); gr.addColorStop(1, '#b8d46a');
+    const gr = g.createLinearGradient(0, n, 0, n - h); gr.addColorStop(0, '#4f7f34'); gr.addColorStop(0.5, '#86b84a'); gr.addColorStop(1, '#d4ec88');
     g.fillStyle = gr; g.beginPath(); g.moveTo(x0 - w, n); g.quadraticCurveTo(x0 - w * 0.4 + lean * 0.4, n - h * 0.55, x0 + lean, n - h); g.quadraticCurveTo(x0 + w * 0.4 + lean * 0.4, n - h * 0.55, x0 + w, n); g.fill();
   }
 });
@@ -88,12 +88,13 @@ export function buildPlazaRemaster(spec) {
   lamps.forEach((l, i) => { m4.compose(v.copy(T({ x: l.x, y: 0.025, z: l.z })), q.identity(), sc.set(PLAZA.pool.r, 1, PLAZA.pool.r)); pool.setMatrixAt(i, m4); });
   pool.count = lamps.length; pool.renderOrder = -1; pool.frustumCulled = false; grp.add(pool);
   // ---- swaying grass tufts: at the fountain step, around lamp / planter / tree / bench bases, a few in paving cracks
-  const spots = [];
-  const ringAt = (cx, cz, r0, r1, n) => { for (let i = 0; i < n; i++) { const a = rnd() * Math.PI * 2, rr = r0 + rnd() * (r1 - r0); spots.push([cx + Math.cos(a) * rr, cz + Math.sin(a) * rr]); } };
-  ringAt(0, 0, fr + 0.02, fr + 0.45, 150);
-  for (const l of lamps) ringAt(l.x, l.z, l.r * 0.85, l.r * 1.35, 22);
-  for (const b of blobs) if (b.sx > 0.6) ringAt(b.x, b.z, b.sx * 0.55, b.sx * 0.95, 14);
-  while (spots.length < PLAZA.grass) { const a = rnd() * Math.PI * 2, rr = fr + 2 + rnd() * (R - fr - 3); spots.push([Math.cos(a) * rr, Math.sin(a) * rr]); }
+  const spots = [];   // tufts come in small clumps (3~6 within ~0.2 m) hugging the bases — single tufts on open paving read as noise
+  const clump = (x, z, k) => { for (let i = 0; i < k; i++) { const a = rnd() * 6.283, rr = Math.sqrt(rnd()) * 0.2; spots.push([x + Math.cos(a) * rr, z + Math.sin(a) * rr]); } };
+  const ringAt = (cx, cz, r0, r1, n) => { for (let i = 0; i < n; i++) { const a = rnd() * Math.PI * 2, rr = r0 + rnd() * (r1 - r0); clump(cx + Math.cos(a) * rr, cz + Math.sin(a) * rr, 3 + Math.floor(rnd() * 4)); } };
+  ringAt(0, 0, fr + 0.05, fr + 0.3, 46);
+  for (const l of lamps) ringAt(l.x, l.z, l.r * 0.62, l.r * 0.85, 4);
+  for (const b of blobs) if (b.sx > 0.6) ringAt(b.x, b.z, b.sx * 0.45, b.sx * 0.7, 3);
+  for (let i = 0; i < 18; i++) { const a = rnd() * Math.PI * 2, rr = fr + 3 + rnd() * (R - fr - 4); clump(Math.cos(a) * rr, Math.sin(a) * rr, 2); }
   spots.length = Math.min(spots.length, PLAZA.grass);
   for (let i = spots.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [spots[i], spots[j]] = [spots[j], spots[i]]; }   // shuffled: 'medium' draws the first half = an even thinning
   const card = new THREE.PlaneGeometry(1, 1).translate(0, 0.5, 0), card2 = card.clone().rotateY(Math.PI / 2);
@@ -106,7 +107,7 @@ export function buildPlazaRemaster(spec) {
     transformed.z += k * sin(uWind * 1.4 + wp.z * .9) * .05; }`); };
   gm.customProgramCacheKey = () => 'rmGrass';
   const grass = new THREE.InstancedMesh(tuftGeo, gm, spots.length);
-  spots.forEach(([x, z], i) => { const s = 0.22 + rnd() * 0.2; q.setFromEuler(e.set(0, rnd() * 6.283, 0)); m4.compose(v.copy(T({ x, y: 0, z })), q, sc.set(s * (0.9 + rnd() * 0.5), s, s)); grass.setMatrixAt(i, m4); });
+  spots.forEach(([x, z], i) => { const s = 0.2 + rnd() * 0.16; q.setFromEuler(e.set(0, rnd() * 6.283, 0)); m4.compose(v.copy(T({ x, y: 0, z })), q, sc.set(s * (0.9 + rnd() * 0.5), s, s)); grass.setMatrixAt(i, m4); });
   grass.receiveShadow = true; grass.frustumCulled = false; grp.add(grass);
   // ---- pebbles and fallen leaves along the step, kerbs and bases
   const pebGeo = new THREE.DodecahedronGeometry(0.5, 0).scale(1, 0.45, 0.8);
@@ -118,7 +119,7 @@ export function buildPlazaRemaster(spec) {
   const leafM = new THREE.MeshLambertMaterial({ map: leafTex(), alphaTest: 0.5, side: THREE.DoubleSide });
   const leaf = new THREE.InstancedMesh(new THREE.PlaneGeometry(0.16, 0.16).rotateX(-Math.PI / 2), leafM, PLAZA.leaf);
   const trees = bl.filter(b => /^tree|^shrub/.test(b.model));
-  for (let i = 0; i < PLAZA.leaf; i++) { const t = trees.length ? trees[Math.floor(rnd() * trees.length)] : { pos: [0, 0] }, a = rnd() * 6.283, rr = 0.6 + Math.pow(rnd(), 1.5) * 3.2;
+  for (let i = 0; i < PLAZA.leaf; i++) { const t = trees.length ? trees[Math.floor(rnd() * trees.length)] : { pos: [0, 0] }, a = rnd() * 6.283, rr = 0.5 + Math.pow(rnd(), 1.8) * 2.2;
     q.setFromEuler(e.set(0, rnd() * 6.283, 0)); m4.compose(v.copy(T({ x: t.pos[0] + Math.cos(a) * rr, y: 0.03, z: t.pos[1] + Math.sin(a) * rr })), q, sc.setScalar(0.7 + rnd() * 0.6)); leaf.setMatrixAt(i, m4);
     leaf.setColorAt(i, pc.setHSL(0.06 + rnd() * 0.07, 0.55, 0.45 + rnd() * 0.2)); }
   leaf.receiveShadow = true; leaf.frustumCulled = false; grp.add(leaf);

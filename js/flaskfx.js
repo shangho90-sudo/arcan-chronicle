@@ -209,7 +209,7 @@ void main(){
   float er = vn(vec3(q * 3.5, 4.)) * .7 + vn(vec3(q * 9., 9.)) * .3;
   float keep = smoothstep(uErode, uErode + .08, er + (1. - r) * .25 * (1. - uKind));
   line *= keep;
-  float fill = (uKind > .5 ? (1. - smoothstep(.2, .95, r)) * .55 : smoothstep(.98, .6, r) * .12) * drawn * keep;
+  float fill = (uKind > .5 ? (1. - smoothstep(.2, .95, r)) * .3 : smoothstep(.98, .6, r) * .12) * drawn * keep;
   float k = clamp(line, 0., 1.) * (1. + uPulse);
   if (uAdd > .5) gl_FragColor = vec4((uCol * k * .55 + uHi * k * k * .25) * uA, 1.);
   else { if (k + fill < .01) discard; gl_FragColor = vec4(mix(uDark, uCol, clamp(k, 0., 1.)), clamp(k * .85 + fill, 0., 1.) * uA); }
@@ -386,7 +386,7 @@ Object.assign(FlaskKit.prototype, {
   /** falling flask of 약병폭격: spins down from the sky onto the exact impact point (same point the blast uses); a soft shadow grows under it
    *  and a thin dashed ring marks the REAL blast radius — both are gone at the impact (no lingering circles) */
   fall(pos, o = {}) {
-    const O = this.o, pal = PAL[o.elem] || PAL.poison, fall = o.fall || 0.5, R = o.r || 1.5, c = P3(pos), H = 6.5;
+    const O = this.o, pal = PAL[o.elem] || PAL.poison, fall = o.fall || 0.5, R = o.r || 1.5, c = P3(pos), H = gfxOn() ? FLASK.rain.H - 0.32 : 6.5;   // 리마스터: 병이 차원문(낮게 열림)에서 나옴 — 시각·자리·판정은 그대로
     const dx = rnd(-0.7, 0.7), dz = rnd(-0.7, 0.7), ax = this.randAx(), sp = rnd(9, 14) * (rnd(0, 1) < 0.5 ? -1 : 1), tr = this.trail(pal), P = new THREE.Vector3();
     const e = O._fx('ffall', fall, (e) => {
       const k = clamp01(e.t / fall), f = k * k;
@@ -516,8 +516,9 @@ const _v2 = new THREE.Vector3();
 //   ③ 명중 (병마다, kit.burst의 리마스터 층 + impact()): 낙하 구역 마법진이 잠깐 밝아지고 차원문이 떨림
 //   ④ 지속 (첫 병 ~ 마지막 착탄): 낙하 구역 마법진(= 실제 낙하 반경 op.r)이 돌고, 차원문 둘레 구름이 감돌고, 가는 빛 이슬이 내림
 //   ⑤ 종료 (마지막 착탄 뒤 ~0.9 s): 차원문이 반짝임을 흩뿌리며 닫히고, 땅의 마법진은 안에서 밖으로 녹아 사라짐
-// 크기: 땅 마법진 = 낙하 반경 op.r(실제 병이 떨어지는 범위), 차원문 반지름 = op.r × FLASK.rain.portal. 높이 = fall()의 시작 높이(6.5 m + 0.32).
-FLASK.rain = { portal: 0.62, H: 6.82, zoneA: 0.7, portalA: 0.85, motes: 14, drizzle: 0.05 };
+// 크기: 땅 마법진 = 낙하 반경 op.r(실제 병이 떨어지는 범위), 차원문 반지름 = op.r × FLASK.rain.portal. 높이 FLASK.rain.H = 병이 나타나는 높이
+// (fall()도 리마스터 중엔 이 높이에서 떨어뜨림 — 예전 6.8 m는 게임 카메라 화면 밖이라 차원문이 안 보였음; 낙하 시간·착탄 자리는 그대로).
+FLASK.rain = { portal: 0.5, H: 3.7, zoneA: 0.55, portalA: 0.85, motes: 14, drizzle: 0.05 };
 Object.assign(FlaskKit.prototype, {
   rain(aim, o = {}) {
     const O = this.o, pal = PAL.poison, R = o.r || 3.4, c = P3(aim), gy = c.y, pc = o.pc, med = gfxQ() === 'medium', K = med ? 0.55 : 1;

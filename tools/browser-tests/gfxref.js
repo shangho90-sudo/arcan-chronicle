@@ -45,9 +45,10 @@ const ZONE = process.env.ZONE || '';   // QUALITY=high|medium|low: 리마스터 
   }, [SPOT ? SPOT[0] : null, SPOT ? SPOT[1] : null, DIR, MON]);
   await pg.waitForFunction(() => window.__d.body && window.__d.body.ready !== false, null, { timeout: 120000 });
   await pg.waitForTimeout(1500);
+  if (process.env.DET) await ev(() => { window.__det = true; });
   const base = `${TAG}${process.env.QUALITY ? '_q' + process.env.QUALITY : ''}_${SIZE}_${G_}${JOB !== 'blacksmith' ? '_' + JOB : ''}${ZONE ? '_' + ZONE : ''}`, res = { errs };
   const reset = async () => ev(() => {
-    let seed = 777; Math.random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+    let seed = 777; Math.random = window.__det ? () => 0.5 : () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };   // DET=1: 0.5 고정
     const p = G.player, f = window.__f, m = window.__d; G.input.stick = { x: 0, y: 0 }; G.input.hold('attack', false);
     p.teleport(window.__spot); p.setFacing(f.x, f.z); p.body.place(p.pos); p.skills.comboN = 0; p.skills.lock = 0; p.skills.pending = [];
     m.teleport({ x: window.__spot.x + f.x * 1.7, z: window.__spot.z + f.z * 1.7 }); m.setFacing(-f.x, -f.z); m.body.place(m.pos);

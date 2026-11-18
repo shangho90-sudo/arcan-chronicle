@@ -54,7 +54,7 @@ const SEC = +(process.env.SEC || (SCENE === 'repeat' ? 2.2 : SCENE === 'sheathed
   await pg.waitForTimeout(1500);
   const name = `${TAG}${process.env.QUALITY ? '_q' + process.env.QUALITY : ''}_${SKILL}_${SCENE}_${G_}_${SIZE}_fx${FX ? 1 : 0}`, dirOut = `${OUT}/${name}`; fs.rmSync(dirOut, { recursive: true, force: true }); fs.mkdirSync(dirOut, { recursive: true });
   await ev(s => { window.__slam = s; }, SLAM);
-  await ev(([dir, scene, thr, push]) => {
+  await ev(([dir, scene, thr, push, extra]) => {
     const p = G.player, a = (window.__wdir ?? dir) * Math.PI / 180, f = { x: Math.sin(a), z: Math.cos(a) };
     for (const m of [...G.zone.actors]) if (m !== p && m.def && m.body) m.remove && m.remove();
     G.skillFx.clear(); p.teleport(window.__spot); p.body.place(p.pos); p.setFacing(f.x, f.z); p.target = null; p.lockOn = null; p.path = []; G.dev.full();
@@ -65,12 +65,15 @@ const SEC = +(process.env.SEC || (SCENE === 'repeat' ? 2.2 : SCENE === 'sheathed
     if (push && scene === 'wall') spots = [[1.6, 0]];
     if (window.__slam) spots = [[4, 0], [4.3, 1.9], [3.6, -2.1], [5.8, 0.6], [2.2, 0.4]];   // 천근쇄약: 조준점(4 m 앞) 한가운데 1 (중심 보너스 1.5 m 안) + 둘레 4 (1.8~2.2 m)
     window.__ds = spots.map(([d, s]) => { const m = G.dev.dummies('mon_boar', 1, 0.01, at(d, s))[0]; m.teleport(at(d, s)); m.thinkStep = () => {}; return m; });
-  }, [DIR, SCENE, THROW, PUSH]);
+    for (const [dx, dz] of extra) { const a0 = at(thr ? 5 : 1.6), q = { x: a0.x + dx, z: a0.z + dz }; const m = G.dev.dummies('mon_boar', 1, 0.01, q)[0]; m.teleport(q); m.thinkStep = () => {}; window.__ds.push(m); }
+  }, [DIR, SCENE, THROW, PUSH, (process.env.EXTRA || '').split(';').filter(Boolean).map(v => v.split(',').map(Number))]);   // EXTRA="dx,dz;..": more boars at world offsets from the aim (DET=1 약병폭격: 0.5 고정이면 2~10번째 병이 모두 (−2.4, 0)에 떨어짐)
   await pg.waitForFunction(() => window.__ds.every(m => m.body), null, { timeout: 120000 });
   if (process.env.CAMLOCK) await ev(() => { window.__camLock = true; });
+  if (process.env.DET) await ev(() => { window.__det = true; });
   if (process.env.PERFAT) await ev(f => { window.__perfAt = f; }, Math.round(+process.env.PERFAT * FPS));
   const info = await ev(([scene, fps, skill, thr, focus]) => {
     let seed = 12345; Math.random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+    if (window.__det) Math.random = () => 0.5;   // DET=1: 난수 0.5 고정 — 코드 버전 사이 피해·시각 비교(소리 음높이 등 다른 난수 소비가 실행마다 달라 고정 씨앗만으로는 안 맞음)
     if (scene === 'miss') Math.random = () => 0.0001;   // every accuracy roll fails -> MISS: no impact text
     const p = G.player, f = window.__f, ds = window.__ds, m = ds[0];
     for (const d of ds) { d.teleport(d.pos); d.setFacing(-f.x, -f.z); d.body.place(d.pos); }
