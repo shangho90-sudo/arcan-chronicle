@@ -43,7 +43,7 @@ S = {
  'pharm': dict(body='#a8d86a', sec='#f5eedb', acc='#e0b04a', gem='#bfeaff', hem=-0.45, flare=0.44, sleeve='short',
                apron=dict(col='#f5eedb', top=0.78, hem=-0.25, pocket='#8ab854'), collar='#f5eedb', crest='antler', crestcol='#fbf6ea', emb='tripo', pat='#f5eedb'),
  'smith': dict(body='#3a3438', sec='#7a4a2a', acc='#c8302a', gem='#ff9a3a', hem=0.28, flare=0.3, sleeve='cap', armor=True,
-               apron=dict(col='#6e4426', top=0.66, hem=-0.3, pocket='#4e2e1a'), collar='#c8302a', crest='flame', crestcol='#ff7a2a', emb='tripo', chain=True),
+               apron=dict(col='#6e4426', top=0.56, hem=-0.3, pocket='#4e2e1a', w=0.58), collar='#c8302a', crest='flame', crestcol='#ff7a2a', emb='tripo', chain=True),
  'cook': dict(body='#f2f4f6', sec='#2fb3a8', acc='#ff7f6a', gem='#2fb3a8', hem=0.05, flare=0.34, sleeve='short', buttons2=True,
               apron=dict(col='#2fb3a8', top=0.5, hem=-0.3, pocket='#249a90'), collar='#2fb3a8', crest='fin', crestcol='#5fd8c8', emb='tripo'),
  'hair': dict(body='#f7f5f2', sec='#c8ccd6', acc='#e86a8e', gem='#e86a8e', hem=0.08, flare=0.33, sleeve='short',
@@ -457,8 +457,8 @@ def build(line, stage, n):
             if x == 0 and ev < 3: continue
             p = front(0.42, st, 1.1, x); sphere(P, p, (0.055, 0.04, 0.06), hx('#7a5230'), 6, 3)
     if st.get('goggles') and ev >= 2:
-        for x in (-0.07, 0.07):
-            p = front(0.82, st, 1.1, x); torus(P, p, 0.045, 0.014, hx('#5a4a3a'), 10, 3, M=Matrix.Rotation(math.pi / 2, 4, 'X')); sphere(P, p, (0.04, 0.012, 0.04), hx('#6ad8ff'), 8, 3, glow=0.5)
+        for x in (-0.25, -0.16):                                  # 고글은 옆구리 쪽(가슴 브로치와 겹쳐 다른 그림처럼 보이지 않게)
+            p = front(0.66, st, 1.1, x); torus(P, p, 0.045, 0.014, hx('#5a4a3a'), 10, 3, M=Matrix.Rotation(math.pi / 2, 4, 'X')); sphere(P, p, (0.04, 0.012, 0.04), hx('#6ad8ff'), 8, 3, glow=0.5)
     if st.get('bandolier'):
         a = front(0.95, st, 1.07, 0.2); b = front(0.45, st, 1.07, -0.24)
         tube(P, [a, (a + b) / 2 + Vector((0, -0.03, 0)), b], 0.022, hx('#8a6a4a'), 4)
@@ -661,7 +661,25 @@ def process(id_):
         render(sc, os.path.join(CHECK, id_ + '_3d.png'))
     print(id_, 'stage', stage, 'ev', ev, 'drop', drop, 'tris', tris, 'KB', size // 1024, flush=True)
 
+def sheets(out='/tmp/gear2'):
+    """계열마다 확인표 /tmp/gear2/sheet_<계열>_arm.png: 윗줄 아이콘(128 px ×1.5), 아랫줄 내보낸 GLB 다시 읽은 렌더, 단계 순서·이름"""
+    from PIL import ImageFont
+    items = [i for i in json.load(open(os.path.join(ROOT, 'assets', 'data', 'items.json')))['items'] if i['id'].startswith('ag_')]
+    try: font = ImageFont.truetype(os.path.join(ROOT, 'assets', 'fonts', 'Jua.woff2'), 15)
+    except Exception: font = ImageFont.load_default()
+    for L in designs.LINES:
+        row = [i for i in items if i['id'].split('_')[1] == L['key']]; row.sort(key=lambda i: int(i['id'].split('_')[2]))
+        W = 200; img = Image.new('RGBA', (W * len(row) + 20, 450), (58, 56, 70, 255)); d = ImageDraw.Draw(img)
+        for k, it in enumerate(row):
+            x = 10 + k * W
+            for f, y, sz in ((os.path.join(ICONS, it['id'] + '.png'), 8, 192), (os.path.join(CHECK, it['id'] + '_3d.png'), 205, 200)):
+                if os.path.exists(f): a = Image.open(f).convert('RGBA').resize((sz, sz)); img.paste(a, (x + (W - sz) // 2, y), a)
+            d.text((x + 6, 408), it['id'] + (' 드롭' if it.get('dropFrom') else ''), fill=(200, 160, 255) if it.get('dropFrom') else (230, 230, 230), font=font)
+            d.text((x + 6, 428), it['name'], fill=(255, 226, 150), font=font)
+        img.save(os.path.join(out, 'sheet_%s_arm.png' % L['key']))
+
 if __name__ == '__main__':
+    if '--sheets' in sys.argv: sheets(); sys.exit(0)
     ids = [i['id'] for i in json.load(open(os.path.join(ROOT, 'assets', 'data', 'items.json')))['items'] if i['id'].startswith('ag_')]
     args = sys.argv[1:]
     sel = [i for i in ids if not args or i in args or i.split('_')[1] in args]

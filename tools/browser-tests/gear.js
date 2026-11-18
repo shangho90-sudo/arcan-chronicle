@@ -142,7 +142,7 @@ const MTOWNS = (process.env.MTOWNS || 'town,kairion_capital,marseon').split(',')
       const rw = G.reward; G.reward = null; const ft = G.ui.floatText; G.ui.floatText = () => {}; const sfx = G.audio.sfx; G.audio.sfx = () => {};
       for (let i = 0; i < N; i++) G.onMonsterKilled(m);
       z.dropLoot = real; G.reward = rw; G.ui.floatText = ft; G.audio.sfx = sfx; G.timers.length = 0;
-      const p = G.player.pos; z.dropLoot(it.id, 1, { x: p.x + 2.6, y: p.y, z: p.z + 1 }); z.dropLoot('ag_pharm_6', 1, { x: p.x - 2.6, y: p.y, z: p.z + 1 }); z.dropLoot('ac_g9', 1, { x: p.x, y: p.y, z: p.z + 3 });
+      const p = G.player.pos; z.dropLoot(it.id, 1, { x: p.x + 2.6, y: p.y, z: p.z + 1 }); z.dropLoot('ag_pharm_6', 1, { x: p.x - 2.6, y: p.y, z: p.z + 1 }); z.dropLoot('ag_smith_7', 1, { x: p.x - 1.4, y: p.y, z: p.z + 2.4 }); z.dropLoot('ag_music_4', 1, { x: p.x + 1.4, y: p.y, z: p.z + 2.4 }); z.dropLoot('ac_g9', 1, { x: p.x, y: p.y, z: p.z + 3 });
       return { item: it.name, monster: def.name, tableChance: want, kills: N, drops: n, rate: +(n / N).toFixed(4), inDrops: def.drops.filter(d => d.gear).map(d => G.data.item(d.item).name + ' ' + d.chance) };
     });
     await pg.waitForTimeout(4000); await step(3);
