@@ -384,11 +384,18 @@ class Game {
   showTitleMenu() {
     const all = this.slotList().filter(s => s.p).sort((a, b) => (b.p.saveAt || 0) - (a.p.saveAt || 0));
     const info = all.length ? `${all[0].label} · ${this.saveSummary(all[0].p)}` : null;
-    this.ui.showTitle(info, () => this.showLoadMenu(), () => this.newGameFlow());
+    this.ui.showTitle(info, () => this.showLoadMenu(), () => this.newGameFlow(), () => this.ui.showSettings(() => this.showTitleMenu()), () => this.quitGame());
   }
   saveSummary(p) { const j = this.data.job(p.job), z = this.data.zones[p.zone]; return `${p.name} · Lv${p.level} ${j ? j.name : p.job} · ${z ? z.name : p.zone} · 저장 ${p.saveTime}`; }
   /** [{ i, label, p (migrated profile or null) }] for 자동 저장 + 저장 1..SAVE_SLOTS */
   slotList() { return this.slots.map((st, i) => ({ i, label: i ? "저장 " + i : "자동 저장", p: st.exists() ? st.load() : null })); }
+  /** title 게임 종료: a web page can't close itself unless the browser opened it as an app window — try, then explain */
+  quitGame() {
+    this.ui.confirm("게임을 종료할까요?<br><span class='small muted'>진행 상황은 이동할 때마다 자동 저장됩니다.</span>", () => {
+      try { window.close(); } catch (e) {}
+      setTimeout(() => { if (!window.closed) { this.showTitleMenu(); this.ui.toast("브라우저 탭(또는 앱)을 닫으면 게임이 종료됩니다."); } }, 300);
+    }, () => this.showTitleMenu());
+  }
   showLoadMenu() { this.ui.showSaveSlots("load", i => this.loadSlot(i), () => this.showTitleMenu()); }
   loadSlot(i) { const st = this.slots[i], p = st && st.load(); if (!p) return this.ui.toast("저장 파일을 읽을 수 없습니다" + (st && st.lastError ? ": " + st.lastError : "")); this.enterWorld(p, false); }
   /** manual save into slot i (1..): also refreshes the auto slot so 자동 저장 is never older than the last manual save */

@@ -680,9 +680,9 @@ export class UI {
     $("div", "second small", b, "<b>2차 전직</b> <span class='muted'>(Lv30 · 준비 중 - 데이터만 정의됨)</span><br>" + G.data.jobList.filter(j => j.tier === 2).map(j => `${G.data.job(j.parent).name} → <b>${j.name}</b> <span class='muted'>[준비 중]</span>`).join(" &nbsp; "));
   }
 
-  showPause() {
-    G.paused = true;
-    const s = G.settings, b = this.open("pause", "일시정지 · 설정", 900, 0);
+  /** sound / display rows shared by the pause window and the title screen's 환경 설정 */
+  settingsRows(b) {
+    const s = G.settings;
     const row = (label, html) => { const r = $("div", "setrow", b, `<span>${label}</span>`); r.insertAdjacentHTML("beforeend", html); return r; };
     for (const [k, label] of [["music", "배경음"], ["sfx", "효과음"], ["shake", "화면 흔들림"]]) {
       const r = row(label, `<input type="range" min="0" max="100" value="${Math.round(s[k] * 100)}"><b>${Math.round(s[k] * 100)}%</b>`);
@@ -693,6 +693,18 @@ export class UI {
     tog("섬광 효과 줄이기", () => s.reduceFlash ? "켜짐" : "꺼짐", () => { s.reduceFlash = !s.reduceFlash; G.reduceFlash = s.reduceFlash; if (G.skillFx) G.skillFx.constructor.reduceFlash = s.reduceFlash; });
     tog("그래픽 효과 (빛 번짐·색감)", () => s.graphicsFx !== false ? "켜짐" : "꺼짐", () => s.graphicsFx = s.graphicsFx === false);
     tog("모바일 조작 버튼", () => ["자동", "항상 표시", "숨김"][s.mobileControls], () => s.mobileControls = (s.mobileControls + 1) % 3);
+  }
+  /** title screen 환경 설정 */
+  showSettings(back) {
+    const b = this.open("settings", "환경 설정", 900, 0, false, true);
+    this.settingsRows(b);
+    const bb = $("div", "pbtns", b);
+    this.button(bb, "뒤로", "teal", back, "ui_back");
+  }
+  showPause() {
+    G.paused = true;
+    const b = this.open("pause", "일시정지 · 설정", 900, 0);
+    this.settingsRows(b);
     $("div", "help small muted", b, "PC: WASD/방향키 이동 · 클릭 이동/공격 · Space 공격 · 1~4 스킬 · K 스킬창 · N 제작 · Shift 회피 · Q 물약 · H 마을 귀환 · F 대화 · I 가방 · O 퀘스트 · Esc 메뉴");
     const bb = $("div", "pbtns", b);
     this.button(bb, "게임 재개", "gold", () => this.close());
@@ -815,22 +827,25 @@ export class UI {
     this.button(bb, "마을에서 부활", "teal", () => { this.close(false); town(); });
     const h = this.button(bb, `제자리 부활 (${cost} G)`, "gold", () => { this.close(false); here(); }); h.disabled = !can;
   }
-  showTitle(info, cont, ng) {
+  showTitle(info, cont, ng, settings, quit) {
     this.toasts.replaceChildren();                         // in-game notices (e.g. "저장 1에 저장했습니다") don't follow to the title
     const b = this.open("title", null, 1000, 0, false, false);
     this.current.classList.add("titlewin");
-    this.current.setAttribute("aria-label", "아르칸 연대기 시작 메뉴");
+    this.current.setAttribute("aria-label", "아스테리온 연대기 시작 메뉴");
     const stage = $("div", "title-art", b);
-    $("img", "title-illustration", stage).src = "assets/ui/title-screen.png";
-    stage.firstChild.alt = "아르칸 연대기 — 꽃과 분수가 있는 마을";
+    $("img", "title-illustration", stage).src = "assets/ui/title-asterion.jpg";
+    stage.firstChild.alt = "아스테리온 연대기 — 약사·대장장이·요리사·예술가·디자이너가 꽃밭 마을에 모인 그림";
+    // the four buttons are painted in the picture (게임 시작 · 불러오기 · 환경 설정 · 게임 종료); invisible native buttons sit on them
+    const n = this.button(stage, "", "title-action title-new", ng);
+    n.setAttribute("aria-label", "게임 시작 (새 게임)");
     const c = this.button(stage, "", "title-action title-continue", cont);
     c.setAttribute("aria-label", info ? "불러오기" : "불러오기 (저장 없음)");
     c.disabled = !info;
     const save = $("div", "title-save", stage);
-    save.textContent = info || "저장된 모험이 없습니다. 새 게임으로 시작하세요.";
+    save.textContent = info || "저장된 모험이 없습니다. 게임 시작으로 새 모험을 시작하세요.";
     save.title = save.textContent;
-    const n = this.button(stage, "", "title-action title-new", ng);
-    n.setAttribute("aria-label", "새 게임");
+    this.button(stage, "", "title-action title-settings", settings).setAttribute("aria-label", "환경 설정");
+    this.button(stage, "", "title-action title-quit", quit).setAttribute("aria-label", "게임 종료");
     (info ? c : n).focus({ preventScroll: true });
     // the browser blocks sound until the first click / key: show a small speaker button while it is still muted
     const snd = this.button(stage, "", "title-sound", () => { G.audio.unlock(); });

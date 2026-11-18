@@ -111,7 +111,7 @@ export function showWorldMap(ui) {
   const D = G.data, here = G.zone && G.zone.def.id, b = ui.open('worldmap', '세계 지도', 1400, 0);
   const wnd = ui.current, cur = D.zones[here];
   const logo = document.createElement('div'); logo.className = 'wmlogo';
-  logo.innerHTML = `${LOGO_WING}<div><b>아르칸 연대기</b><small>ARKAN CHRONICLES</small></div>${LOGO_WING.replace('class="wmwing"', 'class="wmwing r"')}`;
+  logo.innerHTML = `${LOGO_WING}<div><b>아스테리온 연대기</b><small>ASTERION CHRONICLE</small></div>${LOGO_WING.replace('class="wmwing"', 'class="wmwing r"')}`;
   wnd.appendChild(logo);
   const cp = document.createElement('div'); cp.className = 'wmcorner'; cp.innerHTML = COMPASS; wnd.appendChild(cp);
   const top = document.createElement('div'); top.className = 'wmtop'; b.appendChild(top);

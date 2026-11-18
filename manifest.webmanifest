@@ -1,7 +1,7 @@
 {
-  "name": "아르칸 연대기",
-  "short_name": "아르칸",
-  "description": "아르칸 연대기 모바일 RPG",
+  "name": "아스테리온 연대기",
+  "short_name": "아스테리온",
+  "description": "아스테리온 연대기 모바일 RPG",
   "start_url": "./",
   "scope": "./",
   "display": "fullscreen",
