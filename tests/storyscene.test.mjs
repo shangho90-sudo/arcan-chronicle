@@ -43,3 +43,40 @@ ok(res('그레이스') === 'mon:qb_grace_1' && res('말라키온') === 'mon:qb_m
 const man = JSON.parse(readFileSync(new URL('../assets/ui/story/portraits.json', import.meta.url), 'utf8'));
 for (const [k, v] of Object.entries(man.portraits || {})) ok(existsSync(new URL('../assets/ui/story/' + v.file, import.meta.url)), '초상 파일 ' + k);
 console.log(`storyscene: ${n} 통과 — 메인 ${mains.length}개, ${pages}쪽, 화자 있는 쪽 ${speakers}(NPC ${npcSpk}), 이어지지 않은 이름: ${[...unknown].map(([a, b]) => a + '×' + b).join(', ') || '없음'}`);
+
+// 대화 상자 글꼴(2026-11-17): 주아체 + 보충 DialogExtra 부분 집합에 메인 대사·프롤로그·상자 UI 글자가 빠짐없이 들어 있는지
+// (WOFF2를 직접 읽어 cmap을 봄 — 빠졌으면 python3 tools/fonts/jua_subset.py <Jua-Regular.ttf>로 다시 만들 것)
+import { brotliDecompressSync } from 'node:zlib';
+function woff2Cmap(path) {
+  const b = readFileSync(new URL('../' + path, import.meta.url)), v = new DataView(b.buffer, b.byteOffset, b.byteLength);
+  assert.equal(v.getUint32(0), 0x774F4632, path + ' = wOF2');
+  const nt = v.getUint16(12), comp = v.getUint32(20); let o = 48;
+  const u128 = () => { let r = 0; for (let i = 0; i < 5; i++) { const x = b[o++]; r = r * 128 + (x & 127); if (!(x & 128)) return r; } throw new Error('u128'); };
+  const tabs = [];
+  for (let i = 0; i < nt; i++) {
+    const fl = b[o++], ti = fl & 63; let tag = ti; if (ti === 63) { tag = b.toString('latin1', o, o + 4); o += 4; }
+    const tv = (fl >> 6) & 3, orig = u128(); let len = orig;
+    if ((ti === 10 || ti === 11) ? tv === 0 : tv !== 0) len = u128();
+    tabs.push({ tag, len });
+  }
+  const data = brotliDecompressSync(b.subarray(o, o + comp)); let off = 0, cm = null;
+  for (const t of tabs) { if (t.tag === 0) cm = data.subarray(off, off + t.len); off += t.len; }
+  const d = new DataView(cm.buffer, cm.byteOffset, cm.byteLength), set = new Set(), n = d.getUint16(2);
+  for (let i = 0; i < n; i++) {
+    const p = d.getUint16(4 + i * 8), e = d.getUint16(6 + i * 8), so = d.getUint32(8 + i * 8);
+    if (p !== 3 && p !== 0) continue; const f = d.getUint16(so);
+    if (f === 12) { const ng = d.getUint32(so + 12); for (let g = 0; g < ng; g++) { const s0 = d.getUint32(so + 16 + g * 12), s1 = d.getUint32(so + 20 + g * 12); for (let c = s0; c <= s1; c++) set.add(c); } }
+    else if (f === 4) { const sx = d.getUint16(so + 6) / 2; for (let g = 0; g < sx; g++) { const end = d.getUint16(so + 14 + g * 2), st = d.getUint16(so + 16 + sx * 2 + g * 2); for (let c = st; c <= end && c !== 0xFFFF; c++) set.add(c); } }
+  }
+  assert.ok(set.size > 0, path + ' cmap'); return set;
+}
+const jua = woff2Cmap('assets/fonts/Jua.woff2'), extra = woff2Cmap('assets/fonts/DialogExtra.woff2');
+let need = '';
+for (const q of mains) { need += q.name || ''; for (const k of ['offerText', 'progressText', 'completeText']) if (q[k]) for (const p of parseStory(q[k], null, res)) need += plainText(p.html) + (p.who ? p.who.name : ''); }
+const pro = J('prologue.json'); for (const P of pro.panels) for (const L of P.lines) need += plainText(L.text) + (L.who || '');
+need += '“”이야기용흔 대륙의 기록건너뛰기›계속 읽기→수락하기나중에돌아가기대화 종료메인 퀘스트✦장보상0123456789/×';
+for (const id of new Set(mains.flatMap(q => [q.giver, q.turnIn]).filter(Boolean))) { const nd = d.npcs[id]; if (nd) need += (nd.name || '') + (nd.title || ''); }
+const miss = [...new Set(need)].filter(c => !/\s/.test(c) && c !== '✦' && !jua.has(c.codePointAt(0)) && !extra.has(c.codePointAt(0)));
+eq(miss.join(''), '', '대화 상자 글꼴(주아체 + DialogExtra)에 빠진 글자 없음');
+ok([...'『』①無龍…'].every(c => !jua.has(c.codePointAt(0)) ? extra.has(c.codePointAt(0)) : true), '주아체에 없는 기호·한자는 DialogExtra에');
+console.log(`대화 글꼴: ${new Set(need).size}자 확인(주아체 ${jua.size} + 보충 ${extra.size} 글리프)`);

@@ -1,5 +1,5 @@
 // Game orchestrator + zone runtime. Port of Boot/ArcanGame.cs and World/ZoneRuntime.cs.
-import { GameData, SaveStore, SAVE_SLOTS, saveSlotKey, CharacterSheet, QuestLog, QS, ZoneGeometry, NavGrid, newProfile, DEG, clamp, HitShape, levelGapExp, monsterAtLevel, discoverTown, payWarp, warpPrice, zoneLock, questCategory } from './core.js';
+import { GameData, SaveStore, SAVE_SLOTS, saveSlotKey, CharacterSheet, QuestLog, QS, ZoneGeometry, NavGrid, newProfile, DEG, clamp, HitShape, levelGapExp, monsterAtLevel, discoverTown, payWarp, warpPrice, zoneLock, questCategory, questTitle } from './core.js';
 import { Renderer, Fx, TelegraphView, TG_TIME, loadSheet, preloadTextures, THREE, T } from './render.js';
 import { Player, Monster, Boss, Npc, Loot, bindGame as bindActors } from './actors.js';
 import { preloadDrops } from './dropfx.js';
@@ -602,7 +602,7 @@ class Game {
   /** quest dialogue: main quests play as a story scene (js/storyscene.js), everything else in the plain dialogue window */
   questTalk(npc, q, html, opts, reward = "") {
     if (questCategory(q) === "main" && !this.noStoryScene) {
-      const go = m => { (this.story || (this.story = new m.StoryScene(this))).play({ npc, html, opts, reward, title: q.name }); };
+      const go = m => { const t = questTitle(q); (this.story || (this.story = new m.StoryScene(this))).play({ npc, html, opts, reward, title: t.title, kicker: t.ch }); };
       if (this._storyMod) return go(this._storyMod);
       return import("./storyscene.js").then(m => { this._storyMod = m; go(m); }).catch(e => { console.warn("story scene", e); this.ui.showDialog(npc, html + (reward ? `<div class="reward">${reward}</div>` : ""), opts); });
     }

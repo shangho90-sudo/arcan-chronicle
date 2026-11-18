@@ -4,6 +4,8 @@
 // Controls: click / tap / Space / Enter = finish the line or go on, Esc or "건너뛰기" = skip to the end.
 // The last card ("그리고 지금. 카이리온 왕국의 어느 가을날") fades over the live town with falling leaves.
 
+import { GB_STAR, gbCount, gbSteps } from './goldbox.js';
+
 const CPS = 30;                        // typewriter speed (characters / s)
 const FADE = 900;                      // panel cross-fade (ms)
 
@@ -22,9 +24,9 @@ export class Prologue {
     this.previousFocus = document.activeElement;
     root.innerHTML = `<div class="pl-stage" role="img"></div><div class="pl-shade"></div>
       <header class="pl-heading"><div class="pl-kicker">서장 <span>✦</span> 별을 잇는 자</div><h1 class="pl-title"></h1></header>
-      <div class="pl-box"><div class="pl-meta"><span class="pl-who"></span><span class="pl-count"></span></div><div class="pl-text"></div>
-      <div class="pl-footer"><span class="pl-steps" aria-hidden="true"></span><button type="button" class="pl-next" aria-label="다음 대사">계속 읽기 <span>→</span></button></div></div>
-      <button type="button" class="pl-skip" aria-label="건너뛰기">건너뛰기 <span>»</span></button>
+      <div class="pl-box gb-box">${GB_STAR}<div class="gb-head"><span class="pl-who gb-plate"></span><span class="pl-count gb-count"></span></div><div class="pl-text gb-text"></div>
+      <div class="gb-rule"></div><div class="gb-foot"><span class="pl-steps gb-steps" aria-hidden="true"></span><button type="button" class="pl-next gb-btn" aria-label="다음 대사">계속 읽기 <span>→</span></button></div></div>
+      <button type="button" class="pl-skip gb-skip" aria-label="건너뛰기">건너뛰기 <span>›</span></button>
       <div class="pl-end"><div class="pl-leaves"></div><p class="pl-e1"></p><p class="pl-e2"></p></div>`;
     document.body.appendChild(root);
     this.stage = root.querySelector('.pl-stage'); this.box = root.querySelector('.pl-box');
@@ -61,7 +63,7 @@ export class Prologue {
     if (this.done || this.pi !== i) return;
     this.stage.setAttribute('aria-label', P.alt || P.title || '');
     this.el.querySelector('.pl-title').textContent = P.title || '';
-    this.el.querySelector('.pl-steps').innerHTML = this.data.panels.map((_, n) => `<i class="${n <= i ? 'lit' : ''}"></i>`).join('');
+    this.el.querySelector('.pl-steps').innerHTML = gbSteps(i, this.data.panels.length);
     const [z0, z1, x0, y0, x1, y1] = P.pan || [1.06, 1, 50, 50, 50, 50];
     const dur = Math.max(9, P.lines.reduce((s, l) => s + 1.6 + l.text.replace(/<[^>]+>/g, '').length / CPS, 2));
     const layer = document.createElement('div'); layer.className = 'pl-layer';
@@ -78,7 +80,7 @@ export class Prologue {
     this.box.classList.add('show'); this.box.classList.toggle('speak', !!L.who);
     this.pending = false; this.next.disabled = false;
     this.who.textContent = L.who || '용흔 대륙의 기록';
-    this.el.querySelector('.pl-count').textContent = `${String(this.pi + 1).padStart(2, '0')} / ${String(this.data.panels.length).padStart(2, '0')}`;
+    this.el.querySelector('.pl-count').textContent = gbCount(this.pi, this.data.panels.length);
     this.text.textContent = '';
     // typewriter over the visible characters only (tags are kept whole)
     const parts = L.text.split(/(<[^>]+>)/); let shown = 0; const total = L.text.replace(/<[^>]+>/g, '').length;

@@ -19,7 +19,11 @@ const fails = [], errs = []; const ok = (c, m) => { console.log((c ? '  ok   ' :
     const inZone = id => pg.waitForFunction(id => window.G && G.inWorld && G.zone && G.zone.def.id === id && G.player && !G.loading && !G.input.block, id, { timeout: 400000 });
     // 넘기기: 휴대폰은 화면 위쪽 터치, PC는 Space(타자 중이면 줄 끝내기)
     const tapNext = async () => { if (touch) await pg.touchscreen.tap(W / 2, H * 0.3); else await pg.keyboard.press('Space'); await pg.waitForTimeout(350); };
-    const goNext = async () => { await ev(() => G.story.typing && G.story.finishType()); await pg.waitForTimeout(120); await tapNext(); };   // 타자기가 끝났는지와 상관없이 정확히 다음 쪽
+    // 타자기가 끝났는지와 상관없이 정확히 다음 쪽. 장면은 연 직후 0.25초·누른 뒤 0.3초 안의 누름을 일부러 무시하므로(StoryScene.advance)
+    // 그 시간이 지난 뒤에 누름 — 2026-11-17 1280x720에서 19장 '보스 화자 이름'이 아스텔로 남던 것은 장면이 뜨자마자(0.25초 안) 누른 테스트 타이밍 문제
+    const goNext = async () => { await ev(() => G.story.typing && G.story.finishType());
+      await pg.waitForFunction(() => { const s = G.story, t = performance.now(); return t - s.shownAt > 320 && t - (s.advAt || 0) > 340; }, null, { timeout: 30000, polling: 50 });
+      await tapNext(); };
     const st = () => ev(() => { const s = G.story, el = document.querySelector('.vnscene'); if (!el) return null;
       const por = side => { const p = el.querySelector('.vn-por.' + side); return { who: p.dataset.who || null, shown: p.classList.contains('shown'), speak: p.classList.contains('speak'), listen: p.classList.contains('listen'), none: p.classList.contains('none'), src: (p.querySelector('img').getAttribute('src') || '').slice(0, 30) }; };
       return { i: s.i, n: s.pages.length, typing: s.typing, name: el.querySelector('.vn-nm').textContent, text: el.querySelector('.vn-text').textContent, end: el.querySelector('.vn-end').classList.contains('show'),

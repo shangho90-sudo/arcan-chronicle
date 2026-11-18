@@ -6,7 +6,7 @@ const { chromium } = require('playwright'); const fs = require('fs'), path = req
 const OUT = process.env.OUT || '/tmp/mapicons'; fs.mkdirSync(OUT, { recursive: true });
 const URL = process.env.URL || 'http://localhost:8765', ROOT = path.join(__dirname, '..', '..');
 const SHOP = { shop_weapons: 'weapon', shop_armor: 'armor', shop_general: 'potion', shop_pharmacy: 'potion', shop_forge: 'forge', shop_smithy: 'forge' };
-const kindOf = d => d.role === 'jobmaster' && d.job ? 'job_' + d.job : SHOP[d.shop] || '';
+const kindOf = d => d.role === 'jobmaster' && d.job ? 'job_' + d.job : d.role === 'warp' ? 'warp' : SHOP[d.shop] || '';   // 2026-11-17 워프 안내인 = 차원문
 const J = f => JSON.parse(fs.readFileSync(path.join(ROOT, f), 'utf8'));
 const npcs = J('assets/data/npcs.json'), zones = J('assets/data/zones.json');
 const N = Array.isArray(npcs) ? Object.fromEntries(npcs.map(n => [n.id, n])) : (npcs.npcs ? Object.fromEntries(npcs.npcs.map(n => [n.id, n])) : npcs);
@@ -35,7 +35,7 @@ for (const st of zl) {
     await ready(); await pg.waitForTimeout(1500);
     const clip = async (sel, file) => { const r = await ev(s => { const e = document.querySelector(s); if (!e) return null; const b = e.getBoundingClientRect(); return { x: Math.max(0, b.x), y: Math.max(0, b.y), width: Math.min(innerWidth - Math.max(0, b.x), b.width), height: Math.min(innerHeight - Math.max(0, b.y), b.height) }; }, sel); if (r && r.width > 4 && r.height > 4) await pg.screenshot({ path: file, clip: r, timeout: 900000 }); };
     for (const zid of (process.env.ZONES || 'town,kairion_capital,baltern').split(',')) {
-      if (zid !== 'town') { await ev(z => G.travel(z), zid); await pg.waitForTimeout(800); await ready(); await pg.waitForTimeout(2500); }
+      if (zid !== 'town') { await ev(() => { G.lockOf = () => null; }); await ev(z => G.travel(z), zid); await pg.waitForTimeout(800); await ready(); await pg.waitForTimeout(2500); }   // 테스트만: 메인 퀘스트 입장 조건(lockOf)을 끄고 이동
       // 아이콘 NPC가 가장 많이 모인 곳 옆에 서서 미니맵을 찍음
       const at = await ev(() => { const L = G.zone.npcs.filter(n => n.def.shop || n.def.role === 'jobmaster'); let best = L[0], bn = -1;
         for (const a of L) { const c = L.filter(o => Math.hypot(o.pos.x - a.pos.x, o.pos.z - a.pos.z) < 18).length; if (c > bn) { bn = c; best = a; } }
@@ -43,6 +43,10 @@ for (const st of zl) {
       await pg.waitForTimeout(1500);
       const mini = await ev(() => (G.ui.minimap.icons || []).map(i => [i.id, i.kind]));
       await clip('#hMap', `${OUT}/mapicons_${zid}_mini_${sz}.png`);
+      // 워프 안내인 곁에서 한 장 더(차원문 아이콘)
+      const wk = await ev(() => { const n = G.zone.npcs.find(n => n.def.role === 'warp'); if (n) { G.player.pos.x = n.pos.x + 1.5; G.player.pos.z = n.pos.z + 3; } return n && n.def.name; });
+      if (wk) { await pg.waitForTimeout(1500); await clip('#hMap', `${OUT}/mapicons_${zid}_miniwarp_${sz}.png`);
+        const wi = await ev(() => (G.ui.minimap.icons || []).filter(i => i.kind === 'warp').length); if (!wi) { console.log('  !! ' + zid + ' 미니맵에 워프 아이콘 없음(' + wk + ')'); fail++; } }
       await ev(() => G.ui.showAreaMap()); await pg.waitForTimeout(5000);
       const got = await ev(() => ({ icons: (G.ui.minimap.icons || []).map(i => [i.id, i.kind, Math.round(i.x), Math.round(i.y)]), legend: [...document.querySelectorAll('.amlegend span')].map(e => e.textContent.trim()), list: [...document.querySelectorAll('.amitem')].filter(e => e.querySelector('.amkind')).map(e => e.querySelector('.amname').firstChild.textContent + '=' + e.querySelector('.amkind').alt) }));
       await pg.screenshot({ path: `${OUT}/mapicons_${zid}_area_${sz}.png`, timeout: 300000 });

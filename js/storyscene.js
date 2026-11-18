@@ -2,7 +2,8 @@
 // 받기·진행·완료 대사만. 상점·주민·서브 퀘스트는 예전 대화창(ui.showDialog) 그대로.
 //  - 게임 화면은 뒤에 보이게(어둡게·살짝 흐리게), 큰 반신 초상 왼쪽/오른쪽 두 자리: 말하는 사람은 밝고 앞으로, 듣는 사람은
 //    어둡고 작게. 화자가 바뀌면 작게 튀어 오름, 평소에는 숨쉬기.
-//  - 아래 넓은 반투명 남색 상자 + 얇은 금빛 테 + 이름 패(주아체), 타자기 글자. 누르기/Space/Enter/F = 줄 끝내기 → 다음.
+//  - 아래 상자 = 프롤로그와 같은 금테 상자(js/goldbox.js, CSS .gb-*: 이름 패·쪽수·다이아 진행 점·'계속 읽기 →'·'건너뛰기 ›',
+//    2026-11-17 사용자 그림), 대사는 주아체, 타자기 글자. 누르기/Space/Enter/F = 줄 끝내기 → 다음.
 //    '건너뛰기' = 마지막 쪽(수락·완료 단추)으로. 끝 쪽에 원래 단추(수락하기/나중에, 돌아가기/대화 종료)를 같은 상자 안에.
 //  - 대사·화자는 quests.json 텍스트에서 읽음(js/storyparse.js) — 퀘스트마다 코드 없음.
 //  - 초상: assets/ui/story/portraits.json(화자 키 → 그림, 표정 expr) → 없으면 3D 모델 반신 렌더(portrait.js renderBust,
@@ -12,6 +13,7 @@ import * as THREE from 'three';
 import { NPC_MODELS, loadNpcModel, loadActions, ModelBody } from './model.js';
 import { renderBust, bodyTexturesReady } from './portrait.js';
 import { parseStory, makeResolver } from './storyparse.js';
+import { GB_STAR, gbCount, gbSteps } from './goldbox.js';
 
 const CPS = 42;                          // 타자기 글자/초
 const MANIFEST = 'assets/ui/story/portraits.json';
@@ -69,7 +71,7 @@ export class StoryScene {
    * npc: the NPC being talked to (def), html: quest text, opts: [[label, fn]] (last = ivory, like showDialog),
    * reward: html shown with the buttons on the last page, title: quest name (small kicker)
    */
-  async play({ npc, html, opts, reward = '', title = '' }) {
+  async play({ npc, html, opts, reward = '', title = '', kicker = '' }) {
     const G = this.G, ui = G.ui;
     const resolve = makeResolver(G.data, G.profile && G.profile.name);
     const defWho = npc ? { key: npc.id, name: npc.name } : null;
@@ -89,15 +91,18 @@ export class StoryScene {
     el.className = 'vnscene'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', '이야기 대화');
     el.innerHTML = `<div class="vn-shade"></div>
       <div class="vn-stage"><div class="vn-por left"><div class="vn-fig"><img alt=""></div></div><div class="vn-por right"><div class="vn-fig"><img alt=""></div></div></div>
-      <div class="vn-box"><div class="vn-name"><span class="vn-nm"></span><small class="vn-ti"></small></div>
-        <div class="vn-text"></div><div class="vn-end"><div class="vn-reward"></div><div class="vn-opts"></div></div><i class="vn-next" aria-hidden="true"></i></div>
-      ${title ? `<div class="vn-kicker">✦ ${esc(title)}</div>` : ''}
-      <button type="button" class="vn-skip" aria-label="건너뛰기">건너뛰기 <span>»</span></button>`;
+      <div class="vn-box gb-box">${GB_STAR}<div class="gb-head"><span class="vn-name gb-plate"><span class="vn-nm"></span><small class="vn-ti"></small></span><span class="vn-count gb-count"></span></div>
+        <div class="vn-text gb-text"></div><div class="gb-rule"></div>
+        <div class="gb-foot"><span class="vn-steps gb-steps" aria-hidden="true"></span><div class="vn-end"><div class="vn-reward"></div><div class="vn-opts"></div></div>
+          <button type="button" class="vn-more gb-btn" aria-label="다음 대사">계속 읽기 <span>→</span></button></div></div>
+      ${title ? `<header class="vn-kicker gb-heading"><div class="gb-kicker">메인 퀘스트${kicker ? ` <span>✦</span> ${esc(kicker)}` : ''}</div><h1 class="gb-title">${esc(title)}</h1></header>` : ''}
+      <button type="button" class="vn-skip gb-skip" aria-label="건너뛰기">건너뛰기 <span>›</span></button>`;
     this.box = el.querySelector('.vn-box'); this.nameEl = el.querySelector('.vn-nm'); this.tiEl = el.querySelector('.vn-ti');
     this.text = el.querySelector('.vn-text'); this.endEl = el.querySelector('.vn-end');
     this.por = { left: el.querySelector('.vn-por.left'), right: el.querySelector('.vn-por.right') };
     ui.openLayer('story', el, () => this.cleanup(el));
     el.addEventListener('pointerup', e => { if (e.target.closest('button')) return; e.preventDefault(); this.advance(); });
+    el.querySelector('.vn-more').onclick = e => { e.stopPropagation(); this.advance(); };
     el.querySelector('.vn-skip').onclick = e => { e.stopPropagation(); G.audio && G.audio.sfx('ui'); this.skip(); };
     this.onKey = e => {
       if (!this.el) return;
@@ -185,14 +190,22 @@ export class StoryScene {
     this.i++;
     const p = this.pages[this.i], G = this.G;
     this.stage(p);
+    this.header(p);
+    this.endEl.classList.remove('show'); this.box.classList.remove('done', 'end');
+    this.type(p.html);
+    if (this.i > 0) G.audio && G.audio.sfx('dialog');
+  }
+
+  /** name plate (서술 = '이야기'), page counter and diamonds of page this.i */
+  header(p) {
     const c = p.who && p.who.key ? this.cast.get(p.who.key) : null;
     this.nameEl.textContent = p.narr ? '' : (p.who ? p.who.name : '');
     this.tiEl.textContent = !p.narr && c && c.title ? c.title : '';
     this.box.classList.toggle('noname', !this.nameEl.textContent);
     this.text.classList.toggle('narr', !!p.narr);
-    this.endEl.classList.remove('show'); this.box.classList.remove('done');
-    this.type(p.html);
-    if (this.i > 0) G.audio && G.audio.sfx('dialog');
+    const n = this.pages.length, el = this.el;
+    el.querySelector('.vn-count').textContent = gbCount(this.i, n);
+    el.querySelector('.vn-steps').innerHTML = gbSteps(this.i, n);
   }
 
   /** typewriter over the text nodes (inline markup kept) */
@@ -221,10 +234,10 @@ export class StoryScene {
   showEnd() {
     if (this.endEl.classList.contains('show')) return;
     const r = this.endEl.querySelector('.vn-reward'), o = this.endEl.querySelector('.vn-opts');
-    r.innerHTML = this.reward || ''; r.style.display = this.reward ? '' : 'none'; o.innerHTML = '';
+    r.innerHTML = (this.reward || '').replace(/ {2,}/g, ' · '); r.style.display = this.reward ? '' : 'none'; o.innerHTML = '';   // rewardText joins its parts with two spaces
     this.opts.forEach(([label, fn], i) => {
       const b = document.createElement('button'); b.type = 'button';
-      b.className = 'vn-btn' + (i === this.opts.length - 1 && this.opts.length > 1 ? ' alt' : ''); b.textContent = label;
+      b.className = 'vn-btn gb-btn' + (i === this.opts.length - 1 && this.opts.length > 1 ? ' alt' : ''); b.textContent = label;
       b.onclick = e => { e.stopPropagation(); if (performance.now() - this.endAt < 300) return; this.G.audio && this.G.audio.sfx('dialog'); fn(); };   // no tap-through from the tap that finished the line
       o.appendChild(b);
     });
@@ -244,10 +257,7 @@ export class StoryScene {
     if (!this.el) return;
     if (this.typing) this.finishType();
     while (!this.atEnd()) { this.i++; }
-    const p = this.pages[this.i]; this.stage(p);
-    const c = p.who && p.who.key ? this.cast.get(p.who.key) : null;
-    this.nameEl.textContent = p.narr ? '' : (p.who ? p.who.name : ''); this.tiEl.textContent = !p.narr && c && c.title ? c.title : '';
-    this.box.classList.toggle('noname', !this.nameEl.textContent); this.text.classList.toggle('narr', !!p.narr);
+    const p = this.pages[this.i]; this.stage(p); this.header(p);
     this.type(p.html); this.finishType();
   }
 
