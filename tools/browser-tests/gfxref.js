@@ -9,7 +9,7 @@ const SIZE = process.env.SIZE || '1280x720', TOUCH = SIZE.endsWith('t'), [VW, VH
 const TAG = process.env.TAG || 'after', OUT = process.env.OUT || '/tmp/gfx', G_ = process.env.GENDER || 'm', JOB = process.env.JOB || 'blacksmith';
 const ZOOMS = (process.env.ZOOMS || '1,2.2').split(',').map(Number), PERF = process.env.PERF !== '0', HUD = process.env.HUD === '1';
 const SPOT = process.env.SPOT === 'spawn' ? null : (process.env.SPOT || '-6.2,-6.6').split(',').map(Number), DIR = +(process.env.DIR || 70), MON = process.env.MON || 'mon_boar';   // SPOT=spawn: where the zone put the player
-const ZONE = process.env.ZONE || '';
+const ZONE = process.env.ZONE || '';   // QUALITY=high|medium|low: 리마스터 그래픽 품질(settings.gfxQuality)
 (async () => {
   fs.mkdirSync(OUT, { recursive: true });
   const b = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', ...(process.env.BARGS ? process.env.BARGS.split(' ') : [])] });   // BARGS='--single-process' = less memory on a shared machine
@@ -18,7 +18,7 @@ const ZONE = process.env.ZONE || '';
   const ev = (f, a) => pg.evaluate(f, a);
   await pg.goto(process.env.URL || 'http://localhost:8817/index.html');
   const click = async t => { await pg.waitForFunction(t => [...document.querySelectorAll('button,[aria-label]')].some(b => (b.getAttribute('aria-label') || b.textContent || '').trim() === t), t, { timeout: 300000 }); await ev(t => [...document.querySelectorAll('button,[aria-label]')].find(b => (b.getAttribute('aria-label') || b.textContent || '').trim() === t).click(), t); await pg.waitForTimeout(400); };
-  await ev(() => localStorage.clear()); await pg.reload(); await click('게임 시작 (새 게임)'); await click('모험 시작');
+  await ev(q => { localStorage.clear(); if (q) localStorage.setItem('arcan_settings', JSON.stringify({ gfxQuality: q })); }, process.env.QUALITY || ''); await pg.reload(); await click('게임 시작 (새 게임)'); await click('모험 시작');
   await pg.waitForSelector('.prologue.on', { timeout: 60000 }).then(() => click('건너뛰기')).catch(() => {});
   await pg.waitForFunction(() => window.G && G.inWorld && G.player && !G.loading && G.player.body && G.player.body.md, null, { timeout: 300000 });
   if (ZONE) { await ev(z => G.loadZone(z, null, false), ZONE); await pg.waitForFunction(() => !G.loading && G.player.body && G.player.body.md, null, { timeout: 300000 }); }
@@ -45,7 +45,7 @@ const ZONE = process.env.ZONE || '';
   }, [SPOT ? SPOT[0] : null, SPOT ? SPOT[1] : null, DIR, MON]);
   await pg.waitForFunction(() => window.__d.body && window.__d.body.ready !== false, null, { timeout: 120000 });
   await pg.waitForTimeout(1500);
-  const base = `${TAG}_${SIZE}_${G_}${JOB !== 'blacksmith' ? '_' + JOB : ''}${ZONE ? '_' + ZONE : ''}`, res = { errs };
+  const base = `${TAG}${process.env.QUALITY ? '_q' + process.env.QUALITY : ''}_${SIZE}_${G_}${JOB !== 'blacksmith' ? '_' + JOB : ''}${ZONE ? '_' + ZONE : ''}`, res = { errs };
   const reset = async () => ev(() => {
     let seed = 777; Math.random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
     const p = G.player, f = window.__f, m = window.__d; G.input.stick = { x: 0, y: 0 }; G.input.hold('attack', false);

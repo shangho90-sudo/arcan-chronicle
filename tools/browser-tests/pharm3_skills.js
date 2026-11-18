@@ -27,7 +27,7 @@ const SEC = +(process.env.SEC || (SCENE === 'repeat' ? 2.2 : SCENE === 'sheathed
   const ev = (f, a) => pg.evaluate(f, a);
   await pg.goto(process.env.URL || 'http://localhost:8798/index.html');
   const click = async t => { await pg.waitForFunction(t => [...document.querySelectorAll('button,[aria-label]')].some(b => (b.getAttribute('aria-label') || b.textContent || '').trim() === t), t, { timeout: 300000 }); await ev(t => [...document.querySelectorAll('button,[aria-label]')].find(b => (b.getAttribute('aria-label') || b.textContent || '').trim() === t).click(), t); await pg.waitForTimeout(400); };
-  await ev(fx => { localStorage.clear(); localStorage.setItem('arcan_settings', JSON.stringify({ graphicsFx: fx })); }, FX);
+  await ev(fx => { localStorage.clear(); localStorage.setItem('arcan_settings', JSON.stringify(Object.assign({ graphicsFx: fx[0] }, fx[1] ? { gfxQuality: fx[1] } : {}))); }, [FX, process.env.QUALITY || '']);   // QUALITY=high|medium|low
   await pg.reload(); await click('게임 시작 (새 게임)'); await click('모험 시작');
   await pg.waitForSelector('.prologue.on', { timeout: 60000 }).then(() => click('건너뛰기')).catch(() => {});
   await pg.waitForFunction(() => window.G && G.inWorld && G.player && !G.loading && G.player.body && G.player.body.md, null, { timeout: 300000 });
@@ -52,7 +52,7 @@ const SEC = +(process.env.SEC || (SCENE === 'repeat' ? 2.2 : SCENE === 'sheathed
   }, [ZOOM, G_, SCENE === 'wall']);
   await pg.waitForFunction(() => G.skillFx.pharm.ready && G.player.body && G.player.body.md, null, { timeout: 120000 });
   await pg.waitForTimeout(1500);
-  const name = `${TAG}_${SKILL}_${SCENE}_${G_}_${SIZE}_fx${FX ? 1 : 0}`, dirOut = `${OUT}/${name}`; fs.rmSync(dirOut, { recursive: true, force: true }); fs.mkdirSync(dirOut, { recursive: true });
+  const name = `${TAG}${process.env.QUALITY ? '_q' + process.env.QUALITY : ''}_${SKILL}_${SCENE}_${G_}_${SIZE}_fx${FX ? 1 : 0}`, dirOut = `${OUT}/${name}`; fs.rmSync(dirOut, { recursive: true, force: true }); fs.mkdirSync(dirOut, { recursive: true });
   await ev(s => { window.__slam = s; }, SLAM);
   await ev(([dir, scene, thr, push]) => {
     const p = G.player, a = (window.__wdir ?? dir) * Math.PI / 180, f = { x: Math.sin(a), z: Math.cos(a) };
@@ -68,6 +68,7 @@ const SEC = +(process.env.SEC || (SCENE === 'repeat' ? 2.2 : SCENE === 'sheathed
   }, [DIR, SCENE, THROW, PUSH]);
   await pg.waitForFunction(() => window.__ds.every(m => m.body), null, { timeout: 120000 });
   if (process.env.CAMLOCK) await ev(() => { window.__camLock = true; });
+  if (process.env.PERFAT) await ev(f => { window.__perfAt = f; }, Math.round(+process.env.PERFAT * FPS));
   const info = await ev(([scene, fps, skill, thr, focus]) => {
     let seed = 12345; Math.random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
     if (scene === 'miss') Math.random = () => 0.0001;   // every accuracy roll fails -> MISS: no impact text
@@ -115,6 +116,11 @@ const SEC = +(process.env.SEC || (SCENE === 'repeat' ? 2.2 : SCENE === 'sheathed
       const cp = G.render.cam.position, fu = G.render.focusU, rel = { x: cp.x - fu.x, y: cp.y - fu.y, z: cp.z + fu.z }; if (!window.__c0) window.__c0 = rel;
       L.cam.push(+Math.hypot(rel.x - window.__c0.x, rel.y - window.__c0.y, rel.z - window.__c0.z).toFixed(4));
       const s = G.render.toScreen({ x: p.pos.x + f.x * focus, y: p.pos.y + 1.0, z: p.pos.z + f.z * focus });
+      if (window.__perfAt != null && i === window.__perfAt) {   // PERFAT=s: draw-only timing at that moment (no simulation step): ms / draw calls / triangles / heap
+        const r = G.render.r; r.info.autoReset = false; const out = [];
+        for (let k = 0; k < 3; k++) { r.info.reset(); const t0 = performance.now(); for (let j = 0; j < 4; j++) { G.render.render(0); r.getContext().finish(); }
+          out.push({ ms: +((performance.now() - t0) / 4).toFixed(1), calls: Math.round(r.info.render.calls / 4), tris: Math.round(r.info.render.triangles / 4) }); }
+        r.info.autoReset = true; window.__perf = { runs: out, heapMB: performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576) : null, geometries: r.info.memory.geometries, textures: r.info.memory.textures, programs: (r.info.programs || []).length }; }
       return [s.x, s.y, G.render.r ? G.render.r.info.render.calls : -1];
     }, [i, FPS, SKILL, THROW, FOCUS, !process.env.FAST || (want && !process.env.NOSHOT)]);
     const fn = `${dirOut}/${String(i).padStart(3, '0')}.png`;
@@ -130,7 +136,7 @@ const SEC = +(process.env.SEC || (SCENE === 'repeat' ? 2.2 : SCENE === 'sheathed
       blockedAfter: ds.map(d => d && !d.removed ? !!G.zone.geo.blocked(d.pos.x, d.pos.z, 0.2) : null),
       spUsed: +(window.__sp0 - p.sp).toFixed(1), cdLen: p.skills2.cdLen, armedSeries: L.arm.join('').replace(/(.)\1+/g, (s, c) => c + 'x' + s.length + ' '),
       live: G.skillFx.pharm.live.length, armed: p.body.armed }; });
-  res.drawCallsMax = dc; res.fps = FPS; res.info = info;
+  res.drawCallsMax = dc; res.fps = FPS; res.info = info; res.perf = await ev(() => window.__perf || null);
   if (process.env.STRESS) {   // STRESS=n: n more casts back to back (cooldown / SP reset), then renderer memory, programs, JS heap, live effects, and the draw time during one cast
     res.stress = await ev(async ([n, skill, thr]) => {
       const R = G.render.r, snap = () => ({ geo: R.info.memory.geometries, tex: R.info.memory.textures, prog: (R.info.programs || []).length, heap: performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576) : null, live: G.skillFx.pharm.live.length, kit: G.skillFx.pharm.kit && G.skillFx.pharm.kit.stats ? Object.values(G.skillFx.pharm.kit.stats()).reduce((a, b) => a + b, 0) : null });
