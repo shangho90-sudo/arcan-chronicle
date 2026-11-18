@@ -60,7 +60,7 @@ def tint(mat, line):
     from PIL import ImageOps, ImageStat
     src = bpy.path.abspath(img.filepath); im = Image.open(src).convert('RGB')
     sat = ImageStat.Stat(im.convert('HSV')).mean[1]
-    if sat > 30 and line not in TINT: return
+    if sat > 30: return                              # 색이 있으면 그대로
     d, m, l = TINT.get(line, ('#606060', '#c0c0c0', '#ffffff'))
     g = ImageOps.autocontrast(im.convert('L'), cutoff=2); ImageOps.colorize(g, black=d, white=l, mid=m).save(src); img.reload()
     print(line, 'tinted (saturation %.0f)' % sat, flush=True)

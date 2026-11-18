@@ -115,6 +115,7 @@ def ornament(key, s):
                 if o is not ob: bpy.data.objects.remove(o)
             ob.parent = None; bpy.context.view_layer.objects.active = ob; ob.select_set(True)
             bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+            if key + '_' + v in ORN_PRE: place(ob, (0, 0, 0), ORN_PRE[key + '_' + v])
             ob['mat'] = 'tripo'; ob['variant'] = v; PARTS.append(ob); return ob
     return None
 def fit_orn(ob, size, loc, rot=(0, 0, 0), axis=None):
@@ -258,7 +259,9 @@ def build_instrument(key, C, s):
 
 BUILD = {'sword': build_sword, 'pestle': build_pestle, 'hammer': build_hammer, 'knife': build_knife, 'scissors': build_scissors, 'brush': build_brush, 'instrument': build_instrument}
 # Tripo 장식을 붙일 때 더 돌릴 각도(x, y, z rad) — gear2_wpn_prep.py의 세 방향 그림을 보고 정함
-ORN_ROT = {'cook': (0, -math.pi / 2, 0)}   # 잉어: 머리(+X)가 위, 등지느러미가 칼등(-X)
+ORN_ROT = {'cook': (0, -math.pi / 2, 0)}
+# 변형마다 먼저 돌릴 각도: 견습생 전설 코등이는 초안의 짧은 칼날이 아래(손잡이 쪽)로 나와서 뒤집음 — 날개가 아래로 처지고 짧은 날이 칼날 쪽
+ORN_PRE = {'nov_b': (0, math.pi, 0)}   # 잉어: 머리(+X)가 위, 등지느러미가 칼등(-X)
 
 # ---------------------------------------------------------------- 단계 장식(모든 계열 공통): 보석 · 리본 · 구슬 줄 · 금테 · 날개 · 후광 · 관
 def extras(key, C, s, A, kind):

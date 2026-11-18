@@ -87,7 +87,10 @@ def gen(name):
     d = s.get('data', {}); out = d.get('output', {}) or {}
     url = out.get('pbr_model') or out.get('model') or out.get('base_model')
     if d.get('status') != 'success' or not url: print(name, 'failed', json.dumps(s, ensure_ascii=False)[:300], flush=True); return False
-    tripo.download(url, dst)
+    for k in range(5):                                       # 받기가 끊기면(연결 재설정) 다시 — 요청은 다시 하지 않음
+        try: tripo.download(url, dst); break
+        except Exception as e: print(name, 'download retry', k, e, flush=True); time.sleep(10)
+    else: return False
     if out.get('rendered_image'):
         try: tripo.download(out['rendered_image'], os.path.join(RAW, 'wpn_' + name + '_preview.webp'))
         except Exception: pass

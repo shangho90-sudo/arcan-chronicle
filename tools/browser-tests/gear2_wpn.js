@@ -22,7 +22,7 @@ const IDS = (process.env.IDS || 'wg_nov_4,wg_pharm_5,wg_smith_7,wg_cook_5,wg_hai
   await pg.waitForTimeout(1000);
   await ev(async g => { G.sheet.p.gender = g; await G.player.attachBody(); G.player.body.place(G.player.pos); G.frame = () => {}; document.querySelectorAll('.qhud,.qh-reopen,.toasts').forEach(e => e.style.display = 'none'); }, G_);
   const step = (n, draw = true) => ev(([n, draw]) => { for (let i = 0; i < n; i++) G.step(1 / 60, draw && i === n - 1); }, [n, draw]);
-  const CW = 300, CH = 340;
+  const CW = 380, CH = 420;
   const grab = async (zoom = 2.6) => {
     await ev(z => { const p = G.player, c = G.render.cam; c.zoom = z; c.updateProjectionMatrix(); document.querySelectorAll('.hud,.layer:not(.controls),.plates,.controls').forEach(e => e.style.visibility = 'hidden'); G.render.setFocus({ x: p.pos.x, y: 0, z: p.pos.z }, true); G.render.render(0); }, zoom);
     const c = await ev(() => { const p = G.player, s = G.render.toScreen({ x: p.pos.x, y: p.pos.y + 0.9, z: p.pos.z }); return [s.x, s.y]; });
@@ -42,10 +42,10 @@ const IDS = (process.env.IDS || 'wg_nov_4,wg_pharm_5,wg_smith_7,wg_cook_5,wg_hai
     await step(3);
     if (!/^wg_(hair|design)_/.test(id)) await pg.waitForFunction(() => { const h = G.player.body.props && G.player.body.props.R; let ok = false; h && h.traverse(o => { if (o.userData.gearReady) ok = true; }); return ok; }, null, { timeout: 120000 }).catch(() => errs.push(id + ' model not ready'));
     const r = { job, equipErr: await ev(() => G.__eqErr) };
-    await face(200); await step(30); const s1 = await grab(); r.back = await st();
-    await face(90); await ev(() => G.input.hold('attack', true)); await step(10); const s2 = await grab(); r.draw = await st();
+    await face(160); await step(30); const s1 = await grab(); r.back = await st();
+    await face(250); await ev(() => G.input.hold('attack', true)); await step(10); const s2 = await grab(); r.draw = await st();
     await step(14); const s3 = await grab(); r.swing = await st();
-    await ev(() => G.input.hold('attack', false)); await step(70); await face(20); await step(4); const s4 = await grab(); r.hand = await st();
+    await ev(() => G.input.hold('attack', false)); await step(70); await face(300); await step(4); const s4 = await grab(); r.hand = await st();
     R.items[id] = r; console.log(id, JSON.stringify(r));
     for (const [k, buf] of [['1back', s1], ['2draw', s2], ['3swing', s3], ['4hand', s4]]) fs.writeFileSync(`${OUT}/${SIZE}_${G_}_${id}_${k}.png`, buf);
     await ev(() => { G.player.resetArms && G.player.resetArms(); });
