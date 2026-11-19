@@ -29,8 +29,8 @@ const cfg = (SKILL) => { const WIDE = ['ball', 'soup', 'pepper', 'flour', 'skewe
   const ev = (f, a) => pg.evaluate(f, a);
   await pg.goto(process.env.URL || 'http://localhost:8797/index.html');
   const click = async t => { await pg.waitForFunction(t => [...document.querySelectorAll('button,[aria-label]')].some(b => (b.getAttribute('aria-label') || b.textContent || '').trim() === t), t, { timeout: 300000 }); await ev(t => [...document.querySelectorAll('button,[aria-label]')].find(b => (b.getAttribute('aria-label') || b.textContent || '').trim() === t).click(), t); await pg.waitForTimeout(400); };
-  await ev(fx => { localStorage.clear(); localStorage.setItem('arcan_settings', JSON.stringify({ graphicsFx: fx })); }, FX);
-  await pg.reload(); await click('새 게임'); await click('모험 시작');
+  await ev(([fx, q]) => { localStorage.clear(); localStorage.setItem('arcan_settings', JSON.stringify(Object.assign({ graphicsFx: fx }, q ? { gfxQuality: q } : {}))); }, [FX, process.env.QUALITY || '']);   // QUALITY=high|medium|low (리마스터)
+  await pg.reload(); await click('게임 시작 (새 게임)'); await click('모험 시작');   // 2026-11-19 새 시작 화면 단추 이름
   await pg.waitForSelector('.prologue.on', { timeout: 60000 }).then(() => click('건너뛰기')).catch(() => {});
   await pg.waitForFunction(() => window.G && G.inWorld && G.player && !G.loading && G.player.body && G.player.body.md, null, { timeout: 300000 });
   await pg.waitForFunction(() => G.skillFx && G.skillFx.cook, null, { timeout: 120000 });

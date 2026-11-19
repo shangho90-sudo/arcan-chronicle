@@ -4,7 +4,7 @@
 // ⑤ 종료 = 마법진이 녹아 사라지며 바깥으로 퍼지는 고리 + 반짝임(대장장이는 불티 비).
 // 그림만: 피해·시각·판정·카메라는 skillrt 그대로, 난수는 이 파일의 xorshift(게임 Math.random 안 씀), 품질 낮음이면 아무것도 만들지 않음
 // (skillrt.js release가 gfxOn()일 때만 부름). 마법진은 시전자 발밑 반지름 ≤ 1.2 m(판정 범위 그림이 아님 — 범위 그림은 각 스킬 것).
-// draw call: 살아 있는 마법진마다 1 + 고리 1 + 빛 알갱이 전체 1(THREE.Points 하나, 상한 STAGEFX.cap). 보통 = 알갱이 수 0.55배.
+// draw call: 살아 있는 마법진마다 1 + 고리 1 + 빛 알갱이 전체 1(카메라를 보는 판 인스턴스 묶음 하나, 상한 STAGEFX.cap). 보통 = 알갱이 수 0.55배.
 import * as THREE from 'three';
 import { T } from './render.js';
 import { gfxQ } from './gfxq.js';
@@ -31,7 +31,7 @@ export const STAGES = {
   ar1_a1: { k: 'art', launch: 'tip' }, ar1_a2: { k: 'art', launch: 'tip' }, ar1_a3: { k: 'art', launch: 'tip' },
   ar1_b1: { k: 'art', launch: 'tip' }, ar1_b2: { k: 'art', launch: 'tip' }, ar1_b3: { k: 'art', launch: 'tip' },
 };
-export const STAGEFX = { cap: 700, r: 1.05, draw: 0.2, fadeOut: 0.4, gather: 12, rise: 0.06, endBurst: 16, medK: 0.55 };
+export const STAGEFX = { size: 1.7, cap: 700, r: 1.05, draw: 0.2, fadeOut: 0.4, gather: 12, rise: 0.06, endBurst: 16, medK: 0.55 };
 
 let seed = 0x9e3779b9;
 const rnd = () => { seed ^= seed << 13; seed ^= seed >>> 17; seed ^= seed << 5; return (seed >>> 0) / 4294967296; };
@@ -63,21 +63,25 @@ void main(){
   if (alpha < .01) discard;
   gl_FragColor = vec4(col * (1. + body * .35), alpha);
 }`;
-const PT_VS = `attribute vec4 aC; attribute float aS; varying vec4 vC; uniform float uH;
-void main(){ vC = aC; vec4 mv = modelViewMatrix * vec4(position, 1.); gl_Position = projectionMatrix * mv; gl_PointSize = aS * projectionMatrix[1][1] * uH * .5 / max(.1, -mv.z); }`;
-const PT_FS = `varying vec4 vC; void main(){ vec2 p = gl_PointCoord * 2. - 1.; float d = length(p);
+// camera-facing quads (one instanced draw): aP = centre, aS = size (m), aC = colour + alpha
+const PT_VS = `attribute vec3 aP; attribute vec4 aC; attribute float aS; varying vec4 vC; varying vec2 vQ;
+void main(){ vC = aC; vQ = position.xy * 2.; vec4 mv = viewMatrix * vec4(aP, 1.); mv.xy += position.xy * aS * 2.; gl_Position = projectionMatrix * mv; }`;
+const PT_FS = `varying vec4 vC; varying vec2 vQ; void main(){ vec2 p = vQ; float d = length(p);
   float star = max(1. - smoothstep(.0, .12, abs(p.x)) , 0.) * (1. - abs(p.y)) + max(1. - smoothstep(.0, .12, abs(p.y)), 0.) * (1. - abs(p.x));
-  float k = clamp(star * .8 + (1. - smoothstep(.0, .45, d)) , 0., 1.) * vC.a; if (k < .01) discard; gl_FragColor = vec4(vC.rgb * k, k); }`;
+  float k = clamp(star * .8 + (1. - smoothstep(.0, .45, d)) , 0., 1.) * vC.a; if (k < .01) discard; gl_FragColor = vec4(vC.rgb * (1. + .6 * (1. - d)), k); }`;   // normal blend (additive vanished on the bright paving)
 
 export class StageFx {
   constructor(scene) {
     this.scene = scene; this.live = []; this.pool = []; this.ringPool = [];
     this.geo = new THREE.PlaneGeometry(2, 2).rotateX(-Math.PI / 2);
     const N = STAGEFX.cap; this.N = N; this.parts = [];
-    const g = new THREE.BufferGeometry(); this.P = new Float32Array(N * 3); this.Cc = new Float32Array(N * 4); this.S = new Float32Array(N);
-    g.setAttribute('position', new THREE.BufferAttribute(this.P, 3)); g.setAttribute('aC', new THREE.BufferAttribute(this.Cc, 4)); g.setAttribute('aS', new THREE.BufferAttribute(this.S, 1));
-    this.pm = new THREE.ShaderMaterial({ uniforms: { uH: { value: 720 } }, vertexShader: PT_VS, fragmentShader: PT_FS, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
-    this.points = new THREE.Points(g, this.pm); this.points.frustumCulled = false; this.points.renderOrder = 6; g.setDrawRange(0, 0); scene.add(this.points);
+    const g = new THREE.InstancedBufferGeometry(); const q = new THREE.PlaneGeometry(1, 1); g.index = q.index; g.setAttribute('position', q.attributes.position);
+    this.P = new Float32Array(N * 3); this.Cc = new Float32Array(N * 4); this.S = new Float32Array(N);
+    g.setAttribute('aP', new THREE.InstancedBufferAttribute(this.P, 3)); g.setAttribute('aC', new THREE.InstancedBufferAttribute(this.Cc, 4)); g.setAttribute('aS', new THREE.InstancedBufferAttribute(this.S, 1));
+    for (const k of ['aP', 'aC', 'aS']) g.attributes[k].setUsage(THREE.DynamicDrawUsage);
+    g.instanceCount = 0;
+    this.pm = new THREE.ShaderMaterial({ vertexShader: PT_VS, fragmentShader: PT_FS, transparent: true, depthWrite: false });
+    this.points = new THREE.Mesh(g, this.pm); this.points.frustumCulled = false; this.points.renderOrder = 6; scene.add(this.points);
   }
   _sig() {
     const m = this.pool.pop() || new THREE.Mesh(this.geo, new THREE.ShaderMaterial({ uniforms: { uC: { value: new THREE.Color() }, uD: { value: new THREE.Color() }, uA: { value: 0 }, uT: { value: 0 }, uDraw: { value: 0 }, uErode: { value: 0 }, uV: { value: 0 }, uRing: { value: 0 } },
@@ -88,7 +92,7 @@ export class StageFx {
   _k() { return gfxQ() === 'high' ? 1 : STAGEFX.medK; }
   emit(x, y, z, o) {
     if (this.parts.length >= this.N) return;
-    this.parts.push({ x, y, z, vx: o.vx || 0, vy: o.vy || 0, vz: o.vz || 0, g: o.g || 0, t: -(o.delay || 0), life: o.life || 0.6, s: o.s || 0.08, c: o.c, to: o.to || null, sp: o.sp || 0 });
+    this.parts.push({ x, y, z, vx: o.vx || 0, vy: o.vy || 0, vz: o.vz || 0, g: o.g || 0, t: -(o.delay || 0), life: o.life || 0.6, s: (o.s || 0.08) * STAGEFX.size, c: o.c, to: o.to || null, sp: o.sp || 0 });
   }
   /** skillrt release: pc = caster, id = skill id, o = { ht (hit time s), end (lock end s), aim } */
   play(pc, id, o = {}) {
@@ -104,11 +108,10 @@ export class StageFx {
       this.emit(sx, sy, sz, { life: Math.max(0.16, e.ht * 0.9), s: 0.07 + rnd() * 0.05, c: this._col(K, i), to: hp, delay: rnd() * 0.06 }); }
     this.live.push(e); return e;
   }
-  _col(K, i) { if (K.rainbow) { const c = new THREE.Color().setHSL((i * 0.13 + rnd() * 0.05) % 1, 0.85, 0.66); return [c.r, c.g, c.b]; } const c = C(K.spark); return [c.r, c.g, c.b]; }
+  _col(K, i) { if (K.rainbow) { const c = new THREE.Color().setHSL((i * 0.13 + rnd() * 0.05) % 1, 0.85, 0.62); return [c.r, c.g, c.b]; } const c = C(K.spark).lerp(C(K.col), 0.55); return [c.r, c.g, c.b]; }
   _hand(pc) { let h = null; try { h = pc.body && pc.body.handPoint && pc.body.handPoint(); } catch (e) { h = null; } return h ? { x: h.x, y: h.y, z: -h.z } : { x: pc.pos.x, y: (pc.pos.y || 0) + 1.0, z: pc.pos.z }; }
   _tip(pc) { let b = null; try { b = pc.body && pc.body.bladePoints && pc.body.bladePoints(); } catch (e) { b = null; } if (b && b.tip) return { x: b.tip.x, y: b.tip.y, z: -b.tip.z }; if (b && b[1]) return { x: b[1].x, y: b[1].y, z: -b[1].z }; return this._hand(pc); }
   update(dt) {
-    this.pm.uniforms.uH.value = (typeof window !== 'undefined' && window.G && G.render && G.render.r) ? G.render.r.getDrawingBufferSize(new THREE.Vector2()).y : 720;
     const k = this._k();
     for (let i = this.live.length - 1; i >= 0; i--) {
       const e = this.live[i], u = e.m.material.uniforms; e.t += dt; u.uT.value += dt;
@@ -119,7 +122,7 @@ export class StageFx {
       // ② launch pop at the hit frame
       if (!e.launched && e.t >= e.ht) { e.launched = true; if (e.st.launch !== 'none') { const p = e.st.launch === 'hand' ? this._hand(e.pc) : this._tip(e.pc), nn = Math.round(10 * k);
           for (let j = 0; j < nn; j++) { const a = rnd() * 6.283, b = rnd() * 3.14, sp = 1.4 + rnd() * 1.6; this.emit(p.x, p.y, p.z, { vx: Math.cos(a) * Math.sin(b) * sp, vy: Math.cos(b) * sp, vz: Math.sin(a) * Math.sin(b) * sp, life: 0.28 + rnd() * 0.15, s: 0.09 + rnd() * 0.06, c: this._col(e.K, j) }); }
-          this.emit(p.x, p.y, p.z, { life: 0.12, s: 0.55, c: [1, 1, 1] }); } }
+          this.emit(p.x, p.y, p.z, { life: 0.12, s: 0.3, c: [1, 1, 0.95] }); } }
       // ④ sustain: motes rising off the sigil rim
       if (!e.ended) { e.rise += dt; while (e.rise > STAGEFX.rise / k) { e.rise -= STAGEFX.rise / k; const a = rnd() * 6.283, rr = e.R * (0.8 + rnd() * 0.15);
           this.emit(e.m.position.x + Math.cos(a) * rr, e.gy + 0.05, -e.m.position.z + Math.sin(a) * rr, e.K.ember ? { vy: 1.2 + rnd(), vx: (rnd() - 0.5) * 0.6, vz: (rnd() - 0.5) * 0.6, g: -1.5, life: 0.5 + rnd() * 0.3, s: 0.05 + rnd() * 0.04, c: this._col(e.K, 0) }
@@ -146,8 +149,8 @@ export class StageFx {
     }
     for (const p of this.parts) { if (p.t < 0 || n >= this.N) continue; const f = p.t / p.life, a = Math.min(1, p.t / 0.05) * (1 - f * f);
       P[n * 3] = p.x; P[n * 3 + 1] = p.y; P[n * 3 + 2] = -p.z; Cc[n * 4] = p.c[0]; Cc[n * 4 + 1] = p.c[1]; Cc[n * 4 + 2] = p.c[2]; Cc[n * 4 + 3] = a * 0.9; S[n] = p.s; n++; }
-    const g = this.points.geometry; g.setDrawRange(0, n); g.attributes.position.needsUpdate = true; g.attributes.aC.needsUpdate = true; g.attributes.aS.needsUpdate = true;
+    const g = this.points.geometry; g.instanceCount = n; g.attributes.aP.needsUpdate = true; g.attributes.aC.needsUpdate = true; g.attributes.aS.needsUpdate = true;
   }
-  clear() { for (const e of this.live) { this._free(e.m); if (e.ring) this._free(e.ring); } this.live.length = 0; this.parts.length = 0; this.points.geometry.setDrawRange(0, 0); }
+  clear() { for (const e of this.live) { this._free(e.m); if (e.ring) this._free(e.ring); } this.live.length = 0; this.parts.length = 0; this.points.geometry.instanceCount = 0; }
   get count() { return this.live.length + this.parts.length; }
 }
