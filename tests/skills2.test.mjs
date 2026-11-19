@@ -29,7 +29,7 @@ for (const s of d.skill2List) {
   if (s.type === "ultimate") { Eq(s.maxLv, 3, s.id + " ult max 3"); Ok(s.unlock >= 45, s.id + " ult >= Lv45"); }
   else Eq(s.maxLv, 5, s.id + " max 5");
   const t = d.job(s.job).tier, exp = t === 0 ? [1, 5, 10, 3, 7, 7, 5, 9] : t === 1 ? [10, 12, 15, 18, 20] : [30, 33, 36, 40, 45];
-  const OVR = { ph1_a4: 13 };   // 2026-11-11 약사 개편: 밀어내기 Lv13 (사용자 요청)
+  const OVR = { ph1_a4: 13, nv_a3: 3, nv_a2: 9 };   // nv: 2026-11-19 비연참 Lv3·연 Lv9 (사용자 요청)   // 2026-11-11 약사 개편: 밀어내기 Lv13 (사용자 요청)
   if (s.type !== "ultimate") Eq(s.unlock, OVR[s.id] ?? exp[s.idx - 1], s.id + " unlock by position");
   if (s.type === "craft") Ok((s.recipes || []).length > 0, s.id + " has recipes");
   for (const r of s.recipes || []) if (r !== "salvage") { const rc = d.recipes.find(x => x.id === r); Ok(rc && d.item(rc.output.item) && rc.inputs.every(x => d.item(x.item)), r + " recipe items exist"); }
@@ -141,7 +141,7 @@ Eq(p4.version, 4, "migrated to v4"); Eq(ch4.p.job, "cook", "legacy job kept"); E
   Eq(d.skillsOf("novice").length, 8, "novice has 8 skills");
   let c = make(1); Eq(c.book.sk.npoints, 1, "Lv1 grants 1 novice point"); Eq(c.book.sk.points, 0, "no job points at Lv1");
   Ok(c.book.learn("nv_a1") === null, "novice learns 일격참 at Lv1"); Eq(c.book.sk.slots[0], "nv_a1", "auto-equipped in slot 1");
-  Ok(c.book.learnBlock("nv_a2") !== null, "연 locked before Lv5");
+  Ok(c.book.learnBlock("nv_a3") !== null, "비연참 locked before Lv3"); Ok(make(3).book.learnBlock("nv_a3") === null, "비연참 at Lv3"); Ok(make(8).book.learnBlock("nv_a2") !== null, "연 locked before Lv9"); Ok(make(9).book.learnBlock("nv_a2") === null, "연 at Lv9");
   c = make(7); Ok(c.book.learn("nv_p2") === null, "검수련 at Lv7"); const atk1 = c.final.atk; c.book.learn("nv_p2"); c.recalc(); Ok(c.final.atk > atk1, "검수련 raises atk per level");
   Ok(c.book.learn("nv_p1") === null, "회복력 증가 at Lv3+"); Ok(c.book.passive("restRegen") > 0, "restRegen flag active");
   c = make(12, "cook"); Ok(c.book.learn("nv_a1") === null, "job character still learns novice skills"); Ok(c.book.usable("nv_a1"), "novice skill usable as cook");
