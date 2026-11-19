@@ -58,7 +58,7 @@ export function ph1LevelText(d, L, pass = () => 0) {
       out.push(`얼음길 둔화 ${P(slowAt(op, L))} (벗어난 뒤 ${f1(op.slowDur)}초) · 구르는 거리 ${f1(op.len + tr)}m · 끝 파편 ${P(c)}${cb ? ` (가운데 +${P(cb)})` : ''} 부채꼴 ${f1(op.fanR)}m·${op.fanAng}°`); break; }
     case 'ph_crystal': { const cs = op.coefs.map((c, k) => (k === op.coefs.length - 1 ? lastCoefAt(op, L) : c) * m);
       out.push(`결정침 ${cs.map(P).join(' → ')} (총 ${P(cs.reduce((a, b) => a + b, 0))}) · 대상 하나 · 사거리 ${f1(d.range)}m`); break; }
-    case 'ph_dream': out.push(`수면 ${f1(sleepAt(op, L))}초 · 부채꼴 ${f1(op.r)}m·${op.ang}° · 피해 없음 · 맞으면 깨어남 · 보스 면역`); break;
+    case 'ph_dream': out.push(`수면 ${+sleepAt(op, L).toFixed(2)}초 · 부채꼴 ${f1(op.r)}m·${op.ang}° · 피해 없음 · 맞으면 깨어남 · 보스 면역`); break;
   }
   if (d.cd) out.push(`쿨타임 ${f1(d.cd * (1 - 0.03 * (L - 1)))}초`);
   out.push(`연출 등급 ${Math.max(1, Math.min(10, L))}`);
