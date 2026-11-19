@@ -265,7 +265,9 @@ export class SkillEngine {
   release(ctx) {
     const pc = this.pc, sh = pc.body.sh, d = ctx.d, anim = ctx.act || d.anim || 'cast', cb = ctx.combo;
     if (d.sfxAt !== 'strike' && d.sfxAt !== 'op') G.audio.sfx(skillSound(d));
-    const ht = d.cast ? 0 : Math.min(0.35, (sh.actions[anim] ? sh.actions[anim].hitFrame / sh.actions[anim].fps : 0.2) || 0.2);
+    // action.strikeT = the authored contact time, used as is (유봉강타 ph_smash 0.45 s — 2026-11-19 big two-hand stone pestle; the
+    // 0.35 s cap is for the old sprite-sheet hit frames only)
+    const SA = sh.actions[anim], ht = d.cast ? 0 : SA && SA.strikeT ? SA.strikeT : Math.min(0.35, (SA ? SA.hitFrame / SA.fps : 0.2) || 0.2);
     // 전용 검술 소리는 버튼을 누른 순간 대신 실제 칼 동작에 맞춘다.
     // 연은 레벨별 동작의 hitTimes마다 재생하며, 허공에서도 휘두르는 소리만 남는다.
     if (d.sfxAt === 'strike') {

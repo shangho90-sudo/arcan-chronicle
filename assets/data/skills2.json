@@ -463,13 +463,13 @@
 "mp": 8,
 "cd": 4,
 "cast": 0.0,
-"recover": 0.35,
+"recover": 0.25,
 "anim": "ph_smash",
 "ops": [
 {
 "op": "fx",
 "pharm": "swing",
-"at": -0.34
+"at": -0.45
 },
 {
 "op": "hit",

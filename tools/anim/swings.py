@@ -425,23 +425,29 @@ PH_SLAM = action('ph_slam', [
     key(0.86, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
 ], 0.30, 0.66, [[0.25, 0.33]], fadeIn=0.06, fadeOut=0.16)
 PH_SLAM.update(trailLife=0.16, trailColor=[1.7, 1.4, 0.7])
-# 유봉강타 (ph1_a1, anim ph_smash, 2026-11-12): 준비 0.17 s (무릎을 굽히고 상체를 뒤로 젖히며 유봉을 머리 위 뒤로)
-# -> 내려찍기 (허리·어깨·팔이 함께, 가장 빠른 구간 끝이 타격) -> 앞으로 실린
-# 자세로 잠깐 버팀 -> 부드러운 복귀 (전체 0.55 s 그대로). 발은 제자리(STEP). 칼 잔상은 쓰지 않고(trail 없음) 둔기 궤적은
-# js/pharmfx.js swing()이 실제 유봉 끝을 따라 그림. windT / strikeT = 그 이펙트가 읽는 준비 끝 / 타격 시각.
+# 유봉강타 (ph1_a1, anim ph_smash) — 2026-11-19 사용자 요청: 몸보다 큰 불투명 돌 유봉(js/model.js STONE_PESTLE, 2.53 m ≈ 키의
+# 1.5배)을 두 손으로 들어 올렸다가 체중을 실어 앞 땅을 내려침. prop = 동작 내내 오른손 소품을 돌 유봉으로 바꿈(장착 유봉은 숨음),
+# offGrip = 왼손이 손잡이 끝(오른손에서 0.42 m 아래, 소품 단위 = m / (손 소품 1.3 × 손뼈 배율 1.16))을 잡음(왼팔 IK) — 두 파지점이 동작 내내 두 손에 맞물림.
+#   준비 0.30 s: 무릎을 굽히고 몸통을 오른쪽으로 비틀며 유봉을 오른 어깨 너머 머리 위로(0.20 s) → 정점에서 0.10 s 버팀(무게)
+#   내려찍기 0.15 s: 앞(왼)발을 내디디며 골반·어깨가 앞으로 돌고 큰 호 → 유봉 머리가 몸 앞 약 2 m 땅에 처음 닿음(키 0.435 s) = 피해
+#   0.45 s(strikeT) 프레임 — 피해가 나는 스텝은 몸 시계보다 한 프레임 앞서므로(명중 freezeT가 그 스텝부터 몸을 멈춤) 키를 1프레임 당김
+#   회수 0.25 s: 접지 순간 상체가 숙여지고 무릎이 받아 냄, 머리를 바닥에 0.1 s 댄 채(0.53 s까지) → 몸을 펴며 두 손으로 끌어올려
+#   전투 자세로(0.64 s, 0.70 s까지 그 자세 — 명중 때 시전자 freezeT 0.06 s만큼 늦어져도 잠금이 풀리는 순간 이미 전투 자세)
+# 칼 잔상 없음(trail None) — 둔기 궤적·접지 먼지는 js/pharmfx.js swing/smash. windT / strikeT = 준비 끝 / 접지(js/skillrt.js는 strikeT를
+# 그대로 타격 시각으로 씀 — 0.35 s 상한 예외).
 PH_SMASH = action('ph_smash', [
-    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
-    key(0.12, 'o', twist=-10, lean=-9, sink=0.13, hand=[-16, 66, 0.80], blade=[-10, 96], elbow=[-0.6, 0.2, -1], armL=[64, 30]),
-    key(0.20, 's', twist=-14, lean=-16, sink=0.10, hand=[-10, 86, 0.86], blade=[-4, 128], elbow=[-0.6, 0.3, -1], armL=[84, 34], squint=True),
-    key(0.275, 'i', twist=-5, lean=2, sink=0.14, hand=[-5, 54, 0.97], blade=[-2, 68], elbow=[-0.5, -0.4, -0.6], armL=[40, 36], squint=True),
-    key(0.34, None, twist=6, lean=28, sink=0.28, hand=[0, -24, 1.0], blade=[2, -54], elbow=[-0.4, -1, -0.2], armL=[24, 40], squint=True),
-    key(0.42, 'o', twist=8, lean=33, sink=0.32, hand=[2, -34, 0.95], blade=[4, -68], elbow=[-0.4, -1, -0.1], armL=[18, 44], squint=True),
-    key(0.55, 's', twist=5, lean=15, sink=0.13, hand=[4, -38, 0.84], blade=[12, -28], elbow=[-0.5, -1, -0.1], armL=[14, 30]),
-    key(0.67, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
-], 0.34, 0.50, None, fadeIn=0.05, fadeOut=0.14)
-PH_SMASH.update(windT=0.20, strikeT=0.34)
-# (2026-11-13 '살짝 천천히 땅을 타격': 준비 0.20 s, 내려찍기 0.14 s — 타격 0.25 -> 0.34 s, 전체 0.55 -> 0.67 s. 더 커진 마력 유봉이 땅에
-#  닿는 모습이 보이도록 내려오는 구간을 늘림)
+    key(0.00, hand=[-34, -36, 0.72], blade=[-40, -22], elbow=[-0.7, -1, -0.2], armL=[12, 18]),   # 큰 유봉 머리가 오른쪽 앞 바닥 쪽에 있는 채로 시작(앞으로 뻗은 채 나타나지 않게)
+    key(0.10, 'o', twist=-20, lean=2, sink=0.16, hand=[-40, 20, 0.74], blade=[-120, 40], elbow=[-0.8, -0.3, -0.6], armL=[30, 30]),
+    key(0.20, 's', twist=-34, lean=-10, sink=0.12, hand=[-22, 66, 0.80], blade=[-168, 34], elbow=[-0.8, 0.3, -0.6], armL=[60, 34], squint=True),
+    key(0.30, 's', twist=-36, lean=-13, sink=0.13, hand=[-20, 70, 0.80], blade=[-172, 30], elbow=[-0.8, 0.35, -0.6], armL=[62, 34], squint=True, step=[0.06, 0.0], lift=[0.05, 0.0]),
+    key(0.38, 'i', twist=-6, lean=4, sink=0.14, hand=[-8, 72, 0.94], blade=[-4, 96], elbow=[-0.6, 0.0, -0.8], armL=[50, 36], squint=True, step=[0.30, 0.0], lift=[0.07, 0.0]),
+    key(0.435, None, twist=10, lean=22, sink=0.24, hand=[0, 45, 0.92], blade=[3, -54], elbow=[-0.5, -0.8, -0.5], armL=[24, 40], squint=True, step=[0.40, -0.04], lift=[0.0, 0.0]),
+    key(0.48, 'o', twist=10, lean=28, sink=0.31, hand=[0, 40, 0.92], blade=[3, -52], elbow=[-0.5, -0.8, -0.5], armL=[20, 42], squint=True, step=[0.40, -0.04]),
+    key(0.53, 's', twist=9, lean=26, sink=0.29, hand=[0, 41, 0.92], blade=[3, -52], elbow=[-0.5, -0.8, -0.5], armL=[20, 40], step=[0.40, -0.04]),
+    key(0.64, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
+    key(0.70, None, hand=[-30, -40, 0.70], blade=[-10, 20]),
+], 0.45, 0.60, None, fadeIn=0.04, fadeOut=0.12)
+PH_SMASH.update(windT=0.30, strikeT=0.45, prop='stone_pestle', offGrip=round(-0.42 / (1.3 * 1.16), 4), restT=[0.435, 0.53])
 
 # 약병 투구 (ph1_b1·b2·b4·b6, anim ph_pitch, 2026-11-13): 야구공을 던지듯 뒤에서 앞으로. 왼발을 들어 앞으로 내디디며 상체를 오른쪽
 # 뒤로 틀고 오른손(약병)을 어깨 뒤로 젖힘(0.16 s) -> 허리·어깨가 먼저 돌고 팔이 머리 위로 넘어오며(가장 빠른 구간) 0.24 s에 손을 떠남

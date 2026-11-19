@@ -210,8 +210,54 @@ function crPose(p0, p1, p2, p3, k) {
 }
 const EASE = { i: t => t * t * t, o: t => 1 - (1 - t) ** 3, io: t => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2), s: t => t * t * (3 - 2 * t) };
 
+// ---------------------------------------------------------------- 유봉강타 거대 돌 유봉 (2026-11-19, 사용자 요청)
+// Held in BOTH hands for the whole ph_smash motion (action.prop swaps it for the equipped pestle, action.offGrip puts the left
+// hand on it). Opaque matte stone (Lambert + vertex colours, one shared geometry / material - never rebuilt per cast).
+// Metres along the axis from the RIGHT-hand grip (z = 0): butt end -0.53 (left hand at STONE_PESTLE.left, the end of the
+// grip), thin two-hand shaft, carved collar, neck swelling into a thick round head, head end at +2.0. Total 2.53 m ≈ 1.5 x the
+// 1.65 m character. Prop units (the hand holder scales by 1.3) = metres / 1.3; the player's hand bone is drawn 1.16x (PROPORTION.m,
+// the held weapon grows with it), so the mesh is authored at 1 / 1.16 = world metres for the male body (female 1.14: 2 % shorter).
+export const STONE_PESTLE = { butt: -0.53, end: 2.0, left: -0.42, seg: 22, hand: 1.16 };
+let _stoneGeo = null, _stoneMat = null;
+function stonePestleGeo() {
+  if (_stoneGeo) return _stoneGeo;
+  // [z m, radius m, colour role] — 0 stone, 1 darker carved band, 2 grip cord, 3 head stone (lighter)
+  const P = [[-0.53, 0, 1], [-0.525, 0.03, 1], [-0.505, 0.05, 1], [-0.475, 0.056, 1], [-0.45, 0.044, 1], [-0.44, 0.036, 2], [-0.30, 0.036, 2], [-0.29, 0.033, 0],
+    [-0.10, 0.033, 0], [-0.09, 0.036, 2], [0.10, 0.036, 2], [0.11, 0.034, 0], [0.18, 0.036, 1], [0.20, 0.047, 1], [0.24, 0.047, 1], [0.26, 0.038, 0],
+    [0.55, 0.045, 0], [0.85, 0.062, 0], [1.02, 0.085, 0], [1.10, 0.103, 1], [1.13, 0.122, 1], [1.17, 0.122, 1], [1.20, 0.113, 3],
+    [1.27, 0.137, 3], [1.37, 0.17, 3], [1.50, 0.195, 3], [1.64, 0.206, 3], [1.76, 0.199, 3], [1.86, 0.172, 3], [1.93, 0.128, 3], [1.975, 0.072, 3], [2.0, 0, 3]];
+  const pts = P.map(([z, r]) => new THREE.Vector2(r, z));
+  const g = new THREE.LatheGeometry(pts, STONE_PESTLE.seg);   // around +y: y = axis
+  const pos = g.attributes.position, n = pos.count, col = new Float32Array(n * 3);
+  const C = [new THREE.Color(0x6f6a64), new THREE.Color(0x4c4843), new THREE.Color(0x4a3a2e), new THREE.Color(0x86817a)];   // slate-grey stone (reads against light paving and grass), darker carved bands, brown grip cord
+  const hsh = (a, b) => { const s = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return s - Math.floor(s); };
+  const vn = (a, b) => { const ia = Math.floor(a), ib = Math.floor(b), fa = a - ia, fb = b - ib, u = fa * fa * (3 - 2 * fa), v = fb * fb * (3 - 2 * fb);
+    return (hsh(ia, ib) * (1 - u) + hsh(ia + 1, ib) * u) * (1 - v) + (hsh(ia, ib + 1) * (1 - u) + hsh(ia + 1, ib + 1) * u) * v; };
+  const roleAt = (z) => { let r = P[0][2]; for (const q of P) { if (q[0] <= z + 1e-6) r = q[2]; } return r; };
+  const c = new THREE.Color();
+  for (let i = 0; i < n; i++) {
+    const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i), ang = Math.atan2(z, x), ca = Math.cos(ang), sa = Math.sin(ang), rr = Math.hypot(x, z);
+    // hewn stone: a little low-frequency unevenness on the thick parts (continuous across the lathe seam: uses cos / sin)
+    if (rr > 0.06) { const k = 1 + 0.035 * (vn(ca * 2.2 + 5, y * 3.1) - 0.5) + 0.02 * (vn(sa * 3.1 + 9, y * 6.3) - 0.5); pos.setX(i, x * k); pos.setZ(i, z * k); }
+    const role = roleAt(y); c.copy(C[role]);
+    const mott = 0.86 + 0.24 * vn(ca * 3 + 2, y * 5) + 0.1 * (vn(sa * 9 + 1, y * 21) - 0.5), speck = hsh(Math.round(ang * 40), Math.round(y * 60)) > 0.93 ? 0.8 : 1;
+    const cord = role === 2 ? (0.8 + 0.35 * (Math.sin((y * 70 + ang * 1.0) * Math.PI) > 0 ? 1 : 0)) : 1;   // diagonal wraps of the grip cord
+    c.multiplyScalar(mott * speck * cord); col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
+  }
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  g.rotateX(Math.PI / 2);   // axis +y -> +z (the hand holder's weapon axis)
+  const k = 1 / (1.3 * STONE_PESTLE.hand); g.scale(k, k, k);   // world metres -> prop units (hand holder 1.3, hand bone 1.16)
+  g.computeVertexNormals(); g.computeBoundingSphere();
+  return (_stoneGeo = g);
+}
+function makeStonePestle() {
+  const g = new THREE.Group(); _stoneMat = _stoneMat || new THREE.MeshLambertMaterial({ vertexColors: true });
+  const m = new THREE.Mesh(stonePestleGeo(), _stoneMat); m.castShadow = true; m.userData.shared = true; g.add(m); g.userData.stonePestle = true; return g;
+}
+
 // ---------------------------------------------------------------- held items (same shapes as the sprite baker)
 function makeProp(kind) {
+  if (kind === 'stone_pestle') return makeStonePestle();
   const g = new THREE.Group(), M = c => new THREE.MeshLambertMaterial({ color: c });
   const box = (w, h, d, c, x, y, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), M(c)); m.position.set(x, y, z); g.add(m); return m; };
   const cyl = (r, l, c, x, y, z, rotx = 0) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, l, 12), M(c)); m.position.set(x, y, z); m.rotation.x = rotx; g.add(m); return m; };
@@ -843,6 +889,9 @@ export class ModelBody {
     let p = this.action === 'walk' && md.leg && !md.cfg.npc ? this.poseOf('idle') : this.currentPose();
     if (this.fadeDur > 0 && this.fromPose) { const k = this.fadeT / this.fadeDur; if (k < 1) p = lerpPose(this.fromPose, p, EASE.s(k)); else this.fadeDur = 0; }
     this.lastPose = p;
+    // action.prop (유봉강타 ph_smash = 'stone_pestle'): for the whole action the right hand holds this prop instead of the equipped
+    // weapon (swapped at the press, swapped back when the action ends - the two never show together)
+    { const PA = this.sh.actions[this.action]; if (PA && PA.prop && !md.cfg.npc && !p.held) p = Object.assign({}, p, { held: PA.prop }); }
     // draw / sheathe overlay: its sword arm (hand / blade / elbow / ik / toBack) on top of idle or walking. A swing or skill
     // (a pose with its own hand) takes over at once: a draw that got that far counts as done
     if (this.over && !md.cfg.npc) {
@@ -1075,6 +1124,6 @@ export class ModelBody {
     if (this.trail) this.trail.dispose();
     this.scene.remove(this.root, this.shadow);
     this.mat.dispose();
-    this.root.traverse(o => { if (o.isMesh && o !== this.mesh && !o.userData.outline) { o.geometry.dispose(); o.material.dispose(); } });   // outline hulls share the cached geometry / material
+    this.root.traverse(o => { if (o.isMesh && o !== this.mesh && !o.userData.outline && !o.userData.shared) { o.geometry.dispose(); o.material.dispose(); } });   // outline hulls share the cached geometry / material
   }
 }

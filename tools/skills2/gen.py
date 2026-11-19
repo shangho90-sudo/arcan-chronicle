@@ -81,11 +81,12 @@ J, C = 'pharmacist', 0x48b080
 # 2026-11-19 약사 1차 5종 교체(id·칸·배우는 레벨·최대 레벨 5 그대로 = 예전 저장의 레벨·포인트·퀵슬롯이 그대로 새 스킬): 밀어내기 -> 유봉 되던지기(a4),
 # 화염 약병 -> 불꽃심지병(b1), 냉각 약병 -> 서리병 굴리기(b2), 부식 약병 -> 결정침 개화(b4), 회복제 제작 -> 꿈꽃가루(c1, 제작 -> 보조, 기력 10·재사용 14초).
 # 규칙 js/pharm1.js (PharmKit, CUSTOM ph_rang/ph_wick/ph_frost/ph_crystal/ph_dream — 수치는 op 필드), 그림 js/pharm1fx.js, 동작 ph_rang/ph_bowl/ph_bloom/ph_blow/ph_catch (swings.py)
-# 2026-11-13: 유봉강타 타격 0.25 -> 0.34 s(더 큰 마력 유봉이 조금 천천히 땅을 찍음 + 찌그러진 구덩이, js/pharmfx.js). 밀어내기 = 가로 휘두르기
+# 2026-11-19: 유봉강타 = 거대 돌 유봉 두 손 내려찍기(동작 ph_smash 준비 0.30 + 내려찍기 0.15 -> 접지·피해 0.45 s, 회수 0.25 s = recover 0.25, 잠금 0.70 s;
+# 피해·사거리·기력·재사용·대상 수 그대로). 2026-11-13: 유봉강타 타격 0.25 -> 0.34 s(더 큰 마력 유봉이 조금 천천히 땅을 찍음 + 찌그러진 구덩이, js/pharmfx.js). 밀어내기 = 가로 휘두르기
 # ph_sweep + 부채꼴(반지름 2.2 -> 3.0 m, 80 -> 110도) 땅 뒤집힘·흙 파편, 범위 안 모두 피해 + 밀어냄, oneHit(레벨 추가타를 한 방에 — 땅이 한 번만
 # 뒤집힘, 총 피해 같음), 명중했을 때만 ph_push_hit. 약병(b1·b2·b4·b6) 동작 = 야구 투구 ph_pitch(0.24 s에 실제 손에서 약병이 떠남, 유봉은 등에)
-S(J, 1, 0, '유봉 전투', 1, 'ph1_a1', '유봉강타', 'attack', '정면의 적 하나를 유봉으로 강하게 내려친다.', weapon='pestle', target='enemy', range=2.0, mp=8, cd=4, anim='ph_smash', sfx='ph_smash_swing', sfxAt='strike', sfxLead=0.09,
-  ops=[dict(op='fx', pharm='swing', at=-0.34), hit('single', 2.2, oneHit=True, sfx='ph_smash_hit', fx=dict(pharm='smash'), st=[st('stagger', 0.4)])], fx=dict(color=0xffd27a))
+S(J, 1, 0, '유봉 전투', 1, 'ph1_a1', '유봉강타', 'attack', '정면의 적 하나를 유봉으로 강하게 내려친다.', weapon='pestle', target='enemy', range=2.0, mp=8, cd=4, anim='ph_smash', sfx='ph_smash_swing', sfxAt='strike', sfxLead=0.09, recover=0.25,
+  ops=[dict(op='fx', pharm='swing', at=-0.45), hit('single', 2.2, oneHit=True, sfx='ph_smash_hit', fx=dict(pharm='smash'), st=[st('stagger', 0.4)])], fx=dict(color=0xffd27a))
 S(J, 1, 0, '유봉 전투', 2, 'ph1_a4', '유봉 되던지기', 'attack', '몸을 살짝 틀어 손에 든 유봉을 앞으로 던진다. 유봉은 옆으로 빙글빙글 돌며 적을 꿰뚫고 날아가다 최대 거리(또는 벽)에서 방향을 틀어 약사의 지금 손으로 돌아온다. 적마다 나갈 때 한 번, 돌아올 때 한 번 맞는다. 던진 뒤 바로 움직일 수 있어 옆으로 걸으면 돌아오는 길이 휘어, 처음에 빗나간 적도 맞힐 수 있다. 유봉이 돌아올 때까지 유봉 공격은 쓸 수 없다.', weapon='pestle', target='dir', range=6.5, mp=10, cd=7, anim='ph_rang', unlock=13, sfxAt='op', recover=0.1,
   ops=[custom('ph_rang', at=-1, dist=6.5, speed=13, back=15, w=1.1, coef=0.85, coefLv=0.05, life=3.4, catchR=0.7)], fx=dict(color=0xffd27a))
 S(J, 1, 0, '유봉 전투', 3, 'ph1_a3', '유봉 휘두르기', 'attack', '유봉을 들고 제자리에서 두 바퀴 돌며 주변의 적을 5번 연속으로 친다. 마지막 타격은 적을 밀쳐 낸다.', weapon='pestle', target='self', range=2.8, mp=14, cd=8, anim='ph_spin', sfx='ph_spin', sfxAt='op',
