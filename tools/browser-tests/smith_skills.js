@@ -112,10 +112,11 @@ const MARKS = (process.env.MARKS || base.marks || '0.1,0.5,1.0,1.5,2.0').split('
         else if (a.k.startsWith('tap:')) { r = a.tapped ? 'tap slot ' + (a.tapped.k + 1) : 'no button'; }
         else if (a.k === 'exhaust') { const A = p.skills2.smith.anvil; if (A) A.pulses = A.op.pulse.max; r = A ? 'pulses ' + A.pulses : 'no anvil'; }
         else if (a.k === 'hurt') { const src = ms.find(m => !m.dead) || m0; const hp = p.hp; p.takeDamage({ source: src, amount: 100, noMiss: true, kdir: { x: -f.x, z: -f.z } }); r = 'took ' + Math.round(hp - p.hp) + '/100'; p.hp = p.maxHp; }
-        else { p.setFacing(f.x, f.z); p.target = ids[a.k] === 'bs1_a2' || ids[a.k] === 'bs1_a3' ? m0 : null; const aim = a.aim != null ? window.__at(a.aim, a.side || 0) : window.__at(dist); if (a.side) p.lockOn = null;   // 옆 자리 모루: 휴대폰 자동 록온 대상 자리에 떨어지지 않게 r = p.skills2.cast(ids[a.k], aim); r = r === null ? 'ok' : r; }
+        else { p.setFacing(f.x, f.z); p.target = ids[a.k] === 'bs1_a2' || ids[a.k] === 'bs1_a3' ? m0 : null; const aim = a.aim != null ? window.__at(a.aim, a.side || 0) : window.__at(dist); if (a.side) { window.__lk = { n: 30, v: p.lockOn }; Object.defineProperty(p, 'lockOn', { configurable: true, get() { return null; }, set(v) { window.__lk.v = v; } }); } r = p.skills2.cast(ids[a.k], aim); r = r === null ? 'ok' : r; }
         L.casts.push({ k: a.k, t: +window.__t.toFixed(3), r });
       }
       G.step(1 / fps, true);
+      if (window.__lk && --window.__lk.n <= 0) { const v = window.__lk.v; window.__lk = null; delete p.lockOn; p.lockOn = v; }   // 옆 자리 모루: 휴대폰 자동 록온이 모루 자리를 바꾸지 않게 잠깐 막았다가 되돌림
       ms.forEach((m, j) => { if (!m.removed && m.hp < window.__hp[j]) { L.dmg.push({ m: j, t: +window.__t.toFixed(3), a: Math.round(window.__hp[j] - m.hp) }); window.__hp[j] = m.hp; } });
       if ((p.freezeT || 0) > 0) L.freezeP.push(+window.__t.toFixed(3)); if (m0.freezeT > 0) L.freezeT.push(+window.__t.toFixed(3)); if (G.hitStopT > 0) L.gstop.push(+window.__t.toFixed(3));
       const K = p.skills2.smith;
