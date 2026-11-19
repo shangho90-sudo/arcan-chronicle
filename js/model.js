@@ -852,7 +852,7 @@ export class ModelBody {
     // swing afterimage from the real blade while the action's trail window [start, end] (seconds) is open
     // (trail = one [start, end] window, or a list of them: skill flurries only trail the cutting part of each strike)
     const a = this.sh.actions[this.action], tw = a && a.trail, wins = tw ? (typeof tw[0] === 'number' ? [tw] : tw) : [];
-    const on = this.swingW > 0.5 && SWING_TRAIL.on && wins.some(w => this.t >= w[0] && this.t <= w[1]);
+    const on = this.swingW > 0.5 && SWING_TRAIL.on && this.trailMute !== this.action && wins.some(w => this.t >= w[0] && this.t <= w[1]);
     if (on || (this.trail && this.trail.s.length)) { if (!this.trail) this.trail = new SwingTrail(this.scene); this.trail.update(dt, on ? this.bladePoints() : null, a && a.trailColor && a.combo ? a.trailColor.map(v => v * BASIC_TRAIL) : a && a.trailColor, a && a.trailLife, a && a.combo ? Math.max(a.trailBase || 0.35, 0.55) : a && a.trailBase); }
   }
   poseOf(name) {

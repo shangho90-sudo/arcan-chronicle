@@ -150,7 +150,9 @@ export class YeonFx {
     s.star.visible = !lo;
     // 리마스터(품질 높음·보통, js/rmfx.js): 같은 반달 그룹에 입체 검기 세 층(외곽 빛·색 몸통·흰 칼날)을 얹음 — 마지막 타는 큰 두 겹 반달
     if (s.rmL) { this.rm.bladeFree(s.rmL); s.rmL = null; }
-    if (this.rm && gfxOn() && this.rm.ready) s.rmL = this.rm.bladeLayers(s.arc, { fin: fin || y.p === 'ring', c1: c1.getHex(), c2: c2.getHex() });
+    // 2026-11-19 리마스터 2: 예전 아틀라스 반달·잔상 대신(겹치면 차이가 작아서) 세 층 검기 + 리마스터 잔상만 그림
+    if (this.rm && gfxOn() && this.rm.ready) s.rmL = this.rm.bladeLayers(s.arc, { fin: fin || y.p === 'ring', c1: c1.getHex(), c2: c2.getHex(), ghosts: 2 });
+    if (s.rmL) { for (const k in s.mains) s.mains[k].visible = false; s.ghostN = 0; s.ghosts.forEach(g => { g.visible = false; }); }
     this._place(s); this.root.add(s.g); this.live.push(s); this._strikeTick(s, 0); return s;
   }
   /** centre = chest of the caster (rides the lunge), radius = real sword-tip distance (until the impact) */
@@ -177,7 +179,7 @@ export class YeonFx {
     s.arc.scale.set(R * s.mir, R, R);
     const mm = U(s.main); mm.uHead.value = Math.max(head, s.lead > 0 ? 0 : 0.45); mm.uTail.value = Math.max(0.001, tail); mm.uA.value = fade;
     mm.uI.value = (fin ? 1.7 : 1.35) * k * (fin ? rawK() : 1); mm.uR.value = fin ? 1.25 : 1.0; mm.uMix.value = 0.15 + 0.6 * smooth(0, end, u);
-    s.arc.visible = fade > 0.002;
+    s.arc.visible = fade > 0.002; if (s.rmL) s.main.visible = false;
     if (s.rmL) this.rm.bladeSet(s.rmL, Math.max(head, s.lead > 0 ? 0 : 0.45), tail, fade, k);
     s.ghosts.forEach((g, i) => {
       if (i >= s.ghostN) return;

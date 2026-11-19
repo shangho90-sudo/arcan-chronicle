@@ -8,6 +8,7 @@ import { wakeOnHit } from './pharm1.js';   // 약사 꿈꽃가루: 피해를 받
 import { STEP_COL as ART_STEP_COL } from './artfx.js';
 import { CreatureBody, loadCreature, loadCreatureLook, CREATURES } from './creature.js';
 import { cookFoodKind } from './cookfx.js';
+import { gfxOn } from './gfxq.js';
 import { ModelBody, loadPlayerModel, loadNpcModel, loadActions, PLAYER_MODELS, NPC_MODELS, playerModelCfg } from './model.js';
 
 let G = null; // game context (set by game.js)
@@ -146,6 +147,8 @@ function hammerImpact(pc, t, f, big, dd) {
   if (t.body && t.body.punch) t.body.punch(t.pos.x - pc.pos.x, t.pos.z - pc.pos.z, big ? 0.18 : 0.12);
   if (big && G.render && G.render.kick) G.render.kick(f.x, f.z, 0.07, 0.1);
 }
+/** 견습생 검을 든 공용 콤보인지: 찬 무기가 검 종류, 무기가 없으면 견습생 */
+function novSword(pc) { const id = pc.sheet && pc.sheet.p && pc.sheet.p.weapon, w = id && G.data.item(id); return w ? w.kind === "sword" : !!(pc.sheet && pc.sheet.job && pc.sheet.job.id === "novice"); }
 export const JOB_COMBO = { blacksmith: 'bs', hairdresser: 'hd', artist: 'ar' };
 function comboName(pc, n) {
   const pre = pc.body && JOB_COMBO[pc.body.job], sh = pc.body && pc.body.sh;
@@ -188,12 +191,17 @@ export class SkillRunner {
     // 예술가: a thick wet paint stroke follows the real brush tip through the action's paint window (js/artfx.js), colour per combo step
     const art = cmb && cname.startsWith("ar_combo_") && G.skillFx && G.skillFx.art ? G.skillFx.art : null;
     if (art) { try { art.stroke(pc, { step: this.comboN, act: anim }); } catch (e) { console.warn("artfx stroke", e); } }
+    // 리마스터(품질 높음·보통): 견습생 검 기본 5단(공용 combo_N + 검) — 실제 칼끝 궤적에 맞춘 세 층 반달 검기 + 잔상, 명중 섬광, 5타 큰 검기 + 땅 충격파 (js/rmfx.js swordArc / slashHit).
+    // 예전 가는 칼 잔상(SwingTrail)은 이 동작에서 끔(겹치지 않게). 판정·피해 시각은 그대로.
+    const RM = G.skillFx && G.skillFx.rm, nov = !!(cmb && cname.startsWith("combo_") && RM && RM.ready && gfxOn() && novSword(pc));
+    if (pc.body) pc.body.trailMute = nov ? anim : null;
+    if (nov) { try { RM.swordArc(pc, { act: cmb, name: anim, fin: this.comboN === 5 }); } catch (e) { console.warn("rmfx swordArc", e); } }
     this.lock = anim === "dash" ? 0 : lockTime(sh, anim) / animSpeed;   // the recovery of a swing can blend into moving / the next swing
     if (s.sfx) G.audio.sfx(s.sfx);
     let extra = 0;
     for (const a of s.actions) {
       if (a.type === "projectile") { this.pending.push({ time: this.clock + ht + a.delay, a, s, aim, facing, origin: o }); extra += Math.hypot(aim.x - o.x, aim.z - o.z) / Math.max(1, a.speed); continue; }
-      for (let h = 0; h < Math.max(1, a.hits); h++) this.pending.push({ time: this.clock + ht + a.delay + extra + h * a.interval, a, s, aim, facing, origin: o, cm: cmb && cmb.atk, cn: cmb && cmb.combo, snip: cmb && cmb.snipFx, art: !!art });
+      for (let h = 0; h < Math.max(1, a.hits); h++) this.pending.push({ time: this.clock + ht + a.delay + extra + h * a.interval, a, s, aim, facing, origin: o, cm: cmb && cmb.atk, cn: cmb && cmb.combo, snip: cmb && cmb.snipFx, art: !!art, nov });
     }
     pc.path = [];
     return null;
@@ -235,6 +243,8 @@ export class SkillRunner {
           // 미용사: no freezeT on the basic combo either (same reason as the hammer: it shifts strikes 4-5) — squash + effect + kick on the 5th
           else if (snip) { if (!dd.missed) { landed = true; G.skillFx.hair.snip({ x: t.pos.x, y: (t.pos.y || 0) + Math.min(1.2, 0.45 + (t.radius || 0.5) * 0.6), z: t.pos.z }, { size: snip.big ? 1.25 : 0.9, big: snip.big, ground: t.pos.y || 0 });
               if (t.body && t.body.punch) t.body.punch(p.facing.x, p.facing.z, snip.big ? 0.2 : 0.12); } }
+          else if (p.nov) { if (!dd.missed && G.skillFx.rm) { const fin = p.cn === 5, f = p.facing, r = t.radius || 0.5;   // 견습생 검 콤보(리마스터): 명중 섬광 + 칼 방향 빛줄기, 5타 = 땅 충격파 두 겹 + 미끄러지는 큰 반달 파동
+              G.skillFx.rm.slashHit({ x: t.pos.x - f.x * r * 0.5, y: (t.pos.y || 0) + Math.min(1.2, 0.45 + r * 0.6), z: t.pos.z - f.z * r * 0.5 }, { fin, flash: true, dir: f, groundY: t.pos.y || 0, roll: (p.cn || 1) * 0.7, c1: fin ? 0xffe6a0 : 0x8fe6ff, c2: fin ? 0xff9a4a : 0x7a6bff }); } }
           else if (p.art) { if (!dd.missed) { artHit.push(t); G.skillFx.art.splash(t, { col: ART_STEP_COL[((p.cn || 1) - 1) % 5], big: p.cn === 5 }); } }   // 예술가: the stroke's paint splashes on the target at the contact frame (not on a MISS)
           else if (SF && !a.atTarget) { if (!dd.crit) SF.hit(t.pos, { scale: a.fx === "hit" ? 1.15 : 1 }); }
           else if (fx3) G.skillFx.burst(a.fx === "hit" ? "hit_blunt" : "hit_slash", { x: t.pos.x, y: t.pos.y, z: t.pos.z }, { radius: 0.5, grade: 1 });

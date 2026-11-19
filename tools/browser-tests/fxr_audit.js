@@ -1,4 +1,5 @@
 // 스킬 이펙트 리마스터(테일즈위버풍) 점검용: 여러 직업 스킬을 한 브라우저에서 차례로 실제 시전하고, 게임 줌에서 시각별 장면을 띠로 저장.
+// SKILLS의 id 'combo' = 기본공격 5단(매 프레임 공격 키, 대상 = 멧돼지 1).
 // Usage: SKILLS="novice:nv_a1,novice:nv_a2,cook:ck1_a1" SIZE=1280x720|390x844t ZOOM=1 TIMES=0.1,0.2,.. QUALITY=high DET=1 TAG=audit
 //        URL=http://localhost:8893/index.html OUT=/tmp/fxr  node tools/browser-tests/fxr_audit.js
 //   -> OUT/<TAG>_<size>_<skill>.png (띠) + OUT/<TAG>_<size>.json (스킬마다 피해 시각·양 — DET=1이면 코드 버전 사이 비교용)
@@ -48,7 +49,7 @@ const CW = +(process.env.CW || Math.min(VW, TOUCH ? 390 : 640)), CH = +(process.
       await pg.waitForFunction(() => G.player.body && G.player.body.md, null, { timeout: 120000 }); await pg.waitForTimeout(2500); curJob = job;
     }
     const info = await ev(([id, det, process_env_nofloat, dist]) => {
-      const p = G.player, d = G.data.skill2(id), fa = (window.__face || '0,1').split(',').map(Number), fm = Math.hypot(fa[0], fa[1]) || 1, f = { x: fa[0] / fm, z: fa[1] / fm };
+      const p = G.player, d = id === 'combo' ? { target: 'enemy', type: 'basic' } : G.data.skill2(id), fa = (window.__face || '0,1').split(',').map(Number), fm = Math.hypot(fa[0], fa[1]) || 1, f = { x: fa[0] / fm, z: fa[1] / fm };
       for (const m of [...G.zone.actors]) if (m !== p && m.def && m.body) m.remove && m.remove();
       G.skillFx.clear && G.skillFx.clear(); for (const f of G.ui.floats) f.e.remove(); G.ui.floats.length = 0; if (process_env_nofloat) G.ui.floatLayer.style.display = 'none'; p.skills2.clearTemp && p.skills2.clearTemp(); p.teleport(window.__spot); p.body.place(p.pos); p.setFacing(f.x, f.z); p.target = null; p.lockOn = null; p.path = []; G.dev.full(); p.skills.lock = 0; p.skills2.cd = {};
       const at = (dd, s = 0) => ({ x: p.pos.x + f.x * dd - f.z * s, z: p.pos.z + f.z * dd + f.x * s });
@@ -69,7 +70,9 @@ const CW = +(process.env.CW || Math.min(VW, TOUCH ? 390 : 640)), CH = +(process.
       const fc = window.__ground ? 2.2 : +(window.__focus || 1.2), fx_ = p.pos.x + f.x * fc, fz_ = p.pos.z + f.z * fc; G.render.setFocus({ x: fx_, y: 0, z: fz_ }, true);
       if (window.__focus) { if (!window.__cb0) window.__cb0 = G.camBounds; G.camBounds = [fx_, fz_, fx_, fz_]; }   // FOCUS: the camera stays on that point
       window.__hp = ds.map(d => d.hp); window.__dmg = []; window.__t = 0;
-      G.sheet.book.sk.slots[0] = id; p.target = window.__ground ? null : ds[0];
+      p.target = window.__ground ? null : ds[0];
+      if (id === 'combo') { window.__combo = true; p.skills.comboN = 0; p.skills.lock = 0; p.skills.pending = []; G.input.block = false; return null; }   // 기본공격 5단: 매 프레임 공격 키를 누름
+      window.__combo = false; G.sheet.book.sk.slots[0] = id;
       return p.skills2.cast(id, window.__aim) || null;
     }, [id, !!process.env.DET]);
     if (err) { console.log(id, 'cast error', err); all[id] = { err }; continue; }
@@ -78,6 +81,7 @@ const CW = +(process.env.CW || Math.min(VW, TOUCH ? 390 : 640)), CH = +(process.
       const draw = want.has(i);
       const c = await ev(([i, draw]) => {
         window.__t = i / 60; const p = G.player, ds = window.__ds;
+        if (window.__combo) { G.input.hold('attack', true); p.target = ds[0]; }
         if (draw) G.step(1 / 60, true); else { G.step(1 / 60, false); try { G.skillFx && G.skillFx.update(1 / 60); G.swingFx && G.swingFx.update(1 / 60, G.render.cam); } catch (e) {} }
         ds.forEach((d, k) => { if (d && d.hp < window.__hp[k]) { window.__dmg.push({ t: +window.__t.toFixed(3), k, a: Math.round(window.__hp[k] - d.hp) }); window.__hp[k] = d.hp; } });
         const fc = window.__ground ? 2.2 : +(window.__focus || 1.2), f = window.__f; const s = G.render.toScreen({ x: p.pos.x + f.x * fc, y: (p.pos.y || 0) + 0.8, z: p.pos.z + f.z * fc });
@@ -88,6 +92,7 @@ const CW = +(process.env.CW || Math.min(VW, TOUCH ? 390 : 640)), CH = +(process.
         r.info.autoReset = true; return { runs: out, geometries: r.info.memory.geometries, textures: r.info.memory.textures, programs: (r.info.programs || []).length, rm: G.skillFx.rm && G.skillFx.rm.stats() }; });   // PERFAT=s: draw-only timing at that moment
       if (draw) { const fn = `${OUT}/_a_${String(i).padStart(3, '0')}.png`; await pg.screenshot({ path: fn, clip: { x: Math.max(0, Math.min(VW - CW, Math.round(c[0] - CW / 2))), y: Math.max(0, Math.min(VH - CH, Math.round(c[1] - CH / 2))), width: CW, height: CH }, timeout: 300000 }); frames.push(fn); }
     }
+    if (id === 'combo') await ev(() => { G.input.hold('attack', false); G.input.block = true; window.__combo = false; });
     if (process.env.SETTLE) { await ev(() => { for (let i = 0; i < 180; i++) { G.step(1 / 60, false); G.skillFx.update(1 / 60); } }); all['left_' + id] = await ev(() => G.skillFx.rm ? G.skillFx.rm.stats() : null); }   // SETTLE=1: 3 s later nothing of the remaster may stay
     const dmg = await ev(() => window.__dmg); all[id] = { dmg, total: dmg.reduce((s, x) => s + x.a, 0) };
     const name = `${OUT}/${TAG}_${SIZE}_${id}.png`;

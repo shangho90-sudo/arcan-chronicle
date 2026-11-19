@@ -314,16 +314,20 @@ export class RmFx {
    *  halo (wide soft, additive) / body (alpha: readable on a bright floor) / core (thin white-hot cutting edge, additive) */
   bladeLayers(parent, o = {}) {
     if (!this.ready) return null;
-    const geo = o.fin ? this.geo.rm_cres_big : this.geo.rm_cres, c1 = o.c1 ?? 0x78dfff, c2 = o.c2 ?? 0x8a65ff;
+    const geo = o.fin ? this.geo.rm_cres_big : this.geo.rm_cres, c1 = o.c1 ?? 0x78dfff, c2 = o.c2 ?? 0x8a65ff, lite = rmLite();
     const halo = this._take('add', geo, { w: c1, b: c2, s: 9, order: 8 }), body = this._take('alpha', geo, { w: c1, b: c2, s: 8, order: 9 }), core = this._take('add', geo, { w: 0xffffff, b: 0xffffff, s: 7, order: 10 });
-    for (const m of [halo, body, core]) { m.material.depthTest = false; parent.add(m); }
+    // afterimage: dimmer copies of the body whose head lags behind (o.ghosts, 1 on medium / phone)
+    const gh = []; for (let i = 0; i < Math.min(o.ghosts || 0, lite ? 1 : 2); i++) { const m = this._take('add', geo, { w: c1, b: c2, s: 8, order: 7 }); m.scale.set(0.985 - 0.02 * i, 1, 0.985 - 0.02 * i); gh.push(m); }
+    for (const m of [halo, body, core, ...gh]) { m.material.depthTest = false; parent.add(m); }
     halo.scale.set(1.07, 1, 1.07); body.scale.set(1, 1, 1);
-    return { halo, body, core, fin: !!o.fin };
+    // n / a0 / a1 / lite / c1: the head sparkle dust in bladeSet (angles = the rm_cres / rm_cres_big arc in fx_rm.py)
+    return { halo, body, core, gh, fin: !!o.fin, n: 0, a0: o.fin ? 112 : 92, a1: o.fin ? -104 : -80, lite, c1 };
   }
   /** per frame: head 0..1 along the swing, tail length, fade 0..1, k = intensity */
   bladeSet(L, head, tail, fade, k = 1) {
     if (!L) return; const I = RMFX.intensity * rawK() * k;
     for (const [m, a] of [[L.halo, 1.1 * I], [L.body, 0.85], [L.core, 2.0 * I]]) { const u = m.material.uniforms; u.uE.value = head; u.uT.value = Math.max(0.001, tail); u.uA.value = a * fade; m.visible = fade > 0.003; }
+    (L.gh || []).forEach((m, i) => { const u = m.material.uniforms, lag = 0.07 * (i + 1); u.uE.value = head - lag; u.uT.value = Math.max(0.001, tail * 0.85); u.uA.value = I * (0.5 - 0.18 * i) * fade; m.visible = fade > 0.003 && head - lag > 0.02; });
     // sparkle dust shed from the moving head of the blade (the outer cutting edge), while it sweeps
     const par = L.core.parent;
     if (par && head > 0.04 && head < 0.99 && fade > 0.3 && (L.n++ % (L.lite ? 3 : 1)) === 0) {
@@ -332,13 +336,22 @@ export class RmFx {
       if (L.fin || !L.lite) this.emit('streak', 1, () => ({ p, v: _c.set(rnd(-1, 1), rnd(0, 1.5), rnd(-1, 1)), s: 0.04, col: L.c1, life: 0.14, drag: 6, stretch: 0.12 }));
     }
   }
-  bladeFree(L) { if (!L) return; this._give(L.halo); this._give(L.body); this._give(L.core); }
+  bladeFree(L) { if (!L) return; this._give(L.halo); this._give(L.body); this._give(L.core); for (const m of L.gh || []) this._give(m); L.gh = []; }
   /** a sword hit: white streak sparks thrown along the cut + stars; the finisher adds a ground shock ring pair and a flat crescent wave
    *  running forward on the ground (all at the real target, never wider than ~1.6 m) */
   slashHit(pos, o = {}) {
     if (!this.ok()) return null;
     const low = rmLite(), fin = !!o.fin, c1 = o.c1 ?? 0x78dfff, c2 = o.c2 ?? 0x8a65ff, at = P3(pos), gy = o.groundY != null ? o.groundY : at.y - 0.85, I = RMFX.intensity * rawK();
     const f = o.dir ? new THREE.Vector3(o.dir.x, 0, -o.dir.z).normalize() : new THREE.Vector3(0, 0, -1), tan = o.tan || new THREE.Vector3(-f.z, 0, f.x);
+    if (o.flash) {   // 0.03~0.08 s white star flash + coloured glow on the cut (sword combo — the same frame as the damage)
+      const fl0 = fin ? 1.35 : 0.95, fdur = fin ? 0.08 : 0.055;
+      const ef = this._fx('slashFlash', 0.3, (e) => { const tt = e.t;
+        this._face(fl, fl0 * (0.55 + 0.6 * easeOut(tt / 0.03))); fl.rotateZ(o.roll || 0.5); fl.material.uniforms.uA.value = I * 1.35 * (1 - smooth(0.012, fdur, tt));
+        this._face(gw, fl0 * 0.85 * (0.6 + 0.6 * easeOut(tt / 0.1))); gw.material.uniforms.uA.value = I * 0.6 * (1 - smooth(0.03, 0.22, tt)); });
+      ef.g.position.copy(at);
+      const fl = this._m(ef, 'add', this.quad, { w: 0xffffff, b: c1, s: 4, order: 11 }), gw = this._m(ef, 'add', this.quad, { w: c1, b: c2, s: 6, order: 10 });
+      for (const m of [fl, gw]) m.material.depthTest = false;
+    }
     const nS = Math.round((fin ? 12 : 5) * (low ? RMFX.liteK : 1));
     this.emit('streak', nS, () => { _b.copy(tan).multiplyScalar(rand() < 0.7 ? 1 : -1).addScaledVector(f, rnd(0.2, 0.9)).add(_c.set(rnd(-0.3, 0.3), rnd(-0.1, 0.8), rnd(-0.3, 0.3))).normalize();
       return { p: at, v: _b.multiplyScalar(rnd(5, 9) * (fin ? 1.2 : 1)), s: rnd(0.045, 0.07), col: rand() < 0.5 ? 0xffffff : c1, life: rnd(0.12, 0.2), drag: 8, stretch: 0.08 }; });
@@ -359,6 +372,58 @@ export class RmFx {
     r1.position.y = gy - at.y + 0.06; r2.position.y = gy - at.y + 0.07;
     const wave = this._m(e, 'add', this.geo.rm_cres_big, { w: 0xffffff, b: c1, s: 7, order: 5 }), waveB = this._m(e, 'alpha', this.geo.rm_cres_big, { w: 0xffffff, b: c1, s: 8, order: 4 });
     _q.setFromUnitVectors(_c.set(0, 0, 1), f); wave.quaternion.copy(_q); waveB.quaternion.copy(_q);
+    return e;
+  }
+
+  // ================================================================== 견습생 기본 5단 콤보 검기 (actors.js tryCast: 일반 combo_N + 검을 들었을 때)
+  /** a 3-layer crescent (rm_cres, 5th = rm_cres_big) laid on the REAL swing: the sword tip is sampled (relative to the caster's root)
+   *  through the action's trail window, a circle is fitted through first / middle / latest tip and the crescent is oriented in that
+   *  plane, its head following the real tip angle (so every strike points the way it was swung). Afterimage ghosts trail the head.
+   *  o: {act (action def), name (action name), fin, c1, c2}. Returns the effect (o.tan(): world swing tangent at the latest tip). */
+  swordArc(pc, o = {}) {
+    if (!this.ok() || !pc || !pc.body) return null;
+    const act = o.act || {}, name = o.name, tw = act.trail ? (typeof act.trail[0] === 'number' ? act.trail : act.trail[0]) : [0.15, 0.25];
+    const fin = !!o.fin, hitT = (act.hitTimes && act.hitTimes[0]) || act.hitT || tw[0] + 0.05, w0 = tw[0] - 0.05, w1 = tw[1] + 0.03;
+    const c1 = o.c1 ?? (fin ? 0xffe6a0 : 0x8fe6ff), c2 = o.c2 ?? (fin ? 0xff9a4a : 0x7a6bff), smp = [], arcDeg = fin ? 216 : 172;
+    const root = new THREE.Vector3(), X = new THREE.Vector3(), Y = new THREE.Vector3(), Z = new THREE.Vector3(), C = new THREE.Vector3(), tan = new THREE.Vector3();
+    let L = null, R = 1, head = 0, fitT = -1, freeze = false, tFit = 0;
+    const angOf = (q) => { _b.copy(q).sub(C); let a = Math.atan2(_b.dot(Z), _b.dot(X)) * 180 / Math.PI; if (a < -40) a += 360; return a; };
+    const fit = () => {
+      const p0 = smp[0], pl = smp[smp.length - 1], pm = smp[Math.floor(smp.length / 2)];
+      // circumcentre of p0, pm, pl
+      const a = _a.copy(p0).sub(pl), b = _b.copy(pm).sub(pl), axb = _c.crossVectors(a, b), d = 2 * axb.lengthSq();
+      let ok = d > 1e-6;
+      if (ok) { const t1 = new THREE.Vector3().crossVectors(axb, a).multiplyScalar(b.lengthSq()), t2 = new THREE.Vector3().crossVectors(b, axb).multiplyScalar(a.lengthSq());
+        C.copy(t1).add(t2).divideScalar(d).add(pl); R = C.distanceTo(p0); ok = R > 0.35 && R < 2.2; }
+      if (!ok) { C.set(0, 1.05, 0); R = Math.max(0.6, Math.min(1.6, C.distanceTo(p0))); }
+      X.copy(p0).sub(C); const n = new THREE.Vector3().crossVectors(X, _a.copy(pm).sub(C));
+      if (n.lengthSq() < 1e-8) n.crossVectors(X, _a.copy(pl).sub(C)); if (n.lengthSq() < 1e-8) n.set(0, 1, 0);
+      n.normalize(); X.addScaledVector(n, -X.dot(n)).normalize(); Y.copy(n).negate(); Z.crossVectors(X, Y).normalize();
+      R = Math.min(1.7, Math.max(0.75, R * 1.06)) * (fin ? 1.18 : 1);
+      L = this.bladeLayers(e.g, { fin, c1, c2, ghosts: 2 });
+      if (L) { _m4.makeBasis(X, Y, Z); e.g.quaternion.setFromRotationMatrix(_m4); e.g.scale.set(R, R * 2.2, R); for (const m of [L.halo, L.body, L.core, ...L.gh]) m.material.depthTest = true; }
+      fitT = e.t; tFit = pc.body.t;
+    };
+    const e = this._fx('swordArc', 1.2, (e, dt) => {
+      const b = pc.body, mine = b && b.action === name && !pc.dead, bt = mine ? b.t : 99;
+      if (!freeze) root.copy(P3(pc.pos));
+      if (mine && bt >= w0 && bt <= w1 && !freeze) { let bp = null; try { bp = b.bladePoints(); } catch (err) { bp = null; }
+        if (bp) { smp.push(bp[1].clone().sub(root)); const n = smp.length; if (n >= 2) tan.copy(smp[n - 1]).sub(smp[n - 2]).normalize(); } }
+      if (fitT < 0 && smp.length >= 3 && (bt >= hitT - 0.02 || bt > w1 || !mine)) fit();
+      if (fitT < 0) { if (!mine || e.t > 1) e.t = e.life; return; }
+      e.g.position.copy(root).add(C);
+      if (bt > w1 + 0.12 || !mine) freeze = true;
+      const u = e.t - fitT, life = fin ? 0.42 : 0.3;
+      // head = the real tip angle (while sampled) then a short follow-through to the end of the arc
+      const real = clamp01(angOf(smp[smp.length - 1]) / arcDeg + 0.06);
+      head = Math.max(head, bt <= w1 ? real : Math.min(1, real + 0.35 * easeOut(u / 0.08)));
+      const fade = 1 - smooth(fin ? 0.14 : 0.08, life, u), tail = 1.3 * (1 - smooth(0.04, life, u)) + 0.05;
+      { const gs = R * (1 + (fin ? 0.1 : 0.06) * smooth(0, life, u)); e.g.scale.set(gs, gs * 2.2, gs); }   // thicker ridge: a vertical swing seen edge-on still reads as a blade
+      this.bladeSet(L, head, tail, fade, fin ? 1.25 : 1);
+      if (u > life) e.t = e.life;
+    });
+    e.free = () => { if (L) { this.bladeFree(L); L = null; } };
+    e.tan = () => tan; e.fitted = () => fitT >= 0;
     return e;
   }
 
@@ -438,7 +503,7 @@ export class RmFx {
     if (this.parts) for (const k in this.parts) this.parts[k].update(dt);
   }
   _free(e) {
-    if (e.dead) return; e.dead = true; this.root.remove(e.g);
+    if (e.dead) return; e.dead = true; if (e.free) { try { e.free(); } catch (err) { /* ignore */ } } this.root.remove(e.g);
     for (const r of e.ribs || []) { this.root.remove(r); r.material = r.userData.mats[0]; this.ribs.push(r); } e.ribs = null;
     for (const m of e.items) { if (m.parent) m.parent.remove(m); (this.pool[m.userData.kind] || (this.pool[m.userData.kind] = [])).push(m); } e.items.length = 0;
   }
