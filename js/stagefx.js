@@ -25,7 +25,7 @@ export const STAGES = {
   ck1_a1: { k: 'cook', launch: 'tip' }, ck1_a2: { k: 'cook', launch: 'tip' }, ck1_a3: { k: 'cook', launch: 'tip' }, ck1_b1: { k: 'cook', launch: 'hand', end: 1.05 },
   ck1_b2: { k: 'cook', launch: 'hand' }, ck1_b3: { k: 'cook', launch: 'hand' }, ck1_b5: { k: 'cook', launch: 'tip' },
   bs1_a1: { k: 'smith', launch: 'none' }, bs1_a2: { k: 'smith', launch: 'tip' }, bs1_a3: { k: 'smith', launch: 'tip' }, bs1_a4: { k: 'smith', launch: 'tip' },
-  bs1_b1: { k: 'smith', launch: 'tip' }, bs1_b3: { k: 'smith', launch: 'tip' },
+  bs1_b1: { k: 'smith', launch: 'none' }, bs1_b3: { k: 'smith', launch: 'tip' }, bs1_b4: { k: 'smith', launch: 'none' },   // 급랭·튕김망치(2026-11-19): 왼손 동작이라 무기 끝 '퐁' 없음
   hd1_a1: { k: 'hair', launch: 'tip' }, hd1_a2: { k: 'hair', launch: 'tip' }, hd1_a3: { k: 'hair', launch: 'tip' }, hd1_a4: { k: 'hair', launch: 'none' },
   hd1_b1: { k: 'hair', launch: 'hand' }, hd1_b2: { k: 'hair', launch: 'hand' }, hd1_b3: { k: 'hair', launch: 'hand' }, hd1_b4: { k: 'hair', launch: 'hand' },
   ar1_a1: { k: 'art', launch: 'tip' }, ar1_a2: { k: 'art', launch: 'tip' }, ar1_a3: { k: 'art', launch: 'tip' },

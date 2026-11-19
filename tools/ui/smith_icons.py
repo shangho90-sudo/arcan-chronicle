@@ -1,4 +1,4 @@
-"""대장장이 1차 스킬 아이콘 15개 (128 px, 원형) — 2026-11-13.
+"""대장장이 1차 스킬 아이콘 15개 (128 px, 원형) — 2026-11-13 (bs1_b4 2026-11-19 튕김망치로 다시 그림).
 
 Usage:  python3 tools/ui/smith_icons.py [bs1_a1 ...]   ->  assets/ui/skills/bs1_*.png  (+ /tmp/smith/icons_sheet.png 비교표)
 
@@ -150,16 +150,21 @@ def b3():   # 용광로 개방: forge mouth spewing flame + heavy molten drops
         glow(img, lambda d, c, x=x, y=y, r=r: d.ellipse([x - r * 1.8, y - r * 1.8, x + r * 1.8, y + r * 1.8], fill=c), HOT, 8, 230)
         shape(img, lambda d, c, x=x, y=y, r=r: d.ellipse([x - r, y - r * 1.25, x + r, y + r], fill=c), GOLD)
     return img
-def b4():   # 즉석 리벳: three glowing rivets orbiting a chest plate
-    img = background((60, 44, 20), (12, 10, 10))
-    body = [(C - 110, C - 110), (C + 110, C - 110), (C + 130, C + 40), (C, C + 150), (C - 130, C + 40)]
-    shape(img, lambda d, c: d.polygon(body, fill=c), IRON2); shape(img, lambda d, c: d.line(body + [body[0]], fill=c, width=8), IRON3)
-    arc(img, [C - 200, C - 120, C + 200, C + 120], 190, 350, GOLD, 4, 8)
-    for ang in (200, 270, 340):
-        x = C + 200 * math.cos(math.radians(ang)); y = C + 120 * math.sin(math.radians(ang))
-        glow(img, lambda d, c, x=x, y=y: d.ellipse([x - 40, y - 40, x + 40, y + 40], fill=c), HOT, 12, 255)
-        shape(img, lambda d, c, x=x, y=y: d.ellipse([x - 24, y - 24, x + 24, y + 24], fill=c), GOLD)
-        shape(img, lambda d, c, x=x, y=y: d.ellipse([x - 10, y - 14, x + 4, y - 2], fill=c), WHITE)
+def b4():   # 튕김망치(2026-11-19, 예전 즉석 리벳 자리): 작은 모루 위에서 '깡' 튀는 불꽃, 돌며 날아가는 손망치 + 포물선 궤적
+    img = background((64, 36, 14), (12, 10, 10))
+    pts = anvil_pts(C - 70, 370, 120)
+    glow(img, lambda d, c: d.polygon(pts, fill=c), HOT, 14, 150); shape(img, lambda d, c: d.polygon(pts, fill=c), IRON)
+    shape(img, lambda d, c: d.polygon(anvil_pts(C - 70, 365, 118)[:4] + [(C - 70 + 0.62 * 118, 365 - 0.3 * 118), (C - 70 - 118, 365 - 0.36 * 118)], fill=c), IRON2)
+    top = (C - 70, 318)
+    glow(img, lambda d, c: d.ellipse([top[0] - 56, top[1] - 40, top[0] + 56, top[1] + 40], fill=c), WHITE, 18, 255)
+    for dx, dy in ((-150, -40), (-120, -80), (140, -50), (110, -95)):   # 양옆으로 튀는 불꽃
+        glow(img, lambda d, c, dx=dx, dy=dy: d.line([top, (top[0] + dx, top[1] + dy)], fill=c, width=14), HOT, 6, 230)
+        shape(img, lambda d, c, dx=dx, dy=dy: d.line([top, (top[0] + dx * 0.9, top[1] + dy * 0.9)], fill=c, width=5), GOLD)
+    arc(img, [C - 90, 120, C + 230, 460], 200, 320, GOLD, 8, 10)   # 튀어 오르는 포물선
+    for i, k in enumerate((0.55, 0.75)):   # 회전 잔상
+        glow(img, lambda d, c, k=k: d.arc([C + 30, 70, C + 230, 270], 160 + 50 * k, 250 + 50 * k, fill=c, width=16), HOT, 8, int(150 * k))
+    hammer(img, C + 128, 158, 118, 0.95, head=IRON2, hot=True)
+    sparks(img, [(C + 150, 300), (C + 190, 260), (C - 190, 250)], r=6)
     return img
 def b5():   # 충격 재활용: iron plate absorbing an impact, curved arrow turning it into an orange strike
     img = background((50, 30, 16), (10, 10, 12))
