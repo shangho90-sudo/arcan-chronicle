@@ -45,7 +45,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] || '').href) {
   const files = {}; for (const f of ['config', 'levels', 'jobs', 'skills', 'skills2', 'items', 'monsters', 'quests', 'npcs', 'zones']) files[f] = J(f + '.json');
   const d = new GameData(files);
   const spk = mainSpeakers(d, sp, questCategory);
-  const man = JSON.parse(readFileSync(ROOT + '/assets/ui/story/portraits.json', 'utf8'));
+  const man = JSON.parse(readFileSync(process.env.MANIFEST || ROOT + '/assets/ui/story/portraits.json', 'utf8'));
   const miss = missingArt(spk, man);
   console.log(`메인 장면 NPC 화자 ${spk.size}명, 일러스트 없음 ${miss.length}명`);
   for (const s of miss) console.log(`  ${s.key}\t${s.name}\t${s.title || ''}\t${[...s.quests].slice(0, 6).join(',')}`);
