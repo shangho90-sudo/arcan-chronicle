@@ -13,6 +13,7 @@ import { meatballVolley } from './meatball.js';
 import { salImpact } from './salfx.js';
 import { yeonImpact, LEAD as YEON_LEAD } from './yeonfx.js';
 const HAIR_STOP = [0.035, 0.06], HAIR_KICK = [0.09, 0.1], hairMid = t => Math.min(1.2, 0.45 + (t.radius || 0.5) * 0.6);   // 미용사: local hit-stop [light, heavy] (s), camera kick [m, s] on the heavy snip, cut height on a target (= js/hairfx.js hairMid)
+const BIYEON_STOP = 0.045;   // 비연참 원반이 몸통에 닿은 프레임: 맞은 적만 짧게 멈춤(전역 G.hitStop 안 씀)
 const PAN_STOP = 0.07, PAN_KICK = [0.13, 0.11];     // 요리사 팬 강타: local hit-stop (s), camera kick [m, s]
 const PUSH_STOP = 0.05, PUSH_KICK = [0.09, 0.1];   // 밀어내기: local hit-stop (s), camera kick [m, s]
 const RAIN_KICK = [0.06, 0.09];   // 약병폭격: 마지막 병이 맞혔을 때만 약한 카메라 킥 [m, s]
@@ -55,7 +56,7 @@ export const FX = {
   slash(kind, pos, dir, o = {}) { try { if (o.grade == null) o.grade = FXG; if (G.skillFx) return G.skillFx.slash(kind, pos, dir, o); G.fx.play('slash', { x: pos.x, y: (pos.y || 0) + 0.7, z: pos.z }, 1); } catch (e) { console.warn('fx', kind, e); } },
   yeon(kind, a, b) { try { if (G.skillFx && G.skillFx.yeon) return kind === 'strike' ? G.skillFx.yeon.strike(a) : G.skillFx.yeon.hit(a, b); } catch (e) { console.warn('fx yeon', e); } },   // 견습생 '연' (js/yeonfx.js)
   sal(kind, pos, dir, o = {}) { try { if (G.skillFx && G.skillFx.sal) return G.skillFx.sal[kind](pos, dir, o); } catch (e) { console.warn('fx sal', e); } },   // 일격참 '살' (js/salfx.js)
-  biyeon(kind, pos, dir, o = {}) { try { if (G.skillFx && G.skillFx.biyeon) return G.skillFx.biyeon[kind](pos, dir, o); } catch (e) { console.warn('fx biyeon', e); } return null; },   // 비연참 '비연파' (js/biyeonfx.js)
+  biyeon(kind, pos, dir, o = {}) { try { if (G.skillFx && G.skillFx.biyeon) return G.skillFx.biyeon[kind](pos, dir, o); } catch (e) { console.warn('fx biyeon', e); } return null; },   // 비연참 원반 (js/biyeonfx.js)
   pharm(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.pharm) return G.skillFx.pharm[kind](a, o); } catch (e) { console.warn('fx pharm', e); } return null; },   // 약사 1차 소품 (js/pharmfx.js)
   art(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.art) return G.skillFx.art[kind](a, o); } catch (e) { console.warn('fx art', e); } return null; },   // 예술가 1차: 물감·음표·액자·전구 (js/artfx.js)
   cook(kind, a, o = {}) { try { if (G.skillFx && G.skillFx.cook) return G.skillFx.cook[kind](a, o); } catch (e) { console.warn('fx cook', e); } return null; },   // 요리사 1차: 허공 식칼·큰 프라이팬·미트볼 (js/cookfx.js)
@@ -503,7 +504,7 @@ export class SkillEngine {
             lead: -(op.at || 0), aim: ctx.aim, ground: pc.zone.geo.ground(ctx.aim.x, ctx.aim.z).y, r: hop && hop.r, ang: hop && hop.ang, len: hop && hop.len, launch: hop && hop.launch, canToss: cookCanToss }); return; }   // lead·aim·r·ang·len: 뒤집개·국자·후추통·포대·꼬치 (2026-11-13)
         if (op.wp) { ctx.wpFx = FX.wp(op.wp, pc, { dur: op.dur, initial: pc.shield, L: ctx.L }); return; }   // 양약사 다층 코팅막: 실제 보호막 양을 따라 세 겹 (js/wpharmfx.js coat)
         if (op.pharm) { ctx.pharmFx = FX.pharm(op.pharm, op.pharm === 'pestle' ? { x: ctx.aim.x, y: pc.zone.geo.ground(ctx.aim.x, ctx.aim.z).y, z: ctx.aim.z } : pc, { follow: pc, dur: op.dur, fall: op.fall, r: op.r, facing: ctx.facing, L: ctx.L, pal: op.pal, tgt: ctx.tgt }); return; }
-        if (op.biyeon === 'cast') { const a = pc.body && pc.body.sh && pc.body.sh.actions[ctx.act]; ctx.biyeonCast = FX.biyeon('cast', pc.pos, ctx.facing, { follow: pc, swing: a && a.fps ? a.hitFrame / a.fps : 0.22 }); }   // wind-up + sweep + side blades (decoration); the centre blade rides the proj op
+        if (op.biyeon === 'cast') { const a = pc.body && pc.body.sh && pc.body.sh.actions[ctx.act]; ctx.biyeonCast = FX.biyeon('cast', pc.pos, ctx.facing, { follow: pc, swing: a && a.fps ? a.hitFrame / a.fps : 0.2 }); }   // the disc forms on the sword tip until the release; the flying disc rides the proj op
         if (op.bash === 'cast') ctx.bashCast = FX.bash('cast', pc.pos, ctx.facing, { follow: pc });   // crescent on the real sword arc (js/bashfx.js)
         if (op.sal === 'cast') { const tg = ctx.tgt && !ctx.tgt.dead ? ctx.tgt : this.targetFor(ctx.d); ctx.salCast = FX.sal('cast', pc.pos, ctx.facing, { follow: pc, length: op.len || 3.4, width: op.w || 1, target: tg || null }); }   // beam: sword tip -> impact point (salImpact, max op.len m); the hit locks it
         if (op.slash) FX.slash(op.slash, pc.pos, ctx.facing, { radius: op.r || 1.6, angle: op.ang || 120, color: col, tilt: op.tilt || 0, mirror: !!op.mirror }); if (op.burst) FX.burst(op.burst, op.fwd ? { x: pc.pos.x + ctx.facing.x * op.fwd, y: pc.pos.y, z: pc.pos.z + ctx.facing.z * op.fwd } : pc.pos, { radius: op.r || 2, color: col }); return;   // fwd: m in front (일격참 땅 갈라짐)
@@ -840,15 +841,25 @@ class SkillProj {
     this.target = ctx.tgt && !ctx.tgt.dead ? ctx.tgt : null;
     // 약사 약병: the flask leaves the real right hand at the release frame of the pitch (ph_pitch), not a fixed point in front
     if (op.pharmProj) { let h = null; try { h = pc.body && pc.body.handPoint && pc.body.handPoint(); } catch (e) { h = null; } if (h) this.pos = { x: h.x, y: h.y, z: -h.z }; }
+    // 비연참 원반 (fromTip): the disc formed on the real sword tip leaves from that very spot at the release frame
+    if (op.fromTip) { let b = null; try { b = pc.body && pc.body.bladePoints && pc.body.bladePoints(); } catch (e) { b = null; } if (b && b[1]) this.pos = { x: b[1].x, y: b[1].y, z: -b[1].z }; }
     if (op.spread && cnt > 1) { const off = (idx - (cnt - 1) / 2) * op.spread; this.pos.x += -ctx.facing.z * off; this.pos.z += ctx.facing.x * off; }   // side by side out of the hand
     const to = op.kind === 'lob' || op.toGround ? ctx.aim : this.target ? this.target.pos : op.arc && ctx.tgt ? ctx.aim /* arc: the target died while the others were still being thrown -> its last spot */ : { x: pc.pos.x + ctx.facing.x * this.range, z: pc.pos.z + ctx.facing.z * this.range };
     this.to = { ...to }; const dx = to.x - this.pos.x, dz = to.z - this.pos.z, m = Math.hypot(dx, dz) || 1; this.dir = { x: dx / m, z: dz / m };
     if (op.kind === 'lob') { this.from = { ...this.pos }; this.flight = Math.max(0.25, m / this.speed); }
+    // flight = [minT, maxT, m/s] (비연참): the flight time to the moment the leading rim (w/2) touches the target's body
+    // (radius) is contact distance / m/s clamped to [minT, maxT] -> close shots stay snappy, long shots still show the travel.
+    // track: the disc keeps heading for the target's current torso (straight, it just follows a moving target).
+    if (op.flight && this.target) {
+      const tg = this.target, rr = (tg.radius || 0.5) + (op.w || 0) / 2, dc = Math.max(0, m - rr);
+      this.flightT = Math.min(op.flight[1], Math.max(op.flight[0], dc / op.flight[2]));
+      this.speed = dc > 0.02 ? dc / this.flightT : 60; this.dc = dc; this.y0 = this.pos.y; this.yT = biyeonImpact(tg, this.dir).y; this.range = Math.max(this.range, m + 1.5);
+    }
     if (op.toGround) { this.range = m + 0.2; }
     if (op.arc) { if (this.target || ctx.tgt) this.range = m + 0.4; this.arcLen = Math.max(0.6, Math.min(m, this.range)); this.arcH = op.arc * (0.75 + 0.5 * ((idx * 0.37) % 1)) * Math.min(1, m / 4); }   // thrown in an arc (drawn only: the hit test stays on the ground line)
-    // 비연참: the centre crescent of the fan IS this projectile (js/biyeonfx.js); falls back to the generic wave until loaded
+    // 비연참: the thin disc IS this projectile (js/biyeonfx.js, procedural — no download)
     const held = op.pharmProj && ctx.heldFlask && !ctx.heldFlask.dead ? ctx.heldFlask : null; if (held) { held.dead = true; held.fx.release && held.fx.release(); }   // the flask that was in the hand flies on
-    this.fx = (held && held.fx) || (op.biyeon && FX.biyeon('proj', this.pos, this.dir, { groundY: pc.pos.y || 0 })) || (op.pharmProj && FX.pharm('proj', this.pos, { elem: op.elem })) || (op.cook && FX.cook('proj', this.pos, { kind: op.cook })) || (op.hairProj && FX.hair('proj', this.pos, {})) || (op.art && FX.art('proj', this.pos, { kind: op.art, idx })) || FX.projectile(op.fx || 'capsule', { color: ctx.d.fx && ctx.d.fx.color });
+    this.fx = (held && held.fx) || (op.biyeon && FX.biyeon('proj', this.pos, this.dir, { diam: op.w })) || (op.pharmProj && FX.pharm('proj', this.pos, { elem: op.elem })) || (op.cook && FX.cook('proj', this.pos, { kind: op.cook })) || (op.hairProj && FX.hair('proj', this.pos, {})) || (op.art && FX.art('proj', this.pos, { kind: op.art, idx })) || FX.projectile(op.fx || 'capsule', { color: ctx.d.fx && ctx.d.fx.color });
     this.fx.set(this.pos, { x: this.dir.x, y: 0, z: this.dir.z });
   }
   update(dt) {
@@ -864,9 +875,15 @@ class SkillProj {
       const dx = this.target.pos.x - this.pos.x, dz = this.target.pos.z - this.pos.z, m = Math.hypot(dx, dz) || 1, tr = Math.min(1, dt * 6);
       this.dir = { x: this.dir.x + (dx / m - this.dir.x) * tr, z: this.dir.z + (dz / m - this.dir.z) * tr }; const n = Math.hypot(this.dir.x, this.dir.z) || 1; this.dir.x /= n; this.dir.z /= n;
     }
+    let stepMax = Infinity;
+    if (op.track && this.target && !this.target.dead && !this.target.removed) {   // 비연참: straight at the target's current body; the last step stops exactly at rim contact
+      const tg = this.target, dx = tg.pos.x - this.pos.x, dz = tg.pos.z - this.pos.z, m = Math.hypot(dx, dz) || 1;
+      this.dir = { x: dx / m, z: dz / m }; stepMax = Math.max(0, m - (tg.radius || 0.5) - (op.w || 0) / 2);
+    }
     if (op.kind === 'boomerang' && this.back) { const pc = eng.pc, dx = pc.pos.x - this.pos.x, dz = pc.pos.z - this.pos.z, m = Math.hypot(dx, dz); if (m < 0.6) return this.done(); this.dir = { x: dx / m, z: dz / m }; }
-    const sx = this.dir.x * this.speed * dt, sz = this.dir.z * this.speed * dt;
+    const st = Math.min(this.speed * dt, stepMax), sx = this.dir.x * st, sz = this.dir.z * st;
     this.pos = { x: this.pos.x + sx, y: this.pos.y, z: this.pos.z + sz }; this.trav += Math.hypot(sx, sz);
+    if (this.dc != null) this.pos.y = this.y0 + (this.yT - this.y0) * clamp01(this.trav / Math.max(0.01, this.dc));   // hand height -> torso centre
     if (this.arcH) { const k = clamp01(this.trav / this.arcLen); this.fx.set({ x: this.pos.x, y: this.pos.y + Math.sin(k * Math.PI) * this.arcH - k * 0.45, z: this.pos.z }, { x: this.dir.x, y: Math.cos(k * Math.PI) * 0.6, z: this.dir.z }); }
     else this.fx.set(this.pos, { x: this.dir.x, y: 0, z: this.dir.z });
     if (zone.geo.blocked(this.pos.x, this.pos.z, 0.05)) { if (op.r) this.landBlast(this.pos); else FX.burst('dust', this.pos, { radius: 0.5 }); return this.done(); }
@@ -877,7 +894,7 @@ class SkillProj {
     }
     for (const c of zone.actors) {
       if (c.dead || c.faction === 'player' || c.isSummon || this.hit.has(c)) continue;
-      if (Math.hypot(this.pos.x - c.pos.x, this.pos.z - c.pos.z) <= c.radius + (op.w ? op.w / 2 : 0.3)) {
+      if (Math.hypot(this.pos.x - c.pos.x, this.pos.z - c.pos.z) <= c.radius + (op.w ? op.w / 2 : 0.3) + 1e-4) {
         this.hit.add(c);
         if (!op.r) G.audio.sfx(skillSound(this.ctx.d, op));
         if (op.attach) { this.ctx.attached = c; this.ctx.attachedPos = { ...c.pos }; FX.burst('hit_pierce', c.pos, { radius: 0.5 }); this.eng.dmg(c, op.coef, this.ctx, op); return this.done(); }
@@ -887,7 +904,10 @@ class SkillProj {
         this.eng.dmg(c, coef, this.ctx, op); this.eng.onHit(c, op, this.ctx);
         if (op.tri) { const m = marks(c); m.tri.add(op.tri); m.triT = 3; }
         if (op.stackSlow) { const s = c.status.list.find(x => x.def.id === 'slow'); if (s) s.value = Math.min(0.6, s.value + 0.06); }
-        if (op.biyeon) { const ip = biyeonImpact(c, this.dir); if (this.fx.hit) this.fx.hit(ip); FX.biyeon('hit', ip, this.dir); }   // only the enemy really damaged
+        if (op.biyeon) {   // 비연참 원반: this frame = the leading rim touches the body -> damage (above), sound (above), the disc turns its face to the camera + one thin ring limited to the body width + a few chips
+          const ip = biyeonImpact(c, this.dir); if (this.fx.hit) this.fx.hit(ip, { missed: this.ctx.missed });
+          if (!this.ctx.missed) { FX.biyeon('hit', ip, this.dir, { r: c.radius || 0.5 }); c.freezeT = Math.max(c.freezeT || 0, BIYEON_STOP); if (c.body && c.body.punch) c.body.punch(this.dir.x, this.dir.z, 0.14); if (G.render.kick) G.render.kick(this.dir.x, this.dir.z, 0.035, 0.08); }
+        }
         else if (op.hairProj) { FX.hair('combHit', { x: c.pos.x, y: (c.pos.y || 0) + hairMid(c), z: c.pos.z }, { hit: true, dir: this.dir }); c.freezeT = Math.max(c.freezeT || 0, HAIR_STOP[0]); if (c.body && c.body.punch) c.body.punch(this.dir.x, this.dir.z, 0.14); }   // 빗 투척: 빗살 자국 + 맞은 적만 짧게 멈춤
         else if (op.art) { if (!this.ctx.missed) { FX.art('projHit', c, { kind: op.art, idx: this.idx, dir: this.dir }); artFeel(null, [c], this.dir, op.art); } }   // 예술가: paint splat / sharp note burst only on a real hit
         else FX.burst(op.burst || 'hit_pierce', c.pos, { radius: 0.6 });

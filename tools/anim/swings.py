@@ -190,7 +190,21 @@ IL = action('nv_ilgyeok', IL_KEYS, IL_T, IL_T + 0.50, [[IL_T - 0.045, IL_T + 0.0
 IL.update(hitTimes=[IL_T], trailLife=0.11, trailBase=0.45, trailColor=[1.55, 1.3, 1.5])
 # 비연참 (nv_a3): one huge horizontal sweep that throws the sword wave
 # (2026-11-10) 비연파: pale sky blade trail (js/biyeonfx.js colours) instead of the gold one; impact time 0.22 unchanged
-BI = combo('nv_biyeon', ['hz'], t0=0.22, lunge=False, trailColor=(1.25, 1.5, 1.7)); del BI['hitFx']
+# (2026-11-19) 비연참 = 한 손 원반 던지기: 대상을 보고 칼 든 팔을 몸 옆으로 살짝 당겼다가(0.10~0.15 s) 앞으로 짧게
+#내뻗음 — 팔이 다 펴지는 0.20 s(hitT)에 칼끝에 맺힌 원반이 그 자리에서 출발(js/biyeonfx.js, skillrt SkillProj fromTip).
+# 근접 베기 궤적 없음(trail []), 발은 그대로(제자리 시전), 전진 없음.
+BI_T = 0.20
+BI = action('nv_biyeon', [
+    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
+    key(0.10, 'o', twist=-22, lean=-3, sink=0.06, hand=[-96, 4, 0.58], blade=[-34, 6], elbow=[-0.6, -0.5, -0.9], armL=[22, 26]),
+    key(0.145, 's', twist=-25, lean=-3, sink=0.07, hand=[-100, 6, 0.56], blade=[-38, 8], elbow=[-0.6, -0.5, -0.9], armL=[24, 26]),
+    key(BI_T - 0.03, 'i', twist=-6, lean=5, sink=0.08, hand=[-52, 5, 0.86], blade=[-16, 4], elbow=[-0.6, -0.7, -0.6], armL=[18, 30], squint=True),
+    key(BI_T, None, twist=10, lean=9, sink=0.09, hand=[-14, 4, 1.02], blade=[-4, 3], elbow=[-0.5, -0.8, -0.2], armL=[12, 34], squint=True),
+    key(BI_T + 0.10, 'o', twist=12, lean=10, sink=0.09, hand=[-12, 3, 1.02], blade=[-4, 1], elbow=[-0.5, -0.8, -0.2], armL=[12, 34]),
+    key(BI_T + 0.28, 's', twist=6, lean=4, sink=0.04, hand=[10, -40, 0.78], blade=[30, -12], elbow=[-0.5, -1, -0.1]),
+    key(BI_T + 0.44, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
+], BI_T, BI_T + 0.22, [], fadeIn=0.07, fadeOut=0.16)
+BI.update(hitTimes=[BI_T], recover=0.3)
 # 구르기 (회피, Shift): crouch -> tucked ball rolling forward 360 deg about a point 0.5 m up (action.flips, js/model.js)
 # -> open up and stand. Matches config.json dodgeDuration 0.42 s (the flip ends just before the dash does)
 TUCK = dict(lean=58, sink=0.40, legL=150, legR=140, tuck=55, armR=[72, 6], armL=[72, 6], wOff=40.0, ik=0, plant=0)
