@@ -4,6 +4,8 @@
 import { THREE, T } from './render.js';
 import { HitShape, CombatMath, clamp, clamp01 } from './core.js';
 import { skillSound } from './sfx.js';
+import { gfxOn } from './gfxq.js';
+import { STAGES } from './stagefx.js';
 import { cookImpact, cookCanToss, cookShout } from './cookfx.js';
 import { pharmShout } from './pharmfx.js';
 // 미트볼 던지기 ck1_b1: 5개가 서로 다른 곡선으로 한 적에게 차례로 (CUSTOM.meatball_volley)
@@ -294,6 +296,8 @@ export class SkillEngine {
       ctx.yeonPre = true;
       cb.hitTimes.forEach((t, i) => this.pending.push({ time: this.clock + Math.max(0, t - YEON_LEAD), op: { op: '_run', run: () => { if (!pc.dead) FX.yeon('strike', { follow: pc, y: cb.hitFx[i] && cb.hitFx[i].yeon, lead: Math.min(YEON_LEAD, t) }); } }, ctx }));
     }
+    // 2026-11-19 리마스터 6단계: 1차 직업 주력 스킬의 시전 준비·발사·지속·종료 단계(js/stagefx.js, 그림만 — 품질 낮음이면 없음)
+    if (typeof STAGES !== 'undefined' && STAGES[d.id] && G.stageFx && pc === G.player && gfxOn()) try { G.stageFx.play(pc, d.id, { ht, end: pc.skills.lock }); } catch (e) { console.warn('stagefx', e); }
     if (d.type === 'ultimate' && d.job !== 'western_pharmacist' && d.job !== 'chef' && d.job !== 'engineer' && d.job !== 'designer' && d.job !== 'painter' && d.job !== 'musician' && d.job !== 'herbalist') { G.render.addShake && !G.reduceFlash && G.render.addShake(0.12, 0.25); }   // 양약사·쉐프 궁극기: 주 타격 순간 kick 한 번만(js/wpharm.js)
   }
   interruptCast(reason) {
