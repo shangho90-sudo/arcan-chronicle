@@ -30,13 +30,19 @@ const rawK = () => { const G = window.G; return G && G.settings && G.settings.gr
 
 // ---------------------------------------------------------------------------------------------- shaders
 // one vertex shader for the layer meshes: world normal / view vector for the fresnel, uv for the shapes
-const VS = `varying vec2 vUv; varying vec3 vN, vV;
-void main(){ vUv = uv; vN = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(position, 1.); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }`;
+// uJ > 0: jagged radial wobble (discord rings on rm_band — the ring wall shakes in and out round the circle)
+const VS = `uniform float uJ, uT; varying vec2 vUv; varying vec3 vN, vV;
+void main(){ vUv = uv; vec3 P = position; if (uJ > 0.) { float a = atan(P.z, P.x); P.xz *= 1. + uJ * (sin(a * 9. + uT * 25.) * .6 + sin(a * 5. - uT * 17.) * .4); }
+  vN = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(P, 1.); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }`;
 // uS shape: 0 energy body (fresnel: bright core where it faces the camera, uW -> uB towards the rim) / 1 halo shell (only the rim glows)
 //           2 crown petals (v = height: wet paint, light rim at the tips, erodes from the tips with uE) / 3 ground ring (v across: thin bright edge + soft inner)
 //           4 flash quad (four-point star + round core) / 5 ground stain disc (noisy edge, uE erodes) / 6 soft round glow quad
 //           7 / 8 / 9 sword energy core / body / halo on rm_cres (uE = head 0..1 along the swing, uT = tail length) / 10 heal sigil quad
-const FS = `uniform vec3 uW, uB; uniform float uA, uS, uE, uT, uQ, uAdd; varying vec2 vUv; varying vec3 vN, vV;
+//           11 fire ground fan (fan geo: uv.x across the cone, uv.y radius; uE = shock front radius 0..1.1, runes behind it)
+//           12 frost ground fan (dendrite frost lines growing to uE) / 14 fire sigil quad (hexagram, drawn in by uE, uT = turn)
+//           15 fire pillar on rm_band (flame tongues scrolling up, uE = height cut) / 16 sound wall (rm_wave / rm_band: grooves, uE > 1.5 = closed ring)
+//           17 ice crystal body (translucent fresnel + bright tip) / 18 ice sigil quad (snowflake, drawn in by uE) / 19 heat shimmer quad (faint wavy bands)
+const FS = `uniform vec3 uW, uB; uniform float uA, uS, uE, uT, uQ, uAdd, uJ; varying vec2 vUv; varying vec3 vN, vV;
 float h21(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f); return mix(mix(h21(i), h21(i + vec2(1., 0.)), f.x), mix(h21(i + vec2(0., 1.)), h21(i + vec2(1., 1.)), f.x), f.y); }
 void main(){
@@ -59,6 +65,30 @@ void main(){
     else if (uS < 8.5) { a = smoothstep(.25, .75, v) * smoothstep(1.02, .9, v) * (.45 + .55 * hd); core = smoothstep(.6, 1., v); a *= .85 + .15 * vn(vec2(u * 30. + uQ, v * 4.)); }
     else { a = exp(-pow((v - .7) * 2.6, 2.)) * .7 * (.4 + .6 * hd) * (.7 + .3 * vn(vec2(u * 12. - uQ * 3., v * 3.))); core = .2; }
     a *= w * ends; }
+  else if (uS > 10.5) {
+    vec2 p = vUv * 2. - 1.; float r = length(p), ang = atan(p.y, p.x), x = vUv.x, y = vUv.y, edge = smoothstep(0., .07, x) * smoothstep(1., .93, x);
+    if (uS < 11.5) { float fl = vn(vec2(x * 9. + uQ, y * 5. - uT * 3.)), fl2 = vn(vec2(x * 23. - uQ, y * 11. - uT * 5.));
+      float front = exp(-pow((y - uE) * 10., 2.)) * smoothstep(0., .2, uE), body = step(y, uE) * smoothstep(0., .12, y) * (.25 + .75 * smoothstep(.35, .85, fl * .7 + fl2 * .5));
+      float runes = (exp(-pow((y - .42) * 70., 2.)) + exp(-pow((y - .76) * 70., 2.))) * step(.45, fract(x * 12. + uT * .7)) * step(y, uE);
+      a = (front * 1.3 + body * .55 + runes * .9) * edge * smoothstep(1.02, .9, y); core = front + runes * .7 + body * fl2 * .4; }
+    else if (uS < 12.5) { vec2 q = vec2(x * 6., y * 9.); float n1 = vn(q * 1.6 + uQ), n2 = vn(q * 4.1 - uQ);
+      float lines = smoothstep(.07, 0., abs(n1 - .5)) + .65 * smoothstep(.05, 0., abs(n2 - .5)), sp = smoothstep(.035, 0., abs(fract(x * 7. + n2 * .25) - .5));
+      float grow = step(y, uE + (n1 - .5) * .18); a = (lines + sp * .5 + .16) * grow * edge * smoothstep(1., .86, y); core = lines * .8; }
+    else if (uS < 14.5) { float sh = step(ang + 3.14159, uE * 6.2832 + .001), an = mod(ang + uT, 2.0944) - 1.0472, an2 = mod(ang + uT + 1.0472, 2.0944) - 1.0472;
+      float rings = exp(-pow((r - .93) * 40., 2.)) + .7 * exp(-pow((r - .74) * 50., 2.)), star = (exp(-pow((r * cos(an) - .37) * 45., 2.)) + exp(-pow((r * cos(an2) - .37) * 45., 2.))) * step(r, .75);
+      float dots = step(.55, fract(ang * 3.8197 - uT * 2.)) * exp(-pow((r - .835) * 34., 2.));
+      a = (rings + star * .85 + dots * .7) * sh + .16 * smoothstep(1., .1, r) * sh; core = rings * .8 + star * .6; }
+    else if (uS < 15.5) { float v = vUv.y, n = vn(vec2(vUv.x * 10. + uQ, v * 3. - uT * 4.)), n2 = vn(vec2(vUv.x * 22. - uQ, v * 6. - uT * 7.));
+      float tg = smoothstep(.45, .95, n * .75 + n2 * .55 - v * .9 + .25); a = tg * smoothstep(0., .08, v) * (1. - smoothstep(uE - .35, uE, v)) * (.35 + .3 * fr); core = smoothstep(.75, 1., tg) * (1. - v) * .6; }
+    else if (uS < 16.5) { float v = vUv.y, pr = exp(-pow((v - .5) * 3.2, 2.)), gr = .55 + .45 * sin(v * 26. + uT * 14.), ends = uE > 1.5 ? 1. : smoothstep(0., .1, vUv.x) * smoothstep(1., .9, vUv.x);
+      a = pr * gr * (.45 + .65 * fr) * ends; core = pr * gr * .7 + pow(fr, 3.) * .4; }
+    else if (uS < 17.5) { a = .3 + .55 * pow(fr, 1.4); core = pow(1. - fr, 3.) * .45 + smoothstep(.72, 1., vUv.y) * .7 + .25 * vn(vUv * vec2(6., 12.) + uQ); }
+    else if (uS < 18.5) { float sh = step(ang + 3.14159, uE * 6.2832 + .001), am = abs(mod(ang + uT, 1.0472) - .5236);
+      float spokes = smoothstep(.05, 0., am * r) * step(r, .8), br = smoothstep(.05, 0., abs(am * r - abs(r - .5) * .55)) * step(.32, r) * step(r, .72);
+      float rings = exp(-pow((r - .93) * 42., 2.)) + .6 * exp(-pow((r - .82) * 60., 2.)) + .5 * exp(-pow((r - .22) * 40., 2.));
+      a = (rings + spokes * .9 + br * .7) * sh + .14 * smoothstep(1., .1, r) * sh; core = rings * .8 + spokes * .7; }
+    else { float w = .5 + .5 * sin(vUv.y * 38. + uT * 13. + vn(vUv * 6. + uQ) * 6.); a = .5 * w * pow(clamp(1. - r, 0., 1.), 1.5); core = 0.; }
+  }
   else {   // 10 heal sigil (flat quad): double ring + 8 leaf petals + rotating dots, drawn in by uE (0..1), uT = time
     vec2 p = vUv * 2. - 1.; float r = length(p), ang = atan(p.y, p.x), sh = step(ang + 3.14159, uE * 6.2832 + .001);
     float rings = exp(-pow((r - .93) * 40., 2.)) + .7 * exp(-pow((r - .8) * 50., 2.)) + .5 * exp(-pow((r - .38) * 45., 2.));
@@ -149,7 +179,8 @@ export class RmFx {
       const g = await new Promise((res, rej) => new GLTFLoader().parse(u8.buffer, '', res, rej));
       g.scene.traverse(o => { if (o.isMesh) this.geo[o.name] = o.geometry; });
       const cap = RMFX.cap;
-      this.parts = { streak: new Parts(this.geo.rm_streak, true, cap), drop: new Parts(this.geo.rm_drop, false, cap), star: new Parts(this.geo.rm_star, true, Math.round(cap / 2)) };
+      this.parts = { streak: new Parts(this.geo.rm_streak, true, cap), drop: new Parts(this.geo.rm_drop, false, cap), star: new Parts(this.geo.rm_star, true, Math.round(cap / 2)),
+        shard: new Parts(this.geo.rm_shard || this.geo.rm_drop, false, Math.round(cap / 3)) };   // 얼음 파편(반투명, 빛 받음)
       for (const k in this.parts) this.root.add(this.parts[k].mesh);
       this.ready = true;
     })().catch(e => console.warn('rmfx load', e));
@@ -158,7 +189,7 @@ export class RmFx {
   ok() { if (!this.ready) { this.load(); return false; } return true; }
   // ------------------------------------------------------------------ pooled layer meshes
   _mat(kind) {
-    const u = U({ uW: new THREE.Color(1, 1, 1), uB: new THREE.Color(1, 1, 1), uA: 0, uS: 0, uE: 2, uT: 0, uQ: 0, uAdd: kind === 'add' ? 1 : 0 });
+    const u = U({ uW: new THREE.Color(1, 1, 1), uB: new THREE.Color(1, 1, 1), uA: 0, uS: 0, uE: 2, uT: 0, uQ: 0, uJ: 0, uAdd: kind === 'add' ? 1 : 0 });
     if (kind === 'paint') return new THREE.ShaderMaterial({ uniforms: u, vertexShader: VS, fragmentShader: PAINT_FS, transparent: true, depthWrite: true, side: THREE.DoubleSide });
     return new THREE.ShaderMaterial({ uniforms: u, vertexShader: VS, fragmentShader: FS, transparent: true, depthWrite: false, side: THREE.DoubleSide,
       blending: kind === 'add' ? THREE.AdditiveBlending : THREE.NormalBlending });
@@ -168,7 +199,7 @@ export class RmFx {
     const p = this.pool[kind] || (this.pool[kind] = []); let m = p.pop();
     if (!m) { m = new THREE.Mesh(geo, this._mat(kind)); m.frustumCulled = false; m.userData.kind = kind; }
     m.geometry = geo; m.position.set(0, 0, 0); m.quaternion.identity(); m.scale.set(1, 1, 1); m.visible = true; m.renderOrder = o.order ?? (kind === 'add' ? 7 : 5);
-    const u = m.material.uniforms; u.uW.value.setHex(o.w ?? 0xffffff); u.uB.value.setHex(o.b ?? 0xffffff); u.uA.value = 0; u.uS.value = o.s ?? 0; u.uE.value = 2; u.uT.value = 0; u.uQ.value = rnd(0, 10);
+    const u = m.material.uniforms; u.uW.value.setHex(o.w ?? 0xffffff); u.uB.value.setHex(o.b ?? 0xffffff); u.uA.value = 0; u.uS.value = o.s ?? 0; u.uE.value = 2; u.uT.value = 0; u.uQ.value = rnd(0, 10); if (u.uJ) u.uJ.value = 0; m.material.depthTest = true;
     e.items.push(m); e.g.add(m); return m;
   }
   _fx(kind, life, update) { const e = { kind, g: new THREE.Group(), items: [], t: 0, life, update }; this.root.add(e.g); this.live.push(e); return e; }
@@ -468,6 +499,197 @@ export class RmFx {
     this.emit('streak', Math.round((o.sparks || 6) * (low ? RMFX.liteK : 1)), () => { const a = rnd(0, Math.PI * 2); _b.set(Math.cos(a), rnd(-0.1, 0.9), Math.sin(a)).addScaledVector(dir, -0.7).normalize();
       return { p: front, v: _c.copy(_b).multiplyScalar(rnd(4, 7)), s: rnd(0.045, 0.07), col: rand() < 0.5 ? hi : col, life: rnd(0.12, 0.2), drag: 7, stretch: 0.09 }; });
     if (!low) this.emit('star', 4, () => ({ p: _a.copy(front).add(_b.set(rnd(-0.3, 0.3), rnd(-0.1, 0.4), rnd(-0.3, 0.3))), v: _c.set(rnd(-0.4, 0.4), rnd(0.6, 1.2), rnd(-0.4, 0.4)), s: rnd(0.05, 0.08), col: rand() < 0.5 ? 0xffffff : col, life: rnd(0.4, 0.6), spin: 5, t: -rnd(0.03, 0.15) }));
+    return e;
+  }
+
+  // ================================================================== 4묶음 원소 (용광로 개방·뜨거운 국물·온풍/냉풍 드라이·음파 파동·불협화음)
+  // 모든 큰 층은 실제 판정 안: 부채꼴 판(_fanGeo)은 판정 반지름·각도 그대로, 마법진·기둥·결정은 부채꼴 안쪽 점에서 그 점이 부채꼴을 벗어나지 않는 크기.
+  /** flat fan in the XZ plane, apex at the origin, centred on local +X; uv.x = across the cone, uv.y = radius 0..1 (cached per angle) */
+  _fanGeo(ang) {
+    const key = Math.round(ang); this.fans = this.fans || {}; if (this.fans[key]) return this.fans[key];
+    const A = 24, R = 10, h = key * Math.PI / 360, pos = [], uv = [], nrm = [], idx = [];
+    for (let j = 0; j <= R; j++) for (let i = 0; i <= A; i++) { const th = -h + 2 * h * i / A, r = j / R; pos.push(Math.cos(th) * r, 0, Math.sin(th) * r); uv.push(i / A, r); nrm.push(0, 1, 0); }
+    for (let j = 0; j < R; j++) for (let i = 0; i < A; i++) { const a = j * (A + 1) + i, b = a + A + 1; idx.push(a, b, a + 1, a + 1, b, b + 1); }
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); g.setAttribute('normal', new THREE.Float32BufferAttribute(nrm, 3)); g.setIndex(idx);
+    return (this.fans[key] = g);
+  }
+  /** cone frame (three coords): apex g0 on the ground, forward d, side s, yaw for the fan mesh */
+  _cone(pc, o) { const f = o.f || pc.facing || { x: 0, z: 1 }, m = Math.hypot(f.x, f.z) || 1, d = new THREE.Vector3(f.x / m, 0, -f.z / m);
+    return { g0: P3(pc.pos), d, s: new THREE.Vector3(-d.z, 0, d.x), yaw: Math.atan2(f.z / m, f.x / m), r: o.r || 3.2, h: (o.ang || 60) * Math.PI / 360 }; }
+  /** a point inside the cone (three): angle fraction a (-1..1 of the half angle), distance k (0..1 of r) */
+  _inCone(c, a, k, y = 0) { const th = a * c.h; return c.g0.clone().addScaledVector(c.d, Math.cos(th) * k * c.r).addScaledVector(c.s, Math.sin(th) * k * c.r).setY(c.g0.y + y); }
+  static PAL = {
+    fire: { w: 0xfff2b0, b: 0xff5a14, mid: 0xff9a2a, deep: 0xc8300a, ember: [0xffd27a, 0xff8a2a, 0xffffff] },
+    soup: { w: 0xffeaa8, b: 0xff7a1e, mid: 0xffb040, deep: 0xc85010, ember: [0xffe08a, 0xff9a2a, 0xfff4e6] },
+    forge: { w: 0xfff6c8, b: 0xff4a0a, mid: 0xffb02a, deep: 0xa82008, ember: [0xffe6a0, 0xffb040, 0xff6a1a] },
+    ice: { w: 0xffffff, b: 0x5ab8ff, mid: 0xa8e4ff, deep: 0x2a6ad8, ember: [0xffffff, 0xbfe8ff, 0x7ac8ff] },
+  };
+  /** fire in a cone (용광로 개방·뜨거운 국물·온풍 드라이). o: {f (game facing), r, ang, at (s until the burst = damage frame), dur (sustain s, channel), pal}
+   *  준비(at 전): 부채꼴 안 지면 마법진이 그려짐 / 발동: 섬광 + 불꽃 부채꼴의 충격 앞선(= 원형 충격파를 판정 부채꼴로 자름) + 도는 불꽃 혀 + 솟는 불기둥 + 불티 + 열기 아지랑이 / 끝: 천천히 꺼짐.
+   *  handle: pulse() = 채널 틱마다 앞선을 다시 보냄, stop() = 일찍 끝. */
+  fireCone(pc, o = {}) {
+    if (!this.ok() || !pc) return null;
+    const low = rmLite(), P = RmFx.PAL[o.pal] || RmFx.PAL.fire, I = RMFX.intensity * rawK(), c = this._cone(pc, o), at = Math.max(0, o.at || 0), dur = o.dur || 0, sustain = dur > 0;
+    const sigD = 0.55, sigR = Math.min(0.95, sigD * c.r * Math.sin(c.h) * 0.92, 0.42 * c.r), sigP = this._inCone(c, 0, sigD, 0.07);
+    const nFl = low ? 4 : 8, nPil = low ? 1 : 2, fl = [], pil = [];
+    let front0 = 0, endT = at + (sustain ? dur : 0.55), emT = 0, flT = 0;
+    const e = this._fx('fireCone', at + (sustain ? dur : 0.55) + 0.5, (e, dt) => {
+      const t = e.t, T = t - at, out = 1 - smooth(endT, endT + 0.45, t), on = T >= 0;
+      // ground sigil inside the cone: drawn in before the burst, turns, flares at the burst, fades with the rest
+      sig.material.uniforms.uE.value = easeOut(at > 0 ? t / Math.max(0.12, at) : t / 0.15); sig.material.uniforms.uT.value = t * 0.9; sig.material.uniforms.uA.value = I * (0.85 + 0.6 * Math.exp(-Math.max(0, T) * 9) * (on ? 1 : 0)) * smooth(0, 0.06, t) * out;
+      sigA.material.uniforms.uE.value = sig.material.uniforms.uE.value; sigA.material.uniforms.uT.value = t * 0.9; sigA.material.uniforms.uA.value = 0.55 * smooth(0, 0.06, t) * out;
+      // the fire fan: shock front racing to the edge (one-shot), pulsing on every channel tick
+      const kf = on ? (T - front0) / 0.24 : -1; fan.visible = fanA.visible = on;
+      if (on) { const fe = Math.min(1.1, 0.05 + 1.05 * easeOut(clamp01(kf))), body = sustain ? 1 : 1 - smooth(0.25, 0.55, T);
+        for (const [m, a] of [[fan, I * 1.15], [fanA, 0.5]]) { const u = m.material.uniforms; u.uE.value = fe; u.uT.value = t; u.uA.value = a * out * Math.max(body, kf < 1 ? 1 - smooth(0.6, 1, kf) : 0) * smooth(0, 0.03, T); } }
+      // flash at the burst (0.05 s), on the cone mouth
+      this._face(fx, 1.1 * (0.6 + 0.5 * easeOut(T / 0.03))); fx.material.uniforms.uA.value = on ? I * 1.4 * (1 - smooth(0.012, 0.06, T)) : 0;
+      // flame tongues swirling round the cone axis, born at the burst (and again through a channel), growing, licking up, shrinking
+      flT -= dt; if (on && t < endT && flT <= 0 && sustain) { flT = low ? 0.22 : 0.12; spawnFlame(); }
+      for (const q of fl) { const k = (t - q.t0) / q.life; q.m.visible = k > 0 && k < 1; if (!q.m.visible) continue;
+        q.ang += dt * q.w; const p = this._inCone(c, Math.sin(q.ang) * 0.75, q.k + 0.08 * Math.cos(q.ang), 0); q.m.position.copy(p).add(_a.set(0, 0.04 + 0.25 * k, 0));
+        const sz = q.s * Math.sin(Math.PI * Math.min(1, k * 1.25)) ** 0.7; q.m.scale.set(sz, sz * (1.2 + 0.5 * k), sz); q.m.rotation.y = q.ang * 2; q.m.material.uniforms.uA.value = I * 1.2 * out; q.m.material.uniforms.uT.value = t; }
+      // rising fire pillars (rm_band) at points inside the cone
+      for (const q of pil) { const k = (T - q.d) / q.life, vis = k > 0 && k < 1; q.m.visible = q.a.visible = vis; if (!vis) continue;
+        const hh = q.H * easeOut(Math.min(1, k * 2.5)); q.m.scale.set(q.R * (1 + 0.2 * k), hh, q.R * (1 + 0.2 * k)); q.m.material.uniforms.uE.value = 1.25 - 0.9 * smooth(0.55, 1, k); q.m.material.uniforms.uT.value = t;
+        const fs = 2.2 * q.R / 0.18 * 0.5 * (1 - smooth(0.6, 1, k)); q.a.scale.set(fs, hh * 0.85, fs); q.a.rotation.y = t * 5;
+        q.m.material.uniforms.uA.value = I * 1.3 * out; q.a.material.uniforms.uA.value = I * 1.1 * out; }
+      // heat shimmer over the cone (faint wavy quads facing the camera)
+      for (const m of shim) { this._face(m, null); m.scale.set(c.r * 0.55, c.r * 0.38, 1); m.material.uniforms.uT.value = t; m.material.uniforms.uA.value = on ? 0.5 * out * smooth(0, 0.15, T) : 0; }
+      // embers rising out of the cone (inside it)
+      emT -= dt; if (on && t < endT + 0.15 && emT <= 0) { emT = low ? 0.05 : 0.025; const p = this._inCone(c, rnd(-0.9, 0.9), rnd(0.2, 0.95), rnd(0.05, 0.4));
+        this.emit('streak', 1, () => ({ p, v: _c.set(rnd(-0.4, 0.4), rnd(1.6, 3.2), rnd(-0.4, 0.4)), s: rnd(0.035, 0.055), col: P.ember[(rand() * 3) | 0], life: rnd(0.35, 0.6), drag: 1.5, stretch: 0.09 })); }
+    });
+    e.g.position.set(0, 0, 0);
+    const sig = this._m(e, 'add', this.quad, { w: P.w, b: P.b, s: 14, order: 3 }); this._flat(sig, sigR * 2, 0); sig.position.copy(sigP);
+    const sigA = this._m(e, 'alpha', this.quad, { w: P.mid, b: P.deep, s: 14, order: 2 }); this._flat(sigA, sigR * 2, 0); sigA.position.copy(sigP).setY(sigP.y - 0.01);
+    const fan = this._m(e, 'add', this._fanGeo(o.ang || 60), { w: P.w, b: P.b, s: 11, order: 3 }), fanA = this._m(e, 'alpha', this._fanGeo(o.ang || 60), { w: P.mid, b: P.deep, s: 11, order: 2 });
+    for (const m of [fan, fanA]) { m.position.copy(c.g0).setY(c.g0.y + (m === fan ? 0.06 : 0.05)); m.rotation.set(0, c.yaw, 0); m.scale.set(c.r, 1, c.r); m.visible = false; }
+    const fx = this._m(e, 'add', this.quad, { w: 0xffffff, b: P.mid, s: 4, order: 9 }); fx.position.copy(this._inCone(c, 0, Math.min(0.3, 0.8 / c.r), 1.0));
+    const spawnFlame = () => { const q = fl.find(q => e.t - q.t0 > q.life); if (q) { Object.assign(q, mk(q.m)); return; } if (fl.length < 14) fl.push(mk()); };   // reuse a finished tongue's mesh
+    const mk = (m0) => { const m = m0 || this._m(e, 'add', this.geo.rm_flame, { w: P.w, b: P.b, s: 0, order: 6 }); m.visible = false;
+      return { m, t0: Math.max(e.t, at) + rnd(0, 0.08), life: rnd(0.4, 0.62), ang: rnd(0, 6.28), w: rnd(4, 7) * (rand() < 0.5 ? 1 : -1), k: rnd(0.3, 0.82), s: rnd(0.75, 1.15) * Math.min(1.25, c.r / 3) }; };
+    for (let i = 0; i < nFl; i++) fl.push(mk());
+    for (let i = 0; i < nPil; i++) { const a = nPil === 1 ? 0 : (i ? 0.45 : -0.45), k = 0.62 + 0.12 * i, p = this._inCone(c, a, k, 0), R = Math.min(0.34, k * c.r * Math.sin(c.h * (1 - Math.abs(a))) * 0.5 + 0.12);
+      const m = this._m(e, 'add', this.geo.rm_band, { w: P.mid, b: P.b, s: 15, order: 6 }), am = this._m(e, 'add', this.geo.rm_flame, { w: P.w, b: P.b, s: 0, order: 6 });   // pillar wall + a tall flame tongue inside it
+      m.position.copy(p); am.position.copy(p); m.visible = am.visible = false; pil.push({ m, a: am, d: 0.03 + 0.07 * i, life: sustain ? Math.min(0.9, dur) : 0.6, H: 1.5 + 0.3 * i, R: Math.min(0.26, R) }); }
+    const shim = low ? [] : [0, 1].map(i => { const m = this._m(e, 'add', this.quad, { w: P.mid, b: P.b, s: 19, order: 4 }); m.position.copy(this._inCone(c, i ? 0.35 : -0.3, 0.55, 0.9)); return m; });
+    e.handle = { pulse: () => { if (e.t >= at) front0 = e.t - at; for (const q of pil) if (e.t - at - q.d > q.life) q.d = e.t - at; },
+      stop: () => { if (e.t < endT) { endT = e.t; e.life = Math.min(e.life, e.t + 0.5); } } };
+    return e.handle;
+  }
+  /** fire landing on a target (game pos p with y, radius r): orange-white flash 0.05 s, small fire pillar, ground shock ring, embers, flame tongues; o.small = one channel tick */
+  fireHit(p, r = 0.5, o = {}) {
+    if (!this.ok() || !p) return null;
+    const low = rmLite(), P = RmFx.PAL[o.pal] || RmFx.PAL.fire, I = RMFX.intensity * rawK(), g = P3(p), small = !!o.small, ch = g.clone().setY(g.y + Math.min(1.1, 0.45 + r * 0.6));
+    const life = small ? 0.35 : 0.6, R = Math.min(1.2, r + 0.35);
+    const e = this._fx('fireHit', life, (e) => { const t = e.t;
+      this._face(fl, (small ? 0.6 : 1.0) * (0.6 + 0.5 * easeOut(t / 0.03))); fl.material.uniforms.uA.value = I * 1.35 * (1 - smooth(0.012, small ? 0.045 : 0.065, t));
+      const kr = t / (small ? 0.22 : 0.3); ring.visible = kr < 1; ring.scale.set(R * (0.3 + 0.7 * easeOut(kr)), 1, R * (0.3 + 0.7 * easeOut(kr))); ring.material.uniforms.uA.value = I * (small ? 0.8 : 1.2) * (1 - smooth(0.4, 1, kr)); ring.material.uniforms.uT.value = t;
+      if (pl) { const k = t / life; pl.scale.set(r * 0.9, 1.3 * easeOut(Math.min(1, k * 3)), r * 0.9); pl.material.uniforms.uE.value = 1.25 - smooth(0.4, 1, k); pl.material.uniforms.uT.value = t; pl.material.uniforms.uA.value = I * 1.2 * (1 - smooth(0.6, 1, k)); }
+      for (const q of tg) { const k = t / q.life; q.m.visible = k < 1; const sz = q.s * Math.sin(Math.PI * Math.min(1, k * 1.2)); q.m.scale.set(sz, sz * 1.4, sz); q.m.position.y = g.y + 0.25 * k; q.m.material.uniforms.uA.value = I * 1.2; q.m.material.uniforms.uT.value = t; }
+    });
+    e.g.position.set(0, 0, 0);
+    const fl = this._m(e, 'add', this.quad, { w: 0xffffff, b: P.mid, s: 4, order: 9 }); fl.position.copy(ch); fl.material.depthTest = false;
+    const ring = this._m(e, 'add', this.geo.rm_ring, { w: P.w, b: P.b, s: 3, order: 4 }); ring.position.copy(g).setY(g.y + 0.06);
+    const pl = null;   // (a pillar round the target read as a glass jar — flame tongues round its feet instead)
+    const tg = []; if (!small) for (let i = 0; i < (low ? 3 : 5); i++) { const a = i / (low ? 2 : 4) * 6.28 + rnd(-0.3, 0.3), m = this._m(e, 'add', this.geo.rm_flame, { w: P.w, b: P.b, s: 0, order: 6 });
+      m.position.set(g.x + Math.cos(a) * r * 0.8, g.y, g.z + Math.sin(a) * r * 0.8); tg.push({ m, life: rnd(0.35, 0.5), s: rnd(0.6, 0.9) }); }
+    this.emit('streak', Math.round((small ? 3 : 8) * (low ? RMFX.liteK : 1)), () => ({ p: _a.copy(ch).add(_b.set(rnd(-r, r) * 0.6, rnd(-0.3, 0.2), rnd(-r, r) * 0.6)), v: _c.set(rnd(-1, 1), rnd(1.5, 3.4), rnd(-1, 1)), s: rnd(0.04, 0.06), col: P.ember[(rand() * 3) | 0], life: rnd(0.3, 0.55), drag: 2, stretch: 0.09 }));
+    return e;
+  }
+  /** ice in a cone (냉풍 드라이): 지면 서리 문양 마법진 → 섬광 + 서리 무늬가 부채꼴로 자람 → 얼음 결정이 솟음(반투명) → 0.75초에 깨져 파편·반짝임 → 서리가 녹음 */
+  iceCone(pc, o = {}) {
+    if (!this.ok() || !pc) return null;
+    const low = rmLite(), P = RmFx.PAL.ice, I = RMFX.intensity * rawK(), c = this._cone(pc, o), at = Math.max(0, o.at || 0), shatter = at + (o.hold || 0.75);
+    const sigD = 0.55, sigR = Math.min(0.9, sigD * c.r * Math.sin(c.h) * 0.92), sigP = this._inCone(c, 0, sigD, 0.07), cr = []; let broke = false;
+    const e = this._fx('iceCone', shatter + 0.9, (e) => {
+      const t = e.t, T = t - at, on = T >= 0, out = 1 - smooth(shatter + 0.2, shatter + 0.85, t);
+      sig.material.uniforms.uE.value = easeOut(at > 0 ? t / Math.max(0.12, at) : t / 0.15); sig.material.uniforms.uT.value = t * 0.5; sig.material.uniforms.uA.value = I * (0.8 + 0.6 * (on ? Math.exp(-T * 8) : 0)) * smooth(0, 0.06, t) * out;
+      sigA.material.uniforms.uE.value = sig.material.uniforms.uE.value; sigA.material.uniforms.uT.value = t * 0.5; sigA.material.uniforms.uA.value = 0.6 * smooth(0, 0.06, t) * out;
+      fan.visible = fanA.visible = on; if (on) { const fe = Math.min(1.08, 0.05 + 1.05 * easeOut(T / 0.35)); for (const [m, a] of [[fan, I * 0.9], [fanA, 0.75]]) { m.material.uniforms.uE.value = fe; m.material.uniforms.uA.value = a * out * smooth(0, 0.04, T); } }
+      this._face(fx, 1.0 * (0.6 + 0.5 * easeOut(T / 0.03))); fx.material.uniforms.uA.value = on ? I * 1.4 * (1 - smooth(0.012, 0.06, T)) : 0;
+      for (const q of cr) { const k = (T - q.d) / 0.18, vis = on && k > 0 && !broke; q.m.visible = q.a.visible = vis; if (!vis) continue; const g = easeOut(Math.min(1, k)) * (1 + 0.12 * Math.exp(-Math.max(0, k - 1) * 6) * Math.sin(k * 9));
+        for (const m of [q.m, q.a]) m.scale.set(q.s, q.s * q.hh * g, q.s); q.m.material.uniforms.uA.value = 0.85; q.a.material.uniforms.uA.value = I * 0.6 * (0.6 + 0.4 * Math.exp(-Math.max(0, k - 1) * 3)); }
+      if (!broke && t >= shatter) { broke = true;   // the crystals shatter: translucent shards + sparkles + a small blue flash each
+        for (const q of cr) { if (!(T - q.d > 0)) continue; const p = q.m.position.clone().setY(q.m.position.y + q.s * q.hh * 0.5);
+          this.emit('shard', low ? 1 : 3, () => ({ p, v: _c.set(rnd(-1.6, 1.6), rnd(1.0, 2.8), rnd(-1.6, 1.6)), s: rnd(0.07, 0.13) * q.s / 1.2, col: rand() < 0.5 ? 0xe8f8ff : P.mid, a: 0.75, life: rnd(0.45, 0.7), grav: 8, floor: c.g0.y + 0.02, spin: 9 }));
+          if (!low) this.emit('star', 1, () => ({ p, v: _c.set(0, rnd(0.4, 0.9), 0), s: rnd(0.05, 0.08), col: 0xffffff, life: 0.35, spin: 6 })); }
+        sh0 = t; }
+      this._face(shf, 0.9); shf.material.uniforms.uA.value = broke ? I * 0.9 * (1 - smooth(0, 0.08, t - sh0)) : 0;
+    });
+    let sh0 = 0;
+    e.g.position.set(0, 0, 0);
+    const sig = this._m(e, 'add', this.quad, { w: P.w, b: P.b, s: 18, order: 3 }); this._flat(sig, sigR * 2, 0); sig.position.copy(sigP);
+    const sigA = this._m(e, 'alpha', this.quad, { w: 0xffffff, b: P.deep, s: 18, order: 2 }); this._flat(sigA, sigR * 2, 0); sigA.position.copy(sigP).setY(sigP.y - 0.01);
+    const fan = this._m(e, 'add', this._fanGeo(o.ang || 60), { w: P.w, b: P.b, s: 12, order: 3 }), fanA = this._m(e, 'alpha', this._fanGeo(o.ang || 60), { w: 0xffffff, b: P.mid, s: 12, order: 2 });
+    for (const m of [fan, fanA]) { m.position.copy(c.g0).setY(c.g0.y + (m === fan ? 0.06 : 0.05)); m.rotation.set(0, c.yaw, 0); m.scale.set(c.r, 1, c.r); m.visible = false; }
+    const fx = this._m(e, 'add', this.quad, { w: 0xffffff, b: P.b, s: 4, order: 9 }); fx.position.copy(this._inCone(c, 0, Math.min(0.3, 0.8 / c.r), 1.0));
+    const shf = this._m(e, 'add', this.quad, { w: 0xffffff, b: P.b, s: 6, order: 8 }); shf.position.copy(this._inCone(c, 0, 0.6, 0.4));
+    const n = low ? 4 : 7;
+    for (let i = 0; i < n; i++) { const a = (i / (n - 1) * 2 - 1) * 0.8 + rnd(-0.1, 0.1), k = rnd(0.35, 0.9), p = this._inCone(c, a, k, 0), s = rnd(0.9, 1.3) * Math.min(1.2, c.r / 3);
+      const m = this._m(e, 'alpha', this.geo.rm_crystal, { w: 0xffffff, b: P.mid, s: 17, order: 6 }), am = this._m(e, 'add', this.geo.rm_crystal, { w: 0xffffff, b: P.b, s: 1, order: 7 });
+      m.position.copy(p); am.position.copy(p); _q.setFromEuler(new THREE.Euler(rnd(-0.35, 0.35), rnd(0, 6), rnd(-0.35, 0.35))); m.quaternion.copy(_q); am.quaternion.copy(_q); m.visible = am.visible = false;
+      cr.push({ m, a: am, d: 0.05 + k * 0.25, s, hh: rnd(0.7, 1.15) });
+      if (i % 2 === 0) for (let j = 0; j < (low ? 0 : 2); j++) { const p2 = p.clone().add(_b.set(rnd(-0.22, 0.22), 0, rnd(-0.22, 0.22))), m2 = this._m(e, 'alpha', this.geo.rm_crystal, { w: 0xffffff, b: P.mid, s: 17, order: 6 }), a2 = this._m(e, 'add', this.geo.rm_crystal, { w: 0xffffff, b: P.b, s: 1, order: 7 });
+        m2.position.copy(p2); a2.position.copy(p2); _q.setFromEuler(new THREE.Euler(rnd(-0.6, 0.6), rnd(0, 6), rnd(-0.6, 0.6))); m2.quaternion.copy(_q); a2.quaternion.copy(_q); m2.visible = a2.visible = false; cr.push({ m: m2, a: a2, d: 0.08 + k * 0.25, s: s * 0.6, hh: rnd(0.6, 0.9) }); } }
+    return e;
+  }
+  /** ice on a target: blue flash, frost ring, crystal cluster growing round its feet, shattering at 0.65 s into translucent shards */
+  iceHit(p, r = 0.5) {
+    if (!this.ok() || !p) return null;
+    const low = rmLite(), P = RmFx.PAL.ice, I = RMFX.intensity * rawK(), g = P3(p), ch = g.clone().setY(g.y + Math.min(1.1, 0.45 + r * 0.6)), cr = [], R = Math.min(1.2, r + 0.3); let broke = false;
+    const e = this._fx('iceHit', 1.0, (e) => { const t = e.t;
+      this._face(fl, 0.95 * (0.6 + 0.5 * easeOut(t / 0.03))); fl.material.uniforms.uA.value = I * 1.4 * (1 - smooth(0.012, 0.065, t));
+      const kr = t / 0.3; ring.visible = kr < 1; ring.scale.set(R * (0.3 + 0.7 * easeOut(kr)), 1, R * (0.3 + 0.7 * easeOut(kr))); ring.material.uniforms.uA.value = I * 1.2 * (1 - smooth(0.4, 1, kr));
+      for (const q of cr) { const k = t / 0.12; q.m.visible = q.a.visible = !broke; if (broke) continue; const gg = easeOut(Math.min(1, k)); for (const m of [q.m, q.a]) m.scale.set(q.s, q.s * gg * q.hh, q.s); q.m.material.uniforms.uA.value = 0.85; q.a.material.uniforms.uA.value = I * 0.55; }
+      if (!broke && t > 0.65) { broke = true; this._face(fl, 0.7); for (const q of cr) { const pp = q.m.position.clone().setY(q.m.position.y + 0.15);
+          this.emit('shard', low ? 1 : 2, () => ({ p: pp, v: _c.set(rnd(-1.4, 1.4), rnd(0.8, 2.2), rnd(-1.4, 1.4)), s: rnd(0.06, 0.1), col: rand() < 0.5 ? 0xe8f8ff : P.mid, a: 0.75, life: rnd(0.4, 0.6), grav: 8, floor: g.y + 0.02, spin: 9 })); } b0 = t; }
+      bf.material.uniforms.uA.value = broke ? I * 0.8 * (1 - smooth(0, 0.07, t - b0)) : 0; this._face(bf, 0.8);
+    });
+    let b0 = 0; e.g.position.set(0, 0, 0);
+    const fl = this._m(e, 'add', this.quad, { w: 0xffffff, b: P.b, s: 4, order: 9 }); fl.position.copy(ch); fl.material.depthTest = false;
+    const bf = this._m(e, 'add', this.quad, { w: 0xffffff, b: P.b, s: 6, order: 8 }); bf.position.copy(g).setY(g.y + 0.3);
+    const ring = this._m(e, 'add', this.geo.rm_ring, { w: 0xffffff, b: P.b, s: 3, order: 4 }); ring.position.copy(g).setY(g.y + 0.06);
+    const n = low ? 3 : 6;
+    for (let i = 0; i < n; i++) { const a = (i + rnd(-0.25, 0.25)) / n * 6.28, rr = r * rnd(0.8, 1.05), m = this._m(e, 'alpha', this.geo.rm_crystal, { w: 0xffffff, b: P.mid, s: 17, order: 6 }), am = this._m(e, 'add', this.geo.rm_crystal, { w: 0xffffff, b: P.b, s: 1, order: 7 });
+      const pp = new THREE.Vector3(g.x + Math.cos(a) * rr, g.y, g.z + Math.sin(a) * rr); m.position.copy(pp); am.position.copy(pp);
+      _q.setFromUnitVectors(UP, _b.set(Math.cos(a) * 0.45, 1, Math.sin(a) * 0.45).normalize()); m.quaternion.copy(_q); am.quaternion.copy(_q); cr.push({ m, a: am, s: rnd(0.7, 1.0) * Math.min(1.3, 0.7 + r * 0.6), hh: rnd(0.6, 0.95) }); }
+    if (!low) this.emit('star', 3, () => ({ p: _a.copy(ch).add(_b.set(rnd(-0.3, 0.3), rnd(-0.2, 0.3), rnd(-0.3, 0.3))), v: _c.set(0, rnd(0.2, 0.6), 0), s: rnd(0.05, 0.08), col: rand() < 0.5 ? 0xffffff : P.mid, life: 0.45, spin: 6 }));
+    return e;
+  }
+  /** 음파 파동: 3D 소리 벽(rm_wave, 60° 호)이 차례로 판정 부채꼴 끝까지 퍼짐 — 금·보라 번갈아, 홈 무늬가 흐름 + 앞을 미는 빛줄기 */
+  soundWave(pc, o = {}) {
+    if (!this.ok() || !pc) return null;
+    const low = rmLite(), I = RMFX.intensity * rawK(), c = this._cone(pc, o), n = low ? 3 : 4, gap = 0.06, run = 0.34, ws = [], cols = o.cols || [[0xfff0b0, 0xffb02a], [0xf0d8ff, 0x9a5aff]];
+    const sx = Math.tan(c.h) / Math.tan(Math.PI / 6);   // mesh = 60°: widen / narrow to the real angle
+    const e = this._fx('soundWave', run + n * gap + 0.1, (e) => { const t = e.t;
+      ws.forEach((q, i) => { const k = (t - i * gap) / run, vis = k > 0 && k < 1; q.m.visible = q.a.visible = vis; if (!vis) return;
+        const rr = c.r * (0.15 + 0.85 * easeOut(k)) * 0.97, hh = 0.75 + 0.4 * Math.sin(k * Math.PI);
+        for (const m of [q.m, q.a]) { m.scale.set(rr * sx, hh, rr); m.material.uniforms.uT.value = t + i; }
+        q.m.material.uniforms.uA.value = I * (1.6 - 0.15 * i) * smooth(0, 0.1, k) * (1 - smooth(0.6, 1, k)); q.a.material.uniforms.uA.value = 0.65 * smooth(0, 0.1, k) * (1 - smooth(0.55, 1, k)); });
+    });
+    e.g.position.copy(c.g0).setY(c.g0.y + 0.25); e.g.rotation.set(0, Math.atan2(c.d.x, c.d.z), 0);
+    for (let i = 0; i < n; i++) { const [w, b] = cols[i % 2]; const m = this._m(e, 'add', this.geo.rm_wave, { w, b, s: 16, order: 6 }), a = this._m(e, 'alpha', this.geo.rm_wave, { w, b, s: 16, order: 5 }); m.visible = a.visible = false; ws.push({ m, a }); }
+    this.emit('streak', low ? 4 : 9, () => { const th = rnd(-c.h, c.h) * 0.85, d = _b.copy(c.d).applyAxisAngle(UP, th);
+      return { p: _a.copy(c.g0).addScaledVector(d, 0.6).setY(c.g0.y + rnd(0.4, 1.1)), v: _c.copy(d).multiplyScalar(c.r * rnd(2.0, 2.6)), s: rnd(0.05, 0.07), col: rand() < 0.5 ? cols[0][0] : cols[1][1], life: c.r / (c.r * 2.3) * 0.9, drag: 0.5, stretch: 0.05 }; });
+    return e;
+  }
+  /** 불협화음: 삐죽하게 떨리는 고리 벽 두 개(rm_band, uJ 흔들림)가 엇갈린 색으로 판정 원(r) 안에서 퍼짐 + 가운데 섬광 + 사방으로 튀는 빛줄기 */
+  discordRing(pc, o = {}) {
+    if (!this.ok() || !pc) return null;
+    const low = rmLite(), I = RMFX.intensity * rawK(), g0 = P3(pc.pos), r = o.r || 2.6, rs = [];
+    const e = this._fx('discord', 0.6, (e) => { const t = e.t;
+      rs.forEach((q, i) => { const k = (t - q.d) / 0.4, vis = k > 0 && k < 1; q.m.visible = q.a.visible = vis; if (!vis) return; const rr = r * (0.2 + 0.72 * easeOut(k)), hh = 0.5 + 0.25 * Math.sin(k * Math.PI);
+        for (const m of [q.m, q.a]) { m.scale.set(rr, hh, rr); m.material.uniforms.uT.value = t * (i ? -1 : 1); m.material.uniforms.uJ.value = 0.07 * (1 - 0.5 * k); }
+        q.m.material.uniforms.uA.value = I * 1.3 * smooth(0, 0.08, k) * (1 - smooth(0.55, 1, k)); q.a.material.uniforms.uA.value = 0.45 * (1 - smooth(0.5, 1, k)); });
+      this._face(fl, 1.2 * (0.6 + 0.5 * easeOut(t / 0.03))); fl.material.uniforms.uA.value = I * 1.3 * (1 - smooth(0.012, 0.07, t));
+    });
+    e.g.position.copy(g0).setY(g0.y + 0.15);
+    for (const [i, w, b] of [[0, 0xffc8ff, 0xc84aff], [1, 0xeaffb0, 0x8ac81a]]) { const m = this._m(e, 'add', this.geo.rm_band, { w, b, s: 16, order: 6 }), a = this._m(e, 'alpha', this.geo.rm_band, { w, b, s: 16, order: 5 });
+      for (const x of [m, a]) { x.material.uniforms.uE.value = 2; x.visible = false; } rs.push({ m, a, d: i * 0.07 }); }
+    const fl = this._m(e, 'add', this.quad, { w: 0xffffff, b: 0xc84aff, s: 4, order: 9 }); fl.position.y = 0.85;
+    this.emit('streak', low ? 5 : 12, (i) => { const a = rnd(0, 6.28), d = _b.set(Math.cos(a), 0, Math.sin(a)); return { p: _a.copy(g0).addScaledVector(d, 0.4).setY(g0.y + rnd(0.5, 1.1)), v: _c.copy(d).multiplyScalar(rnd(5, 7)).setY(rnd(-0.5, 0.8)), s: rnd(0.05, 0.07), col: i % 2 ? 0xff7aff : 0xc8ff5a, life: r / 7, drag: 1, stretch: 0.07 }; });
     return e;
   }
 

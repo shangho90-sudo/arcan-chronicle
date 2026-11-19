@@ -12,6 +12,11 @@ Usage:  python3 tools/blender/fx_rm.py        (bpy module, Blender 5.x)
   rm_streak     불티·빛줄기: 길이 1(+Z) 가는 마름모 두 장 교차, u = 꼬리 0 → 머리 1.
   rm_drop       방울: 저폴리 구(반지름 1).
   rm_star       통통한 네 갈래 3D 별(반지름 1).
+  (4묶음 원소) rm_band   위가 열린 원통 벽(반지름 1, 높이 1): u = 둘레, v = 아래 0 → 위 1 — 불기둥·소리 고리 벽(셰이더가 모양을 냄).
+  rm_flame      불꽃 혀: 아래가 둥글고 위로 휘며 뾰족(높이 1, 폭 약 0.36), u = 둘레, v = 아래 0 → 끝 1.
+  rm_crystal    얼음 결정: 육각 기둥 + 뾰족한 끝(높이 1, 반지름 0.16, 바닥 원점), u = 둘레, v = 높이.
+  rm_shard      얼음 파편: 두께 있는 불규칙 삼각 조각(가장 긴 변 약 1).
+  rm_wave       음파 호 벽: 60° 호(반지름 1), 단면은 가운데가 부푼 얇은 띠(높이 0.6), u = 호 0 → 1, v = 아래 0 → 위 1.
 출력: assets/fx/fx_rm.glb.json (base64 GLB, 재질·이미지 없음, 노멀·UV 있음) + tools/blender/rm/fx_rm.blend
 """
 import os, sys, math, json, base64
@@ -108,6 +113,58 @@ def star(bm, uvl):
         face(bm, uvl, (c0, ring_[k], ring_[k2]), ((0.5, 0.5), (0.5 + pts[k][0] / 2, 0.5 + pts[k][1] / 2), (0.5 + pts[k2][0] / 2, 0.5 + pts[k2][1] / 2)))
         face(bm, uvl, (c1, ring_[k2], ring_[k]), ((0.5, 0.5), (0.5 + pts[k2][0] / 2, 0.5 + pts[k2][1] / 2), (0.5 + pts[k][0] / 2, 0.5 + pts[k][1] / 2)))
 
+def band(bm, uvl, n=32, rows=4):
+    rr = []
+    for j in range(rows + 1):
+        v = j / rows; rr.append([bm.verts.new(V(math.cos(2 * math.pi * k / n), v, math.sin(2 * math.pi * k / n))) for k in range(n + 1)])
+    for j in range(rows):
+        for k in range(n):
+            face(bm, uvl, (rr[j][k], rr[j][k + 1], rr[j + 1][k + 1], rr[j + 1][k]), ((k / n, j / rows), ((k + 1) / n, j / rows), ((k + 1) / n, (j + 1) / rows), (k / n, (j + 1) / rows)))
+
+def flame(bm, uvl, n=10, rows=8):
+    rr = []
+    for j in range(rows + 1):
+        v = j / rows; rad = 0.18 * math.sin(math.pi * min(1, v * 1.35 + 0.08)) ** 0.8 * (1 - v) ** 0.35 + 0.004
+        bend = 0.12 * v * v; out = []
+        for k in range(n + 1):
+            a = 2 * math.pi * k / n; out.append(bm.verts.new(V(math.cos(a) * rad + bend, v, math.sin(a) * rad)))
+        rr.append(out)
+    for j in range(rows):
+        for k in range(n):
+            face(bm, uvl, (rr[j][k], rr[j][k + 1], rr[j + 1][k + 1], rr[j + 1][k]), ((k / n, j / rows), ((k + 1) / n, j / rows), ((k + 1) / n, (j + 1) / rows), (k / n, (j + 1) / rows)))
+
+def crystal(bm, uvl, n=6):
+    prof = [(0.0, 0.11), (0.08, 0.16), (0.7, 0.15), (1.0, 0.0)]
+    rr = []
+    for z, r in prof:
+        rr.append([bm.verts.new(V(math.cos(2 * math.pi * k / n + 0.3) * max(r, 0.002), z, math.sin(2 * math.pi * k / n + 0.3) * max(r, 0.002))) for k in range(n + 1)])
+    for j in range(len(prof) - 1):
+        for k in range(n):
+            v0, v1 = prof[j][0], prof[j + 1][0]
+            face(bm, uvl, (rr[j][k], rr[j][k + 1], rr[j + 1][k + 1], rr[j + 1][k]), ((k / n, v0), ((k + 1) / n, v0), ((k + 1) / n, v1), (k / n, v1)))
+    c = bm.verts.new(V(0, 0, 0))
+    for k in range(n): face(bm, uvl, (rr[0][k + 1], rr[0][k], c), ((0, 0), (1, 0), (0.5, 0.5)))
+
+def shard(bm, uvl):
+    pts = [(0.0, 0.5), (0.28, -0.32), (-0.12, -0.5), (-0.3, 0.05)]
+    top = [bm.verts.new(V(x, 0.05, y)) for x, y in pts]; bot = [bm.verts.new(V(x * 0.9, -0.05, y * 0.9)) for x, y in pts]
+    uv = [(x + 0.5, y + 0.5) for x, y in pts]
+    face(bm, uvl, top, uv); face(bm, uvl, list(reversed(bot)), list(reversed(uv)))
+    for k in range(4):
+        k2 = (k + 1) % 4; face(bm, uvl, (top[k], bot[k], bot[k2], top[k2]), ((k / 4, 1), (k / 4, 0), ((k + 1) / 4, 0), ((k + 1) / 4, 1)))
+
+def wave(bm, uvl, seg=24, rows=6):
+    rr = []
+    for j in range(rows + 1):
+        v = j / rows; bulge = 0.06 * math.sin(math.pi * v); out = []
+        for k in range(seg + 1):
+            a = math.radians(-30 + 60 * k / seg); r = 1 + bulge
+            out.append(bm.verts.new(V(math.sin(a) * r, 0.6 * v, math.cos(a) * r)))
+        rr.append(out)
+    for j in range(rows):
+        for k in range(seg):
+            face(bm, uvl, (rr[j][k], rr[j][k + 1], rr[j + 1][k + 1], rr[j + 1][k]), ((k / seg, j / rows), ((k + 1) / seg, j / rows), ((k + 1) / seg, (j + 1) / rows), (k / seg, (j + 1) / rows)))
+
 def make(name, fn):
     bm = bmesh.new(); uvl = bm.loops.layers.uv.new('UVMap'); fn(bm, uvl)
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
@@ -121,6 +178,7 @@ def main():
         make('rm_cres', lambda bm, uv: crescent(bm, uv, 92, -80, 0.40, 0.62, 0.10)),
         make('rm_cres_big', lambda bm, uv: (crescent(bm, uv, 112, -104, 0.55, 0.56, 0.14), crescent(bm, uv, 96, -86, 0.20, 0.5, 0.04, r_out=0.62, v0=0.0, v1=0.35))),
         make('rm_comet', comet), make('rm_crown', crown), make('rm_ring', ring), make('rm_streak', streak), make('rm_drop', drop), make('rm_star', star),
+        make('rm_band', band), make('rm_flame', flame), make('rm_crystal', crystal), make('rm_shard', shard), make('rm_wave', wave),
     ]
     tris = {o.name: sum(len(p.vertices) - 2 for p in o.data.polygons) for o in obs}
     bpy.ops.object.select_all(action='DESELECT')

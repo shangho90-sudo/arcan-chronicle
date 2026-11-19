@@ -477,10 +477,14 @@ export class HairFx {
     if (mode === 'gust') { for (let i = 0; i < (low ? HAIR.gust.swirlsLite : HAIR.gust.swirls) && this.geo.hair_swirl; i++) { const m = this._m(e, 'spr', this.geo.hair_swirl, 5), u = m.material.uniforms; u.uK.value = 5; u.uW.value.setHex(C.white); u.uB.value.setHex(i % 2 ? C.mintG : 0xc8d8ff); u.uA.value = 0;
         swirls.push({ m, d: lead + i * 0.07, th: (i - ((low ? HAIR.gust.swirlsLite : HAIR.gust.swirls) - 1) / 2) * half * 0.55, sg: i % 2 ? -1 : 1, ph: i * 2.1 }); }
       for (let i = 0; i < HAIR.gust.rings; i++) rings.push({ m: this.spr(e, 1, 0xffffff, C.mintG, 6), d: lead + 0.04 + i * 0.13 }); }
-    e.stop = () => { if (e.t < dur) { const cut = e.t; e.life = Math.min(e.life, cut + K.fade + 0.05); stopAt = cut; } };
-    e.pulse = (hits) => { kick = 1; tick++;
+    // 리마스터(높음·보통, js/rmfx.js): 온풍 = 부채꼴 안 화염 마법진·불꽃 앞선(틱마다)·불꽃 혀·불기둥·불티·아지랑이, 냉풍 = 서리 마법진·자라는 서리 무늬·반투명 얼음 결정 → 깨짐;
+    // 맞은 적은 예전 열기 고리·발밑 결정 대신 rm.fireHit(작게)·rm.iceHit (겹치지 않게)
+    const rmE = this.rm && gfxOn() && this.rm.ok() && mode !== 'gust' ? (mode === 'hot' ? this.rm.fireCone(pc, { f, r, ang: o.ang || 60, at: lead + 0.06, dur: Math.max(0.2, dur - lead - 0.06), pal: 'fire' }) : this.rm.iceCone(pc, { f, r, ang: o.ang || 60, at: lead + 0.06 })) : null;
+    e.stop = () => { if (e.t < dur) { const cut = e.t; e.life = Math.min(e.life, cut + K.fade + 0.05); stopAt = cut; } if (rmE && rmE.stop) rmE.stop(); };
+    e.pulse = (hits) => { kick = 1; tick++; if (rmE && mode === 'hot' && rmE.pulse) rmE.pulse();
       for (const t of hits || []) { const p = P3(t), c = p.clone(); c.y += t.mid || 0.7; const rad = t.r || 0.5;
         if (mode === 'gust') this._shove(p, c, fw, rt, P3(pc.pos));
+        else if (rmE) { const gp = { x: p.x, y: p.y, z: -p.z }; if (mode === 'hot') this.rm.fireHit(gp, rad, { small: true }); else this.rm.iceHit(gp, rad); }
         else if (mode === 'hot') this._heat(p, c, rad, tick);
         else this._frost(p, c, rad, t.ref || null); }
     };

@@ -18,6 +18,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { CookFx, cookTop } from './cookfx.js';
+import { gfxOn } from './gfxq.js';
 
 export const SMITHFX = {
   intensity: 1.0,
@@ -291,6 +292,8 @@ export class SmithFx extends CookFx {
       parts.push({ m, s, v: new THREE.Vector3(Math.cos(a) * sp, rnd(0.6, 1.8), -Math.sin(a) * sp), down: 0 });
     }
     this.flash(mouth, { size: 0.9, life: 0.16, b: C.hotB });
+    // 리마스터(높음·보통, js/rmfx.js): 부채꼴 안 화염 마법진·불꽃 앞선(충격파)·도는 불꽃 혀·불기둥·불티·아지랑이 + 맞은 적마다 섬광·작은 불기둥·땅 고리
+    if (this.rm && gfxOn()) { this.rm.fireCone(pc, { f, r, ang, at: 0, pal: 'forge' }); for (const h of o.hits || []) this.rm.fireHit(h, h.r || 0.5, { pal: 'forge' }); }
     for (const h of o.hits || []) { const g = P3(h), p = g.clone(); p.y += 0.55; this.flash(p, { size: 0.6, life: 0.12, b: C.hotB }); this.sparks(p, low ? 1 : 3, { ground: g.y }); }
     return e;
   }

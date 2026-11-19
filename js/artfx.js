@@ -404,7 +404,9 @@ export class ArtFx {
       arcs.forEach((m, i) => { const k = clamp01((e.t - i * K.gap) / K.run), rr = r * (0.22 + 0.78 * easeOut(k)); this._flat(m, rr * 2 / 0.9, K.y, f); m.material.uniforms.uA.value = k <= 0 ? 0 : I * (1.5 - i * 0.2) * smooth(0, 0.12, k) * (1 - smooth(0.6, 1, k)); });
     });
     e.g.position.copy(P3(pc.pos));
-    for (let i = 0; i < n; i++) { const m = this.spr(e, 8, i % 2 ? C.violet : C.gold, i % 2 ? C.violetB : C.goldB, 5); m.material.uniforms.uQ.value = ha; arcs.push(m); }
+    // 리마스터(높음·보통, js/rmfx.js): 납작한 음파 호 대신 3D 소리 벽(rm_wave)이 판정 부채꼴 끝까지 차례로 퍼짐 (음표·명중은 그대로)
+    const rmW = this.rm && gfxOn() && this.rm.ok() ? this.rm.soundWave(pc, { f, r, ang: o.ang || 60 }) : null;
+    if (!rmW) for (let i = 0; i < n; i++) { const m = this.spr(e, 8, i % 2 ? C.violet : C.gold, i % 2 ? C.violetB : C.goldB, 5); m.material.uniforms.uQ.value = ha; arcs.push(m); }
     // two notes ride the wave front along the cone axis
     const from = P3(pc.pos); from.y += K.y + 0.2; const dir = new THREE.Vector3(f.x, 0, -f.z);
     for (let i = 0; i < (lite() ? 1 : 3); i++) { const d = dir.clone().applyAxisAngle(UP, (i - 1) * ha * 0.55); this._flyNote(from, d, r * 0.85, K.run + 0.1, i); }
@@ -429,6 +431,8 @@ export class ArtFx {
     });
     e.g.position.copy(g0);
     const j1 = this.spr(e, 9, C.violet, C.violetB, 5), j2 = this.spr(e, 9, C.sour, 0x6a8a1a, 5), fl = this.spr(e, 3, 0xffffff, C.violet, 6); fl.position.y = 1.0; j2.material.uniforms.uQ.value = 0.5;
+    // 리마스터(높음·보통): 납작한 삐죽 고리 대신 떨리는 3D 고리 벽 두 개(rm.discordRing) — 예전 고리·섬광은 숨김 (깨진 음표·명중은 그대로)
+    if (this.rm && gfxOn() && this.rm.ok() && this.rm.discordRing(pc, { r })) { e.update = () => {}; for (const m of [j1, j2, fl]) m.visible = false; }
     // broken notes tumble outwards (to the real radius at most), clashing colours
     this._bits(g0.clone().setY(g0.y + 1.0), low ? K.notesLite : K.notes, { geo: this.geo.art_note, cols: [C.violetB, C.sour, 0xff5a8a], size: [0.16, 0.24], speed: [r * 0.9, r * 1.6], up: [0.6, 1.8], ground: g0.y, life: 0.5, grav: 6, spin: true });
     (o.hits || []).slice(0, 6).forEach((t, i) => this.projHit(t, { kind: 'note', idx: i + 1 }));

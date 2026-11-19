@@ -523,6 +523,8 @@ export class CookFx {
   soup(pc, o = {}) {
     if (!this._ok() || !this.geo.cook_ladle) return null;
     const K = COOK.soup, I = COOK.intensity, lead = Math.max(0.08, o.lead || 0.17), f = this._f3(o.facing || { x: 0, z: 1 }), r = o.r || 3.2, ang = o.ang || 60, low = lite();
+    // 리마스터(높음·보통, js/rmfx.js): 실제 부채꼴(판정 r·ang) 안 화염 마법진 → 국물이 떠나는 순간 불꽃 앞선·불꽃 혀·불기둥·불티·아지랑이, 맞은 적마다 섬광·작은 불기둥
+    const rmF = this.rm && gfxOn() ? this.rm.fireCone(pc, { f: o.facing || { x: 0, z: 1 }, r, ang, at: lead, pal: 'soup' }) : null;
     const p0 = P3(pc.pos), right = new THREE.Vector3().crossVectors(f, UP).normalize(), piv = p0.clone().addScaledVector(right, 0.35 * K.vis).setY(p0.y + K.pivot); let thrown = -1;
     const e = this._fx('soup', lead + 0.75, (e) => {
       // the ladle swings from low behind the cook up and over to the front; the soup leaves it at `lead`
@@ -549,6 +551,7 @@ export class CookFx {
         drops.push({ m, v: new THREE.Vector3((to.x - ld.position.x) / T, dy / T + 4.5 * T, (to.z - ld.position.z) / T) }); }
       const ns = low ? K.steamLite : K.steam;
       for (let i = 0; i < ns; i++) { const a = rnd(-h, h) * 0.8, at = p0.clone().addScaledVector(f.clone().applyAxisAngle(UP, a), rv * rnd(0.4, 0.9)); this._puffs(at.setY(p0.y + 0.15 * V), 1, 0.5 * V, { c1: COOK.col.steam1, c2: COOK.col.steam2, a: 0.26, life: rnd(0.5, 0.75), rise: 0.9 * V }); }
+      if (rmF) for (const t of ok || []) this.rm.fireHit(t.pos, t.radius || 0.5, { pal: 'soup' });
       for (const t of ok || []) { const g = P3(t.pos); this._pop(g, { r: 0, y: cookTop(t) * 0.55, size: 0.55 * V, flash: 1.0, w: COOK.col.soupHi }); this._bits(g.clone().setY(g.y + cookTop(t) * 0.55), low ? 1 : 3, { geo: this.geo.cook_drop, size: [0.035 * V, 0.06 * V], speed: [1.0 * V, 2.0 * V], up: [1.2 * Math.SQRT2, 2.4 * Math.SQRT2], ground: g.y, life: 0.4 }); }
     };
     return e;
