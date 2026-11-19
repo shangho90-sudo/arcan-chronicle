@@ -48,13 +48,16 @@ PH2_ROWS = [235, 347, 460, 572, 680]
 PH2_IDS = {'a': ['ph1_a1', 'ph1_a4', 'ph1_a3', 'ph1_a6', 'ph1_a5'], 'b': ['ph1_b1', 'ph1_b2', 'ph1_b6', 'ph1_b4', 'ph1_b5'],
            'c': ['ph1_c1', 'ph1_c7', 'ph1_c6', 'ph1_c8', 'ph1_c9']}
 
+PH1_DRAWN = {'ph1_a4', 'ph1_b1', 'ph1_b2', 'ph1_b4', 'ph1_c1'}
 PH2_FIXED = {'ph1_c7': (1010, 308, 1086, 384)}   # 파란 그림이 남색 배경과 섞여 자동으로 못 찾음
 
 def pharmacist():
     im = Image.open(SRC_PH2).convert('RGB')
     for col, x in PH2_COLS.items():
         for i, y in enumerate(PH2_ROWS):
-            k = PH2_IDS[col][i]; b = PH2_FIXED.get(k) or circle_box(im, x, y)
+            k = PH2_IDS[col][i]
+            if k in PH1_DRAWN: continue   # 2026-11-19 교체된 5개는 tools/ui/pharm1_icons.py 가 그림 — 예전 그림으로 덮어쓰지 않음
+            b = PH2_FIXED.get(k) or circle_box(im, x, y)
             ic = im.crop(b).resize((SIZE, SIZE), Image.LANCZOS).convert('RGBA')
             m = Image.new('L', (SIZE * 4, SIZE * 4), 0); ImageDraw.Draw(m).ellipse((2, 2, SIZE * 4 - 3, SIZE * 4 - 3), fill=255)
             ic.putalpha(m.resize((SIZE, SIZE), Image.LANCZOS)); ic.save(os.path.join(OUT, k + '.png'), optimize=True); print(k, b)

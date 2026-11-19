@@ -87,6 +87,96 @@
         "file": "sfx_ph_glass_acid.mp3",
         "duration": 0.8,
         "description": "부식 약병 착탄: glass crack, thick low splat, six bubble pops of different sizes"
+      },
+      {
+        "file": "sfx_ph_rang_throw.mp3",
+        "generatedOn": "2026-11-19",
+        "generator": "python3 tools/audio/pharm1_sfx.py (fixed seed; Runway sound models were at their daily limit)",
+        "description": ""
+      },
+      {
+        "file": "sfx_ph_rang_hit.mp3",
+        "generatedOn": "2026-11-19",
+        "generator": "python3 tools/audio/pharm1_sfx.py (fixed seed; Runway sound models were at their daily limit)",
+        "description": "퍽 — 나무 유봉이 몸에 맞는 둔탁한 소리(짧게, 여러 번 나도 귀찮지 않게)"
+      },
+      {
+        "file": "sfx_ph_rang_catch.mp3",
+        "generatedOn": "2026-11-19",
+        "generator": "python3 tools/audio/pharm1_sfx.py (fixed seed; Runway sound models were at their daily limit)",
+        "description": "탁 — 손바닥에 자루가 감기는 가벼운 나무 소리"
+      },
+      {
+        "file": "sfx_ph_wick_break.mp3",
+        "generatedOn": "2026-11-19",
+        "generator": "python3 tools/audio/pharm1_sfx.py (fixed seed; Runway sound models were at their daily limit)",
+        "description": "유리 깨짐 + 철퍽(반응음 없음 — 불은 나중에)"
+      },
+      {
+        "file": "sfx_ph_wick_sizzle.mp3",
+        "generatedOn": "2026-11-19",
+        "generator": "python3 tools/audio/pharm1_sfx.py (fixed seed; Runway sound models were at their daily limit)",
+        "description": "심지가 타들어 가는 지지직(0.35 s, 작은 불티 탁탁)"
+      },
+      {
+        "file": "sfx_ph_wick_whoomp.mp3",
+        "generatedOn": "2026-11-19",
+        "generator": "python3 tools/audio/pharm1_sfx.py (fixed seed; Runway sound models were at their daily limit)",
+        "description": "확 — 약액에 불이 붙는 낮은 '훅'"
+      },
+      {
+        "file": "sfx_ph_wick_crackle.mp3",
+        "generatedOn": "2026-11-19",
+        "generator": "python3 tools/audio/pharm1_sfx.py (fixed seed; Runway sound models were at their daily limit)",
+        "description": "불꽃 틱마다 작게 타닥"
+      },
+      {
+        "file": "sfx_ph_frost_roll.mp3",
+        "generatedOn": "2026-11-19",
+        "generator": "python3 tools/audio/pharm1_sfx.py (fixed seed; Runway sound models were at their daily limit)",
+        "description": ""
+      },
+      {
+        "file": "sfx_ph_frost_shatter.mp3",
+        "generatedOn": "2026-11-19",
+        "generator": "python3 tools/audio/pharm1_sfx.py (fixed seed; Runway sound models were at their daily limit)",
+        "description": "깨지며 얼음 파편이 부채꼴로 흩어지는 쨍그랑 + 차가운 쉿"
+      },
+      {
+        "file": "sfx_ph_crystal_grow.mp3",
+        "generatedOn": "2026-11-19",
+        "generator": "python3 tools/audio/pharm1_sfx.py (fixed seed; Runway sound models were at their daily limit)",
+        "description": ""
+      },
+      {
+        "file": "sfx_ph_crystal_pierce.mp3",
+        "generatedOn": "2026-11-19",
+        "generator": "python3 tools/audio/pharm1_sfx.py (fixed seed; Runway sound models were at their daily limit)",
+        "description": "날카롭게 꽂히는 짧은 '칭'"
+      },
+      {
+        "file": "sfx_ph_crystal_shatter.mp3",
+        "generatedOn": "2026-11-19",
+        "generator": "python3 tools/audio/pharm1_sfx.py (fixed seed; Runway sound models were at their daily limit)",
+        "description": "마지막 굵은 결정이 꽃잎처럼 갈라지는 '쨍'(높은 배음 + 흩어지는 조각)"
+      },
+      {
+        "file": "sfx_ph_crystal_scatter.mp3",
+        "generatedOn": "2026-11-19",
+        "generator": "python3 tools/audio/pharm1_sfx.py (fixed seed; Runway sound models were at their daily limit)",
+        "description": "표적을 잃은 결정이 힘없이 흩어지는 작은 소리"
+      },
+      {
+        "file": "sfx_ph_dream_blow.mp3",
+        "generatedOn": "2026-11-19",
+        "generator": "python3 tools/audio/pharm1_sfx.py (fixed seed; Runway sound models were at their daily limit)",
+        "description": "후 — 부드러운 숨 + 반짝이 소리"
+      },
+      {
+        "file": "sfx_ph_dream_sleep.mp3",
+        "generatedOn": "2026-11-19",
+        "generator": "python3 tools/audio/pharm1_sfx.py (fixed seed; Runway sound models were at their daily limit)",
+        "description": "잠드는 순간 낮게 울리는 자장 종소리(두 음)"
       }
     ]
   }
