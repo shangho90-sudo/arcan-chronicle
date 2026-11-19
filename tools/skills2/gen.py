@@ -278,32 +278,35 @@ S(J, 2, 2, '왕실의 테이블', 5, 'cf_c5', '로열 그랑 디너', 'ultimate'
 J, C = 'blacksmith', 0xff8a30
 # 2026-11-13 대장장이 1차 전면 개편(스킬 id·배우는 레벨·5단계는 그대로 — 저장한 습득 레벨·장착 칸이 그대로 새 스킬이 됨):
 #   A 단조와 제압: 모루 떨구기 · 집게 낚아채기 · 불량품 판정 · 백련타 · 장인의 박자(패시브)
-#   B 열처리와 반격: 급랭 담금질 · 접이식 철벽 · 용광로 개방 · 즉석 리벳 · 충격 재활용(패시브)
+#   B 열처리와 반격: 급랭 담금질 · 접이식 철벽 · 용광로 개방 · 튕김망치(2026-11-19, 예전 즉석 리벳 자리 — id bs1_b4 그대로) · 충격 재활용(패시브)
 #   C 장인의 제작: 제작 4종은 그대로 + 재료 회수·알뜰 공급의 전투용 고철(임시 자원)
 # 규칙·수치는 flags `smith`(js/smith.js SMITH가 기본값, 여기 값이 덮어씀)와 op 필드. 가열(heat, 최대 3중첩·5초, 더하면 시간 갱신)·
-# 낙인(brand)은 STATUSES. 파생 피해(모루 충격파·급랭 번짐·낙인 파괴·리벳 추가타·충격 방출)는 derived — 가열·낙인·모루·충전을 다시 일으키지 않음.
+# 낙인(brand)은 STATUSES. 파생 피해(모루 충격파·급랭 번짐·낙인 파괴·충격 방출)는 derived — 가열·낙인·모루·충전을 다시 일으키지 않음.
 # 타격 정지는 시전자·대상만(freezeT, op quiet), 카메라는 Renderer.kick 한 번. 이펙트 js/smithfx.js, 메시 tools/blender/fx_smith.py.
 SM = dict(quiet=True, stOnHit=True)
-S(J, 1, 0, '단조와 제압', 1, 'bs1_a1', '모루 떨구기', 'attack', '지정한 곳에 거대한 철 모루를 떨어뜨려 범위 피해와 짧은 경직을 준다. 모루는 5초 동안 남아, 내 망치 공격(기본 공격·백련타·집게 내려치기)이 닿으면 주변에 충격파를 낸다(0.4초 간격, 최대 4번). 모루는 하나만 둘 수 있고 길을 막지 않는다.', weapon='hammer', target='ground', range=5.0, mp=12, cd=7, anim='bs_call', sfx='bs_swing', sfxAt='strike', sfxLead=0.1, recover=0.25,
+S(J, 1, 0, '단조와 제압', 1, 'bs1_a1', '모루 떨구기', 'attack', '지정한 곳에 거대한 철 모루를 떨어뜨려 범위 피해와 짧은 경직을 준다. 모루는 5초 동안 남아, 내 망치 공격(기본 공격·백련타·집게 내려치기·튕김망치)이 닿으면 주변에 충격파를 낸다(0.4초 간격, 최대 4번). 모루는 하나만 둘 수 있고 길을 막지 않는다.', weapon='hammer', target='ground', range=5.0, mp=12, cd=7, anim='bs_call', sfx='bs_swing', sfxAt='strike', sfxLead=0.1, recover=0.25,
   ops=[custom('smith_anvil', r=2.0, coef=2.2, fall=0.34, at=-0.30, life=5.0, lifeLv=0.25, st=[st('stagger', 0.5)], pulse=dict(r=2.2, coef=0.6, gap=0.4, max=4))], fx=dict(color=C))
 S(J, 1, 0, '단조와 제압', 2, 'bs1_a2', '집게 낚아채기', 'attack', '거대한 집게를 뻗어 적 하나를 붙잡아 내 앞으로 끌어온다. 끌려온 적이 내 모루 곁에 떨어지면 모루에 부딪혀 추가 피해를 받는다. 보스와 무거운 적은 끌려오지 않으므로 내가 다가가 집게로 내려친다. 장애물 너머의 적은 잡을 수 없다.', weapon='hammer', target='enemy', range=6.5, mp=12, cd=8, anim='bs_thrust', sfx='bs_swing', sfxAt='strike', sfxLead=0.08, recover=0.3,
   ops=[custom('smith_tongs', coef=1.3, heavy=2.1, reach=0.16, pull=0.24, stop=1.5, anvil=1.5, at=-0.16, st=[st('stagger', 0.6)])], fx=dict(color=0xd8dde6))
-S(J, 1, 0, '단조와 제압', 3, 'bs1_a3', '불량품 판정', 'attack', '적에게 붉은 단조 낙인을 찍는다(10초). 그 뒤 내 직접 공격이 3번 맞으면 낙인이 깨지며 추가 피해를 주고 6초 동안 방어력을 낮춘다. 지속 피해와 충격파 같은 파생 피해는 세지 않는다.', weapon='hammer', target='enemy', range=2.2, mp=12, cd=9, anim='bs_slam', sfx='bs_swing', sfxAt='strike', sfxLead=0.09,
+S(J, 1, 0, '단조와 제압', 3, 'bs1_a3', '불량품 판정', 'attack', '적 몸통에 붉은 \'불량\' 도장을 꽝 찍는다(10초). 작은 쇠 각인이 적을 따라다니며, 내 직접 공격이 맞을 때마다 금이 간다 — 첫 타에 실금, 둘째 타에 굵은 균열, 셋째 타에 \'쨍!\' 하고 깨지며 추가 피해를 주고 6초 동안 방어력을 낮춘다. 모루 충격파·화상·수증기 번짐 같은 파생 피해는 세지 않는다.', weapon='hammer', target='enemy', range=2.2, mp=12, cd=9, anim='bs_slam', sfx='bs_swing', sfxAt='strike', sfxLead=0.09,
   ops=[hit('single', 1.4, oneHit=True, sfx='bs_hit', brand=dict(dur=10, n=3, coef=2.0, defdown=0.22, defLv=0.02, defDur=6), fx=dict(smith='brand'), **SM)], fx=dict(color=0xff5a3a))
 S(J, 1, 0, '단조와 제압', 4, 'bs1_a4', '백련타', 'attack', '앞쪽을 빠르게 세 번 두드리고(좌·우·좌) 크게 들어 올려 한 번 내려찍는다. 마지막 내려찍기는 맞은 적을 달군다(가열 1중첩). 내 모루가 닿는 곳에 있으면 모루 충격파가 함께 터진다.', weapon='hammer', target='dir', range=2.4, mp=16, cd=9, anim='bs_flurry', sfx='bs_swing', sfxAt='op', recover=0.3,
   ops=[hit('cone', 0.5, r=2.4, ang=110, hits=3, gap=0.14, oneHit=True, anvil=True, swingSfx='bs_swing', sfx='bs_hit', fx=dict(smith='tap'), **SM),
        hit('cone', 1.6, r=2.4, ang=80, at=0.62, oneHit=True, anvil=True, heat=1, swingSfx='bs_swing', sfx='bs_hit_heavy', st=[st('stagger', 0.4)], fx=dict(smith='finish'), **SM)], fx=dict(color=C))
 S(J, 1, 0, '단조와 제압', 5, 'bs1_a5', '장인의 박자', 'passive', '전투 스킬을 쓰면 4초 안의 다음 기본 공격 한 번이 강화 망치질이 된다(피해 +60%, 레벨마다 +10%). 겹쳐 쌓이지 않으며, 강화된 동안 망치에 주황색 테두리가 뜬다.', weapon='hammer',
   flags=dict(tempo=[0.6, 0.1]))
-S(J, 1, 1, '열처리와 반격', 1, 'bs1_b1', '급랭 담금질', 'attack', '앞쪽 부채꼴에 냉각수를 끼얹어 피해와 짧은 둔화를 준다. 가열된 적은 가열을 모두 식히며 중첩마다 50% 추가 피해를 받고 흰 수증기가 터져 곁의 적에게도 조금 번진다(번진 피해는 다시 번지지 않음).', target='dir', range=3.2, mp=14, cd=9, anim='bs_sweep', sfx='bs_swing', sfxAt='strike', sfxLead=0.08,
-  ops=[custom('smith_quench', r=3.2, ang=80, coef=1.4, per=0.5, splash=0.2, splashR=1.6, st=[st('slow', 2.5, 0.3)])], fx=dict(color=0xbfe8ff))
+S(J, 1, 1, '열처리와 반격', 1, 'bs1_b1', '급랭 담금질', 'attack', '허리의 담금통을 잡아 몸을 틀며 앞쪽 낮은 부채꼴로 냉각수를 끼얹는다. 물이 닿는 순간 피해와 짧은 둔화를 준다. 가열된 적은 가열을 모두 식히며 중첩마다 50% 추가 피해를 받고 \'치이익\' 흰 수증기가 터져 곁의 적에게도 조금 번진다(번진 피해는 다시 번지지 않음).', target='dir', range=3.2, mp=14, cd=9, anim='bs_douse', sfxAt='op',
+  ops=[custom('smith_quench', at=-1, r=3.2, ang=80, coef=1.4, per=0.5, splash=0.2, splashR=1.6, speed=9.0, mouth=0.6, st=[st('slow', 2.5, 0.3)])], fx=dict(color=0xbfe8ff))
 S(J, 1, 1, '열처리와 반격', 2, 'bs1_b2', '접이식 철벽', 'support', '앞에 철판을 펼쳐 5초 동안 앞쪽에서 오는 피해를 45%(레벨마다 +3%) 줄인다. 그동안 같은 버튼을 다시 누르면 철벽을 걷어차 앞으로 날려 피해를 주고 일반 적을 밀어낸다(보스는 피해만). 걷어차기는 기력이 들지 않고, 재사용 대기는 처음 펼칠 때부터 흐른다.', target='dir', range=6.0, mp=14, cd=16, anim='cast', sfx='bs_wall', recover=0.1,
   ops=[custom('smith_wall', at=-0.3, dur=5.0, block=0.45, blockLv=0.03, kick=dict(coef=1.8, w=2.4, len=6.0, push=2.6, speed=16))], fx=dict(color=0xb8c0cc))
 S(J, 1, 1, '열처리와 반격', 3, 'bs1_b3', '용광로 개방', 'attack', '화구를 열어 앞쪽 부채꼴로 불꽃과 쇳물을 짧게 뿜는다. 맞은 적은 화상을 입고 달궈진다(가열 2중첩). 바닥의 쇳물 자국은 보이기만 한다.', target='dir', range=3.2, mp=12, cd=7, anim='bs_thrust', sfx='bs_swing', sfxAt='strike', sfxLead=0.08,
   ops=[hit('cone', 1.5, r=3.2, ang=70, elem='fire', heat=2, sfx='bs_forge', st=[st('burn', 3, 0.08)], fx=dict(smith='forge'), **SM)], fx=dict(color=0xff8a30))
-S(J, 1, 1, '열처리와 반격', 4, 'bs1_b4', '즉석 리벳', 'support', '갑옷에 빛나는 리벳 3개를 박는다(10초). 공격을 맞을 때마다 리벳 하나가 튕겨 나가며 그 피해를 35%(레벨마다 +3%) 줄인다. 리벳이 남은 채 강화 기본 공격을 하면 남은 리벳을 모두 쏘아 앞쪽에 추가 타격을 준다.', target='self', mp=12, cd=18, anim='cast', sfx='bs_rivet', recover=0.1,
-  ops=[custom('smith_rivets', at=-0.3, n=3, dur=10.0, block=0.35, blockLv=0.03, gap=0.35, shot=0.5)], fx=dict(color=0xffc86a))
-S(J, 1, 1, '열처리와 반격', 5, 'bs1_b5', '충격 재활용', 'passive', '접이식 철벽과 즉석 리벳으로 실제로 줄인 피해의 60%(레벨마다 +5%)를 8초 동안 모아 두었다가, 다음 강화 기본 공격이 맞을 때 추가 피해로 돌려준다(모을 수 있는 양에 상한). 최대 체력과 방어력도 조금 오른다.',
+# 튕김망치(2026-11-19, 예전 즉석 리벳 bs1_b4 자리 — 같은 id라 저장한 습득 레벨·칸이 그대로): 허리춤의 손망치를 왼손으로 옆으로 던짐(동작 bs_toss, 0.24 s에 손을 떠남).
+#   적 = 묵직한 한 방(던질 때마다 직접 타격 최대 1번), 내 모루 = '깡!' + 모루 충격파 시도(0.4 s 간격·최대 4번 공유) 뒤 위로 튀어 모루 3.5 m 안 가장 가까운 적에게 포물선으로 떨어짐
+#   (닿는 순간 피해 — 직접 타격으로 셈), 튈 적이 없으면 바닥에 떨어져 사라짐. 휴대폰: 조준선 위에 적과 모루가 겹칠 때만 모루 우선. 규칙 js/smith.js smith_throw.
+S(J, 1, 1, '열처리와 반격', 4, 'bs1_b4', '튕김망치', 'attack', '허리춤의 손망치를 꺼내 옆으로 던진다. 망치는 돌며 날아가 처음 닿은 적 하나에게 묵직한 피해를 준다. 내 모루에 맞으면 \'깡!\' 하고 모루 충격파를 한 번 일으킨 뒤(모루의 0.4초 간격·최대 4번 제한을 함께 씀) 위로 튀어 올라, 모루 3.5m 안에서 가장 가까운 적에게 떨어진다. 튈 적이 없으면 바닥에 떨어져 사라진다. 한 번 던질 때 망치가 적을 직접 때리는 것은 한 번뿐이다.', weapon='hammer', target='ground', range=6.0, mp=12, cd=9, anim='bs_toss', sfxAt='op', recover=0.2,
+  ops=[custom('smith_throw', at=-1, coef=2.4, speed=15.0, bounce=3.5, lob=0.46, hop=1.6, st=[st('stagger', 0.35)])], fx=dict(color=0xffb050))
+S(J, 1, 1, '열처리와 반격', 5, 'bs1_b5', '충격 재활용', 'passive', '접이식 철벽으로 실제로 줄인 피해의 60%(레벨마다 +5%)를 8초 동안 모아 두었다가(모을 수 있는 양에 상한), 강화 기본 공격이나 튕김망치가 적을 직접 맞히는 순간 한 번에 추가 피해로 돌려준다(모루에서 튀어 떨어진 망치도 직접 타격). 빗나가거나 모루만 맞히면 모은 양은 그대로 남고, 모루 충격파로는 나가지 않는다. 최대 체력과 방어력도 조금 오른다.',
   flags=dict(recycle=[0.6, 0.05], recycleCap=[1.5, 0.25]), mods=[dict(stat='maxHp', mul=0.03, mulLv=0.015), dict(stat='def', add=2, addLv=1)])
 S(J, 1, 2, '장인의 제작', 1, 'bs1_c1', '기초 무기 제작', 'craft', '기본 망치·도끼와 일반 무기를 만든다.')
 S(J, 1, 2, '장인의 제작', 2, 'bs1_c2', '기초 방어구 제작', 'craft', '기본 금속 방어구를 만든다.')

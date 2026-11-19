@@ -1,6 +1,9 @@
-"""대장장이 1차 스킬 효과음 16개를 합성한다 (numpy + scipy, ffmpeg로 MP3). 2026-11-13.
+"""대장장이 1차 스킬 효과음을 합성한다 (numpy + scipy, ffmpeg로 MP3). 2026-11-13, 2026-11-19 튕김망치·급랭·낙인 소리 6개 추가·리벳 3개 삭제.
 
-Usage:  python3 tools/audio/smith_sfx.py  ->  assets/audio/sfx_bs_*.mp3 (+ /tmp/smith_sfx/*.wav)
+Usage:  python3 tools/audio/smith_sfx.py            ->  2026-11-19 새 소리 6개만(NEW) — 예전 것은 그대로 둠
+        python3 tools/audio/smith_sfx.py --all      ->  모두 다시(예전 13개는 리벳 3개를 지운 뒤라 난수 순서가 달라져 조금 다르게 나옴)
+        python3 tools/audio/smith_sfx.py 이름…       ->  그 이름만     (assets/audio/sfx_bs_*.mp3, /tmp/smith_sfx/*.wav)
+Runway 하루 한도를 다 써서 2026-11-19 새 소리도 합성(출처 assets/audio/blacksmith-sfx-credits.json).
 
 Runway 크레딧이 없어 tools/audio/smash_sfx.py와 같은 방식으로 직접 합성(시드 고정 — 다시 돌리면 같은 파일).
 소리 정체성: 쇠망치가 쇠를 때리는 '깡'(모드 주파수가 어긋난 금속 공명), 집게 '철컥', 철판 펼침 '촤르륵-텅', 담금질 '치이익'.
@@ -15,11 +18,15 @@ Runway 크레딧이 없어 tools/audio/smash_sfx.py와 같은 방식으로 직�
   bs_steam3      3중첩 수증기: 더 크고 선명한 '치이익' + 높은 쉭 소리
   bs_wall        철판 펼침: 금속 마찰 '촤르륵' + '텅'
   bs_block       철벽이 막음: 둔탁한 '텅'
-  bs_rivet       리벳 박기: 작은 '팅' 세 번
-  bs_rivet_pop   리벳 튕겨 나감: 높은 '핑'
-  bs_rivet_shot  리벳 발사: 빠른 '슉슉슉'
   bs_forge       용광로 개방: 불꽃 '화르륵' + 쇳물 떨어지는 지글
   bs_break       낙인 파괴: 금속 외피가 깨지는 '쨍그랑'
+  -- 2026-11-19 (새 소리는 이름마다 고정 시드 — 하나만 다시 만들어도 같은 결과)
+  bs_throw       튕김망치 던짐: 손망치가 돌며 나는 짧은 '휙휙휙'
+  bs_clang       망치가 모루를 침: 맑고 높은 '깡!' (짧은 저음 없이 밝은 금속 공명)
+  bs_drop        망치가 바닥에 떨어짐: 작고 둔한 '덜컹'
+  bs_crack       낙인 각인에 금이 감: 작고 높은 '팅'
+  bs_stamp       '불량' 도장: 묵직한 '꽝' + 쇠판 울림
+  bs_steam2      2중첩 수증기: bs_steam보다 굵고 선명한 '치이익'
 """
 import os, subprocess, wave
 import numpy as np
@@ -107,19 +114,6 @@ def bs_wall():
 def bs_block():
     d = 0.5; t = T(d); x = thud(t, 170, 80, 0.06, 1.0) + metal(t, 360, 0.18, 0.5, ratios=(1.0, 1.73, 3.1)) + click(t, 500, 3500, 0.012, 1.0)
     return fin(x, d)
-def bs_rivet():
-    d = 0.6; t = T(d); x = np.zeros(len(t))
-    for i, at in enumerate((0.0, 0.11, 0.22)): x += metal(t, 2100 + 140 * i, 0.08, 0.7, at=at) + click(t, 3000, 9000, 0.004, 0.8, at)
-    return fin(x, d)
-def bs_rivet_pop():
-    d = 0.35; t = T(d); f = 2600 + 1200 * np.exp(-t / 0.05); x = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t / 0.07) + click(t, 2500, 9000, 0.004, 0.9)
-    return fin(x, d)
-def bs_rivet_shot():
-    d = 0.45; t = T(d); x = np.zeros(len(t))
-    for i, at in enumerate((0.0, 0.05, 0.1)):
-        u = T(0.12); w = bp(noise(len(u)), 1500 + 400 * i, 7000) * np.exp(-((u - 0.03) / 0.02) ** 2); place(x, w, at, 1.0)
-        x += metal(t, 1900, 0.04, 0.25, at=at)
-    return fin(x, d)
 def bs_forge():
     d = 0.8; t = T(d); fl = lp(noise(len(t)), 900) * (0.7 + 0.3 * np.sin(2 * np.pi * 13 * t)) * np.minimum(1, t / 0.04) * np.exp(-np.maximum(0, t - 0.25) / 0.18)
     x = fl * 1.2 + thud(t, 90, 50, 0.08, 0.6) + bp(noise(len(t)), 2000, 8000) * np.exp(-t / 0.25) * 0.2
@@ -133,6 +127,31 @@ def bs_break():
         at = rng.uniform(0.0, 0.3); x += metal(t, rng.uniform(1400, 4200), rng.uniform(0.04, 0.12), rng.uniform(0.15, 0.4), at=at)
     return fin(x, d)
 
+def seeded(name):
+    global rng; rng = np.random.default_rng(sum(map(ord, name)) * 7919)
+def bs_throw():
+    seeded('bs_throw'); d = 0.5; t = T(d); x = np.zeros(len(t))
+    for i, at in enumerate((0.0, 0.085, 0.17, 0.255)):   # spinning hammer: 4 quick whooshes, fading
+        u = T(0.14); w = bp(noise(len(u)), 500 + 120 * i, 2600) * np.exp(-((u - 0.05) / 0.03) ** 2); place(x, w, at, 1.0 - 0.18 * i)
+    return fin(x + lp(noise(len(t)), 300) * np.exp(-t / 0.08) * 0.3, d)
+def bs_clang():
+    seeded('bs_clang'); d = 0.9; t = T(d)
+    x = metal(t, 1320, 0.42, 1.0, ratios=(1.0, 2.32, 4.25, 6.63)) + metal(t, 2410, 0.18, 0.35, ratios=(1.0, 2.76)) + click(t, 3000, 10000, 0.004, 1.2) + thud(t, 260, 140, 0.02, 0.25)
+    return fin(x, d)
+def bs_drop():
+    seeded('bs_drop'); d = 0.45; t = T(d); x = thud(t, 190, 90, 0.04, 0.9) + click(t, 600, 4000, 0.01, 0.8) + metal(t, 520, 0.08, 0.25)
+    x += thud(t, 160, 90, 0.03, 0.4, 0.09) + click(t, 800, 4000, 0.008, 0.4, 0.09)   # small second bounce
+    return fin(x, d)
+def bs_crack():
+    seeded('bs_crack'); d = 0.35; t = T(d); x = metal(t, 2950, 0.07, 0.9, ratios=(1.0, 2.32, 4.25)) + click(t, 4000, 12000, 0.0025, 0.9)
+    return fin(x, d)
+def bs_stamp():
+    seeded('bs_stamp'); d = 0.6; t = T(d); x = thud(t, 120, 55, 0.07, 1.2) + click(t, 300, 2500, 0.02, 1.1) + metal(t, 300, 0.22, 0.35, ratios=(1.0, 1.73, 3.1))
+    return fin(x, d)
+def bs_steam2():
+    seeded('bs_steam2'); d = 0.72; t = T(d); x = hiss(t, 0.21, 2800, 1.1) + hiss(t, 0.07, 5500, 0.35, 0.02) + click(t, 200, 1500, 0.025, 0.5) + splash_layer(t, 0.07, 0.35)
+    return fin(x, d)
+
 def save(name, x):
     st = np.stack([x, x], 1); pcm = (np.clip(st, -1, 1) * 0.89 * 32767).astype('<i2')
     wav = os.path.join(TMP, name + '.wav')
@@ -142,6 +161,9 @@ def save(name, x):
     print(name, '%.2f s' % (len(x) / SR), os.path.getsize(mp3), 'bytes')
 
 NAMES = ['bs_swing', 'bs_hit', 'bs_hit_heavy', 'bs_anvil', 'bs_anvil_ring', 'bs_tongs', 'bs_quench', 'bs_steam', 'bs_steam3',
-         'bs_wall', 'bs_block', 'bs_rivet', 'bs_rivet_pop', 'bs_rivet_shot', 'bs_forge', 'bs_break']
+         'bs_wall', 'bs_block', 'bs_forge', 'bs_break']
+NEW = ['bs_throw', 'bs_clang', 'bs_drop', 'bs_crack', 'bs_stamp', 'bs_steam2']
 if __name__ == '__main__':
-    for n in NAMES: save('sfx_' + n, globals()[n]())
+    import sys
+    a = sys.argv[1:]; names = NAMES + NEW if a == ['--all'] else (a or NEW)
+    for n in names: save('sfx_' + n, globals()[n]())

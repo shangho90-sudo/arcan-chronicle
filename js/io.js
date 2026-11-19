@@ -2,7 +2,7 @@
 import { screenToWorldDir } from './render.js';
 import { SFX_NAMES, SFX_REWARDS, SFX_EVENTS } from './sfx.js';
 // 대장장이 효과음 음량(합성 파일은 같은 정점으로 맞춰지므로 여기서 역할별로 나눔)
-const BS_GAIN = { bs_swing: 0.26, bs_hit: 0.42, bs_hit_heavy: 0.5, bs_anvil: 0.55, bs_anvil_ring: 0.36, bs_tongs: 0.4, bs_quench: 0.34, bs_steam: 0.3, bs_steam3: 0.42, bs_wall: 0.4, bs_block: 0.32, bs_rivet: 0.3, bs_rivet_pop: 0.3, bs_rivet_shot: 0.34, bs_forge: 0.42, bs_break: 0.48 };
+const BS_GAIN = { bs_swing: 0.26, bs_hit: 0.42, bs_hit_heavy: 0.5, bs_anvil: 0.55, bs_anvil_ring: 0.36, bs_tongs: 0.4, bs_quench: 0.34, bs_steam: 0.3, bs_steam3: 0.42, bs_wall: 0.4, bs_block: 0.32, bs_forge: 0.42, bs_break: 0.5, bs_throw: 0.26, bs_clang: 0.46, bs_drop: 0.26, bs_crack: 0.34, bs_stamp: 0.44, bs_steam2: 0.36 };
 
 const KEYS = {
   attack: ["Space", "KeyJ"], skill1: ["Digit1", "Numpad1"], skill2: ["Digit2", "Numpad2"], skill3: ["Digit3", "Numpad3"], skill4: ["Digit4", "Numpad4", "KeyR"], skillWin: ["KeyK"], craftWin: ["KeyN"],

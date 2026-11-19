@@ -567,16 +567,20 @@ BS_FLURRY = action('bs_flurry', [
     key(1.14, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
 ], 0.16, 0.96, [[0.11, 0.20], [0.25, 0.34], [0.39, 0.48], [0.735, 0.84]], fadeIn=0.05, fadeOut=0.16)
 BS_FLURRY.update(trailLife=0.12, trailColor=[1.9, 1.2, 0.55], hitTimes=[0.16, 0.30, 0.44, 0.78])
-# bs_sweep (급랭 담금질): 왼손의 물통을 뒤로 뺐다가 0.22 s에 앞으로 크게 끼얹음. 망치는 옆으로 내려 둠. 잔상 없음.
-BS_SWEEP = action('bs_sweep', [
+# bs_douse (급랭 담금질, 2026-11-19 — 예전 bs_sweep 대신): 왼손을 허리 뒤의 담금통으로 내려 잡고(0.08 s) 몸통을 오른쪽 뒤로 틀어 통을 당겼다가
+# (0.18 s) 허리부터 돌려 0.28 s에 통을 앞으로 낮게 휘둘러 냉각수를 쏟음 — 그 순간 물줄기가 통 입구에서 출발(js/smith.js smith_quench가 이 hitT에
+# 맞춰 물을 내보내고, 물이 각 적에게 닿는 순간 피해). 오른손 망치는 옆에 내려 둠, 잔상 없음. 담금통 그림은 js/smithfx.js douse(왼손 handPointL).
+BS_DOUSE = action('bs_douse', [
     key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
-    key(0.10, 'o', twist=24, lean=-4, sink=0.07, hand=[-40, -46, 0.70], blade=[-20, 10], elbow=[-0.8, -1, -0.3], armL=[-30, 46]),
-    key(0.16, 's', twist=30, lean=-6, sink=0.08, hand=[-44, -48, 0.68], blade=[-24, 8], elbow=[-0.8, -1, -0.3], armL=[-40, 52], squint=True),
-    key(0.22, 'i', twist=-16, lean=14, sink=0.12, hand=[-36, -44, 0.72], blade=[-16, 12], elbow=[-0.8, -1, -0.2], armL=[84, 40], squint=True),
-    key(0.32, 'o', twist=-24, lean=17, sink=0.13, hand=[-34, -44, 0.72], blade=[-14, 14], elbow=[-0.8, -1, -0.2], armL=[104, 26], squint=True),
-    key(0.46, 's', twist=-10, lean=8, sink=0.06, hand=[-32, -42, 0.70], blade=[-12, 18], elbow=[-0.7, -1, -0.2], armL=[40, 22]),
-    key(0.58, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
-], 0.22, 0.40, None, fadeIn=0.05, fadeOut=0.15)
+    key(0.08, 'o', twist=10, lean=4, sink=0.09, hand=[-34, -44, 0.68], blade=[-14, 14], elbow=[-0.8, -1, -0.2], armL=[-14, 10]),
+    key(0.18, 's', twist=34, lean=-5, sink=0.10, hand=[-42, -48, 0.68], blade=[-22, 8], elbow=[-0.8, -1, -0.3], armL=[-44, 40], squint=True),
+    key(0.24, 'i', twist=4, lean=8, sink=0.13, hand=[-38, -46, 0.70], blade=[-18, 10], elbow=[-0.8, -1, -0.2], armL=[30, 34], squint=True),
+    key(0.28, None, twist=-20, lean=15, sink=0.15, hand=[-36, -44, 0.72], blade=[-16, 12], elbow=[-0.8, -1, -0.2], armL=[80, 30], squint=True),
+    key(0.38, 'o', twist=-30, lean=18, sink=0.15, hand=[-34, -44, 0.72], blade=[-14, 14], elbow=[-0.8, -1, -0.2], armL=[104, 24], squint=True),
+    key(0.52, 's', twist=-12, lean=8, sink=0.07, hand=[-32, -42, 0.70], blade=[-12, 18], elbow=[-0.7, -1, -0.2], armL=[44, 20]),
+    key(0.66, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
+], 0.28, 0.46, None, fadeIn=0.05, fadeOut=0.15)
+BS_DOUSE.update(pourT=0.28)
 # bs_kick (접이식 철벽 걷어차기): 몸을 뒤로 젖히며 오른발을 앞으로 뻗어 찬다(0.10 s). 발 고정을 풀어(plant 0) 다리가 실제로 나감.
 BS_KICK = action('bs_kick', [
     key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
@@ -586,6 +590,21 @@ BS_KICK = action('bs_kick', [
     key(0.30, 's', plant=0, twist=-4, lean=-5, sink=0.03, legR=16, hand=[-40, -34, 0.70], blade=[-18, 26], elbow=[-0.8, -1, -0.3], armL=[18, 24]),
     key(0.40, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
 ], 0.10, 0.32, None, fadeIn=0.04, fadeOut=0.12)
+
+# bs_toss (튕김망치, 2026-11-19): 오른손 큰 망치는 그대로 들고, 왼손으로 허리춤의 짧은 손망치를 쥐어(0.07 s) 몸을 오른쪽으로 감으며 왼팔을
+# 허리 높이 뒤로 젖혔다가(0.16 s) 허리를 풀며 팔을 옆으로 크게 휘둘러 0.24 s에 손을 떠나보냄(옆던지기) — js/smith.js smith_throw가 이 hitT에
+# 실제 왼손 위치(handPointL)에서 망치를 날림. 손에 든 손망치 그림은 누른 순간부터 js/smithfx.js toss(왼손을 따라감). 잔상 없음.
+BS_TOSS = action('bs_toss', [
+    key(0.00, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18]),
+    key(0.07, 'o', twist=8, lean=3, sink=0.06, hand=[-32, -42, 0.68], blade=[-12, 16], elbow=[-0.7, -1, -0.2], armL=[-8, 12]),
+    key(0.16, 's', twist=36, lean=-4, sink=0.10, hand=[-40, -46, 0.66], blade=[-18, 12], elbow=[-0.8, -1, -0.3], armL=[-52, 66], squint=True),
+    key(0.21, 'i', twist=8, lean=6, sink=0.12, hand=[-36, -44, 0.68], blade=[-16, 14], elbow=[-0.8, -1, -0.2], armL=[10, 80], squint=True),
+    key(0.24, None, twist=-12, lean=10, sink=0.13, hand=[-34, -44, 0.70], blade=[-14, 14], elbow=[-0.8, -1, -0.2], armL=[48, 84], squint=True),
+    key(0.32, 'o', twist=-30, lean=12, sink=0.12, hand=[-32, -42, 0.70], blade=[-12, 16], elbow=[-0.7, -1, -0.2], armL=[96, 58]),
+    key(0.46, 's', twist=-12, lean=5, sink=0.06, hand=[-30, -40, 0.70], blade=[-10, 18], elbow=[-0.7, -1, -0.2], armL=[46, 26]),
+    key(0.60, 's', hand=[-30, -40, 0.70], blade=[-10, 20]),
+], 0.24, 0.40, None, fadeIn=0.05, fadeOut=0.15)
+BS_TOSS.update(throwT=0.24)
 
 # ------------------------------------------------------------------------------------------------ 미용사 1차 (2026-11-13)
 # 큰 가위(예전의 3배)를 두 손으로 잡고 '싹뚝' 자름: pose.grip2 = 왼손도 가위 고리를 잡음(js/model.js 왼팔 IK), pose.snip = 가위가
@@ -694,7 +713,7 @@ HD_STEP = action('hd_step', [
 ], 0.12, 0.2786, None, fadeIn=0.04, fadeOut=0.16)
 HD_STEP.update(hitTimes=[0.12, 0.24, 0.36], hold=True)   # hold: 잠금이 끝나도 서 있으면 세 번째 싹뚝까지 재생(actors.js idle)
 
-SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL] + BS_ACTS + [DRAW, SHEATHE, PH_SPIN, PH_SLAM, PH_SMASH, PH_PITCH, PH_SWEEP, CK_CHOP, CK_PAN, CK_TOSS, BS_CALL, BS_THRUST, BS_SLAM, BS_FLURRY, BS_SWEEP, BS_KICK] + HD_ACTS + [HD_SNIP, HD_TRIM, HD_END, HD_STEP]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
+SKILL_ACTS = COMBOS + [dict(COMBOS[0], name='nv_yeon'), IL, BI, ROLL] + C5_ACTS + [C5_FULL] + BS_ACTS + [DRAW, SHEATHE, PH_SPIN, PH_SLAM, PH_SMASH, PH_PITCH, PH_SWEEP, CK_CHOP, CK_PAN, CK_TOSS, BS_CALL, BS_THRUST, BS_SLAM, BS_FLURRY, BS_DOUSE, BS_KICK, BS_TOSS] + HD_ACTS + [HD_SNIP, HD_TRIM, HD_END, HD_STEP]   # nv_yeon = the 2-hit flurry (fallback name in the skill data)
 # ------------------------------------------------------------------------------------------------ 예술가 1차 (2026-11-13)
 # 큰 붓(2배)을 두 손으로 잡고 허공에 그림을 그리듯 휘두름. offGrip = 왼손이 잡는 자리(오른손 그립에서 붓 축을 따라 m, js/model.js
 # apply가 왼팔을 그 점에 IK로 붙임 — 다른 직업의 양손 무기도 같은 필드를 쓰면 됨). paint = [시작, 끝] 붓끝이 물감 획을 남기는 구간

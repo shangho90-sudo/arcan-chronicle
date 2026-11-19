@@ -21,7 +21,7 @@ const ART_FEEL = { sweep: [0.05, 0.16, 1], discord: [0.05, 0.16, 1], wave: [0.03
 const ART_KICK = [0.1, 0.1];
 import { biyeonImpact } from './biyeonfx.js';
 import { bashImpact, BASH } from './bashfx.js';
-// 대장장이 1차: 가열·모루·집게·낙인·철벽·리벳 규칙 (js/smith.js)
+// 대장장이 1차: 가열·모루·집게·낙인·철벽·튕김망치 규칙 (js/smith.js)
 import { SmithKit, clearLine } from './smith.js';
 // 양약사 2차: 반응 표식·촉매·표적 전달·연쇄 용출·서방형 지대·최종 처방 규칙 (js/wpharm.js)
 import { WpKit } from './wpharm.js';
@@ -1092,9 +1092,9 @@ export const CUSTOM = {
   ...Object.fromEntries(['en_sentry', 'en_spider', 'en_drones', 'en_anchor', 'en_walker', 'en_pile', 'en_breach', 'en_hive', 'en_rail', 'en_orbital', 'en_beacon', 'en_redline'].map(k => [k, (eng, op, ctx) => eng.en && eng.en[k](op, ctx)])),   // 엔지니어 2차 (js/engineer.js)
   ...Object.fromEntries(['wp_capsule', 'wp_cryo', 'wp_ion', 'wp_tri', 'wp_collapse', 'wp_catalyst', 'wp_carrier', 'wp_chain', 'wp_critical'].map(k => [k, (eng, op, ctx) => eng.wp && eng.wp[k](op, ctx)])),
 
-  // 대장장이 1차 (js/smith.js): 모루 떨구기 · 집게 낚아채기 · 급랭 담금질 · 접이식 철벽 · 즉석 리벳
+  // 대장장이 1차 (js/smith.js): 모루 떨구기 · 집게 낚아채기 · 급랭 담금질 · 접이식 철벽 · 튕김망치
   smith_anvil(eng, op, ctx) { eng.smith.smith_anvil(op, ctx); }, smith_tongs(eng, op, ctx) { eng.smith.smith_tongs(op, ctx); }, smith_quench(eng, op, ctx) { eng.smith.smith_quench(op, ctx); },
-  smith_wall(eng, op, ctx) { eng.smith.smith_wall(op, ctx); }, smith_rivets(eng, op, ctx) { eng.smith.smith_rivets(op, ctx); },
+  smith_wall(eng, op, ctx) { eng.smith.smith_wall(op, ctx); }, smith_throw(eng, op, ctx) { eng.smith.smith_throw(op, ctx); },
   // (2026-11-16) 예전 양약사 triple_check · mark_chain · critical_mass 는 js/wpharm.js wp_tri · wp_chain · wp_critical 로 바뀜
   // 디자이너 2차 (js/designer.js)
   ...Object.fromEntries(['ds_drape', 'ds_break', 'ds_stitch', 'ds_cross', 'ds_finale', 'ds_road', 'ds_pirouette', 'ds_mirror', 'ds_muse', 'ds_collection', 'ds_restitch'].map(k => [k, (eng, op, ctx) => eng.ds && eng.ds[k](op, ctx)])),

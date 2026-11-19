@@ -1,5 +1,5 @@
 {
- "note": "Synthesized in-repo (no Runway credit). Regenerate with python3 tools/audio/smith_sfx.py (fixed seed).",
+ "note": "Synthesized in-repo (no Runway credit). Regenerate with python3 tools/audio/smith_sfx.py (fixed seed; 인자 없이 = 2026-11-19 새 6개만, --all = 모두).",
  "generatedOn": "2026-11-13",
  "assets": [
   {
@@ -47,24 +47,48 @@
    "description": "철벽이 막음: 둔탁한 '텅'"
   },
   {
-   "file": "sfx_bs_rivet.mp3",
-   "description": "리벳 박기: 작은 '팅' 세 번"
-  },
-  {
-   "file": "sfx_bs_rivet_pop.mp3",
-   "description": "리벳 튕겨 나감: 높은 '핑'"
-  },
-  {
-   "file": "sfx_bs_rivet_shot.mp3",
-   "description": "리벳 발사: 빠른 '슉슉슉'"
-  },
-  {
    "file": "sfx_bs_forge.mp3",
    "description": "용광로 개방: 불꽃 '화르륵' + 쇳물 떨어지는 지글"
   },
   {
    "file": "sfx_bs_break.mp3",
    "description": "낙인 파괴: 금속 외피가 깨지는 '쨍그랑'"
+  },
+  {
+   "file": "sfx_bs_throw.mp3",
+   "description": "튕김망치 던짐: 손망치가 돌며 나는 짧은 '휙휙휙'",
+   "generatedOn": "2026-11-19",
+   "why": "Runway 하루 한도를 다 써서 합성"
+  },
+  {
+   "file": "sfx_bs_clang.mp3",
+   "description": "망치가 모루를 침: 맑고 높은 '깡!'",
+   "generatedOn": "2026-11-19",
+   "why": "Runway 하루 한도를 다 써서 합성"
+  },
+  {
+   "file": "sfx_bs_drop.mp3",
+   "description": "망치가 바닥에 떨어짐: 작고 둔한 '덜컹'",
+   "generatedOn": "2026-11-19",
+   "why": "Runway 하루 한도를 다 써서 합성"
+  },
+  {
+   "file": "sfx_bs_crack.mp3",
+   "description": "낙인 각인에 금이 감: 작고 높은 '팅'",
+   "generatedOn": "2026-11-19",
+   "why": "Runway 하루 한도를 다 써서 합성"
+  },
+  {
+   "file": "sfx_bs_stamp.mp3",
+   "description": "'불량' 도장: 묵직한 '꽝' + 쇠판 울림",
+   "generatedOn": "2026-11-19",
+   "why": "Runway 하루 한도를 다 써서 합성"
+  },
+  {
+   "file": "sfx_bs_steam2.mp3",
+   "description": "2중첩 수증기: 굵고 선명한 '치이익'",
+   "generatedOn": "2026-11-19",
+   "why": "Runway 하루 한도를 다 써서 합성"
   }
  ]
 }

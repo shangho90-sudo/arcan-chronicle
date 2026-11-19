@@ -50,7 +50,7 @@ export class Combatant {
       const fg = this.status.flag("frontguard"); if (fg && d.source && d.source.pos) { const dx = d.source.pos.x - this.pos.x, dz = d.source.pos.z - this.pos.z, m = Math.hypot(dx, dz) || 1; if ((dx * this.facing.x + dz * this.facing.z) / m > 0.3) { amount *= 1 - fg; if (G.skillFx && G.skillFx.cook && this._cookBoard) G.skillFx.cook.blocked(this); } }   // 도마 방어: knife mark on the board (js/cookfx.js)
       if (this.skills2.smith) amount = this.skills2.smith.guard(d, amount);
       if (this.skills2.music) this.skills2.music.onPlayerHit(d);   // 음악가 수호의 코랄: 맞은 쪽 현이 떨림
-      if (this.skills2.herbal) this.skills2.herbal.onPlayerHit(d);   // 한약사 금강 약갑: 맞은 쪽 잎맥이 금빛으로   // 대장장이 접이식 철벽(정면)·즉석 리벳: 줄인 만큼 충격 재활용에 모임
+      if (this.skills2.herbal) this.skills2.herbal.onPlayerHit(d);   // 한약사 금강 약갑: 맞은 쪽 잎맥이 금빛으로   // 대장장이 접이식 철벽(정면): 줄인 만큼 충격 재활용에 모임
       if (this.skills2.casting && !d.dot && amount > this.maxHp * 0.15) this.skills2.interruptCast("강한 공격에 시전이 끊겼습니다");
       const sh = this.shield > 0 ? Math.min(this.shield, amount) : 0;
       if (this.hp - (amount - sh) <= 0 && this.skills2.cheatDeath()) return;
@@ -228,9 +228,9 @@ export class SkillRunner {
         // 히트스톱(freezeT)은 쓰지 않음 — 공격·밀림 타이밍 그대로, 대상 눌림(그림만) — 5타만 카메라 kick 한 번. 판정·피해는 그대로.
         const HA = G.hammerFx && pc.body && pc.body.sh && pc.body.sh.actions[pc.body.action], hammer = HA && HA.impact === 'hammer' && !a.atTarget ? HA : null;
         let landed = false; const snip = !hammer && p.snip && G.skillFx && G.skillFx.hair ? p.snip : null;   // 미용사 기본공격: 두 줄이 가위처럼 오므라드는 '싹뚝' (js/hairfx.js), 맞은 적마다
-        const artHit = [];
+        const artHit = [], hitTs = [];   // hitTs: 실제로 맞은 대상(MISS 제외) — 대장장이 낙인 타수·충격 방출은 이것만 (js/smith.js basicLanded)
         for (const t of ts) {
-          const dd = Resolver.damage(pc, t, a.coef * bmul, a.power, a.knockback); if (snip) dd.localStop = "quiet"; t.takeDamage(dd);
+          const dd = Resolver.damage(pc, t, a.coef * bmul, a.power, a.knockback); if (snip) dd.localStop = "quiet"; t.takeDamage(dd); if (!dd.missed) hitTs.push(t);
           if (hammer) hammerImpact(pc, t, p.facing, hammer.combo === 5, dd);
           // 미용사: no freezeT on the basic combo either (same reason as the hammer: it shifts strikes 4-5) — squash + effect + kick on the 5th
           else if (snip) { if (!dd.missed) { landed = true; G.skillFx.hair.snip({ x: t.pos.x, y: (t.pos.y || 0) + Math.min(1.2, 0.45 + (t.radius || 0.5) * 0.6), z: t.pos.z }, { size: snip.big ? 1.25 : 0.9, big: snip.big, ground: t.pos.y || 0 });
@@ -260,7 +260,7 @@ export class SkillRunner {
         }
         else if (ts.length) { G.audio.sfx(a.sfx || "hit"); pc.onHitLanded(a0.coef >= 1.5); }
         else if (a.atTarget && a.sfx) G.audio.sfx(a.sfx);
-        if (smith) smith.basicLanded(ts, sh, p.facing, emp);   // 낙인 타수 · 모루 충격파 · (강화 타격) 리벳 발사 / 충격 방출
+        if (smith) smith.basicLanded(hitTs, sh, p.facing, emp);   // 낙인 타수 · 모루 충격파 · (강화 타격) 충격 방출 — 맞은 대상만
         break;
       }
       case "status": { const def = G.data.status(a.status); for (const t of Resolver.targets(pc, this.shape(a, p))) t.status.apply(def, a.duration, a.value, pc); break; }

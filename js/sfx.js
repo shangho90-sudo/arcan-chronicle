@@ -24,7 +24,7 @@ export const SFX_NAMES = ['levelup', 'jobchange', 'dialog', 'warp', 'hit', 'heav
   'ph_rang_throw', 'ph_rang_hit', 'ph_rang_catch', 'ph_wick_break', 'ph_wick_sizzle', 'ph_wick_whoomp', 'ph_wick_crackle', 'ph_frost_roll', 'ph_frost_shatter',   // 약사 1차 5종(2026-11-19, tools/audio/pharm1_sfx.py 합성)
   'ph_crystal_grow', 'ph_crystal_pierce', 'ph_crystal_shatter', 'ph_crystal_scatter', 'ph_dream_blow', 'ph_dream_sleep',
   'bs_swing', 'bs_hit', 'bs_hit_heavy', 'bs_anvil', 'bs_anvil_ring', 'bs_tongs', 'bs_quench', 'bs_steam', 'bs_steam3',   // 대장장이 1차 (tools/audio/smith_sfx.py)
-  'bs_wall', 'bs_block', 'bs_rivet', 'bs_rivet_pop', 'bs_rivet_shot', 'bs_forge', 'bs_break',
+  'bs_wall', 'bs_block', 'bs_forge', 'bs_break', 'bs_throw', 'bs_clang', 'bs_drop', 'bs_crack', 'bs_stamp', 'bs_steam2',   // 2026-11-19 튕김망치·낙인·급랭(리벳 3개 지움)
   'ck_flip', 'ck_board', 'ck_soup', 'ck_pepper', 'ck_flour', 'ck_skewer', 'ck_eat', 'ck_ball_toss', 'ck_ball_fly', 'ck_ball_hit', 'ck_ball_fin',
   'cf_wok_toss', 'cf_sizzle', 'cf_flame', 'cf_splash', 'cf_ignite', 'cf_steam', 'cf_place', 'cf_steam_hiss', 'cf_pop', 'cf_skewer', 'cf_whoosh', 'cf_knife', 'cf_cloche_fall', 'cf_cloche_slam', 'cf_scoop', 'cf_sorbet_hit', 'cf_frost_draw', 'cf_frost', 'cf_disc', 'cf_disc_hit', 'cf_disc_catch', 'cf_sugar', 'cf_shatter', 'cf_choux_pop', 'cf_serve', 'cf_cloche_open', 'cf_sigil', 'cf_twinkle', 'cf_bless',   // 쉐프 2차 (Runway: tools/audio/chef_runway_sfx.py)
   'hb_simmer', 'hb_root', 'hb_needle', 'hb_resonance', 'hb_bloom', 'hb_dragon', 'hb_phoenix', 'hb_flameburst', 'hb_quake', 'hb_wave', 'hb_spore', 'hb_stomp', 'hb_hop', 'hb_scroll', 'hb_armor', 'hb_drop',   // fx2 Runway (tools/audio/herbal_runway_sfx.py)
