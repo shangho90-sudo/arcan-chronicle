@@ -20,8 +20,8 @@ const KIT = {
 };
 // 스킬 id → 직업 묶음 + 발사 지점(hand = 던지는 손, tip = 무기 끝, none) + 끝 시각 덧붙임(초, 동작 잠금 뒤)
 export const STAGES = {
-  ph1_a1: { k: 'pharm', launch: 'tip' }, ph1_a4: { k: 'pharm', launch: 'tip' }, ph1_a3: { k: 'pharm', launch: 'tip' }, ph1_a6: { k: 'pharm', launch: 'tip', r: 1.2 },
-  ph1_b1: { k: 'pharm', launch: 'hand' }, ph1_b2: { k: 'pharm', launch: 'hand' }, ph1_b4: { k: 'pharm', launch: 'hand' },
+  ph1_a1: { k: 'pharm', launch: 'tip' }, ph1_a4: { k: 'pharm', launch: 'hand' }, ph1_a3: { k: 'pharm', launch: 'tip' }, ph1_a6: { k: 'pharm', launch: 'tip', r: 1.2 },
+  ph1_b1: { k: 'pharm', launch: 'hand' }, ph1_b2: { k: 'pharm', launch: 'hand' }, ph1_b4: { k: 'pharm', launch: 'hand' }, ph1_c1: { k: 'pharm', launch: 'hand' },
   ck1_a1: { k: 'cook', launch: 'tip' }, ck1_a2: { k: 'cook', launch: 'tip' }, ck1_a3: { k: 'cook', launch: 'tip' }, ck1_b1: { k: 'cook', launch: 'hand', end: 1.05 },
   ck1_b2: { k: 'cook', launch: 'hand' }, ck1_b3: { k: 'cook', launch: 'hand' }, ck1_b5: { k: 'cook', launch: 'tip' },
   bs1_a1: { k: 'smith', launch: 'none' }, bs1_a2: { k: 'smith', launch: 'tip' }, bs1_a3: { k: 'smith', launch: 'tip' }, bs1_a4: { k: 'smith', launch: 'tip' },

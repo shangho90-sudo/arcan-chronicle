@@ -4,6 +4,7 @@ import { CombatMath, HitShape, StatusSet, clamp, clamp01, DEG, missChance, level
 import { SpriteBody, dirFromWorld, hitTime, duration, lockTime, action, TelegraphView, T, THREE } from './render.js';
 import { groundItem } from './dropfx.js';
 import { SkillEngine, applyStatus, clearMarks } from './skillrt.js';
+import { wakeOnHit } from './pharm1.js';   // 약사 꿈꽃가루: 피해를 받으면 깨어남
 import { STEP_COL as ART_STEP_COL } from './artfx.js';
 import { CreatureBody, loadCreature, loadCreatureLook, CREATURES } from './creature.js';
 import { cookFoodKind } from './cookfx.js';
@@ -55,6 +56,7 @@ export class Combatant {
       if (this.hp - (amount - sh) <= 0 && this.skills2.cheatDeath()) return;
     }
     if (this.shield > 0) { const a = Math.min(this.shield, amount); this.shield -= a; amount -= a; }
+    if (amount >= 1 && this.faction !== "player") wakeOnHit(this, amount);   // 약사 꿈꽃가루: 잠든 몬스터는 피해(직접·지속)를 받으면 깨어남 (js/pharm1.js)
     this.hp = Math.max(this.minHp || 0, this.hp - amount);   // minHp: scripted quest bosses (yieldAt / surviveSec) give up instead of dying
     if (!d.silent) {
       if (amount < 1) G.ui.floatText(this.pos, "흡수", "#8ce6ff", 0.9);
@@ -463,6 +465,7 @@ export class Player extends Combatant {
   basic(input) {
     // a press during a combo strike is remembered (Chain_Open .. the strike's lock end) and fires as soon as it ends
     if (this.skills.busy) { const A = this.body && this.body.sh && this.body.sh.actions[this.body.action]; if (A && A.combo && this.body.t >= A.chainOpen * 0.999) this.atkBuf = 0.4; return; }
+    if (this.skills2 && this.skills2.ph && this.skills2.ph.away()) return;   // 유봉 되던지기: 유봉이 돌아올 때까지 기본 공격 없음 (js/pharm1.js)
     if (!this.weaponReady()) { this.combat(DRAW_FAST); this.atkBuf = Math.max(this.atkBuf || 0, 0.6); return; }   // draw first, swing when ready
     this.atkBuf = 0; const s = G.data.skill(this.sheet.job.basicAttack); if (s && !this.skills.tryCast(s, this.aimFor(s, input))) this.combat();
   }
@@ -653,7 +656,7 @@ export class Monster extends Combatant {
       if (left !== this._survShown) { this._survShown = left; if (left > 0 && (left % 10 === 0 || left <= 5)) G.ui.toast(`버티기: ${left}초`); }
       if (this.surviveT >= this.def.surviveSec) return this.onYield();
     }
-    if (this.stunned) { this.cancelAttack(); this.body.play("hit", 0.6); return; }
+    if (this.stunned) { this.cancelAttack(); if (this.status.has("sleep")) this.body.play("idle", 0.25); else this.body.play("hit", 0.6); return; }   // 수면(꿈꽃가루): 느린 숨쉬기, 머리 위 초승달 (js/pharm1fx.js moon)
     if (this.hitReact > 0 && this.state !== "windup") return;
     this.thinkStep(dt);
   }

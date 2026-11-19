@@ -6,6 +6,7 @@ import { wpLevelText } from './wpharm.js';
 import { enLevelText } from './engineer.js';   // 엔지니어 2차: 실제 계산과 같은 수치 문구   // 양약사 2차: 실제 계산과 같은 수치 문구
 import { chefLevelText } from './chef.js';   // 쉐프 2차: 스킬 창 수치 줄(실제 데이터)
 import { herbText } from './herbal.js';   // 한약사 2차 툴팁(실제 op 값)
+import { ph1LevelText } from './pharm1.js';   // 약사 1차 5종(2026-11-19): 스킬 창 수치 줄(실제 op 값)
 import { dsLevelText } from './designer.js';   // 디자이너 2차: 스킬 창 수치 줄(실제 데이터)
 import { paintText } from './painter.js';   // 화가 2차 툴팁(실제 op 값)
 import { muText, MU } from './musician.js';   // 음악가 2차 툴팁(실제 op 값)·HUD 선율 색
@@ -66,6 +67,7 @@ const STAT_KO = { atk: '공격력', atkSpeed: '공격 속도', crit: '치명타'
 const PCT_ADD = new Set(['elemRes', 'eva', 'crit']);   // these add a fraction -> shown as %
 const FLAG_KO = { restRegen: '휴식 중 3초마다 체력 회복', basicDmg: '기본 공격 피해', beatHaste: '박자 가속', centerBonus: '중심부 추가 피해', cheatDeath: '치명상 버티기', craftDiscount: '제작 재료 절약', 'craftExtra:potion': '포션 추가 제작', 'craftReturn:food': '요리 재료 반환', fitting: '완벽한 피팅', flow: '흐름 지속', ingredientDrop: '재료 획득률', killHaste: '처치 시 가속', landscapeSize: '풍경화 범위', landscapeTime: '풍경화 지속', paintRange: '붓 사거리', phraseGain: '악절 획득', powerRefund: '동력 환급', projSpeed: '투사체 속도', residue: '잔여 효과', staggerBonus: '경직 추가 피해', switchBonus: '전환 추가 피해', throwRange: '투척 사거리', vsDefdown: '방어 약화 대상 추가 피해' };
 function levelText(d, L) {
+  if (d.job === 'pharmacist') { const pb = G.player && G.player.sheet && G.player.sheet.book; const t = ph1LevelText(d, L, k => pb ? pb.passive(k) : 0); if (t) return t; }
   if (d.job === 'chef') { const t = chefLevelText(d, L, G.data); if (t) return t; }
   if (d.job === 'designer') { const t = dsLevelText(d, L, G.data); if (t) return t; }
   const wt = wpLevelText(d, L) || enLevelText(d, L); if (wt) return d.type === 'passive' ? wt : wt + ` · 연출 등급 ${Math.max(1, Math.min(10, 3 + L + (d.type === 'ultimate' ? 2 + L : 0)))}`;

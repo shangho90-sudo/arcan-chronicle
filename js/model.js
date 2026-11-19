@@ -652,6 +652,8 @@ export class ModelBody {
   /** the weapon is in the hand and the draw has come far enough for a swing / skill to take over */
   get drawReady() { const o = this.over; return this.armed && (!o || o.name !== 'draw' || o.t >= (this.sh.actions.draw.readyT || 0)); }
   get drawing() { return !!(this.over && this.over.name === 'draw'); }
+  /** 유봉 되던지기 (js/pharm1.js): 돌아온 유봉을 손으로 낚아채는 짧은 상체 겹침 동작(ph_catch) — 걷는 다리는 그대로, 무기는 손에 */
+  catchOver() { if (this.md.cfg.npc || !this.sh.actions.ph_catch) return; this.armed = true; this.armW = 1; this.over = { name: 'ph_catch', t: 0, speed: 1, switched: true }; }
   /** a stow action (action.stow, e.g. ph_pitch) is playing: the right hand throws, the weapon rides on the back */
   get stowing() { const a = this.sh.actions[this.action]; return !!(a && a.stow) && !this.finished && !this.md.cfg.npc; }
   /** right palm in world (three) space, or null — where a thrown item leaves the hand */
@@ -1003,7 +1005,7 @@ export class ModelBody {
   }
   /** blade base / tip of the right-hand weapon in world space (for the swing trail), or null */
   bladePoints() {
-    const h = this.props.R; if (!h || !this.visible || this.armW < 0.5) return null;
+    const h = this.props.R; if (!h || !this.visible || this.armW < 0.5 || this.thrownR) return null;
     this.root.updateMatrixWorld(true);
     if (h.userData.len === undefined) { const bb = new THREE.Box3().setFromObject(h.children[0]).applyMatrix4(_m().copy(h.matrixWorld).invert()); h.userData.len = Math.max(0.1, bb.max.z); }
     const L = h.userData.len, mw = h.matrixWorld;
@@ -1048,6 +1050,7 @@ export class ModelBody {
       }
     }
     const h = this.props[side]; if (!h) return;
+    h.visible = !(side === 'R' && this.thrownR);   // 유봉 되던지기: 손의 유봉이 날아가는 동안 숨김 (js/pharm1.js thrown)
     const md = this.md, W = this.W;
     if (h.children[0] && h.children[0].userData.shears) setShears(h.children[0], this.snipK || 0);
     let inHand = this.gripM(side, W, tilt);

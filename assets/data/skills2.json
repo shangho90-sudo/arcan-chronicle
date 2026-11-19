@@ -514,44 +514,41 @@
 "cat": 0,
 "catName": "유봉 전투",
 "idx": 2,
-"name": "밀어내기",
+"name": "유봉 되던지기",
 "type": "attack",
-"desc": "유봉을 가로로 크게 휘둘러 앞쪽 부채꼴의 땅을 뒤집는다. 범위 안의 적 모두에게 피해를 주고 뒤로 밀어낸다. 밀치기에 면역인 적에게는 추가 피해.",
+"desc": "몸을 살짝 틀어 손에 든 유봉을 앞으로 던진다. 유봉은 옆으로 빙글빙글 돌며 적을 꿰뚫고 날아가다 최대 거리(또는 벽)에서 방향을 틀어 약사의 지금 손으로 돌아온다. 적마다 나갈 때 한 번, 돌아올 때 한 번 맞는다. 던진 뒤 바로 움직일 수 있어 옆으로 걸으면 돌아오는 길이 휘어, 처음에 빗나간 적도 맞힐 수 있다. 유봉이 돌아올 때까지 유봉 공격은 쓸 수 없다.",
 "maxLv": 5,
 "unlock": 13,
 "prereq": [],
 "weapon": "pestle",
-"target": "enemy",
-"range": 2.0,
+"target": "dir",
+"range": 6.5,
 "mp": 10,
 "cd": 7,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "ph_sweep",
+"recover": 0.1,
+"anim": "ph_rang",
 "ops": [
 {
-"op": "hit",
-"shape": "cone",
-"coef": 1.4,
-"r": 3.0,
-"ang": 110,
-"knock": 7.5,
-"vsImmune": 1.6,
-"oneHit": true,
-"sfx": "ph_push_hit",
-"fx": {
-"pharm": "push"
-}
+"op": "custom",
+"fn": "ph_rang",
+"at": -1,
+"dist": 6.5,
+"speed": 13,
+"back": 15,
+"w": 1.1,
+"coef": 0.85,
+"coefLv": 0.05,
+"life": 3.4,
+"catchR": 0.7
 }
 ],
 "mods": [],
 "flags": {},
 "fx": {
-"color": 16769696
+"color": 16765562
 },
-"sfx": "ph_smash_swing",
-"sfxAt": "strike",
-"sfxLead": 0.08,
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -753,9 +750,9 @@
 "cat": 1,
 "catName": "기초 약병술",
 "idx": 1,
-"name": "화염 약병",
+"name": "불꽃심지병",
 "type": "attack",
-"desc": "약병을 던져 작은 폭발과 화상을 일으킨다.",
+"desc": "심지 끝에 불씨가 붙은 호박색 약병을 지정한 곳에 포물선으로 던진다. 병이 깨지며 작은 충격 피해를 주고, 바닥에 둥글게 퍼진 약액이 약 0.4초 뒤 불붙어 2초 동안 0.4초마다 그 위에 서 있는 적에게 화염 피해를 준다(들어오고 나가는 적은 그 순간의 자리로 판정). 화상은 따로 걸지 않는다.",
 "maxLv": 5,
 "unlock": 10,
 "prereq": [],
@@ -769,34 +766,28 @@
 "anim": "ph_pitch",
 "ops": [
 {
-"op": "proj",
-"kind": "lob",
-"coef": 1.6,
-"r": 1.6,
+"op": "custom",
+"fn": "ph_wick",
+"at": -1,
+"pharmHeld": true,
 "elem": "fire",
-"fx": "flask_fire",
-"pharmProj": true,
-"burst": "none",
-"pharm": "burst",
-"sfx": "ph_glass_fire",
-"st": [
-{
-"id": "burn",
-"dur": 4,
-"val": 0.12,
-"ch": 1.0
-}
-],
-"tag": "flask"
+"tag": "flask",
+"r": 1.6,
+"speed": 12,
+"impact": 0.6,
+"ignite": 0.4,
+"tick": 0.4,
+"ticks": 5,
+"coef": 0.26,
+"coefLv": 0.03
 }
 ],
 "mods": [],
 "flags": {},
 "fx": {
-"color": 16742960
+"color": 16751152
 },
-"sfxAt": "strike",
-"sfxLead": 0.02,
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -813,42 +804,37 @@
 "cat": 1,
 "catName": "기초 약병술",
 "idx": 2,
-"name": "냉각 약병",
+"name": "서리병 굴리기",
 "type": "attack",
-"desc": "냉기 피해와 둔화를 준다.",
+"desc": "몸을 낮춰 흰 줄무늬가 감긴 둥근 푸른 약병을 볼링하듯 앞으로 굴린다. 병은 적 무리를 지나가며 뒤에 가느다란 얼음길을 남기고, 얼음길을 밟은 적은 둔화된다(머무는 동안은 시간만 갱신). 최대 거리나 벽에 닿으면 그 자리에서 깨져 진행 방향으로 얼음 파편이 부채꼴로 퍼지며 냉기 피해를 한 번 준다. 파편은 벽 너머로 가지 않는다.",
 "maxLv": 5,
 "unlock": 12,
 "prereq": [],
 "weapon": null,
-"target": "ground",
+"target": "dir",
 "range": 7,
 "mp": 12,
 "cd": 6,
 "cast": 0.0,
 "recover": 0.35,
-"anim": "ph_pitch",
+"anim": "ph_bowl",
 "ops": [
 {
-"op": "proj",
-"kind": "lob",
-"coef": 1.4,
-"r": 1.8,
-"elem": "ice",
-"fx": "flask_ice",
-"pharmProj": true,
-"burst": "none",
-"pharm": "burst",
-"sfx": "ph_glass_ice",
-"linger": 3,
-"st": [
-{
-"id": "slow",
-"dur": 3,
-"val": 0.35,
-"ch": 1.0
-}
-],
-"tag": "flask"
+"op": "custom",
+"fn": "ph_frost",
+"at": -1,
+"tag": "flask",
+"len": 7,
+"speed": 7.5,
+"w": 0.9,
+"trail": 3.0,
+"slow": 0.3,
+"slowLv": 0.03,
+"slowDur": 1.5,
+"fanR": 3.0,
+"fanAng": 70,
+"coef": 1.6,
+"coefLv": 0.1
 }
 ],
 "mods": [],
@@ -856,8 +842,7 @@
 "fx": {
 "color": 8048895
 },
-"sfxAt": "strike",
-"sfxLead": 0.02,
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -924,57 +909,46 @@
 "cat": 1,
 "catName": "기초 약병술",
 "idx": 4,
-"name": "부식 약병",
+"name": "결정침 개화",
 "type": "attack",
-"desc": "지속 피해와 방어력 감소를 남긴다.",
+"desc": "적 하나를 정해 손끝을 펼치면 표적의 왼쪽·오른쪽·머리 위에 보랏빛 약결정이 꽃봉오리처럼 자란다. 손을 오므리는 순간 왼쪽의 가는 결정침, 오른쪽 결정침, 반 박자 뒤 머리 위의 굵은 결정침이 차례로 표적을 꿰뚫고, 마지막 결정은 꽃잎처럼 갈라지며 흩어진다. 움직이는 표적을 따라가며, 표적이 먼저 쓰러지면 남은 결정은 그 자리에서 흩어진다.",
 "maxLv": 5,
 "unlock": 18,
 "prereq": [],
 "weapon": null,
-"target": "ground",
+"target": "enemy",
 "range": 7,
 "mp": 14,
 "cd": 8,
 "cast": 0.0,
-"recover": 0.35,
-"anim": "ph_pitch",
+"recover": 0.5,
+"anim": "ph_bloom",
 "ops": [
 {
-"op": "proj",
-"kind": "lob",
-"coef": 0.8,
-"r": 1.8,
-"elem": "acid",
-"fx": "flask_acid",
-"pharmProj": true,
-"burst": "none",
-"pharm": "burst",
-"sfx": "ph_glass_acid",
-"linger": 5,
-"st": [
-{
-"id": "poison",
-"dur": 5,
-"val": 0.15,
-"ch": 1.0
-},
-{
-"id": "defdown",
-"dur": 5,
-"val": 0.2,
-"ch": 1.0
-}
+"op": "custom",
+"fn": "ph_crystal",
+"at": -1,
+"grow": 0.38,
+"hits": [
+0.46,
+0.55,
+0.78
 ],
-"tag": "flask"
+"coefs": [
+0.55,
+0.55,
+1.3
+],
+"lastLv": 0.15,
+"leash": 11
 }
 ],
 "mods": [],
 "flags": {},
 "fx": {
-"color": 9097280
+"color": 11563263
 },
-"sfxAt": "strike",
-"sfxLead": 0.02,
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -1034,24 +1008,38 @@
 "cat": 2,
 "catName": "조제와 응급처치",
 "idx": 1,
-"name": "회복제 제작",
-"type": "craft",
-"desc": "약초와 빈 병으로 HP 회복제를 만든다.",
+"name": "꿈꽃가루",
+"type": "support",
+"desc": "손바닥 위에 연보라색 꽃 한 송이를 피워 가볍게 분다. 꽃잎과 금빛 꽃가루가 앞쪽 짧은 부채꼴로 퍼지고, 꽃가루에 닿은 일반 몬스터는 잠든다(피해 없음). 잠든 적은 움직이지도 공격하지도 않으며, 수면 시간이 끝나거나 직접 공격·지속 피해(불꽃심지병의 불 포함)를 받으면 바로 깨어난다. 한 번 쓸 때 같은 적은 한 번만 잠든다. 보스는 잠들지 않는다.",
 "maxLv": 5,
 "unlock": 10,
 "prereq": [],
 "weapon": null,
-"target": "self",
-"range": 2.0,
-"mp": 0,
-"cd": 0,
+"target": "dir",
+"range": 3.2,
+"mp": 10,
+"cd": 14,
 "cast": 0.0,
 "recover": 0.35,
-"anim": null,
-"ops": [],
+"anim": "ph_blow",
+"ops": [
+{
+"op": "custom",
+"fn": "ph_dream",
+"at": -1,
+"r": 3.2,
+"ang": 80,
+"wave": 0.35,
+"sleep": 2.0,
+"sleepLv": 0.25
+}
+],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 13150463
+},
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -1059,11 +1047,7 @@
 "test": false,
 "play": false
 },
-"implemented": true,
-"recipes": [
-"r_potion_s",
-"r_potion_m"
-]
+"implemented": true
 },
 {
 "id": "ph1_c7",
@@ -10003,6 +9987,16 @@
 "color": "#ffe680"
 },
 {
+"id": "sleep",
+"name": "수면",
+"kind": "stun",
+"debuff": true,
+"cleanse": true,
+"stack": "refresh",
+"boss": "immune",
+"color": "#c8b8ff"
+},
+{
 "id": "defdown",
 "name": "방어력 감소",
 "kind": "statMul",
@@ -11327,50 +11321,6 @@
 }
 ],
 "recipes": [
-{
-"id": "r_potion_s",
-"skill": "ph1_c1",
-"inputs": [
-{
-"item": "m_herb",
-"count": 2
-},
-{
-"item": "m_bottle",
-"count": 1
-}
-],
-"output": {
-"item": "c_potion_s",
-"count": 2
-},
-"gold": 0,
-"group": "potion",
-"minLv": 1,
-"kind": "make"
-},
-{
-"id": "r_potion_m",
-"skill": "ph1_c1",
-"inputs": [
-{
-"item": "m_herb",
-"count": 3
-},
-{
-"item": "m_bottle",
-"count": 1
-}
-],
-"output": {
-"item": "c_potion_m",
-"count": 1
-},
-"gold": 0,
-"group": "potion",
-"minLv": 3,
-"kind": "make"
-},
 {
 "id": "r_potion_l",
 "skill": "wp_c1",

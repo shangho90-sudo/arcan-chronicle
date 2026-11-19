@@ -37,6 +37,8 @@ import { DsKit } from './designer.js';
 import { PaintKit } from './painter.js';
 // 음악가 2차 (2026-11-16 '마에스트로'): 악절·지속 선율·환영 악단 규칙 (js/musician.js), 그림 js/musicfx.js
 import { MusicKit } from './musician.js';
+// 약사 1차 5종 (2026-11-19): 유봉 되던지기·불꽃심지병·서리병 굴리기·결정침 개화·꿈꽃가루 규칙 (js/pharm1.js), 그림 js/pharm1fx.js
+import { PharmKit } from './pharm1.js';
 
 let G = null; export function bindSkillRt(g) { G = g; }
 const DEG = Math.PI / 180;
@@ -83,7 +85,7 @@ function artFeel(pc, ts, f, kind) {
   if (k[2] && G.render.kick && !G.reduceFlash) G.render.kick(f.x, f.z, ART_KICK[0], ART_KICK[1]);
 }
 // ------------------------------------------------------------------ statuses with boss / immunity rules
-const CC = new Set(['freeze', 'root', 'stagger', 'stun']);
+const CC = new Set(['freeze', 'root', 'stagger', 'stun', 'sleep']);   // sleep: 약사 꿈꽃가루(보스 면역 = 데이터 boss 'immune')
 const ELEMENTAL = new Set(['burn', 'poison', 'slow', 'freeze']);   // 속성 상태이상 (속성 저항 elemRes가 지속 시간을 줄임)
 export function applyStatus(target, st, caster, lvMul = 1) {
   const def = G.data.status(st.id); if (!def || target.dead) return false;
@@ -154,6 +156,7 @@ export class SkillEngine {
     this.ds = typeof DsKit === 'function' ? new DsKit(this, { applyStatus, fx: FX.ds, G: () => G, summon: (o, ctx, p) => this.dsSummon(o, ctx, p) }) : null;   // 디자이너 2차 규칙 (js/designer.js)
     this.painter = typeof PaintKit === 'function' ? new PaintKit(this, { applyStatus, fx: (k, a, o) => FX.painter ? FX.painter(k, a, o) : null, G: () => G }) : null;   // 화가 2차 규칙 (js/painter.js)
     this.music = typeof MusicKit === 'function' ? new MusicKit(this, { applyStatus, fx: (k, a, o) => FX.music ? FX.music(k, a, o) : null, G: () => G }) : null;   // 음악가 2차 규칙 (js/musician.js)
+    this.ph = typeof PharmKit === 'function' ? new PharmKit(this, { applyStatus, fx: (k, a, o) => FX.pharm(k, a, o), G: () => G }) : null;   // 약사 1차 5종 규칙 (js/pharm1.js)
     this.restoreCooldowns();
   }
   /** 디자이너 미러 피팅: 정해진 자리에 마네킹(AI 없음, 일반 적의 주의를 끎) — 종류별 상한·전체 8 규칙은 opSummon과 같음 */
@@ -191,6 +194,7 @@ export class SkillEngine {
     if (pc.stunned) return '행동 불가 상태';
     if (this.casting || this.channel || pc.skills.busy) return '';
     if (d.weapon) { const w = G.data.item(pc.sheet.p.weapon), job = G.data.job(pc.sheet.p.job), wt = job && job.weaponType; if (!w || !w.job || (w.job !== (job.parent || job.id))) return (G.data.job(job.parent || job.id)?.name || '') + ' 무기가 필요합니다'; void wt; }
+    if (d.weapon === 'pestle' && this.ph && this.ph.away()) return '유봉이 돌아오는 중입니다';   // 유봉 되던지기: 손에 유봉이 없음
     if (this.cdLeft(d.id) > 0) return '재사용 대기 중';
     if (pc.sp < this.mpCost(d)) return '기력이 부족합니다';
     if (d.res && d.res.cost && (this.res[d.res.type] || 0) < d.res.cost) return d.res.type === 'power' ? '전력이 부족합니다' : '자원이 부족합니다';
@@ -273,8 +277,9 @@ export class SkillEngine {
     // object the projectile then flies with — no swap at the release); 약병폭격 has no projectile: its flask is tossed up and away
     const A0 = sh.actions[anim];
     if (A0 && A0.stow && !d.cast && d.job !== 'western_pharmacist' && d.job !== 'herbalist' && d.job !== 'engineer' && d.job !== 'musician') {   // 엔지니어: 손의 장치는 js/engfx.js   // 한약사 hb_*도 손의 약병 없음(js/herbalfx.js pre)   // 양약사 공중 조제(wp_compound)는 손의 약병 없이 — 캡슐·앰플은 js/wpharmfx.js가 손(handPoint)에서 만듦
-      const pop = d.ops.find(o => o.pharmProj), hp = () => { let h = null; try { h = pc.body && pc.body.handPoint && pc.body.handPoint(); } catch (e) { h = null; } return h ? { x: h.x, y: h.y, z: -h.z } : null; };
-      const fx = FX.pharm('proj', hp() || { x: pc.pos.x, y: (pc.pos.y || 0) + 1, z: pc.pos.z }, { elem: pop ? pop.elem : 'poison', held: true });
+      const ph1 = d.ops.find(o => o.op === 'custom' && /^ph_/.test(o.fn || ''));   // 약사 1차 5종(js/pharm1.js): 불꽃심지병만 손의 약병(pharmHeld), 나머지는 자기 그림(pharm1fx)
+      const pop = d.ops.find(o => o.pharmProj || o.pharmHeld), hp = () => { let h = null; try { h = pc.body && pc.body.handPoint && pc.body.handPoint(); } catch (e) { h = null; } return h ? { x: h.x, y: h.y, z: -h.z } : null; };
+      const fx = ph1 && !ph1.pharmHeld ? null : FX.pharm('proj', hp() || { x: pc.pos.x, y: (pc.pos.y || 0) + 1, z: pc.pos.z }, { elem: pop ? pop.elem : 'poison', held: true });
       if (fx && fx.set) { const f = ctx.facing, h = ctx.heldFlask = { t: 0, dead: false, pos: null, fx,
           update(dt) { this.t += dt; if (pc.dead) return this.dispose();
             if (this.t <= ht) { const p = hp(); if (p) { this.pos = p; fx.set(p); } }
@@ -331,6 +336,7 @@ export class SkillEngine {
     if (this.herbal) this.herbal.tick(dt);
     if (this.ds) this.ds.tick(dt);
     if (this.painter) this.painter.tick(dt);
+    if (this.ph) this.ph.tick(dt);   // 약사 1차: 날아가는 유봉·약병·불·얼음길·결정·수면
     if (this.music) this.music.tick(dt);   // 음악가 지속 선율(melody.mu)·악단·메아리는 여기서
     if (this.melody && !this.melody.mu) this.tickMelody(dt);
     if (this.overclockT > 0) { this.overclockT -= dt; if (this.overclockT <= 0) { applyStatus(pc, { id: 'cooldown_heat', dur: this.coolT, val: 1, ch: 1 }, pc); } }
@@ -348,6 +354,7 @@ export class SkillEngine {
     if (this.en) this.en.clear();   // 엔지니어: 비콘·지정 고리(병기는 summons 정리에서)   // 쉐프: 기다리는 단계·쟁반·소르베·원반 취소(피해 없음)
     if (this.herbal) this.herbal.clear();
     if (this.painter) this.painter.clear();   // 화가: 그림 소환물은 summons 쪽, 채색·풍경·성벽·용·예약 타격은 여기
+    if (this.ph) this.ph.clear();   // 약사 1차: 유봉은 손으로, 약병·불·얼음길·결정·꽃가루는 취소(피해 없음)
     if (this.music) this.music.clear();   // 음악가: 예약 타격·파동·하프·선율·메아리·배경 음악 낮춤 정리
     this.pending = []; this.casting = null; if (this.channel) { this.channel = null; }
     for (const m of (this.pc.zone ? this.pc.zone.actors : [])) clearMarks(m);
@@ -1078,7 +1085,9 @@ export const CUSTOM = {
   herb(eng, op, ctx) { if (eng.herbal) eng.herbal.cast(op, ctx); },   
   paint(eng, op, ctx) { if (eng.painter) eng.painter.cast(op, ctx); },   // 화가 2차 15종 (js/painter.js, op.k = 칸)   // 한약사 2차 15종 (js/herbal.js, op.k = 칸)
   mu(eng, op, ctx) { if (eng.music) eng.music.cast(op, ctx); },   // 음악가 2차 15종 (js/musician.js, op.k = 칸)
-  meatball_volley(eng, op, ctx) { meatballVolley(eng, op, ctx, G); },   // 요리사 미트볼 던지기 (js/meatball.js + js/cookfx.js volley)
+  meatball_volley(eng, op, ctx) { meatballVolley(eng, op, ctx, G); },
+  // 약사 1차 5종 (js/pharm1.js): 유봉 되던지기 · 불꽃심지병 · 서리병 굴리기 · 결정침 개화 · 꿈꽃가루
+  ...Object.fromEntries(['ph_rang', 'ph_wick', 'ph_frost', 'ph_crystal', 'ph_dream'].map(k => [k, (eng, op, ctx) => eng.ph && eng.ph[k](op, ctx)])),   // 요리사 미트볼 던지기 (js/meatball.js + js/cookfx.js volley)
   // 양약사 2차 (js/wpharm.js): 작열·분열 캡슐 · 극저온 결정화 · 이온 관통술 · 삼상 복합제 · 대형 캡슐 붕괴 · 촉매 활성화 · 정밀 표적 전달 · 연쇄 용출 · 임계 농도
   ...Object.fromEntries(['en_sentry', 'en_spider', 'en_drones', 'en_anchor', 'en_walker', 'en_pile', 'en_breach', 'en_hive', 'en_rail', 'en_orbital', 'en_beacon', 'en_redline'].map(k => [k, (eng, op, ctx) => eng.en && eng.en[k](op, ctx)])),   // 엔지니어 2차 (js/engineer.js)
   ...Object.fromEntries(['wp_capsule', 'wp_cryo', 'wp_ion', 'wp_tri', 'wp_collapse', 'wp_catalyst', 'wp_carrier', 'wp_chain', 'wp_critical'].map(k => [k, (eng, op, ctx) => eng.wp && eng.wp[k](op, ctx)])),

@@ -48041,5 +48041,1219 @@
    1.9
   ],
   "stow": true
+ },
+ {
+  "name": "ph_rang",
+  "frames": 5,
+  "fps": 10.8696,
+  "loop": false,
+  "hitFrame": 2.3913,
+  "keys": [
+   0.0,
+   0.13,
+   0.22,
+   0.3,
+   0.46
+  ],
+  "poses": [
+   {
+    "bob": 0.0,
+    "lean": 0.0,
+    "twist": 0.0,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.0,
+    "squint": false,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     12,
+     18
+    ],
+    "held": null,
+    "step": [
+     0.0,
+     0.0
+    ],
+    "ik": 1,
+    "plant": 1,
+    "hand": [
+     -30,
+     -40,
+     0.7
+    ],
+    "blade": [
+     -10,
+     20
+    ],
+    "elbow": [
+     -0.7,
+     -1,
+     -0.2
+    ]
+   },
+   {
+    "bob": 0.0,
+    "lean": -3,
+    "twist": -34,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.05,
+    "squint": false,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     40,
+     30
+    ],
+    "held": null,
+    "step": [
+     0.14,
+     0.0
+    ],
+    "ik": 1,
+    "plant": 1,
+    "hand": [
+     -112,
+     12,
+     0.84
+    ],
+    "blade": [
+     -160,
+     6
+    ],
+    "elbow": [
+     -0.4,
+     -0.6,
+     -0.8
+    ],
+    "e": "o"
+   },
+   {
+    "bob": 0.0,
+    "lean": 9,
+    "twist": 18,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.08,
+    "squint": true,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     22,
+     34
+    ],
+    "held": null,
+    "step": [
+     0.24,
+     0.0
+    ],
+    "ik": 1,
+    "plant": 1,
+    "hand": [
+     -6,
+     10,
+     1.0
+    ],
+    "blade": [
+     10,
+     2
+    ],
+    "elbow": [
+     -0.5,
+     -0.8,
+     0.0
+    ],
+    "e": "i"
+   },
+   {
+    "bob": 0.0,
+    "lean": 11,
+    "twist": 30,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.07,
+    "squint": false,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     12,
+     36
+    ],
+    "held": null,
+    "step": [
+     0.24,
+     0.0
+    ],
+    "ik": 1,
+    "plant": 1,
+    "hand": [
+     30,
+     -6,
+     0.92
+    ],
+    "blade": [
+     50,
+     -8
+    ],
+    "elbow": [
+     -0.2,
+     -1,
+     0.3
+    ],
+    "e": "o"
+   },
+   {
+    "bob": 0.0,
+    "lean": 0.0,
+    "twist": 0.0,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.0,
+    "squint": false,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     12,
+     18
+    ],
+    "held": null,
+    "step": [
+     0.0,
+     0.0
+    ],
+    "ik": 1,
+    "plant": 1,
+    "hand": [
+     -30,
+     -40,
+     0.7
+    ],
+    "blade": [
+     -10,
+     20
+    ],
+    "elbow": [
+     -0.7,
+     -1,
+     -0.2
+    ],
+    "e": "s"
+   }
+  ],
+  "dur": 0.46,
+  "hitT": 0.22,
+  "lock": 0.32,
+  "trail": null,
+  "fadeIn": 0.05,
+  "fadeOut": 0.12,
+  "trailColor": [
+   1.25,
+   1.45,
+   1.9
+  ],
+  "throwT": 0.22
+ },
+ {
+  "name": "ph_catch",
+  "frames": 4,
+  "fps": 12.5,
+  "loop": false,
+  "hitFrame": 0.875,
+  "keys": [
+   0.0,
+   0.07,
+   0.14,
+   0.32
+  ],
+  "poses": [
+   {
+    "bob": 0.0,
+    "lean": 0.0,
+    "twist": 0.0,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.0,
+    "squint": false,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     8,
+     14
+    ],
+    "held": null,
+    "step": [
+     0.0,
+     0.0
+    ],
+    "ik": 0,
+    "plant": 0,
+    "hand": [
+     -30,
+     -40,
+     0.7
+    ],
+    "blade": [
+     -10,
+     20
+    ],
+    "elbow": [
+     -0.7,
+     -1,
+     -0.2
+    ]
+   },
+   {
+    "bob": 0.0,
+    "lean": 0.0,
+    "twist": -8,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.0,
+    "squint": false,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     8,
+     14
+    ],
+    "held": null,
+    "step": [
+     0.0,
+     0.0
+    ],
+    "ik": 1,
+    "plant": 0,
+    "hand": [
+     -26,
+     22,
+     0.96
+    ],
+    "blade": [
+     -14,
+     46
+    ],
+    "elbow": [
+     -0.6,
+     -0.5,
+     -0.5
+    ],
+    "e": "o"
+   },
+   {
+    "bob": 0.0,
+    "lean": 0.0,
+    "twist": -3,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.0,
+    "squint": false,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     8,
+     14
+    ],
+    "held": null,
+    "step": [
+     0.0,
+     0.0
+    ],
+    "ik": 1,
+    "plant": 0,
+    "hand": [
+     -28,
+     -8,
+     0.8
+    ],
+    "blade": [
+     -12,
+     26
+    ],
+    "elbow": [
+     -0.7,
+     -1,
+     -0.2
+    ],
+    "e": "i"
+   },
+   {
+    "bob": 0.0,
+    "lean": 0.0,
+    "twist": 0.0,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.0,
+    "squint": false,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     8,
+     14
+    ],
+    "held": null,
+    "step": [
+     0.0,
+     0.0
+    ],
+    "ik": 0,
+    "plant": 0,
+    "hand": [
+     -30,
+     -40,
+     0.7
+    ],
+    "blade": [
+     -10,
+     20
+    ],
+    "elbow": [
+     -0.7,
+     -1,
+     -0.2
+    ],
+    "e": "s"
+   }
+  ],
+  "dur": 0.32,
+  "hitT": 0.07,
+  "lock": 0.0,
+  "trail": null,
+  "fadeIn": 0.0,
+  "fadeOut": 0.0,
+  "trailColor": [
+   1.25,
+   1.45,
+   1.9
+  ],
+  "overlay": true,
+  "catchT": 0.07
+ },
+ {
+  "name": "ph_bowl",
+  "frames": 5,
+  "fps": 8.0645,
+  "loop": false,
+  "hitFrame": 2.4194,
+  "keys": [
+   0.0,
+   0.14,
+   0.3,
+   0.4,
+   0.62
+  ],
+  "poses": [
+   {
+    "bob": 0.0,
+    "lean": 0.0,
+    "twist": 0.0,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.0,
+    "squint": false,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     12,
+     18
+    ],
+    "held": null,
+    "step": [
+     0.0,
+     0.0
+    ],
+    "ik": 1,
+    "plant": 1,
+    "hand": [
+     -30,
+     -40,
+     0.7
+    ],
+    "blade": [
+     -10,
+     20
+    ],
+    "elbow": [
+     -0.7,
+     -1,
+     -0.2
+    ]
+   },
+   {
+    "bob": 0.0,
+    "lean": 14,
+    "twist": -22,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.2,
+    "squint": true,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     40,
+     40
+    ],
+    "held": null,
+    "step": [
+     0.3,
+     0.0
+    ],
+    "ik": 1,
+    "plant": 1,
+    "hand": [
+     -150,
+     -40,
+     0.86
+    ],
+    "blade": [
+     -170,
+     -30
+    ],
+    "elbow": [
+     -0.6,
+     -1,
+     -0.3
+    ],
+    "e": "o"
+   },
+   {
+    "bob": 0.0,
+    "lean": 30,
+    "twist": 8,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.34,
+    "squint": true,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     30,
+     46
+    ],
+    "held": null,
+    "step": [
+     0.42,
+     -0.06
+    ],
+    "ik": 1,
+    "plant": 1,
+    "hand": [
+     -4,
+     -62,
+     1.0
+    ],
+    "blade": [
+     0,
+     -50
+    ],
+    "elbow": [
+     -0.5,
+     -1,
+     0.0
+    ],
+    "e": "i"
+   },
+   {
+    "bob": 0.0,
+    "lean": 26,
+    "twist": 12,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.3,
+    "squint": false,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     26,
+     46
+    ],
+    "held": null,
+    "step": [
+     0.42,
+     -0.06
+    ],
+    "ik": 1,
+    "plant": 1,
+    "hand": [
+     4,
+     -20,
+     0.96
+    ],
+    "blade": [
+     6,
+     10
+    ],
+    "elbow": [
+     -0.5,
+     -1,
+     0.0
+    ],
+    "e": "o"
+   },
+   {
+    "bob": 0.0,
+    "lean": 0.0,
+    "twist": 0.0,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.0,
+    "squint": false,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     12,
+     18
+    ],
+    "held": null,
+    "step": [
+     0.0,
+     0.0
+    ],
+    "ik": 1,
+    "plant": 1,
+    "hand": [
+     -30,
+     -40,
+     0.7
+    ],
+    "blade": [
+     -10,
+     20
+    ],
+    "elbow": [
+     -0.7,
+     -1,
+     -0.2
+    ],
+    "e": "s"
+   }
+  ],
+  "dur": 0.62,
+  "hitT": 0.3,
+  "lock": 0.45,
+  "trail": null,
+  "fadeIn": 0.05,
+  "fadeOut": 0.14,
+  "trailColor": [
+   1.25,
+   1.45,
+   1.9
+  ],
+  "stow": true,
+  "throwT": 0.3
+ },
+ {
+  "name": "ph_bloom",
+  "frames": 6,
+  "fps": 5.7143,
+  "loop": false,
+  "hitFrame": 2.2857,
+  "keys": [
+   0.0,
+   0.18,
+   0.36,
+   0.42,
+   0.82,
+   1.05
+  ],
+  "poses": [
+   {
+    "bob": 0.0,
+    "lean": 0.0,
+    "twist": 0.0,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.0,
+    "squint": false,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     12,
+     18
+    ],
+    "held": null,
+    "step": [
+     0.0,
+     0.0
+    ],
+    "ik": 1,
+    "plant": 1,
+    "hand": [
+     -30,
+     -40,
+     0.7
+    ],
+    "blade": [
+     -10,
+     20
+    ],
+    "elbow": [
+     -0.7,
+     -1,
+     -0.2
+    ]
+   },
+   {
+    "bob": 0.0,
+    "lean": -3,
+    "twist": -10,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.04,
+    "squint": false,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     40,
+     30
+    ],
+    "held": null,
+    "step": [
+     0.0,
+     0.0
+    ],
+    "ik": 1,
+    "plant": 1,
+    "hand": [
+     -20,
+     22,
+     1.0
+    ],
+    "blade": [
+     -14,
+     30
+    ],
+    "elbow": [
+     -0.6,
+     -0.4,
+     -0.6
+    ],
+    "e": "o"
+   },
+   {
+    "bob": 0.0,
+    "lean": -4,
+    "twist": -12,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.05,
+    "squint": false,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     44,
+     30
+    ],
+    "held": null,
+    "step": [
+     0.0,
+     0.0
+    ],
+    "ik": 1,
+    "plant": 1,
+    "hand": [
+     -22,
+     30,
+     1.0
+    ],
+    "blade": [
+     -14,
+     44
+    ],
+    "elbow": [
+     -0.6,
+     -0.3,
+     -0.6
+    ],
+    "e": "s"
+   },
+   {
+    "bob": 0.0,
+    "lean": 6,
+    "twist": 4,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.08,
+    "squint": true,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     24,
+     34
+    ],
+    "held": null,
+    "step": [
+     0.0,
+     0.0
+    ],
+    "ik": 1,
+    "plant": 1,
+    "hand": [
+     -12,
+     10,
+     0.86
+    ],
+    "blade": [
+     -6,
+     6
+    ],
+    "elbow": [
+     -0.6,
+     -0.8,
+     -0.4
+    ],
+    "e": "i"
+   },
+   {
+    "bob": 0.0,
+    "lean": 4,
+    "twist": 2,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.06,
+    "squint": false,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     20,
+     32
+    ],
+    "held": null,
+    "step": [
+     0.0,
+     0.0
+    ],
+    "ik": 1,
+    "plant": 1,
+    "hand": [
+     -12,
+     8,
+     0.85
+    ],
+    "blade": [
+     -6,
+     4
+    ],
+    "elbow": [
+     -0.6,
+     -0.8,
+     -0.4
+    ],
+    "e": "s"
+   },
+   {
+    "bob": 0.0,
+    "lean": 0.0,
+    "twist": 0.0,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.0,
+    "squint": false,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     12,
+     18
+    ],
+    "held": null,
+    "step": [
+     0.0,
+     0.0
+    ],
+    "ik": 1,
+    "plant": 1,
+    "hand": [
+     -30,
+     -40,
+     0.7
+    ],
+    "blade": [
+     -10,
+     20
+    ],
+    "elbow": [
+     -0.7,
+     -1,
+     -0.2
+    ],
+    "e": "s"
+   }
+  ],
+  "dur": 1.05,
+  "hitT": 0.4,
+  "lock": 0.85,
+  "trail": null,
+  "fadeIn": 0.05,
+  "fadeOut": 0.16,
+  "trailColor": [
+   1.25,
+   1.45,
+   1.9
+  ],
+  "stow": true,
+  "closeT": 0.4
+ },
+ {
+  "name": "ph_blow",
+  "frames": 5,
+  "fps": 6.25,
+  "loop": false,
+  "hitFrame": 2.0,
+  "keys": [
+   0.0,
+   0.2,
+   0.32,
+   0.56,
+   0.8
+  ],
+  "poses": [
+   {
+    "bob": 0.0,
+    "lean": 0.0,
+    "twist": 0.0,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.0,
+    "squint": false,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     12,
+     18
+    ],
+    "held": null,
+    "step": [
+     0.0,
+     0.0
+    ],
+    "ik": 1,
+    "plant": 1,
+    "hand": [
+     -30,
+     -40,
+     0.7
+    ],
+    "blade": [
+     -10,
+     20
+    ],
+    "elbow": [
+     -0.7,
+     -1,
+     -0.2
+    ]
+   },
+   {
+    "bob": 0.0,
+    "lean": -4,
+    "twist": -6,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.03,
+    "squint": false,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     20,
+     24
+    ],
+    "held": null,
+    "step": [
+     0.0,
+     0.0
+    ],
+    "ik": 1,
+    "plant": 1,
+    "hand": [
+     -10,
+     26,
+     0.56
+    ],
+    "blade": [
+     0,
+     64
+    ],
+    "elbow": [
+     -0.8,
+     -1,
+     -0.2
+    ],
+    "e": "o"
+   },
+   {
+    "bob": 0.0,
+    "lean": 10,
+    "twist": 2,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.06,
+    "squint": true,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     16,
+     28
+    ],
+    "held": null,
+    "step": [
+     0.0,
+     0.0
+    ],
+    "ik": 1,
+    "plant": 1,
+    "hand": [
+     -6,
+     22,
+     0.7
+    ],
+    "blade": [
+     4,
+     50
+    ],
+    "elbow": [
+     -0.8,
+     -1,
+     -0.2
+    ],
+    "e": "i"
+   },
+   {
+    "bob": 0.0,
+    "lean": 8,
+    "twist": 2,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.05,
+    "squint": false,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     16,
+     28
+    ],
+    "held": null,
+    "step": [
+     0.0,
+     0.0
+    ],
+    "ik": 1,
+    "plant": 1,
+    "hand": [
+     -6,
+     20,
+     0.7
+    ],
+    "blade": [
+     4,
+     46
+    ],
+    "elbow": [
+     -0.8,
+     -1,
+     -0.2
+    ],
+    "e": "s"
+   },
+   {
+    "bob": 0.0,
+    "lean": 0.0,
+    "twist": 0.0,
+    "legL": 0.0,
+    "legR": 0.0,
+    "wOff": 90.0,
+    "wSide": 0.0,
+    "offOff": 60.0,
+    "fall": 0.0,
+    "sink": 0.0,
+    "squint": false,
+    "armR": [
+     8,
+     14
+    ],
+    "armL": [
+     12,
+     18
+    ],
+    "held": null,
+    "step": [
+     0.0,
+     0.0
+    ],
+    "ik": 1,
+    "plant": 1,
+    "hand": [
+     -30,
+     -40,
+     0.7
+    ],
+    "blade": [
+     -10,
+     20
+    ],
+    "elbow": [
+     -0.7,
+     -1,
+     -0.2
+    ],
+    "e": "s"
+   }
+  ],
+  "dur": 0.8,
+  "hitT": 0.32,
+  "lock": 0.5,
+  "trail": null,
+  "fadeIn": 0.05,
+  "fadeOut": 0.16,
+  "trailColor": [
+   1.25,
+   1.45,
+   1.9
+  ],
+  "stow": true,
+  "blowT": 0.32
  }
 ]

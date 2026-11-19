@@ -47,32 +47,14 @@ for (const [id, sound, count] of [['ph1_a3','ph_spin',5],['ph1_a6','ph_slam',1],
     assert.ok(Math.abs(lock-.69)<.005,'lock = hit 0.34 + recover 0.35: '+lock);
     assert.ok(!pc.freezeT,'no hit-stop on a whiff'); }
 }
-// 밀어내기 (2026-11-13): 부채꼴 3 m · 110도, 한 방(oneHit), 휘두름 소리 한 번, 아무도 안 맞으면 타격음·히트스톱·카메라 킥 없음; 수치는 그대로
-{ const d = skills.find(s => s.id === 'ph1_a4'), sounds = [], hitOp = d.ops.find(o => o.op === 'hit');
-  assert.equal(d.anim, 'ph_sweep'); assert.equal(actions.ph_sweep.hitT, 0.26); assert.equal(d.mp, 10); assert.equal(d.cd, 7); assert.equal(d.range, 2.0);
-  assert.equal(hitOp.shape, 'cone'); assert.equal(hitOp.coef, 1.4); assert.equal(hitOp.r, 3.0); assert.equal(hitOp.ang, 110); assert.equal(hitOp.vsImmune, 1.6); assert.ok(hitOp.oneHit); assert.equal(hitOp.sfx, 'ph_push_hit');
-  for (const L of [1, 5]) { sounds.length = 0; let fxCalls = 0;
-    const pc = { pos:{x:0,y:0,z:0}, facing:{x:0,z:1}, skills:{lock:0}, body:{sh:{actions}, bladePoints:()=>null},
-      sheet:{p:{sk:{}},book:{passive:()=>0}}, status:{flag:()=>0}, zone:{actors:[],nearestEnemy:()=>null,geo:{ground:(x,z)=>({x,y:0,z})}}, dist:()=>99 };
-    const eng = new SkillEngine(pc); FX.pharm = (k) => { if (k === 'push') fxCalls++; return null; };
-    bindSkillRt({audio:{sfx:name=>sounds.push({name,t:eng.clock})},render:{addShake(){},kick(){ throw new Error('no camera kick on a whiff'); }},data:{}});
-    eng.release({d,L,grade:1,mult:1,origin:{...pc.pos},facing:{...pc.facing},aim:{x:0,y:0,z:2},hitOnce:new Set(),act:'ph_sweep'});
-    for(let i=0;i<200;i++) eng.tick(.01);
-    assert.equal(fxCalls, 1, 'the ground turns over once at every level (oneHit)');
-    assert.equal(sounds.filter(s=>s.name==='ph_smash_swing').length,1,'one whoosh');
-    assert.ok(!sounds.some(s=>s.name==='ph_push_hit'||s.name==='heavy'||s.name==='hit'),'no hit sound when nothing was hit');
-    assert.ok(!pc.freezeT,'no hit-stop on a whiff'); }
-  FX.pharm = () => ({set(){},dispose(){},end(){},pulse(){}});
-}
+// 2026-11-19 밀어내기 -> 유봉 되던지기(ph_rang, 넉백·면역 추가 피해 없음), 화염·냉각·부식 약병 -> 불꽃심지병·서리병 굴리기·결정침 개화 — 규칙·소리 순서는 tests/pharm2.test.mjs
+{ const d = skills.find(s => s.id === 'ph1_a4'); assert.equal(d.anim, 'ph_rang'); assert.equal(d.mp, 10); assert.equal(d.cd, 7); assert.ok(!d.ops.some(o => o.knock || o.vsImmune), 'no knockback / immune bonus'); }
 // 약병 투구 (2026-11-13): 던지는 약병 넷은 야구 투구 동작 ph_pitch(유봉은 등에 = stow), 0.24 s에 손을 떠남
 { assert.ok(actions.ph_pitch.stow); assert.equal(actions.ph_pitch.hitT, 0.24); assert.equal(actions.ph_pitch.throwT, 0.24);
-  for (const id of ['ph1_b1','ph1_b2','ph1_b4','ph1_b6']) assert.equal(skills.find(s => s.id === id).anim, 'ph_pitch', id);
+  for (const [id, an] of [['ph1_b1','ph_pitch'],['ph1_b2','ph_bowl'],['ph1_b4','ph_bloom'],['ph1_b6','ph_pitch']]) assert.equal(skills.find(s => s.id === id).anim, an, id);
   assert.equal(actions.throw.frames, 5, 'the shared throw of the other jobs is untouched'); }
 // 약병 연출 개편 (2026-11-14): 화염·냉각·부식 약병은 착탄 때 원소별 유리 깨짐 소리 한 번(피해 순간 = 폭발 순간), 수치·판정은 그대로
-{ const want = { ph1_b1: ['ph_glass_fire', 1.6, 1.6, 'fire', 12, 5], ph1_b2: ['ph_glass_ice', 1.4, 1.8, 'ice', 12, 6], ph1_b4: ['ph_glass_acid', 0.8, 1.8, 'acid', 14, 8] };
-  for (const [id, [snd, coef, r, elem, mp, cd]] of Object.entries(want)) { const d = skills.find(s => s.id === id), op = d.ops[0];
-    assert.equal(op.op, 'proj'); assert.equal(op.kind, 'lob'); assert.equal(op.coef, coef, id); assert.equal(op.r, r, id); assert.equal(op.elem, elem); assert.equal(d.mp, mp); assert.equal(d.cd, cd);
-    assert.equal(skillSound(d, op), snd, id + ' impact sound'); assert.equal(skillSound(d), 'throw', id + ' the throw itself'); }
+{
   const b6 = skills.find(s => s.id === 'ph1_b6').ops[0]; assert.equal(b6.n, 10); assert.equal(b6.coef, 0.6); assert.equal(b6.blast, 1.5); assert.equal(b6.gap, 0.2);
   // 약 보호막: 그림은 2초만(사용자 요청), 보호막·면역 시간은 8초 그대로
   const c7 = skills.find(s => s.id === 'ph1_c7'); assert.equal(c7.ops.find(o => o.op === 'shield').dur, 8); assert.equal(c7.ops.find(o => o.op === 'buff').dur, 8);

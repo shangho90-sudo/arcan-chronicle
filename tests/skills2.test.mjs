@@ -91,25 +91,27 @@ n.p.quests.push({ id: "qt_painter", state: "completed", counts: [1, 30] });
 Ok(n.chooseJob("painter") == null, "advance to painter"); Ok(n.chooseJob("musician") != null, "single branch");
 
 // ---- crafting (atomic)
-ch = make(10); ch.p.job = "pharmacist"; ch.recalc(); ch.book.learn("ph1_c1");
-const rc = d.recipes.find(r => r.id === "r_potion_s");
+// (2026-11-19: 약사 회복제 제작 ph1_c1 -> 꿈꽃가루, 회복제 레시피 삭제 — 같은 규칙을 요리사 도시락 제작 ck1_c1 / r_lunch 로 검사)
+ch = make(10); ch.p.job = "cook"; ch.recalc(); ch.book.learn("ck1_c1");
+const rc = d.recipes.find(r => r.id === "r_lunch");
 Ok(sys.craft(d, ch, ch.book, rc, 1).err, "craft fails without materials");
-ch.bag.add("m_herb", 4); ch.bag.add("m_bottle", 2);
-const pot0 = ch.bag.count("c_potion_s");
+ch.bag.add("m_flour", 2); ch.bag.add("m_veg", 2); ch.bag.add("m_meat", 2);
+const pot0 = ch.bag.count("f_lunch");
 const r1 = sys.craft(d, ch, ch.book, rc, 2, () => 0.99);
-Ok(r1.ok && ch.bag.count("c_potion_s") === pot0 + 4 && ch.bag.count("m_herb") === 0 && ch.bag.count("m_bottle") === 0, "craft x2 consumes and produces");
+Ok(r1.ok && ch.bag.count("f_lunch") === pot0 + 4 && ch.bag.count("m_flour") === 0 && ch.bag.count("m_meat") === 0, "craft x2 consumes and produces");
 // bag full -> nothing lost
-ch.bag.add("m_herb", 3); ch.bag.add("m_bottle", 2);
+ch.bag.add("m_flour", 2); ch.bag.add("m_veg", 2); ch.bag.add("m_meat", 2);
 const inv = ch.p.inventory; for (let i = 0; i < inv.length; i++) if (!(inv[i].count > 0)) inv[i] = { id: "w_knife_1", count: 1 };
-ch.bag.remove("c_potion_s", ch.bag.count("c_potion_s")); for (let i = 0; i < inv.length; i++) if (!(inv[i].count > 0)) inv[i] = { id: "w_knife_1", count: 1 };
-const herbs = ch.bag.count("m_herb"), bottles = ch.bag.count("m_bottle");
+ch.bag.remove("f_lunch", ch.bag.count("f_lunch")); for (let i = 0; i < inv.length; i++) if (!(inv[i].count > 0)) inv[i] = { id: "w_knife_1", count: 1 };
+const herbs = ch.bag.count("m_flour"), bottles = ch.bag.count("m_meat");
 const r2 = sys.craft(d, ch, ch.book, rc, 1);
-Ok(r2.err && ch.bag.count("m_herb") === herbs && ch.bag.count("m_bottle") === bottles, "bag full -> materials kept: " + r2.err);
+Ok(r2.err && ch.bag.count("m_flour") === herbs && ch.bag.count("m_meat") === bottles, "bag full -> materials kept: " + r2.err);
 // bonus output never re-triggers: rng 0 -> exactly one bonus batch
-ch = make(20); ch.p.job = "pharmacist"; ch.recalc(); ch.book.learn("ph1_c1");
-{ const orig = ch.book.passive.bind(ch.book); ch.book.passive = k => k === "craftExtra:potion" ? 0.1 : orig(k); }   // 알뜰 조제 패시브는 2026-11-11 삭제 — 덤 생산 규칙 자체를 검사
-ch.bag.add("m_herb", 2); ch.bag.add("m_bottle", 1);
+ch = make(20); ch.p.job = "cook"; ch.recalc(); ch.book.learn("ck1_c1");
+{ const orig = ch.book.passive.bind(ch.book); ch.book.passive = k => k === "craftExtra:food" ? 0.1 : orig(k); }   // 덤 생산 규칙 자체를 검사
+ch.bag.add("m_flour", 1); ch.bag.add("m_veg", 1); ch.bag.add("m_meat", 1);
 const r3 = sys.craft(d, ch, ch.book, rc, 1, () => 0); Eq(r3.made, 4, "bonus output = one extra batch only");
+Ok(!d.recipes.some(r => r.id === "r_potion_s" || r.id === "r_potion_m" || r.skill === "ph1_c1"), "약사 회복제 레시피 삭제(꿈꽃가루는 제작 스킬이 아님)");
 
 // ---- craft success rate (행운): tier 1 always works, higher tiers can fail and consume the materials
 Eq(sys.craftSuccessRate({ final: { craftRate: 0 } }, 1), 1, "tier 1 always succeeds");
@@ -158,7 +160,8 @@ Eq(p4.version, 4, "migrated to v4"); Eq(ch4.p.job, "cook", "legacy job kept"); E
 { const ids = d.skill2List.filter(x => x.job === "pharmacist").map(x => x.id).sort().join(",");
   Eq(ids, "ph1_a1,ph1_a3,ph1_a4,ph1_a5,ph1_a6,ph1_b1,ph1_b2,ph1_b4,ph1_b5,ph1_b6,ph1_c1,ph1_c6,ph1_c7,ph1_c8,ph1_c9", "pharmacist skill ids after the rework");
   const S = id => d.skill2(id);
-  Eq(S("ph1_a4").unlock, 13, "밀어내기 Lv13"); Eq(S("ph1_a6").unlock, 18, "천근쇄약 Lv18"); Eq(S("ph1_b6").unlock, 15, "약병폭격 Lv15");
+  Eq(S("ph1_a4").unlock, 13, "유봉 되던지기 Lv13"); Eq(S("ph1_b1").unlock, 10, "불꽃심지병 Lv10"); Eq(S("ph1_b2").unlock, 12, "서리병 굴리기 Lv12"); Eq(S("ph1_b4").unlock, 18, "결정침 개화 Lv18"); Eq(S("ph1_c1").unlock, 10, "꿈꽃가루 Lv10");
+  Eq(S("ph1_c1").type, "support", "꿈꽃가루 = 보조(제작 아님)"); Eq(S("ph1_c1").mp, 10, "꿈꽃가루 기력 10"); Eq(S("ph1_c1").cd, 14, "꿈꽃가루 재사용 14초"); Eq(S("ph1_a6").unlock, 18, "천근쇄약 Lv18"); Eq(S("ph1_b6").unlock, 15, "약병폭격 Lv15");
   const sp = S("ph1_a3").ops.find(o => o.op === "hit"); Ok(sp.shape === "circle" && sp.hits === 5 && sp.last && sp.last.push > 0, "유봉 휘두르기: circle, 5 hits, last pushes");
   const sl = S("ph1_a6").ops.find(o => o.op === "delay"); Ok(sl.coef === 4.5 && sl.core > 0 && sl.r >= 4, "천근쇄약 450% wide + centre bonus");
   const fr = S("ph1_b6").ops[0]; Ok(fr.op === "custom" && fr.fn === "flask_rain" && fr.n === 10, "약병폭격 10 flasks");

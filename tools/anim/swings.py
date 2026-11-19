@@ -1372,6 +1372,58 @@ for _a in MU_ACTS: _a.update(stow=True)
 MU_BOW.update(strokes=[0.20, 0.38, 0.56, 0.74])   # 활을 끝까지 당긴 순간 = 파동 발사(gen.py mu_a3 gap 0.18과 같음)
 SKILL_ACTS += MU_ACTS
 
+# ------------------------------------------------------------------------------------------------ 약사 1차 5종 교체 (2026-11-19, js/pharm1.js)
+REST = dict(hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2], armL=[12, 18])
+# 유봉 되던지기 (ph1_a4, anim ph_rang): 몸을 오른쪽으로 살짝 틀며 유봉을 옆으로 젖혔다가(0.13 s) 앞으로 휙 뿌림 — 0.22 s 에 손을 떠남
+# (throwT = hitT: js/pharm1.js 가 이때 손의 유봉을 숨기고(ModelBody.thrownR) 날아가는 유봉을 띄움). 빈손이 앞으로 따라가며 마무리, 짧은 잠금.
+PH_RANG = action('ph_rang', [
+    key(0.00, **REST),
+    key(0.13, 'o', twist=-34, lean=-3, sink=0.05, hand=[-112, 12, 0.84], blade=[-160, 6], elbow=[-0.4, -0.6, -0.8], armL=[40, 30], step=[0.14, 0.0]),
+    key(0.22, 'i', twist=18, lean=9, sink=0.08, hand=[-6, 10, 1.0], blade=[10, 2], elbow=[-0.5, -0.8, 0.0], armL=[22, 34], step=[0.24, 0.0], squint=True),
+    key(0.30, 'o', twist=30, lean=11, sink=0.07, hand=[30, -6, 0.92], blade=[50, -8], elbow=[-0.2, -1, 0.3], armL=[12, 36], step=[0.24, 0.0]),
+    key(0.46, 's', **REST),
+], 0.22, 0.32, None, fadeIn=0.05, fadeOut=0.12)
+PH_RANG.update(throwT=0.22)
+# 유봉을 손으로 낚아채는 짧은 상체 겹침 동작(draw 와 같은 overlay — 걷는 다리는 그대로): 손을 앞으로 뻗어 받고 당겨 쥠
+PH_CATCH = action('ph_catch', [
+    key(0.00, None, ik=0, plant=0, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2]),
+    key(0.07, 'o', ik=1, plant=0, twist=-8, hand=[-26, 22, 0.96], blade=[-14, 46], elbow=[-0.6, -0.5, -0.5]),
+    key(0.14, 'i', ik=1, plant=0, twist=-3, hand=[-28, -8, 0.80], blade=[-12, 26], elbow=[-0.7, -1, -0.2]),
+    key(0.32, 's', ik=0, plant=0, hand=[-30, -40, 0.70], blade=[-10, 20], elbow=[-0.7, -1, -0.2]),
+], 0.07, 0.0, None, fadeIn=0.0, fadeOut=0.0)
+PH_CATCH.update(overlay=True, catchT=0.07)
+# 서리병 굴리기 (ph1_b2, anim ph_bowl): 볼링 — 몸을 낮추며 오른손(둥근 병)을 뒤로 크게 젖혔다가 바닥 가까이로 앞으로 밀어 굴림, 0.30 s 에
+# 손을 떠남. stow: 유봉은 등에(약병 투구와 같음).
+PH_BOWL = action('ph_bowl', [
+    key(0.00, **REST),
+    key(0.14, 'o', twist=-22, lean=14, sink=0.20, hand=[-150, -40, 0.86], blade=[-170, -30], elbow=[-0.6, -1, -0.3], armL=[40, 40], step=[0.30, 0.0], squint=True),
+    key(0.30, 'i', twist=8, lean=30, sink=0.34, hand=[-4, -62, 1.0], blade=[0, -50], elbow=[-0.5, -1, 0.0], armL=[30, 46], step=[0.42, -0.06], squint=True),
+    key(0.40, 'o', twist=12, lean=26, sink=0.30, hand=[4, -20, 0.96], blade=[6, 10], elbow=[-0.5, -1, 0.0], armL=[26, 46], step=[0.42, -0.06]),
+    key(0.62, 's', **REST),
+], 0.30, 0.45, None, fadeIn=0.05, fadeOut=0.14)
+PH_BOWL.update(stow=True, throwT=0.30)
+# 결정침 개화 (ph1_b4, anim ph_bloom): 손끝을 표적 쪽으로 펼침(0.18 ~ 0.36 s, 결정이 자라는 동안) -> 0.40 s 에 손을 오므리며 끌어당김(결정침이
+# 꿰뚫는 신호) -> 그 자세로 마지막 결정까지 버팀 -> 복귀. stow: 빈손(유봉은 등에).
+PH_BLOOM = action('ph_bloom', [
+    key(0.00, **REST),
+    key(0.18, 'o', twist=-10, lean=-3, sink=0.04, hand=[-20, 22, 1.0], blade=[-14, 30], elbow=[-0.6, -0.4, -0.6], armL=[40, 30]),
+    key(0.36, 's', twist=-12, lean=-4, sink=0.05, hand=[-22, 30, 1.0], blade=[-14, 44], elbow=[-0.6, -0.3, -0.6], armL=[44, 30]),
+    key(0.42, 'i', twist=4, lean=6, sink=0.08, hand=[-12, 10, 0.86], blade=[-6, 6], elbow=[-0.6, -0.8, -0.4], armL=[24, 34], squint=True),
+    key(0.82, 's', twist=2, lean=4, sink=0.06, hand=[-12, 8, 0.85], blade=[-6, 4], elbow=[-0.6, -0.8, -0.4], armL=[20, 32]),
+    key(1.05, 's', **REST),
+], 0.40, 0.85, None, fadeIn=0.05, fadeOut=0.16)
+PH_BLOOM.update(stow=True, closeT=0.40)
+# 꿈꽃가루 (ph1_c1, anim ph_blow): 오른손바닥을 얼굴 앞으로 올려(꽃이 핌) -> 0.32 s 에 몸을 앞으로 숙이며 훅 붊 -> 잠깐 -> 복귀. stow: 빈손.
+PH_BLOW = action('ph_blow', [
+    key(0.00, **REST),
+    key(0.20, 'o', twist=-6, lean=-4, sink=0.03, hand=[-10, 26, 0.56], blade=[0, 64], elbow=[-0.8, -1, -0.2], armL=[20, 24]),
+    key(0.32, 'i', twist=2, lean=10, sink=0.06, hand=[-6, 22, 0.70], blade=[4, 50], elbow=[-0.8, -1, -0.2], armL=[16, 28], squint=True),
+    key(0.56, 's', twist=2, lean=8, sink=0.05, hand=[-6, 20, 0.70], blade=[4, 46], elbow=[-0.8, -1, -0.2], armL=[16, 28]),
+    key(0.80, 's', **REST),
+], 0.32, 0.50, None, fadeIn=0.05, fadeOut=0.16)
+PH_BLOW.update(stow=True, blowT=0.32)
+SKILL_ACTS += [PH_RANG, PH_CATCH, PH_BOWL, PH_BLOOM, PH_BLOW]
+
 acts = json.load(open(P))
 names = {'attack', 'attack2'} | {x['name'] for x in SKILL_ACTS}
 acts = [a for a in acts if a['name'] not in names and not a['name'].startswith('nv_yeon_')]
