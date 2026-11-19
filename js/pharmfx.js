@@ -37,7 +37,8 @@
 import * as THREE from 'three';
 import { gfxOn } from './gfxq.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { FlaskKit } from './flaskfx.js';   // 2026-11-14 약병 연출 공용 모듈 (약병·유리·액체·반응·잔여물)
+import { FlaskKit } from './flaskfx.js';
+import { Ph1Fx } from './pharm1fx.js';   // 2026-11-19 약사 1차 5종 교체 그림(유봉 되던지기·불꽃심지병·서리병 굴리기·결정침 개화·꿈꽃가루·수면 초승달)   // 2026-11-14 약병 연출 공용 모듈 (약병·유리·액체·반응·잔여물)
 
 // ------------------------------------------------------------------------------------------------ tunables
 export const PHARM = {
@@ -220,7 +221,7 @@ export class PharmFx {
   constructor(root) {
     this.root = root; this.live = []; this.ready = false; this.geo = {}; this.pieces = []; this.shards = []; this.loading = null; this.cells = {}; this.span = 3.6;
     this.tri = {}; this.triShards = []; this.pool = {}; this.camQ = new THREE.Quaternion(); this.yawQ = new THREE.Quaternion(); this.toCam = new THREE.Vector3(0, 0.7, 0.7); this.camR = new THREE.Vector3(1, 0, 0);
-    this.kit = new FlaskKit(this);
+    this.kit = new FlaskKit(this); this.ph1 = new Ph1Fx(this);
   }
   low() { return lite(); }
   load() {
@@ -442,6 +443,13 @@ export class PharmFx {
 
   // ------------------------------------------------------------------ 약병 (falling flask) + ⑥ burst
   /** 2026-11-19 리마스터: 약병폭격 5단계 연출(js/flaskfx.js rain). 품질 낮음·모듈 없음 = null (예전 연출 그대로) */
+  // 약사 1차 5종(js/pharm1.js 핸들 — js/pharm1fx.js)
+  rang(pc, o = {}) { return this.ph1.rang(pc, o); }
+  wick(pos, o = {}) { return this.ph1.wick(pos, o); }
+  frost(pc, o = {}) { return this.ph1.frost(pc, o); }
+  crystal(t, o = {}) { return this.ph1.crystal(t, o); }
+  dream(pc, o = {}) { return this.ph1.dream(pc, o); }
+  moon(t, o = {}) { return this.ph1.moon(t, o); }
   rain(pos, o = {}) { if (!this._ok() || !this.kit.ready || !gfxOn()) return null; return this.kit.rain(pos, o); }
   flask(pos, o = {}) {
     if (!this._ok()) return null;
