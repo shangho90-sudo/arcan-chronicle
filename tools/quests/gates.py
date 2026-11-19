@@ -31,7 +31,7 @@ LEGACY = {
     'q_job1': dict(gz='town', tz='town', oz=['kairion_capital']),          # 전직 마스터 = 카이리온 왕도 길드 회관
     'q7_boss': dict(gz='town', tz='town', oz=['mushroom_grove']),
 }
-INSERT_BEFORE = {'mq06a': 'q7_boss', 'mq07c': 'q_job1'}                     # 이야기 순서 안 자리
+INSERT_BEFORE = {'mq00h': 'q7_boss', 'mq01a': 'q_job1'}                     # 이야기 순서 안 자리 (2026-11-19 서장: 거대 독버섯·첫 전직은 아르칸 서장 끝)
 # job 목표: 'any' = 1차 전직(길드 회관), 'tier2' = 2차 전직 시험(qt_*: 안개골 우두머리 곰·서리뿔 산양 사냥)
 JOB_ZONES = {'any': ['kairion_capital'], 'tier2': ['kairion_capital', 'mist_valley', 'frost_highland']}
 KEEP_LEVEL = {'forest'}          # 처음 필드(Lv1 몬스터) 레벨은 그대로
@@ -42,6 +42,8 @@ def chain():
     """메인 단계 목록(이야기 순서): [{id, name, lv, prereq, gz, tz, objs:[(type, target, zone|None, extra)]}]"""
     qj = json.load(open(os.path.join(ROOT, 'assets', 'data', 'quests.json'), encoding='utf-8'))
     old = {q['id']: q for q in qj['quests']}
+    for i, pt in story.LEGACY_PATCH.items():
+        if i in old: old[i] = dict(old[i], **pt)
     out = []
     def legacy(i):
         q = old[i]; L = LEGACY[i]

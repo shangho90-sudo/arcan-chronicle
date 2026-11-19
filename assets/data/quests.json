@@ -70,7 +70,7 @@
   {
    "id": "q_job1",
    "prereq": [
-    "q1_start"
+    "mq00h"
    ],
    "minLevel": 10,
    "consumeCollected": true,
@@ -84,7 +84,7 @@
      }
     ]
    },
-   "name": "첫 전직",
+   "name": "서장 첫 전직",
    "category": "main",
    "giver": "elder",
    "turnIn": "elder",
@@ -97,9 +97,9 @@
      "text": "1차 전직하기"
     }
    ],
-   "offerText": "견습생 수련을 마쳤군! 이제 약국·식당·대장간·의상실·화방 중 마음에 드는 마스터를 찾아가 전직하게. 전직하면 스킬 포인트를 받아 스킬창(K)에서 배울 수 있다네.",
-   "progressText": "마스터들은 광장을 둘러싼 가게 앞에 있네.",
-   "completeText": "훌륭하네! 스킬창(K)에서 스킬을 배우고 슬롯에 장착해 보게."
+   "offerText": "<b class='gold'>하람</b> 레벨 10이 됐군! 이제 자네 손에 맞는 생활 직업을 정할 때야.<br><b class='gold'>하람</b> 마스터들은 카이리온 왕도의 장인 길드 회관에 모여 있네. 약사·대장장이·요리사·미용사·예술가 중 마음에 드는 마스터를 찾아가 '직업 상담'을 하게.<br><b class='gold'>하람</b> 왕도 가는 길을 따라가면 카이리온일세. 전직하면 그걸로 이 일은 끝이야. 그다음 수확제 납품을 맡기지.",
+   "progressText": "<b class='gold'>하람</b> 왕도 길드 회관 앞에 마스터들이 서 있네. 길이 헷갈리면 광장의 하늘에게 물어보게.",
+   "completeText": "<i>길드 회관의 종이 맑게 울렸다. 마스터가 새 장인의 손을 맞잡았다.</i><br><i>아르칸 마을에서는 수확제 짐수레가 떠날 채비를 하고 있다. 하람 촌장에게 돌아가 기쁜 소식을 전하자.</i>"
   },
   {
    "id": "q3_slime",
@@ -234,15 +234,15 @@
   },
   {
    "id": "q7_boss",
-   "name": "거대 독버섯",
+   "name": "서장 거대 독버섯",
    "category": "main",
    "giver": "elder",
    "turnIn": "elder",
    "summary": "숲 북동쪽 워프로 독버섯 군락지에 가서 거대 독버섯을 쓰러뜨리자.",
    "prereq": [
-    "q6_golem"
+    "mq00g"
    ],
-   "minLevel": 8,
+   "minLevel": 9,
    "objectives": [
     {
      "type": "kill",
@@ -252,7 +252,7 @@
     }
    ],
    "reward": {
-    "exp": 400,
+    "exp": 70,
     "gold": 500,
     "items": [
      {
@@ -262,9 +262,9 @@
     ]
    },
    "consumeCollected": true,
-   "offerText": "숲이 병드는 원인은 독버섯 군락지의 거대 독버섯이네. 독 웅덩이와 땅의 경고 표시를 잘 보고 싸우게. 해독제도 챙기고!",
-   "progressText": "숲 북동쪽 길 끝의 보라빛 워프를 타면 독버섯 군락지로 갈 수 있네.",
-   "completeText": "해냈군! 이제 숲도 다시 숨을 쉬겠지. 아르칸 마을의 영웅일세!"
+   "offerText": "<b class='gold'>하람</b> 다래 말이 맞다면 숲이 병드는 원인은 독버섯 군락지의 거대 독버섯이네.<br><b class='gold'>하람</b> 독 웅덩이와 땅의 경고 표시를 잘 보고 싸우게. 해독제도 챙기고!",
+   "progressText": "<b class='gold'>하람</b> 숲 북동쪽 길 끝의 보랏빛 워프를 타면 독버섯 군락지로 갈 수 있네.",
+   "completeText": "<b class='gold'>하람</b> 해냈군! 이제 숲도 다시 숨을 쉬겠지.<br><i>쓰러진 독버섯의 뿌리에서 손톱만 한 검은 결정이 굴러 나왔다. 결정은 아주 느리게, 심장처럼 맥박쳤다.</i><br><b class='gold'>하람</b> …이건 마을에서 다룰 물건이 아니야. 내가 잘 맡아 두겠네."
   },
   {
    "id": "qt_western_pharmacist",
@@ -561,6 +561,361 @@
    "completeText": "합격일세! 이제 나에게 음악가 전직을 신청할 수 있네."
   },
   {
+   "id": "mq00a",
+   "name": "서장 수확제 준비 ①",
+   "category": "main",
+   "giver": "elder",
+   "turnIn": "arcan_smith_boy",
+   "summary": "숲의 마른 참나무 가지 줍기 · 길을 막는 새싹 젤리 치우기",
+   "prereq": [
+    "q2_merchant"
+   ],
+   "minLevel": 2,
+   "objectives": [
+    {
+     "type": "collect",
+     "target": "qi_oak_branch",
+     "count": 5,
+     "text": "숲의 마른 참나무 가지 줍기",
+     "gather": {
+      "zone": "forest"
+     }
+    },
+    {
+     "type": "kill",
+     "target": "mon_jelly",
+     "count": 5,
+     "text": "길을 막는 새싹 젤리 치우기"
+    }
+   ],
+   "reward": {
+    "exp": 0,
+    "gold": 40,
+    "items": [
+     {
+      "id": "c_potion_s",
+      "count": 3
+     }
+    ]
+   },
+   "consumeCollected": true,
+   "offerText": "<b class='gold'>하람</b> 올가을 왕도 카이리온에서 수확제가 열리네. 우리 아르칸 마을도 물건을 바치기로 했지.<br><b class='gold'>하람</b> 철산이 왕도로 떠나기 전에 벼려 둔 수확제 칼을 쇠돌이 마무리하는 중인데, 화덕에 넣을 마른 참나무가 모자란다는군.<br><b class='gold'>하람</b> 속삭이는 숲에서 마른 참나무 가지를 주워 쇠돌에게 갖다주게. 요즘 새싹 젤리가 숲길을 막는다니 그것도 치워 주고.",
+   "progressText": "<b class='gold'>하람</b> 속삭이는 숲은 마을 성문 밖이야. 바닥에 빛이 도는 자리를 찾으면 가지가 있을 걸세.",
+   "completeText": "<b class='gold'>쇠돌</b> 우와, 바싹 마른 참나무다! 이 정도면 화덕이 사흘은 버텨요.<br><b class='gold'>쇠돌</b> 그런데… 가지 몇 개에 검은 얼룩이 묻어 있네요. 숲에 이런 게 있었나?<br><i>쇠돌은 고개를 갸웃하며 얼룩진 가지를 화덕 옆에 따로 내려놓았다.</i>",
+   "story": true
+  },
+  {
+   "id": "mq00b",
+   "name": "서장 수확제 준비 ②",
+   "category": "main",
+   "giver": "merchant",
+   "turnIn": "merchant",
+   "summary": "길가의 이끼 달팽이 치우기 · 가시 고슴도치 쫓기",
+   "prereq": [
+    "mq00a"
+   ],
+   "minLevel": 3,
+   "objectives": [
+    {
+     "type": "kill",
+     "target": "mon_snail",
+     "count": 6,
+     "text": "길가의 이끼 달팽이 치우기"
+    },
+    {
+     "type": "kill",
+     "target": "mon_hedgehog",
+     "count": 5,
+     "text": "가시 고슴도치 쫓기"
+    }
+   ],
+   "reward": {
+    "exp": 5,
+    "gold": 60,
+    "items": [
+     {
+      "id": "c_potion_s",
+      "count": 3
+     }
+    ]
+   },
+   "consumeCollected": true,
+   "offerText": "<b class='gold'>모아</b> 수확제 짐수레는 왕도 가는 길로 나가. 그런데 길가에 이끼 달팽이랑 가시 고슴도치가 잔뜩 몰려 있대.<br><b class='gold'>모아</b> 바퀴가 달팽이 껍데기에 미끄러지면 큰일이야. 길을 좀 치워 줄래?",
+   "progressText": "<b class='gold'>모아</b> 왕도 가는 길은 마을 성문 밖, 카이리온 쪽 길이야.",
+   "completeText": "<b class='gold'>모아</b> 고마워! 이제 짐수레가 무사히 지나가겠어.<br><b class='gold'>모아</b> 그런데 행상들 말로는 요즘 숲 짐승들이 밤마다 운대. 경비병 도윤 씨가 그 일로 걱정이 많던데, 한번 가 봐.",
+   "story": true
+  },
+  {
+   "id": "mq00c",
+   "name": "서장 숲의 속삭임 ①",
+   "category": "main",
+   "giver": "guard",
+   "turnIn": "arcan_pharm_clerk",
+   "summary": "날쌘 여우 쫓아내기 · 검은 얼룩 털 모으기",
+   "prereq": [
+    "mq00b"
+   ],
+   "minLevel": 4,
+   "objectives": [
+    {
+     "type": "kill",
+     "target": "mon_fox",
+     "count": 6,
+     "text": "날쌘 여우 쫓아내기"
+    },
+    {
+     "type": "collect",
+     "target": "qi_dark_fur",
+     "count": 3,
+     "text": "검은 얼룩 털 모으기",
+     "drop": {
+      "from": [
+       "mon_fox",
+       "mon_wolf"
+      ],
+      "chance": 0.5
+     }
+    }
+   ],
+   "reward": {
+    "exp": 10,
+    "gold": 80,
+    "items": [
+     {
+      "id": "c_potion_s",
+      "count": 3
+     }
+    ]
+   },
+   "consumeCollected": true,
+   "offerText": "<b class='gold'>도윤</b> 밤마다 숲에서 여우들이 울어. 한 놈을 쫓아갔더니 눈이 검게 번들거리더군.<br><b class='gold'>도윤</b> 날쌘 여우들을 쫓아내고, 털에 묻은 검은 얼룩을 모아 와. 약국의 다래라면 뭔지 알아낼 거야.",
+   "progressText": "<b class='gold'>도윤</b> 검은 얼룩은 날쌘 여우나 달빛 늑대의 털에 묻어 있어.",
+   "completeText": "<b class='gold'>다래</b> 이건… 독이 아니에요. 소연 스승님 책에도 없는 냄새예요. 차갑고, 쇳내가 나요.<br><b class='gold'>다래</b> 숲 안쪽에서 뭔가 번지고 있는 것 같아요.",
+   "story": true
+  },
+  {
+   "id": "mq00d",
+   "name": "서장 숲의 속삭임 ②",
+   "category": "main",
+   "giver": "arcan_pharm_clerk",
+   "turnIn": "arcan_pharm_clerk",
+   "summary": "맨드레이크 뿌리 캐기 · 뿌리를 노리는 달빛 늑대",
+   "prereq": [
+    "mq00c"
+   ],
+   "minLevel": 5,
+   "objectives": [
+    {
+     "type": "collect",
+     "target": "qi_mandrake_root",
+     "count": 4,
+     "text": "맨드레이크 뿌리 캐기",
+     "drop": {
+      "from": [
+       "mon_mandrake"
+      ],
+      "chance": 0.6
+     }
+    },
+    {
+     "type": "kill",
+     "target": "mon_wolf",
+     "count": 6,
+     "text": "뿌리를 노리는 달빛 늑대"
+    }
+   ],
+   "reward": {
+    "exp": 10,
+    "gold": 100,
+    "items": [
+     {
+      "id": "c_potion_s",
+      "count": 3
+     }
+    ]
+   },
+   "consumeCollected": true,
+   "offerText": "<b class='gold'>다래</b> 검은 얼룩을 씻어 낼 약을 만들어 볼게요. 비명 맨드레이크 뿌리가 꼭 필요해요.<br><b class='gold'>다래</b> 맨드레이크는 뽑히면 비명을 지르니까 귀를 막고요! 주변의 달빛 늑대도 조심하세요.",
+   "progressText": "<b class='gold'>다래</b> 맨드레이크는 숲 안쪽 그늘진 곳에 숨어 있어요.",
+   "completeText": "<b class='gold'>다래</b> 됐다! 정화약이 맑게 우러났어요.<br><b class='gold'>다래</b> 그런데 약을 묻혀 보니 얼룩이 더 진해지는 쪽이 있어요. 숲 동쪽, 꽃잎 곰들이 사는 쪽이에요.",
+   "story": true
+  },
+  {
+   "id": "mq00e",
+   "name": "서장 숲의 속삭임 ③",
+   "category": "main",
+   "giver": "arcan_pharm_clerk",
+   "turnIn": "arcan_pharm_clerk",
+   "summary": "날뛰는 이끼 멧돼지 진정시키기 · 나무에 맺힌 검은 수액 담기",
+   "prereq": [
+    "mq00d"
+   ],
+   "minLevel": 6,
+   "objectives": [
+    {
+     "type": "kill",
+     "target": "mon_boar",
+     "count": 8,
+     "text": "날뛰는 이끼 멧돼지 진정시키기"
+    },
+    {
+     "type": "collect",
+     "target": "qi_black_sap",
+     "count": 4,
+     "text": "나무에 맺힌 검은 수액 담기",
+     "gather": {
+      "zone": "forest"
+     }
+    }
+   ],
+   "reward": {
+    "exp": 15,
+    "gold": 120,
+    "items": [
+     {
+      "id": "c_potion_s",
+      "count": 3
+     }
+    ]
+   },
+   "consumeCollected": true,
+   "offerText": "<b class='gold'>다래</b> 숲 동쪽 나무들에서 검은 수액이 흐른대요. 그 수액을 핥은 이끼 멧돼지들이 날뛰고 있고요.<br><b class='gold'>다래</b> 멧돼지들을 진정시키고 수액을 조금 담아 와 주세요. 어디서 오는 건지 알아내야 해요.",
+   "progressText": "<b class='gold'>다래</b> 수액은 바닥에 빛이 도는 자리에서 모을 수 있어요.",
+   "completeText": "<b class='gold'>다래</b> 수액에서 보랏빛 포자 냄새가 나요. 그런데 그 아래 깔린 건 훨씬 오래되고 차가운 기운이에요.<br><b class='gold'>다래</b> 촌장님께 말씀드려야겠어요. 꽃잎 곰 하나가 아예 까맣게 변했다는 말도 들었거든요.",
+   "story": true
+  },
+  {
+   "id": "mq00f",
+   "name": "서장 검게 물든 꽃잎 곰",
+   "category": "main",
+   "giver": "elder",
+   "turnIn": "guard",
+   "summary": "검게 물든 꽃잎 곰 쓰러뜨리기",
+   "prereq": [
+    "mq00e"
+   ],
+   "minLevel": 7,
+   "objectives": [
+    {
+     "type": "kill",
+     "target": "qb_dark_bear",
+     "count": 1,
+     "text": "검게 물든 꽃잎 곰 쓰러뜨리기",
+     "spawn": {
+      "zone": "forest"
+     }
+    }
+   ],
+   "reward": {
+    "exp": 20,
+    "gold": 140,
+    "items": [
+     {
+      "id": "c_potion_s",
+      "count": 3
+     }
+    ]
+   },
+   "consumeCollected": true,
+   "offerText": "<b class='gold'>하람</b> 다래에게 들었네. 숲 동쪽의 꽃잎 곰 하나가 검게 물들어 나무꾼들을 덮쳤다는군.<br><b class='gold'>하람</b> 본래 순한 녀석들이야. 그 곰을 쓰러뜨려 숲을 진정시켜 주게. 도윤이 숲 길목을 지키고 있을 걸세.",
+   "progressText": "<b class='gold'>하람</b> 앞발을 내려치기 전에 땅에 붉은 표시가 떠오른다네. 그때 바로 피하게.",
+   "completeText": "<b class='gold'>도윤</b> 쓰러뜨렸군! …봐, 털 속에서 검은 가루가 연기처럼 빠져나가.<br><i>검은 가루는 바람을 타고 숲 북동쪽, 보랏빛 안개가 낀 쪽으로 흩어졌다.</i><br><b class='gold'>도윤</b> 저쪽은 독버섯 군락지야. 이게 다 거기서 오는 건가?",
+   "story": true
+  },
+  {
+   "id": "mq00g",
+   "name": "서장 보랏빛 포자",
+   "category": "main",
+   "giver": "guard",
+   "turnIn": "arcan_pharm_clerk",
+   "summary": "독버섯 군락지에 들어가기 · 포자를 뒤집어쓴 도토리 다람쥐 · 보랏빛 포자 모으기",
+   "prereq": [
+    "mq00f"
+   ],
+   "minLevel": 8,
+   "objectives": [
+    {
+     "type": "visit",
+     "target": "mushroom_grove",
+     "count": 1,
+     "text": "독버섯 군락지에 들어가기"
+    },
+    {
+     "type": "kill",
+     "target": "mon_shroom",
+     "count": 8,
+     "text": "포자를 뒤집어쓴 도토리 다람쥐"
+    },
+    {
+     "type": "collect",
+     "target": "qi_violet_spore",
+     "count": 4,
+     "text": "보랏빛 포자 모으기",
+     "gather": {
+      "zone": "mushroom_grove"
+     }
+    }
+   ],
+   "reward": {
+    "exp": 25,
+    "gold": 160,
+    "items": [
+     {
+      "id": "c_potion_s",
+      "count": 3
+     }
+    ]
+   },
+   "consumeCollected": true,
+   "offerText": "<b class='gold'>도윤</b> 숲 북동쪽 길 끝의 보랏빛 워프를 지나면 독버섯 군락지야. 마을 사람들은 거기 가지 않지.<br><b class='gold'>도윤</b> 포자를 조금 가져와 줘. 다래가 검은 수액과 비교해 보겠대. 포자를 뒤집어쓴 다람쥐들이 사나우니 조심하고.",
+   "progressText": "<b class='gold'>도윤</b> 군락지 바닥에서 보랏빛으로 반짝이는 포자를 찾아.",
+   "completeText": "<b class='gold'>다래</b> 똑같아요. 검은 수액 속 포자랑 군락지 포자가 같은 거예요.<br><b class='gold'>다래</b> 군락지 한가운데 거대 독버섯이 검은 기운을 빨아들여 숲 전체에 뿜고 있어요. 촌장님께 가 보세요!",
+   "story": true
+  },
+  {
+   "id": "mq00h",
+   "name": "서장 수확제 전야",
+   "category": "main",
+   "giver": "elder",
+   "turnIn": "elder",
+   "summary": "여관 주인 보름의 수확제 음식 살피기 · 쇠돌에게 수확제 칼 확인하기",
+   "prereq": [
+    "q7_boss"
+   ],
+   "minLevel": 9,
+   "objectives": [
+    {
+     "type": "talk",
+     "target": "arcan_innkeeper",
+     "count": 1,
+     "text": "여관 주인 보름의 수확제 음식 살피기",
+     "talkText": "<b class='gold'>보름</b> 어서 오세요! 촌장님 심부름이죠?<br><b class='gold'>보름</b> 말린 순무랑 도토리 과자는 벌써 다 쌌어요. 숲이 조용해져서 오늘은 손님들도 웃으며 돌아갔답니다.<br><b class='gold'>보름</b> 짐수레에 실을 바구니는 여관 앞에 내놓을게요. 촌장님께 걱정 마시라고 전해 주세요!"
+    },
+    {
+     "type": "talk",
+     "target": "arcan_smith_boy",
+     "count": 1,
+     "text": "쇠돌에게 수확제 칼 확인하기",
+     "talkText": "<b class='gold'>쇠돌</b> 보세요, 칼집까지 다 됐어요! 마른 참나무 덕분에 화덕 불이 끝까지 고왔어요.<br><b class='gold'>쇠돌</b> 스승님이 보시면 기뻐하실 거예요. 왕도에 가면 스승님께 꼭 안부 전해 주세요."
+    }
+   ],
+   "reward": {
+    "exp": 30,
+    "gold": 180,
+    "items": [
+     {
+      "id": "c_potion_s",
+      "count": 3
+     }
+    ]
+   },
+   "consumeCollected": true,
+   "offerText": "<b class='gold'>하람</b> 숲이 조용해지니 수확제 준비도 마무리할 수 있겠군.<br><b class='gold'>하람</b> 보름이 짐수레에 실을 음식을, 쇠돌이 칼을 다 챙겼는지 둘러봐 주게.",
+   "progressText": "<b class='gold'>하람</b> 보름은 산들바람 여관에, 쇠돌은 대장간에 있네.",
+   "completeText": "<b class='gold'>하람</b> 보름도 쇠돌도 준비를 마쳤다니 다행이군. 고생 많았네. 자네도 이제 견습생 티를 벗었군.<br><b class='gold'>하람</b> 레벨 10이 되면 왕도 카이리온 길드 회관에서 직업을 정하게. 전직하고 돌아오면 수확제 납품을 맡기겠네.",
+   "story": true
+  },
+  {
    "id": "mq01a",
    "name": "1장 가을의 납품",
    "category": "main",
@@ -568,9 +923,9 @@
    "turnIn": "capital_merchant",
    "summary": "왕도 가는 길의 흙두더지 쫓기 · 길목의 엄니 멧돼지 쓰러뜨리기",
    "prereq": [
-    "q2_merchant"
+    "q_job1"
    ],
-   "minLevel": 2,
+   "minLevel": 10,
    "objectives": [
     {
      "type": "kill",
@@ -589,18 +944,18 @@
     }
    ],
    "reward": {
-    "exp": 15,
-    "gold": 40,
+    "exp": 205,
+    "gold": 200,
     "items": [
      {
-      "id": "c_potion_s",
+      "id": "c_potion_m",
       "count": 3
      }
     ]
    },
    "consumeCollected": true,
-   "offerText": "<b class='gold'>하람</b> 왕도 수확제에 우리 마을 물건을 납품하기로 했네. 철산의 칼과 모아의 물건을 실은 짐수레가 곧 떠나는데, 길에 두더지 구멍과 사나운 멧돼지가 말썽이야.<br><b class='gold'>하람</b> 길을 열고 왕도의 상인 베아에게 물건이 도착했다고 전해 주게.",
-   "progressText": "<b class='gold'>하람</b> 왕도 가는 길은 마을 북쪽 출구야. 엄니가 유난히 큰 멧돼지를 조심하게.",
+   "offerText": "<b class='gold'>하람</b> 돌아왔군! 손이 달라졌어. 이제 아르칸의 장인이라 불러도 되겠네.<br><b class='gold'>하람</b> 왕도 수확제에 우리 마을 물건을 납품할 차례야. 쇠돌이 마무리한 철산의 칼과 모아의 물건을 실은 짐수레가 곧 떠나는데, 길에 두더지 구멍과 사나운 멧돼지가 말썽이야.<br><b class='gold'>하람</b> 길을 열고 왕도의 상인 베아에게 물건이 도착했다고 전해 주게.",
+   "progressText": "<b class='gold'>하람</b> 왕도 가는 길은 마을 성문 밖, 카이리온 쪽 길이야. 엄니가 유난히 큰 멧돼지를 조심하게.",
    "completeText": "<b class='gold'>베아</b> 아르칸 마을 짐수레? 다행이다, 수확제에 늦을 뻔했어!<br><b class='gold'>베아</b> 그런데… 성문이 오늘 아침부터 이상하게 조용하네.",
    "story": true
   },
@@ -614,7 +969,7 @@
    "prereq": [
     "mq01a"
    ],
-   "minLevel": 3,
+   "minLevel": 10,
    "objectives": [
     {
      "type": "talk",
@@ -624,11 +979,11 @@
     }
    ],
    "reward": {
-    "exp": 25,
-    "gold": 60,
+    "exp": 205,
+    "gold": 200,
     "items": [
      {
-      "id": "c_potion_s",
+      "id": "c_potion_m",
       "count": 3
      }
     ]
@@ -649,7 +1004,7 @@
    "prereq": [
     "mq02a"
    ],
-   "minLevel": 4,
+   "minLevel": 10,
    "objectives": [
     {
      "type": "collect",
@@ -668,11 +1023,11 @@
     }
    ],
    "reward": {
-    "exp": 45,
-    "gold": 80,
+    "exp": 205,
+    "gold": 200,
     "items": [
      {
-      "id": "c_potion_s",
+      "id": "c_potion_m",
       "count": 3
      }
     ]
@@ -693,7 +1048,7 @@
    "prereq": [
     "mq02b"
    ],
-   "minLevel": 5,
+   "minLevel": 11,
    "objectives": [
     {
      "type": "kill",
@@ -706,11 +1061,11 @@
     }
    ],
    "reward": {
-    "exp": 65,
-    "gold": 100,
+    "exp": 240,
+    "gold": 220,
     "items": [
      {
-      "id": "c_potion_s",
+      "id": "c_potion_m",
       "count": 3
      }
     ]
@@ -731,7 +1086,7 @@
    "prereq": [
     "mq02c"
    ],
-   "minLevel": 5,
+   "minLevel": 11,
    "objectives": [
     {
      "type": "visit",
@@ -747,11 +1102,11 @@
     }
    ],
    "reward": {
-    "exp": 65,
-    "gold": 100,
+    "exp": 240,
+    "gold": 220,
     "items": [
      {
-      "id": "c_potion_s",
+      "id": "c_potion_m",
       "count": 3
      }
     ]
@@ -772,7 +1127,7 @@
    "prereq": [
     "mq03a"
    ],
-   "minLevel": 6,
+   "minLevel": 11,
    "objectives": [
     {
      "type": "kill",
@@ -785,11 +1140,11 @@
     }
    ],
    "reward": {
-    "exp": 90,
-    "gold": 120,
+    "exp": 240,
+    "gold": 220,
     "items": [
      {
-      "id": "c_potion_s",
+      "id": "c_potion_m",
       "count": 3
      }
     ]
@@ -810,7 +1165,7 @@
    "prereq": [
     "mq03b"
    ],
-   "minLevel": 6,
+   "minLevel": 11,
    "objectives": [
     {
      "type": "collect",
@@ -823,11 +1178,11 @@
     }
    ],
    "reward": {
-    "exp": 90,
-    "gold": 120,
+    "exp": 240,
+    "gold": 220,
     "items": [
      {
-      "id": "c_potion_s",
+      "id": "c_potion_m",
       "count": 3
      }
     ]
@@ -848,7 +1203,7 @@
    "prereq": [
     "mq04a"
    ],
-   "minLevel": 7,
+   "minLevel": 12,
    "objectives": [
     {
      "type": "kill",
@@ -867,11 +1222,11 @@
     }
    ],
    "reward": {
-    "exp": 115,
-    "gold": 140,
+    "exp": 275,
+    "gold": 240,
     "items": [
      {
-      "id": "c_potion_s",
+      "id": "c_potion_m",
       "count": 3
      }
     ]
@@ -892,7 +1247,7 @@
    "prereq": [
     "mq04b"
    ],
-   "minLevel": 7,
+   "minLevel": 12,
    "objectives": [
     {
      "type": "kill",
@@ -911,11 +1266,11 @@
     }
    ],
    "reward": {
-    "exp": 115,
-    "gold": 140,
+    "exp": 275,
+    "gold": 240,
     "items": [
      {
-      "id": "c_potion_s",
+      "id": "c_potion_m",
       "count": 3
      }
     ]
@@ -923,7 +1278,7 @@
    "consumeCollected": true,
    "offerText": "<b class='gold'>아스텔</b> 발테른으로 가는 길에 속삭이는 숲을 지나야 해. 그런데 숲이 검게 병들고 있다는 소문이야.<br><b class='gold'>카스티야</b> 아르칸 마을 바로 옆 숲이잖아?",
    "progressText": "<b class='gold'>카일러스</b> 검게 물든 이끼를 모아 촌장님께 보여 드리지요.",
-   "completeText": "<b class='gold'>하람</b> 이건… 독버섯 군락지의 기운이야. 하지만 이렇게 검지는 않았는데.<br><b class='gold'>하람</b> 숲의 꽃잎 곰과 거대 독버섯 이야기는 내가 따로 부탁하겠네(서브 '꽃잎 곰 토벌' → 메인 '거대 독버섯').",
+   "completeText": "<b class='gold'>하람</b> 이건… 거대 독버섯을 쓰러뜨렸는데도 숲이 다시 검어지다니.<br><b class='gold'>하람</b> 그때 독버섯 뿌리에서 나온 검은 결정과 같은 기운이야. 독버섯은 원인이 아니라 그릇이었던 게야.",
    "story": true
   },
   {
@@ -934,10 +1289,9 @@
    "turnIn": "kylus",
    "summary": "안개 골짜기를 지나 바위산 고갯길로 · 검은 깃털 표식 모으기",
    "prereq": [
-    "mq05a",
-    "q7_boss"
+    "mq05a"
    ],
-   "minLevel": 8,
+   "minLevel": 12,
    "objectives": [
     {
      "type": "visit",
@@ -961,17 +1315,17 @@
     }
    ],
    "reward": {
-    "exp": 145,
-    "gold": 160,
+    "exp": 275,
+    "gold": 240,
     "items": [
      {
-      "id": "c_potion_s",
+      "id": "c_potion_m",
       "count": 3
      }
     ]
    },
    "consumeCollected": true,
-   "offerText": "<b class='gold'>하람</b> 숲이 다시 숨을 쉬는구먼. 왕자님 일행은 발테른으로 간다지? 고갯길에 검은 깃털을 단 무리가 숨어 있다는 소문이 있네.",
+   "offerText": "<b class='gold'>하람</b> 숲은 마을 사람들과 내가 지켜보겠네. 왕자님 일행은 발테른으로 간다지? 고갯길에 검은 깃털을 단 무리가 숨어 있다는 소문이 있네.",
    "progressText": "<b class='gold'>하람</b> 안개 골짜기 북쪽 끝이 바위산 고갯길이야.",
    "completeText": "<b class='gold'>카일러스</b> 현상금 사냥꾼들이군요. '검은 깃'. 누군가 전하의 목에 값을 매겼습니다.",
    "story": true
@@ -986,7 +1340,7 @@
    "prereq": [
     "mq06a"
    ],
-   "minLevel": 9,
+   "minLevel": 12,
    "objectives": [
     {
      "type": "kill",
@@ -999,11 +1353,11 @@
     }
    ],
    "reward": {
-    "exp": 175,
-    "gold": 180,
+    "exp": 275,
+    "gold": 240,
     "items": [
      {
-      "id": "c_potion_s",
+      "id": "c_potion_m",
       "count": 3
      }
     ]
@@ -1024,7 +1378,7 @@
    "prereq": [
     "mq06b"
    ],
-   "minLevel": 9,
+   "minLevel": 13,
    "objectives": [
     {
      "type": "talk",
@@ -1034,11 +1388,11 @@
     }
    ],
    "reward": {
-    "exp": 175,
-    "gold": 180,
+    "exp": 315,
+    "gold": 260,
     "items": [
      {
-      "id": "c_potion_s",
+      "id": "c_potion_m",
       "count": 3
      }
     ]
@@ -1059,7 +1413,7 @@
    "prereq": [
     "mq07a"
    ],
-   "minLevel": 10,
+   "minLevel": 13,
    "objectives": [
     {
      "type": "kill",
@@ -1072,8 +1426,8 @@
     }
    ],
    "reward": {
-    "exp": 205,
-    "gold": 200,
+    "exp": 315,
+    "gold": 260,
     "items": [
      {
       "id": "c_potion_m",
@@ -1093,22 +1447,22 @@
    "category": "main",
    "giver": "kerin",
    "turnIn": "kerin",
-   "summary": "카이리온 왕도 길드 회관 마스터에게 1차 전직하기",
+   "summary": "고갯길의 바위산 매 떨어뜨리기",
    "prereq": [
     "mq07b"
    ],
-   "minLevel": 10,
+   "minLevel": 13,
    "objectives": [
     {
-     "type": "job",
-     "target": "any",
-     "count": 1,
-     "text": "카이리온 왕도 길드 회관 마스터에게 1차 전직하기"
+     "type": "kill",
+     "target": "mon_hawk",
+     "count": 6,
+     "text": "고갯길의 바위산 매 떨어뜨리기"
     }
    ],
    "reward": {
-    "exp": 205,
-    "gold": 200,
+    "exp": 315,
+    "gold": 260,
     "items": [
      {
       "id": "c_potion_m",
@@ -1117,8 +1471,8 @@
     ]
    },
    "consumeCollected": true,
-   "offerText": "<b class='gold'>케린</b> 칼만 휘두르는 녀석은 오래 못 간다. 네 손에 맞는 일을 찾아라. 카이리온 왕도 길드 회관에 마스터들이 모여 있다지?",
-   "progressText": "<b class='gold'>케린</b> 약국·식당·대장간·의상실·화방. 마스터를 찾아가 '직업 상담'을 해라.",
+   "offerText": "<b class='gold'>케린</b> 왕도 길드 회관에서 직업을 얻었다고? 칼만 휘두르는 녀석보다 낫지. 그 손을 보여 봐라.<br><b class='gold'>케린</b> 고갯길 매들이 전령을 덮친다. 네 직업의 기술로 여섯 마리를 떨어뜨려라.",
+   "progressText": "<b class='gold'>케린</b> 매는 하늘에서 내리꽂힌다. 내려오는 순간을 노려라.",
    "completeText": "<b class='gold'>케린</b> 좋은 손이 됐군. 그 손으로 사람을 살릴 수도, 벨 수도 있다.",
    "story": true
   },
@@ -1132,7 +1486,7 @@
    "prereq": [
     "mq07c"
    ],
-   "minLevel": 10,
+   "minLevel": 13,
    "objectives": [
     {
      "type": "kill",
@@ -1151,8 +1505,8 @@
     }
    ],
    "reward": {
-    "exp": 205,
-    "gold": 200,
+    "exp": 315,
+    "gold": 260,
     "items": [
      {
       "id": "c_potion_m",
@@ -1176,7 +1530,7 @@
    "prereq": [
     "mq08a"
    ],
-   "minLevel": 11,
+   "minLevel": 13,
    "objectives": [
     {
      "type": "kill",
@@ -1189,8 +1543,8 @@
     }
    ],
    "reward": {
-    "exp": 240,
-    "gold": 220,
+    "exp": 315,
+    "gold": 260,
     "items": [
      {
       "id": "c_potion_m",
@@ -1214,7 +1568,7 @@
    "prereq": [
     "mq08b"
    ],
-   "minLevel": 11,
+   "minLevel": 13,
    "objectives": [
     {
      "type": "visit",
@@ -1242,8 +1596,8 @@
     }
    ],
    "reward": {
-    "exp": 240,
-    "gold": 220,
+    "exp": 315,
+    "gold": 260,
     "items": [
      {
       "id": "c_potion_m",
@@ -1267,7 +1621,7 @@
    "prereq": [
     "mq09a"
    ],
-   "minLevel": 12,
+   "minLevel": 14,
    "objectives": [
     {
      "type": "kill",
@@ -1280,8 +1634,8 @@
     }
    ],
    "reward": {
-    "exp": 275,
-    "gold": 240,
+    "exp": 360,
+    "gold": 280,
     "items": [
      {
       "id": "c_potion_m",
@@ -1305,7 +1659,7 @@
    "prereq": [
     "mq09b"
    ],
-   "minLevel": 13,
+   "minLevel": 14,
    "objectives": [
     {
      "type": "visit",
@@ -1324,8 +1678,8 @@
     }
    ],
    "reward": {
-    "exp": 315,
-    "gold": 260,
+    "exp": 360,
+    "gold": 280,
     "items": [
      {
       "id": "c_potion_m",
@@ -3749,9 +4103,9 @@
    "turnIn": "merchant",
    "summary": "흙두더지 · 이끼 달팽이 껍데기",
    "prereq": [
-    "mq01a"
+    "mq00b"
    ],
-   "minLevel": 2,
+   "minLevel": 3,
    "objectives": [
     {
      "type": "kill",
@@ -3773,8 +4127,8 @@
     }
    ],
    "reward": {
-    "exp": 10,
-    "gold": 24,
+    "exp": 15,
+    "gold": 36,
     "items": [
      {
       "id": "c_potion_s",
@@ -3798,7 +4152,7 @@
    "prereq": [
     "mq02a"
    ],
-   "minLevel": 4,
+   "minLevel": 10,
    "objectives": [
     {
      "type": "kill",
@@ -3826,11 +4180,11 @@
     }
    ],
    "reward": {
-    "exp": 25,
-    "gold": 48,
+    "exp": 110,
+    "gold": 120,
     "items": [
      {
-      "id": "c_potion_s",
+      "id": "c_potion_m",
       "count": 2
      }
     ]
@@ -3855,7 +4209,7 @@
    "prereq": [
     "mq04a"
    ],
-   "minLevel": 6,
+   "minLevel": 11,
    "objectives": [
     {
      "type": "collect",
@@ -3883,8 +4237,8 @@
     }
    ],
    "reward": {
-    "exp": 50,
-    "gold": 72,
+    "exp": 130,
+    "gold": 132,
     "items": [
      {
       "id": "a_armor_2",
@@ -3909,9 +4263,9 @@
    "turnIn": "guard",
    "summary": "달빛 늑대",
    "prereq": [
-    "mq05a"
+    "mq00d"
    ],
-   "minLevel": 7,
+   "minLevel": 6,
    "objectives": [
     {
      "type": "kill",
@@ -3921,8 +4275,8 @@
     }
    ],
    "reward": {
-    "exp": 60,
-    "gold": 84,
+    "exp": 50,
+    "gold": 72,
     "items": [
      {
       "id": "c_potion_s",
@@ -3931,7 +4285,7 @@
     ]
    },
    "consumeCollected": true,
-   "offerText": "<b class='gold'>도윤</b> 밤마다 달빛 늑대가 마을까지 내려와. 숲과 구릉지의 늑대를 줄여 줘.",
+   "offerText": "<b class='gold'>도윤</b> 밤마다 달빛 늑대가 마을까지 내려와. 숲의 늑대를 줄여 줘.",
    "progressText": "<i>목표를 마치고 돌아오면 됩니다.</i>",
    "completeText": "<b class='gold'>도윤</b> 오늘 밤은 다들 푹 자겠군.",
    "story": true
@@ -3946,7 +4300,7 @@
    "prereq": [
     "mq06a"
    ],
-   "minLevel": 7,
+   "minLevel": 12,
    "objectives": [
     {
      "type": "kill",
@@ -3968,11 +4322,11 @@
     }
    ],
    "reward": {
-    "exp": 60,
-    "gold": 84,
+    "exp": 145,
+    "gold": 144,
     "items": [
      {
-      "id": "c_potion_s",
+      "id": "c_potion_m",
       "count": 2
      }
     ]
@@ -3997,7 +4351,7 @@
    "prereq": [
     "mq07a"
    ],
-   "minLevel": 9,
+   "minLevel": 13,
    "objectives": [
     {
      "type": "kill",
@@ -4019,11 +4373,11 @@
     }
    ],
    "reward": {
-    "exp": 95,
-    "gold": 108,
+    "exp": 170,
+    "gold": 156,
     "items": [
      {
-      "id": "c_potion_s",
+      "id": "c_potion_m",
       "count": 2
      }
     ]
@@ -4049,7 +4403,7 @@
    "prereq": [
     "mq08a"
    ],
-   "minLevel": 10,
+   "minLevel": 13,
    "objectives": [
     {
      "type": "kill",
@@ -4068,8 +4422,8 @@
     }
    ],
    "reward": {
-    "exp": 110,
-    "gold": 120,
+    "exp": 170,
+    "gold": 156,
     "items": [
      {
       "id": "c_potion_m",
@@ -4098,7 +4452,7 @@
    "prereq": [
     "mq08a"
    ],
-   "minLevel": 11,
+   "minLevel": 13,
    "objectives": [
     {
      "type": "collect",
@@ -4114,8 +4468,8 @@
     }
    ],
    "reward": {
-    "exp": 130,
-    "gold": 132,
+    "exp": 170,
+    "gold": 156,
     "items": [
      {
       "id": "c_antidote",
@@ -4235,7 +4589,7 @@
    "prereq": [
     "mq09a"
    ],
-   "minLevel": 10,
+   "minLevel": 13,
    "objectives": [
     {
      "type": "collect",
@@ -4254,8 +4608,8 @@
     }
    ],
    "reward": {
-    "exp": 110,
-    "gold": 120,
+    "exp": 170,
+    "gold": 156,
     "items": [
      {
       "id": "c_potion_m",

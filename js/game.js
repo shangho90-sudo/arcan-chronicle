@@ -436,6 +436,7 @@ class Game {
     this.ui.close(false);
     this.profile = prof; this.sheet = new CharacterSheet(this.data, prof); this.quests = new QuestLog(this.data, this.sheet);
     this.wireEvents(); this.inWorld = true; this.ui.showGameplay(true);
+    this.quests.autoComplete("load");       // 예전 저장: 이미 전직했는데 받아 둔 전직 퀘스트(core.js migrateArcanArc)
     const zone = this.data.zones[prof.zone] ? prof.zone : this.data.levels.startZone;
     // a brand-new character gets a one-time welcome notice after the area name (profile.ui.welcomed is saved)
     prof.ui = prof.ui && typeof prof.ui === "object" ? prof.ui : {};
@@ -467,6 +468,21 @@ class Game {
     });
     Q.events.updated.push(() => ui.updateTracker());
     Q.events.completed.push(() => { this.audio.sfx("quest"); ui.updateTracker(); this.autoSave(); this.qworld.sync(); });
+    // 2026-11-19 전직 퀘스트(서장 「첫 전직」)는 전직하는 순간 바로 완료(core.js QuestLog.autoComplete): 보상 알림 + 전직 연출(3.6초)이
+    // 끝난 뒤 다른 창이 없으면 완료 대사 장면. 가방이 가득하면 실패 안내 — 그때는 예전처럼 완료 NPC에게.
+    Q.events.auto.push(({ q, err, why }) => {
+      const who = this.data.npcs[q.turnIn || q.giver];
+      if (err) return ui.toast(`「${q.name}」 완료 보상을 받지 못했습니다: ${err}` + (who ? ` (${who.name}에게서 완료할 수 있어요)` : ""));
+      ui.toast("퀘스트 완료: " + q.name);
+      if (q.reward.gold > 0) ui.toast("+" + q.reward.gold + " G"); if (q.reward.exp > 0) ui.toast("경험치 +" + questExp(this.data, q));
+      for (const it of q.reward.items || []) ui.itemToast(this.data.item(it.id), it.count);
+      if (why === "load" || !who || !q.completeText) return;
+      const prof = this.profile;
+      setTimeout(() => {
+        if (this.profile !== prof || !this.inWorld || this.ui.current || (this.player && this.player.dead)) return;
+        this.questTalk(who, q, q.completeText, [["대화 종료", () => this.ui.close()]]);
+      }, why === "job" ? 3900 : 300);
+    });
   }
 
   // ------------------------------------------------------------------ zones

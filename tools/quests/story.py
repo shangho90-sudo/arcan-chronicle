@@ -62,6 +62,12 @@ SHEET = {'npc_artist': 'npc_master_artist', 'npc_blacksmith': 'npc_master_blacks
 
 # ===================================================================================== items (퀘스트 물건)
 ITEMS = {  # id: (name, desc, icon)
+    # 서장(아르칸, 2026-11-19)
+    'qi_oak_branch': ('마른 참나무 가지', '수확제 칼을 벼릴 화덕에 넣을 바싹 마른 가지.', 'm_moss_stone'),
+    'qi_dark_fur': ('검은 얼룩 털', '숲 짐승의 털에 묻은 차갑고 쇳내 나는 검은 얼룩.', 'm_fox_fur'),
+    'qi_mandrake_root': ('맨드레이크 뿌리', '정화약에 쓰는 비명 맨드레이크의 뿌리.', 'm_herb'),
+    'qi_black_sap': ('검은 수액', '숲 동쪽 나무에서 흘러나온 검은 수액.', 'm_toad_gland'),
+    'qi_violet_spore': ('보랏빛 포자', '독버섯 군락지 바닥에서 반짝이는 포자.', 'm_spore'),
     'qi_black_blood': ('검은 핏자국', '검은 피를 흘린 사슴의 흔적.', 'm_toad_gland'),
     'qi_hills_herb': ('구릉지 약초', '상처를 덮는 쓴 약초.', 'm_herb'),
     'qi_poison_sample': ('병든 이끼', '검게 물든 숲의 이끼.', 'm_moss_stone'),
@@ -119,14 +125,15 @@ ITEMS = {  # id: (name, desc, icon)
 # id: (name, level, base monster (stats/ai/sheet), look {base model, size, tint, recolor}, extra)
 def look(base, size, tint=None, recolor=0.6): return dict(base=base, size=size, **({'tint': tint, 'recolor': recolor} if tint else {}))
 BOSSES = {
-    'qb_boar_lord':      ('길목의 엄니 멧돼지', 4, 'mon_boar', look('mon_boar', 1.9, [0.75, 0.55, 0.4], 0.4), dict(hpMul=3)),
-    'qb_shadow_scout':   ('그림자 정찰대', 5, 'mon_wraith', look('mon_wraith', 1.3, [0.3, 0.28, 0.42], 0.7), dict(hpMul=3, ai='melee')),
-    'qb_roderick':       ('근위대장 로데릭', 6, 'mon_soldier', look('mon_soldier', 1.35, [0.95, 0.45, 0.4], 0.55), dict(hpMul=2.5, yieldAt=0.5, yieldLine='로데릭: 물러서라! …성문을 닫아라! 반역자들이 달아난다!')),
-    'qb_chaser_captain': ('추격 기마대장', 7, 'mon_soldier', look('mon_soldier', 1.3, [0.55, 0.6, 0.85], 0.5), dict(hpMul=2.5)),
-    'qb_black_feather':  ('검은 깃 두목', 9, 'mon_goblin_miner', look('mon_goblin_miner', 1.5, [0.25, 0.22, 0.3], 0.75), dict(hpMul=3)),
-    'qb_kerin_spar':     ('노기사 케린 (대련)', 10, 'mon_soldier', look('mon_soldier', 1.3, [0.85, 0.88, 0.95], 0.5), dict(hpMul=5, yieldAt=0.3, yieldLine='케린: 됐다. 검이 아직 무디지만, 등을 맡길 만은 하구나.')),
-    'qb_quarry_golem':   ('그림자 깃든 석상', 11, 'mon_mine_golem', look('mon_mine_golem', 1.9, [0.45, 0.4, 0.6], 0.6), dict(elite=True)),
-    'qb_fog_alpha':      ('안개 늑대 우두머리', 13, 'mon_shadow_wolf', look('mon_shadow_wolf', 1.8, [0.7, 0.75, 0.9], 0.5), dict(elite=True)),
+    'qb_dark_bear':      ('검게 물든 꽃잎 곰', 7, 'mon_golem', look('mon_golem', 1.9, [0.32, 0.28, 0.38], 0.7), dict(hpMul=2.5)),
+    'qb_boar_lord':      ('길목의 엄니 멧돼지', 10, 'mon_boar', look('mon_boar', 1.9, [0.75, 0.55, 0.4], 0.4), dict(hpMul=3)),
+    'qb_shadow_scout':   ('그림자 정찰대', 11, 'mon_wraith', look('mon_wraith', 1.3, [0.3, 0.28, 0.42], 0.7), dict(hpMul=3, ai='melee', elite=True)),   # elite: 레벨을 옮기기 전 자동 정예 판정 그대로
+    'qb_roderick':       ('근위대장 로데릭', 11, 'mon_soldier', look('mon_soldier', 1.35, [0.95, 0.45, 0.4], 0.55), dict(hpMul=2.5, elite=True, yieldAt=0.5, yieldLine='로데릭: 물러서라! …성문을 닫아라! 반역자들이 달아난다!')),
+    'qb_chaser_captain': ('추격 기마대장', 12, 'mon_soldier', look('mon_soldier', 1.3, [0.55, 0.6, 0.85], 0.5), dict(hpMul=2.5)),
+    'qb_black_feather':  ('검은 깃 두목', 12, 'mon_goblin_miner', look('mon_goblin_miner', 1.5, [0.25, 0.22, 0.3], 0.75), dict(hpMul=3)),
+    'qb_kerin_spar':     ('노기사 케린 (대련)', 13, 'mon_soldier', look('mon_soldier', 1.3, [0.85, 0.88, 0.95], 0.5), dict(hpMul=5, yieldAt=0.3, yieldLine='케린: 됐다. 검이 아직 무디지만, 등을 맡길 만은 하구나.')),
+    'qb_quarry_golem':   ('그림자 깃든 석상', 13, 'mon_mine_golem', look('mon_mine_golem', 1.9, [0.45, 0.4, 0.6], 0.6), dict(elite=True)),
+    'qb_fog_alpha':      ('안개 늑대 우두머리', 14, 'mon_shadow_wolf', look('mon_shadow_wolf', 1.8, [0.7, 0.75, 0.9], 0.5), dict(elite=True)),
     'qb_phantom_king':   ('환영의 아버지', 15, 'mon_wraith', look('mon_wraith', 1.7, [1.0, 0.85, 0.45], 0.6), dict(elite=True)),
     'qb_digona':         ('디고나', 16, 'mon_spider_elite', look('mon_spider', 3.2, [0.9, 0.35, 0.45], 0.55), dict(elite=True, hpMul=1.4)),
     'qb_cult_spy':       ('교단 첩보 사제', 17, 'mon_wraith', look('mon_wraith', 1.3, [0.6, 0.35, 0.8], 0.6), dict(elite=True, ai='ranged')),
@@ -160,8 +167,14 @@ BOSSES = {
     'qb_sabnak_grace':   ('사브낙-그레이스', 50, 'mon_abyss_drake', look('mon_abyss_drake', 3.4, [0.12, 0.1, 0.2], 0.85), dict(elite=True, hpMul=3)),
 }
 
+# 2026-11-19 서장: 1~7장 보스를 첫 전직 뒤로 옮기며 레벨을 올림. 몬스터 정예 판단(js/core.js balanceMonsters)의 이웃 기준은 처음 레벨 그대로,
+# 새 서장 보스는 이웃 기준에서 뺌 — 꽃잎 곰 등 다른 몬스터의 정예 판정이 바뀌지 않게
+BAL_LEVEL = {'qb_boar_lord': 4, 'qb_shadow_scout': 5, 'qb_roderick': 6, 'qb_chaser_captain': 7, 'qb_black_feather': 9, 'qb_kerin_spar': 10, 'qb_quarry_golem': 11, 'qb_fog_alpha': 13}
+NEW_2026_11_19 = {'qb_dark_bear'}
+
 # ===================================================================================== quest DSL
-def talk(at, text): n, z = at.split('@'); return dict(type='talk', target=n, count=1, text=text, _at=z)
+def talk(at, text, line=None):     # line = 그 NPC에게 말을 걸면 먼저 나오는 대사(objective talkText, game.js talkLines) — 주거나 받는 NPC가 아닌 대화 대상엔 꼭
+    n, z = at.split('@'); return dict(type='talk', target=n, count=1, text=text, _at=z, **({'talkText': line} if line else {}))
 def visit(z, text): return dict(type='visit', target=z, count=1, text=text)
 def kill(m, n, text): return dict(type='kill', target=m, count=n, text=text)
 def boss(m, z, text, at=None): return dict(type='kill', target=m, count=1, text=text, spawn=dict(zone=z, **({'at': at} if at else {})))
@@ -186,92 +199,144 @@ def say(*lines):
 
 # ===================================================================================== MAIN (40장)
 M = 'main'
+# ---- 서장 아르칸 마을 (2026-11-19 사용자 '레벨 10이 될 때까지 메인 퀘스트는 아르칸 마을에서'): Lv1~10, 주는/받는 NPC는 모두 아르칸,
+# 사냥·채집은 속삭이는 숲·왕도 가는 길·독버섯 군락지. 순서: q1_start → q2_merchant → mq00a~mq00g → q7_boss(거대 독버섯) → mq00h
+# → q_job1(Lv10 첫 전직, 전직하면 바로 완료 — js/core.js QuestLog.autoComplete) → 1장(mq01a). 예전 q1/q2/q7/q_job1의 고친 값은 LEGACY_PATCH.
+Q('mq00a', '서장 수확제 준비 ①', M, 2, 'elder@town', [gather('qi_oak_branch', 5, 'forest', '숲의 마른 참나무 가지 줍기'), kill('mon_jelly', 5, '길을 막는 새싹 젤리 치우기')],
+  say(('하람', '올가을 왕도 카이리온에서 수확제가 열리네. 우리 아르칸 마을도 물건을 바치기로 했지.'), ('하람', '철산이 왕도로 떠나기 전에 벼려 둔 수확제 칼을 쇠돌이 마무리하는 중인데, 화덕에 넣을 마른 참나무가 모자란다는군.'), ('하람', '속삭이는 숲에서 마른 참나무 가지를 주워 쇠돌에게 갖다주게. 요즘 새싹 젤리가 숲길을 막는다니 그것도 치워 주고.')),
+  say(('하람', '속삭이는 숲은 마을 성문 밖이야. 바닥에 빛이 도는 자리를 찾으면 가지가 있을 걸세.')),
+  say(('쇠돌', '우와, 바싹 마른 참나무다! 이 정도면 화덕이 사흘은 버텨요.'), ('쇠돌', '그런데… 가지 몇 개에 검은 얼룩이 묻어 있네요. 숲에 이런 게 있었나?'), '쇠돌은 고개를 갸웃하며 얼룩진 가지를 화덕 옆에 따로 내려놓았다.'),
+  turn='arcan_smith_boy@town', prereq=['q2_merchant'])
+Q('mq00b', '서장 수확제 준비 ②', M, 3, 'merchant@town', [kill('mon_snail', 6, '길가의 이끼 달팽이 치우기'), kill('mon_hedgehog', 5, '가시 고슴도치 쫓기')],
+  say(('모아', '수확제 짐수레는 왕도 가는 길로 나가. 그런데 길가에 이끼 달팽이랑 가시 고슴도치가 잔뜩 몰려 있대.'), ('모아', '바퀴가 달팽이 껍데기에 미끄러지면 큰일이야. 길을 좀 치워 줄래?')),
+  say(('모아', '왕도 가는 길은 마을 성문 밖, 카이리온 쪽 길이야.')),
+  say(('모아', '고마워! 이제 짐수레가 무사히 지나가겠어.'), ('모아', '그런데 행상들 말로는 요즘 숲 짐승들이 밤마다 운대. 경비병 도윤 씨가 그 일로 걱정이 많던데, 한번 가 봐.')))
+Q('mq00c', '서장 숲의 속삭임 ①', M, 4, 'guard@town', [kill('mon_fox', 6, '날쌘 여우 쫓아내기'), drop('qi_dark_fur', 3, ['mon_fox', 'mon_wolf'], 0.5, '검은 얼룩 털 모으기')],
+  say(('도윤', '밤마다 숲에서 여우들이 울어. 한 놈을 쫓아갔더니 눈이 검게 번들거리더군.'), ('도윤', '날쌘 여우들을 쫓아내고, 털에 묻은 검은 얼룩을 모아 와. 약국의 다래라면 뭔지 알아낼 거야.')),
+  say(('도윤', '검은 얼룩은 날쌘 여우나 달빛 늑대의 털에 묻어 있어.')),
+  say(('다래', '이건… 독이 아니에요. 소연 스승님 책에도 없는 냄새예요. 차갑고, 쇳내가 나요.'), ('다래', '숲 안쪽에서 뭔가 번지고 있는 것 같아요.')),
+  turn='arcan_pharm_clerk@town')
+Q('mq00d', '서장 숲의 속삭임 ②', M, 5, 'arcan_pharm_clerk@town', [drop('qi_mandrake_root', 4, ['mon_mandrake'], 0.6, '맨드레이크 뿌리 캐기'), kill('mon_wolf', 6, '뿌리를 노리는 달빛 늑대')],
+  say(('다래', '검은 얼룩을 씻어 낼 약을 만들어 볼게요. 비명 맨드레이크 뿌리가 꼭 필요해요.'), ('다래', '맨드레이크는 뽑히면 비명을 지르니까 귀를 막고요! 주변의 달빛 늑대도 조심하세요.')),
+  say(('다래', '맨드레이크는 숲 안쪽 그늘진 곳에 숨어 있어요.')),
+  say(('다래', '됐다! 정화약이 맑게 우러났어요.'), ('다래', '그런데 약을 묻혀 보니 얼룩이 더 진해지는 쪽이 있어요. 숲 동쪽, 꽃잎 곰들이 사는 쪽이에요.')))
+Q('mq00e', '서장 숲의 속삭임 ③', M, 6, 'arcan_pharm_clerk@town', [kill('mon_boar', 8, '날뛰는 이끼 멧돼지 진정시키기'), gather('qi_black_sap', 4, 'forest', '나무에 맺힌 검은 수액 담기')],
+  say(('다래', '숲 동쪽 나무들에서 검은 수액이 흐른대요. 그 수액을 핥은 이끼 멧돼지들이 날뛰고 있고요.'), ('다래', '멧돼지들을 진정시키고 수액을 조금 담아 와 주세요. 어디서 오는 건지 알아내야 해요.')),
+  say(('다래', '수액은 바닥에 빛이 도는 자리에서 모을 수 있어요.')),
+  say(('다래', '수액에서 보랏빛 포자 냄새가 나요. 그런데 그 아래 깔린 건 훨씬 오래되고 차가운 기운이에요.'), ('다래', '촌장님께 말씀드려야겠어요. 꽃잎 곰 하나가 아예 까맣게 변했다는 말도 들었거든요.')))
+Q('mq00f', '서장 검게 물든 꽃잎 곰', M, 7, 'elder@town', [boss('qb_dark_bear', 'forest', '검게 물든 꽃잎 곰 쓰러뜨리기')],
+  say(('하람', '다래에게 들었네. 숲 동쪽의 꽃잎 곰 하나가 검게 물들어 나무꾼들을 덮쳤다는군.'), ('하람', '본래 순한 녀석들이야. 그 곰을 쓰러뜨려 숲을 진정시켜 주게. 도윤이 숲 길목을 지키고 있을 걸세.')),
+  say(('하람', '앞발을 내려치기 전에 땅에 붉은 표시가 떠오른다네. 그때 바로 피하게.')),
+  say(('도윤', '쓰러뜨렸군! …봐, 털 속에서 검은 가루가 연기처럼 빠져나가.'), '검은 가루는 바람을 타고 숲 북동쪽, 보랏빛 안개가 낀 쪽으로 흩어졌다.', ('도윤', '저쪽은 독버섯 군락지야. 이게 다 거기서 오는 건가?')),
+  turn='guard@town')
+Q('mq00g', '서장 보랏빛 포자', M, 8, 'guard@town', [visit('mushroom_grove', '독버섯 군락지에 들어가기'), kill('mon_shroom', 8, '포자를 뒤집어쓴 도토리 다람쥐'), gather('qi_violet_spore', 4, 'mushroom_grove', '보랏빛 포자 모으기')],
+  say(('도윤', '숲 북동쪽 길 끝의 보랏빛 워프를 지나면 독버섯 군락지야. 마을 사람들은 거기 가지 않지.'), ('도윤', '포자를 조금 가져와 줘. 다래가 검은 수액과 비교해 보겠대. 포자를 뒤집어쓴 다람쥐들이 사나우니 조심하고.')),
+  say(('도윤', '군락지 바닥에서 보랏빛으로 반짝이는 포자를 찾아.')),
+  say(('다래', '똑같아요. 검은 수액 속 포자랑 군락지 포자가 같은 거예요.'), ('다래', '군락지 한가운데 거대 독버섯이 검은 기운을 빨아들여 숲 전체에 뿜고 있어요. 촌장님께 가 보세요!')),
+  turn='arcan_pharm_clerk@town')
+Q('mq00h', '서장 수확제 전야', M, 9, 'elder@town', [talk('arcan_innkeeper@town', '여관 주인 보름의 수확제 음식 살피기', say(('보름', '어서 오세요! 촌장님 심부름이죠?'), ('보름', '말린 순무랑 도토리 과자는 벌써 다 쌌어요. 숲이 조용해져서 오늘은 손님들도 웃으며 돌아갔답니다.'), ('보름', '짐수레에 실을 바구니는 여관 앞에 내놓을게요. 촌장님께 걱정 마시라고 전해 주세요!'))),
+   talk('arcan_smith_boy@town', '쇠돌에게 수확제 칼 확인하기', say(('쇠돌', '보세요, 칼집까지 다 됐어요! 마른 참나무 덕분에 화덕 불이 끝까지 고왔어요.'), ('쇠돌', '스승님이 보시면 기뻐하실 거예요. 왕도에 가면 스승님께 꼭 안부 전해 주세요.')))],
+  say(('하람', '숲이 조용해지니 수확제 준비도 마무리할 수 있겠군.'), ('하람', '보름이 짐수레에 실을 음식을, 쇠돌이 칼을 다 챙겼는지 둘러봐 주게.')),
+  say(('하람', '보름은 산들바람 여관에, 쇠돌은 대장간에 있네.')),
+  say(('하람', '보름도 쇠돌도 준비를 마쳤다니 다행이군. 고생 많았네. 자네도 이제 견습생 티를 벗었군.'), ('하람', '레벨 10이 되면 왕도 카이리온 길드 회관에서 직업을 정하게. 전직하고 돌아오면 수확제 납품을 맡기겠네.')),
+  prereq=['q7_boss'])
+# 예전 메인 퀘스트(quests.json에 그대로 있는 것)를 서장 순서에 맞게 고친 값 — build()와 gates.chain()이 함께 씀
+LEGACY_PATCH = {
+    'q7_boss': dict(name='서장 거대 독버섯', minLevel=9, prereq=['mq00g'], reward=dict(exp=70, gold=500, items=[dict(id='c_potion_m', count=5)]),   # 경험치 400 → 70(× questExpMul 3 = 210): 보스 처치만으로도 큼
+        offerText=say(('하람', '다래 말이 맞다면 숲이 병드는 원인은 독버섯 군락지의 거대 독버섯이네.'), ('하람', '독 웅덩이와 땅의 경고 표시를 잘 보고 싸우게. 해독제도 챙기고!')),
+        progressText=say(('하람', '숲 북동쪽 길 끝의 보랏빛 워프를 타면 독버섯 군락지로 갈 수 있네.')),
+        completeText=say(('하람', '해냈군! 이제 숲도 다시 숨을 쉬겠지.'), '쓰러진 독버섯의 뿌리에서 손톱만 한 검은 결정이 굴러 나왔다. 결정은 아주 느리게, 심장처럼 맥박쳤다.', ('하람', '…이건 마을에서 다룰 물건이 아니야. 내가 잘 맡아 두겠네.'))),
+    'q_job1': dict(name='서장 첫 전직', minLevel=10, prereq=['mq00h'],
+        offerText=say(('하람', '레벨 10이 됐군! 이제 자네 손에 맞는 생활 직업을 정할 때야.'), ('하람', '마스터들은 카이리온 왕도의 장인 길드 회관에 모여 있네. 약사·대장장이·요리사·미용사·예술가 중 마음에 드는 마스터를 찾아가 \'직업 상담\'을 하게.'), ('하람', '왕도 가는 길을 따라가면 카이리온일세. 전직하면 그걸로 이 일은 끝이야. 그다음 수확제 납품을 맡기지.')),
+        progressText=say(('하람', '왕도 길드 회관 앞에 마스터들이 서 있네. 길이 헷갈리면 광장의 하늘에게 물어보게.')),
+        completeText=say('길드 회관의 종이 맑게 울렸다. 마스터가 새 장인의 손을 맞잡았다.', '아르칸 마을에서는 수확제 짐수레가 떠날 채비를 하고 있다. 하람 촌장에게 돌아가 기쁜 소식을 전하자.')),
+}
 # ---- 1막 반역의 가을
-Q('mq01a', '1장 가을의 납품', M, 2, 'elder@town', [kill('mon_mole', 6, '왕도 가는 길의 흙두더지 쫓기'), boss('qb_boar_lord', 'capital_road', '길목의 엄니 멧돼지 쓰러뜨리기')],
-  say(('하람', '왕도 수확제에 우리 마을 물건을 납품하기로 했네. 철산의 칼과 모아의 물건을 실은 짐수레가 곧 떠나는데, 길에 두더지 구멍과 사나운 멧돼지가 말썽이야.'), ('하람', '길을 열고 왕도의 상인 베아에게 물건이 도착했다고 전해 주게.')),
-  say(('하람', '왕도 가는 길은 마을 북쪽 출구야. 엄니가 유난히 큰 멧돼지를 조심하게.')),
+Q('mq01a', '1장 가을의 납품', M, 10, 'elder@town', [kill('mon_mole', 6, '왕도 가는 길의 흙두더지 쫓기'), boss('qb_boar_lord', 'capital_road', '길목의 엄니 멧돼지 쓰러뜨리기')],
+  say(('하람', '돌아왔군! 손이 달라졌어. 이제 아르칸의 장인이라 불러도 되겠네.'), ('하람', '왕도 수확제에 우리 마을 물건을 납품할 차례야. 쇠돌이 마무리한 철산의 칼과 모아의 물건을 실은 짐수레가 곧 떠나는데, 길에 두더지 구멍과 사나운 멧돼지가 말썽이야.'), ('하람', '길을 열고 왕도의 상인 베아에게 물건이 도착했다고 전해 주게.')),
+  say(('하람', '왕도 가는 길은 마을 성문 밖, 카이리온 쪽 길이야. 엄니가 유난히 큰 멧돼지를 조심하게.')),
   say(('베아', '아르칸 마을 짐수레? 다행이다, 수확제에 늦을 뻔했어!'), ('베아', '그런데… 성문이 오늘 아침부터 이상하게 조용하네.')),
-  turn='capital_merchant@kairion_capital', prereq=['q2_merchant'])
-Q('mq02a', '2장 검은 피의 사슴 ①', M, 3, 'capital_merchant@kairion_capital', [talk('astel@kairion_hunt', '사냥터에서 왕자 아스텔 찾기')],
+  turn='capital_merchant@kairion_capital', prereq=['q_job1'])
+Q('mq02a', '2장 검은 피의 사슴 ①', M, 10, 'capital_merchant@kairion_capital', [talk('astel@kairion_hunt', '사냥터에서 왕자 아스텔 찾기')],
   say(('베아', '수확제 칼 한 자루는 왕세자 전하께 바칠 물건이야. 전하는 오늘 사냥터에 나가 계신대.'), ('베아', '사냥터 숲으로 가서 직접 전해 드려.')),
   say(('베아', '사냥터 숲은 왕도 서쪽 출구로 나가면 돼.')),
   say(('아스텔', '아르칸 마을의 칼이라고? 고맙다. …쉿, 저기 사슴이 있어.'), ('카스티야', '내가 먼저 봤거든요, 전하!'), ('카일러스', '두 분 다 조용히 하십시오.')))
-Q('mq02b', '2장 검은 피의 사슴 ②', M, 4, 'astel@kairion_hunt', [gather('qi_black_blood', 4, 'kairion_hunt', '검은 핏자국 따라가기'), kill('mon_sapling', 6, '길을 막는 걷는 묘목 치우기')],
+Q('mq02b', '2장 검은 피의 사슴 ②', M, 10, 'astel@kairion_hunt', [gather('qi_black_blood', 4, 'kairion_hunt', '검은 핏자국 따라가기'), kill('mon_sapling', 6, '길을 막는 걷는 묘목 치우기')],
   say(('아스텔', '내 화살이 박혔는데… 피가 검다. 이런 건 처음 봐.'), ('카일러스', '핏자국을 따라가 보지요. 숲이 너무 조용합니다.')),
   say(('카스티야', '핏자국이 빛나는 자리를 찾아. 바닥을 잘 봐.')),
   say('새소리가 끊기고 바람이 멈췄다. 나무 사이로 검은 두건의 그림자들이 피어오른다.'))
-Q('mq02c', '2장 검은 피의 사슴 ③', M, 5, 'astel@kairion_hunt', [boss('qb_shadow_scout', 'kairion_hunt', '그림자 정찰대 물리치기')],
+Q('mq02c', '2장 검은 피의 사슴 ③', M, 11, 'astel@kairion_hunt', [boss('qb_shadow_scout', 'kairion_hunt', '그림자 정찰대 물리치기')],
   say(('그림자', '다른 쪽이다. 그릇은…… 이미 깨어났다.'), ('아스텔', '칼이 통과한다…! 다들 물러서!')),
   say(('카일러스', '저것들은 전하만 보고 있습니다. 전하 곁을 지켜 주십시오!')),
   say('그림자들이 흩어지자 아스텔의 오른손 등에 용의 눈을 닮은 금빛 문양이 떠올랐다가 꺼졌다.', ('아스텔', '…왕도로 돌아가자. 아버지께 알려야 해.')))
 # ---- 3장
-Q('mq03a', '3장 닫힌 성문 ①', M, 5, 'astel@kairion_hunt', [visit('kairion_capital', '왕도로 돌아가기'), talk('roderick@kairion_capital', '근위대장 로데릭의 선고 듣기')],
+Q('mq03a', '3장 닫힌 성문 ①', M, 11, 'astel@kairion_hunt', [visit('kairion_capital', '왕도로 돌아가기'), talk('roderick@kairion_capital', '근위대장 로데릭의 선고 듣기')],
   say(('아스텔', '함께 가 주겠나? 숲에서 본 것을 증언해 줄 사람이 필요해.')),
   say(('카스티야', '성문에… 푸른 깃발 대신 검은 천이 걸려 있어.')),
   say(('로데릭', '국왕 시해. 현장에 남은 왕세자의 예장검, 왕세자의 이름으로 쓴 밀서. 아스텔, 그대를 반역자로 체포한다!'), ('그레이스', '형님은 언제나 질문이 틀려요. 누가 죽였느냐가 아니라, 왜 아무도 몰랐느냐고 물어야죠.')))
-Q('mq03b', '3장 닫힌 성문 ②', M, 6, 'roderick@kairion_capital', [boss('qb_roderick', 'kairion_hills', '구릉지로 달아나며 로데릭 막아 내기')],
+Q('mq03b', '3장 닫힌 성문 ②', M, 11, 'roderick@kairion_capital', [boss('qb_roderick', 'kairion_hills', '구릉지로 달아나며 로데릭 막아 내기')],
   say(('로데릭', '쏴라!'), '화살비가 쏟아진다. 카일러스가 방패를 들어 왕자를 가렸다.', ('카일러스', '구릉지로! 제가 뒤를 막겠습니다!')),
   say(('카스티야', '서쪽이 아니라 동쪽 구릉지야! 빨리!')),
   say('그날 밤 카이리온의 왕자 아스텔은 반역자가 되었다.', ('아스텔', '그레이스의 눈에서… 검은 눈물이 흘렀어.')),
   turn='astel@kairion_hills')
 # ---- 4장
-Q('mq04a', '4장 언덕 너머로 ①', M, 6, 'astel@kairion_hills', [gather('qi_hills_herb', 5, 'kairion_hills', '구릉지 약초 모으기')],
+Q('mq04a', '4장 언덕 너머로 ①', M, 11, 'astel@kairion_hills', [gather('qi_hills_herb', 5, 'kairion_hills', '구릉지 약초 모으기')],
   say(('아스텔', '카일러스가 화살을 맞았어. 약초를 구해 줄 수 있겠나? 아르칸 마을 사람이라면 약초를 알아볼 테지.')),
   say(('카스티야', '쓴 냄새가 나는 잎이야. 빛이 도는 자리를 찾아봐.')),
   say(('카일러스', '…이 정도로 쓰러질 호위기사가 아닙니다. 하지만 고맙군.')), turn='kylus@kairion_hills')
-Q('mq04b', '4장 언덕 너머로 ②', M, 7, 'kylus@kairion_hills', [kill('mon_wolf', 6, '야영지를 노리는 달빛 늑대'), boss('qb_chaser_captain', 'kairion_hills', '추격 기마대장 쓰러뜨리기')],
+Q('mq04b', '4장 언덕 너머로 ②', M, 12, 'kylus@kairion_hills', [kill('mon_wolf', 6, '야영지를 노리는 달빛 늑대'), boss('qb_chaser_captain', 'kairion_hills', '추격 기마대장 쓰러뜨리기')],
   say(('카일러스', '왕실 추격 기마대가 진을 쳤습니다. 대장만 쓰러뜨리면 흩어질 겁니다.')),
   say(('카일러스', '늑대 떼가 야영지 주변을 맴돕니다. 먼저 정리하지요.')),
   say(('아스텔', '길이 열렸다. 서쪽 숲을 지나 발테른으로 간다. 케린 경이라면 우리를 믿어 줄 거야.')), turn='astel@kairion_hills')
 # ---- 5장 (기존 거대 독버섯 q7_boss 연결)
-Q('mq05a', '5장 병드는 숲', M, 7, 'astel@kairion_hills', [kill('mon_jelly', 6, '검게 물든 새싹 젤리'), gather('qi_poison_sample', 3, 'forest', '병든 이끼 모으기')],
+Q('mq05a', '5장 병드는 숲', M, 12, 'astel@kairion_hills', [kill('mon_jelly', 6, '검게 물든 새싹 젤리'), gather('qi_poison_sample', 3, 'forest', '병든 이끼 모으기')],
   say(('아스텔', '발테른으로 가는 길에 속삭이는 숲을 지나야 해. 그런데 숲이 검게 병들고 있다는 소문이야.'), ('카스티야', '아르칸 마을 바로 옆 숲이잖아?')),
   say(('카일러스', '검게 물든 이끼를 모아 촌장님께 보여 드리지요.')),
-  say(('하람', '이건… 독버섯 군락지의 기운이야. 하지만 이렇게 검지는 않았는데.'), ('하람', '숲의 꽃잎 곰과 거대 독버섯 이야기는 내가 따로 부탁하겠네(서브 \'꽃잎 곰 토벌\' → 메인 \'거대 독버섯\').')),
+  say(('하람', '이건… 거대 독버섯을 쓰러뜨렸는데도 숲이 다시 검어지다니.'), ('하람', '그때 독버섯 뿌리에서 나온 검은 결정과 같은 기운이야. 독버섯은 원인이 아니라 그릇이었던 게야.')),
   turn='elder@town')
 # ---- 6장
-Q('mq06a', '6장 안개 속 감시자 ①', M, 8, 'elder@town', [visit('baltern_pass', '안개 골짜기를 지나 바위산 고갯길로'), drop('qi_black_feather', 4, ['mon_goblin_miner', 'mon_hawk', 'mon_rock_ram'], 0.5, '검은 깃털 표식 모으기')],
-  say(('하람', '숲이 다시 숨을 쉬는구먼. 왕자님 일행은 발테른으로 간다지? 고갯길에 검은 깃털을 단 무리가 숨어 있다는 소문이 있네.')),
+Q('mq06a', '6장 안개 속 감시자 ①', M, 12, 'elder@town', [visit('baltern_pass', '안개 골짜기를 지나 바위산 고갯길로'), drop('qi_black_feather', 4, ['mon_goblin_miner', 'mon_hawk', 'mon_rock_ram'], 0.5, '검은 깃털 표식 모으기')],
+  say(('하람', '숲은 마을 사람들과 내가 지켜보겠네. 왕자님 일행은 발테른으로 간다지? 고갯길에 검은 깃털을 단 무리가 숨어 있다는 소문이 있네.')),
   say(('하람', '안개 골짜기 북쪽 끝이 바위산 고갯길이야.')),
   say(('카일러스', '현상금 사냥꾼들이군요. \'검은 깃\'. 누군가 전하의 목에 값을 매겼습니다.')),
-  prereq=['mq05a', 'q7_boss'], turn='kylus@baltern_pass')
-Q('mq06b', '6장 안개 속 감시자 ②', M, 9, 'kylus@baltern_pass', [boss('qb_black_feather', 'baltern_pass', '검은 깃 두목 쓰러뜨리기')],
+  turn='kylus@baltern_pass')
+Q('mq06b', '6장 안개 속 감시자 ②', M, 12, 'kylus@baltern_pass', [boss('qb_black_feather', 'baltern_pass', '검은 깃 두목 쓰러뜨리기')],
   say(('카일러스', '표식이 모이는 곳이 소굴입니다. 두목을 치면 나머지는 흩어질 겁니다.')),
   say(('카스티야', '고갯길 위쪽, 바위 그늘을 살펴.')),
   say(('검은 깃 두목', '크윽… 의뢰인은 얼굴을 보인 적이 없다. 검은 로브… 그것뿐이야.')))
 # ---- 7장
-Q('mq07a', '7장 바위산의 노기사 ①', M, 9, 'kylus@baltern_pass', [talk('kerin@baltern', '발테른 공국의 케린 찾아가기')],
+Q('mq07a', '7장 바위산의 노기사 ①', M, 13, 'kylus@baltern_pass', [talk('kerin@baltern', '발테른 공국의 케린 찾아가기')],
   say(('카일러스', '발테른은 이 고갯길 끝입니다. 케린 경께 가지요.')),
   say(('아스텔', '케린 경은 내 검술 스승이야. 아무것도 묻지 않을 분이지.')),
   say(('케린', '…'), '케린은 아무것도 묻지 않고 제자의 어깨를 두드렸다.', ('케린', '삼십 년 전 지라트 국경에서, 목을 베어도 일어나는 병사들과 검은 로브의 사내를 보았다.')))
-Q('mq07b', '7장 바위산의 노기사 ②', M, 10, 'kerin@baltern', [boss('qb_kerin_spar', 'baltern_pass', '케린과 대련하기')],
+Q('mq07b', '7장 바위산의 노기사 ②', M, 13, 'kerin@baltern', [boss('qb_kerin_spar', 'baltern_pass', '케린과 대련하기')],
   say(('케린', '왕자를 따라다닐 생각이라면 실력부터 보자. 고갯길 공터로 나와라.')),
   say(('케린', '대련이다. 쓰러뜨릴 필요는 없다. 버티고, 파고들어라.')),
   say(('케린', '검이 아직 무디다. 하지만 등을 맡길 만은 하구나.')))
-Q('mq07c', '7장 바위산의 노기사 ③', M, 10, 'kerin@baltern', [job('any', '카이리온 왕도 길드 회관 마스터에게 1차 전직하기')],
-  say(('케린', '칼만 휘두르는 녀석은 오래 못 간다. 네 손에 맞는 일을 찾아라. 카이리온 왕도 길드 회관에 마스터들이 모여 있다지?')),
-  say(('케린', '약국·식당·대장간·의상실·화방. 마스터를 찾아가 \'직업 상담\'을 해라.')),
+Q('mq07c', '7장 바위산의 노기사 ③', M, 13, 'kerin@baltern', [kill('mon_hawk', 6, '고갯길의 바위산 매 떨어뜨리기')],
+  say(('케린', '왕도 길드 회관에서 직업을 얻었다고? 칼만 휘두르는 녀석보다 낫지. 그 손을 보여 봐라.'), ('케린', '고갯길 매들이 전령을 덮친다. 네 직업의 기술로 여섯 마리를 떨어뜨려라.')),
+  say(('케린', '매는 하늘에서 내리꽂힌다. 내려오는 순간을 노려라.')),
   say(('케린', '좋은 손이 됐군. 그 손으로 사람을 살릴 수도, 벨 수도 있다.')))
 # ---- 8장
-Q('mq08a', '8장 구하는 일과 베는 일 ①', M, 10, 'kerin@baltern', [kill('mon_goblin_miner', 8, '채석장의 고블린 광부'), gather('qi_shadow_ember', 4, 'baltern_quarry', '그림자 불씨 거두기')],
+Q('mq08a', '8장 구하는 일과 베는 일 ①', M, 13, 'kerin@baltern', [kill('mon_goblin_miner', 8, '채석장의 고블린 광부'), gather('qi_shadow_ember', 4, 'baltern_quarry', '그림자 불씨 거두기')],
   say(('케린', '주변 영주들에게 밀서를 보내는 동안 부탁이 있다. 옛 채석장에 그림자가 둥지를 틀었다.')),
   say(('케린', '채석장은 공국 남쪽 출구다.')),
   say(('케린', '그림자 불씨라… 둥지의 주인이 있겠군.')))
-Q('mq08b', '8장 구하는 일과 베는 일 ②', M, 11, 'kerin@baltern', [boss('qb_quarry_golem', 'baltern_quarry', '그림자 깃든 석상 부수기')],
+Q('mq08b', '8장 구하는 일과 베는 일 ②', M, 13, 'kerin@baltern', [boss('qb_quarry_golem', 'baltern_quarry', '그림자 깃든 석상 부수기')],
   say(('케린', '석상에 그림자가 깃들었다. 부숴라.')),
   say(('케린', '채석장 한가운데, 오래된 석상이다.')),
   say(('케린', '루미에르로 가라. 대사제 저스티나가 무언가 알고 있을 거다.'), ('케린', '동생을 구하고 싶거든 기억해라. 구하는 일과 베는 일은 같은 검 끝에 있다.')))
 # ---- 2막 연합의 깃발: 9장
-Q('mq09a', '9장 푸른숲 어귀 ①', M, 11, 'kerin@baltern', [visit('blue_forest_edge', '절벽길을 지나 푸른숲 어귀로'), gather('qi_lost_pilgrim', 3, 'blue_forest_edge', '길 잃은 순례자 찾기'), gather('qi_blue_lamp', 4, 'blue_forest_edge', '푸른 등불 켜기')],
+Q('mq09a', '9장 푸른숲 어귀 ①', M, 13, 'kerin@baltern', [visit('blue_forest_edge', '절벽길을 지나 푸른숲 어귀로'), gather('qi_lost_pilgrim', 3, 'blue_forest_edge', '길 잃은 순례자 찾기'), gather('qi_blue_lamp', 4, 'blue_forest_edge', '푸른 등불 켜기')],
   say(('케린', '루미에르로 가는 길은 푸른숲을 지나야 한다. 어린 녀석을 일곱 밤 세워 뒀던 곳이지.')),
   say(('카스티야', '안개가 짙어. 등불을 켜면 길이 보일 거야.')),
   say(('순례자', '살았다… 등불이 꺼지고 나서부터 늑대 울음이 들렸어요.')), turn='astel@blue_forest_edge')
-Q('mq09b', '9장 푸른숲 어귀 ②', M, 12, 'astel@blue_forest_edge', [boss('qb_fog_alpha', 'blue_forest_edge', '안개 늑대 우두머리')],
+Q('mq09b', '9장 푸른숲 어귀 ②', M, 14, 'astel@blue_forest_edge', [boss('qb_fog_alpha', 'blue_forest_edge', '안개 늑대 우두머리')],
   say(('아스텔', '순례자들을 노리는 늑대 우두머리가 있어. 오늘 밤은 여기서 야영하자. 그 전에 정리하자.')),
   say(('카일러스', '안개 속에서 눈이 빛나는 놈입니다.')),
   say(('아스텔', '어릴 때 여기서 일곱 밤을 버텼지. 그때는 무서운 게 늑대뿐이었는데.')))
 # ---- 10장
-Q('mq10a', '10장 환영의 숲 ①', M, 13, 'astel@blue_forest_edge', [visit('blue_forest', '환영의 숲으로'), gather('qi_illusion_shard', 4, 'blue_forest', '환영 속 거짓 단서 깨기')],
+Q('mq10a', '10장 환영의 숲 ①', M, 14, 'astel@blue_forest_edge', [visit('blue_forest', '환영의 숲으로'), gather('qi_illusion_shard', 4, 'blue_forest', '환영 속 거짓 단서 깨기')],
   say(('아스텔', '숲 깊은 곳은 사람의 마음을 비춘다고 했어. 무엇을 보든 믿지 마.')),
   say('안개 속에서 아르칸 마을이 불타는 환영이 보인다. 일그러진 자리를 찾아 깨뜨리자.'),
   say(('카스티야', '거기 있었구나! 다들 하나씩 사라져서… 전하가 이상해.')), turn='castilla@blue_forest')
@@ -515,27 +580,27 @@ Q('mq40b', '40장 별을 잇는 자 ② (에필로그)', M, 50, 'castilla@abyss_
 S = 'sub'
 def SQ(qid, name, lv, giver, objs, offer, done, opens, turn=None, items=None):
     Q(qid, name, S, lv, giver, objs, offer, say('목표를 마치고 돌아오면 됩니다.'), done, turn=turn, prereq=[opens] if isinstance(opens, str) else opens, items=items)
-SQ('qs05', '길가의 굴착꾼', 2, 'merchant@town', [kill('mon_mole', 8, '흙두더지'), drop('qi_snail_shell', 5, ['mon_snail'], 0.6, '이끼 달팽이 껍데기')],
-   say(('모아', '짐수레 길을 두더지들이 다 파헤쳐 놨어! 달팽이 껍데기는 포장재로 딱이고.')), say(('모아', '고마워! 이제 수레가 덜컹거리지 않겠어.')), 'mq01a')
-SQ('qs06', '걷는 나무들', 4, 'capital_cook@kairion_capital', [kill('mon_sapling', 5, '걷는 묘목'), kill('mon_stumpling', 5, '걷는 그루터기'), drop('qi_honey', 5, ['mon_hornet'], 0.55, '왕벌 꿀')],
+SQ('qs05', '길가의 굴착꾼', 3, 'merchant@town', [kill('mon_mole', 8, '흙두더지'), drop('qi_snail_shell', 5, ['mon_snail'], 0.6, '이끼 달팽이 껍데기')],
+   say(('모아', '짐수레 길을 두더지들이 다 파헤쳐 놨어! 달팽이 껍데기는 포장재로 딱이고.')), say(('모아', '고마워! 이제 수레가 덜컹거리지 않겠어.')), 'mq00b')
+SQ('qs06', '걷는 나무들', 10, 'capital_cook@kairion_capital', [kill('mon_sapling', 5, '걷는 묘목'), kill('mon_stumpling', 5, '걷는 그루터기'), drop('qi_honey', 5, ['mon_hornet'], 0.55, '왕벌 꿀')],
    say(('곤', '수확제 요리에 꿀이 모자라! 사냥터 숲의 걷는 나무들이 벌통을 다 엎었다고.')), say(('곤', '이 꿀이면 왕도 최고의 파이를 굽지!')), 'mq02a')
-SQ('qs07', '딱정벌레 껍질', 6, 'arcan_smith_boy@town', [drop('qi_beetle_shell', 6, ['mon_beetle'], 0.55, '뿔 딱정벌레 껍질'), drop('qi_turtle_moss', 3, ['mon_turtle'], 0.5, '이끼 거북 등딱지')],
+SQ('qs07', '딱정벌레 껍질', 11, 'arcan_smith_boy@town', [drop('qi_beetle_shell', 6, ['mon_beetle'], 0.55, '뿔 딱정벌레 껍질'), drop('qi_turtle_moss', 3, ['mon_turtle'], 0.5, '이끼 거북 등딱지')],
    say(('쇠돌', '구릉지 딱정벌레 껍질은 방패에 덧대기 좋대요. 스승님께 보낼 거예요!')), say(('쇠돌', '와, 이걸로 방패 몇 개는 더 만들겠어요.')), 'mq04a', items=[('a_armor_2', 1)])
-SQ('qs08', '달빛 늑대의 밤', 7, 'guard@town', [kill('mon_wolf', 8, '달빛 늑대')],
-   say(('도윤', '밤마다 달빛 늑대가 마을까지 내려와. 숲과 구릉지의 늑대를 줄여 줘.')), say(('도윤', '오늘 밤은 다들 푹 자겠군.')), 'mq05a')
-SQ('qs09', '고블린 광부 쫓기', 7, 'baltern_merchant@baltern', [kill('mon_goblin_miner', 8, '고블린 광부'), drop('qi_stolen_pick', 4, ['mon_goblin_miner'], 0.5, '훔친 곡괭이')],
+SQ('qs08', '달빛 늑대의 밤', 6, 'guard@town', [kill('mon_wolf', 8, '달빛 늑대')],
+   say(('도윤', '밤마다 달빛 늑대가 마을까지 내려와. 숲의 늑대를 줄여 줘.')), say(('도윤', '오늘 밤은 다들 푹 자겠군.')), 'mq00d')
+SQ('qs09', '고블린 광부 쫓기', 12, 'baltern_merchant@baltern', [kill('mon_goblin_miner', 8, '고블린 광부'), drop('qi_stolen_pick', 4, ['mon_goblin_miner'], 0.5, '훔친 곡괭이')],
    say(('오린', '고갯길 고블린들이 우리 곡괭이를 다 훔쳐 갔어.')), say(('오린', '찾아 줬구나! 다음엔 싸게 팔게.')), 'mq06a')
-SQ('qs10', '매의 둥지', 9, 'baltern_captain@baltern', [kill('mon_hawk', 6, '바위산 매'), drop('qi_gargoyle_feather', 5, ['mon_gargoyle'], 0.5, '아기 가고일 깃')],
+SQ('qs10', '매의 둥지', 13, 'baltern_captain@baltern', [kill('mon_hawk', 6, '바위산 매'), drop('qi_gargoyle_feather', 5, ['mon_gargoyle'], 0.5, '아기 가고일 깃')],
    say(('가론', '절벽길 매들이 전령을 덮친다. 가고일 깃은 화살 깃으로 쓰고.')), say(('가론', '이제 전령이 무사히 오가겠어.')), 'mq07a')
-SQ('qs11', '채석장 다시 열기', 10, 'baltern_captain@baltern', [kill('mon_armadillo', 8, '바위 아르마딜로'), gather('qi_quarry_stone', 10, 'baltern_quarry', '채석장 돌')],
+SQ('qs11', '채석장 다시 열기', 13, 'baltern_captain@baltern', [kill('mon_armadillo', 8, '바위 아르마딜로'), gather('qi_quarry_stone', 10, 'baltern_quarry', '채석장 돌')],
    say(('가론', '피난민 숙소를 고칠 돌이 필요해. 채석장 아르마딜로들이 길을 막고 있어.')), say(('가론', '이걸로 지붕을 올리겠어.')), 'mq08a')
-SQ('qs12', '안개 두꺼비의 독샘', 11, 'baltern_herbalist@baltern', [drop('m_toad_gland', 6, ['mon_fog_toad'], 0.6, '안개 두꺼비 독샘')],
+SQ('qs12', '안개 두꺼비의 독샘', 13, 'baltern_herbalist@baltern', [drop('m_toad_gland', 6, ['mon_fog_toad'], 0.6, '안개 두꺼비 독샘')],
    say(('미르', '안개 골짜기 두꺼비 독샘으로 해독제를 만들어요.')), say(('미르', '해독제 몇 병 드릴게요.')), 'mq08a', items=[('c_antidote', 5)])
 SQ('qs13', '대나무 도둑', 14, 'arcan_innkeeper@town', [kill('mon_panda', 6, '대나무 팬더'), gather('qi_bamboo', 8, 'mist_valley', '도둑맞은 죽순')],
    say(('보름', '안개 골짜기 팬더들이 죽순을 다 가져갔어요! 여관 봄 요리에 꼭 필요한데.')), say(('보름', '오늘 저녁은 죽순 볶음이에요!')), 'mq09a')
 SQ('qs14', '안개골의 왕', 18, 'baltern_captain@baltern', [kill('mon_mist_wolf', 10, '안개 늑대'), kill('mon_mist_bear', 1, '안개골 우두머리 곰 (정예)')],
    say(('가론', '고갯길 상인을 습격하는 우두머리 곰이 있다. 늑대 무리를 거느리고.')), say(('가론', '이제 고갯길에 상인들이 돌아오겠군.')), 'mq13a', items=[('ac_ring_3', 1)])
-SQ('qs15', '요정의 장난', 10, 'lumiere_pilgrim@blue_forest_edge', [gather('qi_pilgrim_lamp', 6, 'blue_forest_edge', '요정이 훔친 순례 등불'), kill('mon_blue_jelly', 8, '푸른숲 젤리')],
+SQ('qs15', '요정의 장난', 13, 'lumiere_pilgrim@blue_forest_edge', [gather('qi_pilgrim_lamp', 6, 'blue_forest_edge', '요정이 훔친 순례 등불'), kill('mon_blue_jelly', 8, '푸른숲 젤리')],
    say(('티아', '장난꾸러기 요정들이 등불을 훔쳐 갔어요. 등불 없이는 순례를 못 해요.')), say(('티아', '찾아 주셨군요! 이제 길을 밝힐 수 있어요.')), 'mq09a')
 SQ('qs16', '별빛 사슴의 뿔', 13, 'lumiere_monk@lumiere', [gather('qi_deer_antler', 5, 'blue_forest', '별빛 사슴이 떨어뜨린 뿔 (사슴은 해치지 않기)')],
    say(('세오', '성수를 담는 단지는 별빛 사슴의 뿔로 만들어요. 떨어진 뿔만 주워 오세요.')), say(('세오', '고맙습니다. 회복 물약을 몇 병 드리지요.')), 'mq10a', items=[('c_potion_m', 5)])
@@ -616,6 +681,7 @@ SQ('qs52', '심연을 맴도는 것들', 45, 'chirzen@capital_plain', [kill('mon
 def reward(q):
     L = max(1, min(50, q['lv'])); need = LEVELS[min(len(LEVELS) - 1, L - 1)]
     k = 0.30 if q['category'] == 'main' else 0.16
+    if q['id'].startswith('mq00'): k = 0.05     # 서장: 사냥 경험치가 대부분 — 실제로는 × config questExpMul(3) = 0.15, 메인만 하면 서장 끝(mq00h)에 Lv10 쯤 (2026-11-19)
     exp = q['exp'] or int(round(need * k / 5) * 5)
     gold = (20 if q['category'] == 'main' else 12) * L
     items = [dict(id=i, count=n) for i, n in (q['items'] or [])]
@@ -673,6 +739,7 @@ def zone_npcs(zid): return {n['npc'] for n in zone_def(zid).get('npcs', [])}
 def build():
     quests = load(D('quests.json')); npcs = load(D('npcs.json')); mons = load(D('monsters.json')); items = load(D('items.json'))
     keepq = [q for q in quests['quests'] if not re.match(r'^(mq|qs)\d', q['id'])]
+    for q in keepq: q.update(json.loads(json.dumps(LEGACY_PATCH.get(q['id'], {}))))
     keepn = [n for n in npcs['npcs'] if not n.get('story')]; keepm = [m for m in mons['monsters'] if not m.get('story')]; keepi = [i for i in items['items'] if not i.get('story')]
     byid = {m['id']: m for m in keepm}; ibase = next(i for i in keepi if i['id'] == 'm_spore')
     creatures = set(re.findall(r"^  ([a-z_0-9]+):", open(os.path.join(ROOT, 'js', 'creature.js')).read(), re.M))
@@ -691,6 +758,8 @@ def build():
         assert lk['base'] in creatures, (mid, lk['base'])
         b.update(id=mid, name=name, level=lv, look=lk, questBoss=True, story=True, respawn=99999, drops=[dict(item='c_potion_m', chance=1.0, min=2, max=3)],
                  detectRange=max(b.get('detectRange', 7), 11), leashRange=40, goldMin=lv * 8, goldMax=lv * 14)
+        if mid in BAL_LEVEL: b['balLevel'] = BAL_LEVEL[mid]
+        if mid in NEW_2026_11_19: b['noBalanceRef'] = True
         b.update(extra); newm.append(b)
     # quests
     allq = {q['id']: q for q in keepq}

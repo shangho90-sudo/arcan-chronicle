@@ -1,7 +1,7 @@
 // 메인 퀘스트 NPC 표시 + 메인 퀘스트 진행 입장 조건 (2026-11-15).
 // 새 게임 → 촌장 머리 위 금관 "!"·미니맵 금관 표시 → 받으면 대화 목표(쇠돌) 금관 "?" → 숲의 안개 골짜기 포털: 막히고 안내 →
 // (테스트 훅으로 6장까지 진행) 같은 포털로 들어감 → 워프 안내인 목록(닫힌 마을 회색·이동 막힘) → 세계 지도(자물쇠·금별) →
-// 닫힌 곳에 저장된 예전 저장 불러오기 → 아르칸 → 보통 진행(7장 ②까지, Lv10)으로 카이리온 길드 회관에서 1차 전직.
+// 닫힌 곳에 저장된 예전 저장 불러오기 → 아르칸 → 보통 진행(서장 끝, Lv10 — 2026-11-19)으로 카이리온 길드 회관에서 1차 전직(그 순간 「첫 전직」 완료).
 // Usage: (cd repo && python3 -m http.server 8811 &)  URL=http://localhost:8811/index.html SIZES=1280x720,390x844t NODE_PATH=$(npm root -g) node tools/browser-tests/gates.js
 const { chromium } = require('playwright'); const fs = require('fs');
 const OUT = process.env.OUT || '/tmp/gate', URL = process.env.URL || 'http://localhost:8811/index.html'; fs.mkdirSync(OUT, { recursive: true });
@@ -31,7 +31,7 @@ const fails = []; const ok = (c, m) => { console.log((c ? '  ok   ' : '  FAIL ')
     }, [upto, level]);
 
     await pg.goto(URL, { timeout: 300000 }); await ev(() => localStorage.clear()); await pg.reload({ timeout: 300000 });
-    await click('새 게임'); await click('모험 시작'); await pg.waitForSelector('.prologue.on', { timeout: 60000 }); await click('건너뛰기');
+    await click('게임 시작 (새 게임)'); await click('모험 시작'); await pg.waitForSelector('.prologue.on', { timeout: 60000 }); await click('건너뛰기');
     await pg.waitForFunction(() => !document.querySelector('.prologue'), null, { timeout: 300000 }); await inZone('town');
     if (ONLY !== 'oldsave') {
     // 1) 새 게임: 첫 메인 퀘스트(q1_start)를 주는 촌장
@@ -60,17 +60,17 @@ const fails = []; const ok = (c, m) => { console.log((c ? '  ok   ' : '  FAIL ')
     ok(/메인 퀘스트 6장 「안개 속 감시자 ①」을 진행해야 들어갈 수 있습니다/.test(t1), '닫힌 포털 안내: ' + t1.slice(0, 120));
     await shot('4_portal_blocked');
     // 4) 테스트 훅으로 6장까지 → 같은 포털로 들어감
-    await progress('mq06a', 8); await step(pt.pos[0] + 6, pt.pos[1]); await armed(); await step(pt.pos[0], pt.pos[1]);
+    await progress('mq06a', 12); await step(pt.pos[0] + 6, pt.pos[1]); await armed(); await step(pt.pos[0], pt.pos[1]);
     await inZone('mist_valley'); ok(true, '6장 진행 뒤 같은 포털로 안개 골짜기에 들어감');
-    ok(await ev(() => { const L = G.zone.def.level; return L[0] === 8 && L[1] === 11; }), '안개 골짜기 권장 Lv 8~11 ' + JSON.stringify(await ev(() => G.zone.def.level)));
-    ok(await ev(() => G.zone.spawners.every(s => !s.def.level || (s.def.level >= 8 && s.def.level <= 12))), '안개 골짜기 몬스터 무리 Lv 8~12');
+    ok(await ev(() => { const L = G.zone.def.level; return L[0] === 12 && L[1] === 15; }), '안개 골짜기 권장 Lv 12~15 ' + JSON.stringify(await ev(() => G.zone.def.level)));
+    ok(await ev(() => G.zone.spawners.every(s => !s.def.level || (s.def.level >= 12 && s.def.level <= 16))), '안개 골짜기 몬스터 무리 Lv 12~16');
     await pg.waitForTimeout(2500); await shot('5_mist_valley');
     // 5) 워프 안내인: 가 본 마을이어도 메인 퀘스트로 닫히면 회색 + 이동 막힘
     await progress('q1_start', 1); await ev(() => { G.profile.towns = ['town', 'kairion_capital', 'baltern']; G.profile.gold = 1000; G.loadZone('town', 'start'); }); await inZone('town');
     await ev(() => { const n = G.zone.npcs.find(n => n.def.role === 'warp'); G.ui.showTownWarp(n.def); }); await pg.waitForTimeout(800);
     const rows = await ev(() => [...document.querySelectorAll('.window.townwarp .twrow')].map(r => ({ id: r.dataset.town, lock: r.dataset.lock || '', btn: !!r.querySelector('button'), text: r.innerText.replace(/\s+/g, ' ') })));
     const rk = rows.find(r => r.id === 'kairion_capital'), rb = rows.find(r => r.id === 'baltern');
-    ok(rk && rk.lock === 'mq01a' && !rk.btn && /1장 「가을의 납품」 필요/.test(rk.text), '카이리온(가 봤지만 닫힘): ' + (rk && rk.text));
+    ok(rk && rk.lock === 'q_job1' && !rk.btn && /서장 「첫 전직」 필요/.test(rk.text), '카이리온(가 봤지만 닫힘): ' + (rk && rk.text));
     ok(rb && rb.lock === 'mq07a' && !rb.btn, '발테른 닫힘: ' + (rb && rb.text));
     ok(await ev(() => G.townWarp('baltern') === false && G.zone.def.id === 'town'), '닫힌 마을로 직접 불러도 막힘'); await shot('6_townwarp');
     await ev(() => G.ui.close());
@@ -81,8 +81,8 @@ const fails = []; const ok = (c, m) => { console.log((c ? '  ok   ' : '  FAIL ')
     await ev(() => document.querySelector('.wmnode[data-z=mist_valley]').dispatchEvent(new MouseEvent('click', { bubbles: true }))); await pg.waitForTimeout(500);
     ok(await ev(() => /6장 「안개 속 감시자 ①」/.test(document.querySelector('.wminfotxt').innerText)), '정보 막대에 입장 조건'); await shot('7_worldmap');
     await ev(() => G.ui.close());
-    // 7) 보통 진행(7장 ②까지 완료, Lv10): 왕도 가는 길 → 카이리온 → 길드 회관 마스터에게 전직
-    await ev(() => G.ui.close()); await progress('mq07c', 10); await ev(() => G.quests.accept('mq07c'));
+    // 7) 보통 진행(서장 끝, Lv10): 첫 전직 받기 → 왕도 가는 길 → 카이리온 → 길드 회관 마스터에게 전직
+    await ev(() => G.ui.close()); await progress('q_job1', 10); await ev(() => G.quests.accept('q_job1'));
     await ev(() => G.loadZone('capital_road', 'from_town')); await inZone('capital_road'); await pg.waitForTimeout(800);
     const pk = await ev(() => G.zone.def.portals.find(p => p.targetZone === 'kairion_capital'));
     await step(pk.pos[0] + 5, pk.pos[1] + 5); await armed(); await step(pk.pos[0], pk.pos[1]); await inZone('kairion_capital');
@@ -91,9 +91,9 @@ const fails = []; const ok = (c, m) => { console.log((c ? '  ok   ' : '  FAIL ')
     await near(master); await pg.waitForTimeout(3000);
     ok(await ev(m => G.mainState(m) === 'talk' && /qmain/.test(G.questMark(m)), master), '전직 목표: 마스터 ' + master + ' 금관 "?"');
     await ev(m => G.openNpcMenu(G.data.npcs[m]), master); await pg.waitForTimeout(600); await shot('9_master');
-    await click('직업 상담'); await pg.waitForTimeout(600); await click('이 직업으로 전직'); await pg.waitForTimeout(1500);
+    await click('직업 상담'); await pg.waitForTimeout(600); await ev(() => [...document.querySelectorAll('.jobcard.hl button')][0].click()); await pg.waitForTimeout(1500);
     ok(await ev(() => G.profile.job !== 'novice'), '1차 전직 완료: ' + await ev(() => G.profile.job));
-    ok(await ev(() => G.quests.stateOf(G.data.quests.mq07c) === 3), '7장 ③(전직) 보고 가능');
+    ok(await ev(() => G.quests.isCompleted('q_job1')), '서장 「첫 전직」 전직하는 순간 완료');
     await pg.waitForTimeout(3000); await shot('10_jobchanged');
     }
     // 8) 예전 저장: 닫힌 곳(서리 고원)에 저장 → 다시 열어 불러오면 아르칸 시작 지점

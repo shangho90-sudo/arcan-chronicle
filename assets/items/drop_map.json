@@ -118,6 +118,281 @@
 "ac_ring_3": {
 "m": "crystal"
 },
+"ag_art_1": {
+"m": "flower"
+},
+"ag_art_2": {
+"m": "bundle"
+},
+"ag_art_3": {
+"m": "scale"
+},
+"ag_art_4": {
+"m": "cloth"
+},
+"ag_art_5": {
+"m": "cloth"
+},
+"ag_art_6": {
+"m": "bundle"
+},
+"ag_art_7": {
+"m": "cloth"
+},
+"ag_chef_1": {
+"m": "ember"
+},
+"ag_chef_2": {
+"m": "tail"
+},
+"ag_chef_3": {
+"m": "wool"
+},
+"ag_chef_4": {
+"m": "tail"
+},
+"ag_chef_5": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"ag_chef_6": {
+"m": "tail"
+},
+"ag_chef_7": {
+"m": "spool"
+},
+"ag_cook_1": {
+"m": "bundle"
+},
+"ag_cook_2": {
+"m": "scale"
+},
+"ag_cook_3": {
+"m": "bundle"
+},
+"ag_cook_4": {
+"m": "bundle"
+},
+"ag_cook_5": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"ag_cook_6": {
+"m": "bundle"
+},
+"ag_cook_7": {
+"m": "bundle"
+},
+"ag_design_1": {
+"m": "spool"
+},
+"ag_design_2": {
+"m": "bundle"
+},
+"ag_design_3": {
+"m": "spool"
+},
+"ag_design_4": {
+"m": "spool"
+},
+"ag_design_5": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"ag_design_6": {
+"m": "feather"
+},
+"ag_design_7": {
+"m": "bundle"
+},
+"ag_eng_1": {
+"m": "bundle"
+},
+"ag_eng_2": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"ag_eng_3": {
+"m": "bundle"
+},
+"ag_eng_4": {
+"m": "bundle"
+},
+"ag_eng_5": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"ag_eng_6": {
+"m": "bundle"
+},
+"ag_eng_7": {
+"m": "token"
+},
+"ag_hair_1": {
+"m": "feather"
+},
+"ag_hair_2": {
+"m": "tail"
+},
+"ag_hair_3": {
+"m": "feather"
+},
+"ag_hair_4": {
+"m": "feather"
+},
+"ag_hair_5": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"ag_hair_6": {
+"m": "feather"
+},
+"ag_hair_7": {
+"m": "feather"
+},
+"ag_herb_1": {
+"m": "bundle"
+},
+"ag_herb_2": {
+"m": "bundle"
+},
+"ag_herb_3": {
+"m": "bundle"
+},
+"ag_herb_4": {
+"m": "bundle"
+},
+"ag_herb_5": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"ag_herb_6": {
+"m": "bundle"
+},
+"ag_herb_7": {
+"m": "bundle"
+},
+"ag_music_1": {
+"m": "bundle"
+},
+"ag_music_2": {
+"m": "tail"
+},
+"ag_music_3": {
+"m": "feather"
+},
+"ag_music_4": {
+"m": "bundle"
+},
+"ag_music_5": {
+"m": "tail"
+},
+"ag_music_6": {
+"m": "bundle"
+},
+"ag_music_7": {
+"m": "feather"
+},
+"ag_nov_1": {
+"m": "bundle"
+},
+"ag_nov_2": {
+"m": "bundle"
+},
+"ag_nov_3": {
+"m": "bundle"
+},
+"ag_nov_4": {
+"m": "seedbag"
+},
+"ag_paint_1": {
+"m": "bundle"
+},
+"ag_paint_2": {
+"m": "bundle"
+},
+"ag_paint_3": {
+"m": "bundle"
+},
+"ag_paint_4": {
+"m": "bundle"
+},
+"ag_paint_5": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"ag_paint_6": {
+"m": "bundle"
+},
+"ag_paint_7": {
+"m": "bundle"
+},
+"ag_pharm_1": {
+"m": "bundle"
+},
+"ag_pharm_2": {
+"m": "herb"
+},
+"ag_pharm_3": {
+"m": "cloth"
+},
+"ag_pharm_4": {
+"m": "antler",
+"tint": "#d8ecff"
+},
+"ag_pharm_5": {
+"m": "flower"
+},
+"ag_pharm_6": {
+"m": "antler",
+"tint": "#d8ecff"
+},
+"ag_pharm_7": {
+"m": "flower"
+},
+"ag_smith_1": {
+"m": "ember"
+},
+"ag_smith_2": {
+"m": "ember"
+},
+"ag_smith_3": {
+"m": "scale"
+},
+"ag_smith_4": {
+"m": "tail"
+},
+"ag_smith_5": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"ag_smith_6": {
+"m": "bundle"
+},
+"ag_smith_7": {
+"m": "ember"
+},
+"ag_wpharm_1": {
+"m": "bundle"
+},
+"ag_wpharm_2": {
+"m": "crystal"
+},
+"ag_wpharm_3": {
+"m": "crystal"
+},
+"ag_wpharm_4": {
+"m": "crystal"
+},
+"ag_wpharm_5": {
+"m": "crystal"
+},
+"ag_wpharm_6": {
+"m": "crystal"
+},
+"ag_wpharm_7": {
+"m": "crystal"
+},
 "c_antidote": {
 "m": "vial"
 },
@@ -234,6 +509,10 @@
 "m": "feather",
 "tint": "#5a5470"
 },
+"qi_black_sap": {
+"m": "vial",
+"tint": "#302838"
+},
 "qi_blue_lamp": {
 "m": "lamp"
 },
@@ -254,6 +533,9 @@
 },
 "qi_collapse_mark": {
 "m": "tablet"
+},
+"qi_dark_fur": {
+"m": "wool"
 },
 "qi_deer_antler": {
 "m": "antler",
@@ -299,6 +581,14 @@
 },
 "qi_lost_pilgrim": {
 "m": "token"
+},
+"qi_mandrake_root": {
+"m": "herb",
+"tint": "#c8a070"
+},
+"qi_oak_branch": {
+"m": "logs",
+"tint": "#a07848"
 },
 "qi_oil_barrel": {
 "m": "barrel"
@@ -367,6 +657,10 @@
 },
 "qi_village_diary": {
 "m": "book"
+},
+"qi_violet_spore": {
+"m": "seedbag",
+"tint": "#a070d0"
 },
 "w_brush_1": {
 "m": "bundle"
@@ -447,6 +741,308 @@
 },
 "w_stick_1": {
 "m": "bundle"
+},
+"wg_art_1": {
+"m": "flower"
+},
+"wg_art_2": {
+"m": "bundle"
+},
+"wg_art_3": {
+"m": "scale"
+},
+"wg_art_4": {
+"m": "bundle"
+},
+"wg_art_5": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"wg_art_6": {
+"m": "bundle"
+},
+"wg_art_7": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"wg_artm_1": {
+"m": "bundle"
+},
+"wg_artm_2": {
+"m": "bundle"
+},
+"wg_artm_3": {
+"m": "bundle"
+},
+"wg_artm_4": {
+"m": "bundle"
+},
+"wg_artm_5": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"wg_artm_6": {
+"m": "bundle"
+},
+"wg_artm_7": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"wg_chef_1": {
+"m": "ember"
+},
+"wg_chef_2": {
+"m": "tail"
+},
+"wg_chef_3": {
+"m": "wool"
+},
+"wg_chef_4": {
+"m": "tail"
+},
+"wg_chef_5": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"wg_chef_6": {
+"m": "tail"
+},
+"wg_chef_7": {
+"m": "spool"
+},
+"wg_cook_1": {
+"m": "scale"
+},
+"wg_cook_2": {
+"m": "scale"
+},
+"wg_cook_3": {
+"m": "bundle"
+},
+"wg_cook_4": {
+"m": "bundle"
+},
+"wg_cook_5": {
+"m": "scale"
+},
+"wg_cook_6": {
+"m": "bundle"
+},
+"wg_cook_7": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"wg_design_1": {
+"m": "spool"
+},
+"wg_design_2": {
+"m": "bundle"
+},
+"wg_design_3": {
+"m": "spool"
+},
+"wg_design_4": {
+"m": "spool"
+},
+"wg_design_5": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"wg_design_6": {
+"m": "feather"
+},
+"wg_design_7": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"wg_eng_1": {
+"m": "bundle"
+},
+"wg_eng_2": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"wg_eng_3": {
+"m": "bundle"
+},
+"wg_eng_4": {
+"m": "bundle"
+},
+"wg_eng_5": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"wg_eng_6": {
+"m": "bundle"
+},
+"wg_eng_7": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"wg_hair_1": {
+"m": "feather"
+},
+"wg_hair_2": {
+"m": "tail"
+},
+"wg_hair_3": {
+"m": "feather"
+},
+"wg_hair_4": {
+"m": "feather"
+},
+"wg_hair_5": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"wg_hair_6": {
+"m": "bundle"
+},
+"wg_hair_7": {
+"m": "feather"
+},
+"wg_herb_1": {
+"m": "bundle"
+},
+"wg_herb_2": {
+"m": "bundle"
+},
+"wg_herb_3": {
+"m": "bundle"
+},
+"wg_herb_4": {
+"m": "bundle"
+},
+"wg_herb_5": {
+"m": "flower"
+},
+"wg_herb_6": {
+"m": "bundle"
+},
+"wg_herb_7": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"wg_music_1": {
+"m": "bundle"
+},
+"wg_music_2": {
+"m": "tail"
+},
+"wg_music_3": {
+"m": "feather"
+},
+"wg_music_4": {
+"m": "tail"
+},
+"wg_music_5": {
+"m": "tail"
+},
+"wg_music_6": {
+"m": "bundle"
+},
+"wg_music_7": {
+"m": "tail"
+},
+"wg_nov_1": {
+"m": "bundle"
+},
+"wg_nov_2": {
+"m": "bundle"
+},
+"wg_nov_3": {
+"m": "bundle"
+},
+"wg_nov_4": {
+"m": "seedbag"
+},
+"wg_paint_1": {
+"m": "bundle"
+},
+"wg_paint_2": {
+"m": "bundle"
+},
+"wg_paint_3": {
+"m": "bundle"
+},
+"wg_paint_4": {
+"m": "bundle"
+},
+"wg_paint_5": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"wg_paint_6": {
+"m": "bundle"
+},
+"wg_paint_7": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"wg_pharm_1": {
+"m": "bundle"
+},
+"wg_pharm_2": {
+"m": "bundle"
+},
+"wg_pharm_3": {
+"m": "bundle"
+},
+"wg_pharm_4": {
+"m": "bundle"
+},
+"wg_pharm_5": {
+"m": "flower"
+},
+"wg_pharm_6": {
+"m": "antler",
+"tint": "#d8ecff"
+},
+"wg_pharm_7": {
+"m": "flower"
+},
+"wg_smith_1": {
+"m": "ember"
+},
+"wg_smith_2": {
+"m": "ember"
+},
+"wg_smith_3": {
+"m": "scale"
+},
+"wg_smith_4": {
+"m": "tail"
+},
+"wg_smith_5": {
+"m": "tail"
+},
+"wg_smith_6": {
+"m": "bundle"
+},
+"wg_smith_7": {
+"m": "ember"
+},
+"wg_wpharm_1": {
+"m": "bundle"
+},
+"wg_wpharm_2": {
+"m": "crystal",
+"tint": "#8a5ad0"
+},
+"wg_wpharm_3": {
+"m": "crystal"
+},
+"wg_wpharm_4": {
+"m": "crystal"
+},
+"wg_wpharm_5": {
+"m": "crystal"
+},
+"wg_wpharm_6": {
+"m": "crystal"
+},
+"wg_wpharm_7": {
+"m": "crystal"
 }
 },
 "models": [

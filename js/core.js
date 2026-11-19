@@ -34,8 +34,11 @@ export function levelGapExp(exp, pl, ml) { const g = ml - pl; const k = g >= 0 ?
  *  (ai heavy / ranged, elite = a monster whose data hp is >= 2x its level neighbours). Bosses keep their data values. */
 export function balanceMonsters(mons, levels) {
   const list = Object.values(mons), normal = list.filter(m => !(m.id.startsWith("boss_") || m.ai === "boss"));
+  // 정예 판단의 이웃 기준: 이야기 보스는 처음 넣은 레벨(balLevel)로 셈, 2026-11-19 이후 새 보스(noBalanceRef)는 빼서 — 서장 때문에
+  // 1~7장 보스 레벨을 옮겨도 다른 몬스터(꽃잎 곰 등)의 정예 판정이 바뀌지 않게 (tools/quests/story.py BAL_LEVEL)
+  const ref = normal.filter(o => !o.noBalanceRef), refL = o => (o.balLevel || o.level) | 0;
   for (const m of normal) {
-    const L = Math.max(1, m.level | 0), near = normal.filter(o => Math.abs((o.level | 0) - L) <= 3).map(o => (o._orig || o).hp).sort((x, y) => x - y);
+    const L = Math.max(1, m.level | 0), near = ref.filter(o => Math.abs(refL(o) - L) <= 3).map(o => (o._orig || o).hp).sort((x, y) => x - y);
     const med = near[near.length >> 1] || m.hp;
     m._orig = m._orig || { hp: m.hp, atk: m.atk, def: m.def, exp: m.exp };
     m.elite = !!(m.elite || (m._orig.hp >= med * 2 && near.length >= 3));
@@ -172,8 +175,21 @@ export function migrate(p) {
   // 마지막으로 들른 마을(returnZone), 지금 있는 곳을 넣음 — 마을이 아닌 id는 townsKnown이 걸러 냄.
   if (!Array.isArray(p.towns)) p.towns = [];
   for (const z of ["town", p.returnZone, p.zone]) if (typeof z === "string" && z && !p.towns.includes(z)) p.towns.push(z);
+  migrateArcanArc(p);
   p.version = SAVE_VERSION;
   return p;
+}
+/** 2026-11-19 아르칸 서장: Lv1~10 메인은 아르칸 마을(서장 mq00a~mq00h → 거대 독버섯 q7_boss → 첫 전직 q_job1), 1장(mq01a)부터는
+ *  첫 전직 뒤. 이미 1장 이후로 나아간 예전 저장(mq01a 이상을 받았거나 마친 것)은 막히지 않게: 새 서장 단계는 완료로 넣고(보상 없음),
+ *  첫 전직 q_job1이 없으면 '받은 상태'로 넣음 → 카이리온(첫 전직이 여는 곳)이 그대로 열려 있고, 이미 전직했으면 불러올 때
+ *  QuestLog.autoComplete가 보상과 함께 바로 완료, 아직 견습생이면 Lv10에 전직하는 순간 완료. 거대 독버섯은 손대지 않음(안 했으면 나중에 할 수 있음).
+ *  여러 번 불러도 같음. 저장 형식은 그대로(v4). */
+export const ARCAN_ARC = ["mq00a", "mq00b", "mq00c", "mq00d", "mq00e", "mq00f", "mq00g", "mq00h"];
+export function migrateArcanArc(p) {
+  const qs = p.quests; if (!Array.isArray(qs)) return;
+  if (!qs.some(q => q && /^mq(0[1-9]|[1-4]\d)[a-z]$/.test(q.id))) return;
+  for (const id of ARCAN_ARC) if (!qs.some(q => q.id === id)) qs.push({ id, state: "completed", counts: [] });
+  if (!qs.some(q => q.id === "q_job1")) qs.push({ id: "q_job1", state: "active", counts: [0] });
 }
 
 // ======================================================================================= 마을 간 워프 (워프 안내인, npc.role === "warp")
@@ -207,7 +223,7 @@ export function josa(word, a, b) {
   return a;
 }
 /** "6장 안개 속 감시자 ①" → { ch: "6장", title: "안개 속 감시자 ①" } */
-export function questTitle(q) { const m = /^(\d+장)\s+(.*)$/.exec(q && q.name || ""); return m ? { ch: m[1], title: m[2] } : { ch: "", title: (q && q.name) || "" }; }
+export function questTitle(q) { const m = /^(\d+장|서장)\s+(.*)$/.exec(q && q.name || ""); return m ? { ch: m[1], title: m[2] } : { ch: "", title: (q && q.name) || "" }; }
 const qDone = (p, id) => (p.quests || []).some(x => x.id === id && x.state === "completed");
 /** 들어갈 수 없으면 { step, quest, text, short }, 들어갈 수 있으면 null */
 export function zoneLock(data, p, zoneId) {
@@ -484,16 +500,31 @@ export function questCategory(q) {
   if (q && (q.category === "main" || q.category === "sub")) return q.category;
   return q && q.objectives && q.objectives.length && q.objectives.every(o => ["kill", "collect", "equip"].includes(o.type)) ? "sub" : "main";
 }
+/** 목표가 모두 전직(job)인 퀘스트 = 전직하면 바로 완료 */
+export const isJobQuest = q => !!(q && q.objectives && q.objectives.length && q.objectives.every(o => o.type === "job"));
 export class QuestLog {
   constructor(data, ch) {
-    this.data = data; this.ch = ch; this.events = { accepted: [], updated: [], completed: [], ready: [] };
+    this.data = data; this.ch = ch; this.events = { accepted: [], updated: [], completed: [], ready: [], auto: [] };
     ch.questLog = this;
     const P = ch.p;
     P.quests = (P.quests || []).filter(q => data.quests[q.id]).map(q => {
       const d = data.quests[q.id];
       return { id: q.id, state: q.state === "completed" ? "completed" : "active", counts: d.objectives.map((o, i) => clamp((q.counts || [])[i] | 0, 0, o.count)) };
     });
-    ch.events.job.push(j => this.notify("job", j, 1));
+    ch.events.job.push(j => { this.notify("job", j, 1); this.autoComplete("job"); });
+  }
+  /** 전직 퀘스트(목표가 전직뿐인 퀘스트, 지금 서장 「첫 전직」 q_job1)는 전직하는 순간 바로 완료 — 완료 NPC에게 돌아갈 필요 없음
+   *  (2026-11-19). 받은 퀘스트만, 보상은 평소 complete 그대로(가방이 가득하면 실패 → 예전처럼 NPC에게 완료). 완료한 것마다 "auto" 이벤트
+   *  {q, err, why}. 전직 때("job")·받을 때("accept")·불러온 뒤("load", game.js) 부름. */
+  autoComplete(why = "") {
+    const out = [];
+    for (const pr of this.ch.p.quests.slice()) {
+      if (pr.state === "completed") continue;
+      const q = this.data.quests[pr.id];
+      if (!isJobQuest(q) || !this.isDone(q, pr)) continue;
+      const err = this.complete(q.id); out.push({ q, err }); this.emit("auto", { q, err, why });
+    }
+    return out;
   }
   emit(k, v) { for (const f of this.events[k]) f(v); }
   find(id) { return this.ch.p.quests.find(q => q.id === id); }
@@ -529,7 +560,7 @@ export class QuestLog {
   accept(id) {
     const q = this.data.quests[id]; if (!q || this.stateOf(q) !== QS.Available) return false;
     this.ch.p.quests.push({ id, state: "active", counts: q.objectives.map(() => 0) });
-    this.emit("accepted", q); if (this.isDone(q, this.find(id))) this.emit("ready", q); return true;
+    this.emit("accepted", q); if (this.isDone(q, this.find(id))) { this.emit("ready", q); if (isJobQuest(q)) this.autoComplete("accept"); } return true;
   }
   notify(type, target, amount) {
     for (const pr of this.ch.p.quests) {

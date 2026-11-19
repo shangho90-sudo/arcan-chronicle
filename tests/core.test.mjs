@@ -246,7 +246,16 @@ function TestQuests() {
   Ok(q.complete("q4_spore") == null, "complete q4");
   Eq(ch.bag.count("m_spore"), 2, "5 spores consumed, 2 left");
   ch.addExp(300); ch.p.level = Math.max(ch.p.level, 10); ch.recalc();
-  Ok(q.accept("q_job1") && ch.chooseJob("pharmacist") == null && q.complete("q_job1") == null, "1st advancement");
+  // 2026-11-19: 첫 전직은 아르칸 서장(mq00h) 뒤 Lv10에 받고, 전직하는 순간 바로 완료(QuestLog.autoComplete)
+  Eq(q.stateOf(d.quests["q_job1"]), QS.Locked, "1st advancement quest locked before the Arcan prologue");
+  ch.p.quests.push({ id: "mq00h", state: "completed", counts: [1, 1] });
+  const expJ = ch.p.exp, lvJ = ch.p.level, goldJ = ch.p.gold, autos = []; q.events.auto.push(e => autos.push(e));
+  Ok(q.accept("q_job1") && ch.chooseJob("pharmacist") == null, "1st advancement");
+  Ok(q.isCompleted("q_job1"), "1st advancement quest completes the moment the job changes");
+  Eq(autos.length === 1 && autos[0].why === "job" && !autos[0].err, true, "auto event (job)");
+  Eq(ch.p.gold, goldJ + d.quests["q_job1"].reward.gold, "auto completion pays the gold reward");
+  Ok(ch.p.level > lvJ || ch.p.exp > expJ, "auto completion pays the exp reward");
+  Ok(q.complete("q_job1") != null, "no second reward");
   Ok(q.accept("q5_gear"), "accept q5");
   Eq(q.stateOf(d.quests["q5_gear"]), QS.Active, "no tier2 weapon yet");
   ch.bag.add("w_pestle_2", 1);
@@ -541,9 +550,10 @@ function TestFullFlow() {
   while (ql.stateOf(d.quests["q4_spore"]) !== QS.Completable && guard++ < 100) kill("mon_shroom");
   Ok(ql.complete("q4_spore") == null, "flow: q4 done");
   while (ch.p.level < 10 && guard++ < 900) kill(ch.p.level < 6 ? "mon_shroom" : "mon_boar");
+  ch.p.quests.push({ id: "mq00g", state: "completed", counts: [] }, { id: "mq00h", state: "completed", counts: [] });   // 아르칸 서장(2026-11-19)
   Ok(ql.accept("q_job1"), "flow: accept 1st advancement (lv " + ch.p.level + ")");
   Ok(ch.chooseJob("hairdresser") == null, "flow: become a hairdresser at Lv10");
-  Ok(ql.complete("q_job1") == null, "flow: advancement quest done");
+  Ok(ql.isCompleted("q_job1"), "flow: advancement quest done the moment the job changes");
   Eq(ch.book.sk.points >= 5, true, "flow: skill points granted");
   Ok(ch.book.learn("hd1_a1") == null, "flow: learn 가위 연격");
   Ok(ql.accept("q5_gear"), "flow: accept q5 (lv " + ch.p.level + ")");
@@ -603,6 +613,22 @@ function TestQuestCategories() {
   Eq(core.questCategory({ objectives: [{ type: "kill" }, { type: "collect" }] }), "sub", "no category: kill/collect -> sub");
   Eq(core.questCategory({ objectives: [{ type: "talk" }] }), "main", "no category: talk -> main");
 }
+// 2026-11-19 첫 전직 바로 완료: 전직하고 나서 받아도 받는 순간 완료, 예전 저장(이미 전직 + 1장 이후)은 불러올 때 완료, 서장 제목
+function TestJobQuestAuto() {
+  const d = LoadData();
+  Eq(core.questTitle(d.quests.q_job1).ch, "서장", "서장 kicker"); Eq(core.questTitle(d.quests.q_job1).title, "첫 전직", "서장 title");
+  Ok(core.isJobQuest(d.quests.q_job1) && !core.isJobQuest(d.quests.mq22a) && !core.isJobQuest(d.quests.mq07c), "only pure job-change quests complete by themselves");
+  let ch = NewChar(d); ch.p.level = 10; ch.recalc(); let q = new QuestLog(d, ch);
+  ch.p.quests.push({ id: "mq00h", state: "completed", counts: [] });
+  Ok(ch.chooseJob("cook") == null, "job before taking the quest");
+  Eq(q.stateOf(d.quests.q_job1), QS.Available, "quest still offered");
+  Ok(q.accept("q_job1") && q.isCompleted("q_job1"), "accepting after the job change completes it at once");
+  const old = migrate({ version: 4, name: "옛", level: 14, job: "pharmacist", jobsUnlocked: ["novice", "pharmacist"], gold: 10, quests: [{ id: "q1_start", state: "completed" }, { id: "q2_merchant", state: "completed" }, { id: "mq01a", state: "completed" }, { id: "mq02a", state: "active" }] });
+  ch = new CharacterSheet(d, old); q = new QuestLog(d, ch);
+  Eq(q.stateOf(d.quests.q_job1), QS.Completable, "old save: job quest put in, already satisfied");
+  const r = q.autoComplete("load"); Eq(r.length === 1 && !r[0].err && q.isCompleted("q_job1"), true, "old save: completed on load");
+  Eq(ch.p.gold, 10 + d.quests.q_job1.reward.gold, "old save: reward once"); Eq(q.autoComplete("load").length, 0, "second load: nothing");
+}
 function TestAttributes() {
   const d = LoadData(); const ch = NewChar(d);
   Eq(ch.p.apoints, 0, "new character: no attribute points at Lv1");
@@ -633,7 +659,7 @@ const tests = [
   ["Data", TestData], ["Inventory", TestInventory], ["Shop", TestShop], ["Stats & equipment", TestStats],
   ["Leveling", TestLeveling], ["Jobs", TestJobs], ["Quests", TestQuests], ["Save/Load", TestSave],
   ["Hit shapes", TestShapes], ["Combat math", TestCombat], ["Status effects", TestStatus],
-  ["Geometry & nav", TestGeometry], ["Layouts", TestLayouts], ["Balance", TestBalance], ["Full flow", TestFullFlow], ["Attributes", TestAttributes], ["Quest categories", TestQuestCategories], ["Save slots", TestSaveSlots],
+  ["Geometry & nav", TestGeometry], ["Layouts", TestLayouts], ["Balance", TestBalance], ["Full flow", TestFullFlow], ["Attributes", TestAttributes], ["Quest categories", TestQuestCategories], ["Job quest auto", TestJobQuestAuto], ["Save slots", TestSaveSlots],
 ];
 for (const [name, fn] of tests) {
   const p0 = pass, f0 = fail;

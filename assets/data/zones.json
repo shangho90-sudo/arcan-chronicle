@@ -68819,7 +68819,7 @@
    ],
    "region": "kairion",
    "oriented": 180,
-   "unlock": "q7_boss"
+   "unlock": "mq00g"
   },
   {
    "id": "mist_valley",
@@ -90581,7 +90581,7 @@
      "radius": 13.0,
      "count": 7,
      "spread": 6.0,
-     "level": 8
+     "level": 12
     },
     {
      "monster": "mon_mist_fox",
@@ -90592,7 +90592,7 @@
      "radius": 12.0,
      "count": 7,
      "spread": 6.0,
-     "level": 8
+     "level": 12
     },
     {
      "monster": "mon_fog_toad",
@@ -90603,7 +90603,7 @@
      "radius": 12.0,
      "count": 7,
      "spread": 6.0,
-     "level": 9
+     "level": 13
     },
     {
      "monster": "mon_fog_toad",
@@ -90614,7 +90614,7 @@
      "radius": 12.0,
      "count": 7,
      "spread": 6.0,
-     "level": 9
+     "level": 13
     },
     {
      "monster": "mon_bog_boar",
@@ -90625,7 +90625,7 @@
      "radius": 13.0,
      "count": 5,
      "spread": 6.0,
-     "level": 10
+     "level": 14
     },
     {
      "monster": "mon_bog_boar",
@@ -90636,7 +90636,7 @@
      "radius": 12.0,
      "count": 5,
      "spread": 6.0,
-     "level": 10
+     "level": 14
     },
     {
      "monster": "mon_mist_wolf",
@@ -90647,7 +90647,7 @@
      "radius": 12.0,
      "count": 5,
      "spread": 6.0,
-     "level": 11
+     "level": 15
     },
     {
      "monster": "mon_mist_wolf",
@@ -90658,7 +90658,7 @@
      "radius": 12.0,
      "count": 5,
      "spread": 6.0,
-     "level": 11
+     "level": 15
     },
     {
      "monster": "mon_mist_bear",
@@ -90669,7 +90669,7 @@
      "radius": 12.0,
      "count": 1,
      "spread": 6.0,
-     "level": 12
+     "level": 16
     },
     {
      "monster": "mon_panda",
@@ -90680,7 +90680,7 @@
      "radius": 12.0,
      "count": 5,
      "spread": 6.0,
-     "level": 10
+     "level": 14
     }
    ],
    "boss": {
@@ -90719,8 +90719,8 @@
     430
    ],
    "level": [
-    8,
-    11
+    12,
+    15
    ],
    "region": "kairion",
    "oriented": 90,
@@ -131308,7 +131308,7 @@
    ],
    "region": "kairion",
    "biome": "town",
-   "unlock": "mq01a"
+   "unlock": "q_job1"
   },
   {
    "id": "baltern",
@@ -131320,8 +131320,8 @@
     420
    ],
    "level": [
-    8,
-    14
+    12,
+    16
    ],
    "region": "baltern",
    "biome": "town",
@@ -131439,8 +131439,8 @@
     410
    ],
    "level": [
-    2,
-    5
+    3,
+    6
    ],
    "region": "kairion",
    "biome": "meadow"
@@ -131455,8 +131455,8 @@
     465
    ],
    "level": [
-    3,
-    6
+    10,
+    13
    ],
    "region": "kairion",
    "biome": "woods",
@@ -131472,8 +131472,8 @@
     420
    ],
    "level": [
-    6,
-    9
+    11,
+    14
    ],
    "region": "kairion",
    "biome": "meadow",
@@ -131523,8 +131523,8 @@
     440
    ],
    "level": [
-    8,
-    11
+    12,
+    15
    ],
    "region": "baltern",
    "biome": "stone",
@@ -131540,8 +131540,8 @@
     340
    ],
    "level": [
-    11,
-    14
+    13,
+    16
    ],
    "region": "baltern",
    "biome": "stone",
@@ -131557,8 +131557,8 @@
     510
    ],
    "level": [
-    10,
-    13
+    13,
+    16
    ],
    "region": "baltern",
    "biome": "canyon",
@@ -131574,8 +131574,8 @@
     320
    ],
    "level": [
-    11,
-    14
+    13,
+    16
    ],
    "region": "lumiere",
    "biome": "blue",
@@ -131591,8 +131591,8 @@
     245
    ],
    "level": [
-    13,
-    16
+    14,
+    17
    ],
    "region": "lumiere",
    "biome": "blue",
@@ -132285,6 +132285,16 @@
    "order": [
     "q1_start",
     "q2_merchant",
+    "mq00a",
+    "mq00b",
+    "mq00c",
+    "mq00d",
+    "mq00e",
+    "mq00f",
+    "mq00g",
+    "q7_boss",
+    "mq00h",
+    "q_job1",
     "mq01a",
     "mq02a",
     "mq02b",
@@ -132294,12 +132304,10 @@
     "mq04a",
     "mq04b",
     "mq05a",
-    "q7_boss",
     "mq06a",
     "mq06b",
     "mq07a",
     "mq07b",
-    "q_job1",
     "mq07c",
     "mq08a",
     "mq08b",
@@ -132382,6 +132390,84 @@
       "town"
      ]
     },
+    "mq00a": {
+     "gz": "town",
+     "tz": "town",
+     "oz": [
+      "forest",
+      "forest"
+     ]
+    },
+    "mq00b": {
+     "gz": "town",
+     "tz": "town",
+     "oz": [
+      "capital_road",
+      "capital_road"
+     ]
+    },
+    "mq00c": {
+     "gz": "town",
+     "tz": "town",
+     "oz": [
+      "capital_road",
+      "capital_road"
+     ]
+    },
+    "mq00d": {
+     "gz": "town",
+     "tz": "town",
+     "oz": [
+      "forest",
+      "forest"
+     ]
+    },
+    "mq00e": {
+     "gz": "town",
+     "tz": "town",
+     "oz": [
+      "forest",
+      "forest"
+     ]
+    },
+    "mq00f": {
+     "gz": "town",
+     "tz": "town",
+     "oz": [
+      "forest"
+     ]
+    },
+    "mq00g": {
+     "gz": "town",
+     "tz": "town",
+     "oz": [
+      "mushroom_grove",
+      "mushroom_grove",
+      "mushroom_grove"
+     ]
+    },
+    "q7_boss": {
+     "gz": "town",
+     "tz": "town",
+     "oz": [
+      "mushroom_grove"
+     ]
+    },
+    "mq00h": {
+     "gz": "town",
+     "tz": "town",
+     "oz": [
+      "town",
+      "town"
+     ]
+    },
+    "q_job1": {
+     "gz": "town",
+     "tz": "town",
+     "oz": [
+      "kairion_capital"
+     ]
+    },
     "mq01a": {
      "gz": "town",
      "tz": "kairion_capital",
@@ -132450,13 +132536,6 @@
       "forest"
      ]
     },
-    "q7_boss": {
-     "gz": "town",
-     "tz": "town",
-     "oz": [
-      "mushroom_grove"
-     ]
-    },
     "mq06a": {
      "gz": "town",
      "tz": "baltern_pass",
@@ -132486,18 +132565,11 @@
       "baltern_pass"
      ]
     },
-    "q_job1": {
-     "gz": "town",
-     "tz": "town",
-     "oz": [
-      "kairion_capital"
-     ]
-    },
     "mq07c": {
      "gz": "baltern",
      "tz": "baltern",
      "oz": [
-      "kairion_capital"
+      "baltern_pass"
      ]
     },
     "mq08a": {

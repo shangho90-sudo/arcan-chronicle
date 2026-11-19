@@ -30,6 +30,10 @@ RULES = [
     (r'병든 이끼', 'moss', 0xb090c8),
     (r'이끼', 'moss', None),
     (r'약초|풀잎|허브', 'herb', None),
+    (r'^맨드레이크 뿌리', 'herb', 0xc8a070),       # 2026-11-19 서장
+    (r'^검은 수액', 'vial', 0x302838),
+    (r'^보랏빛 포자', 'seedbag', 0xa070d0),
+    (r'^마른 참나무', 'logs', 0xa07848),
     (r'죽순|대나무', 'bamboo', None),
     (r'씨앗|보리', 'seedbag', None),
     (r'꿀', 'honey', None),

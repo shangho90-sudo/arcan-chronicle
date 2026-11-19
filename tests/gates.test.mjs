@@ -1,7 +1,7 @@
 // 메인 퀘스트 입장 조건 + 필드 권장 레벨 (2026-11-15, tools/quests/gates.py → world.py --write).  Run: node tests/gates.test.mjs
 // - 메인 단계를 처음부터 끝까지 차례로 받으며, 그 단계가 쓰는 모든 지역(주는/완료 NPC, 대화·처치·줍기·방문 목표, 퀘스트 보스,
 //   목표 몬스터가 사는 곳, 2차 전직 시험 사냥터)이 열려 있고 아르칸에서 열린 지역만 지나 갈 수 있는지(막힘 없음)
-// - 처음부터 열린 곳, 카이리온은 1장부터(Lv10 전직보다 먼저), 닫힌 곳의 안내 문구, 마을 워프 차단
+// - 처음부터 열린 곳, Lv10까지 아르칸 서장, 카이리온은 서장 「첫 전직」부터(2026-11-19), 닫힌 곳의 안내 문구, 마을 워프 차단
 // - 메인 퀘스트 순서대로 필드 권장 레벨이 줄지 않고, 여는 단계의 예상 레벨과 맞으며, 몬스터 무리 레벨이 범위 안
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -55,21 +55,47 @@ for (const sid of M.order) {
   addDone(sid);
 }
 
-// 카이리온: 1장(선행 = 마을 상인 모아)부터 — Lv10 전직(길드 회관)보다 먼저
-eq(d.zones.kairion_capital.unlock, 'mq01a'); eq(d.quests.mq01a.prereq, ['q2_merchant']);
-{ const p = newProfile(d, '전직', 'f'); p.level = 10;
+// 2026-11-19 아르칸 서장: Lv10까지 메인은 아르칸 마을(주는/완료 NPC 모두 아르칸, 목표는 숲·왕도 가는 길·독버섯 군락지),
+// 카이리온은 서장 「첫 전직」(q_job1, Lv10, 선행 = 서장 끝 mq00h)부터, 1장(mq01a)은 첫 전직 뒤
+eq(d.zones.kairion_capital.unlock, 'q_job1'); eq(d.quests.q_job1.prereq, ['mq00h']); eq(d.quests.q_job1.minLevel, 10); eq(d.quests.mq01a.prereq, ['q_job1']);
+{ const arc = M.order.slice(0, M.order.indexOf('q_job1'));
+  eq(arc.slice(0, 2), ['q1_start', 'q2_merchant'], '서장은 촌장 인사부터');
+  ok(arc.includes('q7_boss') && arc.filter(id => /^mq00/.test(id)).length === 8, '서장 = mq00a~h + 거대 독버섯: ' + arc.join(','));
+  const near = new Set(['town', 'forest', 'capital_road', 'mushroom_grove']);
+  let prev = 0;
+  for (const id of arc) {
+    const q = d.quests[id], S = M.steps[id];
+    eq(S.gz, 'town', id + ' 아르칸에서 받음'); eq(S.tz, 'town', id + ' 아르칸에서 완료');
+    for (const z of S.oz) ok(!z || near.has(z), `${id} 목표 지역 ${z} 는 아르칸 근처`);
+    ok(q.minLevel >= prev && q.minLevel <= 9, `${id} Lv${q.minLevel} (서장은 Lv10 전)`); prev = q.minLevel;
+    eq(questCategory(q), 'main', id + ' 메인');
+  }
+  for (const id of M.order.slice(M.order.indexOf('mq01a'))) ok(d.quests[id].minLevel >= 10, id + ' 1장부터는 첫 전직 뒤 Lv10+');
+  const p = newProfile(d, '전직', 'f'); p.level = 10;
   ok(zoneLock(d, p, 'kairion_capital'), '처음엔 카이리온 닫힘');
-  p.quests = [{ id: 'q1_start', state: 'completed', counts: [1] }, { id: 'q2_merchant', state: 'completed', counts: [1] }];
-  ok(!zoneLock(d, p, 'kairion_capital') && !zoneLock(d, p, 'capital_road'), '모아에게 인사하면 카이리온 열림 (Lv10 전직 가능)');
-  for (const id of ['q_job1', 'mq07c']) ok(M.order.indexOf('mq01a') < M.order.indexOf(id), id + ' 보다 먼저 열림');
+  p.quests = ['q1_start', 'q2_merchant', 'mq00a', 'mq00b', 'mq00c', 'mq00d', 'mq00e', 'mq00f', 'mq00g', 'q7_boss'].map(id => ({ id, state: 'completed', counts: [] }));
+  ok(zoneLock(d, p, 'kairion_capital') && !zoneLock(d, p, 'capital_road') && !zoneLock(d, p, 'mushroom_grove'), '서장 중에는 카이리온 닫힘');
+  eq(zoneLock(d, p, 'kairion_capital').text, '메인 퀘스트 서장 「첫 전직」을 진행해야 들어갈 수 있습니다');
+  p.quests.push({ id: 'mq00h', state: 'completed', counts: [] });
+  ok(!zoneLock(d, p, 'kairion_capital'), '서장을 마치면 카이리온 열림 (Lv10 전직)');
   ok(Object.values(d.npcs).filter(x => x.role === 'jobmaster').every(m => Object.values(Z).some(z => z.id === 'kairion_capital' && (z.npcs || []).some(x => x.npc === m.id))), '전직 마스터는 카이리온에');
+  ok(!d.quests.mq07c.objectives.some(o => o.type === 'job'), '7장 ③은 더 이상 전직 목표가 아님(중복 없음)');
+  eq(d.questList.filter(q => questCategory(q) === 'main' && q.objectives.some(o => o.type === 'job' && o.target === 'any')).map(q => q.id), ['q_job1'], '1차 전직 메인 단계는 하나');
+}
+// 예전 저장(1장 이후로 나아간 것): 서장은 완료로, 첫 전직은 받은 상태로 → 카이리온이 막히지 않음
+{ const o1 = migrate({ version: 4, name: '옛1', level: 6, job: 'novice', zone: 'kairion_hunt', quests: [{ id: 'q1_start', state: 'completed' }, { id: 'q2_merchant', state: 'completed' }, { id: 'mq01a', state: 'completed' }, { id: 'mq02a', state: 'completed' }, { id: 'mq02b', state: 'active', counts: [2, 0] }] });
+  ok(!zoneLock(d, o1, 'kairion_capital') && !zoneLock(d, o1, 'kairion_hunt'), '예전 저장(2장 진행 중, Lv6 견습생): 카이리온·사냥터 그대로 열림');
+  eq(o1.quests.find(q => q.id === 'q_job1').state, 'active', '첫 전직은 받은 상태'); ok(o1.quests.find(q => q.id === 'mq00h').state === 'completed', '서장은 완료');
+  const n1 = o1.quests.length; migrate(o1); eq(o1.quests.length, n1, '두 번 불러도 같음');
+  const o2 = migrate({ version: 4, name: '옛2', level: 3, quests: [{ id: 'q1_start', state: 'completed' }, { id: 'q2_merchant', state: 'completed' }] });
+  ok(!o2.quests.some(q => /^mq00|q_job1/.test(q.id)), '1장 전의 예전 저장은 서장을 처음부터');
 }
 
 // 안내 문구 · 마을 워프 · 예전 저장
 { const p = newProfile(d, '문', 'm'); p.gold = 9999; p.towns = ['town', 'baltern'];
   const L = zoneLock(d, p, 'mist_valley'); ok(L && L.step === 'mq06a', '안개 골짜기 = 6장');
   eq(L.text, '메인 퀘스트 6장 「안개 속 감시자 ①」을 진행해야 들어갈 수 있습니다'); eq(L.short, '6장 「안개 속 감시자 ①」 필요');
-  const G2 = zoneLock(d, p, 'mushroom_grove'); ok(G2 && /「거대 독버섯」을 진행해야 들어갈 수 있습니다 \(먼저 「.+」 완료\)$/.test(G2.text), '선행 서브 퀘스트 안내: ' + G2.text);
+  const G2 = zoneLock(d, p, 'mushroom_grove'); eq(G2 && G2.text, '메인 퀘스트 서장 「보랏빛 포자」를 진행해야 들어갈 수 있습니다', '서장 안내: ' + (G2 && G2.text));
   eq(warpBlock(d, p, 'town', 'baltern'), zoneLock(d, p, 'baltern').text, '가 본 마을이어도 메인 퀘스트로 닫히면 워프 막힘');
   eq(josa('가을의 납품', '을', '를'), '을'); eq(josa('검은 피의 사슴 ②', '을', '를'), '를'); eq(josa('별을 잇는 자 ② (에필로그)', '을', '를'), '를'); eq(josa('거대 독버섯', '을', '를'), '을');
   const old = migrate({ version: 4, name: '옛', level: 30, zone: 'frost_highland', returnZone: 'baltern', returnSpawn: 'revive', quests: [] });
