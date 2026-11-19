@@ -1,0 +1,157 @@
+{
+ "spent": 35,
+ "done": {
+  "ds_snip_open": {
+   "prompt": "large ornate golden tailor scissors opening with a smooth metallic slide and a tiny shimmering sparkle, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 0.5,
+   "task": "19255689-9b6f-44cb-bf76-45b0e7f8dc0b",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.5
+  },
+  "ds_snip": {
+   "prompt": "big magical tailor scissors snapping shut, crisp sharp metal snip with a bright crystal chime and a quick fabric tear, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 0.6,
+   "task": "6654936c-dd28-49da-8bfe-5d64d27ab06b",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.5
+  },
+  "ds_snip_silver": {
+   "prompt": "giant silver scissors slicing shut with a high ringing metallic schwing and a sparkling glass shimmer tail, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 0.7,
+   "task": "e17aab09-ba61-4cae-8135-edc2789c60ab",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.65
+  },
+  "ds_needle": {
+   "prompt": "tiny golden sewing needle piercing through cloth with a small bright metallic ting, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 0.4,
+   "task": "e08fe674-ee5f-4fba-a3de-1e1476843105",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.44
+  },
+  "ds_thread": {
+   "prompt": "magical golden thread pulled tight with a stretching zip and a twinkling harp pluck at the end, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 0.8,
+   "task": "f79f81b2-fa28-4aa3-a104-4b45fc63fdce",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.55
+  },
+  "ds_pin": {
+   "prompt": "jeweled pins snapping into place, quick crisp metallic clicks with a sparkling gem chime, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 0.5,
+   "task": "9558d6a2-be31-4fa2-b955-50b128df92c0",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.55
+  },
+  "ds_silk": {
+   "prompt": "long silk fabric flying through the air, soft swooshing flutter of satin with a light magical shimmer, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 0.8,
+   "task": "9aa30721-0212-4e7b-8318-b7b2a437df9f",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.84
+  },
+  "ds_silk_hit": {
+   "prompt": "quick soft slap of silk ribbon striking, short swish with a light sparkle, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 0.4,
+   "task": "937e8944-0a85-430b-b766-aeb8bbb5898c",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.39
+  },
+  "ds_cloth": {
+   "prompt": "satin cloth whipping and fluttering in a short burst, fabric snap with a soft whoosh, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 0.6,
+   "task": "9614d553-a4ed-4f7a-a583-dbf044d535ff",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.63
+  },
+  "ds_ribbon": {
+   "prompt": "graceful ribbon dance swirling around, airy spinning whoosh of silk ribbons with soft glittering chimes, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 1.0,
+   "task": "65adae77-8429-468d-8896-d9565ef6d81e",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.97
+  },
+  "ds_whoosh": {
+   "prompt": "fast elegant dash past the listener, swift fabric whoosh with a tiny sparkle trail, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 0.5,
+   "task": "4efe58f6-6b00-4809-82ab-738b50a12b48",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.52
+  },
+  "ds_spot": {
+   "prompt": "a magical stage spotlight switching on, bright ascending glass chime with a warm shimmering glow, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 1.0,
+   "task": "ee17a847-7fc5-4380-997c-44dca69b5e21",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 1.04
+  },
+  "ds_unfold": {
+   "prompt": "a large magical sewing pattern paper unfolding in the air, crisp paper rustle with a rising mystical hum, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 1.2,
+   "task": "fd8c61c8-b40c-4c3e-b469-800e373bb792",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 1.2
+  },
+  "ds_finale": {
+   "prompt": "grand finale giant golden scissors slam shut with a powerful metallic crash, then a sparkling magical shimmer burst and glittering tail, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 1.4,
+   "task": "56af86f1-4685-409f-ae1f-efc9ebdada92",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 1.44
+  },
+  "ds_sparkle": {
+   "prompt": "a cute bright magical sparkle pop, twinkling star chimes bursting outward, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 0.6,
+   "task": "ee269a08-bab0-4c5a-88c7-b827308116a1",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.63
+  },
+  "ds_sigil": {
+   "prompt": "a pastel magic circle forming on the ground, soft rising shimmer hum with gentle bell tones, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 1.0,
+   "task": "c4d68cad-da2d-4413-9d0d-50220414a3da",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 1.02
+  },
+  "ds_jewel": {
+   "prompt": "a precious gemstone brooch gleaming, high crystal ting with a sparkling glint, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 0.7,
+   "task": "40461bed-03ba-4714-a668-5b7a73febdd2",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.71
+  },
+  "ds_mannequin": {
+   "prompt": "a wooden tailor mannequin assembling with a soft knock and a magical poof of glitter, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 0.8,
+   "task": "08ab7d1e-9958-4cd3-8235-f198ad0843b5",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.84
+  },
+  "ds_flashbulb": {
+   "prompt": "fashion runway camera flashes, a few quick vintage flash bulb pops and shutter clicks with a magical shimmer, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+   "duration": 0.8,
+   "task": "b2a535e2-60ad-4377-99fe-2533c69862c5",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.84
+  }
+ }
+}

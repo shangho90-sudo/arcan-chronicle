@@ -1,26 +1,147 @@
 {
-  "provider": "synthesized (tools/audio/designer_sfx.py, numpy + scipy, fixed seed)",
-  "generatedOn": "2026-11-16",
-  "note": "디자이너 2차 스킬. 직접 합성 — 같은 이름의 파일로 바꿔 넣으면 교체됨.",
-  "assets": [
-    "sfx_ds_cloth.mp3",
-    "sfx_ds_finale.mp3",
-    "sfx_ds_flashbulb.mp3",
-    "sfx_ds_jewel.mp3",
-    "sfx_ds_mannequin.mp3",
-    "sfx_ds_needle.mp3",
-    "sfx_ds_pin.mp3",
-    "sfx_ds_ribbon.mp3",
-    "sfx_ds_sigil.mp3",
-    "sfx_ds_silk.mp3",
-    "sfx_ds_silk_hit.mp3",
-    "sfx_ds_snip.mp3",
-    "sfx_ds_snip_open.mp3",
-    "sfx_ds_snip_silver.mp3",
-    "sfx_ds_sparkle.mp3",
-    "sfx_ds_spot.mp3",
-    "sfx_ds_thread.mp3",
-    "sfx_ds_unfold.mp3",
-    "sfx_ds_whoosh.mp3"
-  ]
+ "provider": "synthesized (tools/audio/designer_sfx.py, numpy + scipy, fixed seed)",
+ "generatedOn": "2026-11-16",
+ "note": "디자이너 2차 스킬. 2026-11-17 fx2: 효과음을 Runway eleven_text_to_sound_v2로 새로 만듦(runway 항목). 예전 합성음 14개는 같은 이름으로 덮어씀(합성 스크립트 designer_sfx.py는 대체용으로 남김 — 다시 돌리면 Runway 소리를 덮어쓰니 주의).",
+ "assets": [
+  "sfx_ds_cloth.mp3",
+  "sfx_ds_finale.mp3",
+  "sfx_ds_flashbulb.mp3",
+  "sfx_ds_jewel.mp3",
+  "sfx_ds_mannequin.mp3",
+  "sfx_ds_needle.mp3",
+  "sfx_ds_pin.mp3",
+  "sfx_ds_ribbon.mp3",
+  "sfx_ds_sigil.mp3",
+  "sfx_ds_silk.mp3",
+  "sfx_ds_silk_hit.mp3",
+  "sfx_ds_snip.mp3",
+  "sfx_ds_snip_open.mp3",
+  "sfx_ds_snip_silver.mp3",
+  "sfx_ds_sparkle.mp3",
+  "sfx_ds_spot.mp3",
+  "sfx_ds_thread.mp3",
+  "sfx_ds_unfold.mp3",
+  "sfx_ds_whoosh.mp3"
+ ],
+ "runway": {
+  "provider": "runway eleven_text_to_sound_v2 · 2026-11-19부터 eleven 이 THROTTLED 로 밀리면 같은 프롬프트로 mirelo_sfx_2_0 — 소리마다 model (tools/audio/designer_runway_sfx.py)",
+  "generatedOn": "2026-11-19",
+  "creditsSpent": 35,
+  "assets": {
+   "sfx_ds_cloth.mp3": {
+    "prompt": "satin cloth whipping and fluttering in a short burst, fabric snap with a soft whoosh, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 0.6,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_ds_finale.mp3": {
+    "prompt": "grand finale giant golden scissors slam shut with a powerful metallic crash, then a sparkling magical shimmer burst and glittering tail, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 1.4,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_ds_flashbulb.mp3": {
+    "prompt": "fashion runway camera flashes, a few quick vintage flash bulb pops and shutter clicks with a magical shimmer, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 0.8,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_ds_jewel.mp3": {
+    "prompt": "a precious gemstone brooch gleaming, high crystal ting with a sparkling glint, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 0.7,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_ds_mannequin.mp3": {
+    "prompt": "a wooden tailor mannequin assembling with a soft knock and a magical poof of glitter, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 0.8,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_ds_needle.mp3": {
+    "prompt": "tiny golden sewing needle piercing through cloth with a small bright metallic ting, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 0.4,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_ds_pin.mp3": {
+    "prompt": "jeweled pins snapping into place, quick crisp metallic clicks with a sparkling gem chime, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 0.5,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_ds_ribbon.mp3": {
+    "prompt": "graceful ribbon dance swirling around, airy spinning whoosh of silk ribbons with soft glittering chimes, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 1.0,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_ds_sigil.mp3": {
+    "prompt": "a pastel magic circle forming on the ground, soft rising shimmer hum with gentle bell tones, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 1.0,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_ds_silk.mp3": {
+    "prompt": "long silk fabric flying through the air, soft swooshing flutter of satin with a light magical shimmer, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 0.8,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_ds_silk_hit.mp3": {
+    "prompt": "quick soft slap of silk ribbon striking, short swish with a light sparkle, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 0.4,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_ds_snip.mp3": {
+    "prompt": "big magical tailor scissors snapping shut, crisp sharp metal snip with a bright crystal chime and a quick fabric tear, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 0.6,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_ds_snip_open.mp3": {
+    "prompt": "large ornate golden tailor scissors opening with a smooth metallic slide and a tiny shimmering sparkle, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 0.5,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_ds_snip_silver.mp3": {
+    "prompt": "giant silver scissors slicing shut with a high ringing metallic schwing and a sparkling glass shimmer tail, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 0.7,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_ds_sparkle.mp3": {
+    "prompt": "a cute bright magical sparkle pop, twinkling star chimes bursting outward, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 0.6,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_ds_spot.mp3": {
+    "prompt": "a magical stage spotlight switching on, bright ascending glass chime with a warm shimmering glow, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 1.0,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_ds_thread.mp3": {
+    "prompt": "magical golden thread pulled tight with a stretching zip and a twinkling harp pluck at the end, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 0.8,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_ds_unfold.mp3": {
+    "prompt": "a large magical sewing pattern paper unfolding in the air, crisp paper rustle with a rising mystical hum, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 1.2,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_ds_whoosh.mp3": {
+    "prompt": "fast elegant dash past the listener, swift fabric whoosh with a tiny sparkle trail, bright magical fantasy RPG skill sound effect, clean, short, no music, no voice",
+    "duration": 0.5,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   }
+  }
+ }
 }
