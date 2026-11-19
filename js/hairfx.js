@@ -29,6 +29,7 @@
 // shears, the lines and the flash stay. No global bloom / exposure / hit-stop is touched here.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { gfxOn } from './gfxq.js';
 
 export const HAIR = {
   intensity: 1.0,
@@ -396,8 +397,10 @@ export class HairFx {
     });
     e.g.position.copy(last);
     const cb = this.model(e, 'tripo_comb', 'hair_comb', { rim: 0xffffff, spec: 0.7 }), gl = this.spr(e, 0, HAIR.col.pink, HAIR.col.violet, 3);
-    if (cb) cb.scale.setScalar(K.size);
-    return { set: (p) => { const n = P3(p); n.y += 0.15; _c.copy(n).sub(last); if (_c.lengthSq() > 1e-7) vel.copy(_c).normalize(); last.copy(n); e.g.position.copy(n); }, dispose: () => this._free(e), dir: vel };
+    // 리마스터(품질 높음·보통, js/rmfx.js): 빗을 1.5배로 + 분홍 빛 리본·반짝이 궤적(빗은 그대로 돎) — 낮음은 예전 그대로
+    const tr = this.rm && gfxOn() ? this.rm.tracer(pos, { col: HAIR.col.pinkB, hi: 0xffffff, w: 0.32, glow: 0.8 }) : null;
+    if (cb) cb.scale.setScalar(K.size * (tr ? 1.5 : 1));
+    return { set: (p) => { const n = P3(p); n.y += 0.15; _c.copy(n).sub(last); if (_c.lengthSq() > 1e-7) vel.copy(_c).normalize(); last.copy(n); e.g.position.copy(n); if (tr) tr.set({ x: p.x, y: (p.y || 0) + 0.15, z: p.z }); }, dispose: () => { this._free(e); if (tr) tr.dispose(); }, dir: vel };
   }
   combHit(pos, o = {}) {
     if (!this._ok()) return null;
@@ -409,6 +412,7 @@ export class HairFx {
     for (let i = -2; i <= 2; i++) { const m = this.spr(e, 2, 0xffffff, i % 2 ? HAIR.col.violet : HAIR.col.pinkB, 7); m.position.copy(sd).multiplyScalar(i * 0.11); this._alignLine(m, d); ls.push(m); }   // comb-teeth marks: five thin parallel lines
     const fl = this.spr(e, 3, 0xffffff, HAIR.col.pink, 8);
     if (hit) this.strands(c, lite() ? 1 : 3, { ground: c.y - 0.8 });
+    if (hit && this.rm && gfxOn()) this.rm.burstOn({ pos: { x: pos.x, y: (pos.y || 0) - 0.75, z: pos.z }, radius: 0.5 }, { col: HAIR.col.pinkB, hi: 0xffffff, dir: o.dir, sparks: 7 });   // 리마스터: 섬광·땅 고리·빛줄기
     return e;
   }
 

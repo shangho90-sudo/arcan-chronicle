@@ -35,6 +35,7 @@ void main(){ vUv = uv; vN = normalize(normalMatrix * normal); vec4 mv = modelVie
 // uS shape: 0 energy body (fresnel: bright core where it faces the camera, uW -> uB towards the rim) / 1 halo shell (only the rim glows)
 //           2 crown petals (v = height: wet paint, light rim at the tips, erodes from the tips with uE) / 3 ground ring (v across: thin bright edge + soft inner)
 //           4 flash quad (four-point star + round core) / 5 ground stain disc (noisy edge, uE erodes) / 6 soft round glow quad
+//           7 / 8 / 9 sword energy core / body / halo on rm_cres (uE = head 0..1 along the swing, uT = tail length)
 const FS = `uniform vec3 uW, uB; uniform float uA, uS, uE, uT, uQ, uAdd; varying vec2 vUv; varying vec3 vN, vV;
 float h21(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f); return mix(mix(h21(i), h21(i + vec2(1., 0.)), f.x), mix(h21(i + vec2(0., 1.)), h21(i + vec2(1., 1.)), f.x), f.y); }
@@ -50,7 +51,14 @@ void main(){
   else if (uS < 5.5) { vec2 p = vUv * 2. - 1.; float r = length(p), ang = atan(p.y, p.x); float nz = vn(vec2(ang * 2.5 + uQ, uQ)) * .22 + vn(p * 5. + uQ) * .12;
     float R = .78 + nz; a = smoothstep(R, R - .07, r) * (1. - smoothstep(uE - .1, uE, vn(p * 3.2 + uQ * 2.) * .8 + r * .35));
     float q = vn(p * 9. + uQ); core = smoothstep(R - .1, R - .02, r) * .5 + q * .25; }
-  else { vec2 p = vUv * 2. - 1.; float r = length(p); a = pow(clamp(1. - r, 0., 1.), 2.); core = pow(clamp(1. - r * 1.8, 0., 1.), 2.); }
+  else if (uS < 6.5) { vec2 p = vUv * 2. - 1.; float r = length(p); a = pow(clamp(1. - r, 0., 1.), 2.); core = pow(clamp(1. - r * 1.8, 0., 1.), 2.); }
+  else {   // 7 blade core / 8 blade body / 9 blade halo: wipe along the swing (head uE, tail length uT), bright at the head
+    float u = vUv.x, v = vUv.y, dh = uE - u, w = smoothstep(-.02, .03, dh) * (1. - smoothstep(uT * .55, uT, dh)), hd = exp(-max(dh, 0.) * 5.);
+    float ends = smoothstep(0., .08, u) * smoothstep(1., .9, u);
+    if (uS < 7.5) { a = exp(-pow((v - .9) * 9., 2.)) * (.45 + .9 * hd); core = 1.; }
+    else if (uS < 8.5) { a = smoothstep(.25, .75, v) * smoothstep(1.02, .9, v) * (.45 + .55 * hd); core = smoothstep(.6, 1., v); a *= .85 + .15 * vn(vec2(u * 30. + uQ, v * 4.)); }
+    else { a = exp(-pow((v - .7) * 2.6, 2.)) * .7 * (.4 + .6 * hd) * (.7 + .3 * vn(vec2(u * 12. - uQ * 3., v * 3.))); core = .2; }
+    a *= w * ends; }
   vec3 c = mix(uB, uW, clamp(core, 0., 1.));
   if (uAdd > .5) gl_FragColor = vec4(c * clamp(a, 0., 2.) * uA, 1.); else gl_FragColor = vec4(c, clamp(a, 0., 1.) * uA);
 }`;
@@ -289,6 +297,106 @@ export class RmFx {
     this.emit('streak', nS, () => { const a = rnd(0, Math.PI * 2); _b.set(Math.cos(a), rnd(-0.2, 0.9), Math.sin(a)).addScaledVector(dir, -0.6).normalize();
       return { p: front, v: _c.copy(_b).multiplyScalar(rnd(4, 7)), s: rnd(0.05, 0.08), col: hi, life: rnd(0.14, 0.22), drag: 7, stretch: 0.09 }; });
     if (!low) this.emit('star', 4, () => ({ p: _a.copy(front).add(_b.set(rnd(-0.3, 0.3), rnd(-0.1, 0.4), rnd(-0.3, 0.3))), v: _c.set(rnd(-0.4, 0.4), rnd(0.6, 1.3), rnd(-0.4, 0.4)), s: rnd(0.05, 0.09), col: 0xffffff, life: rnd(0.45, 0.7), spin: 5, t: -rnd(0.05, 0.2) }));
+    return e;
+  }
+
+  // ================================================================== 검기 층 (견습생 '연' nv_a2 — yeonfx.js가 자기 반달 그룹에 붙임)
+  /** pooled layer mesh outside an effect (the caller owns the parent) */
+  _take(kind, geo, o) { const e = { items: [], g: { add() {} } }; const m = this._m(e, kind, geo, o); return m; }
+  _give(m) { if (!m) return; if (m.parent) m.parent.remove(m); (this.pool[m.userData.kind] || (this.pool[m.userData.kind] = [])).push(m); }
+  /** three layers of a 3D crescent (rm_cres / rm_cres_big) added to `parent` (yeonfx strike arc group: radius 1, swing from +X side):
+   *  halo (wide soft, additive) / body (alpha: readable on a bright floor) / core (thin white-hot cutting edge, additive) */
+  bladeLayers(parent, o = {}) {
+    if (!this.ready) return null;
+    const geo = o.fin ? this.geo.rm_cres_big : this.geo.rm_cres, c1 = o.c1 ?? 0x78dfff, c2 = o.c2 ?? 0x8a65ff;
+    const halo = this._take('add', geo, { w: c1, b: c2, s: 9, order: 8 }), body = this._take('alpha', geo, { w: c1, b: c2, s: 8, order: 9 }), core = this._take('add', geo, { w: 0xffffff, b: 0xffffff, s: 7, order: 10 });
+    for (const m of [halo, body, core]) { m.material.depthTest = false; parent.add(m); }
+    halo.scale.set(1.07, 1, 1.07); body.scale.set(1, 1, 1);
+    return { halo, body, core, fin: !!o.fin };
+  }
+  /** per frame: head 0..1 along the swing, tail length, fade 0..1, k = intensity */
+  bladeSet(L, head, tail, fade, k = 1) {
+    if (!L) return; const I = RMFX.intensity * rawK() * k;
+    for (const [m, a] of [[L.halo, 1.1 * I], [L.body, 0.85], [L.core, 2.0 * I]]) { const u = m.material.uniforms; u.uE.value = head; u.uT.value = Math.max(0.001, tail); u.uA.value = a * fade; m.visible = fade > 0.003; }
+    // sparkle dust shed from the moving head of the blade (the outer cutting edge), while it sweeps
+    const par = L.core.parent;
+    if (par && head > 0.04 && head < 0.99 && fade > 0.3 && (L.n++ % (L.lite ? 3 : 1)) === 0) {
+      const a = (L.a0 + (L.a1 - L.a0) * head) * Math.PI / 180, p = par.localToWorld(_a.set(Math.sin(a) * 0.96, 0, Math.cos(a) * 0.96));
+      this.emit('star', 1, () => ({ p, v: _c.set(rnd(-0.5, 0.5), rnd(0.2, 1.1), rnd(-0.5, 0.5)), s: rnd(0.035, 0.06), col: rand() < 0.5 ? 0xffffff : L.c1, life: rnd(0.25, 0.4), spin: 7, drag: 2 }));
+      if (L.fin || !L.lite) this.emit('streak', 1, () => ({ p, v: _c.set(rnd(-1, 1), rnd(0, 1.5), rnd(-1, 1)), s: 0.04, col: L.c1, life: 0.14, drag: 6, stretch: 0.12 }));
+    }
+  }
+  bladeFree(L) { if (!L) return; this._give(L.halo); this._give(L.body); this._give(L.core); }
+  /** a sword hit: white streak sparks thrown along the cut + stars; the finisher adds a ground shock ring pair and a flat crescent wave
+   *  running forward on the ground (all at the real target, never wider than ~1.6 m) */
+  slashHit(pos, o = {}) {
+    if (!this.ok()) return null;
+    const low = rmLite(), fin = !!o.fin, c1 = o.c1 ?? 0x78dfff, c2 = o.c2 ?? 0x8a65ff, at = P3(pos), gy = o.groundY != null ? o.groundY : at.y - 0.85, I = RMFX.intensity * rawK();
+    const f = o.dir ? new THREE.Vector3(o.dir.x, 0, -o.dir.z).normalize() : new THREE.Vector3(0, 0, -1), tan = o.tan || new THREE.Vector3(-f.z, 0, f.x);
+    const nS = Math.round((fin ? 12 : 5) * (low ? RMFX.liteK : 1));
+    this.emit('streak', nS, () => { _b.copy(tan).multiplyScalar(rand() < 0.7 ? 1 : -1).addScaledVector(f, rnd(0.2, 0.9)).add(_c.set(rnd(-0.3, 0.3), rnd(-0.1, 0.8), rnd(-0.3, 0.3))).normalize();
+      return { p: at, v: _b.multiplyScalar(rnd(5, 9) * (fin ? 1.2 : 1)), s: rnd(0.045, 0.07), col: rand() < 0.5 ? 0xffffff : c1, life: rnd(0.12, 0.2), drag: 8, stretch: 0.08 }; });
+    if (!fin) return null;
+    if (!low) this.emit('star', 5, () => ({ p: _a.copy(at).add(_b.set(rnd(-0.4, 0.4), rnd(-0.2, 0.5), rnd(-0.4, 0.4))), v: _c.set(rnd(-0.5, 0.5), rnd(0.8, 1.6), rnd(-0.5, 0.5)), s: rnd(0.06, 0.1), col: rand() < 0.5 ? 0xffffff : c1, life: rnd(0.5, 0.75), spin: 6, t: -rnd(0, 0.15) }));
+    const R = Math.min(1.7, o.r ?? 1.5), life = 0.55;
+    const e = this._fx('slashFin', life, (e) => { const t = e.t;
+      const k1 = (t - 0.0) / 0.24, k2 = (t - 0.07) / 0.3;
+      r1.visible = k1 > 0 && k1 < 1; r1.scale.set(R * (0.2 + 0.8 * easeOut(k1)), 1, R * (0.2 + 0.8 * easeOut(k1))); r1.material.uniforms.uA.value = I * 1.2 * (1 - smooth(0.4, 1, k1)); r1.material.uniforms.uT.value = t;
+      r2.visible = k2 > 0 && k2 < 1; r2.scale.set(R * 0.75 * (0.2 + 0.8 * easeOut(k2)), 1, R * 0.75 * (0.2 + 0.8 * easeOut(k2))); r2.material.uniforms.uA.value = I * 0.8 * (1 - smooth(0.3, 1, k2));
+      // flat crescent wave sliding forward along the ground (head sweeps across, then it fades)
+      const kw = t / 0.32; wave.position.copy(_a.copy(f).multiplyScalar(0.35 + 0.9 * easeOut(kw))).setY(gy - at.y + 0.08); const ws = R * (0.6 + 0.5 * easeOut(kw)); wave.scale.set(ws, ws, ws);
+      wave.material.uniforms.uE.value = 0.2 + 1.0 * easeOut(kw * 1.6); wave.material.uniforms.uT.value = 1.2; wave.material.uniforms.uA.value = I * 1.1 * (1 - smooth(0.5, 1, kw)); wave.visible = kw < 1;
+      waveB.position.copy(wave.position); waveB.scale.copy(wave.scale); waveB.material.uniforms.uE.value = wave.material.uniforms.uE.value; waveB.material.uniforms.uT.value = 1.2; waveB.material.uniforms.uA.value = 0.6 * (1 - smooth(0.4, 1, kw)); waveB.visible = wave.visible;
+    });
+    e.g.position.copy(at);
+    const r1 = this._m(e, 'add', this.geo.rm_ring, { w: 0xffffff, b: c1, s: 3, order: 4 }), r2 = this._m(e, 'add', this.geo.rm_ring, { w: c1, b: c2, s: 3, order: 4 });
+    r1.position.y = gy - at.y + 0.06; r2.position.y = gy - at.y + 0.07;
+    const wave = this._m(e, 'add', this.geo.rm_cres_big, { w: 0xffffff, b: c1, s: 7, order: 5 }), waveB = this._m(e, 'alpha', this.geo.rm_cres_big, { w: 0xffffff, b: c1, s: 8, order: 4 });
+    _q.setFromUnitVectors(_c.set(0, 0, 1), f); wave.quaternion.copy(_q); waveB.quaternion.copy(_q);
+    return e;
+  }
+
+  // ================================================================== 공용 빛 궤적 + 명중 (빗 투척·스타카토 등 — 직업 모듈의 투사체 메시는 그대로 두고 둘레에 덧그림)
+  /** tracer around an existing projectile: additive halo + light ribbon + sparkle dust; handle {set(pos), hit(), dispose()} */
+  tracer(pos, o = {}) {
+    if (!this.ok()) return null;
+    const low = rmLite(), col = o.col ?? 0xff9ad0, hi = o.hi ?? 0xffffff, I = RMFX.intensity * rawK(), N = low ? 9 : (o.trail || 14), w = o.w || 0.3;
+    const last = P3(pos), pts = []; let dT = 0, dead = false, hitAt = -1;
+    const e = this._fx('tracer', 6, (e, dt) => {
+      const born = smooth(0, 0.05, e.t), pul = 1 + 0.12 * Math.sin(e.t * 28);
+      this._face(gl, (o.glow || 0.75) * pul); gl.material.uniforms.uA.value = I * 0.55 * born;
+      pts.push(e.g.position.clone()); if (pts.length > N) pts.shift();
+      this._ribFill(rib, pts, (k) => w * 0.55 * Math.pow(k, 0.9)); rib.material.uniforms.uA.value = I * 1.1 * born;
+      this._ribFill(ribP, pts, (k) => w * Math.pow(k, 0.7)); ribP.material.uniforms.uA.value = 0.85 * born;
+      dT -= dt; if (dT <= 0) { dT = low ? 0.05 : 0.025; const P = e.g.position;
+        this.emit('star', 1, () => ({ p: _a.copy(P).add(_b.set(rnd(-0.12, 0.12), rnd(-0.1, 0.1), rnd(-0.12, 0.12))), v: _c.set(rnd(-0.3, 0.3), rnd(0.2, 0.8), rnd(-0.3, 0.3)), s: rnd(0.03, 0.055), col: rand() < 0.5 ? hi : col, life: 0.32, spin: 7 })); }
+    });
+    e.g.position.copy(last);
+    const gl = this._m(e, 'add', this.quad, { w: hi, b: col, s: 6, order: 4 });
+    const rib = this._rib(N), ribP = this._rib(N); rib.material = rib.userData.mats[1]; ribP.material = ribP.userData.mats[0];   // additive light core over a coloured (alpha) ribbon — readable on a bright floor
+    for (const [m, a, b, o2] of [[ribP, o.light ?? col, col, 4], [rib, hi, col, 5]]) { const u = m.material.uniforms; u.uW.value.setHex(a); u.uB.value.setHex(b); u.uQ.value = rnd(0, 20); u.uA.value = 0; m.renderOrder = o2; this.root.add(m); }
+    e.ribs = [ribP, rib];
+    e.handle = { set: (p) => { last.copy(P3(p)); e.g.position.copy(last); }, _markHit: () => { hitAt = this.frame; },
+      dispose: () => { if (dead) return; dead = true; if (hitAt !== this.frame) this.emit('star', low ? 3 : 6, () => ({ p: e.g.position, v: _c.set(rnd(-1, 1), rnd(0.2, 1.4), rnd(-1, 1)), s: rnd(0.03, 0.05), col, life: 0.4, spin: 5 })); this._fadeTrail(e, 0.2); } };
+    return e.handle;
+  }
+  /** generic layered hit: 0.05 s white star flash + coloured glow core + thin ground shock ring + spark streaks + stars (t = actor) */
+  burstOn(t, o = {}) {
+    if (!this.ok() || !t || !t.pos) return null;
+    for (const x of this.live) if (x.kind === 'tracer' && x.handle && x.g.position.distanceTo(_a.set(t.pos.x, x.g.position.y, -t.pos.z)) < (t.radius || 0.5) + 1.2) x.handle._markHit();
+    const low = rmLite(), col = o.col ?? 0xff9ad0, hi = o.hi ?? 0xffffff, I = RMFX.intensity * rawK(), r = t.radius || 0.5, at = P3(t.pos), gy = at.y; at.y += Math.min(1.25, 0.45 + r * 0.6);
+    const dir = o.dir ? new THREE.Vector3(o.dir.x, 0, -o.dir.z).normalize() : new THREE.Vector3(0, 0, -1), front = at.clone().addScaledVector(dir, -r * 0.6), sz = o.size || 1, R = Math.min(1.3, 0.6 + r * 0.9) * sz;
+    const e = this._fx('burstOn', 0.5, (e) => { const tt = e.t;
+      this._face(fl, 1.0 * sz * (0.55 + 0.6 * easeOut(tt / 0.035))); fl.rotateZ(0.6); fl.material.uniforms.uA.value = I * 1.35 * (1 - smooth(0.015, 0.06, tt));
+      this._face(gw, 0.9 * sz * (0.6 + 0.6 * easeOut(tt / 0.1))); gw.material.uniforms.uA.value = I * 0.65 * (1 - smooth(0.04, 0.24, tt));
+      const kr = (tt - 0.015) / 0.25; ring.visible = kr > 0 && kr < 1; ring.scale.set(R * (0.25 + 0.75 * easeOut(kr)), 1, R * (0.25 + 0.75 * easeOut(kr))); ring.material.uniforms.uA.value = I * (1 - smooth(0.45, 1, kr)); ring.material.uniforms.uT.value = tt;
+    });
+    e.g.position.copy(front);
+    const fl = this._m(e, 'add', this.quad, { w: 0xffffff, b: hi, s: 4, order: 9 }), gw = this._m(e, 'add', this.quad, { w: hi, b: col, s: 6, order: 8 });
+    const ring = this._m(e, 'add', this.geo.rm_ring, { w: hi, b: col, s: 3, order: 4 }); ring.position.set(at.x - front.x, gy - front.y + 0.06, at.z - front.z);
+    this.emit('streak', Math.round((o.sparks || 6) * (low ? RMFX.liteK : 1)), () => { const a = rnd(0, Math.PI * 2); _b.set(Math.cos(a), rnd(-0.1, 0.9), Math.sin(a)).addScaledVector(dir, -0.7).normalize();
+      return { p: front, v: _c.copy(_b).multiplyScalar(rnd(4, 7)), s: rnd(0.045, 0.07), col: rand() < 0.5 ? hi : col, life: rnd(0.12, 0.2), drag: 7, stretch: 0.09 }; });
+    if (!low) this.emit('star', 4, () => ({ p: _a.copy(front).add(_b.set(rnd(-0.3, 0.3), rnd(-0.1, 0.4), rnd(-0.3, 0.3))), v: _c.set(rnd(-0.4, 0.4), rnd(0.6, 1.2), rnd(-0.4, 0.4)), s: rnd(0.05, 0.08), col: rand() < 0.5 ? 0xffffff : col, life: rnd(0.4, 0.6), spin: 5, t: -rnd(0.03, 0.15) }));
     return e;
   }
 

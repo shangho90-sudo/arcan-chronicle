@@ -21,6 +21,7 @@
 // Tuning: YEON (intensity, size, speed) — window.YEON_FX at runtime.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { gfxOn } from './gfxq.js';
 
 export const YEON = { white: 0xffffff, sky: 0x78dfff, violet: 0x8a65ff, pink: 0xff8bd8, intensity: 1, size: 1, speed: 1, hitSize: 1 };
 export const LEAD = 0.05;            // s: the crescent starts drawing this long before the damage frame
@@ -147,6 +148,9 @@ export class YeonFx {
     for (const mm of [...Object.values(s.mains), ...s.ghosts, s.tip, s.star]) { mm.material.uniforms.uC1.value.copy(c1); mm.material.uniforms.uC2.value.copy(c2); }
     s.ghostN = lo ? 1 : 2; s.ghosts.forEach((g, i) => { g.visible = i < s.ghostN; g.rotation.set(0, 0, (i + 1) * 0.07 * (i % 2 ? -1 : 1)); g.scale.setScalar(1 - 0.06 * (i + 1)); });
     s.star.visible = !lo;
+    // 리마스터(품질 높음·보통, js/rmfx.js): 같은 반달 그룹에 입체 검기 세 층(외곽 빛·색 몸통·흰 칼날)을 얹음 — 마지막 타는 큰 두 겹 반달
+    if (s.rmL) { this.rm.bladeFree(s.rmL); s.rmL = null; }
+    if (this.rm && gfxOn() && this.rm.ready) s.rmL = this.rm.bladeLayers(s.arc, { fin: fin || y.p === 'ring', c1: c1.getHex(), c2: c2.getHex() });
     this._place(s); this.root.add(s.g); this.live.push(s); this._strikeTick(s, 0); return s;
   }
   /** centre = chest of the caster (rides the lunge), radius = real sword-tip distance (until the impact) */
@@ -174,6 +178,7 @@ export class YeonFx {
     const mm = U(s.main); mm.uHead.value = Math.max(head, s.lead > 0 ? 0 : 0.45); mm.uTail.value = Math.max(0.001, tail); mm.uA.value = fade;
     mm.uI.value = (fin ? 1.7 : 1.35) * k * (fin ? rawK() : 1); mm.uR.value = fin ? 1.25 : 1.0; mm.uMix.value = 0.15 + 0.6 * smooth(0, end, u);
     s.arc.visible = fade > 0.002;
+    if (s.rmL) this.rm.bladeSet(s.rmL, Math.max(head, s.lead > 0 ? 0 : 0.45), tail, fade, k);
     s.ghosts.forEach((g, i) => {
       if (i >= s.ghostN) return;
       const d = 0.022 * (i + 1), gu = u - d, gh = s.lead > 0 && gu < 0 ? 0.62 * easeIn((t - d) / s.lead) : 0.62 + 0.38 * easeOut(gu / 0.05);
@@ -213,6 +218,7 @@ export class YeonFx {
       const v = s.tan.clone().multiplyScalar(along * rnd(0.5, 1)).addScaledVector(fwd, rnd(0.1, 0.8)).add(new THREE.Vector3(rnd(-0.3, 0.3), rnd(-0.2, 0.7), rnd(-0.3, 0.3))).normalize().multiplyScalar(sp);
       s.sh.push({ p: new THREE.Vector3(), v, life: rnd(0.16, 0.3) * (s.fin ? 1.3 : 1), len: rnd(0.14, 0.28) * (s.fin ? 1.3 : 1), hue: rnd(0, 0.4) });
     }
+    if (this.rm && gfxOn() && !s.whiff) this.rm.slashHit(pos, { fin: s.fin, dir: { x: dx, z: -dz }, tan: s.tan, c1: c1.getHex(), c2: c2.getHex() });   // 리마스터: 빛줄기 스파크 + (마지막 타) 땅 충격파 고리·땅을 미끄러지는 반달 파동
     this.root.add(s.g); this.live.push(s); this._hitTick(s, 0); return s;
   }
   _hitTick(s, dt) {
@@ -266,9 +272,9 @@ export class YeonFx {
     for (let i = this.live.length - 1; i >= 0; i--) {
       const s = this.live[i]; s.t += dt;
       const alive = s.kind === 'strike' ? this._strikeTick(s, dt) : this._hitTick(s, dt);
-      if (!alive) { this.root.remove(s.g); s.follow = null; this.live.splice(i, 1); const f = this.free[s.kind]; if (f.length < 10) f.push(s); }
+      if (!alive) { if (s.rmL) { this.rm.bladeFree(s.rmL); s.rmL = null; } this.root.remove(s.g); s.follow = null; this.live.splice(i, 1); const f = this.free[s.kind]; if (f.length < 10) f.push(s); }
     }
   }
-  clear() { for (const s of this.live) { this.root.remove(s.g); s.follow = null; this.free[s.kind].push(s); } this.live.length = 0; }
+  clear() { for (const s of this.live) { if (s.rmL && this.rm) { this.rm.bladeFree(s.rmL); s.rmL = null; } this.root.remove(s.g); s.follow = null; this.free[s.kind].push(s); } this.live.length = 0; }
 }
 if (typeof window !== 'undefined') window.YEON_FX = YEON;

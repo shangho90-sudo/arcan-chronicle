@@ -290,6 +290,8 @@ export class ArtFx {
     if (!this._ok()) return null;
     // 리마스터(품질 높음·보통, 2026-11-19): 물감 탄환 = 세 층 혜성 + 꼬리 리본 + 물감 방울 (js/rmfx.js paintComet) — 낮음은 아래 예전 그대로
     if (o.kind === 'blob' && this.rm && gfxOn() && this.rm.ok()) { const h = this.rm.paintComet(pos, { col: o.col ?? C.blu }); if (h) return h; }
+    // 스타카토 음표: 음표 메시는 그대로 + 금·보라 빛 리본·반짝이 궤적(리마스터)
+    const ntr = o.kind === 'note' && this.rm && gfxOn() ? this.rm.tracer(pos, { col: (o.idx || 0) % 2 ? C.violetB : C.goldB, hi: (o.idx || 0) % 2 ? C.violet : C.gold, w: 0.26, glow: 0.7, trail: 10 }) : null;
     const note = o.kind === 'note', last = P3(pos), vel = new THREE.Vector3(0, 0, 1), idx = o.idx || 0, low = lite();
     const col = note ? (idx % 2 ? C.violetB : C.goldB) : (o.col ?? C.blu); let dropT = 0;
     const e = this._fx('proj', 6, (e, dt) => {
@@ -302,13 +304,14 @@ export class ArtFx {
     e.g.position.copy(last);
     const mb = this.solid(e, note ? (idx % 3 === 2 && this.geo.art_note2 ? this.geo.art_note2 : this.geo.art_note) : this.geo.art_blob, { tint: col, rim: note ? 0xffffff : light(col, 0.6), spec: 0.9, glow: note ? 0.6 : 0 });
     const gl = this.spr(e, 0, note ? C.gold : light(col, 0.4), note ? C.violetB : col, 3); mb.renderOrder = 6;
-    return { set: (p) => { const n = P3(p); _c.copy(n).sub(last); if (_c.lengthSq() > 1e-7) vel.copy(_c).normalize(); last.copy(n); e.g.position.copy(n); }, dispose: () => this._free(e) };
+    return { set: (p) => { const n = P3(p); _c.copy(n).sub(last); if (_c.lengthSq() > 1e-7) vel.copy(_c).normalize(); last.copy(n); e.g.position.copy(n); if (ntr) ntr.set(p); }, dispose: () => { this._free(e); if (ntr) ntr.dispose(); } };
   }
   projHit(t, o = {}) {
     if (!this._ok() || !t || !t.pos) return null;
     if (o.kind !== 'note' && this.rm && gfxOn() && this.rm.ready) { const r = this.rm.paintImpact(t, { col: o.col ?? C.blu, dir: o.dir }); if (r) return r; }   // 리마스터: 섬광 → 물감 왕관 → 땅 충격파 → 얼룩
     const at = P3(t.pos); at.y += artMid(t);
     if (o.kind !== 'note') return this._splash(at, o.col ?? C.blu, { big: true, ground: t.pos.y || 0, size: Math.min(1.15, 0.7 + (t.radius || 0.5) * 0.45), cols: [o.col ?? C.blu, C.white, light(o.col ?? C.blu, 0.4)] });
+    if (this.rm && gfxOn()) this.rm.burstOn(t, { col: (o.idx || 0) % 2 ? C.violetB : C.goldB, hi: (o.idx || 0) % 2 ? C.violet : C.gold, dir: o.dir, size: 0.8, sparks: 5 });   // 리마스터: 섬광·땅 고리·빛줄기 (아래 별·음표는 그대로)
     // staccato: a short sharp star, one thin ring, two tiny notes hopping off — over in 0.25 s
     const I = ART.intensity, life = 0.26, idx = o.idx || 0, w = idx % 2 ? C.violet : C.gold, b = idx % 2 ? C.violetB : C.goldB;
     const e = this._fx('notehit', life, (e) => { const k = e.t / life;
