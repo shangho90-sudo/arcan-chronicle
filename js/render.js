@@ -752,7 +752,8 @@ export class TelegraphView {
 //   천(나머지) = 가장자리 보풀 빛 + 그늘을 조금 올림. 빛은 장면의 해(directionalLights[0]) 하나 — 따로 조명을 두지 않음.
 // 값은 RMC(조절값), 품질 '낮음'이면 이 코드가 아예 들어가지 않음(예전 셰이더와 똑같음).
 export const RMC = { debug: false, skin: 0.7, hair: 0.85, leather: 0.55, metal: 0.8, cloth: 0.14 };
-const REMASTER_CHAR = `
+// per-model tuning (model.js REMASTER_TUNE): skinSat = [lo, hi] saturation where skin starts (cook: the cream hat on the head is not skin)
+const rmChar = (t = {}) => `
   {
     vec3 al = diffuseColor.rgb, sr = pow(max(al, vec3(1e-4)), vec3(1. / 2.2));
     float mx = max(sr.r, max(sr.g, sr.b)), mn = min(sr.r, min(sr.g, sr.b)), ch = mx - mn, sa = ch / max(mx, 1e-3);
@@ -762,7 +763,7 @@ const REMASTER_CHAR = `
     float warmHue = smoothstep(2., 10., hu) * (1. - smoothstep(38., 46., hu));
     float head = clamp(vHead, 0., 1.);
     // skin only on the head (face / ears / neck top): the light warm coats and bright hair highlights share the colour range
-    float skin = warmHue * smoothstep(.1, .17, sa) * (1. - smoothstep(.34, .44, sa)) * smoothstep(.62, .74, mx) * smoothstep(.35, .7, head);
+    float skin = warmHue * smoothstep(${(t.skinSat || [.1, .17])[0].toFixed(3)}, ${(t.skinSat || [.1, .17])[1].toFixed(3)}, sa) * (1. - smoothstep(.34, .44, sa)) * smoothstep(.62, .74, mx) * smoothstep(.35, .7, head);
     float hair = head * (1. - skin) * (1. - smoothstep(.9, .97, mx));
     float brown = warmHue * smoothstep(.3, .42, sa) * (1. - smoothstep(.66, .8, mx));
     float leather = (1. - head) * brown * (1. - skin);
@@ -834,11 +835,11 @@ export function paintMat(m, o = {}) {
   outgoingLight = mix(vec3(dot(outgoingLight, vec3(.299, .587, .114))), outgoingLight, ${sat});
   float fr = pow(1. - clamp(dot(vN, vV), 0., 1.), 3.);
   outgoingLight += vec3(${rim.map(v => v.toFixed(3)).join(', ')}) * fr * ${rk} * (.4 + .6 * smoothstep(-.2, .6, wN.y));
-${RM ? (RMC.debug ? '#define RM_DEBUG\n' : '') + REMASTER_CHAR : ''}
+${RM ? (RMC.debug ? '#define RM_DEBUG\n' : '') + rmChar(typeof o.remaster === 'object' ? o.remaster : {}) : ''}
 }
 #include <opaque_fragment>`);
   };
-  m.customProgramCacheKey = () => key + '|paint' + rk + sat + rim.join(',') + (soft ? 's' : '') + (rm && gfxOn() ? '|rm1' + (RMC.debug ? 'd' : '') : '');
+  m.customProgramCacheKey = () => key + '|paint' + rk + sat + rim.join(',') + (soft ? 's' : '') + (rm && gfxOn() ? '|rm1' + (RMC.debug ? 'd' : '') + (typeof o.remaster === 'object' ? JSON.stringify(o.remaster) : '') : '');
   m.needsUpdate = true; return m;
 }
 

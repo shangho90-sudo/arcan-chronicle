@@ -588,7 +588,12 @@ class SwingTrail {
 }
 
 // 리마스터 파일럿(2026-11-19): 재질 구분 셰이더를 쓰는 플레이어 모델 — 지금은 약사 남녀만(사용자 확인 뒤 넓힘)
-export const REMASTER_MODELS = /^pharmacist_[mf]$/;
+// 2026-11-19 6단계: 1차 직업 5개(남녀) + 견습생(boy/girl) 모두 — 2차 직업은 1차 몸을 그대로 씀. NPC 몸(npc_*)도(REMASTER_NPC).
+export const REMASTER_MODELS = /^(pharmacist|blacksmith|cook|hairdresser|artist)_[mf]$|^(boy|girl)$/;
+export const REMASTER_NPC = true;
+// 모델별 재질 구분 조정(render.js rmChar): 요리사 모자(머리 위 크림색)가 피부로 잡혀 피부 채도 문턱을 올림
+export const REMASTER_TUNE = { cook_m: { skinSat: [0.2, 0.27] }, cook_f: { skinSat: [0.2, 0.27] }, npc_cook: { skinSat: [0.2, 0.27] } };
+const rmOpt = (cfg) => REMASTER_TUNE[cfg.tex || cfg.file] || REMASTER_TUNE[cfg.file] || true;
 let shadowMat = null;
 const shadowGeo = new THREE.PlaneGeometry(1, 0.85);
 
@@ -602,7 +607,7 @@ export class ModelBody {
     this.root = new THREE.Group();
     this.mat = new THREE.MeshLambertMaterial({ map: md.texture, emissive: 0xffffff, emissiveIntensity: 0 });
     // 2026-11-13: rim cooler and weaker (the warm rim on a warm plaza did not separate); the outline hull does that now
-    paintMat(this.mat, md.cfg.npc ? { rim: [1.0, 0.9, 0.74], rimK: 0.16, sat: 1.08, soft: true } : { rim: [0.92, 0.94, 1.0], rimK: 0.14, sat: 1.08, soft: true, remaster: REMASTER_MODELS.test(md.cfg.file) });   // soft volume, weak rim (2026-11-14)
+    paintMat(this.mat, md.cfg.npc ? { rim: [1.0, 0.9, 0.74], rimK: 0.16, sat: 1.08, soft: true, remaster: REMASTER_NPC && rmOpt(md.cfg) } : { rim: [0.92, 0.94, 1.0], rimK: 0.14, sat: 1.08, soft: true, remaster: REMASTER_MODELS.test(md.cfg.file) && rmOpt(md.cfg) });   // soft volume, weak rim (2026-11-14)
     this.mesh = new THREE.SkinnedMesh(md.geometry, this.mat);
     this.mesh.castShadow = true; this.mesh.frustumCulled = false;
     this.mesh.scale.setScalar(md.scale);

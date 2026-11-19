@@ -5,7 +5,7 @@
 const { chromium } = require('playwright'); const fs = require('fs'); const { execSync } = require('child_process');
 const SIZE = process.env.SIZE || '1280x720', TOUCH = SIZE.endsWith('t'), [VW, VH] = SIZE.replace('t', '').split('x').map(Number);
 const G_ = process.env.GENDER || 'm', OUT = process.env.OUT || '/tmp/remaster/probe', ZOOM = +(process.env.ZOOM || 3.2), DIR = +(process.env.DIR || 200);
-const VARS = (process.env.VARIANTS || 'low,high,debug').split(','), JOB = process.env.JOB || 'pharmacist';
+const VARS = (process.env.VARIANTS || 'low,high,debug').split(','), JOBS = (process.env.JOBS || process.env.JOB || 'pharmacist').split(','), GENDERS = (process.env.GENDERS || G_).split(',');
 (async () => {
   fs.mkdirSync(OUT, { recursive: true });
   const b = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
@@ -17,10 +17,11 @@ const VARS = (process.env.VARIANTS || 'low,high,debug').split(','), JOB = proces
   await ev(() => { localStorage.clear(); localStorage.setItem('arcan_settings', JSON.stringify({ gfxQuality: 'low' })); }); await pg.reload(); await click('게임 시작 (새 게임)'); await click('모험 시작');
   await pg.waitForSelector('.prologue.on', { timeout: 60000 }).then(() => click('건너뛰기')).catch(() => {});
   await pg.waitForFunction(() => window.G && G.inWorld && G.player && !G.loading && G.player.body && G.player.body.md, null, { timeout: 300000 });
+  for (const JOB of JOBS) for (const G_ of GENDERS) {
   await ev(async ([g, job, z, dir, sp]) => {
     G.frame = () => {}; document.querySelectorAll('.hud,.controls,.toasts,.qhud,.qh-reopen,.plates,.layer:not(.controls)').forEach(e => e.style.display = 'none');
     if (G.reward) { G.reward.jobChange = sw => sw && sw(); G.reward.levelUp = () => {}; }
-    G.dev.level(12); G.sheet.p.gender = g; G.dev.job(job); G.sheet.bag.add('w_pestle_1', 1); G.sheet.p.weapon = 'w_pestle_1'; G.sheet.recalc();
+    G.dev.level(job === 'novice' ? 5 : 12); G.sheet.p.gender = g; G.sheet.p.job = 'novice'; if (job !== 'novice') G.dev.job(job); G.sheet.recalc(); G.sheet.bag.add('w_pestle_1', 1); G.sheet.p.weapon = 'w_pestle_1'; G.sheet.recalc();
     await G.player.attachBody(); const p = G.player, a = dir * Math.PI / 180;
     const spot = G.zone.geo.nearestFree(sp[0], sp[1], 0.4); p.teleport(spot); p.body.place(p.pos); p.setFacing(Math.sin(a), Math.cos(a)); p.body.play('idle', 1, true);
     for (const n of G.zone.npcs) if (n.body && n.pos && Math.hypot(n.pos.x - spot.x, n.pos.z - spot.z) < 3) n.body.setVisible && n.body.setVisible(false);
@@ -40,5 +41,6 @@ const VARS = (process.env.VARIANTS || 'low,high,debug').split(','), JOB = proces
   const out = `${OUT}/probe_${JOB}_${G_}_${SIZE}_sheet.png`;
   fs.writeFileSync('/tmp/_rmprobe.py', `from PIL import Image, ImageDraw\nfr=${JSON.stringify(files)}\nlab=${JSON.stringify(VARS)}\nims=[Image.open(f).convert('RGB') for f in fr]\nw,h=ims[0].size\nsh=Image.new('RGB',(w*len(ims),h+24),(20,20,28))\nd=ImageDraw.Draw(sh)\nfor i,im in enumerate(ims):\n  sh.paste(im,(i*w,24)); d.text((i*w+6,5),lab[i],fill=(255,255,255))\nsh.save('${out}')\n`);
   execSync('python3 /tmp/_rmprobe.py'); console.log('sheet', out, 'errors', errs.filter(e => !/favicon/.test(e)).slice(0, 8));
+  }
   await b.close();
 })();
