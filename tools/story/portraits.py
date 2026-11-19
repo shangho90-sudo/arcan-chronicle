@@ -70,6 +70,47 @@ CAST = {
     'boldran':   ('볼드란', '전설의 대장장이', ['볼드란'], "BOLDRAN, a legendary old blacksmith. Bald with a thick braided grey beard, leather apron, soot-stained strong arms, big hammer, regretful eyes."),
     'erdin':     ('에르딘', '왕실 대장장이', ['에르딘'], "ERDIN, a young royal blacksmith. Freckles, goggles on the head, leather apron over a work shirt, tongs in hand, eager."),
     'ruin_monk': ('유디트', '살아남은 수도사', ['유디트'], "YUDIT, a surviving monk of the ruined temple. Young woman with short ash hair, grey-ivory monk robes with burn marks, clutching records."),
+    # 2026-11-20 둘째 묶음: 메인 장면에 나오는데 3D 반신 렌더로 나오던 NPC(아르칸 마을 사람·전직 마스터·라엘). 색·옷은 게임 3D 모델을 따름
+    # (자기 메시가 있는 사람은 USE_REF로 그 렌더를 참고, 다른 메시를 색만 바꿔 빌려 쓴 주민은 글로만 — 역할과 모델이 어긋나서)
+    'merchant':  ('모아', '잡화 상인', ['모아'], "MOA, the cheerful item merchant girl of Arcan village. Light brown braids under an olive hood, amber "
+                  "eyes, cream blouse, satchel and belt of potion bottles, holding up a red potion, friendly grin."),
+    'armorer':   ('단오', '무기 상인', ['단오'], "DANO, Arcan's weapon dealer, a sturdy man in his 30s. Wavy brown hair, short beard, navy work vest with a crest over a cream "
+                  "shirt, leather gloves, holding a short sword, confident smile."),
+    'town_armor': ('보라', '방어구·장신구 상인', ['보라'], "BORA, the armor and trinket seller of Arcan village, a young woman. Light brown hair with a violet hood and violet-plum "
+                  "dress, small round shield on her back, a violet gem amulet in her hand, warm sales smile."),
+    'guard':     ('도윤', '경비병', ['도윤'], "DOYUN, the young village guard of Arcan. Short brown hair, round gold-trimmed steel helmet with a blue plume, blue tabard "
+                  "with a gold fleur emblem over steel plate, a long spear, earnest dutiful face."),
+    'warp_town': ('미르', '워프 안내인', ['미르'], "MIR, the warp guide of Arcan village, a gentle young woman. Long dark brown hair with a pale blue flower ornament, "
+                  "layered indigo and teal mystic robe with silver embroidery, a small glowing blue warp stone floating above her palm, calm smile."),
+    'arcan_guide': ('하늘', '전직 안내인', ['하늘'], "HANEUL, the friendly job guide of Arcan village, a young man. Fluffy sky-blue hair, light blue scarf, cream and sky-blue "
+                  "traveler coat, a small open guidebook in one hand, pointing the way with the other, bright helpful smile."),
+    'arcan_pharm_clerk': ('다래', '약국 점원', ['다래'], "DARAE, the pharmacy clerk of Arcan village, a kind young woman. Black hair tied with a cream flower hairpin, dark green "
+                  "and cream herbalist apron dress, a mortar and pestle with fresh herbs in her hands, soft caring smile."),
+    'arcan_smith_boy': ('쇠돌', '대장간 견습', ['쇠돌'], "SOEDOL, a young boy apprentice blacksmith of Arcan village, about 12, short and spirited. Messy black hair, soot "
+                  "smudge on his cheek, no beard, dark green leather apron over a rolled-sleeve shirt, oversized gloves, a small hammer on "
+                  "his shoulder, proud cheeky grin."),
+    'arcan_innkeeper': ('보름', '여관 주인', ['보름'], "BOREUM, the warm-hearted innkeeper of Arcan village, a plump cheerful woman in her 40s. Dark green hair in a bun, "
+                  "white cook cap, cream blouse, green apron, holding a steaming bowl of stew, motherly smile."),
+    'arcan_miller': ('곡이', '풍차지기', ['곡이'], "GOGI, the old windmill keeper of Arcan village. Round glasses, bushy white beard and eyebrows, teal hooded work cloak, "
+                  "flour-dusted sleeves, a small sack of flour under one arm, kindly cheerful face."),
+    'arcan_child': ('토리', '마을 아이', ['토리'], "TORI, a lively little village girl of Arcan, about 8. Lime-green twin pigtails, big green eyes, leaf-green dress with a "
+                  "cream collar, a shiny coin held up in her fingers, mischievous wink."),
+    'arcan_farmer': ('한솔', '농부', ['한솔'], "HANSOL, a hard-working young farmer of Arcan village. Tanned skin, short dark hair under a straw hat, green neckerchief, "
+                  "purple vest over a cream work shirt, a bunch of fresh white-purple turnips in his arms, honest smile."),
+    'arcan_granny': ('옥분', '꽃 가꾸는 할머니', ['옥분'], "OKBUN, a sweet little grandmother of Arcan who tends flowers. Silver-white hair in a bun with a flower, rosy cheeks, "
+                  "olive shawl over a cream dress, a watering can and a pot of pink flowers, gentle crinkled smile."),
+    'master_pharmacist': ('소연', '약사 마스터', ['소연'], "SOYEON, the pharmacist guild master, a graceful woman. Long black hair with a cream flower and gold hairpin, dark "
+                  "green robe with gold embroidery, a stone mortar and herbs, wise calm smile."),
+    'master_cook': ('금강', '요리사 마스터', ['금강'], "GEUMGANG, the cook guild master, an energetic young man. Brown hair, tall white chef hat with a gold emblem, cream chef "
+                  "jacket, teal neckerchief, a frying pan in hand, hearty grin."),
+    'master_blacksmith': ('철산', '대장장이 마스터', ['철산'], "CHEOLSAN, the blacksmith guild master, a huge muscular man. Black hair, thick black beard, sleeveless cream shirt "
+                  "under a heavy brown leather apron, a big hammer, stern but kind eyes."),
+    'master_hairdresser': ('리라', '미용사 마스터', ['리라'], "LIRA, the hairdresser guild master, a stylish confident woman. Wavy rose-auburn hair in a high ponytail, cream blouse, "
+                  "coral-red sash and skirt, large golden scissors, playful wink."),
+    'master_artist': ('노을', '예술가 마스터', ['노을'], "NOEUL, the artist guild master, a dreamy young man. Tousled light brown hair, dark beret with a feather, dark navy "
+                  "coat over cream clothes, a paint palette and long brush, gentle smile."),
+    'silvern_hunter': ('라엘', '실베른 사냥꾼', ['라엘'], "RAEL, a keen-eyed hunter of the Silvern forests, a lean young woman. Short silver-ash hair, forest-green hooded "
+                  "cloak, brown leather jerkin, a longbow and quiver of arrows, a wolf-fang charm at her neck, cool focused gaze."),
 }
 
 
@@ -90,7 +131,9 @@ def call(method, path, body=None):
 
 # 참고 그림(3D 렌더)을 쓰는 인물: 자기 모델이 있는 아스텔, 그리고 마을 촌장. 나머지 이야기 NPC는 다른 NPC 모델을 빌려 써서
 # (예: 저스티나 = 약사 모델) 렌더를 따르면 이야기 설정(은발 대사제 등)과 어긋나므로 글로만 만듦.
-USE_REF = {'astel', 'elder'}
+USE_REF = {'astel', 'elder',
+           # 2026-11-20: 자기 메시를 그대로 쓰는 마을 상인·경비병·전직 마스터
+           'merchant', 'armorer', 'guard', 'master_pharmacist', 'master_cook', 'master_blacksmith', 'master_hairdresser', 'master_artist'}
 
 
 def ref_path(key):
@@ -98,9 +141,13 @@ def ref_path(key):
     return p if key in USE_REF and p.exists() else None
 
 
+def tag(key):
+    return key.replace('_', '')[:16]            # referenceImages tag: 16자 이하
+
+
 def prompt(key):
     n, t, _, desc = CAST[key]
-    ref = f" Match the character's colors, hair and outfit to the reference image @{key.replace('_', '')}." if ref_path(key) else ''
+    ref = f" Match the character's colors, hair and outfit to the reference image @{tag(key)}." if ref_path(key) else ''
     return f'{desc}{ref} {STYLE}'
 
 
@@ -144,7 +191,7 @@ def run(keys):
         tid = state.get(key)
         if not tid or os.environ.get('FORCE'):
             body = {'model': MODEL, 'promptText': prompt(key)[:1000], 'ratio': RATIO, **EXTRA}
-            if ref_path(key): body['referenceImages'] = [{'uri': data_uri(ref_path(key)), 'tag': key.replace('_', '')}]
+            if ref_path(key): body['referenceImages'] = [{'uri': data_uri(ref_path(key)), 'tag': tag(key)}]
             tid = call('POST', '/v1/text_to_image', body)['id']; state[key] = tid; STATE.write_text(json.dumps(state, indent=1))
             print(key, '작업', tid)
         for _ in range(120):

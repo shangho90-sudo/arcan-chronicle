@@ -140,6 +140,139 @@
       "names": [
         "저스티나"
       ]
+    },
+    "arcan_smith_boy": {
+      "file": "arcan_smith_boy.webp",
+      "facing": "right",
+      "names": [
+        "쇠돌"
+      ]
+    },
+    "merchant": {
+      "file": "merchant.webp",
+      "facing": "right",
+      "names": [
+        "모아"
+      ]
+    },
+    "armorer": {
+      "file": "armorer.webp",
+      "facing": "right",
+      "names": [
+        "단오"
+      ]
+    },
+    "town_armor": {
+      "file": "town_armor.webp",
+      "facing": "right",
+      "names": [
+        "보라"
+      ]
+    },
+    "guard": {
+      "file": "guard.webp",
+      "facing": "right",
+      "names": [
+        "도윤"
+      ]
+    },
+    "warp_town": {
+      "file": "warp_town.webp",
+      "facing": "right",
+      "names": [
+        "미르"
+      ]
+    },
+    "arcan_guide": {
+      "file": "arcan_guide.webp",
+      "facing": "right",
+      "names": [
+        "하늘"
+      ]
+    },
+    "arcan_pharm_clerk": {
+      "file": "arcan_pharm_clerk.webp",
+      "facing": "right",
+      "names": [
+        "다래"
+      ]
+    },
+    "arcan_innkeeper": {
+      "file": "arcan_innkeeper.webp",
+      "facing": "right",
+      "names": [
+        "보름"
+      ]
+    },
+    "arcan_miller": {
+      "file": "arcan_miller.webp",
+      "facing": "right",
+      "names": [
+        "곡이"
+      ]
+    },
+    "arcan_child": {
+      "file": "arcan_child.webp",
+      "facing": "right",
+      "names": [
+        "토리"
+      ]
+    },
+    "arcan_farmer": {
+      "file": "arcan_farmer.webp",
+      "facing": "right",
+      "names": [
+        "한솔"
+      ]
+    },
+    "arcan_granny": {
+      "file": "arcan_granny.webp",
+      "facing": "right",
+      "names": [
+        "옥분"
+      ]
+    },
+    "master_pharmacist": {
+      "file": "master_pharmacist.webp",
+      "facing": "right",
+      "names": [
+        "소연"
+      ]
+    },
+    "master_cook": {
+      "file": "master_cook.webp",
+      "facing": "right",
+      "names": [
+        "금강"
+      ]
+    },
+    "master_blacksmith": {
+      "file": "master_blacksmith.webp",
+      "facing": "right",
+      "names": [
+        "철산"
+      ]
+    },
+    "master_hairdresser": {
+      "file": "master_hairdresser.webp",
+      "facing": "right",
+      "names": [
+        "리라"
+      ]
+    },
+    "master_artist": {
+      "file": "master_artist.webp",
+      "facing": "right",
+      "names": [
+        "노을"
+      ]
+    },
+    "silvern_hunter": {
+      "file": "silvern_hunter.webp",
+      "facing": "right",
+      "names": [
+        "라엘"
+      ]
     }
   }
 }

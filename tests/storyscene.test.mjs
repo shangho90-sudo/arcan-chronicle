@@ -51,6 +51,15 @@ for (const nm of ['아스텔', '카스티야', '카일러스', '케린', '저스
 ok(res('그레이스') === 'mon:qb_grace_1' && res('말라키온') === 'mon:qb_malachion', '그레이스·말라키온 → 이야기 보스');
 const man = JSON.parse(readFileSync(new URL('../assets/ui/story/portraits.json', import.meta.url), 'utf8'));
 for (const [k, v] of Object.entries(man.portraits || {})) ok(existsSync(new URL('../assets/ui/story/' + v.file, import.meta.url)), '초상 파일 ' + k);
+// 2D 일러스트가 없는 메인 장면 NPC 화자(tools/story/missing_art.mjs): 2026-11-20에 그린 사람은 꼭 그림이 있어야 하고(아래 목록),
+// 그 뒤에 새로 생긴 화자는 3D 반신 렌더로 나오므로 실패가 아니라 '참고'로만 출력 — 새 일러스트는 tools/story/portraits.py
+const { mainSpeakers, missingArt } = await import('../tools/story/missing_art.mjs');
+const spk = mainSpeakers(d, { parseStory, makeResolver }, questCategory), noArt = missingArt(spk, man);
+const ART_REQUIRED = ['elder', 'astel', 'merchant', 'arcan_smith_boy', 'arcan_pharm_clerk', 'arcan_innkeeper', 'guard', 'arcan_guide', 'armorer', 'town_armor', 'warp_town',
+  'master_pharmacist', 'master_cook', 'master_blacksmith', 'master_hairdresser', 'master_artist', 'silvern_hunter'];
+for (const k of ART_REQUIRED) ok(man.portraits[k] && existsSync(new URL('../assets/ui/story/' + man.portraits[k].file, import.meta.url)), '일러스트 ' + k);
+for (const [k, v] of Object.entries(man.portraits)) ok(v.facing === 'right' && Array.isArray(v.names), '초상 manifest ' + k);
+console.log(`  참고: 메인 장면 NPC 화자 ${spk.size}명 중 2D 일러스트 없음 ${noArt.length}명${noArt.length ? ' — ' + noArt.map(s => s.key + '(' + s.name + ')').join(', ') : ''}`);
 console.log(`storyscene: ${n} 통과 — 메인 ${mains.length}개, ${pages}쪽, 화자 있는 쪽 ${speakers}(NPC ${npcSpk}), 이어지지 않은 이름: ${[...unknown].map(([a, b]) => a + '×' + b).join(', ') || '없음'}`);
 
 // 대화 상자 글꼴(2026-11-17): 주아체 + 보충 DialogExtra 부분 집합에 메인 대사·프롤로그·상자 UI 글자가 빠짐없이 들어 있는지

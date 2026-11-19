@@ -33,7 +33,7 @@ const fails = [], errs = []; const ok = (c, m) => { console.log((c ? '  ok   ' :
     const toEnd = async () => { for (let k = 0; k < 40; k++) { const s = await st(); if (!s || (s.end && !s.typing)) return s; await tapNext(); } return st(); };
 
     await pg.goto(URL, { timeout: 300000 }); await ev(() => localStorage.clear()); await pg.reload({ timeout: 300000 });
-    await click('새 게임'); await click('모험 시작'); await pg.waitForSelector('.prologue.on', { timeout: 60000 }); await click('건너뛰기');
+    await click(await pg.evaluate(() => [...document.querySelectorAll('button,[role=button],[aria-label]')].some(b => (b.getAttribute('aria-label') || b.textContent || '').trim() === '새 게임') ? '새 게임' : '게임 시작 (새 게임)')); await click('모험 시작'); await pg.waitForSelector('.prologue.on', { timeout: 60000 }); await click('건너뛰기');
     await pg.waitForFunction(() => !document.querySelector('.prologue'), null, { timeout: 300000 }); await inZone('town');
     await pg.waitForTimeout(3000);
 

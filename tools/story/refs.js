@@ -9,7 +9,7 @@ const KEYS = (process.env.KEYS || 'astel,castilla,kylus,kerin,justina,roderick,e
   await pg.goto(URL, { timeout: 300000 }); await pg.evaluate(() => localStorage.clear()); await pg.reload({ timeout: 300000 });
   const S = 'button,[role=button],[aria-label]';
   const click = async t => { await pg.waitForFunction(([S, t]) => [...document.querySelectorAll(S)].some(b => (b.getAttribute('aria-label') || b.textContent || '').trim() === t), [S, t], { timeout: 300000 }); await pg.evaluate(([S, t]) => [...document.querySelectorAll(S)].find(b => (b.getAttribute('aria-label') || b.textContent || '').trim() === t).click(), [S, t]); await pg.waitForTimeout(500); };
-  await click('새 게임'); await click('모험 시작'); await pg.waitForSelector('.prologue.on', { timeout: 60000 }); await click('건너뛰기');
+  await click(await pg.evaluate(() => [...document.querySelectorAll('button,[role=button],[aria-label]')].some(b => (b.getAttribute('aria-label') || b.textContent || '').trim() === '새 게임') ? '새 게임' : '게임 시작 (새 게임)')); await click('모험 시작'); await pg.waitForSelector('.prologue.on', { timeout: 60000 }); await click('건너뛰기');
   await pg.waitForFunction(() => window.G && G.inWorld && G.player && !G.loading && !G.input.block, null, { timeout: 400000 });
   for (const k of KEYS) {
     const url = await pg.evaluate(async k => (await import('./js/storyscene.js')).castBust(G, k), k);
