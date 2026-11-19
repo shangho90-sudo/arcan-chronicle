@@ -1661,7 +1661,7 @@ export class SkillFx {
     this.bash = new BashFx(this.root); this.bash.load();
     this.ds = new DesignerFx(this.root); this.ds.load();                       // 디자이너 2차: 마법 가위·바늘·실·리본·원단·마네킹·런웨이 분신 (js/designerfx.js)
     this.chef = new ChefFx(this.root); this.chef.load();                     // 쉐프 2차: 웍·압력솥·클로슈·소르베·밀푀유·설탕 벽·크로캉부슈·구리 냄비 (js/cheffx.js)
-    this.smith = new SmithFx(this.root); this.smith.load();                   // 대장장이 1차: 모루·집게·철판·리벳·불티·수증기 (js/smithfx.js)
+    this.smith = new SmithFx(this.root); this.smith.load();                   // 대장장이 1차: 모루·집게·철판·손망치·담금통·불티·수증기 (js/smithfx.js)
     this.hair = new HairFx(this.root); this.hair.load();                      // 미용사 1차: 큰 가위·빗·드라이어·헤어롤 (js/hairfx.js)
     this.cook = new CookFx(this.root); this.cook.load();                      // 요리사 1차: 허공 식칼·큰 프라이팬·미트볼 (js/cookfx.js)
     this.en = new EnFx(this.root); this.en.load();                            // 엔지니어 2차: 병기·화기·포격·정비 (js/engfx.js)

@@ -112,7 +112,7 @@ const MARKS = (process.env.MARKS || base.marks || '0.1,0.5,1.0,1.5,2.0').split('
         else if (a.k.startsWith('tap:')) { r = a.tapped ? 'tap slot ' + (a.tapped.k + 1) : 'no button'; }
         else if (a.k === 'exhaust') { const A = p.skills2.smith.anvil; if (A) A.pulses = A.op.pulse.max; r = A ? 'pulses ' + A.pulses : 'no anvil'; }
         else if (a.k === 'hurt') { const src = ms.find(m => !m.dead) || m0; const hp = p.hp; p.takeDamage({ source: src, amount: 100, noMiss: true, kdir: { x: -f.x, z: -f.z } }); r = 'took ' + Math.round(hp - p.hp) + '/100'; p.hp = p.maxHp; }
-        else { p.setFacing(f.x, f.z); p.target = ids[a.k] === 'bs1_a2' || ids[a.k] === 'bs1_a3' ? m0 : null; const aim = a.aim != null ? window.__at(a.aim, a.side || 0) : window.__at(dist); r = p.skills2.cast(ids[a.k], aim); r = r === null ? 'ok' : r; }
+        else { p.setFacing(f.x, f.z); p.target = ids[a.k] === 'bs1_a2' || ids[a.k] === 'bs1_a3' ? m0 : null; const aim = a.aim != null ? window.__at(a.aim, a.side || 0) : window.__at(dist); if (a.side) p.lockOn = null;   // 옆 자리 모루: 휴대폰 자동 록온 대상 자리에 떨어지지 않게 r = p.skills2.cast(ids[a.k], aim); r = r === null ? 'ok' : r; }
         L.casts.push({ k: a.k, t: +window.__t.toFixed(3), r });
       }
       G.step(1 / fps, true);

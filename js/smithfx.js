@@ -26,8 +26,8 @@ export const SMITHFX = {
   tongs: { jaw: 1.25, open: 0.55, shut: 0.06, y: 1.0 },
   wall: { w: 0.85, h: 0.78, dist: 0.95, unfold: 0.2, wing: 0.42 },   // 캐릭터를 가리지 않게 허리~가슴 높이(2026-11-13 화면 확인 뒤 낮춤)
   forge: { drops: 9, dropsLite: 4, life: 0.5, puddle: 1.1 },
-  // 급랭(2026-11-19): life = 물결 부채꼴 시간, bucket = 담금통 크기 배율, tip = 붓는 기울기(rad), steamLife/rise = 수증기 시간(초, + 0.05 x 중첩)·솟는 높이(m)
-  quench: { life: 0.62, bucket: 1.25, tip: 1.9, steamLife: 0.48, rise: 1.5 },
+  // 급랭(2026-11-19): life = 물결 부채꼴 시간, bucket = 담금통 크기 배율, tip = 붓는 기울기(rad), steamLife/rise = 수증기 시간(초, + 0.05 x 중첩 — 2026-11-19 화면 확인 뒤 0.48 -> 0.36, 다음 공격이 보이게)·솟는 높이(m)
+  quench: { life: 0.62, bucket: 1.25, tip: 1.9, steamLife: 0.36, rise: 1.5 },
   // 튕김망치: size = 손망치 크기 배율(실제 0.42 m — 쿼터뷰에서 읽히게 키움), spin = 회전(rad/s), trail = 금빛 꼬리 폭, glow = 망치 둘레 빛 크기
   toss: { size: 1.45, spin: 24, trail: 0.07, glow: 0.7, dropT: 0.45 },
   // 낙인: big/small = 도장/각인 크기(+ 대상 반지름), slam = 도장이 꽝 찍히는 시간, hold = 도장 유지, shrink = 각인으로 줄어드는 시간, fade = 시간 만료 흐려짐
@@ -359,7 +359,7 @@ export class SmithFx extends CookFx {
       tmp.copy(hot).lerp(wh, c); fl.material.uniforms.uW.value.copy(tmp); fl.material.uniforms.uB.value.copy(tmp).lerp(hot, 0.5 * (1 - c));
       fl.quaternion.copy(this.camQ); fl.scale.setScalar((0.7 + 0.25 * n + r * 0.6) * (0.8 + 0.5 * easeOut(e.t / 0.15))); fl.material.uniforms.uA.value = I * (1.3 + 0.2 * n) * (1 - smooth(0.06, 0.24, e.t));
       for (const q of ps) { const u = clamp01((e.t - q.d) / (life - q.d)); q.m.quaternion.copy(this.camQ); q.m.position.copy(q.p0).addScaledVector(q.v, easeOut(u)); q.m.scale.setScalar(q.s * (0.5 + 1.1 * easeOut(u)));
-        q.m.material.uniforms.uA.value = q.a * smooth(0, 0.1, u) * (1 - smooth(0.35, 1, u)); }
+        q.m.material.uniforms.uA.value = q.a * smooth(0, 0.1, u) * (1 - smooth(0.25, 0.9, u)); }
       if (rg) { this._flat(rg, (0.4 + 0.25 * n) * (0.4 + 0.6 * easeOut(k * 1.6)), 0.06); rg.position.y = gy - p.y + 0.06; rg.material.uniforms.uA.value = I * 1.4 * (1 - smooth(0.25, 0.8, k)); }
     });
     e.g.position.copy(p);
