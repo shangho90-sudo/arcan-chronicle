@@ -786,6 +786,7 @@ export class PharmFx {
 
   // ------------------------------------------------------------------ ⑧ 약 보호막
   shield(pc, o = {}) {
+    if (this.rm && gfxOn()) this.rm.healAura(pc, { gold: 0xe8f6ff, col: 0x6ab8ff, dur: 1.1, r: 0.9, s: 18 });   // 리마스터: 보호막 = 하늘색 눈꽃 마법진 + 몸을 감고 오르는 빛 고리
     if (!this._ok() || !pc) return null;
     const Sh = PHARM.shield, dur = Math.min(o.dur || 8, Sh.show), pal = PHARM.pal.shield, I = PHARM.intensity, low = lite();   // 2026-11-14 사용자 요청: 그림은 2초만(보호막·면역 자체는 원래 시간 그대로 — pc.shield / immune 상태)
     let gone = -1, last = pc.shield || 0, hitT = 9;
@@ -817,6 +818,7 @@ export class PharmFx {
   // ------------------------------------------------------------------ ⑨ 광역 회복진
   circle(pos, o = {}) {
     if (!this._ok()) return null;
+    if (this.rm && gfxOn()) this.rm.healAura({ pos: { x: pos.x, y: pos.y || 0, z: pos.z } }, { gold: 0xfff0a8, col: 0x6affb8, dur: 1.6, r: Math.min((o.r || 3.6) * 0.85, 2.6) });   // 리마스터: 펼칠 때 금·초록 회복 마법진 + 오르는 빛 고리·입자(반경 안)
     const r = o.r || 3.6, dur = o.dur || 8, low = lite(), pal = PHARM.pal.heal, I = PHARM.intensity, Cc = PHARM.circle;
     let pulseT = -9;
     const e = this._fx('circle', dur + 0.6, (e) => {

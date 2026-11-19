@@ -471,7 +471,7 @@ export class EnFx extends CookFx {
     return this._h(e, {
       zap(ps) { if (e.dead) return; for (const p of ps.slice(0, 4)) { let bi = 0, bd = 1e9; pyl.forEach((q, i) => { const d = q.position.distanceTo(P3(p)); if (d < bd) { bd = d; bi = i; } });
         const zA = pyl[bi].position.clone().setY(pts[bi].y + 1.0), zB = P3(p).setY((p.y || 0) + 0.7);
-        if (self.rm && gfxOn() && self.rm.ready) { self.rm.lightning(zA, zB, { col: C.sky, hi: 0xffffff, deep: C.blueB, w: 0.09, strikes: 2, gap: 0.06, branches: 2, jag: 0.22, impact: false }); self.rm.crawl({ pos: p, radius: 0.5 }, { dur: 0.35, col: C.sky, n: 2 }); }   // 리마스터: 갈라지는 번개 + 몸의 전류
+        if (self.rm && gfxOn() && self.rm.ready) { self.rm.lightning(zA, zB, { col: C.sky, hi: 0xffffff, deep: C.blueB, w: 0.12, strikes: 2, gap: 0.06, branches: 2, jag: 0.22, impact: false }); self.rm.crawl({ pos: p, radius: 0.5 }, { dur: 0.35, col: C.sky, n: 2 }); }   // 리마스터: 갈라지는 번개 + 몸의 전류
         else { const z = zaps[zi++ % zaps.length]; self.seg(z.m, zA, zB, 0.1); z.t = 0.12; }   // 미리 만든 8개를 돌려 씀
         const q = P3(p).setY((p.y || 0) + 0.7); self.flash(q, 0xffffff, C.sky, 0.45, 0.07, 1.0); self.sparks(q, 2, { tint: [C.ice, C.sky], ground: (p.y || 0), life: 0.22, speed: [1, 2.2] }); }
       },

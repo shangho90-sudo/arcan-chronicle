@@ -365,7 +365,8 @@ export class ArtFx {
     const bl = this.solid(e, this.geo.art_blob, { tint: 0x221a33, rim: C.inkHi, spec: 1.2 }), rm = this.spr(e, 1, C.violet, C.violetB, 3);
     let landed = false;
     const land = this._fx('poolland', K.fall + 0.05, (x) => { if (!landed && x.t >= K.fall) { landed = true;
-      if (this.rm && gfxOn()) this.rm.paintImpact({ pos: { x: pos.x, y: g0.y, z: pos.z }, radius: Math.min(0.9, r * 0.35) }, { col: 0x3a2a6a, hi: 0xb08aff, deep: 0x140c24 });   // 리마스터: 먹물 왕관·섬광·땅 충격파(반경 안) this._bits(g0.clone().setY(g0.y + 0.15), low ? 3 : 8, { cols: [0x221a33, 0x3a2a5a], ground: g0.y, speed: [1.2, r * 1.3], up: [1.2, 2.6], size: [0.05, 0.1], life: 0.5 }); } });
+      if (this.rm && gfxOn()) this.rm.paintImpact({ pos: { x: pos.x, y: g0.y, z: pos.z }, radius: Math.min(0.9, r * 0.35) }, { col: 0x3a2a6a, hi: 0xb08aff, deep: 0x140c24 });   // 리마스터: 먹물 왕관·섬광·땅 충격파(반경 안)
+      this._bits(g0.clone().setY(g0.y + 0.15), low ? 3 : 8, { cols: [0x221a33, 0x3a2a5a], ground: g0.y, speed: [1.2, r * 1.3], up: [1.2, 2.6], size: [0.05, 0.1], life: 0.5 }); } });
     void land;
     /** a damage tick landed on these targets: one ripple ring from the centre and a small ink splash on each of them */
     e.pulse = (ts) => {

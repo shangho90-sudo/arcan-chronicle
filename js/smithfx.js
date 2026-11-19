@@ -217,7 +217,8 @@ export class SmithFx extends CookFx {
     const top = () => g0.clone().setY(g0.y + 0.74 * K.size);
     return this._h(e, {
       land: (hit) => { if (landed >= 0) return; landed = e.t; sq = 1; pulse = 1; const low = lite(); ring(R, true);
-        if (this.rm && gfxOn()) this.rm.slam(pos, { r: R, pal: 'anvil', k: 1.1, rubble: 12 });   // 리마스터(js/rmfx.js slam): 판정 반경 안 균열 별·충격 고리 두 겹·먼지 벽·돌 파편 this.flash(g0.clone().setY(g0.y + 0.2), { size: 1.3, a: 1.1 });
+        if (this.rm && gfxOn()) this.rm.slam(pos, { r: R, pal: 'anvil', k: 1.1, rubble: 12 });   // 리마스터(js/rmfx.js slam): 판정 반경 안 균열 별·충격 고리 두 겹·먼지 벽·돌 파편
+        this.flash(g0.clone().setY(g0.y + 0.2), { size: 1.3, a: 1.1 });
         this.sparks(g0.clone().setY(g0.y + 0.15), low ? K.sparksLite : K.sparks, { ground: g0.y, speed: [2.2, 4.4], up: [1.8, 3.8], life: 0.5 }); this._puffs(g0, low ? 3 : 6, R * 0.6, { a: 0.4, life: 0.4 }); void hit; },
       pulse: (r, last) => { pulse = 1; sq = 0.5; ring(r, false); this.flash(top(), { size: 0.75, life: 0.12 }); this.sparks(top(), lite() ? 2 : 5, { ground: g0.y, life: 0.4 }); void last; },
       bump: () => { pulse = 1; sq = 0.7; this.flash(top(), { size: 1.0 }); this.sparks(top(), lite() ? 3 : 6, { ground: g0.y }); },

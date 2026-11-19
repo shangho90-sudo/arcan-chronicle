@@ -936,7 +936,7 @@ export class RmFx {
         if (!low && rand() < 0.5) this.emit('star', 1, () => ({ p: _a.set(P.x + Math.cos(a) * rr * 0.8, P.y + rnd(0.3, 1.4), P.z + Math.sin(a) * rr * 0.8), v: _c.set(0, rnd(0.4, 0.9), 0), s: rnd(0.04, 0.07), col: rand() < 0.5 ? 0xffffff : col, life: 0.5, spin: 5 })); }
     });
     e.g.position.set(pc.pos.x, pc.pos.y || 0, -pc.pos.z);
-    const sig = this._m(e, 'add', this.quad, { w: gold, b: col, s: 10, order: 3 }); this._flat(sig, R * 2, 0.05);
+    const sig = this._m(e, 'add', this.quad, { w: gold, b: col, s: o.s ?? 10, order: 3 }); this._flat(sig, R * 2, 0.05);   // o.s: 10 회복 잎 / 18 눈꽃(보호막) / 14 육망성(코팅)
     const glow = this._m(e, 'add', this.quad, { w: col, b: col, s: 6, order: 2 }); this._flat(glow, R * 2.3, 0.04);
     const rings = [0, 1, 2].map(i => this._m(e, 'add', this.geo.rm_ring, { w: 0xffffff, b: i % 2 ? gold : col, s: 3, order: 7 }));
     return e;
