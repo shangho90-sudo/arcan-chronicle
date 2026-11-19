@@ -1,6 +1,6 @@
 // Game orchestrator + zone runtime. Port of Boot/ArcanGame.cs and World/ZoneRuntime.cs.
 import { applyGfxQuality, buildTownRemaster, buildFieldRemaster } from './remaster.js';
-import { GameData, SaveStore, SAVE_SLOTS, saveSlotKey, CharacterSheet, QuestLog, QS, ZoneGeometry, NavGrid, newProfile, DEG, clamp, HitShape, levelGapExp, monsterAtLevel, discoverTown, payWarp, warpPrice, zoneLock, questCategory, questTitle } from './core.js';
+import { questExp, GameData, SaveStore, SAVE_SLOTS, saveSlotKey, CharacterSheet, QuestLog, QS, ZoneGeometry, NavGrid, newProfile, DEG, clamp, HitShape, levelGapExp, monsterAtLevel, discoverTown, payWarp, warpPrice, zoneLock, questCategory, questTitle } from './core.js';
 import { Renderer, Fx, TelegraphView, TG_TIME, loadSheet, preloadTextures, THREE, T } from './render.js';
 import { Player, Monster, Boss, Npc, Loot, bindGame as bindActors } from './actors.js';
 import { preloadDrops } from './dropfx.js';
@@ -595,7 +595,23 @@ class Game {
   }
   interact(npc) {
     if (!npc || this.ui.current || !this.player || this.player.dead) return;
-    this.quests.notify("talk", npc.def.id, 1); this.audio.sfx("ui"); this.openNpcMenu(npc.def, true); this.audio.npcGreeting(npc.def.id);
+    const said = this.talkLines(npc.def.id);
+    this.quests.notify("talk", npc.def.id, 1); this.audio.sfx("ui");
+    // a quest that sent us to talk to this NPC: they say their quest line first (objective "talkText"), then the usual menu
+    if (said) this.questTalk(npc.def, said.q, said.text, [["계속", () => this.openNpcMenu(npc.def)]]);
+    else this.openNpcMenu(npc.def, true);
+    this.audio.npcGreeting(npc.def.id);
+  }
+  /** the first accepted quest with an unfinished talk objective for this NPC that has its own line */
+  talkLines(npcId) {
+    const Q = this.quests;
+    for (const pr of this.profile.quests || []) {
+      if (pr.state === "completed") continue;
+      const q = this.data.quests[pr.id]; if (!q) continue;
+      const i = q.objectives.findIndex((o, k) => o.type === "talk" && o.target === npcId && o.talkText && Q.current(q, k, pr) < o.count);
+      if (i >= 0) return { q, text: q.objectives[i].talkText };
+    }
+    return null;
   }
   openNpcMenu(npc, greeting = false) {
     const Q = this.quests, opts = [];
@@ -630,7 +646,7 @@ class Game {
   }
   completeQuest(npc, q) {
     const e = this.quests.complete(q.id); if (e) return this.ui.toast(e);
-    if (q.reward.gold > 0) this.ui.toast("+" + q.reward.gold + " G"); if (q.reward.exp > 0) this.ui.toast("경험치 +" + q.reward.exp);
+    if (q.reward.gold > 0) this.ui.toast("+" + q.reward.gold + " G"); if (q.reward.exp > 0) this.ui.toast("경험치 +" + questExp(this.data, q));
     for (const it of q.reward.items || []) this.ui.itemToast(this.data.item(it.id), it.count);
     this.questTalk(npc, q, q.completeText, this.back(npc));
   }

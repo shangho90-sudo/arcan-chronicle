@@ -37,6 +37,15 @@ for (const q of mains) for (const k of ['offerText', 'progressText', 'completeTe
     if (p.who) { speakers++; if (p.who.key && !p.who.key.startsWith('mon:')) { npcSpk++; ok(p.who.key === 'player' || d.npcs[p.who.key], q.id + ' 화자 ' + p.who.key); } if (!p.who.key) unknown.set(p.who.name, (unknown.get(p.who.name) || 0) + 1); }
   }
 }
+// 대화 목표의 대사(objective talkText — 그 NPC에게 말을 걸면 장면으로 나옴): 화자가 NPC로 이어지고 글자가 빠지지 않음
+let talks = 0;
+for (const q of d.questList) for (const o of q.objectives || []) if (o.type === 'talk' && o.talkText) {
+  talks++; const npc = d.npcs[o.target]; ok(npc, q.id + ' talk 대상 ' + o.target);
+  const ps = parseStory(o.talkText, npc ? { key: npc.id, name: npc.name } : null, res);
+  ok(ps.length >= 1 && ps.every(p => !p.who || p.who.key), q.id + ' talkText 화자');
+  eq(ps.map(p => plainText(p.html)).join('').replace(/\s/g, ''), plainText(o.talkText.replace(/<b class='gold'>.*?<\/b>/g, '')).replace(/\s/g, ''), q.id + ' talkText 글자 빠짐 없음');
+}
+ok(talks >= 1, 'talkText ' + talks);
 // 주요 인물은 모두 NPC로 이어져야 함(그림·3D 초상)
 for (const nm of ['아스텔', '카스티야', '카일러스', '케린', '저스티나', '로데릭', '요이센', '다이센', '치르젠', '얀베르', '볼드란', '베리온', '하람']) ok(res(nm) && d.npcs[res(nm)], nm + ' → NPC');
 ok(res('그레이스') === 'mon:qb_grace_1' && res('말라키온') === 'mon:qb_malachion', '그레이스·말라키온 → 이야기 보스');
@@ -73,8 +82,9 @@ function woff2Cmap(path) {
 const jua = woff2Cmap('assets/fonts/Jua.woff2'), extra = woff2Cmap('assets/fonts/DialogExtra.woff2');
 let need = '';
 for (const q of mains) { need += q.name || ''; for (const k of ['offerText', 'progressText', 'completeText']) if (q[k]) for (const p of parseStory(q[k], null, res)) need += plainText(p.html) + (p.who ? p.who.name : ''); }
+for (const q of d.questList) for (const o of q.objectives || []) if (o.talkText) for (const p of parseStory(o.talkText, null, res)) need += plainText(p.html) + (p.who ? p.who.name : '');
 const pro = J('prologue.json'); for (const P of pro.panels) for (const L of P.lines) need += plainText(L.text) + (L.who || '');
-need += '“”이야기용흔 대륙의 기록건너뛰기›계속 읽기→수락하기나중에돌아가기대화 종료메인 퀘스트✦장보상0123456789/×';
+need += '“”이야기아카디아 대륙의 기록건너뛰기›계속 읽기→수락하기나중에돌아가기대화 종료메인 퀘스트✦장보상0123456789/×';
 for (const id of new Set(mains.flatMap(q => [q.giver, q.turnIn]).filter(Boolean))) { const nd = d.npcs[id]; if (nd) need += (nd.name || '') + (nd.title || ''); }
 const miss = [...new Set(need)].filter(c => !/\s/.test(c) && c !== '✦' && !jua.has(c.codePointAt(0)) && !extra.has(c.codePointAt(0)));
 eq(miss.join(''), '', '대화 상자 글꼴(주아체 + DialogExtra)에 빠진 글자 없음');

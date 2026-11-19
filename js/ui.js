@@ -1,6 +1,6 @@
 // HTML/CSS user interface (ivory / teal / gold, Galmuri pixel font). Port of the Unity uGUI views.
 import { gfxQ, GFX_LEVELS, GFX_NAMES } from './gfxq.js';
-import { QS, QUEST_CAT, questCategory, Shop, shopStockFor, jobBuffActive, isEquipment, slotOf, EQUIP_SLOTS, ATTRS, ATTR_KR, ATTR_BASE, ATTR_FX, warpTowns, warpPrice, townsKnown } from './core.js';
+import { questExp, QS, QUEST_CAT, questCategory, Shop, shopStockFor, jobBuffActive, isEquipment, slotOf, EQUIP_SLOTS, ATTRS, ATTR_KR, ATTR_BASE, ATTR_FX, warpTowns, warpPrice, townsKnown } from './core.js';
 import { showWorldMap } from './worldmap.js';
 import { THREE, tex, CAM } from './render.js';
 import { ModelBody, loadPlayerModel, loadActions } from './model.js';
@@ -835,8 +835,11 @@ export class UI {
     this.current.classList.add("titlewin");
     this.current.setAttribute("aria-label", "아스테리온 연대기 시작 메뉴");
     const stage = $("div", "title-art", b);
-    $("img", "title-illustration", stage).src = "assets/ui/title-asterion.jpg";
-    stage.firstChild.alt = "아스테리온 연대기 — 약사·대장장이·요리사·예술가·디자이너가 꽃밭 마을에 모인 그림";
+    // portrait phones get their own tall picture (941×1672, same four painted buttons lower down)
+    const pic = $("picture", "", stage);
+    const src = $("source", "", pic); src.media = "(max-aspect-ratio: 3/4)"; src.srcset = "assets/ui/title-asterion-mobile.jpg";
+    const img = $("img", "title-illustration", pic); img.src = "assets/ui/title-asterion.jpg";
+    img.alt = "아스테리온 연대기 — 약사·대장장이·요리사·예술가·디자이너가 꽃밭 마을에 모인 그림";
     // the four buttons are painted in the picture (게임 시작 · 불러오기 · 환경 설정 · 게임 종료); invisible native buttons sit on them
     const n = this.button(stage, "", "title-action title-new", ng);
     n.setAttribute("aria-label", "게임 시작 (새 게임)");
@@ -943,7 +946,7 @@ export const CHARACTERS = [
 
 export function rewardText(q) {
   const r = q.reward, parts = [];
-  if (r.exp) parts.push("경험치 " + r.exp); if (r.gold) parts.push(r.gold + " G");
+  if (r.exp) parts.push("경험치 " + questExp(G.data, q)); if (r.gold) parts.push(r.gold + " G");
   for (const it of r.items || []) parts.push(G.data.item(it.id).name + " x" + it.count);
   return parts.join("  ");
 }

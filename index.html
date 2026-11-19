@@ -509,6 +509,7 @@ small { font-size:.8em; }
 .titlewin .wbody { display:grid; place-items:center; isolation:isolate; }
 .titlewin .wbody::before { content:""; position:absolute; inset:-30px; background:url(assets/ui/title-asterion.jpg) center/cover no-repeat; filter:blur(18px) brightness(.55) saturate(1.1); z-index:-1; }
 /* 2026-11-19 '아스테리온 연대기' title art (1670×941) with four painted buttons — invisible native buttons sit exactly on them */
+.title-art picture { display:contents; }
 .title-art { position:relative; width:min(100vw,177.47vh); aspect-ratio:1670 / 941; flex:none; }
 .title-illustration { display:block; width:100%; height:100%; }
 .titlewin .title-action { position:absolute; border:0; border-image:none; padding:0; min-height:0; background:transparent; border-radius:999px; cursor:pointer; transition:box-shadow .15s,background .15s; }
@@ -522,26 +523,18 @@ small { font-size:.8em; }
 .titlewin .title-action:disabled { opacity:1; background:#17273599; cursor:not-allowed; filter:none; }
 .title-save { position:absolute; left:1.4%; bottom:2.2%; max-width:30%; display:flex; align-items:center; padding:.5% 1.4%; border:1px solid #d9bc72; border-radius:999px; background:linear-gradient(#253447e6,#101d2ce6); color:#fff6de; font-family:"Malgun Gothic",sans-serif; font-size:clamp(9px,min(1.05vw,1.85vh),17px); line-height:1.3; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 @media (max-aspect-ratio:3/4) {
-  /* portrait phones: the picture's top part (logo + characters, above its painted buttons) as a full-width banner, then real buttons in a column */
-  .titlewin .wbody { place-items:stretch; }
-  .title-art { width:100vw; height:100%; aspect-ratio:auto; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:max(16px, env(safe-area-inset-top)) 0 max(20px, env(safe-area-inset-bottom)); box-sizing:border-box; }
-  /* banner = the picture's top 63 % at --bh tall (sides cropped on narrow screens; the logo stays centred) */
-  .title-art { --bh:min(40vh, 62vw); }
-  .title-illustration { width:auto; max-width:none; height:calc(var(--bh) / .63); flex:none; margin-bottom:calc(var(--bh) / .63 * -.37 + 6px);
-    clip-path:inset(0 0 37% 0); -webkit-mask-image:linear-gradient(#000 0, #000 56%, transparent 63%); mask-image:linear-gradient(#000 0, #000 56%, transparent 63%); }
-  .titlewin .title-action, .title-save { position:relative; left:auto; top:auto; bottom:auto; flex:none; width:min(84vw, 380px); max-width:none; box-sizing:border-box; }
-  .titlewin .title-action { height:52px; border:2px solid #f6d58a; border-radius:16px; font:700 21px Jua, "Malgun Gothic", sans-serif; letter-spacing:1px; box-shadow:0 4px 12px rgba(0,0,0,.4); }
-  .titlewin .title-new { order:1; background:linear-gradient(#ffe4a0,#c48a30); color:#38250c; }
-  .title-new::after { content:"게임 시작"; }
-  .titlewin .title-continue { order:2; background:linear-gradient(#149fdb,#07476f); color:#fff4d8; }
-  .titlewin .title-continue:disabled { background:linear-gradient(#5b6470,#39424e); color:#c8ccd4; border-color:#8a8f98; }
-  .title-continue::after { content:"불러오기"; }
-  .titlewin .title-settings { order:4; background:linear-gradient(#3a4658,#1b2432); color:#fff4d8; }
-  .title-settings::after { content:"환경 설정"; }
-  .titlewin .title-quit { order:5; background:linear-gradient(#3a4658,#1b2432); color:#fff4d8; }
-  .title-quit::after { content:"게임 종료"; }
-  .title-save { order:3; height:auto; min-height:36px; font-size:12px; padding:8px 14px; border-radius:12px; white-space:normal; justify-content:center; text-align:center; }
-  .title-sound { top:max(12px, env(safe-area-inset-top)); right:12px; font-size:13px; padding:5px 10px; z-index:2; }
+  /* portrait phones (2026-11-19 사용자 그림 941×1672): the tall picture fills the screen, invisible buttons on its four painted buttons */
+  .titlewin .wbody::before { background-image:url(assets/ui/title-asterion-mobile.jpg); }
+  /* fill the screen height; on tall phones the flowery sides are cropped (at most ~16 % each — the buttons span 20–80 %) */
+  .titlewin .wbody { overflow:hidden; }
+  .title-art { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:min(56.28vh, 147vw); aspect-ratio:941 / 1672; }
+  .title-art picture { display:contents; }
+  .title-new { left:23.9%; top:62.5%; width:52.1%; height:6.3%; }
+  .title-continue { left:19.7%; top:70.3%; width:60.3%; height:5.6%; }
+  .title-settings { left:21.8%; top:77.2%; width:56.3%; height:5.4%; }
+  .title-quit { left:21.8%; top:83.9%; width:56.3%; height:5.4%; }
+  .title-save { left:50%; transform:translateX(-50%); bottom:max(1.6%, env(safe-area-inset-bottom)); max-width:86%; font-size:clamp(10px, 2.9vw, 13px); padding:5px 12px; }
+  .title-sound { top:max(10px, env(safe-area-inset-top)); right:10px; font-size:12px; padding:4px 9px; z-index:2; }
 }
 @media (prefers-reduced-motion:reduce) { .titlewin .title-action { transition:none; } }
 </style>

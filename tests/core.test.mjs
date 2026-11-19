@@ -228,6 +228,8 @@ function TestQuests() {
   const gold = ch.p.gold, pots = ch.bag.count("c_potion_s");
   Ok(q.complete("q1_start") == null, "complete q1");
   Eq(ch.p.gold, gold + 50, "gold reward");
+  Eq(d.config.questExpMul, 3, "quest EXP x3 (2026-11-19)");
+  Eq(core.questExp(d, q1), 3 * q1.reward.exp, "questExp = data exp x3");
   Eq(ch.bag.count("c_potion_s"), pots + 5, "item reward");
   Ok(q.complete("q1_start") != null, "cannot complete twice (no duplicate reward)");
   Eq(ch.p.gold, gold + 50, "still single reward");

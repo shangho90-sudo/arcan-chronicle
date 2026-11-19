@@ -79,7 +79,7 @@ export class Prologue {
     const L = this.data.panels[this.pi].lines[this.li];
     this.box.classList.add('show'); this.box.classList.toggle('speak', !!L.who);
     this.pending = false; this.next.disabled = false;
-    this.who.textContent = L.who || '용흔 대륙의 기록';
+    this.who.textContent = L.who || '아카디아 대륙의 기록';
     this.el.querySelector('.pl-count').textContent = gbCount(this.pi, this.data.panels.length);
     this.text.textContent = '';
     // typewriter over the visible characters only (tags are kept whole)

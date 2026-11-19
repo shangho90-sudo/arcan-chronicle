@@ -478,6 +478,8 @@ export const QS = { Locked: 0, Available: 1, Active: 2, Completable: 3, Complete
 /** quest category: "main" = story chain, "sub" = side hunting / gathering. quests.json "category"; without it, quests
  *  whose goals are only kill / collect / equip count as side quests. */
 export const QUEST_CAT = { main: "메인 퀘스트", sub: "서브 퀘스트" };
+/** quest EXP actually given: data value × config.questExpMul (2026-11-19 사용자 '퀘스트 경험치 3배' — 3) */
+export function questExp(data, q) { const e = (q && q.reward && q.reward.exp) || 0; return Math.round(e * ((data && data.config && data.config.questExpMul) || 1)); }
 export function questCategory(q) {
   if (q && (q.category === "main" || q.category === "sub")) return q.category;
   return q && q.objectives && q.objectives.length && q.objectives.every(o => ["kill", "collect", "equip"].includes(o.type)) ? "sub" : "main";
@@ -568,7 +570,7 @@ export class QuestLog {
     for (const c of consume) if (!this.ch.bag.remove(c.id, c.count)) return "필요한 아이템이 부족합니다.";
     this.find(id).state = "completed";
     for (const r of rewards) this.ch.bag.add(r.id, r.count);
-    this.ch.addGold(q.reward?.gold || 0); this.ch.addExp(q.reward?.exp || 0);
+    this.ch.addGold(q.reward?.gold || 0); this.ch.addExp(questExp(this.data, q));
     this.emit("completed", q); return null;
   }
   objectiveText(q, i) {
