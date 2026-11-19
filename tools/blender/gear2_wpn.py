@@ -262,6 +262,8 @@ BUILD = {'sword': build_sword, 'pestle': build_pestle, 'hammer': build_hammer, '
 ORN_ROT = {'cook': (0, -math.pi / 2, 0)}
 # 변형마다 먼저 돌릴 각도: 견습생 전설 코등이는 초안의 짧은 칼날이 아래(손잡이 쪽)로 나와서 뒤집음 — 날개가 아래로 처지고 짧은 날이 칼날 쪽
 ORN_PRE = {'nov_b': (0, math.pi, 0)}   # 잉어: 머리(+X)가 위, 등지느러미가 칼등(-X)
+# 2026-11-19 전설 장식(디자이너·화가·음악가 b): 다듬은 GLB가 Z-up 그대로라 불러오면 앞면이 아래(−Z)로 눕는다 → 세워서 앞면을 −Y(아이콘 카메라 쪽)로
+ORN_PRE.update({k: (math.pi / 2, 0, math.pi) for k in ('design_b', 'paint_b', 'music_b')})
 
 # ---------------------------------------------------------------- 단계 장식(모든 계열 공통): 보석 · 리본 · 구슬 줄 · 금테 · 날개 · 후광 · 관
 def extras(key, C, s, A, kind):

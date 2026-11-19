@@ -14,6 +14,7 @@ RAW = os.environ.get('RAW', '/home/claude/gear2_3d'); OUT = os.path.join(RAW, 'p
 FORCE = os.environ.get('FORCE') == '1'
 TRIS = {'smith': 1900, 'eng': 1900, 'cook': 1500, 'pharm': 1800, 'wpharm': 1800, 'herb': 1800}   # 머리 전체가 장식인 계열은 조금 더
 TEX = 512
+NOSPLIT = {'music_b'}
 
 def load(path):
     bpy.ops.wm.read_factory_settings(use_empty=True)
@@ -36,7 +37,9 @@ def prep(key):
     if os.path.exists(dst) and not FORCE: print(key, 'have', flush=True); return
     ob = load(src); PT.drop_small(ob, 0.01)
     # 겹친 껍질을 용접하면 면이 셋 이상 붙은 모서리(non-manifold)가 생기고, 줄이기가 그 근처에서 멈춤(5천 개 아래로 안 내려감) → 그 모서리만 떼어 놓음
-    bm = bmesh.new(); bm.from_mesh(ob.data); bmesh.ops.split_edges(bm, edges=[e for e in bm.edges if not e.is_manifold and not e.is_boundary]); bm.to_mesh(ob.data); bm.free()
+    # 단, 별노래 전설 장식(music_b)은 떼면 76만 면이 수백 조각으로 갈라져 줄이기 뒤 부스러기만 남음 → 떼지 않음(NOSPLIT)
+    if key not in NOSPLIT:
+      bm = bmesh.new(); bm.from_mesh(ob.data); bmesh.ops.split_edges(bm, edges=[e for e in bm.edges if not e.is_manifold and not e.is_boundary]); bm.to_mesh(ob.data); bm.free()
     tgt = TRIS.get(key.split('_')[0], 1600); n0 = PT.decimate(ob, tgt)
     for _ in range(6):                                     # 첫 줄이기가 UV 경계 때문에 덜 줄면 몇 번 더(삼각형 수 기준)
         bm = bmesh.new(); bm.from_mesh(ob.data); bmesh.ops.triangulate(bm, faces=bm.faces[:]); bm.to_mesh(ob.data); bm.free()
@@ -53,7 +56,7 @@ def prep(key):
     views(ob, key)
 
 # 초안이 거의 무채색(흰 석고처럼)으로 오면 계열 색으로 칠함: 어두운 곳 = 테 색, 중간 = 머리 색, 밝은 곳 = 거의 흰색
-TINT = {'nov': ('#9a7430', '#f3ead2', '#ffffff')}
+TINT = {'nov': ('#9a7430', '#f3ead2', '#ffffff'), 'design': ('#3a2c78', '#9a8ad8', '#f6eeff')}   # design = 월광 나방(남보라·은)
 def tint(mat, line):
     img = next((n.image for n in mat.node_tree.nodes if n.type == 'TEX_IMAGE'), None)
     if not img: return
