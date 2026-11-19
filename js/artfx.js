@@ -340,6 +340,10 @@ export class ArtFx {
     const end = P3(pc.pos).add(_a.set(f.x, 0, -f.z).applyAxisAngle(UP, ha * 0.8).multiplyScalar(r * 0.8)); end.y += K.y;
     this._bits(end, lite() ? 2 : 5, { cols: [col, c2, C.yel], ground: pc.pos.y || 0, dir: { x: _a.x, z: _a.z }, fan: 0.5, speed: [0.8, 1.8], up: [0.6, 1.8] });
     (o.hits || []).forEach((t, i) => this.splash(t, { col: i % 2 ? c2 : col, big: i === 0 }));
+    // 리마스터(높음·보통, js/rmfx.js flatArc): 허리 높이에 오른쪽 → 왼쪽으로 쓸리는 입체 물감 반달 세 층 + 잔상 2겹 — 반달 중심을 앞으로 0.84 R 당겨 양 끝까지 판정 부채꼴 안
+    if (this.rm && gfxOn() && this.rm.ok()) { const fw = new THREE.Vector3(f.x, 0, -f.z).normalize(), R = r * 0.54, c = P3(pc.pos).addScaledVector(fw, R * 0.84);
+      this.rm.flatArc(c, { yaw: Math.atan2(fw.x, fw.z), R, y: 0.85, dir: -1, draw: K.draw, life: 0.3, c1: light(col, 0.55), c2: col, thick: 2.2 });
+      if (o.hits && o.hits[0]) this.rm.burstOn(o.hits[0], { col, hi: light(col, 0.6), dir: f, size: 0.9, sparks: 6 }); }
     return e;
   }
 
@@ -360,7 +364,8 @@ export class ArtFx {
     const pl = this.pnt(e, 6, C.inkHi, C.ink, 2); this._flat(pl, r * 2 / 0.98, 0.06);   // wobbly rim stays inside the real radius
     const bl = this.solid(e, this.geo.art_blob, { tint: 0x221a33, rim: C.inkHi, spec: 1.2 }), rm = this.spr(e, 1, C.violet, C.violetB, 3);
     let landed = false;
-    const land = this._fx('poolland', K.fall + 0.05, (x) => { if (!landed && x.t >= K.fall) { landed = true; this._bits(g0.clone().setY(g0.y + 0.15), low ? 3 : 8, { cols: [0x221a33, 0x3a2a5a], ground: g0.y, speed: [1.2, r * 1.3], up: [1.2, 2.6], size: [0.05, 0.1], life: 0.5 }); } });
+    const land = this._fx('poolland', K.fall + 0.05, (x) => { if (!landed && x.t >= K.fall) { landed = true;
+      if (this.rm && gfxOn()) this.rm.paintImpact({ pos: { x: pos.x, y: g0.y, z: pos.z }, radius: Math.min(0.9, r * 0.35) }, { col: 0x3a2a6a, hi: 0xb08aff, deep: 0x140c24 });   // 리마스터: 먹물 왕관·섬광·땅 충격파(반경 안) this._bits(g0.clone().setY(g0.y + 0.15), low ? 3 : 8, { cols: [0x221a33, 0x3a2a5a], ground: g0.y, speed: [1.2, r * 1.3], up: [1.2, 2.6], size: [0.05, 0.1], life: 0.5 }); } });
     void land;
     /** a damage tick landed on these targets: one ripple ring from the centre and a small ink splash on each of them */
     e.pulse = (ts) => {

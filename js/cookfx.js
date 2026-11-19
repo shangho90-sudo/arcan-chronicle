@@ -251,6 +251,7 @@ export class CookFx {
       });
       const ln = self.spr(lf, 2, 0xffffff, COOK.col.steelB, 7), fl = self.spr(lf, 3, 0xffffff, COOK.col.steel, 7);
       lf.g.position.copy(at); self._alignLine(ln, dirL);
+      if (self.rm && gfxOn()) self.rm.slashHit({ x: at.x, y: at.y, z: -at.z }, { flash: true, tan: dirL, c1: last ? 0xfff2c0 : 0xe6f6ff, c2: last ? 0xffb050 : 0x8aa8c8, roll: 0.3 + h * 0.7 });   // 리마스터: 썰 때마다 0.05초 흰 별 섬광 + 칼 방향 빛줄기
       self._bits(at, (lite() ? K.chipsLite : K.chips) + (last && !lite() ? 2 : 0), { ground: anchor.y, life: 0.55, size: K.chip, speed: [1.5 * K.vis, 2.8 * K.vis], up: [2.0 * Math.SQRT2, 3.4 * Math.SQRT2] });   // 2배 크기 = 2배 멀리 (높이 2배 = 속도 √2배)
     };
     e.miss = () => { if (ended < 0) ended = e.t; e.life = Math.min(e.life, e.t + K.leave); };
@@ -289,6 +290,7 @@ export class CookFx {
       if (t) { anchor.copy(P3(t.pos)); top = cookTop(t); }
       const g0 = anchor.clone(), hp = anchor.clone().setY(anchor.y + top * K.rest), low = lite();
       if (!t) { this._puffs(g0, low ? 2 : 4, R, { a: 0.32, life: 0.4 }); return; }
+      if (this.rm && gfxOn()) this.rm.slam(g0, { r: Math.min(R, 1.8), pal: 'pan', k: 0.85, rubble: 6 });   // 리마스터(js/rmfx.js slam): 팬 둘레 균열 별·충격 고리·먼지
       const fx = this._fx('panhit', K.ringLife + 0.1, (x) => {
         const k = x.t / K.ringLife; this._flat(rg, R * (0.55 + 0.45 * easeOut(k))); rg.material.uniforms.uA.value = I * K.ring * (1 - smooth(0.25, 1, k));
         fl.quaternion.copy(this.camQ); fl.scale.setScalar(R * 1.05 * (0.7 + 0.5 * easeOut(x.t / K.flashT))); fl.material.uniforms.uA.value = I * K.flash * (1 - smooth(0, K.flashT * 2.2, x.t));
@@ -408,6 +410,7 @@ export class CookFx {
         const b = balls[i]; if (!b) return; b.state = 'over'; b.m.visible = false;
         const p = P3(pos), d = new THREE.Vector3(dir.x, dir.y, -dir.z).normalize(), gy = b.gy;
         if (!ok) { self._puffs(p, low ? 1 : 2, 0.4, { c1: COOK.col.steam1, c2: COOK.col.steam2, a: 0.28, life: 0.3, rise: 0.3 }); return; }
+        if (last && self.rm && gfxOn()) self.rm.burstOn({ pos: { x: pos.x, y: gy, z: pos.z }, radius: 0.5 }, { col: 0xff8a3a, hi: 0xfff0c8, dir: { x: d.x, z: -d.z }, size: 1.1, sparks: 8 });   // 리마스터: 마지막 공 = 별 섬광·땅 고리·빛줄기
         const life = last ? 0.22 : 0.14, len = last ? K.streakLast : K.streak;
         const fx = self._fx('ballhit', life + 0.04, (x) => {
           const k = clamp01(x.t / life);
@@ -552,6 +555,7 @@ export class CookFx {
       const ns = low ? K.steamLite : K.steam;
       for (let i = 0; i < ns; i++) { const a = rnd(-h, h) * 0.8, at = p0.clone().addScaledVector(f.clone().applyAxisAngle(UP, a), rv * rnd(0.4, 0.9)); this._puffs(at.setY(p0.y + 0.15 * V), 1, 0.5 * V, { c1: COOK.col.steam1, c2: COOK.col.steam2, a: 0.26, life: rnd(0.5, 0.75), rise: 0.9 * V }); }
       if (rmF) for (const t of ok || []) this.rm.fireHit(t.pos, t.radius || 0.5, { pal: 'soup' });
+      if (this.rm && gfxOn() && !again) for (const t of ok || []) this.rm.burstOn(t, { col: 0xffa040, hi: 0xfff2d0, dir: { x: f.x, z: -f.z }, size: 0.8, sparks: 5 });
       for (const t of ok || []) { const g = P3(t.pos); this._pop(g, { r: 0, y: cookTop(t) * 0.55, size: 0.55 * V, flash: 1.0, w: COOK.col.soupHi }); this._bits(g.clone().setY(g.y + cookTop(t) * 0.55), low ? 1 : 3, { geo: this.geo.cook_drop, size: [0.035 * V, 0.06 * V], speed: [1.0 * V, 2.0 * V], up: [1.2 * Math.SQRT2, 2.4 * Math.SQRT2], ground: g.y, life: 0.4 }); }
     };
     return e;
@@ -640,6 +644,7 @@ export class CookFx {
     });
     const sk = this.prop(e, 'tripo_kebab', 'cook_skewer', { spec: 1.0, rim: COOK.col.steelB }); sk.renderOrder = 6;
     const ln = this.spr(e, 2, 0xffffff, COOK.col.steelB, 5); ln.position.copy(p0).addScaledVector(f, len * 0.5).setY(p0.y + K.y); this._alignLine(ln, f);
+    if (this.rm && gfxOn()) this.rm.lance(p0.clone().addScaledVector(f, 0.35).setY(p0.y + K.y), p0.clone().addScaledVector(f, len).setY(p0.y + K.y), { run: lead, life: 0.28, col: 0xffa040, hi: 0xfff6e0, light: 0xffe0a0, w: 0.36 });   // 리마스터: 실제 직선 길이만큼 뻗는 빛 창끝 + 끝 섬광
     e.hit = (ok) => {
       if (e.dead) return; const again = hitAt >= 0; if (again && !(ok && ok.length)) return;
       hitAt = e.t; e.life = Math.max(e.life, e.t + 0.42); spin += again ? 1.6 : 0;

@@ -20,6 +20,7 @@
 // 저사양(휴대폰 / 그래픽 효과 끔): 입자 수만 줄임(WPFX.liteK) — 캡슐·결정·마법진·빛기둥·표식 소비는 그대로.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { gfxOn } from './gfxq.js';
 import { CookFx, cookTop } from './cookfx.js';
 
 export const WPFX = {
@@ -438,8 +439,12 @@ export class WpFx extends CookFx {
     return this._h(e, { strike: (hits) => {
       fired = e.t; const pts = [], side = _b.crossVectors(f, UP).normalize().clone();
       for (let i = 0; i <= K.segs; i++) { const k = i / K.segs, j = i === 0 || i === K.segs ? 0 : rnd(-0.22, 0.22); pts.push(base.clone().addScaledVector(f, 0.3 + k * (o.len - 0.3)).addScaledVector(side, j * o.w * 0.5).add(_a.set(0, rnd(-0.12, 0.12) * (j ? 1 : 0), 0))); }
-      bolt.forEach((m, i) => { m.visible = true; this.seg(m, pts[i], pts[i + 1], 0.3); m.material.uniforms.uA.value = 1.6; glow[i].visible = true; this.seg(glow[i], pts[i], pts[i + 1], Math.min(1.2, o.w)); glow[i].material.uniforms.uA.value = 0.85; });
-      for (let b = 0; b < NB; b++) { const i0 = 2 + Math.floor(rnd(0, K.segs - 4)), p0 = pts[i0], p1 = p0.clone().addScaledVector(side, rnd(-0.6, 0.6) * o.w).addScaledVector(f, rnd(0.2, 0.6)).add(_a.set(0, rnd(-0.2, 0.4), 0)), p2 = p1.clone().addScaledVector(side, rnd(-0.3, 0.3) * o.w).addScaledVector(f, 0.3);
+      // 리마스터(높음·보통, js/rmfx.js lightning): 곧은 마디 대신 갈라지는 번개 두 번 연속(번쩍일 때마다 새 경로, 판정 직선 폭 안) + 맞은 적 몸의 전류 + 그은 자국 위 남는 전류
+      const rmL = this.rm && gfxOn() && this.rm.ok() ? this.rm.lightning(pts[0], pts[pts.length - 1], { col: C.sky, hi: C.white, deep: 0x1a3a9a, w: 0.19, strikes: 2, gap: 0.08, branches: 4, jag: 0.12, impact: false, floorY: (pc.pos.y || 0) + 0.1 }) : null;
+      if (rmL) { for (const h of hits || []) this.rm.crawl({ pos: h, radius: 0.5 }, { dur: 0.5, col: C.sky });
+        const r0 = Math.min(0.55, o.w * 0.45); for (const k of [0.35, 0.75]) this.rm.current(P3(pc.pos).addScaledVector(f, o.len * k), { r: r0, dur: 0.5, col: C.sky, n: 2, delay: 0.03 }); }
+      if (!rmL) bolt.forEach((m, i) => { m.visible = true; this.seg(m, pts[i], pts[i + 1], 0.3); m.material.uniforms.uA.value = 1.6; glow[i].visible = true; this.seg(glow[i], pts[i], pts[i + 1], Math.min(1.2, o.w)); glow[i].material.uniforms.uA.value = 0.85; });
+      if (!rmL) for (let b = 0; b < NB; b++) { const i0 = 2 + Math.floor(rnd(0, K.segs - 4)), p0 = pts[i0], p1 = p0.clone().addScaledVector(side, rnd(-0.6, 0.6) * o.w).addScaledVector(f, rnd(0.2, 0.6)).add(_a.set(0, rnd(-0.2, 0.4), 0)), p2 = p1.clone().addScaledVector(side, rnd(-0.3, 0.3) * o.w).addScaledVector(f, 0.3);
         br[b * 2].visible = br[b * 2 + 1].visible = true; this.seg(br[b * 2], p0, p1, 0.08); this.seg(br[b * 2 + 1], p1, p2, 0.06); }
       const g0 = P3(pc.pos), g1 = g0.clone().addScaledVector(f, o.len); g0.y += 0.06; g1.y += 0.06; scorch.visible = true;   // 바닥 자국: 판정 직선 위에 납작하게
       _m4.makeBasis(f, _c.crossVectors(UP, f).normalize(), UP); scorch.quaternion.setFromRotationMatrix(_m4); scorch.position.addVectors(g0, g1).multiplyScalar(0.5); scorch.scale.set(o.len, o.w * 0.55, 1);

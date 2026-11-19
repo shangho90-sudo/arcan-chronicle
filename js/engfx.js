@@ -16,6 +16,7 @@
 // 소리: 판정 순간 소리(en_shot/pile/cannon/…)는 규칙이 내고, 그림에만 있는 순간(전개·조립·냉각판·조준 고정·낙하·코어 회수·경보·제작)은 여기서 snd() — Runway(tools/audio/en_runway_sfx.py).
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { gfxOn } from './gfxq.js';
 import { CookFx, cookTop } from './cookfx.js';
 
 export const ENFX = {
@@ -449,6 +450,10 @@ export class EnFx extends CookFx {
         this.groundLine(edges[i], pts[i], pts[(i + 1) % 3], 0.14); edges[i].material.uniforms.uA.value = 0.9 * on; edges[i].material.uniforms.uT.value = e.t; }
       fill.material.uniforms.uA.value = 0.7 * on; fill.material.uniforms.uT.value = e.t;
       for (const z of zaps) { z.t -= dt; z.m.material.uniforms.uA.value = Math.max(0, z.t / 0.12) * 1.3 * a; }
+      // 리마스터(높음·보통, js/rmfx.js): 연결된 동안 삼각형(= 판정) 안 바닥을 기어가는 전류 — 한 꼭짓점 쪽에서 맞은편 변 쪽으로, 0.4초마다 새 경로
+      if (on > 0.5 && endT < 0 && self.rm && gfxOn() && self.rm.ready) { e.gc = (e.gc || 0) - dt; if (e.gc <= 0) { e.gc = 0.4; const i = (rnd(0, 3) | 0) % 3, A = pts[i], B = pts[(i + 1) % 3], C2 = pts[(i + 2) % 3];
+        const p0 = A.clone().lerp(c3, 0.25), p1 = B.clone().lerp(C2, rnd(0.25, 0.75)).lerp(c3, 0.25); p0.y += 0.05; p1.y += 0.05;
+        self.rm.lightning(p0, p1, { col: C.sky, hi: 0xffffff, deep: C.blueB, w: 0.07, strikes: 2, gap: 0.09, branches: 2, flat: true, impact: false, jag: 0.16 }); } }
     });
     const pyl = pts.map(() => { const p = this.pivot(e.g); this.part(e, 'en_pylon', p); return p; });
     const coils = pyl.map(p => [0, 1, 2].map(() => this.part(e, 'en_coil', p, { s: 0.06 })));
@@ -465,7 +470,9 @@ export class EnFx extends CookFx {
     const self = this;
     return this._h(e, {
       zap(ps) { if (e.dead) return; for (const p of ps.slice(0, 4)) { let bi = 0, bd = 1e9; pyl.forEach((q, i) => { const d = q.position.distanceTo(P3(p)); if (d < bd) { bd = d; bi = i; } });
-        const z = zaps[zi++ % zaps.length]; self.seg(z.m, pyl[bi].position.clone().setY(pts[bi].y + 1.0), P3(p).setY((p.y || 0) + 0.7), 0.1); z.t = 0.12;   // 미리 만든 8개를 돌려 씀
+        const zA = pyl[bi].position.clone().setY(pts[bi].y + 1.0), zB = P3(p).setY((p.y || 0) + 0.7);
+        if (self.rm && gfxOn() && self.rm.ready) { self.rm.lightning(zA, zB, { col: C.sky, hi: 0xffffff, deep: C.blueB, w: 0.09, strikes: 2, gap: 0.06, branches: 2, jag: 0.22, impact: false }); self.rm.crawl({ pos: p, radius: 0.5 }, { dur: 0.35, col: C.sky, n: 2 }); }   // 리마스터: 갈라지는 번개 + 몸의 전류
+        else { const z = zaps[zi++ % zaps.length]; self.seg(z.m, zA, zB, 0.1); z.t = 0.12; }   // 미리 만든 8개를 돌려 씀
         const q = P3(p).setY((p.y || 0) + 0.7); self.flash(q, 0xffffff, C.sky, 0.45, 0.07, 1.0); self.sparks(q, 2, { tint: [C.ice, C.sky], ground: (p.y || 0), life: 0.22, speed: [1, 2.2] }); }
       },
       end() { if (endT < 0) endT = 0; },

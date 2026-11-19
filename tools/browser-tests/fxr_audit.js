@@ -90,14 +90,14 @@ const CW = +(process.env.CW || Math.min(VW, TOUCH ? 390 : 640)), CH = +(process.
       if (process.env.PERFAT && i === Math.round(+process.env.PERFAT * FPS)) all['perf_' + id] = await ev(() => { const r = G.render.r; r.info.autoReset = false; const out = [];
         for (let k = 0; k < 3; k++) { r.info.reset(); const t0 = performance.now(); for (let j = 0; j < 4; j++) { G.render.render(0); r.getContext().finish(); } out.push({ ms: +((performance.now() - t0) / 4).toFixed(1), calls: Math.round(r.info.render.calls / 4), tris: Math.round(r.info.render.triangles / 4) }); }
         r.info.autoReset = true; return { runs: out, geometries: r.info.memory.geometries, textures: r.info.memory.textures, programs: (r.info.programs || []).length, rm: G.skillFx.rm && G.skillFx.rm.stats() }; });   // PERFAT=s: draw-only timing at that moment
-      if (draw) { const fn = `${OUT}/_a_${String(i).padStart(3, '0')}.png`; await pg.screenshot({ path: fn, clip: { x: Math.max(0, Math.min(VW - CW, Math.round(c[0] - CW / 2))), y: Math.max(0, Math.min(VH - CH, Math.round(c[1] - CH / 2))), width: CW, height: CH }, timeout: 300000 }); frames.push(fn); }
+      if (draw) { const fn = `${OUT}/_a_${TAG}_${SIZE}_${String(i).padStart(3, '0')}.png`; await pg.screenshot({ path: fn, clip: { x: Math.max(0, Math.min(VW - CW, Math.round(c[0] - CW / 2))), y: Math.max(0, Math.min(VH - CH, Math.round(c[1] - CH / 2))), width: CW, height: CH }, timeout: 300000 }); frames.push(fn); }
     }
     if (id === 'combo') await ev(() => { G.input.hold('attack', false); G.input.block = true; window.__combo = false; });
     if (process.env.SETTLE) { await ev(() => { for (let i = 0; i < 180; i++) { G.step(1 / 60, false); G.skillFx.update(1 / 60); } }); all['left_' + id] = await ev(() => G.skillFx.rm ? G.skillFx.rm.stats() : null); }   // SETTLE=1: 3 s later nothing of the remaster may stay
     const dmg = await ev(() => window.__dmg); all[id] = { dmg, total: dmg.reduce((s, x) => s + x.a, 0) };
     const name = `${OUT}/${TAG}_${SIZE}_${id}.png`;
-    fs.writeFileSync('/tmp/_fxrstrip.py', `from PIL import Image, ImageDraw\nfr=${JSON.stringify(frames)}\nlab=${JSON.stringify(TIMES)}\nims=[Image.open(f) for f in fr]\nw,h=ims[0].size\nn=len(ims); cols=4 if n>4 else n; rows=(n+cols-1)//cols\nsh=Image.new('RGB',(w*cols,(h+22)*rows),(20,20,28))\nd=ImageDraw.Draw(sh)\nfor i,(im,l) in enumerate(zip(ims,lab)):\n  x=(i%cols)*w; y=(i//cols)*(h+22)\n  sh.paste(im,(x,y+22)); d.text((x+6,y+4),'${id} %.2fs'%l,fill=(255,255,255))\nsh.save('${name}')`);
-    try { execSync('python3 /tmp/_fxrstrip.py'); } catch (e) { console.log('strip failed', e.message); }
+    fs.writeFileSync(`/tmp/_fxrstrip_${TAG}_${SIZE}.py`, `from PIL import Image, ImageDraw\nfr=${JSON.stringify(frames)}\nlab=${JSON.stringify(TIMES)}\nims=[Image.open(f) for f in fr]\nw,h=ims[0].size\nn=len(ims); cols=4 if n>4 else n; rows=(n+cols-1)//cols\nsh=Image.new('RGB',(w*cols,(h+22)*rows),(20,20,28))\nd=ImageDraw.Draw(sh)\nfor i,(im,l) in enumerate(zip(ims,lab)):\n  x=(i%cols)*w; y=(i//cols)*(h+22)\n  sh.paste(im,(x,y+22)); d.text((x+6,y+4),'${id} %.2fs'%l,fill=(255,255,255))\nsh.save('${name}')`);
+    try { execSync(`python3 /tmp/_fxrstrip_${TAG}_${SIZE}.py`); } catch (e) { console.log('strip failed', e.message); }
     for (const f of frames) fs.rmSync(f, { force: true });
     console.log(id, JSON.stringify(all[id]), name);
   }

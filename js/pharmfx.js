@@ -358,6 +358,9 @@ export class PharmFx {
       for (const m of pops) { const d = m.userData, u = clamp01(t / 0.2); m.quaternion.copy(this.camQ); m.scale.setScalar(d.s * (0.4 + 0.8 * easeOut(u))); m.material.uniforms.uA.value = I * 1.5 * (1 - smooth(0.02, 0.2, t)); m.visible = t < 0.2; }
     });
     const ribs = defs.map(d => { const m = this.rib(e, pal); m.userData = d; return m; });
+    // 리마스터(높음·보통, js/rmfx.js flatArc): 실제 유봉 끝에서 시작해 도는 방향으로 쓸리는 입체 금빛 반달 세 층(반지름 0.8 r — 원형 판정 안), 마지막 타는 큰 두 겹
+    if (this.rm && gfxOn() && this.rm.ok()) { const a0r = 92 * Math.PI / 180, b0 = a0 ?? base;
+      this.rm.flatArc(P3(pc.pos), { yaw: sense > 0 ? Math.PI / 2 - a0r - b0 : Math.PI / 2 + a0r - b0, dir: sense > 0 ? 1 : -1, R: r * 0.8, y: 0.75, draw: 0.11, life: last ? 0.34 : 0.24, fin: last, c1: 0xfff0b0, c2: 0xffa020, thick: 1.8, ghosts: last ? 2 : 1 }); }
     const gr = last ? this.ring(e, pal, 0.3) : null, stars = [], pops = [];
     for (let i = 0, n = (last ? 8 : 3) * (low ? 0.5 : 1); i < n; i++) { const m = this.spr(e, 'star', pal, 6); m.userData = { a: Math.random() * 6.283, rr: r * rnd(0.45, 0.97), y: rnd(0.4, 1.3), w: rnd(0.5, 1.2), s: rnd(0.18, last ? 0.42 : 0.3), t0: rnd(0, 0.1), life: rnd(0.2, 0.34) }; stars.push(m); }
     // small flash on every enemy this strike touched (the hit itself, not a disc over the whole area)
@@ -385,7 +388,7 @@ export class PharmFx {
         trail.visible = k > 0.25; trail.quaternion.copy(this.yawQ); trail.scale.set(1.1, 4.5 * k, 1); trail.position.set(0, pe.position.y + Pc.height * 0.7 + trail.scale.y * 0.4, 0); trail.material.uniforms.uA.value = I * 0.5 * k;
         flash.visible = glow.visible = wave.visible = false; for (const m of wraps) m.visible = false;
       } else {
-        if (!hit) { hit = true; this.shatter(pos, { r }); }
+        if (!hit) { hit = true; this.shatter(pos, { r }); if (this.rm && gfxOn()) this.rm.slam(pos, { r: Math.min(r, 3.2), pal: 'gold', k: 1.3, rubble: 14 }); }   // 리마스터(js/rmfx.js slam)
         pe.position.set(0, -0.3 * Math.min(1, u * 14) - 0.9 * smooth(Pc.stay, Pc.stay + 0.6, u), 0);
         pe.material.uniforms.uA.value = 1 - smooth(Pc.stay + 0.1, Pc.stay + 0.65, u); pe.material.uniforms.uGlow.value = Pc.glow + 0.22 * (1 - smooth(0, 0.25, u));
         mark.material.uniforms.uA.value = I * 0.8 * (1 - smooth(0, 0.2, u)); aim.visible = trail.visible = false;

@@ -226,6 +226,7 @@ export class HairFx {
       const sh = e.t - first - h * gap; if (Math.abs(sh - shift) > 0.02) { shift = sh; e.life = Math.max(e.life, total + shift + K.leave + 0.05); }
       if (t && t !== tgt) { tgt = t; anchor.copy(P3(t.pos)); mid = hairMid(t); rad = t.radius || 0.5; }
       glow = last ? 1.5 : 1.0;
+      if (this.rm && gfxOn()) this.rm.slashHit({ x: anchor.x, y: anchor.y + mid * (gold ? 0.55 : 1), z: -anchor.z }, { flash: true, c1: gold ? 0xfff0b0 : 0xffd0ec, c2: gold ? 0xffa030 : 0xc860d8, roll: roll0 + Math.PI / 2 });   // 리마스터: 닫힐 때마다 0.05초 별 섬광 + 빛줄기
       this.snip({ x: anchor.x, y: anchor.y + mid * (gold ? 0.55 : 1), z: -anchor.z }, { size: (gold ? 1.3 : 0.95) * Math.min(1.3, 0.8 + rad * 0.4), big: gold || !!bonus, roll: roll0 + Math.PI / 2 + rnd(-0.25, 0.25), ground: anchor.y });
     };
     e.miss = () => { if (ended < 0) ended = e.t; e.life = Math.min(e.life, e.t + K.leave); };
@@ -244,6 +245,7 @@ export class HairFx {
     });
     e.g.position.copy(c);
     const ln = this.spr(e, 2, 0xffffff, HAIR.col.pinkB, 7), l2 = this.spr(e, 2, HAIR.col.pink, HAIR.col.violet, 6); this._alignLine(ln, sideDir); this._alignLine(l2, sideDir);
+    if (this.rm && gfxOn() && this.rm.ok()) this.rm.lance(c.clone().addScaledVector(sideDir, -w * 0.5), c.clone().addScaledVector(sideDir, w * 0.5), { run: 0.06, life: 0.26, col: HAIR.col.pinkB, hi: 0xffffff, light: HAIR.col.pink, w: 0.3, flash: 0.6 });   // 리마스터: 판정 폭만큼 가로로 긋는 빛 칼날
     this.strands(c, low ? K.strandsLite : K.strands, { spread: w * 0.5, spreadDir: sideDir, up: [-0.2, 0.3], speed: [0, 0.25], ground: c.y - K.y, life: 0.85 });
     for (const t of o.hits || []) this.snip({ x: t.x, y: (t.y || 0) + (t.mid || 0.8), z: t.z }, { size: 0.8, roll: rnd(-0.2, 0.2), ground: t.y || 0 });
     return e;
@@ -480,6 +482,7 @@ export class HairFx {
     // 리마스터(높음·보통, js/rmfx.js): 온풍 = 부채꼴 안 화염 마법진·불꽃 앞선(틱마다)·불꽃 혀·불기둥·불티·아지랑이, 냉풍 = 서리 마법진·자라는 서리 무늬·반투명 얼음 결정 → 깨짐;
     // 맞은 적은 예전 열기 고리·발밑 결정 대신 rm.fireHit(작게)·rm.iceHit (겹치지 않게)
     const rmE = this.rm && gfxOn() && this.rm.ok() && mode !== 'gust' ? (mode === 'hot' ? this.rm.fireCone(pc, { f, r, ang: o.ang || 60, at: lead + 0.06, dur: Math.max(0.2, dur - lead - 0.06), pal: 'fire' }) : this.rm.iceCone(pc, { f, r, ang: o.ang || 60, at: lead + 0.06 })) : null;
+    if (this.rm && gfxOn() && this.rm.ok() && mode === 'gust') this.rm.windCone(pc, { f, r, ang: o.ang || 60, at: lead, cols: [0xeafff6, 0x5ad8b0] });   // 리마스터: 부채꼴 안을 감아 도는 바람 리본·빛줄기
     e.stop = () => { if (e.t < dur) { const cut = e.t; e.life = Math.min(e.life, cut + K.fade + 0.05); stopAt = cut; } if (rmE && rmE.stop) rmE.stop(); };
     e.pulse = (hits) => { kick = 1; tick++; if (rmE && mode === 'hot' && rmE.pulse) rmE.pulse();
       for (const t of hits || []) { const p = P3(t), c = p.clone(); c.y += t.mid || 0.7; const rad = t.r || 0.5;

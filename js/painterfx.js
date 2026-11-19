@@ -27,6 +27,7 @@
 // 가산 색은 블룸 문턱 아래, 전역 히트스톱·흔들림 없음(카메라 kick 은 규칙 js/painter.js 만), 저사양은 입자 수만(HERBFX.liteK).
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { gfxOn } from './gfxq.js';
 import { HerbalFx, HERBFX } from './herbalfx.js';
 
 export const PAINTFX = {
@@ -968,8 +969,12 @@ export class PaintFx extends HerbalFx {
     }
     return this._h(e, {
       rain: () => { },
-      bolt: (p, hits) => { const at = P3(p), gy = groundY(at.x, -at.z), top = new THREE.Vector3(at.x, gy + H, at.z); this._bolt(top, at.clone().setY(gy)); this.flash(at.clone().setY(gy + 0.4), 0xe8f0ff, 0x6a8aff, 1.0, 0.14, 1.0); this.ring(at.clone().setY(gy), 1.2, 0xc8d8ff, 0x3a4a8a, 0.3, 1.0, 0.2); for (const q of hits) { const t = P3(q); t.y += 0.6; this.flash(t, 0xe8f0ff, 0x6a8aff, 0.5, 0.12, 0.8); if (this.parts) this.pang(t, 'pt_storm', { r: 0.4, n: 7, stars: 1 }); }
-        if (this.parts) { const g3 = at.clone().setY(gy); this.beam(g3, 0.45, H, 'pt_storm', { life: 0.35, a: 1.1 }); this.pang(g3.clone().setY(gy + 0.4), 'pt_storm', { r: 0.6, n: 12, ground: gy, stars: lite() ? 1 : 3 }); this._bolt(top.clone().add(new THREE.Vector3(rnd(-0.3, 0.3), 0, rnd(-0.3, 0.3))), g3); } },
+      bolt: (p, hits) => { const at = P3(p), gy = groundY(at.x, -at.z), top = new THREE.Vector3(at.x, gy + H, at.z);
+        // 리마스터(높음·보통, js/rmfx.js lightning): 갈라지는 번개 세 번 연속(번쩍일 때마다 새 경로) + 땅에 남는 전류(번개 반경 안) + 맞은 적 몸의 전류 — 예전 꺾인 선은 낮음에서만
+        const rmB = this.rm && gfxOn() && this.rm.ok() ? this.rm.lightning(top.clone().add(new THREE.Vector3(rnd(-0.4, 0.4), 0, rnd(-0.4, 0.4))), at.clone().setY(gy), { col: 0x8aa8ff, hi: 0xf4f8ff, deep: 0x1c1a4a, w: 0.16, strikes: 3, gap: 0.07, branches: 4, r: Math.min(1.2, o.boltR || 1.2), linger: 0.65, floorY: gy, flashSize: 1.1 }) : null;
+        if (rmB) for (const q of hits) this.rm.crawl({ pos: q, radius: 0.5 }, { dur: 0.55, col: 0x8aa8ff, deep: 0x1c1a4a });
+        if (!rmB) this._bolt(top, at.clone().setY(gy)); this.flash(at.clone().setY(gy + 0.4), 0xe8f0ff, 0x6a8aff, 1.0, 0.14, 1.0); this.ring(at.clone().setY(gy), 1.2, 0xc8d8ff, 0x3a4a8a, 0.3, 1.0, 0.2); for (const q of hits) { const t = P3(q); t.y += 0.6; this.flash(t, 0xe8f0ff, 0x6a8aff, 0.5, 0.12, 0.8); if (this.parts) this.pang(t, 'pt_storm', { r: 0.4, n: 7, stars: 1 }); }
+        if (this.parts) { const g3 = at.clone().setY(gy); this.beam(g3, 0.45, H, 'pt_storm', { life: 0.35, a: 1.1 }); this.pang(g3.clone().setY(gy + 0.4), 'pt_storm', { r: 0.6, n: 12, ground: gy, stars: lite() ? 1 : 3 }); if (!rmB) this._bolt(top.clone().add(new THREE.Vector3(rnd(-0.3, 0.3), 0, rnd(-0.3, 0.3))), g3); } },
       gallery: () => { this.ring(c3, r, C.gold, C.goldB, 0.6, 1.0, 0.2); if (this.parts) this.sparkle(c3.clone().setY(groundY(c3.x, -c3.z) + P.cloudH), r * 0.6, 'pt_gold', 12, { up: -1.5 }); },
       pulse: () => { this.ring(c3, r, C.violet, C.violetB, 0.4, 0.8, 0.3); },
       end: () => { this._end(e, 0.6); if (e.sig) e.sig.end(0.6); },

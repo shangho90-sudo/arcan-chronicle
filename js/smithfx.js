@@ -216,7 +216,8 @@ export class SmithFx extends CookFx {
     const ring = (r, strong) => { const fx = this._fx('aring', 0.3, (x) => { const k = x.t / x.life; this._flat(rg, r * (0.3 + 0.7 * easeOut(k)), 0.07); rg.material.uniforms.uA.value = I * (strong ? 2.2 : K.ring) * (1 - smooth(0.3, 1, k)); }); fx.g.position.copy(g0); const rg = this.spr(fx, 1, C.white, C.gold, 3); rg.material.uniforms.uP.value = strong ? 1 : 0; };
     const top = () => g0.clone().setY(g0.y + 0.74 * K.size);
     return this._h(e, {
-      land: (hit) => { if (landed >= 0) return; landed = e.t; sq = 1; pulse = 1; const low = lite(); ring(R, true); this.flash(g0.clone().setY(g0.y + 0.2), { size: 1.3, a: 1.1 });
+      land: (hit) => { if (landed >= 0) return; landed = e.t; sq = 1; pulse = 1; const low = lite(); ring(R, true);
+        if (this.rm && gfxOn()) this.rm.slam(pos, { r: R, pal: 'anvil', k: 1.1, rubble: 12 });   // 리마스터(js/rmfx.js slam): 판정 반경 안 균열 별·충격 고리 두 겹·먼지 벽·돌 파편 this.flash(g0.clone().setY(g0.y + 0.2), { size: 1.3, a: 1.1 });
         this.sparks(g0.clone().setY(g0.y + 0.15), low ? K.sparksLite : K.sparks, { ground: g0.y, speed: [2.2, 4.4], up: [1.8, 3.8], life: 0.5 }); this._puffs(g0, low ? 3 : 6, R * 0.6, { a: 0.4, life: 0.4 }); void hit; },
       pulse: (r, last) => { pulse = 1; sq = 0.5; ring(r, false); this.flash(top(), { size: 0.75, life: 0.12 }); this.sparks(top(), lite() ? 2 : 5, { ground: g0.y, life: 0.4 }); void last; },
       bump: () => { pulse = 1; sq = 0.7; this.flash(top(), { size: 1.0 }); this.sparks(top(), lite() ? 3 : 6, { ground: g0.y }); },
@@ -261,7 +262,8 @@ export class SmithFx extends CookFx {
     for (const h of hits) {
       const g = P3(h), p = g.clone(); p.y += Math.min(1.0, 0.35 + (h.r || 0.5) * 0.7);
       if (k === 'tap') { this.flash(p, { size: 0.55, life: 0.1, b: C.hot }); this.sparks(p, low ? 1 : 3, { ground: g.y, life: 0.32 }); }
-      else if (k === 'finish') { this.flash(p, { size: 1.15, ring: (h.r || 0.5) + 0.5, gy: g.y, b: C.hot }); this.sparks(p, low ? 3 : 8, { ground: g.y, speed: [2, 4], life: 0.5 }); this._puffs(g, low ? 2 : 4, 0.9, { a: 0.36, life: 0.38 }); }
+      else if (k === 'finish') { if (this.rm && gfxOn()) this.rm.slam(h, { r: (h.r || 0.5) + 0.6, pal: 'anvil', k: 0.75, rubble: 7 });   // 리마스터: 대상 발밑 작은 균열 별·고리·먼지
+        this.flash(p, { size: 1.15, ring: (h.r || 0.5) + 0.5, gy: g.y, b: C.hot }); this.sparks(p, low ? 3 : 8, { ground: g.y, speed: [2, 4], life: 0.5 }); this._puffs(g, low ? 2 : 4, 0.9, { a: 0.36, life: 0.38 }); }
       else if (k === 'brand') { this.flash(p, { size: 0.95, ring: (h.r || 0.5) + 0.3, gy: g.y, b: C.brand, rb: C.brand }); this.sparks(p, low ? 2 : 5, { ground: g.y, tint: 0xffa070 }); }
     }
     if (!hits.length && k === 'finish') { const f = o.f, g = P3({ x: pc.pos.x + f.x * 1.5, y: pc.pos.y || 0, z: pc.pos.z + f.z * 1.5 }); this._puffs(g, low ? 1 : 3, 0.7, { a: 0.3, life: 0.35 }); }

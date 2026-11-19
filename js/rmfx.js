@@ -87,7 +87,15 @@ void main(){
       float spokes = smoothstep(.05, 0., am * r) * step(r, .8), br = smoothstep(.05, 0., abs(am * r - abs(r - .5) * .55)) * step(.32, r) * step(r, .72);
       float rings = exp(-pow((r - .93) * 42., 2.)) + .6 * exp(-pow((r - .82) * 60., 2.)) + .5 * exp(-pow((r - .22) * 40., 2.));
       a = (rings + spokes * .9 + br * .7) * sh + .14 * smoothstep(1., .1, r) * sh; core = rings * .8 + spokes * .7; }
-    else { float w = .5 + .5 * sin(vUv.y * 38. + uT * 13. + vn(vUv * 6. + uQ) * 6.); a = .5 * w * pow(clamp(1. - r, 0., 1.), 1.5); core = 0.; }
+    else if (uS < 19.5) { float w = .5 + .5 * sin(vUv.y * 38. + uT * 13. + vn(vUv * 6. + uQ) * 6.); a = .5 * w * pow(clamp(1. - r, 0., 1.), 1.5); core = 0.; }
+    else if (uS < 20.5) {   // 20 ground crack star (flat quad): ~9 jagged radial cracks grown out to uE, hot crater glow in the middle
+      float an = ang + (vn(vec2(r * 7. + uQ, uQ)) - .5) * .6 + (vn(vec2(r * 19. - uQ, 3.)) - .5) * .18, sec = fract(an / 6.2832 * 9. + uQ * .37), d = abs(sec - .5) / 9. * 6.2832 * r;
+      float br = step(.55, vn(vec2(floor(an / 6.2832 * 9. + uQ * .37) * 3.1, 1.))), len = mix(.7, 1., br);
+      float line = smoothstep(.03 + .012 * (1. - r), 0., d) * step(.06, r) * smoothstep(len, len - .12, r);
+      a = (line * (.65 + .35 * (1. - r)) + exp(-r * r * 16.) * .9) * smoothstep(uE, uE - .14, r) * smoothstep(1., .86, r); core = line * smoothstep(.6, 0., r) + exp(-r * r * 30.); }
+    else {   // 21 dust wall on rm_band: soft noisy ring of dust rising, thinning upward, eroding with uE
+      float v = vUv.y, n = vn(vec2(vUv.x * 16. + uQ, v * 3. - uT * 1.4)) * .65 + vn(vec2(vUv.x * 37. - uQ, v * 7. - uT * 2.)) * .35;
+      a = pow(1. - v, 1.4) * smoothstep(.25, .75, n + (1. - v) * .25) * smoothstep(0., .06, v) * (1. - smoothstep(uE - .3, uE, n * .6 + v * .7)); core = .15 * n; }
   }
   else {   // 10 heal sigil (flat quad): double ring + 8 leaf petals + rotating dots, drawn in by uE (0..1), uT = time
     vec2 p = vUv * 2. - 1.; float r = length(p), ang = atan(p.y, p.x), sh = step(ang + 3.14159, uE * 6.2832 + .001);
@@ -124,6 +132,14 @@ void main(){ if (vA <= .001) discard; vec3 n = normalize(vN); if (!gl_FrontFacin
   if (uS < .5) { float k = 1. - abs(vUv.y * 2. - 1.); k *= smoothstep(0., .5, vUv.x); vec3 c = mix(vC, vec3(1.), k * k * .7); gl_FragColor = vec4(c * vA * (.35 + k), 1.); }
   else { vec3 L = normalize(vec3(-.4, .8, .5)); float d = max(0., dot(n, L)), rim = pow(1. - max(0., dot(n, normalize(vV))), 2.5), sp = pow(max(0., dot(reflect(-L, n), normalize(vV))), 20.);
     gl_FragColor = vec4(vC * (.55 + .6 * d) + rim * .3 + sp * .7, vA); } }`;
+
+// lightning (one merged strip mesh per layer: main bolt + branches): uv.x along a polyline, uv.y across, aI = brightness per vertex
+// uS 0 = additive light (white-hot core line + coloured glow) / 1 = soft dark outer (normal blending — the bolt reads on a bright floor)
+const BOLT_VS = `attribute float aI; varying vec2 vUv; varying float vI; void main(){ vUv = uv; vI = aI; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`;
+const BOLT_FS = `uniform vec3 uW, uB; uniform float uA, uS; varying vec2 vUv; varying float vI;
+void main(){ float v = abs(vUv.y * 2. - 1.), core = exp(-v * v * 26.), glow = exp(-v * v * 3.2) * (1. - v);
+  if (uS < .5) { vec3 c = mix(uB, uW, core); gl_FragColor = vec4(c * (core * 1.6 + glow * .5) * vI * uA, 1.); }
+  else gl_FragColor = vec4(uB, glow * .55 * vI * uA); }`;
 
 const U = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, { value: v }]));
 
@@ -216,7 +232,7 @@ export class RmFx {
       const mk = (add) => new THREE.ShaderMaterial({ uniforms: U({ uW: new THREE.Color(), uB: new THREE.Color(), uA: 0, uS: add ? 1 : 0, uQ: 0 }), vertexShader: RIB_VS, fragmentShader: RIB_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: add ? THREE.AdditiveBlending : THREE.NormalBlending });
       m = new THREE.Mesh(g, mk(false)); m.userData.N = N; m.userData.mats = [m.material, mk(true)]; m.frustumCulled = false;
     }
-    m.geometry.setDrawRange(0, 0); m.visible = true; return m;
+    m.userData.mats[0].uniforms.uS.value = 0; m.userData.mats[1].uniforms.uS.value = 1; m.geometry.setDrawRange(0, 0); m.visible = true; return m;
   }
   /** pts: newest last; width(k) k 0 = oldest .. 1 = head */
   _ribFill(m, pts, width) {
@@ -523,6 +539,10 @@ export class RmFx {
     soup: { w: 0xffeaa8, b: 0xff7a1e, mid: 0xffb040, deep: 0xc85010, ember: [0xffe08a, 0xff9a2a, 0xfff4e6] },
     forge: { w: 0xfff6c8, b: 0xff4a0a, mid: 0xffb02a, deep: 0xa82008, ember: [0xffe6a0, 0xffb040, 0xff6a1a] },
     ice: { w: 0xffffff, b: 0x5ab8ff, mid: 0xa8e4ff, deep: 0x2a6ad8, ember: [0xffffff, 0xbfe8ff, 0x7ac8ff] },
+    gold: { w: 0xfff6d0, b: 0xffb020, mid: 0xffd27a, deep: 0x6a4210, ember: [0xfff2b0, 0xffd27a, 0xffffff], dust: [0xd8c8a0, 0x8a7458] },
+    pan: { w: 0xfff2d8, b: 0xff9a3a, mid: 0xffd08a, deep: 0x5a3416, ember: [0xfff0c0, 0xffc060, 0xffffff], dust: [0xe0d4b8, 0x9a8466] },
+    anvil: { w: 0xfff2c0, b: 0xff6a1a, mid: 0xffb040, deep: 0x3a2418, ember: [0xffe6a0, 0xffa030, 0xff6a1a], dust: [0xb0a090, 0x6a5a4a] },
+    sky: { w: 0xffffff, b: 0x6ab8ff, mid: 0xb8e2ff, deep: 0x1a3a9a, ember: [0xffffff, 0xbfe8ff, 0x7ac8ff], dust: [0xd8dce8, 0x8a90a8] },
   };
   /** fire in a cone (용광로 개방·뜨거운 국물·온풍 드라이). o: {f (game facing), r, ang, at (s until the burst = damage frame), dur (sustain s, channel), pal}
    *  준비(at 전): 부채꼴 안 지면 마법진이 그려짐 / 발동: 섬광 + 불꽃 부채꼴의 충격 앞선(= 원형 충격파를 판정 부채꼴로 자름) + 도는 불꽃 혀 + 솟는 불기둥 + 불티 + 열기 아지랑이 / 끝: 천천히 꺼짐.
@@ -690,6 +710,213 @@ export class RmFx {
       for (const x of [m, a]) { x.material.uniforms.uE.value = 2; x.visible = false; } rs.push({ m, a, d: i * 0.07 }); }
     const fl = this._m(e, 'add', this.quad, { w: 0xffffff, b: 0xc84aff, s: 4, order: 9 }); fl.position.y = 0.85;
     this.emit('streak', low ? 5 : 12, (i) => { const a = rnd(0, 6.28), d = _b.set(Math.cos(a), 0, Math.sin(a)); return { p: _a.copy(g0).addScaledVector(d, 0.4).setY(g0.y + rnd(0.5, 1.1)), v: _c.copy(d).multiplyScalar(rnd(5, 7)).setY(rnd(-0.5, 0.8)), s: rnd(0.05, 0.07), col: i % 2 ? 0xff7aff : 0xc8ff5a, life: r / 7, drag: 1, stretch: 0.07 }; });
+    return e;
+  }
+
+  // ================================================================== 휘두르기·찌르기 (8묶음: 붓 휘두르기·유봉 휘두르기·꼬치 찌르기)
+  /** a flat 3-layer crescent (bladeLayers on rm_cres) swept round centre c (three) in the ground plane at height y:
+   *  o: {yaw (local +Z = forward), R (radius), y, dir (+1 right->left like the swing, -1 mirrored), draw (s for the head to sweep), life, fin, c1, c2, ghosts, tilt}.
+   *  The caller keeps it inside the real hit shape (centre / radius chosen from the fan or circle). */
+  flatArc(c, o = {}) {
+    if (!this.ok()) return null;
+    const draw = o.draw ?? 0.14, life = o.life ?? 0.32, R = o.R ?? 1;
+    let L = null;
+    const e = this._fx('flatArc', draw + life + 0.05, (e) => { const t = e.t, head = clamp01(easeOut(t / draw)) * 1.02, u = Math.max(0, t - draw), fade = 1 - smooth(0.02, life, u), tail = 1.2 * (1 - smooth(0.05, life, u)) + 0.08;
+      this.bladeSet(L, head, tail, fade, o.k ?? 1); });
+    e.g.position.copy(c.isVector3 ? c : P3(c)); e.g.position.y += o.y ?? 0.9;
+    e.g.rotation.set(o.tilt ?? 0, o.yaw ?? 0, 0, 'YXZ'); e.g.scale.set(R * (o.dir === -1 ? -1 : 1), R * (o.thick ?? 1.6), R);
+    L = this.bladeLayers(e.g, { fin: !!o.fin, c1: o.c1, c2: o.c2, ghosts: o.ghosts ?? 2 });
+    if (L) for (const m of [L.halo, L.body, L.core, ...L.gh]) m.material.depthTest = true;
+    e.free = () => { if (L) { this.bladeFree(L); L = null; } };
+    return e;
+  }
+  /** a straight thrust of light A -> B (three or game coords): the lance head runs out in `run` s leaving a tapered light ribbon over a coloured ribbon, then it fades;
+   *  a small star flash at the tip when it arrives (the real line length — the caller passes the hit line). */
+  lance(A0, B0, o = {}) {
+    if (!this.ok()) return null;
+    const low = rmLite(), I = RMFX.intensity * rawK(), A = A0.isVector3 ? A0.clone() : P3(A0), B = B0.isVector3 ? B0.clone() : P3(B0), run = o.run ?? 0.08, life = o.life ?? 0.3, col = o.col ?? 0xffb060, hi = o.hi ?? 0xffffff, w = o.w ?? 0.34, N = 14, pts = [];
+    for (let i = 0; i < N; i++) pts.push(new THREE.Vector3());
+    const e = this._fx('lance', run + life, (e) => { const t = e.t, k = easeOut(t / run), fade = 1 - smooth(run * 0.6, run + life, t);
+      for (let i = 0; i < N; i++) pts[i].copy(A).lerp(B, k * i / (N - 1));
+      this._ribFill(ribP, pts, (q) => w * (0.25 + 0.75 * q)); this._ribFill(ribL, pts, (q) => w * 0.45 * (0.2 + 0.8 * q));
+      ribP.material.uniforms.uA.value = 0.85 * fade; ribL.material.uniforms.uA.value = I * 1.3 * fade;
+      const ft = t - run; tip.visible = ft > -0.02; this._face(tip, (o.flash ?? 0.8) * (0.6 + 0.5 * easeOut(Math.max(0, ft) / 0.03))); tip.position.copy(pts[N - 1]); tip.rotateZ(0.5); tip.material.uniforms.uA.value = I * 1.3 * (1 - smooth(0.01, 0.06, Math.max(0, ft)));
+    });
+    e.g.position.set(0, 0, 0);
+    const tip = this._m(e, 'add', this.quad, { w: 0xffffff, b: col, s: 4, order: 10 }); tip.material.depthTest = false;
+    const ribP = this._rib(N), ribL = this._rib(N); ribP.material = ribP.userData.mats[0]; ribL.material = ribL.userData.mats[1];
+    for (const [m, a, b, o2] of [[ribP, o.light ?? col, col, 5], [ribL, hi, col, 6]]) { const u = m.material.uniforms; u.uW.value.setHex(a); u.uB.value.setHex(b); u.uQ.value = rnd(0, 20); u.uA.value = 0; m.renderOrder = o2; this.root.add(m); }
+    e.ribs = [ribP, ribL];
+    this.emit('streak', Math.round(5 * (low ? RMFX.liteK : 1)), () => { _b.subVectors(B, A).normalize(); return { p: B, v: _c.copy(_b).multiplyScalar(rnd(3, 6)).add(_a.set(rnd(-1.5, 1.5), rnd(0, 1.5), rnd(-1.5, 1.5))), s: rnd(0.04, 0.06), col: rand() < 0.5 ? hi : col, life: rnd(0.12, 0.2), drag: 7, stretch: 0.09, t: -run }; });
+    return e;
+  }
+
+  /** 돌풍(드라이 돌풍): 판정 부채꼴 안을 감아 도는 바람 리본 n개(머리가 앞으로 달려 나가며 나선으로 꼬임 — 빛 리본 + 옅은 색 리본), 앞으로 밀려 나가는 바람 띠 빛줄기.
+   *  o: {f (game facing), r, ang, at (s), cols [hi, col]} */
+  windCone(pc, o = {}) {
+    if (!this.ok() || !pc) return null;
+    const low = rmLite(), I = RMFX.intensity * rawK(), c = this._cone(pc, o), at = o.at || 0, n = low ? 3 : 5, N = 16, run = 0.32, hi = (o.cols || [])[0] ?? 0xeafff6, col = (o.cols || [])[1] ?? 0x5ad8b0, ws = [];
+    const e = this._fx('wind', at + run + 0.45, (e) => { const T = e.t - at;
+      ws.forEach((q) => { const k = (T - q.d) / run; q.L.visible = q.P.visible = k > 0; if (k <= 0) return; const head = easeOut(Math.min(1, k)), fade = 1 - smooth(0.7, 1.6, k);
+        for (let i = 0; i < N; i++) { const u = head * i / (N - 1), d = 0.35 + u * (c.r * 0.93 - 0.35), tw = q.ph + u * q.turns * 6.283 + T * 6, rr = (0.12 + 0.28 * u) * q.amp;
+          q.pts[i].copy(this._inCone(c, Math.max(-0.95, Math.min(0.95, q.a + Math.sin(tw) * rr / Math.max(0.6, d) * 0.6)), d / c.r, q.y + Math.cos(tw) * rr)); }
+        this._ribFill(q.L, q.pts, (kk) => q.w * 0.5 * (0.2 + 0.8 * kk)); this._ribFill(q.P, q.pts, (kk) => q.w * (0.25 + 0.75 * kk));
+        q.L.material.uniforms.uA.value = I * 1.05 * fade; q.P.material.uniforms.uA.value = 0.6 * fade; });
+    });
+    e.g.position.set(0, 0, 0); e.ribs = [];
+    for (let i = 0; i < n; i++) { const L = this._rib(N), P = this._rib(N); L.material = L.userData.mats[1]; P.material = P.userData.mats[0];
+      for (const [m, a, b, o2] of [[P, hi, col, 5], [L, 0xffffff, col, 6]]) { const u = m.material.uniforms; u.uW.value.setHex(a); u.uB.value.setHex(b); u.uQ.value = rnd(0, 20); u.uA.value = 0; m.renderOrder = o2; m.visible = false; this.root.add(m); }
+      const pts = []; for (let j = 0; j < N; j++) pts.push(new THREE.Vector3());
+      ws.push({ L, P, pts, d: i * 0.045, a: (n === 1 ? 0 : (i / (n - 1)) * 1.4 - 0.7) + rnd(-0.08, 0.08), y: rnd(0.35, 1.0), ph: rnd(0, 6.283), turns: rnd(1.2, 2), amp: rnd(0.7, 1.1), w: rnd(0.16, 0.24) }); e.ribs.push(L, P); }
+    this.emit('streak', low ? 4 : 9, () => { const th = rnd(-c.h, c.h) * 0.85, d = _b.copy(c.d).applyAxisAngle(UP, th);
+      return { p: _a.copy(c.g0).addScaledVector(d, 0.5).setY(c.g0.y + rnd(0.3, 1.1)), v: _c.copy(d).multiplyScalar(c.r * rnd(2.2, 2.8)), s: rnd(0.04, 0.06), col: rand() < 0.5 ? 0xffffff : col, life: 0.32, drag: 0.6, stretch: 0.07, t: -at }; });
+    return e;
+  }
+
+  // ================================================================== 무거운 내려찍기 (7묶음: 모루 떨구기·천근쇄약·팬 강타·백련타 마무리)
+  /** heavy ground slam at p (game coords, ground y): 0.06 s white star flash + hot crater glow, radial crack star growing out (light + dark layers),
+   *  two shock rings, a low dust wall that rises and thins, rubble chunks + hot sparks. Everything inside r (the real hit radius, capped). */
+  slam(p, o = {}) {
+    if (!this.ok() || !p) return null;
+    const low = rmLite(), P = RmFx.PAL[o.pal] || RmFx.PAL.gold, I = RMFX.intensity * rawK(), g = p.isVector3 ? p.clone() : P3(p), r = Math.min(o.r ?? 1.6, o.maxR ?? 3.2), k = o.k ?? 1;
+    const fs = Math.min(1.6, 0.7 + r * 0.35) * k, life = 0.95;
+    const e = this._fx('slam', life, (e) => { const t = e.t;
+      this._face(fl, fs * (0.55 + 0.6 * easeOut(t / 0.03))); fl.rotateZ(0.4); fl.material.uniforms.uA.value = I * 1.4 * (1 - smooth(0.012, 0.065, t));
+      this._face(gw, fs * 0.9 * (0.6 + 0.5 * easeOut(t / 0.12))); gw.material.uniforms.uA.value = I * 0.6 * (1 - smooth(0.04, 0.3, t));
+      const ce = 0.12 + 1.0 * easeOut(t / 0.14); for (const [m, a] of [[cr, I * 1.25 * (1 - smooth(0.25, 0.85, t))], [crD, 0.75 * (1 - smooth(0.45, 0.95, t))]]) { m.material.uniforms.uE.value = ce; m.material.uniforms.uA.value = a; }
+      const k1 = t / 0.26, k2 = (t - 0.06) / 0.38;
+      r1.visible = k1 < 1; r1.scale.set(r * (0.2 + 0.8 * easeOut(k1)), 1, r * (0.2 + 0.8 * easeOut(k1))); r1.material.uniforms.uA.value = I * 1.3 * (1 - smooth(0.4, 1, k1)); r1.material.uniforms.uT.value = t;
+      r2.visible = k2 > 0 && k2 < 1; r2.scale.set(r * 0.8 * (0.2 + 0.8 * easeOut(k2)), 1, r * 0.8 * (0.2 + 0.8 * easeOut(k2))); r2.material.uniforms.uA.value = I * 0.8 * (1 - smooth(0.3, 1, k2));
+      const kd = t / 0.8, dr = r * (0.3 + 0.62 * easeOut(kd * 1.4)), dh = (0.22 + 0.22 * k) * (0.4 + 0.6 * easeOut(kd * 2));
+      dust.scale.set(dr, dh, dr); dust.material.uniforms.uT.value = t; dust.material.uniforms.uE.value = 1.3 - 1.2 * smooth(0.25, 1, kd); dust.material.uniforms.uA.value = 0.8 * smooth(0, 0.05, t) * (1 - smooth(0.45, 0.85, kd));
+    });
+    e.g.position.copy(g);
+    const fl = this._m(e, 'add', this.quad, { w: 0xffffff, b: P.mid, s: 4, order: 10 }); fl.position.y = 0.45; fl.material.depthTest = false;
+    const gw = this._m(e, 'add', this.quad, { w: P.mid, b: P.b, s: 6, order: 9 }); gw.position.y = 0.35;
+    const crD = this._m(e, 'alpha', this.quad, { w: P.deep, b: P.deep, s: 20, order: 2 }); this._flat(crD, r * 2, 0.045);
+    const cr = this._m(e, 'add', this.quad, { w: P.w, b: P.b, s: 20, order: 3 }); this._flat(cr, r * 2, 0.055); cr.material.uniforms.uQ.value = crD.material.uniforms.uQ.value;
+    const r1 = this._m(e, 'add', this.geo.rm_ring, { w: 0xffffff, b: P.b, s: 3, order: 4 }); r1.position.y = 0.07;
+    const r2 = this._m(e, 'add', this.geo.rm_ring, { w: P.mid, b: P.b, s: 3, order: 4 }); r2.position.y = 0.08;
+    const dc = P.dust || [0xd8c8a0, 0x8a7458], dust = this._m(e, 'alpha', this.geo.rm_band, { w: dc[0], b: dc[1], s: 21, order: 5 }); dust.position.y = 0.02;
+    const nR = Math.round((o.rubble ?? 10) * k * (low ? RMFX.liteK : 1)), nS = Math.round(9 * k * (low ? RMFX.liteK : 1));
+    this.emit('shard', nR, () => { const a = rnd(0, 6.283), sp = rnd(1.2, 2.6) * Math.min(1.3, r / 1.5); return { p: _a.copy(g).add(_b.set(Math.cos(a) * 0.25, 0.15, Math.sin(a) * 0.25)), v: _c.set(Math.cos(a) * sp, rnd(2.2, 4.2), Math.sin(a) * sp), s: rnd(0.07, 0.13), col: rand() < 0.5 ? dc[1] : dc[0], a: 1, life: rnd(0.5, 0.75), grav: 12, floor: g.y + 0.03, spin: 10 }; });
+    this.emit('streak', nS, () => { const a = rnd(0, 6.283); return { p: _a.copy(g).setY(g.y + 0.25), v: _c.set(Math.cos(a) * rnd(3, 6), rnd(1.5, 4), Math.sin(a) * rnd(3, 6)), s: rnd(0.04, 0.06), col: P.ember[(rand() * 3) | 0], life: rnd(0.16, 0.3), drag: 5, stretch: 0.09, grav: 6 }; });
+    if (!low) this.emit('star', 3, () => ({ p: _a.copy(g).add(_b.set(rnd(-0.4, 0.4), rnd(0.3, 0.8), rnd(-0.4, 0.4))), v: _c.set(0, rnd(0.5, 1), 0), s: rnd(0.06, 0.09), col: 0xffffff, life: 0.45, spin: 6, t: -rnd(0.02, 0.12) }));
+    return e;
+  }
+
+  // ================================================================== 번개 (6묶음): 불규칙하게 갈라지는 번개 경로(번쩍일 때마다 새로) · 연속 낙뢰 · 전기 스파크 · 땅/대상에 남는 전류
+  // 그림: 층 메시 두 장(가산 빛 = 흰 심 + 색 번짐 / 알파 = 짙은 남색 외곽 — 밝은 바닥에서도 읽힘)에 본 줄기 + 가지를 한꺼번에 채움(draw call 2).
+  /** pooled merged strip mesh for bolts (its own geometry, capacity N points) */
+  _boltM(e, add) {
+    const kind = add ? 'boltL' : 'boltD', p = this.pool[kind] || (this.pool[kind] = []); let m = p.pop();
+    if (!m) { const N = 220, g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(N * 6), 3).setUsage(THREE.DynamicDrawUsage)); g.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(N * 4), 2).setUsage(THREE.DynamicDrawUsage));
+      g.setAttribute('aI', new THREE.BufferAttribute(new Float32Array(N * 2), 1).setUsage(THREE.DynamicDrawUsage)); g.setIndex(new THREE.BufferAttribute(new Uint16Array(N * 6), 1).setUsage(THREE.DynamicDrawUsage)); g.setDrawRange(0, 0);
+      m = new THREE.Mesh(g, new THREE.ShaderMaterial({ uniforms: U({ uW: new THREE.Color(), uB: new THREE.Color(), uA: 0, uS: add ? 0 : 1 }), vertexShader: BOLT_VS, fragmentShader: BOLT_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide,
+        blending: add ? THREE.AdditiveBlending : THREE.NormalBlending }));
+      m.frustumCulled = false; m.userData.kind = kind; m.userData.N = N; }
+    m.geometry.setDrawRange(0, 0); m.visible = true; m.renderOrder = add ? 9 : 6; m.material.uniforms.uA.value = 0; e.items.push(m); e.g.add(m); return m;
+  }
+  /** lines: [{pts: [Vector3], w, i (brightness), tip (fade toward the end)}] -> camera-facing strips in one geometry; wk = width multiplier */
+  _boltFill(m, lines, wk) {
+    const g = m.geometry, N = m.userData.N, pos = g.attributes.position, uv = g.attributes.uv, ai = g.attributes.aI, idx = g.index.array; let v = 0, n = 0;
+    for (const L of lines) { const P = L.pts, c = P.length; if (c < 2 || v + c > N) continue;
+      for (let i = 0; i < c; i++) { const p = P[i], pa = P[Math.max(0, i - 1)], pb = P[Math.min(c - 1, i + 1)], k = i / (c - 1);
+        _a.subVectors(pb, pa); if (_a.lengthSq() < 1e-8) _a.set(1, 0, 0); _b.subVectors(this.camPos, p); _c.crossVectors(_a, _b); if (_c.lengthSq() < 1e-10) _c.set(0, 1, 0); _c.normalize().multiplyScalar(L.w * wk * (L.tip ? 1 - 0.6 * k : 1) / 2);
+        const I = L.i * (L.tip ? Math.pow(1 - k, 0.6) : 1) * (i === 0 && L.tip ? 0.6 : 1);
+        pos.setXYZ((v + i) * 2, p.x - _c.x, p.y - _c.y, p.z - _c.z); pos.setXYZ((v + i) * 2 + 1, p.x + _c.x, p.y + _c.y, p.z + _c.z);
+        uv.setXY((v + i) * 2, k, 0); uv.setXY((v + i) * 2 + 1, k, 1); ai.setX((v + i) * 2, I); ai.setX((v + i) * 2 + 1, I);
+        if (i < c - 1) { const a = (v + i) * 2; idx[n++] = a; idx[n++] = a + 1; idx[n++] = a + 2; idx[n++] = a + 1; idx[n++] = a + 3; idx[n++] = a + 2; } }
+      v += c; }
+    pos.needsUpdate = uv.needsUpdate = ai.needsUpdate = true; g.index.needsUpdate = true; g.setDrawRange(0, n);
+  }
+  /** jagged path A -> B by midpoint displacement (amp = fraction of the length, halves each level); flat = displace in the ground plane only */
+  _jag(A, B, levels, amp, flat) {
+    let P = [A.clone(), B.clone()]; const len = A.distanceTo(B); let d = len * amp; const dir = _a.subVectors(B, A).normalize().clone();
+    for (let l = 0; l < levels; l++) { const Q = [P[0]];
+      for (let i = 0; i < P.length - 1; i++) { const m = P[i].clone().lerp(P[i + 1], 0.5 + rnd(-0.12, 0.12));
+        if (flat) { _b.set(-dir.z, 0, dir.x); m.addScaledVector(_b, rnd(-d, d)); m.y += rnd(-0.03, 0.05) * d; }
+        else { _b.set(rnd(-1, 1), rnd(-1, 1), rnd(-1, 1)); _b.addScaledVector(dir, -_b.dot(dir)); if (_b.lengthSq() < 1e-6) _b.set(1, 0, 0); m.addScaledVector(_b.normalize(), rnd(0.35, 1) * d); }
+        Q.push(m, P[i + 1]); }
+      P = Q; d *= 0.52; }
+    return P;
+  }
+  /** a lightning tree: main path + branches forking off at random points (each regenerated per flash) */
+  _boltTree(A, B, o, low) {
+    const len = A.distanceTo(B), lv = Math.max(2, Math.min(5, Math.round(Math.log2(len / 0.16)))), main = this._jag(A, B, lv, o.jag ?? 0.2, o.flat), lines = [{ pts: main, w: o.w, i: 1 }];
+    const nb = low ? Math.min(o.branches ?? 3, 2) : (o.branches ?? 3), dir = _c.subVectors(B, A).normalize().clone();
+    for (let b = 0; b < nb; b++) { const i0 = Math.floor(main.length * rnd(0.18, 0.78)), p0 = main[i0], bl = len * rnd(0.16, 0.38);
+      _b.set(rnd(-1, 1), o.flat ? 0 : rnd(-1, 1), rnd(-1, 1)); _b.addScaledVector(dir, -_b.dot(dir)).normalize();
+      const p1 = p0.clone().addScaledVector(dir, bl * rnd(0.45, 0.85)).addScaledVector(_b, bl * rnd(0.45, 0.8)); if (o.floorY != null) p1.y = Math.max(p1.y, o.floorY + 0.03);
+      const br = this._jag(p0, p1, Math.max(1, lv - 2), 0.28, o.flat); lines.push({ pts: br, w: o.w * 0.6, i: 0.7, tip: true });
+      if (!low && rand() < 0.5) { const j = Math.floor(br.length * rnd(0.3, 0.7)), q0 = br[j], q1 = q0.clone().addScaledVector(dir, bl * 0.3).addScaledVector(_b.set(rnd(-1, 1), o.flat ? 0 : rnd(-0.5, 0.5), rnd(-1, 1)).normalize(), bl * 0.3);
+        lines.push({ pts: this._jag(q0, q1, 1, 0.3, o.flat), w: o.w * 0.4, i: 0.5, tip: true }); } }
+    return lines;
+  }
+  /** electric sparks (white/blue streaks) thrown from p (three) */
+  _zapSparks(p, n, col, o = {}) { this.emit('streak', n, () => { _b.set(rnd(-1, 1), rnd(o.up ?? 0.1, 1), rnd(-1, 1)).normalize();
+    return { p, v: _c.copy(_b).multiplyScalar(rnd(3.5, 7)), s: rnd(0.035, 0.055), col: rand() < 0.45 ? 0xffffff : col, life: rnd(0.1, 0.2), drag: 7, stretch: 0.11, grav: 4 }; }); }
+  /** 번개 한 줄기(연속 낙뢰): A -> B (THREE.Vector3 = 화면 좌표, 아니면 게임 좌표 {x,y,z}). 번쩍일 때마다 경로·가지를 새로 만들고, strikes번 gap 간격으로 다시 침.
+   *  o: {col, hi, deep, w, strikes, gap, branches, jag, flat, impact (B에 0.05초 섬광·땅 고리·스파크), r (고리 반지름 상한), linger (B 땅에 남는 전류 초), floorY}. 반환 = 효과 */
+  lightning(A0, B0, o = {}) {
+    if (!this.ok() || !A0 || !B0) return null;
+    const low = rmLite(), I = RMFX.intensity * rawK(), A = A0.isVector3 ? A0.clone() : P3(A0), B = B0.isVector3 ? B0.clone() : P3(B0);
+    const col = o.col ?? 0x6ab8ff, hi = o.hi ?? 0xf4fbff, deep = o.deep ?? 0x1c2c8c, strikes = Math.max(1, o.strikes ?? 2), gap = o.gap ?? 0.075, w = o.w ?? 0.11, fl = o.flash ?? 1;
+    const gy = o.groundY != null ? o.groundY : B.y, life = (strikes - 1) * gap + 0.22;
+    let k0 = -1;
+    const e = this._fx('bolt', life + 0.05, (e) => { const t = e.t, i = Math.min(strikes - 1, Math.floor(t / gap));
+      if (i !== k0) { k0 = i; const lines = this._boltTree(A, B, { w, branches: o.branches, jag: o.jag, flat: o.flat, floorY: o.floorY }, low); this._boltFill(L, lines, 3.2); this._boltFill(D, lines, 4.6);
+        if (o.impact !== false) { this._zapSparks(B.clone().setY(B.y + 0.1), Math.round((i ? 3 : 7) * (low ? RMFX.liteK : 1)), col); if (i) { f0 = t; } } }
+      const T = t - k0 * gap, env = (k0 === strikes - 1 ? 1 - smooth(0.02, 0.2, T) : Math.exp(-T * 22)) * (k0 ? 0.85 : 1) * (0.85 + 0.15 * Math.sin(t * 90));
+      L.material.uniforms.uA.value = I * 1.25 * env; D.material.uniforms.uA.value = 0.85 * Math.min(1, env * 1.3);
+      if (fx) { const ft = t - f0; this._face(fx, (o.flashSize || 0.9) * fl * (0.6 + 0.5 * easeOut(ft / 0.03))); fx.material.uniforms.uA.value = I * 1.3 * (1 - smooth(0.012, 0.06, ft)); }
+      if (ring) { const kr = t / 0.28; ring.visible = kr < 1; const R = Math.min(o.r ?? 1.1, 1.4) * (0.3 + 0.7 * easeOut(kr)); ring.scale.set(R, 1, R); ring.material.uniforms.uA.value = I * 1.1 * (1 - smooth(0.4, 1, kr)); ring.material.uniforms.uT.value = t; }
+    });
+    let f0 = 0; e.g.position.set(0, 0, 0);
+    const D = this._boltM(e, false), L = this._boltM(e, true);
+    L.material.uniforms.uW.value.setHex(hi); L.material.uniforms.uB.value.setHex(col); D.material.uniforms.uB.value.setHex(deep); D.material.uniforms.uW.value.setHex(deep);
+    const fx = o.impact === false ? null : this._m(e, 'add', this.quad, { w: 0xffffff, b: col, s: 4, order: 10 }); if (fx) { fx.position.copy(B).setY(B.y + 0.35); fx.material.depthTest = false; }
+    const ring = o.impact === false || o.flat ? null : this._m(e, 'add', this.geo.rm_ring, { w: hi, b: col, s: 3, order: 4 }); if (ring) ring.position.copy(B).setY(gy + 0.06);
+    if (o.linger) this.current(B.clone().setY(gy), { r: Math.min(o.r ?? 1.1, 1.4), dur: o.linger, col, hi, deep, delay: 0.04 });
+    return e;
+  }
+  /** 땅에 남는 전류: p(화면 좌표, 땅 높이) 둘레 반지름 r 안에서 짧은 지그재그 전류가 0.06초마다 새로 기어다니다 사라짐 + 가끔 튀는 스파크 */
+  current(p, o = {}) {
+    if (!this.ok() || !p) return null;
+    const low = rmLite(), I = RMFX.intensity * rawK(), c = p.isVector3 ? p.clone() : P3(p), r = o.r ?? 1, dur = o.dur ?? 0.6, n = low ? 2 : (o.n ?? 4), d0 = o.delay || 0, col = o.col ?? 0x6ab8ff;
+    let nt = 0, sp = 0;
+    const e = this._fx('current', d0 + dur, (e, dt) => { const t = e.t - d0; if (t < 0) return; const k = t / dur;
+      nt -= dt; if (nt <= 0) { nt = 0.06; const lines = [];
+        for (let i = 0; i < n; i++) { const a = rnd(0, 6.283), a2 = a + rnd(-0.9, 0.9), r0 = rnd(0, r * 0.35), r1 = rnd(r * 0.55, r * 0.95);
+          const A = new THREE.Vector3(c.x + Math.cos(a) * r0, c.y + 0.05, c.z + Math.sin(a) * r0), B = new THREE.Vector3(c.x + Math.cos(a2) * r1, c.y + 0.05, c.z + Math.sin(a2) * r1);
+          lines.push({ pts: this._jag(A, B, 3, 0.25, true), w: 0.06, i: rnd(0.6, 1), tip: true }); }
+        this._boltFill(L, lines, 3); this._boltFill(D, lines, 4); }
+      const env = (1 - smooth(0.45, 1, k)) * (0.6 + 0.4 * Math.sin(t * 70)); L.material.uniforms.uA.value = I * 1.05 * env; D.material.uniforms.uA.value = 0.5 * env;
+      sp -= dt; if (sp <= 0 && k < 0.8) { sp = low ? 0.2 : 0.1; const a = rnd(0, 6.283), rr = rnd(0, r * 0.9); this._zapSparks(new THREE.Vector3(c.x + Math.cos(a) * rr, c.y + 0.08, c.z + Math.sin(a) * rr), 1, col, { up: 0.5 }); }
+    });
+    e.g.position.set(0, 0, 0);
+    const D = this._boltM(e, false), L = this._boltM(e, true);
+    L.material.uniforms.uW.value.setHex(o.hi ?? 0xf4fbff); L.material.uniforms.uB.value.setHex(col); D.material.uniforms.uB.value.setHex(o.deep ?? 0x1c2c8c);
+    return e;
+  }
+  /** 대상에 남는 전류: 몸 둘레(반지름 0.8 r, 발 위 0.2 ~ 2r 높이)를 따라 기어다니는 짧은 호 n개, 대상을 따라감 */
+  crawl(t, o = {}) {
+    if (!this.ok() || !t || !t.pos) return null;
+    const low = rmLite(), I = RMFX.intensity * rawK(), dur = o.dur ?? 0.5, n = low ? 2 : (o.n ?? 3), col = o.col ?? 0x6ab8ff;
+    let nt = 0;
+    const e = this._fx('crawl', dur, (e, dt) => { const k = e.t / dur, r = (t.radius || 0.5), h = Math.min(1.6, r * 2 + 0.2), c = P3(t.pos);
+      nt -= dt; if (nt <= 0) { nt = 0.05; const lines = [];
+        for (let i = 0; i < n; i++) { const a = rnd(0, 6.283), y0 = rnd(0.2, h), A = new THREE.Vector3(c.x + Math.cos(a) * r * 0.85, c.y + y0, c.z + Math.sin(a) * r * 0.85), a2 = a + rnd(-1.4, 1.4), B = new THREE.Vector3(c.x + Math.cos(a2) * r * 0.85, c.y + Math.max(0.1, y0 + rnd(-0.5, 0.5)), c.z + Math.sin(a2) * r * 0.85);
+          lines.push({ pts: this._jag(A, B, 2, 0.3, false), w: 0.05, i: rnd(0.6, 1) }); }
+        this._boltFill(L, lines, 3); this._boltFill(D, lines, 3.6); }
+      const env = (1 - smooth(0.5, 1, k)) * (0.55 + 0.45 * Math.sin(e.t * 80)); L.material.uniforms.uA.value = I * env; D.material.uniforms.uA.value = 0.4 * env;
+      if (t.dead && e.t > 0.1) e.t = Math.max(e.t, dur * 0.8);
+    });
+    e.g.position.set(0, 0, 0);
+    const D = this._boltM(e, false), L = this._boltM(e, true);
+    L.material.uniforms.uW.value.setHex(o.hi ?? 0xf4fbff); L.material.uniforms.uB.value.setHex(col); D.material.uniforms.uB.value.setHex(o.deep ?? 0x1c2c8c);
+    for (const m of [L, D]) m.material.depthTest = false;
     return e;
   }
 
