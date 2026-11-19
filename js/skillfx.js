@@ -20,6 +20,7 @@ import { ArtFx } from './artfx.js';
 import { HerbalFx } from './herbalfx.js';   // 한약사 2차 (2026-11-16)
 import { PaintFx } from './painterfx.js';   // 화가 2차 (2026-11-16)
 import { MusicFx } from './musicfx.js';   // 음악가 2차 (2026-11-16)
+import { RmFx } from './rmfx.js';   // 스킬 이펙트 리마스터(테일즈위버풍) 공용 키트 (2026-11-19)
 
 const TAU = Math.PI * 2, DEG = Math.PI / 180;
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -1669,7 +1670,8 @@ export class SkillFx {
     this.music = new MusicFx(this.root); this.music.load();                   // 음악가 2차: 악기·음파·환영 악단 (js/musicfx.js)
     this.herbal = new HerbalFx(this.root); this.herbal.load();                // 한약사 2차: 탕관·영물·오행 침구 (js/herbalfx.js)
     this.painter = new PaintFx(this.root); this.painter.load();               // 화가 2차: 그림 소환물·채색·풍경 (js/painterfx.js)
-    this.art = new ArtFx(this.root); this.art.load();                         // 예술가 1차: 물감·음표·액자·전구 (js/artfx.js)
+    this.rm = new RmFx(this.root); this.rm.load();                            // 리마스터 공용 다층 메시 이펙트 (js/rmfx.js) — 직업 모듈이 gfxOn()일 때 빌려 씀
+    this.art = new ArtFx(this.root); this.art.load(); this.art.rm = this.rm;                         // 예술가 1차: 물감·음표·액자·전구 (js/artfx.js)
     this.pharm = new PharmFx(this.root); this.pharm.load();                   // 약사 1차: 황금 유봉·약병·주사기·보호막·회복진 (js/pharmfx.js)                      // 배쉬 crescent / impact / dust meshes (js/bashfx.js)
     /** optional camera-shake hook: (amplitude, duration) => void. Suppressed when SkillFx.reduceFlash. */
     this.onShake = null;
@@ -1712,6 +1714,7 @@ export class SkillFx {
   update(dt) {
     dt = Math.min(Math.max(dt, 0), 0.1); this.time += dt;
     this.shatter.update(dt); this.sal.update(dt); this.yeon.update(dt); this.biyeon.update(dt); this.bash.update(dt); this.pharm.update(dt); this.cook.update(dt); this.smith.update(dt); this.chef.update(dt); this.ds.update(dt); this.hair.update(dt); this.art.update(dt); this.wp.update(dt); this.en.update(dt); this.herbal.update(dt); this.painter.update(dt); this.music.update(dt);
+    this.rm.update(dt);
     const L = this.live;
     for (let i = 0; i < L.length; i++) {
       const e = L[i]; e.t += dt; e.lt = e.t * e.tk;
@@ -1722,7 +1725,7 @@ export class SkillFx {
     }
     this.pa.update(dt); this.pn.update(dt);
   }
-  clear() { this.shatter.clear(); this.sal.clear(); this.yeon.clear(); this.biyeon.clear(); this.bash.clear(); this.pharm.clear(); this.cook.clear(); this.smith.clear(); this.chef.clear(); this.ds.clear(); this.hair.clear(); this.art.clear(); this.wp.clear(); this.en.clear(); this.herbal.clear(); this.painter.clear(); this.music.clear(); for (const e of this.live) if (!e.dead) this._release(e); this.live.length = 0; this.pa.clear(); this.pn.clear(); }
+  clear() { this.shatter.clear(); this.sal.clear(); this.yeon.clear(); this.biyeon.clear(); this.bash.clear(); this.pharm.clear(); this.cook.clear(); this.smith.clear(); this.chef.clear(); this.ds.clear(); this.hair.clear(); this.art.clear(); this.wp.clear(); this.en.clear(); this.herbal.clear(); this.painter.clear(); this.music.clear(); this.rm.clear(); for (const e of this.live) if (!e.dead) this._release(e); this.live.length = 0; this.pa.clear(); this.pn.clear(); }
   /** remove from scene and free pooled rigs (shared caches stay) */
   dispose() { this.clear(); for (const p of this.pools.values()) for (const r of p) disposeRig(r); this.pools.clear(); this.root.removeFromParent(); this.pa.geo.dispose(); this.pn.geo.dispose(); this.pa.mat.dispose(); this.pn.mat.dispose(); }
 

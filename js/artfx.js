@@ -21,6 +21,7 @@
 // skill (stroke, splat, arc, pool, mark, notes, bulb, frame) stays. No global bloom / exposure / hit-stop is touched here.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { gfxOn } from './gfxq.js';
 
 export const ART = {
   intensity: 1.0,
@@ -287,6 +288,8 @@ export class ArtFx {
   // ------------------------------------------------------------------ 물감 탄환 / 음표 (투사체)
   proj(pos, o = {}) {
     if (!this._ok()) return null;
+    // 리마스터(품질 높음·보통, 2026-11-19): 물감 탄환 = 세 층 혜성 + 꼬리 리본 + 물감 방울 (js/rmfx.js paintComet) — 낮음은 아래 예전 그대로
+    if (o.kind === 'blob' && this.rm && gfxOn() && this.rm.ok()) { const h = this.rm.paintComet(pos, { col: o.col ?? C.blu }); if (h) return h; }
     const note = o.kind === 'note', last = P3(pos), vel = new THREE.Vector3(0, 0, 1), idx = o.idx || 0, low = lite();
     const col = note ? (idx % 2 ? C.violetB : C.goldB) : (o.col ?? C.blu); let dropT = 0;
     const e = this._fx('proj', 6, (e, dt) => {
@@ -303,6 +306,7 @@ export class ArtFx {
   }
   projHit(t, o = {}) {
     if (!this._ok() || !t || !t.pos) return null;
+    if (o.kind !== 'note' && this.rm && gfxOn() && this.rm.ready) { const r = this.rm.paintImpact(t, { col: o.col ?? C.blu, dir: o.dir }); if (r) return r; }   // 리마스터: 섬광 → 물감 왕관 → 땅 충격파 → 얼룩
     const at = P3(t.pos); at.y += artMid(t);
     if (o.kind !== 'note') return this._splash(at, o.col ?? C.blu, { big: true, ground: t.pos.y || 0, size: Math.min(1.15, 0.7 + (t.radius || 0.5) * 0.45), cols: [o.col ?? C.blu, C.white, light(o.col ?? C.blu, 0.4)] });
     // staccato: a short sharp star, one thin ring, two tiny notes hopping off — over in 0.25 s
