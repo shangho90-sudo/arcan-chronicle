@@ -1,5 +1,5 @@
 {
- "spent": 18,
+ "spent": 46,
  "done": {
   "cf_wok_toss": {
    "task": "e93fa16d-7fb6-47c6-a622-0d6086bc6595",
@@ -75,6 +75,90 @@
    "task": "54a43781-dd29-49c0-b845-c8dc632ae50d",
    "duration": 0.5,
    "date": "2026-11-17"
+  },
+  "cf_skewer": {
+   "task": "5357afc9-8240-4c38-a1b5-1fa43aa7b7b8",
+   "duration": 0.8,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19"
+  },
+  "cf_frost_draw": {
+   "task": "9c875603-25bf-40fe-a0d5-5a5abbcf33d9",
+   "duration": 0.8,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19"
+  },
+  "cf_frost": {
+   "task": "008ba1c0-ab37-4e8a-8194-c3ecc62357f7",
+   "duration": 1.2,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19"
+  },
+  "cf_disc": {
+   "task": "a9718c0a-2b4a-4f62-8667-c8b4848f6d30",
+   "duration": 0.8,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19"
+  },
+  "cf_disc_hit": {
+   "task": "c1852a5d-27c4-4f83-9b7c-7d49b62a9df0",
+   "duration": 0.5,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19"
+  },
+  "cf_disc_catch": {
+   "task": "e1a0def5-c52a-4e2d-a84d-8300d28aea38",
+   "duration": 0.5,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19"
+  },
+  "cf_sugar": {
+   "task": "d04ef8b6-3825-42d9-88e8-e13dc56558e9",
+   "duration": 1.0,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19"
+  },
+  "cf_shatter": {
+   "task": "c329c331-64f1-49bb-b2fc-ea87b0c92ae0",
+   "duration": 1.0,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19"
+  },
+  "cf_choux_pop": {
+   "task": "91717c2e-b8c4-4a95-8c98-a19db0594524",
+   "duration": 0.5,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19"
+  },
+  "cf_serve": {
+   "task": "6615376f-9f51-4eb1-97d4-680ba98912da",
+   "duration": 0.7,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19"
+  },
+  "cf_cloche_open": {
+   "task": "6832ba4f-65fd-4c4c-b83f-273dd803d223",
+   "duration": 1.0,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19"
+  },
+  "cf_sigil": {
+   "task": "ca26b9f4-a57f-499c-b737-3420156af04c",
+   "duration": 1.2,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19"
+  },
+  "cf_twinkle": {
+   "task": "f7f7b967-f19e-40ef-a4c8-97e334119436",
+   "duration": 0.6,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19"
+  },
+  "cf_bless": {
+   "task": "15c25a9d-e252-4526-b219-e4c6c4a08f01",
+   "duration": 1.4,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19"
   }
  },
  "rejected": {

@@ -58,24 +58,29 @@ def post(name):
     d = float(subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', dst], capture_output=True, text=True).stdout.strip() or 0)
     return round(d, 2)
 def run(names):
-    os.makedirs(TMP, exist_ok=True); s = load()
-    for n in names:
-        if n in s['done'] and os.path.exists(os.path.join(TMP, n + '.raw')): print(n, 'already'); continue
-        dur, prompt, _ = SFX[n]; cost = max(1, round(dur + 0.4999))
-        if s['spent'] + cost > BUDGET: print('예산 초과 — 멈춤', s['spent']); break
-        t = call('POST', '/sound_effect', {'model': 'eleven_text_to_sound_v2', 'promptText': prompt, 'duration': dur}); s['spent'] += cost; save(s)
-        for _ in range(90):
-            time.sleep(3); st = call('GET', '/tasks/' + t['id'])
-            if st.get('status') in ('SUCCEEDED', 'FAILED', 'CANCELLED'): break
-        if st.get('status') != 'SUCCEEDED': print(n, 'failed', st.get('status'), str(st.get('failure', ''))[:120]); continue
-        req = urllib.request.Request(st['output'][0], headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, timeout=120) as f, open(os.path.join(TMP, n + '.raw'), 'wb') as o: o.write(f.read())
-        s['done'][n] = {'prompt': prompt, 'duration': dur, 'task': t['id'], 'date': time.strftime('%Y-%m-%d'), 'out': post(n)}; save(s); print(n, 'ok', s['done'][n]['out'], 's', 'spent', s['spent'], flush=True)
+    # 2026-11-19: 한 번에 하나·기다림 한도·성공만 크레딧으로 셈(runway_task.py). eleven 이 밀려 있으면 같은 프롬프트로 mirelo_sfx_2_0.
+    # 연속 3번 실패·하루 한도·예산(RW_FLOOR 잔액 바닥)이면 멈춤. 받은 것마다 상태 파일에 바로 저장(이어받기).
+    import runway_task as R
+    os.makedirs(TMP, exist_ok=True); s = load(); bal0 = R.balance(); print('잔액', bal0, flush=True)
+    def todo(n):
+        if n in s['done'] and os.path.exists(os.path.join(TMP, n + '.raw')): print(n, 'already'); return False
+        if s['spent'] + R.cost(SFX[n][0], 'mirelo_sfx_2_0') > BUDGET: print('예산 초과 — 건너뜀', n, s['spent']); return False
+        return True
+    def one(n):
+        dur, prompt, _ = SFX[n]
+        ok, t, el, model = R.generate_any(prompt, dur)
+        if not ok: print(n, 'failed', t, flush=True); return False
+        R.download(t['output'][0], os.path.join(TMP, n + '.raw'))
+        s['spent'] += R.cost(dur, model)
+        s['done'][n] = {'prompt': prompt, 'duration': dur, 'task': t['id'], 'model': model, 'date': time.strftime('%Y-%m-%d'), 'out': post(n)}; save(s)
+        print(n, 'ok', model, s['done'][n]['out'], 's', 'spent', s['spent'], flush=True); return True
+    okn, why = R.run_batch(names, todo, one)
+    print('이번에', len(okn), '개 / 멈춘 까닭:', why, '/ 잔액', bal0, '->', R.balance(), flush=True)
     credits(s)
 def credits(s):
     p = os.path.join(OUT, 'designer-sfx-credits.json'); c = json.load(open(p))
-    c['runway'] = {'provider': 'runway eleven_text_to_sound_v2 (tools/audio/designer_runway_sfx.py)', 'generatedOn': '2026-11-17', 'creditsSpent': s['spent'],
-                   'assets': {('sfx_' + n + '.mp3'): {'prompt': v['prompt'], 'duration': v['duration'], 'date': v['date']} for n, v in sorted(s['done'].items())}}
+    c['runway'] = {'provider': 'runway eleven_text_to_sound_v2 · 2026-11-19부터 eleven 이 THROTTLED 로 밀리면 같은 프롬프트로 mirelo_sfx_2_0 — 소리마다 model (tools/audio/designer_runway_sfx.py)', 'generatedOn': '2026-11-19', 'creditsSpent': s['spent'],
+                   'assets': {('sfx_' + n + '.mp3'): {'prompt': v['prompt'], 'duration': v['duration'], 'date': v['date'], 'model': 'runway ' + v.get('model', 'eleven_text_to_sound_v2')} for n, v in sorted(s['done'].items())}}
     c['note'] = '디자이너 2차 스킬. 2026-11-17 fx2: 효과음을 Runway eleven_text_to_sound_v2로 새로 만듦(runway 항목). 예전 합성음 14개는 같은 이름으로 덮어씀(합성 스크립트 designer_sfx.py는 대체용으로 남김 — 다시 돌리면 Runway 소리를 덮어쓰니 주의).'
     json.dump(c, open(p, 'w'), indent=1, ensure_ascii=False)
 if __name__ == '__main__':

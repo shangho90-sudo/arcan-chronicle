@@ -62,29 +62,28 @@ def post(name):
     print('  ->', os.path.relpath(dst, ROOT), round(dur, 2), 's', flush=True)
 
 def run(names):
-    st = load_state()
-    for n in names:
-        if n in st['done']: print(n, 'already'); continue
+    # 2026-11-19: 한 번에 하나·기다림 한도·성공만 크레딧으로 셈(runway_task.py). 연속 3번 실패나 하루 한도면 멈춤.
+    import runway_task as R
+    st = load_state(); bal0 = R.balance(); print('잔액', bal0, flush=True)
+    def todo(n):
+        if n in st['done']: print(n, 'already'); return False
+        if st['spent'] + R.cost(SOUNDS[n][0], 'mirelo_sfx_2_0') > BUDGET: print('budget stop', st['spent']); return False
+        return True
+    def one(n):
         d, prompt, _ = SOUNDS[n]
-        if st['spent'] + cost(d) > BUDGET: print('budget stop', st['spent']); break
-        r = call('POST', '/sound_effect', {'model': 'eleven_text_to_sound_v2', 'promptText': prompt + TAIL, 'duration': d})
-        st['spent'] += cost(d); save_state(st); tid = r['id']; t0 = time.time()
-        while True:
-            time.sleep(3); t = call('GET', '/tasks/' + tid)
-            if t.get('status') in ('SUCCEEDED', 'FAILED', 'CANCELLED') or time.time() - t0 > 300: break
-        if t.get('status') != 'SUCCEEDED': print(n, 'failed', t.get('status'), str(t.get('failure') or '')[:200]); continue
-        url = t['output'][0]; ext = '.mp3'
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        raw = urllib.request.urlopen(req, timeout=120).read(); fn = os.path.join(RAW, n + '.src')
-        open(fn, 'wb').write(raw)
-        subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', fn, os.path.join(RAW, n + ext)], check=True)
-        st['done'][n] = {'task': tid, 'duration': d, 'date': datetime.date.today().isoformat()}; save_state(st)
-        print(n, 'ok', len(raw), 'bytes, spent', st['spent'], flush=True); post(n)
+        ok, t, el, model = R.generate_any(prompt + TAIL, d)
+        if not ok: print(n, 'failed', t, flush=True); return False
+        fn = os.path.join(RAW, n + '.src'); R.download(t['output'][0], fn)
+        subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', fn, os.path.join(RAW, n + '.mp3')], check=True)
+        st['spent'] += R.cost(d, model); st['done'][n] = {'task': t['id'], 'duration': d, 'model': model, 'date': datetime.date.today().isoformat()}; save_state(st)
+        print(n, 'ok', model, f'{el:.0f}s, spent', st['spent'], flush=True); post(n); return True
+    okn, why = R.run_batch(names, todo, one)
+    print('이번에', len(okn), '개', '/ 멈춘 까닭:', why, '/ 잔액', bal0, '->', R.balance(), flush=True)
     credits(st)
 
 def credits(st):
-    c = {'note': '2026-11-17 fx2: Runway eleven_text_to_sound_v2 로 다시 만듦(예전 합성 10개를 같은 이름으로 대체 + 그림용 8개). 아직 못 만든 것은 synthesized 에 — tools/audio/painter_sfx.py 합성음(예전 10개는 --force 일 때만 다시 씀).', 'model': 'runway eleven_text_to_sound_v2', 'tool': 'tools/audio/painter_runway_sfx.py', 'post': 'ffmpeg trim / loudnorm -16 LUFS / mono mp3 96k',
-         'spentCredits': st['spent'], 'synthesized': {('sfx_' + n): 'tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)' for n in SOUNDS if n not in st['done']}, 'sounds': {('sfx_' + n): {'prompt': SOUNDS[n][1] + TAIL, 'duration': SOUNDS[n][0], 'use': SOUNDS[n][2], 'date': v['date']} for n, v in st['done'].items()}}
+    c = {'note': '2026-11-17 fx2: Runway eleven_text_to_sound_v2 로 다시 만듦(예전 합성 10개를 같은 이름으로 대체 + 그림용 8개). 2026-11-19 eleven 이 THROTTLED 로 밀려 같은 프롬프트로 mirelo_sfx_2_0(2 크레딧/초) — 소리마다 model 항목. 아직 못 만든 것은 synthesized 에 — tools/audio/painter_sfx.py 합성음(예전 10개는 --force 일 때만 다시 씀).', 'model': 'runway eleven_text_to_sound_v2', 'tool': 'tools/audio/painter_runway_sfx.py', 'post': 'ffmpeg trim / loudnorm -16 LUFS / mono mp3 96k',
+         'spentCredits': st['spent'], 'synthesized': {('sfx_' + n): 'tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)' for n in SOUNDS if n not in st['done']}, 'sounds': {('sfx_' + n): {'prompt': SOUNDS[n][1] + TAIL, 'duration': SOUNDS[n][0], 'use': SOUNDS[n][2], 'date': v['date'], 'model': 'runway ' + v.get('model', 'eleven_text_to_sound_v2')} for n, v in st['done'].items()}}
     json.dump(c, open(CREDITS, 'w'), indent=1, ensure_ascii=False)
 
 if __name__ == '__main__':
