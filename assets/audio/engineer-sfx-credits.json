@@ -1,5 +1,5 @@
 {
- "note": "Synthesized in-repo (no Runway credit). Regenerate with python3 tools/audio/en_sfx.py (fixed seed). 2026-11-17 fx2: 그림 순간 소리 8개(en_deploy/assemble/vent/target/whistle/core/alarm/craft) 추가 — Runway(tools/audio/en_runway_sfx.py)로 만들 예정이었으나 그날 Runway 일일 작업 한도에 걸려 같은 합성 도구로 먼저 만듦(이어받기로 나중에 덮어쓸 수 있음).",
+ "note": "엔지니어 2차 스킬. 2026-11-17 fx2: 효과음을 Runway eleven_text_to_sound_v2로 새로 만듦(runway 항목). 예전 합성음 13개는 같은 이름으로 덮어씀(합성 스크립트 en_sfx.py는 대체용으로 남김 — 다시 돌리면 Runway 소리를 덮어쓰니 주의).",
  "generatedOn": "2026-11-16",
  "assets": [
   {
@@ -86,5 +86,108 @@
    "file": "sfx_en_craft.mp3",
    "description": "설계도 부품 결합 + 반짝 종소리 (2026-11-17 fx2, js/engfx.js)"
   }
- ]
+ ],
+ "runway": {
+  "provider": "runway eleven_text_to_sound_v2 · 2026-11-19부터 eleven 이 THROTTLED 로 밀리면 같은 프롬프트로 mirelo_sfx_2_0 — 소리마다 model (tools/audio/en_runway_sfx.py)",
+  "generatedOn": "2026-11-19",
+  "creditsSpent": 31,
+  "assets": {
+   "sfx_en_assemble.mp3": {
+    "prompt": "big robot mech assembling itself, heavy armor plates and legs clanking together in sequence, bolts tightening, hydraulic whirr, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+    "duration": 1.4,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_en_cannon.mp3": {
+    "prompt": "short heavy steampunk cannon blast, deep boom with a wide punchy explosion and a burst of hissing steam, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+    "duration": 1.2,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_en_charge.mp3": {
+    "prompt": "electromagnetic coil capacitor charging up, rising electric whine with crackling sparks, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+    "duration": 1.0,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_en_deploy.mp3": {
+    "prompt": "compact folded metal gadget unfolding quickly, springy hinges snapping open, legs and plates clacking into place, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+    "duration": 0.8,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_en_drop.mp3": {
+    "prompt": "heavy glowing power core falling from the sky and slamming into the ground, deep metallic thud with a humming energy ring, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+    "duration": 1.0,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_en_exhaust.mp3": {
+    "prompt": "mechanical steam exhaust vent releasing a strong pressurized hiss puff, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+    "duration": 0.9,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_en_lock.mp3": {
+    "prompt": "small mechanical device locking into place, two crisp metallic clicks and a tiny servo chirp, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+    "duration": 0.5,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_en_missile.mp3": {
+    "prompt": "small rocket missile launching from a pod, quick whoosh with a sparkling fizzing thrust, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+    "duration": 0.7,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_en_motor.mp3": {
+    "prompt": "small electric servo motor spinning up with a rising whirr and soft gear clatter, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+    "duration": 0.8,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_en_pile.mp3": {
+    "prompt": "hydraulic piston hiss followed by a massive steel pile driver stake slamming into armor, heavy metallic impact with ringing clang, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+    "duration": 1.0,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_en_pop.mp3": {
+    "prompt": "small bright explosion pop with a puff of smoke and tiny metal debris, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+    "duration": 0.6,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_en_rail.mp3": {
+    "prompt": "powerful railgun firing, sharp high electric zing crack with a thunderous whoosh and blue lightning sizzle, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+    "duration": 1.0,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_en_shot.mp3": {
+    "prompt": "single small compact magic turret gun shot, short dry punchy pop with a tiny metallic ring, very short, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+    "duration": 0.4,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_en_vent.mp3": {
+    "prompt": "cooling fins snapping open on a machine with a short burst of hot steam and a warning beep, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+    "duration": 0.7,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_en_weld.mp3": {
+    "prompt": "small welding torch sparks sizzling and crackling, repair tool buzz, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+    "duration": 0.8,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_en_zap.mp3": {
+    "prompt": "short tesla coil electric zap, crackling blue spark arc, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+    "duration": 0.5,
+    "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   }
+  }
+ }
 }

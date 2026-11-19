@@ -1,0 +1,133 @@
+{
+ "spent": 31,
+ "done": {
+  "en_lock": {
+   "prompt": "small mechanical device locking into place, two crisp metallic clicks and a tiny servo chirp, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+   "duration": 0.5,
+   "task": "53110d3b-6b20-48c8-8ce5-d8dcb5ca1a12",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.55
+  },
+  "en_motor": {
+   "prompt": "small electric servo motor spinning up with a rising whirr and soft gear clatter, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+   "duration": 0.8,
+   "task": "445551d7-9bab-4c3a-98e5-de99cc7d214b",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.84
+  },
+  "en_shot": {
+   "prompt": "single small compact magic turret gun shot, short dry punchy pop with a tiny metallic ring, very short, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+   "duration": 0.4,
+   "task": "b020e702-c883-4185-b24f-3aa0e63d232a",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.44
+  },
+  "en_pile": {
+   "prompt": "hydraulic piston hiss followed by a massive steel pile driver stake slamming into armor, heavy metallic impact with ringing clang, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+   "duration": 1.0,
+   "task": "403f74e4-e415-4ad7-a726-e0f7d837bd6a",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 1.04
+  },
+  "en_cannon": {
+   "prompt": "short heavy steampunk cannon blast, deep boom with a wide punchy explosion and a burst of hissing steam, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+   "duration": 1.2,
+   "task": "aa584558-e7c8-45ea-a529-fe888e05232c",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 1.23
+  },
+  "en_missile": {
+   "prompt": "small rocket missile launching from a pod, quick whoosh with a sparkling fizzing thrust, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+   "duration": 0.7,
+   "task": "8f02d854-ee8b-4cd2-95d0-03c58cea1073",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.73
+  },
+  "en_pop": {
+   "prompt": "small bright explosion pop with a puff of smoke and tiny metal debris, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+   "duration": 0.6,
+   "task": "51028d64-61a4-4a59-9b59-a0c6cf3a08b2",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.63
+  },
+  "en_charge": {
+   "prompt": "electromagnetic coil capacitor charging up, rising electric whine with crackling sparks, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+   "duration": 1.0,
+   "task": "81ce077c-1aa9-42b7-91e4-58d03f08bbda",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.99
+  },
+  "en_rail": {
+   "prompt": "powerful railgun firing, sharp high electric zing crack with a thunderous whoosh and blue lightning sizzle, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+   "duration": 1.0,
+   "task": "8a5aa854-c74f-4404-abe6-f4039c3ee354",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 1.04
+  },
+  "en_zap": {
+   "prompt": "short tesla coil electric zap, crackling blue spark arc, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+   "duration": 0.5,
+   "task": "3e835e58-fff3-4f37-9e5a-240afac43405",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.55
+  },
+  "en_weld": {
+   "prompt": "small welding torch sparks sizzling and crackling, repair tool buzz, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+   "duration": 0.8,
+   "task": "9fc80d1f-af32-47ec-9811-281652679f1a",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.65
+  },
+  "en_exhaust": {
+   "prompt": "mechanical steam exhaust vent releasing a strong pressurized hiss puff, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+   "duration": 0.9,
+   "task": "21dcfd42-89f8-40b0-b936-e8f8276d1814",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.94
+  },
+  "en_drop": {
+   "prompt": "heavy glowing power core falling from the sky and slamming into the ground, deep metallic thud with a humming energy ring, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+   "duration": 1.0,
+   "task": "17bdfcff-2705-46d4-bc34-f59f8143bb13",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 1.04
+  },
+  "en_deploy": {
+   "prompt": "compact folded metal gadget unfolding quickly, springy hinges snapping open, legs and plates clacking into place, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+   "duration": 0.8,
+   "task": "d91be8be-6d44-48c6-8dd5-6d9be66c6dfc",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.84
+  },
+  "en_assemble": {
+   "prompt": "big robot mech assembling itself, heavy armor plates and legs clanking together in sequence, bolts tightening, hydraulic whirr, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+   "duration": 1.4,
+   "task": "5bcf7b7d-46e4-4934-a245-8fa22581cc4b",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 1.44
+  },
+  "en_vent": {
+   "prompt": "cooling fins snapping open on a machine with a short burst of hot steam and a warning beep, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+   "duration": 0.7,
+   "task": "50b155a3-0ad7-4516-907b-5d4588c8bd62",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-19",
+   "out": 0.52
+  }
+ }
+}
