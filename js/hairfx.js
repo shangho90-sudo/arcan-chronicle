@@ -570,6 +570,7 @@ export class HairFx {
   // ------------------------------------------------------------------ 스타일링 · 코팅 · 기분 전환
   style(pc, o = {}) {
     if (!this._ok()) return null;
+    if (o.kind === 'fresh' && this.rm && gfxOn()) this.rm.healAura(pc, { gold: 0xfff2c8, col: 0x7dffd8, dur: 1.2, r: 0.85 });   // 리마스터: 기분 전환(정화) = 민트·금 회복 마법진 + 몸을 감고 오르는 고리
     const I = HAIR.intensity, kind = o.kind || 'haste', C = HAIR.col, low = lite(), life = kind === 'coat' ? 0.9 : 0.85;
     const cA = kind === 'fresh' ? C.mintB : kind === 'coat' ? C.violet : C.pink, cB = kind === 'fresh' ? C.mint : kind === 'coat' ? C.white : C.gold;
     const e = this._fx('style', life, (e) => {

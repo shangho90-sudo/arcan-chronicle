@@ -42,7 +42,7 @@ const CW = +(process.env.CW || Math.min(VW, TOUCH ? 390 : 640)), CH = +(process.
         G.dev.learnAll('novice'); if (job !== 'novice') { G.dev.learnAll(job); if (j.parent) G.dev.learnAll(j.parent); }
         const w = G.data.itemList.find(i => i.type === 'weapon' && i.job === (j.parent || job) && !i.legacy) || (job === 'novice' ? G.data.itemList.find(i => i.type === 'weapon' && i.kind === 'sword') : null);
         if (w) { G.sheet.bag.add(w.id, 1); G.sheet.p.weapon = w.id; }
-        G.sheet.recalc(); G.dev.full(); await G.player.attachBody(); G.player.body.place(G.player.pos); G.player.body.play('idle', 1, true);
+        G.sheet.recalc(); G.dev.full(); try { G.dev.items([['f_lunch', 5], ['f_soup', 5], ['c_potion_m', 5]]); } catch (e) {} await G.player.attachBody(); G.player.body.place(G.player.pos); G.player.body.play('idle', 1, true);
         for (const k of Object.keys(G.skillFx)) { const m = G.skillFx[k]; if (m && typeof m.load === 'function') try { m.load(); } catch (e) {} }
       }, job);
       await pg.waitForFunction(() => G.player.body && G.player.body.md, null, { timeout: 120000 }); await pg.waitForTimeout(2500); curJob = job;

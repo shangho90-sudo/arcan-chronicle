@@ -35,7 +35,7 @@ void main(){ vUv = uv; vN = normalize(normalMatrix * normal); vec4 mv = modelVie
 // uS shape: 0 energy body (fresnel: bright core where it faces the camera, uW -> uB towards the rim) / 1 halo shell (only the rim glows)
 //           2 crown petals (v = height: wet paint, light rim at the tips, erodes from the tips with uE) / 3 ground ring (v across: thin bright edge + soft inner)
 //           4 flash quad (four-point star + round core) / 5 ground stain disc (noisy edge, uE erodes) / 6 soft round glow quad
-//           7 / 8 / 9 sword energy core / body / halo on rm_cres (uE = head 0..1 along the swing, uT = tail length)
+//           7 / 8 / 9 sword energy core / body / halo on rm_cres (uE = head 0..1 along the swing, uT = tail length) / 10 heal sigil quad
 const FS = `uniform vec3 uW, uB; uniform float uA, uS, uE, uT, uQ, uAdd; varying vec2 vUv; varying vec3 vN, vV;
 float h21(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f); return mix(mix(h21(i), h21(i + vec2(1., 0.)), f.x), mix(h21(i + vec2(0., 1.)), h21(i + vec2(1., 1.)), f.x), f.y); }
@@ -52,13 +52,19 @@ void main(){
     float R = .78 + nz; a = smoothstep(R, R - .07, r) * (1. - smoothstep(uE - .1, uE, vn(p * 3.2 + uQ * 2.) * .8 + r * .35));
     float q = vn(p * 9. + uQ); core = smoothstep(R - .1, R - .02, r) * .5 + q * .25; }
   else if (uS < 6.5) { vec2 p = vUv * 2. - 1.; float r = length(p); a = pow(clamp(1. - r, 0., 1.), 2.); core = pow(clamp(1. - r * 1.8, 0., 1.), 2.); }
-  else {   // 7 blade core / 8 blade body / 9 blade halo: wipe along the swing (head uE, tail length uT), bright at the head
+  else if (uS < 9.5) {   // 7 blade core / 8 blade body / 9 blade halo: wipe along the swing (head uE, tail length uT), bright at the head
     float u = vUv.x, v = vUv.y, dh = uE - u, w = smoothstep(-.02, .03, dh) * (1. - smoothstep(uT * .55, uT, dh)), hd = exp(-max(dh, 0.) * 5.);
     float ends = smoothstep(0., .08, u) * smoothstep(1., .9, u);
     if (uS < 7.5) { a = exp(-pow((v - .9) * 9., 2.)) * (.45 + .9 * hd); core = 1.; }
     else if (uS < 8.5) { a = smoothstep(.25, .75, v) * smoothstep(1.02, .9, v) * (.45 + .55 * hd); core = smoothstep(.6, 1., v); a *= .85 + .15 * vn(vec2(u * 30. + uQ, v * 4.)); }
     else { a = exp(-pow((v - .7) * 2.6, 2.)) * .7 * (.4 + .6 * hd) * (.7 + .3 * vn(vec2(u * 12. - uQ * 3., v * 3.))); core = .2; }
     a *= w * ends; }
+  else {   // 10 heal sigil (flat quad): double ring + 8 leaf petals + rotating dots, drawn in by uE (0..1), uT = time
+    vec2 p = vUv * 2. - 1.; float r = length(p), ang = atan(p.y, p.x), sh = step(ang + 3.14159, uE * 6.2832 + .001);
+    float rings = exp(-pow((r - .93) * 40., 2.)) + .7 * exp(-pow((r - .8) * 50., 2.)) + .5 * exp(-pow((r - .38) * 45., 2.));
+    float pa = mod(ang + uT * .35, 6.2832 / 8.) - 3.14159 / 8., leaf = smoothstep(.12, 0., abs(pa) * r * 3. - (.22 - abs(r - .6)) * .9) * step(.4, r) * step(r, .78);
+    float dots = smoothstep(.05, .0, length(vec2(mod(ang - uT * .6, 6.2832 / 24.) - 3.14159 / 24., (r - .865) * 5.)) * 1.);
+    a = (rings + leaf * .55 + dots * .8) * sh + .12 * smoothstep(1., .2, r); core = rings * .8 + dots; }
   vec3 c = mix(uB, uW, clamp(core, 0., 1.));
   if (uAdd > .5) gl_FragColor = vec4(c * clamp(a, 0., 2.) * uA, 1.); else gl_FragColor = vec4(c, clamp(a, 0., 1.) * uA);
 }`;
@@ -397,6 +403,28 @@ export class RmFx {
     this.emit('streak', Math.round((o.sparks || 6) * (low ? RMFX.liteK : 1)), () => { const a = rnd(0, Math.PI * 2); _b.set(Math.cos(a), rnd(-0.1, 0.9), Math.sin(a)).addScaledVector(dir, -0.7).normalize();
       return { p: front, v: _c.copy(_b).multiplyScalar(rnd(4, 7)), s: rnd(0.045, 0.07), col: rand() < 0.5 ? hi : col, life: rnd(0.12, 0.2), drag: 7, stretch: 0.09 }; });
     if (!low) this.emit('star', 4, () => ({ p: _a.copy(front).add(_b.set(rnd(-0.3, 0.3), rnd(-0.1, 0.4), rnd(-0.3, 0.3))), v: _c.set(rnd(-0.4, 0.4), rnd(0.6, 1.2), rnd(-0.4, 0.4)), s: rnd(0.05, 0.08), col: rand() < 0.5 ? 0xffffff : col, life: rnd(0.4, 0.6), spin: 5, t: -rnd(0.03, 0.15) }));
+    return e;
+  }
+
+  // ================================================================== 회복 (요리사 먹기·미용사 기분 전환): 금·초록 마법진 + 몸을 감고 오르는 빛 고리 + 오르는 빛 입자
+  healAura(pc, o = {}) {
+    if (!this.ok() || !pc || !pc.pos) return null;
+    const low = rmLite(), gold = o.gold ?? 0xffe08a, col = o.col ?? 0x7dffb0, I = RMFX.intensity * rawK(), dur = o.dur || 1.5, R = o.r || 0.95;
+    let pT = 0;
+    const e = this._fx('heal', dur, (e, dt) => { const t = e.t, k = t / dur;
+      e.g.position.set(pc.pos.x, pc.pos.y || 0, -pc.pos.z);
+      sig.material.uniforms.uE.value = easeOut(t / 0.3); sig.material.uniforms.uT.value = t; sig.material.uniforms.uA.value = I * 0.9 * (1 - smooth(0.6, 1, k));
+      glow.material.uniforms.uA.value = I * 0.35 * (1 - smooth(0.5, 1, k));
+      rings.forEach((m, i) => { const kk = (t - 0.12 - i * 0.22) / 0.75; m.visible = kk > 0 && kk < 1; const h = 0.1 + 1.6 * easeOut(kk), rr = 0.62 - 0.18 * kk;
+        m.position.y = h; m.scale.set(rr, 1, rr); m.material.uniforms.uA.value = I * 1.1 * Math.sin(Math.PI * Math.min(1, Math.max(0, kk))); m.material.uniforms.uT.value = t; });
+      pT -= dt; if (pT <= 0 && k < 0.8) { pT = low ? 0.06 : 0.03; const a = rnd(0, Math.PI * 2), rr = rnd(0.2, R * 0.8), P = e.g.position;
+        this.emit('streak', 1, () => ({ p: _a.set(P.x + Math.cos(a) * rr, P.y + rnd(0, 0.4), P.z + Math.sin(a) * rr), v: _c.set(0, rnd(1.6, 2.6), 0), s: rnd(0.035, 0.05), col: rand() < 0.5 ? gold : col, life: rnd(0.45, 0.7), stretch: 0.09 }));
+        if (!low && rand() < 0.5) this.emit('star', 1, () => ({ p: _a.set(P.x + Math.cos(a) * rr * 0.8, P.y + rnd(0.3, 1.4), P.z + Math.sin(a) * rr * 0.8), v: _c.set(0, rnd(0.4, 0.9), 0), s: rnd(0.04, 0.07), col: rand() < 0.5 ? 0xffffff : col, life: 0.5, spin: 5 })); }
+    });
+    e.g.position.set(pc.pos.x, pc.pos.y || 0, -pc.pos.z);
+    const sig = this._m(e, 'add', this.quad, { w: gold, b: col, s: 10, order: 3 }); this._flat(sig, R * 2, 0.05);
+    const glow = this._m(e, 'add', this.quad, { w: col, b: col, s: 6, order: 2 }); this._flat(glow, R * 2.3, 0.04);
+    const rings = [0, 1, 2].map(i => this._m(e, 'add', this.geo.rm_ring, { w: 0xffffff, b: i % 2 ? gold : col, s: 3, order: 7 }));
     return e;
   }
 

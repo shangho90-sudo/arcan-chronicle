@@ -1671,7 +1671,7 @@ export class SkillFx {
     this.herbal = new HerbalFx(this.root); this.herbal.load();                // 한약사 2차: 탕관·영물·오행 침구 (js/herbalfx.js)
     this.painter = new PaintFx(this.root); this.painter.load();               // 화가 2차: 그림 소환물·채색·풍경 (js/painterfx.js)
     this.rm = new RmFx(this.root); this.rm.load();                            // 리마스터 공용 다층 메시 이펙트 (js/rmfx.js) — 직업 모듈이 gfxOn()일 때 빌려 씀
-    this.art = new ArtFx(this.root); this.art.load(); this.art.rm = this.rm; this.yeon.rm = this.rm; this.hair.rm = this.rm;                         // 예술가 1차: 물감·음표·액자·전구 (js/artfx.js)
+    this.art = new ArtFx(this.root); this.art.load(); this.art.rm = this.rm; this.yeon.rm = this.rm; this.hair.rm = this.rm; this.cook.rm = this.rm;                         // 예술가 1차: 물감·음표·액자·전구 (js/artfx.js)
     this.pharm = new PharmFx(this.root); this.pharm.load();                   // 약사 1차: 황금 유봉·약병·주사기·보호막·회복진 (js/pharmfx.js)                      // 배쉬 crescent / impact / dust meshes (js/bashfx.js)
     /** optional camera-shake hook: (amplitude, duration) => void. Suppressed when SkillFx.reduceFlash. */
     this.onShake = null;

@@ -24,6 +24,7 @@
 // the knife, the pan, the slice line, the ring and the flash stay. No global bloom / exposure / hit-stop is touched here.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { gfxOn } from './gfxq.js';
 
 export const COOK = {
   intensity: 1.0,
@@ -654,6 +655,7 @@ export class CookFx {
   /** food appears over the head, tips toward the camera and is eaten in bites (each bite: smaller + crumbs + munch) */
   eat(pc, o = {}) {
     if (!this._ok()) return null;
+    if (this.rm && gfxOn()) this.rm.healAura(pc, { gold: 0xffe08a, col: 0x8affa0, dur: 1.4 });   // 리마스터: 금·초록 회복 마법진 + 오르는 빛 고리·입자 (요리사 먹기·음식)
     const K = COOK.eat, kind = o.kind || 'meal', bites = kind === 'snack' ? 2 : K.bites, size = K.size * (kind === 'meal' ? 1.3 : kind === 'snack' ? 0.95 : 1), t0 = 0.26, low = lite(); let done = 0;
     const e = this._fx('eat', t0 + bites * K.gap + 0.3, (e) => {
       if (pc.dead) { e.t = e.life; return; }
