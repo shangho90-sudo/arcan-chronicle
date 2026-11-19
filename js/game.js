@@ -1,6 +1,6 @@
 // Game orchestrator + zone runtime. Port of Boot/ArcanGame.cs and World/ZoneRuntime.cs.
 import { applyGfxQuality, buildTownRemaster, buildFieldRemaster } from './remaster.js';
-import { questExp, GameData, SaveStore, SAVE_SLOTS, saveSlotKey, CharacterSheet, QuestLog, QS, ZoneGeometry, NavGrid, newProfile, DEG, clamp, HitShape, levelGapExp, monsterAtLevel, discoverTown, payWarp, warpPrice, zoneLock, questCategory, questTitle } from './core.js';
+import { questExp, josa, GameData, SaveStore, SAVE_SLOTS, saveSlotKey, CharacterSheet, QuestLog, QS, ZoneGeometry, NavGrid, newProfile, DEG, clamp, HitShape, levelGapExp, monsterAtLevel, discoverTown, payWarp, warpPrice, zoneLock, questCategory, questTitle } from './core.js';
 import { Renderer, Fx, TelegraphView, TG_TIME, loadSheet, preloadTextures, THREE, T } from './render.js';
 import { Player, Monster, Boss, Npc, Loot, bindGame as bindActors } from './actors.js';
 import { preloadDrops } from './dropfx.js';
@@ -637,15 +637,38 @@ class Game {
       else if (st === QS.Completable && turnIn === npc.id) opts.push(["[완료] " + q.name, () => this.completeQuest(npc, q)]);
       else opts.push(["[진행 중] " + q.name, () => this.questTalk(npc, q, q.progressText, this.back(npc))]);
     }
-    if (npc.role === "jobmaster" && npc.job) opts.push(["직업 상담", () => this.ui.showJobs(npc.job)]);
+    // 2026-11-20 사용자 요청: 직업 목록 창 대신 그 마스터에게 말을 걸면 그 직업으로 — '[전직] …' → 확인 대화 → 전직
+    this.jobTargets(npc).forEach((t, k) => opts.splice(k, 0, ["[전직] " + this.data.job(t).name + josa(this.data.job(t).name, "으로", "로") + " 전직", () => this.confirmJob(npc, t)]));   // 맨 앞(메뉴가 4개로 잘려도 남게)
     if (npc.role === "warp") opts.push(["마을 이동", () => this.ui.showTownWarp(npc)]);
     if (npc.shop) opts.push(["상점", () => { this.ui.sel = {}; this.ui.showShop(this.data.shops[npc.shop]); }]);
     opts.push(["대화 종료", () => this.ui.close()]);
     while (opts.length > 4) opts.splice(opts.length - 2, 1);
     let line = npc.lines && npc.lines.length ? npc.lines[Math.floor(Math.random() * npc.lines.length)] : "...";
     if (greeting && this.audio.npcVoices[npc.id]) line = this.audio.npcVoices[npc.id].line;
-    if (npc.role === "jobmaster" && this.profile.job === "novice") line += `<br><span class="tealtxt">'직업 상담'에서 ${this.data.job(npc.job).name}(이)가 될 수 있어요.</span>`;
+    if (npc.role === "jobmaster" && this.profile.job === "novice") line += `<br><span class="tealtxt">'[전직]'을 고르면 ${this.data.job(npc.job).name}(이)가 될 수 있어요.</span>`;
     this.ui.showDialog(npc, line, opts);
+  }
+  /** jobs this master can turn you into: a novice → the master's 1st job; the master's own 1st job → its 2nd-job branches */
+  jobTargets(npc) {
+    if (npc.role !== "jobmaster" || !npc.job || !this.profile) return [];
+    const cur = this.profile.job;
+    if (cur === "novice") return this.data.job(npc.job) ? [npc.job] : [];
+    if (cur === npc.job) return this.data.jobList.filter(j => j.tier === 2 && j.parent === cur).map(j => j.id);
+    return [];
+  }
+  /** "…(으)로 전직하시겠습니까?" — 한 번 더 묻고 전직 (조건이 안 되면 이유만 보여 줌) */
+  confirmJob(npc, id) {
+    const j = this.data.job(id), sheet = this.sheet, err = sheet.canChooseJob(id);
+    const head = `<b class="goldtxt">${j.name}</b> <span class="small muted">${j.role || ""}</span><br><span class="small">${j.desc || ""}</span><br>`;
+    if (err) return this.ui.showDialog(npc, head + `<br><span class="bad">${err}</span>`, this.back(npc));
+    this.ui.showDialog(npc, head + `<br>정말 <b>${j.name}</b>${josa(j.name, "으로", "로")} 전직하시겠습니까?<br><span class="small muted">전직 후에는 직업을 바꿀 수 없습니다.</span>`, [
+      ["전직하기", () => {
+        const e = sheet.chooseJob(id); if (e) return this.ui.toast(e);
+        const p = this.player; this.fx.play("levelup", { x: p.pos.x, y: p.pos.y + 0.8, z: p.pos.z }, 1.4);
+        this.ui.toast(j.name + josa(j.name, "으로", "로") + " 전직했습니다! 스킬창(K)에서 스킬을 배우세요."); this.autoSave(); this.ui.close();
+      }],
+      ["아니요", () => this.openNpcMenu(npc)],
+    ]);
   }
   back(npc) { return [["돌아가기", () => this.openNpcMenu(npc)], ["대화 종료", () => this.ui.close()]]; }
   /** quest dialogue: main quests play as a story scene (js/storyscene.js), everything else in the plain dialogue window */

@@ -1,6 +1,6 @@
 // 아르칸 서장 + 첫 전직 바로 완료 (2026-11-19).
 // 새 게임 → 촌장 첫 메인(q1_start) 장면 → 쇠돌 → 모아 → 서장 ①(mq00a) 받기(촌장 "!", 숲 줍기 자리) → 숲의 군락지 포털은 서장 「보랏빛 포자」 전엔 막힘
-// → 왕도 가는 길의 카이리온 포털은 서장 「첫 전직」 전엔 막힘 → (훅) 서장 끝 + Lv10 → 촌장 "!" 첫 전직 받기 → 카이리온 길드 회관 마스터 '직업 상담' 전직
+// → 왕도 가는 길의 카이리온 포털은 서장 「첫 전직」 전엔 막힘 → (훅) 서장 끝 + Lv10 → 촌장 "!" 첫 전직 받기 → 카이리온 길드 회관 마스터 '[전직] …' → '전직하기' 확인
 // → 그 순간 퀘스트 완료(보상·알림) + 전직 연출 뒤 완료 대사 장면 → 촌장에게 1장 「가을의 납품」 "!".
 // Usage: (cd repo && python3 -m http.server 8841 &)  URL=http://localhost:8841/index.html SIZES=1280x720,390x844t OUT=/tmp/qarc NODE_PATH=$(npm root -g) node tools/browser-tests/arcanarc.js
 const { chromium } = require('playwright'); const fs = require('fs');
@@ -75,8 +75,8 @@ const fails = []; const ok = (c, m) => { console.log((c ? '  ok   ' : '  FAIL ')
     ok(await ev(m => G.mainState(m) === 'talk', master), '마스터 ' + master + ' 금관 "?"');
     const before = await ev(() => ({ gold: G.profile.gold, exp: G.profile.exp, lv: G.profile.level }));
     await ev(m => G.openNpcMenu(G.data.npcs[m]), master); await pg.waitForTimeout(600);
-    await click('직업 상담'); await pg.waitForTimeout(600);
-    await ev(() => [...document.querySelectorAll('.jobcard.hl button')][0].click()); await pg.waitForTimeout(1200);
+    await ev(() => [...document.querySelectorAll('.window.dialog button')].find(b => b.textContent.startsWith('[전직]')).click()); await pg.waitForTimeout(600);
+    await click('전직하기'); await pg.waitForTimeout(1200);
     const after = await ev(() => ({ job: G.profile.job, done: G.quests.isCompleted('q_job1'), gold: G.profile.gold, exp: G.profile.exp, lv: G.profile.level }));
     ok(after.job !== 'novice' && after.done, '전직하는 순간 첫 전직 완료 ' + JSON.stringify(after));
     ok(after.gold === before.gold + 200, '보상 골드 +200');

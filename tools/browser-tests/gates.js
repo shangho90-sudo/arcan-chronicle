@@ -91,7 +91,7 @@ const fails = []; const ok = (c, m) => { console.log((c ? '  ok   ' : '  FAIL ')
     await near(master); await pg.waitForTimeout(3000);
     ok(await ev(m => G.mainState(m) === 'talk' && /qmain/.test(G.questMark(m)), master), '전직 목표: 마스터 ' + master + ' 금관 "?"');
     await ev(m => G.openNpcMenu(G.data.npcs[m]), master); await pg.waitForTimeout(600); await shot('9_master');
-    await click('직업 상담'); await pg.waitForTimeout(600); await ev(() => [...document.querySelectorAll('.jobcard.hl button')][0].click()); await pg.waitForTimeout(1500);
+    await ev(() => [...document.querySelectorAll('.window.dialog button')].find(b => b.textContent.startsWith('[전직]')).click()); await pg.waitForTimeout(600); await click('전직하기'); await pg.waitForTimeout(1500);
     ok(await ev(() => G.profile.job !== 'novice'), '1차 전직 완료: ' + await ev(() => G.profile.job));
     ok(await ev(() => G.quests.isCompleted('q_job1')), '서장 「첫 전직」 전직하는 순간 완료');
     await pg.waitForTimeout(3000); await shot('10_jobchanged');
