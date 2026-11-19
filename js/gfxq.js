@@ -15,3 +15,6 @@ export function gfxQ() {
 export const gfxOn = () => gfxQ() !== 'low';
 /** particle / instance count factor for the remaster extras: high 1, medium 0.5 (low draws none) */
 export const gfxK = () => ({ high: 1, medium: 0.5, low: 0 }[gfxQ()]);
+/** shared remaster strength uniform: high 1, medium 0.6, low 0 (same shader for high / medium — no recompile between them) */
+export const RM_K = { value: 0 };
+export const rmK = () => ({ high: 1, medium: 0.6, low: 0 }[gfxQ()]);

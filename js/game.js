@@ -1,5 +1,5 @@
 // Game orchestrator + zone runtime. Port of Boot/ArcanGame.cs and World/ZoneRuntime.cs.
-import { applyGfxQuality, buildPlazaRemaster } from './remaster.js';
+import { applyGfxQuality, buildTownRemaster, buildFieldRemaster } from './remaster.js';
 import { GameData, SaveStore, SAVE_SLOTS, saveSlotKey, CharacterSheet, QuestLog, QS, ZoneGeometry, NavGrid, newProfile, DEG, clamp, HitShape, levelGapExp, monsterAtLevel, discoverTown, payWarp, warpPrice, zoneLock, questCategory, questTitle } from './core.js';
 import { Renderer, Fx, TelegraphView, TG_TIME, loadSheet, preloadTextures, THREE, T } from './render.js';
 import { Player, Monster, Boss, Npc, Loot, bindGame as bindActors } from './actors.js';
@@ -62,14 +62,15 @@ class Zone {
   async build() {
     G.render.buildZone(this.json); G.render.setZoneLight(this.def);
     if (G.render.post) Object.assign(G.render.post.params, G.render.post.defaults, this.def.post || {});
-    this.plazaRM = null;
+    this.plazaRM = null; this.fieldRM = null;
     await G.render.buildImageArt(this.def.imageArt || []);
     if (this.def.town3d) {
       // 3D castle town: user's models + modelled shops, walls, courtyard ground (replaces the builder's grass ground)
-      const rmZone = this.def.id === 'town';                 // 리마스터 파일럿: 아르칸 분수 광장만 (js/remaster.js)
-      const t3 = await buildTown3D(this.def.town3d, G.render.r, { remaster: rmZone });
+      // 리마스터 (js/remaster.js, 2026-11-19 6단계): 9개 마을 모두 — 바닥 돌결·광택(town3d.js rmStone), 접촉 그늘·풀 포기·조약돌·낙엽
+      const t3 = await buildTown3D(this.def.town3d, G.render.r, { remaster: true });
       G.render.zoneRoot.add(t3.root);
-      if (rmZone) { this.plazaRM = buildPlazaRemaster(this.def.town3d); G.render.zoneRoot.add(this.plazaRM.group); }
+      { let sd = 7; for (const ch of this.def.id) sd = (sd * 31 + ch.charCodeAt(0)) | 0;
+        this.plazaRM = buildTownRemaster(this.def.town3d, { seed: this.def.id === 'town' ? 1919 : sd }); G.render.zoneRoot.add(this.plazaRM.group); }
       // the old builder's ground, bushes, flowers and crates are replaced by the 3D town
       for (const g of G.render.groups) if (['ground', 'patches', 'props', 'tree'].includes(g.name)) for (const m of g.meshes) m.visible = false;
       G.render.groups.push(...t3.fade);
@@ -86,6 +87,7 @@ class Zone {
       this.nature = await buildNature(this, G.render.r);
       for (const g of G.render.groups) if (g.name === 'terrain') for (const m of g.meshes) if (/boss_floor$/.test(m.userData.tex || '')) { m.material = this.nature.magicFloor; m.receiveShadow = true; }
       G.render.zoneRoot.add(this.nature.root);
+      this.fieldRM = buildFieldRemaster(this.def, this.geo); G.render.zoneRoot.add(this.fieldRM.group); applyGfxQuality(G, this);   // 리마스터: 나무·바위 밑 접촉 그늘 + 높음 대기
       if (this.nature.water) for (const g of G.render.groups) for (const m of g.meshes) if (m.userData.water) m.visible = false;   // nature draws the ponds
     }
     // the old builder's flat flower clusters (untextured little cubes on the ground) look like stray debris: hide them
@@ -337,6 +339,7 @@ class Game {
     import('./rewardfx.js').then(m => { this.reward = new m.RewardFx(this); }).catch(e => console.warn('reward fx', e));
     import('./swingfx.js').then(m => { this.swingFx = new m.SwingFx(this.render.scene); }).catch(e => console.warn('swing fx', e));
     import('./hammerfx.js').then(m => { this.hammerFx = new m.HammerFx(this.render.scene, this.render.cam); }).catch(e => console.warn('hammer fx', e));
+    import('./stagefx.js').then(m => { this.stageFx = new m.StageFx(this.render.scene); }).catch(e => console.warn('stagefx', e));
     import('./skillfx.js').then(m => { this.skillFx = new m.SkillFx(this.render.scene); this.skillFx.onShake = (a, d) => this.render.addShake(a, d); m.SkillFx.reduceFlash = !!this.reduceFlash; }).catch(e => console.warn('skillfx', e));
     this.ui = new UI(document.getElementById("ui"));
     this.loadSheet = loadSheet; this.timeScale = 1; this.simSteps = Math.max(1, Math.min(8, parseInt(new URLSearchParams(location.search).get("sim")) || 1)); this.timers = []; this.session = 0; this.autoSaveT = 0;
@@ -503,7 +506,7 @@ class Game {
     if (this.reward) this.reward.clear(); if (this.swingFx) this.swingFx.clear(); if (this.hammerFx) this.hammerFx.clear();
     this.loading = true; this.input.block = true; const session = this.session;
     await this.fadeTo(1, 0.25);
-    if (this.player) this.player.skills2.clearTemp(); if (this.skillFx) this.skillFx.clear();
+    if (this.player) this.player.skills2.clearTemp(); if (this.skillFx) this.skillFx.clear(); if (this.stageFx) this.stageFx.clear();
     if (this.player && this.zone) this.zone.removeActor(this.player);
     // 메인 퀘스트로 아직 열리지 않은 곳(예전 저장·귀환·부활)은 아르칸 마을 시작 지점으로 (2026-11-15)
     const lock = this.lockOf(zoneId), P0 = this.profile;
@@ -739,6 +742,7 @@ class Game {
     }
     this.fx.update(dt > 0 ? dt : (this.inWorld ? 0 : rdt), this.render.cam);
     if (this.hammerFx) try { this.hammerFx.low = !!((this.input && this.input.mobile) || (this.settings && this.settings.graphicsFx === false)); this.hammerFx.update(rdt); } catch (e) { console.warn('hammer fx', e); this.hammerFx.clear(); }   // ages with the simulation (also in draw-less test steps)
+    if (this.stageFx) try { this.stageFx.update(rdt); } catch (e) { console.warn('stagefx update', e); this.stageFx = null; }
     if (!draw) return;
     this.ui.tick(rdt);
     if (this.skillFx) try { this.skillFx.update(rdt); } catch (e) { console.warn('skillfx update', e); this.skillFx = null; }

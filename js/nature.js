@@ -6,6 +6,7 @@
 //  * see-through dithering of anything standing between the camera and the player
 // Collision is NOT decided here: trees / rocks / stumps keep their footprints in zones.json (core.js propFootprint),
 // shrubs / flowers / grass are decoration. Layout comes from tools/forest/layout.py.
+import { gfxOn, RM_K } from './gfxq.js';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
@@ -204,6 +205,8 @@ float bayer4(vec2 p){ int x = int(mod(p.x,4.)), y = int(mod(p.y,4.)); int i = x 
 // darker trodden edge soil, dark soil patches; subtle normals for grass and path. Splat weights come from the zone mask
 // (R path, G canopy shade, B trunk / rock contact) broken up by noise, so edges never look cut.
 const GROUND_VS = `varying vec2 vW;`;
+// 2026-11-19 리마스터 6단계 필드 바닥 조절값(품질 높음 = 이 값, 보통 = RM_K 0.6배): 잔결·접촉 그늘·패인 곳·햇빛 잔디 따뜻함·국소 대비·노멀 세기·길 거칠기
+export const NRM = { grain: 0.3, ao: 0.45, cav: 0.35, warm: 0.06, con: 0.2, nrm: 1.0, pathRough: 0.92 };   // rmtune.js 비교로 고름 (길 광택을 더 낮추면 하얗게 뜸)
 function groundMaterial(tex, maskTex, bounds) {
   const m = new THREE.MeshStandardMaterial({ roughness: 1, metalness: 0 });
   const U = {
@@ -212,8 +215,10 @@ function groundMaterial(tex, maskTex, bounds) {
     tNG: { value: tex.grass_n }, tNP: { value: tex.path_n }, tMask: { value: maskTex },
     uB: { value: new THREE.Vector4(bounds[0], bounds[1], bounds[2] - bounds[0], bounds[3] - bounds[1]) },
   };
+  m.userData.remaster = true;   // 2026-11-19 리마스터 6단계: 품질 높음·보통이면 바닥 잔결·광택·깊은 접촉 그늘 (RM_K 세기)
   m.onBeforeCompile = sh => {
-    Object.assign(sh.uniforms, U);
+    const RM = gfxOn();
+    Object.assign(sh.uniforms, U); if (RM) sh.uniforms.uRmK = RM_K;
     sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\n' + GROUND_VS)
       .replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvec4 wpG = modelMatrix * vec4(transformed, 1.0); vW = vec2(wpG.x, -wpG.z);');
     sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>
@@ -226,6 +231,7 @@ float fbm(vec2 p){ return vn(p)*.5 + vn(p*2.03+7.1)*.25 + vn(p*4.11+3.3)*.125 + 
 vec4 tri(sampler2D t, vec2 w, float s){ vec2 a = w / s; vec2 b = mat2(.8,-.6,.6,.8) * w / (s*1.37) + vec2(.31,.77);
   float k = smoothstep(.3, .7, vn(w * .06)); return mix(texture2D(t, a), texture2D(t, b), k); }
 vec3 gN; float gDirt;
+${RM ? 'uniform float uRmK; float rmFg;' : ''}
 `).replace('#include <map_fragment>', `
 vec2 mUv = (vW - uB.xy) / uB.zw;   // canvas texture is flipY: row 0 (north edge) -> v = 1
 vec4 M = texture2D(tMask, mUv);
@@ -250,12 +256,19 @@ col *= 1. - smoothstep(.35, 1., M.b) * .3;                                      
 diffuseColor.rgb *= col;
 gDirt = dirt;
 gN = mix(tri(tNG, vW, 9.).rgb, tri(tNP, vW, 6.).rgb, dirt) * 2. - 1.;
-`).replace('#include <normal_fragment_maps>', `
-{ vec3 nn = normalize(vec3(gN.xy * .3, 1.));
+${RM ? `{ rmFg = vn(vW * 7.3) * .6 + vn(vW * 15.1 + 3.) * .4;                                  // fine grain: grass blades / grit
+  diffuseColor.rgb *= 1. + (rmFg - .5) * ${NRM.grain.toFixed(3)} * uRmK;
+  diffuseColor.rgb *= 1. - smoothstep(.3, 1., M.b) * ${NRM.ao.toFixed(3)} * uRmK;            // deeper contact shade at trunks / rocks
+  diffuseColor.rgb *= 1. - clamp(length(gN.xy) - .25, 0., 1.) * ${NRM.cav.toFixed(3)} * uRmK; // cavities of the painted relief
+  diffuseColor.rgb *= mix(vec3(1.), vec3(1.0 + ${NRM.warm.toFixed(3)}, 1.0 + ${NRM.warm.toFixed(3)} * .5, 1.0 - ${NRM.warm.toFixed(3)} * .7), (1. - dirt) * (1. - shade) * uRmK);   // sunlit grass warmer
+  diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * diffuseColor.rgb * 2.2, ${NRM.con.toFixed(3)} * uRmK); }   // a little local contrast` : ''}
+`).replace('#include <roughnessmap_fragment>', RM ? `#include <roughnessmap_fragment>
+  roughnessFactor = mix(roughnessFactor, mix(.9, ${NRM.pathRough.toFixed(3)}, gDirt) - .06 * rmFg, uRmK);` : '#include <roughnessmap_fragment>').replace('#include <normal_fragment_maps>', `
+{ vec3 nn = normalize(vec3(gN.xy * ${RM ? `(.3 + ${NRM.nrm.toFixed(3)} * uRmK)` : '.3'}, 1.));
   vec3 wn = normalize(vec3(nn.x, nn.z, -nn.y));                    // tangent x = world x, bitangent = world -z (vW.y)
   normal = normalize((viewMatrix * vec4(wn, 0.)).xyz); }`);
   };
-  m.customProgramCacheKey = () => 'forestground2';
+  m.customProgramCacheKey = () => 'forestground2' + (gfxOn() ? '|rm' + JSON.stringify(NRM) : '');
   return m;
 }
 
@@ -267,8 +280,10 @@ function arenaMaterial(tex, boss) {
   const c = boss && boss.center || [0, 0], r = boss && boss.radius || 10;
   const U = { tSoil: { value: tex.grass }, tDeep: { value: tex.grass_shadow }, tBrown: { value: tex.grass_dry }, tMoss: { value: tex.moss },
     tPeb: { value: tex.pebble }, tEdge: { value: tex.path_edge }, tNG: { value: tex.grass_n }, uA: { value: new THREE.Vector3(c[0], -c[1], r) }, uTime: TG_TIME };
+  m.userData.remaster = true;   // 2026-11-19 리마스터 6단계: 품질 높음·보통이면 바닥 잔결·광택·깊은 접촉 그늘 (RM_K 세기)
   m.onBeforeCompile = sh => {
-    Object.assign(sh.uniforms, U);
+    const RM = gfxOn();
+    Object.assign(sh.uniforms, U); if (RM) sh.uniforms.uRmK = RM_K;
     sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\n' + GROUND_VS)
       .replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvec4 wpG = modelMatrix * vec4(transformed, 1.0); vW = vec2(wpG.x, -wpG.z);');
     sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>
@@ -637,16 +652,21 @@ export async function buildNature(zone, renderer) {
   }
   const plantMat = (() => {
     const m = cloneMat(blMaterial('M_plants', aniso)); m.name = 'M_plants_wind'; const base = m.onBeforeCompile;
+    m.userData.remaster = true;   // 리마스터: 포기 밑동을 어둡게(땅에 박힌 느낌) + 바람 조금 크게
     m.onBeforeCompile = (sh, r) => { base(sh, r);
-      Object.assign(sh.uniforms, fm.userData.U);
+      const RM = gfxOn();
+      Object.assign(sh.uniforms, fm.userData.U); if (RM) { sh.uniforms.uRmK = RM_K;
+        sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying float vRoot; uniform float uRmK;');
+        sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying float vRoot; uniform float uRmK;')
+          .replace('#include <color_fragment>', '#include <color_fragment>\n  diffuseColor.rgb *= mix(1., mix(.55, 1., smoothstep(.0, .22, vRoot)), uRmK);'); }
       sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nuniform float uTime;')
         .replace('#include <common>', '#include <common>\nattribute vec3 aRoot;')
         .replace('#include <begin_vertex>', `#include <begin_vertex>
 float gust = .55 + .45 * sin(uTime * .55 + aRoot.x * .09 + aRoot.y * .07);   // slow gust rolling across the field (2026-11-14)
 float sw = (sin(uTime * 1.7 + aRoot.x * .7 + aRoot.y * .5) * .07 + sin(uTime * 3.1 + aRoot.x * 1.9) * .03) * gust;
-transformed.xz += vec2(sw, sw * .4) * aRoot.z * aRoot.z;`);
+transformed.xz += vec2(sw, sw * .4) * aRoot.z * aRoot.z${RM ? ' * (1. + .5 * uRmK);\n  vRoot = aRoot.z;' : ';'}`);
     };
-    m.customProgramCacheKey = () => 'plantwind3'; return m;
+    m.customProgramCacheKey = () => 'plantwind3' + (gfxOn() ? '|rm' : ''); return m;
   })();
   const plantGeo = {}; await Promise.all([...new Set(PLANT)].map(async n => { MODELS[n] = MODELS[n] || { h: 1 }; plantGeo[n] = (await loadModel(n, aniso)).geo; }));   // height 1, base at 0
   // all clumps of a chunk are merged into ONE static mesh (a handful of draw calls for thousands of clumps); the wind

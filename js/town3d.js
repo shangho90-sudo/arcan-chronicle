@@ -2,7 +2,7 @@
 // same style (cream stone ground floor, timber-framed plaster, blue slate roofs, gold finials), castle walls,
 // towers, gatehouse, keep, flagstone courtyard with cobbled roads. Layout / collision come from
 // tools/town_castle.py (zone.town3d + zone.blockPolys); everything here is in game (Unity) metres, T() maps to three.
-import { gfxOn } from './gfxq.js';
+import { gfxOn, RM_K } from './gfxq.js';
 import { THREE, T } from './render.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
@@ -573,12 +573,11 @@ function loadGLB(file) {
 // 2026-11-19 리마스터(js/remaster.js, 품질 높음·보통 + 아르칸만 — RM_GROUND): 같은 텍스처에서 돌 틈(어두운 줄눈)을 찾아 그늘을 깊게,
 // 돌 윗면은 거칠기를 낮춰 해에 은은한 광택(젖은 돌 같은 PBR 느낌), 줄눈은 더 거칠게. 텍스처·draw call 추가 없음.
 export const RM_U = { value: 0 };                 // 분수 물 빛 무늬 켜기 (fountainMats uRm)
+export { RM_K };                                  // 리마스터 바닥 세기(gfxq.js): 높음 1, 보통 0.6 (같은 셰이더 — 품질 사이에서 프로그램이 안 바뀜)
 export const rmMaterials = new Set();            // 품질이 바뀌면 다시 컴파일할 재질
 let RM_GROUND = false;
 function groundVary(m) {
-  const rm = RM_GROUND; if (rm) rmMaterials.add(m);
   m.onBeforeCompile = sh => {
-    const RM = rm && gfxOn();
     sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 vGW;').replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvGW = (modelMatrix * vec4(transformed, 1.0)).xz;');
     sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>
 varying vec2 vGW;
@@ -587,15 +586,48 @@ float gvN(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
   return mix(mix(gvH(i), gvH(i + vec2(1, 0)), f.x), mix(gvH(i + vec2(0, 1)), gvH(i + vec2(1, 1)), f.x), f.y); }`).replace('#include <map_fragment>', `#include <map_fragment>
   { float a = gvN(vGW * 0.07), b = gvN(vGW * 0.23 + 7.3), c = gvN(vGW * 0.6 + 3.1);
     vec3 cool = vec3(0.88, 0.89, 0.97), warm = vec3(1.04, 1.0, 0.93);
-    diffuseColor.rgb *= mix(cool, warm, smoothstep(0.25, 0.75, a * 0.65 + b * 0.35)) * (0.93 + 0.07 * c); }` + (RM ? `
-  float rmL = dot(diffuseColor.rgb, vec3(0.299, 0.587, 0.114));
-  float rmCav = smoothstep(0.42, 0.26, rmL), rmTop = smoothstep(0.5, 0.7, rmL);
-  diffuseColor.rgb *= mix(vec3(1.0), vec3(0.74, 0.70, 0.80), rmCav);                  // deeper, slightly violet grout
-  diffuseColor.rgb *= 0.97 + 0.06 * gvN(vGW * 2.3 + 11.0);                             // per-stone tone variation` : ''));
-    if (RM) sh.fragmentShader = sh.fragmentShader.replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
-  roughnessFactor = mix(0.66, 0.98, rmCav) - 0.06 * rmTop;`);
+    diffuseColor.rgb *= mix(cool, warm, smoothstep(0.25, 0.75, a * 0.65 + b * 0.35)) * (0.93 + 0.07 * c); }`);
   };
-  m.customProgramCacheKey = () => 'groundVary' + (rm && gfxOn() ? '|rm' : ''); return m;
+  m.customProgramCacheKey = () => 'groundVary'; return rmStone(m);
+}
+// 2026-11-19 리마스터 6단계 (모든 마을 바닥·큰길·턱돌, 품질 높음·보통): 같은 바닥 텍스처의 밝기를 높이로 삼아
+//  - 줄눈(어두운 틈)을 더 깊고 보랏빛으로, 돌마다 톤 차이
+//  - 거칠기: 돌 윗면은 매끈(해에 은은한 광택), 줄눈은 거칠게
+//  - 밝기의 화면 미분으로 법선을 기울임(bump) — 돌 모서리가 해를 받아 밝고 반대쪽이 어두워져 입체로 읽힘(PBR 노멀 흉내)
+// 세기는 RM_K(높음 1, 보통 0.6). 텍스처·draw call 추가 없음. 낮음이면 이 코드가 아예 들어가지 않음.
+export const RMG = { grout: 0.9, bump: -0.06, gloss: 0.55, top: 0.1 };   // bump < 0: 텍스처에 칠한 빛과 같은 쪽 (rmtune.js 비교 2026-11-19)
+function rmStone(m) {
+  if (!RM_GROUND) return m;
+  rmMaterials.add(m);
+  const prev = m.onBeforeCompile, prevKey = m.customProgramCacheKey ? m.customProgramCacheKey.bind(m) : () => '';
+  m.onBeforeCompile = (sh, r) => {
+    if (prev) prev.call(m, sh, r);
+    if (!gfxOn()) return;
+    sh.uniforms.uRmK = RM_K;
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 vRmW;').replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvRmW = (modelMatrix * vec4(transformed, 1.0)).xz;');
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>
+varying vec2 vRmW; uniform float uRmK; float rmH, rmCav, rmTop;
+float rmHs(vec2 p){ return fract(sin(dot(p, vec2(269.5, 183.3))) * 43758.5453); }
+float rmN(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(rmHs(i), rmHs(i + vec2(1, 0)), f.x), mix(rmHs(i + vec2(0, 1)), rmHs(i + vec2(1, 1)), f.x), f.y); }`).replace('#include <map_fragment>', `#include <map_fragment>
+  { float L = dot(diffuseColor.rgb, vec3(0.299, 0.587, 0.114));
+    rmCav = smoothstep(0.44, 0.24, L); rmTop = smoothstep(0.5, 0.72, L);
+    #ifdef USE_MAP
+      rmH = smoothstep(0.16, 0.7, dot(texture2D(map, vMapUv, 2.0).rgb, vec3(0.299, 0.587, 0.114)));   // height from a blurred lookup: smooth slopes, no stair-step noise
+    #else
+      rmH = smoothstep(0.18, 0.66, L);
+    #endif
+    diffuseColor.rgb *= mix(vec3(1.0), vec3(0.62, 0.57, 0.72), rmCav * ${RMG.grout.toFixed(2)} * uRmK);        // deeper, violet grout
+    diffuseColor.rgb *= 1.0 + (rmN(vRmW * 1.9 + 11.0) - 0.5) * 0.11 * uRmK;                                          // tone variation stone to stone
+    diffuseColor.rgb *= 1.0 + rmTop * ${(RMG.top ?? 0.05).toFixed(3)} * uRmK; }`).replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
+  roughnessFactor = mix(roughnessFactor, mix(1.0 - ${RMG.gloss.toFixed(2)}, 0.98, rmCav) - 0.08 * rmTop, uRmK);`).replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
+  { vec2 dH = vec2(dFdx(rmH), dFdy(rmH)) * ${RMG.bump.toFixed(3)} * uRmK;   // RMG.bump < 0 flips (texture light comes from the other side)
+    vec3 sx = dFdx(-vViewPosition), sy = dFdy(-vViewPosition), r1 = cross(sy, normal), r2 = cross(normal, sx);
+    float det = dot(sx, r1) * faceDirection; vec3 grad = sign(det) * (dH.x * r1 + dH.y * r2);
+    normal = normalize(abs(det) * normal - grad); }`);
+  };
+  m.customProgramCacheKey = () => prevKey() + (gfxOn() ? '|rm2' + JSON.stringify(RMG) : '');
+  m.needsUpdate = true; return m;
 }
 
 // cloth in the wind (2026-11-14): flags / banners ripple instead of turning as one stiff board - a travelling wave along
@@ -714,7 +746,7 @@ export async function buildTown3D(spec, renderer, opts = {}) {
   const meadow = new THREE.Mesh(puv(new THREE.PlaneGeometry(MW, MD).rotateX(-Math.PI / 2).translate(MCX, 0, -MCZ), TILE.grass), M('grass')); meadow.position.y = -0.04; meadow.receiveShadow = true; root.add(meadow);
   const court = new THREE.Mesh(puv(new THREE.PlaneGeometry(x1 - x0, z1 - z0).rotateX(-Math.PI / 2).translate((x0 + x1) / 2, 0, -(z0 + z1) / 2), TILE.pave), groundVary(M('pave').clone()));
   court.receiveShadow = true; root.add(court);
-  const roadM = decalMat('cobble'), grassM = decalMat('grass');
+  const roadM = rmStone(decalMat('cobble')), grassM = decalMat('grass');
   if (!spec.gates) { const gateRoad = new THREE.Mesh(soft([[spec.gate.pos[0], spec.gate.pos[1] - 12], [spec.gate.pos[0], spec.gate.pos[1] - 1]], 5.2, 1.2), roadM); gateRoad.position.y = -0.02; root.add(gateRoad); }
   // cobble paths that run entirely over the flagstone courtyard are skipped: two stone patterns blended on top of each
   // other read as tiles overlapping by mistake. Paths outside the courtyard (over grass) and the fountain ring stay.
@@ -745,7 +777,7 @@ export async function buildTown3D(spec, renderer, opts = {}) {
       const l = []; for (let i = 0; i <= 96; i++) { const a = i / 96 * Math.PI * 2; l.push([r.pos[0] + Math.cos(a) * rad, r.pos[1] + Math.sin(a) * rad]); }
       lines.push({ l, cut: (x, z) => onPath(x, z) });
     }
-    const kerbM = decalMat('basestone');
+    const kerbM = rmStone(decalMat('basestone'));
     for (const { l, cut } of lines) { const m = new THREE.Mesh(curbGeo([l], 0.26, cut), kerbM); m.position.y = 0.016; m.receiveShadow = true; m.renderOrder = -1; root.add(m); }
   }
   for (const p of spec.ground.grass) { const m = new THREE.Mesh(patchGeo(p.pts), grassM); m.position.y = 0.02; m.receiveShadow = true; m.renderOrder = -1; root.add(m); }
