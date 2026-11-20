@@ -8,7 +8,7 @@
 ## 기본
 - 빌드 없음. `python3 -m http.server 8765` 후 `http://localhost:8765/index.html`.
 - three.js r160을 로컬 import map(`index.html`, `vendor/three-r160/`)으로 불러옵니다. CDN 장애 시 0% 멈춤을 방지하기 위해 동일 버전과 LICENSE를 저장소에 포함합니다. npm 의존성 없음. 새 라이브러리 추가 금지(필요하면 먼저 사용자에게 확인).
-- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs && node tests/gear.test.mjs && node tests/warp.test.mjs && node tests/pharmacist-audio.test.mjs && node tests/smith.test.mjs && node tests/gates.test.mjs && node tests/wpharm.test.mjs && node tests/chef.test.mjs && node tests/herbal.test.mjs && node tests/painter.test.mjs && node tests/storyscene.test.mjs && node tests/engineer.test.mjs && node tests/designer.test.mjs && node tests/musician.test.mjs && node tests/pharm2.test.mjs` (현재 core 555 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략; skills2 631 통과(2026-11-20 보원탕이 제작 스킬에서 직업 제작법으로 바뀌어 2 줄어듦); gates 1104 통과; smith 197 통과).
+- 수정 후 반드시 실행: `node tests/core.test.mjs && node tests/skills2.test.mjs && node tests/gear.test.mjs && node tests/warp.test.mjs && node tests/pharmacist-audio.test.mjs && node tests/smith.test.mjs && node tests/gates.test.mjs && node tests/wpharm.test.mjs && node tests/chef.test.mjs && node tests/herbal.test.mjs && node tests/painter.test.mjs && node tests/storyscene.test.mjs && node tests/engineer.test.mjs && node tests/designer.test.mjs && node tests/musician.test.mjs && node tests/pharm2.test.mjs` (현재 core 555 통과/50 생략 — 존마다 C# 전용 검사 1개씩 생략; skills2 628 통과(2026-11-20 양약사 조제·한약사 보원탕이 제작 스킬에서 빠져 줄어듦); gates 1104 통과; smith 197 통과).
 - 테스트하지 않은 것을 "검증됨"이라고 보고하지 말 것.
 
 ## 데이터 우선
