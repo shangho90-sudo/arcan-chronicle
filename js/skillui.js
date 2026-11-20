@@ -159,7 +159,7 @@ Object.assign(UI.prototype, {
         const eqb = $('div', 'skeq', det);
         for (let i = 0; i < NORMAL_SLOTS; i++) this.button(eqb, `${i + 1}번 슬롯`, sk.slots[i] === sel.id ? 'gold' : 'teal', () => { const e = book.equip(sel.id, i, p.skills2.inCombat); if (e) return this.toast(e); this.showSkills(show); });
       }
-      if (L && sel.type === 'craft') { const eqb = $('div', 'skeq', det); this.button(eqb, '제작 메뉴 열기', 'teal', () => this.showCraft(sel.id)); }
+      if (L && (sel.type === 'craft' || sel.craftName)) { const eqb = $('div', 'skeq', det); this.button(eqb, '제작 메뉴 열기', 'teal', () => this.showCraft(sel.id)); }
     } else det.innerHTML = '<div class="small muted">스킬을 선택하면 자세한 설명과 다음 레벨 변화를 볼 수 있습니다. 패시브는 배우면 자동 적용되고, 제작 스킬은 제작 메뉴(N)에서 사용합니다.</div>';
     this.slotBar(b);
   },
@@ -177,7 +177,7 @@ Object.assign(UI.prototype, {
   // ---------------------------------------------------------------- craft window
   showCraft(skillId) {
     const p = G.player, book = p.sheet.book, bag = p.sheet.bag;
-    const crafts = G.data.skill2List.filter(s => s.type === 'craft' && book.usable(s.id));
+    const crafts = G.data.skill2List.filter(s => (s.type === 'craft' || s.craftName) && book.usable(s.id));   // craftName: 습득 효과 제작법(양약사 구급함·서방 패치 = 예전 조제 스킬 id)
     const b = this.open('craft', '제작', 1700, 920);
     if (!crafts.length) { $('div', 'skempty', b, '<p>배운 제작 스킬이 없습니다. 스킬창(K)에서 제작 스킬을 배우세요.</p>'); return; }
     const inSafe = p.zone.def.kind === 'town';
@@ -185,7 +185,7 @@ Object.assign(UI.prototype, {
     const left = $('div', 'crleft panel-dark', b), right = $('div', 'crright panel-dark', b);
     const sel = this.crSel && G.data.recipes.find(r => r.id === this.crSel) ? this.crSel : null;
     for (const s of crafts) {
-      $('div', 'skcat', left, s.name + ` <span class="small muted">Lv${book.level(s.id)}</span>`);
+      $('div', 'skcat', left, (s.craftName || s.name) + ` <span class="small muted">Lv${book.level(s.id)}</span>`);
       for (const rid of s.recipes || []) {
         if (rid === 'salvage') { const r = $('div', 'crrow' + (this.crSel === 'salvage' ? ' sel' : ''), left, '<b>장비 분해</b> <span class="small muted">장비 → 재료 일부</span>'); r.onclick = () => { this.crSel = 'salvage'; this.showCraft(); }; continue; }
         const rc = G.data.recipes.find(x => x.id === rid); if (!rc) continue; const out = G.data.item(rc.output.item);

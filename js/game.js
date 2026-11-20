@@ -287,6 +287,12 @@ void main(){
     for (const c of this.actors) { if (c.dead || c.faction === "player") continue; const s = G.render.toScreen({ x: c.pos.x, y: c.pos.y + 0.5 + c.radius * 0.6, z: c.pos.z }); const d = Math.hypot(s.x - x, s.y - y); if (d < this.pickR(c.radius + 0.3) && d < bd) { bd = d; best = c; } }
     return best;
   }
+  /** 내 생명 소환물(지원 대상 — 양약사 서방 패치·붕대 릴, js/wpharm.js allyPick) */
+  pickAlly(x, y) {
+    let best = null, bd = 1e9;
+    for (const c of this.actors) { if (c.dead || !c.isSummon || !c.living || c.machine) continue; const s = G.render.toScreen({ x: c.pos.x, y: c.pos.y + 0.5, z: c.pos.z }); const d = Math.hypot(s.x - x, s.y - y); if (d < this.pickR((c.radius || 0.4) + 0.3) && d < bd) { bd = d; best = c; } }
+    return best;
+  }
   pickNpc(x, y) {
     let best = null, bd = 1e9;
     for (const n of this.npcs) { const s = G.render.toScreen({ x: n.pos.x, y: n.pos.y + 0.7, z: n.pos.z }); const d = Math.hypot(s.x - x, s.y - y); if (d < this.pickR(0.6) && d < bd) { bd = d; best = n; } }

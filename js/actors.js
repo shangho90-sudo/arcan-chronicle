@@ -533,6 +533,7 @@ export class Player extends Combatant {
     this.body.play("idle", 1);
   }
   onClick(c) {
+    const al = this.zone.pickAlly && this.zone.pickAlly(c.x, c.y); if (al) { this.allyTarget = al; G.ui.floatText(al.pos, '지원 대상', '#9affd8', 0.8, 1.6); return; }   // 내 생명 소환물 = 지원 대상(양약사 서방 패치·붕대 릴)
     const m = this.zone.pickActor(c.x, c.y); if (m) { this.target = m; this.lockOn = m; this.npcTarget = null; this.setDest(m.pos); return; }
     const n = this.zone.pickNpc(c.x, c.y); if (n) { this.npcTarget = n; this.target = null; this.setDest(n.pos); return; }
     const ray = G.render.screenRay(c.x, c.y), h = this.zone.geo.raycast(ray.o, ray.d);

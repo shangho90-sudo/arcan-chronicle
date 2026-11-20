@@ -1339,42 +1339,37 @@
 "cat": 0,
 "catName": "정밀 제약술",
 "idx": 2,
-"name": "극저온 결정화",
+"name": "발포정",
 "type": "attack",
-"desc": "앰플을 한 점에 꽂는다. 푸른 막이 퍼지고 가장자리부터 가운데로 얼음 결정이 솟아오른 뒤, 가운데 결정이 터지며 냉기 피해와 둔화를 준다. 이미 둔화된 일반 적은 잠깐 얼어붙는다.",
+"desc": "커다란 흰 발포정을 지정한 곳에 떨어뜨린다. 발포정은 가장자리부터 녹으며 낮은 거품을 펼치고, 작은 기포가 연달아 터져 범위 안의 적에게 피해를 준다. 마지막에는 가운데 부푼 큰 기포가 터져 더 큰 피해와 반응 표식을 남긴다. 둔화된 적은 기포 피해를 더 받는다 — 서리병 굴리기로 늦춘 적의 길에 놓아 보자. 긴급 방출로 큰 기포를 바로 터뜨릴 수 있다.",
 "maxLv": 5,
 "unlock": 33,
 "prereq": [],
 "weapon": null,
 "target": "ground",
-"range": 7,
-"mp": 24,
-"cd": 8,
+"range": 8,
+"mp": 22,
+"cd": 9,
 "cast": 0.0,
 "recover": 0.3,
-"anim": "wp_compound",
+"anim": "wp_drop",
 "ops": [
 {
 "op": "custom",
-"fn": "wp_cryo",
-"r": 2.4,
-"coef": 2.4,
-"freeze": 1.2,
-"st": [
-{
-"id": "slow",
-"dur": 3,
-"val": 0.4,
-"ch": 1.0
-}
-]
+"fn": "wp_foam",
+"r": 2.2,
+"tick": 0.3,
+"ticks": 5,
+"fin": 1.5,
+"slowBonus": 0.25
 }
 ],
 "mods": [],
 "flags": {},
 "fx": {
-"color": 9101567
+"color": 14677759
 },
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -1522,35 +1517,35 @@
 "cat": 1,
 "catName": "표적 전달과 약물 반응",
 "idx": 1,
-"name": "촉매 활성화",
-"type": "support",
-"desc": "어깨 뒤에 작은 촉매 앰플 3개를 띄운다. 지속 시간 동안 양약사 공격 스킬을 쓸 때마다 앰플 하나가 빛나며 그 공격의 반응 표식 +1, 피해가 오른다(3회). 약사 약병 공격도 표식을 남긴다.",
+"name": "이중정",
+"type": "attack",
+"desc": "분할선이 새겨진 흰 정제를 손가락으로 튕겨 적 하나에 붙인다. 맞는 순간 흰 외층이 깨져 1차 피해와 반응 표식 1개를 주고, 드러난 푸른 내핵은 적을 따라다니며 두 번 깜빡인 뒤 2초 뒤에 터져 2차 피해를 준다. 습득 효과: 약사 약병 공격도 던질 때마다 맞은 적마다 반응 표식 1개를 남긴다(장판·연타로 더 쌓이지 않음).",
 "maxLv": 5,
 "unlock": 30,
 "prereq": [],
 "weapon": null,
-"target": "self",
-"range": 2.0,
-"mp": 20,
-"cd": 20,
+"target": "enemy",
+"range": 8,
+"mp": 12,
+"cd": 4,
 "cast": 0.0,
 "recover": 0.25,
-"anim": "wp_compound",
+"anim": "wp_flick",
 "ops": [
 {
 "op": "custom",
-"fn": "wp_catalyst",
-"dur": 12,
-"charges": 3,
-"dmg": 0.15,
-"dmgLv": 0.03
+"fn": "wp_tablet",
+"coef": 0.8,
+"core": 1.5,
+"delay": 2.0
 }
 ],
 "mods": [],
 "flags": {},
 "fx": {
-"color": 16765562
+"color": 8042751
 },
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -1567,35 +1562,35 @@
 "cat": 1,
 "catName": "표적 전달과 약물 반응",
 "idx": 2,
-"name": "정밀 표적 전달",
-"type": "support",
-"desc": "반투명한 약물 운반체를 적 하나에 붙인다. 그 적에게는 반응 표식이 하나 더 쌓이고, 표식을 소비하는 공격(연쇄 용출·임계 농도)의 피해가 커진다. 한 번에 한 적에게만 붙는다.",
+"name": "긴급 방출",
+"type": "attack",
+"desc": "내가 붙인 이중정의 내핵이나 설치한 발포정 하나를 즉시 작동시킨다. 이중정은 남은 2차 피해를 바로 주고, 발포정은 남은 작은 기포를 포기하는 대신 마지막 큰 기포를 지금 터뜨린다. 선택한 적에게 붙인 이중정이 먼저, 없으면 조준한 곳에서 가장 가까운 발포정을 고른다. 작동시킬 제제가 없으면 기력과 재사용 시간을 쓰지 않는다. 반응 표식은 쓰지 않는다.",
 "maxLv": 5,
 "unlock": 33,
 "prereq": [],
 "weapon": null,
-"target": "enemy",
-"range": 9,
-"mp": 16,
-"cd": 14,
+"target": "ground",
+"range": 14,
+"mp": 8,
+"cd": 3,
 "cast": 0.0,
-"recover": 0.25,
-"anim": "wp_compound",
+"recover": 0.15,
+"anim": "wp_snap",
 "ops": [
 {
 "op": "custom",
-"fn": "wp_carrier",
-"dur": 10,
-"durLv": 1,
-"bonus": 0.3,
-"bonusLv": 0.05
+"fn": "wp_release",
+"at": -1,
+"boost": 0.1,
+"boostLv": 0.05
 }
 ],
 "mods": [],
 "flags": {},
 "fx": {
-"color": 7004368
+"color": 8042751
 },
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -1630,9 +1625,9 @@
 {
 "op": "custom",
 "fn": "wp_chain",
-"coef": 1.6,
-"perStack": 0.5,
-"sub": 1.2,
+"coef": 1.8,
+"perStack": 0.6,
+"sub": 1.4,
 "r": 2.0,
 "range": 5,
 "max": 5
@@ -1717,8 +1712,8 @@
 "op": "custom",
 "fn": "wp_critical",
 "r": 6,
-"base": 1.4,
-"per": 0.65,
+"base": 1.6,
+"per": 0.72,
 "cap": 9
 }
 ],
@@ -1743,24 +1738,42 @@
 "cat": 2,
 "catName": "첨단 조제와 생체 보호",
 "idx": 1,
-"name": "고순도 제제 조제",
-"type": "craft",
-"desc": "불순물을 걸러 낸 농축 HP 회복제를 만든다.",
+"name": "구급함 전개",
+"type": "support",
+"desc": "발치에 작은 왕진 가방을 내려놓는다. 뚜껑이 열리면 안쪽에 응급 패치 3장이 보이고, 일정 간격마다 범위 안에서 HP 비율이 가장 낮은 나 또는 생명체 소환수에게 패치 한 장이 날아가 즉시 회복시킨다. 모두 건강하면 패치를 아꼈다가 다친 이가 생기면 쓴다. 패치를 다 쓰거나 시간이 끝나면 가방이 닫힌다. 자리를 지킬 때 쓴다. 습득 효과: 고순도 제제(농축 회복제) 제작법.",
 "maxLv": 5,
 "unlock": 30,
 "prereq": [],
 "weapon": null,
 "target": "self",
 "range": 2.0,
-"mp": 0,
-"cd": 0,
+"mp": 22,
+"cd": 20,
 "cast": 0.0,
-"recover": 0.35,
-"anim": null,
-"ops": [],
+"recover": 0.3,
+"anim": "wp_place",
+"ops": [
+{
+"op": "custom",
+"fn": "wp_kit",
+"dur": 10,
+"durLv": 1,
+"r": 6,
+"n": 3,
+"gap": 1.0,
+"open": 0.4,
+"thresh": 0.85,
+"pct": 0.12,
+"pctLv": 0.02
+}
+],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 10158040
+},
+"sfxAt": "op",
+"craftName": "고순도 제제 조제",
 "status": {
 "data": true,
 "impl": true,
@@ -1780,24 +1793,38 @@
 "cat": 2,
 "catName": "첨단 조제와 생체 보호",
 "idx": 2,
-"name": "서방형 캡슐 조제",
-"type": "craft",
-"desc": "조금씩 녹아 15초 동안 HP 또는 기력을 회복시키는 서방형 캡슐을 만든다.",
+"name": "서방 패치",
+"type": "support",
+"desc": "나 또는 선택한 생명체 소환수에게 세 칸짜리 패치를 붙인다. 대상이 움직여도 패치가 따라가며 1.5초마다 세 번 회복시키고, 회복할 때마다 칸이 하나씩 꺼진다. 지원 대상을 고르지 않고 누르면 나에게 붙는다. 보스를 피해 계속 움직일 때 쓴다. 습득 효과: 서방형 캡슐(지속 회복·활력 제제) 제작법.",
 "maxLv": 5,
 "unlock": 33,
 "prereq": [],
 "weapon": null,
 "target": "self",
-"range": 2.0,
-"mp": 0,
-"cd": 0,
+"range": 9,
+"mp": 16,
+"cd": 12,
 "cast": 0.0,
-"recover": 0.35,
-"anim": null,
-"ops": [],
+"recover": 0.25,
+"anim": "wp_patch",
+"ops": [
+{
+"op": "custom",
+"fn": "wp_patch",
+"range": 9,
+"n": 3,
+"gap": 1.5,
+"pct": 0.07,
+"pctLv": 0.015
+}
+],
 "mods": [],
 "flags": {},
-"fx": {},
+"fx": {
+"color": 10158040
+},
+"sfxAt": "op",
+"craftName": "서방형 캡슐 조제",
 "status": {
 "data": true,
 "impl": true,
@@ -1818,39 +1845,37 @@
 "cat": 2,
 "catName": "첨단 조제와 생체 보호",
 "idx": 3,
-"name": "생체 회복 분무",
+"name": "구조용 붕대 릴",
 "type": "support",
-"desc": "앰플을 꽃잎처럼 펼쳐 둘레에 옅은 청록 안개를 뿜는다. 6초 동안 1초마다 범위 안의 나와 생명체 소환물이 회복된다(기계 소환물 제외).",
+"desc": "손목의 릴에서 넓은 붕대를 쏘아 생명체 소환수를 내 쪽의 안전한 자리로 당기고, 도착하는 순간 한 번 회복시킨다. 고른 소환수가 먼저, 없으면 적의 바닥 공격 위에 선 소환수, 그다음 HP가 절반 아래인 소환수를 고른다. 벽은 통과하지 않는다. 당길 소환수가 없으면 붕대로 나를 감아 즉시 조금 회복한다.",
 "maxLv": 5,
 "unlock": 36,
 "prereq": [],
 "weapon": null,
 "target": "self",
-"range": 2.0,
-"mp": 28,
-"cd": 18,
+"range": 9,
+"mp": 18,
+"cd": 14,
 "cast": 0.0,
-"recover": 0.25,
-"anim": "wp_compound",
+"recover": 0.3,
+"anim": "wp_reel",
 "ops": [
 {
-"op": "area",
-"kind": "heal",
-"r": 3.5,
-"dur": 6,
-"tick": 1.0,
-"heal": 0.03,
-"fx": "none",
-"follow": false,
-"living": true,
-"wp": "spray"
+"op": "custom",
+"fn": "wp_reel",
+"range": 9,
+"pct": 0.15,
+"pctLv": 0.025,
+"self": 0.06,
+"selfLv": 0.01
 }
 ],
 "mods": [],
 "flags": {},
 "fx": {
-"color": 7004368
+"color": 16050896
 },
+"sfxAt": "op",
 "status": {
 "data": true,
 "impl": true,
@@ -10053,15 +10078,6 @@
 "color": "#ff5a3a"
 },
 {
-"id": "prescribed",
-"name": "표적 전달",
-"kind": "mark",
-"debuff": true,
-"cleanse": false,
-"boss": "normal",
-"color": "#5aa0ff"
-},
-{
 "id": "painted",
 "name": "색칠 표식",
 "kind": "mark",
@@ -10207,14 +10223,6 @@
 "stack": "max",
 "group": "food",
 "color": "#ffd060"
-},
-{
-"id": "catalyst",
-"name": "촉매 활성화",
-"kind": "flag",
-"buff": true,
-"stack": "max",
-"color": "#5aa0ff"
 },
 {
 "id": "inspired",

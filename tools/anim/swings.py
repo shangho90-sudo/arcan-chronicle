@@ -1462,6 +1462,64 @@ PH_BLOW = action('ph_blow', [
 ], 0.32, 0.50, None, fadeIn=0.05, fadeOut=0.16)
 PH_BLOW.update(stow=True, blowT=0.32)
 SKILL_ACTS += [PH_RANG, PH_CATCH, PH_BOWL, PH_BLOOM, PH_BLOW]
+# ------------------------------------------------------------------------------------------------ 양약사 2차 6종 교체 (2026-11-20, js/wpharm.js)
+# 모두 stow(유봉은 등에, 손은 빔 — 정제·발포정·가방·패치·릴은 js/wpharmfx.js 가 실제 손 위치(handPoint)에서 그림).
+# 이중정 (wp_b1, wp_flick): 오른손을 가슴 앞에 모아 엄지에 정제를 걸었다가(0.12 s) 0.20 s 에 손가락으로 톡 튕김 -> 손끝이 앞으로 잠깐 남음 -> 복귀.
+WP_FLICK = action('wp_flick', [
+    key(0.00, **REST),
+    key(0.12, 'o', twist=-12, lean=-2, sink=0.03, hand=[-14, 6, 0.56], blade=[-4, 34], elbow=[-0.8, -0.7, -0.3], armL=[24, 22]),
+    key(0.20, 'i', twist=10, lean=6, sink=0.05, hand=[-4, 12, 0.96], blade=[6, 14], elbow=[-0.6, -0.8, -0.1], armL=[18, 26], squint=True),
+    key(0.34, 'o', twist=8, lean=5, sink=0.04, hand=[-6, 10, 0.92], blade=[4, 12], elbow=[-0.6, -0.8, -0.1], armL=[16, 24]),
+    key(0.50, 's', **REST),
+], 0.20, 0.30, None, fadeIn=0.04, fadeOut=0.12)
+WP_FLICK.update(stow=True, throwT=0.20)
+# 발포정 (wp_a2, wp_drop): 큰 정제를 두 손으로 머리 위로 들었다가(0.14 s) 0.26 s 에 앞쪽 아래로 던져 떨어뜨림.
+WP_DROP = action('wp_drop', [
+    key(0.00, **REST),
+    key(0.14, 'o', twist=-6, lean=-8, sink=0.02, hand=[-30, 70, 0.78], blade=[-10, 80], elbow=[-0.7, -0.2, -0.3], armL=[70, 60]),
+    key(0.26, 'i', twist=6, lean=14, sink=0.08, hand=[-8, 0, 1.0], blade=[4, -10], elbow=[-0.6, -0.9, -0.1], armL=[60, 20], step=[0.18, 0.0], squint=True),
+    key(0.40, 'o', twist=4, lean=12, sink=0.07, hand=[-8, -10, 0.94], blade=[4, -16], elbow=[-0.6, -0.9, -0.1], armL=[50, 18], step=[0.18, 0.0]),
+    key(0.62, 's', **REST),
+], 0.26, 0.40, None, fadeIn=0.05, fadeOut=0.14)
+WP_DROP.update(stow=True, throwT=0.26)
+# 긴급 방출 (wp_b2, wp_snap): 오른손을 앞으로 내밀며 주먹을 꽉 쥠(0.10 s) — 짧게, 바로 움직일 수 있게.
+WP_SNAP = action('wp_snap', [
+    key(0.00, **REST),
+    key(0.06, 'o', twist=-6, lean=-2, sink=0.02, hand=[-16, 16, 0.62], blade=[-6, 40], elbow=[-0.8, -0.6, -0.3], armL=[16, 20]),
+    key(0.10, 'i', twist=8, lean=6, sink=0.04, hand=[-6, 18, 0.96], blade=[2, 30], elbow=[-0.6, -0.7, -0.1], armL=[20, 24], squint=True),
+    key(0.22, 'o', twist=6, lean=5, sink=0.03, hand=[-6, 16, 0.94], blade=[2, 28], elbow=[-0.6, -0.7, -0.1], armL=[18, 22]),
+    key(0.40, 's', **REST),
+], 0.10, 0.16, None, fadeIn=0.03, fadeOut=0.1)
+WP_SNAP.update(stow=True)
+# 구급함 전개 (wp_c1, wp_place): 몸을 낮춰 오른손에 든 작은 왕진 가방을 발치 앞에 내려놓음(0.30 s) -> 일어섬.
+WP_PLACE = action('wp_place', [
+    key(0.00, **REST),
+    key(0.16, 'o', twist=-8, lean=16, sink=0.18, hand=[-20, -46, 0.86], blade=[-10, -20], elbow=[-0.6, -1, -0.2], armL=[20, 30], step=[0.16, 0.0]),
+    key(0.30, 'i', twist=0, lean=30, sink=0.36, hand=[-6, -66, 1.0], blade=[0, -50], elbow=[-0.5, -1, 0.0], armL=[22, 40], step=[0.26, 0.0], squint=True),
+    key(0.46, 'o', twist=0, lean=26, sink=0.30, hand=[-6, -60, 0.96], blade=[0, -44], elbow=[-0.5, -1, 0.0], armL=[20, 40], step=[0.26, 0.0]),
+    key(0.72, 's', **REST),
+], 0.30, 0.50, None, fadeIn=0.05, fadeOut=0.14)
+WP_PLACE.update(stow=True)
+# 서방 패치 (wp_c2, wp_patch): 패치를 들어 앞으로 톡 붙이는 손짓(0.22 s) — 나에게 붙일 때도 같은 손짓(그림은 대상에 붙음).
+WP_PATCH = action('wp_patch', [
+    key(0.00, **REST),
+    key(0.12, 'o', twist=-10, lean=-2, sink=0.03, hand=[-24, 10, 0.60], blade=[-10, 40], elbow=[-0.8, -0.7, -0.3], armL=[30, 24]),
+    key(0.22, 'i', twist=6, lean=6, sink=0.05, hand=[-6, 4, 0.92], blade=[4, 10], elbow=[-0.6, -0.8, -0.1], armL=[26, 26], squint=True),
+    key(0.36, 'o', twist=4, lean=5, sink=0.04, hand=[-8, 2, 0.88], blade=[2, 8], elbow=[-0.6, -0.8, -0.1], armL=[22, 24]),
+    key(0.55, 's', **REST),
+], 0.22, 0.34, None, fadeIn=0.04, fadeOut=0.12)
+WP_PATCH.update(stow=True)
+# 구조용 붕대 릴 (wp_c3, wp_reel): 오른 손목(릴)을 앞으로 뻗어 0.14 s 에 붕대를 쏨 -> 0.28~0.60 s 팔꿈치를 뒤로 당기며 몸을 젖혀 감음 -> 복귀.
+WP_REEL = action('wp_reel', [
+    key(0.00, **REST),
+    key(0.08, 'o', twist=-8, lean=-2, sink=0.03, hand=[-12, 10, 0.70], blade=[-4, 20], elbow=[-0.7, -0.7, -0.2], armL=[20, 22]),
+    key(0.14, 'i', twist=8, lean=6, sink=0.05, hand=[-4, 12, 1.0], blade=[4, 10], elbow=[-0.5, -0.8, -0.1], armL=[24, 26], squint=True),
+    key(0.30, 's', twist=4, lean=0, sink=0.08, hand=[-4, 10, 0.94], blade=[4, 10], elbow=[-0.6, -0.8, -0.1], armL=[22, 24], step=[0.0, 0.0]),
+    key(0.58, 's', twist=-14, lean=-12, sink=0.10, hand=[-30, 0, 0.58], blade=[-10, 10], elbow=[-0.9, -0.5, -0.5], armL=[30, 30], step=[-0.16, 0.0]),
+    key(0.80, 's', **REST),
+], 0.14, 0.56, None, fadeIn=0.04, fadeOut=0.14)
+WP_REEL.update(stow=True, throwT=0.14)
+SKILL_ACTS += [WP_FLICK, WP_DROP, WP_SNAP, WP_PLACE, WP_PATCH, WP_REEL]
 
 acts = json.load(open(P))
 names = {'attack', 'attack2'} | {x['name'] for x in SKILL_ACTS}

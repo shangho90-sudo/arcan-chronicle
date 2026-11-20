@@ -121,14 +121,20 @@ S(J, 1, 2, '조제와 응급처치', 5, 'ph1_c9', '약사 수련', 'passive', '�
 # 반응 표식: 대상마다 최대 3개·8초, 한 번 시전에 대상마다 1(+촉매 충전 1, +표적 전달 1). 피해는 모두 전역 정지·흔들림 없이(quiet), 카메라 kick은 궁극기 주 타격 한 번만.
 # 총 피해(같은 레벨): 작열·분열 캡슐 = 예전 캡슐 0.6 + 지연 폭발 2.8 = 3.4 그대로(과립 1.6 + 고리 1.8), 극저온 2.4·이온 2.6·삼상 1.0x3 + 2.5 그대로,
 # 대형 캡슐 붕괴 = 예전 광선 6.0 + 끝 폭발 7.0 대신 원 하나 10.0(반경 3.8), 연쇄 용출 1.6 x (1 + 0.5/표식)(예전 0.6), 임계 농도 1.4 + 0.65/표식(최대 9개, 예전 3.0 + 0.8 x 합/대상 수, 상한 15)
+# 2026-11-20 6종 교체(사용자 기획 '제형을 붙이고, 터질 시점을 고르고, 위급한 아군에게 제제를 전달하는 전투 약사'): id·칸·배우는 레벨·최대 레벨 그대로 —
+#   촉매 활성화(b1) -> 이중정, 극저온 결정화(a2) -> 발포정, 정밀 표적 전달(b2) -> 긴급 방출, 고순도 제제 조제(c1) -> 구급함 전개,
+#   서방형 캡슐 조제(c2) -> 서방 패치, 생체 회복 분무(c3) -> 구조용 붕대 릴. 제작법(r_potion_l·r_regen_hp·r_regen_sp)은 같은 스킬 id(wp_c1·wp_c2)를
+#   배운 캐릭터가 계속 씀(스킬 데이터 recipes + craftName, js/skillui.js showCraft) — 예전 저장의 습득 레벨이 그대로라 제작법도 그대로.
+#   촉매·표적 전달이 없어져 표식이 덜 쌓이므로 연쇄 용출 1.6 -> 1.8(+표식당 0.5 -> 0.6, 이어진 적 1.2 -> 1.4), 임계 농도 1.4 + 0.65/표식 -> 1.6 + 0.72/표식.
+#   약사 1차 약병 표식은 이중정 습득 효과(던질 때마다 대상당 1, js/wpharm.js flaskMarks).
 J, C = 'western_pharmacist', 0x5aa0ff
 A_, B_, C_ = '정밀 제약술', '표적 전달과 약물 반응', '첨단 조제와 생체 보호'
 S(J, 2, 0, A_, 1, 'wp_a1', '작열·분열 캡슐', 'attack', '붉고 흰 캡슐을 던진다. 캡슐은 대상 위에서 빠르게 돌다 두 쪽으로 갈라지고, 금빛 과립 5개가 서로 다른 곡선으로 차례로 꽂힌다. 마지막 과립이 붉은 반응 고리를 터뜨려 둘레에 피해와 화상을 준다. 대상이 쓰러지면 남은 과립은 가까운 적에게 날아간다.',
   target='enemy', range=7, mp=22, cd=7, anim='wp_compound', recover=0.3,
   ops=[custom('wp_capsule', n=5, coef=1.6, fin=1.8, finR=1.6, retarget=6, st=[st('burn', 4, 0.15)])], fx=dict(color=0xff6a3a))
-S(J, 2, 0, A_, 2, 'wp_a2', '극저온 결정화', 'attack', '앰플을 한 점에 꽂는다. 푸른 막이 퍼지고 가장자리부터 가운데로 얼음 결정이 솟아오른 뒤, 가운데 결정이 터지며 냉기 피해와 둔화를 준다. 이미 둔화된 일반 적은 잠깐 얼어붙는다.',
-  target='ground', range=7, mp=24, cd=8, anim='wp_compound', recover=0.3,
-  ops=[custom('wp_cryo', r=2.4, coef=2.4, freeze=1.2, st=[st('slow', 3, 0.4)])], fx=dict(color=0x8ae0ff))
+S(J, 2, 0, A_, 2, 'wp_a2', '발포정', 'attack', '커다란 흰 발포정을 지정한 곳에 떨어뜨린다. 발포정은 가장자리부터 녹으며 낮은 거품을 펼치고, 작은 기포가 연달아 터져 범위 안의 적에게 피해를 준다. 마지막에는 가운데 부푼 큰 기포가 터져 더 큰 피해와 반응 표식을 남긴다. 둔화된 적은 기포 피해를 더 받는다 — 서리병 굴리기로 늦춘 적의 길에 놓아 보자. 긴급 방출로 큰 기포를 바로 터뜨릴 수 있다.',
+  target='ground', range=8, mp=22, cd=9, anim='wp_drop', recover=0.3, sfxAt='op',
+  ops=[custom('wp_foam', r=2.2, tick=0.3, ticks=5, fin=1.5, slowBonus=0.25)], fx=dict(color=0xdff6ff))
 S(J, 2, 0, A_, 3, 'wp_a3', '이온 관통술', 'attack', '은빛 약액 구슬을 한 줄로 세운 뒤, 푸른 흰 번개 한 줄기로 앞의 적들을 꿰뚫는다. 맞은 적마다 반응 표식이 남는다.',
   target='dir', range=9, mp=24, cd=7, anim='wp_compound', recover=0.3,
   ops=[custom('wp_ion', len=9, w=1.2, coef=2.6)], fx=dict(color=0xbfe6ff))
@@ -138,24 +144,28 @@ S(J, 2, 0, A_, 4, 'wp_a4', '삼상 복합제', 'attack', '붉은 캡슐·푸른 
 S(J, 2, 0, A_, 5, 'wp_a5', '대형 캡슐 붕괴', 'ultimate', '조준한 곳 위에 거대한 반투명 캡슐을 띄운다. 과립이 가운데로 모여 핵이 되고, 캡슐이 열리며 핵이 떨어져 땅에 닿는 순간 넓은 범위에 큰 피해를 준다.',
   target='ground', range=9, mp=70, cd=60, anim='wp_condense', recover=0.4,
   ops=[custom('wp_collapse', r=3.8, coef=10.0)], fx=dict(color=0x9ad8ff))
-S(J, 2, 1, B_, 1, 'wp_b1', '촉매 활성화', 'support', '어깨 뒤에 작은 촉매 앰플 3개를 띄운다. 지속 시간 동안 양약사 공격 스킬을 쓸 때마다 앰플 하나가 빛나며 그 공격의 반응 표식 +1, 피해가 오른다(3회). 약사 약병 공격도 표식을 남긴다.',
-  target='self', mp=20, cd=20, anim='wp_compound', recover=0.25,
-  ops=[custom('wp_catalyst', dur=12, charges=3, dmg=0.15, dmgLv=0.03)], fx=dict(color=0xffd27a))
-S(J, 2, 1, B_, 2, 'wp_b2', '정밀 표적 전달', 'support', '반투명한 약물 운반체를 적 하나에 붙인다. 그 적에게는 반응 표식이 하나 더 쌓이고, 표식을 소비하는 공격(연쇄 용출·임계 농도)의 피해가 커진다. 한 번에 한 적에게만 붙는다.',
-  target='enemy', range=9, mp=16, cd=14, anim='wp_compound', recover=0.25,
-  ops=[custom('wp_carrier', dur=10, durLv=1, bonus=0.3, bonusLv=0.05)], fx=dict(color=0x6ae0d0))
+S(J, 2, 1, B_, 1, 'wp_b1', '이중정', 'attack', '분할선이 새겨진 흰 정제를 손가락으로 튕겨 적 하나에 붙인다. 맞는 순간 흰 외층이 깨져 1차 피해와 반응 표식 1개를 주고, 드러난 푸른 내핵은 적을 따라다니며 두 번 깜빡인 뒤 2초 뒤에 터져 2차 피해를 준다. 습득 효과: 약사 약병 공격도 던질 때마다 맞은 적마다 반응 표식 1개를 남긴다(장판·연타로 더 쌓이지 않음).',
+  target='enemy', range=8, mp=12, cd=4, anim='wp_flick', recover=0.25, sfxAt='op',
+  ops=[custom('wp_tablet', coef=0.8, core=1.5, delay=2.0)], fx=dict(color=0x7ab8ff))
+S(J, 2, 1, B_, 2, 'wp_b2', '긴급 방출', 'attack', '내가 붙인 이중정의 내핵이나 설치한 발포정 하나를 즉시 작동시킨다. 이중정은 남은 2차 피해를 바로 주고, 발포정은 남은 작은 기포를 포기하는 대신 마지막 큰 기포를 지금 터뜨린다. 선택한 적에게 붙인 이중정이 먼저, 없으면 조준한 곳에서 가장 가까운 발포정을 고른다. 작동시킬 제제가 없으면 기력과 재사용 시간을 쓰지 않는다. 반응 표식은 쓰지 않는다.',
+  target='ground', range=14, mp=8, cd=3, anim='wp_snap', recover=0.15, sfxAt='op',
+  ops=[custom('wp_release', at=-1, boost=0.1, boostLv=0.05)], fx=dict(color=0x7ab8ff))
 S(J, 2, 1, B_, 3, 'wp_b3', '연쇄 용출', 'attack', '대상의 반응 표식을 소비해 터뜨린다. 풀려난 미립자가 곡선을 그리며 가까운 \'표식이 있는\' 적에게 차례로 옮겨 가 그 표식도 터뜨린다. 한 번의 시전에서 같은 적에게는 한 번만 이어진다.',
   target='enemy', range=8, mp=26, cd=9, anim='wp_compound', recover=0.3,
-  ops=[custom('wp_chain', coef=1.6, perStack=0.5, sub=1.2, r=2.0, range=5, max=5)], fx=dict(color=0x6ae0d0))
+  ops=[custom('wp_chain', coef=1.8, perStack=0.6, sub=1.4, r=2.0, range=5, max=5)], fx=dict(color=0x6ae0d0))
 S(J, 2, 1, B_, 4, 'wp_b4', '서방형 미립자', 'passive', '표식이 터진 자리에 빛나는 과립 지대가 4초 동안 남아 1초마다 작은 피해를 준다. 과립은 시간이 지날수록 줄어든다. 지대의 피해는 표식을 만들지 않는다.', flags=dict(residue=[0.25, 0.08]))
 S(J, 2, 1, B_, 5, 'wp_b5', '임계 농도', 'ultimate', '주변 적들의 반응 표식을 모두 거둬들인다. 표식마다 가운데로 빛줄기가 모이고 맑은 구 안에서 결정이 자라다가, 푸른 흰 충격파로 터진다. 거둔 표식이 많을수록 강하다(표식이 없으면 약함).',
   target='self', range=0, mp=60, cd=50, anim='wp_condense', recover=0.4,
-  ops=[custom('wp_critical', r=6, base=1.4, per=0.65, cap=9)], fx=dict(color=0x9ad8ff))
-S(J, 2, 2, C_, 1, 'wp_c1', '고순도 제제 조제', 'craft', '불순물을 걸러 낸 농축 HP 회복제를 만든다.')
-S(J, 2, 2, C_, 2, 'wp_c2', '서방형 캡슐 조제', 'craft', '조금씩 녹아 15초 동안 HP 또는 기력을 회복시키는 서방형 캡슐을 만든다.')
-S(J, 2, 2, C_, 3, 'wp_c3', '생체 회복 분무', 'support', '앰플을 꽃잎처럼 펼쳐 둘레에 옅은 청록 안개를 뿜는다. 6초 동안 1초마다 범위 안의 나와 생명체 소환물이 회복된다(기계 소환물 제외).',
-  target='self', mp=28, cd=18, anim='wp_compound', recover=0.25,
-  ops=[area('heal', 3.5, 6, tick=1.0, heal=0.03, fx='none', follow=False, living=True, wp='spray')], fx=dict(color=0x6ae0d0))
+  ops=[custom('wp_critical', r=6, base=1.6, per=0.72, cap=9)], fx=dict(color=0x9ad8ff))
+S(J, 2, 2, C_, 1, 'wp_c1', '구급함 전개', 'support', '발치에 작은 왕진 가방을 내려놓는다. 뚜껑이 열리면 안쪽에 응급 패치 3장이 보이고, 일정 간격마다 범위 안에서 HP 비율이 가장 낮은 나 또는 생명체 소환수에게 패치 한 장이 날아가 즉시 회복시킨다. 모두 건강하면 패치를 아꼈다가 다친 이가 생기면 쓴다. 패치를 다 쓰거나 시간이 끝나면 가방이 닫힌다. 자리를 지킬 때 쓴다. 습득 효과: 고순도 제제(농축 회복제) 제작법.',
+  target='self', mp=22, cd=20, anim='wp_place', recover=0.3, sfxAt='op', craftName='고순도 제제 조제',
+  ops=[custom('wp_kit', dur=10, durLv=1, r=6, n=3, gap=1.0, open=0.4, thresh=0.85, pct=0.12, pctLv=0.02)], fx=dict(color=0x9affd8))
+S(J, 2, 2, C_, 2, 'wp_c2', '서방 패치', 'support', '나 또는 선택한 생명체 소환수에게 세 칸짜리 패치를 붙인다. 대상이 움직여도 패치가 따라가며 1.5초마다 세 번 회복시키고, 회복할 때마다 칸이 하나씩 꺼진다. 지원 대상을 고르지 않고 누르면 나에게 붙는다. 보스를 피해 계속 움직일 때 쓴다. 습득 효과: 서방형 캡슐(지속 회복·활력 제제) 제작법.',
+  target='self', range=9, mp=16, cd=12, anim='wp_patch', recover=0.25, sfxAt='op', craftName='서방형 캡슐 조제',
+  ops=[custom('wp_patch', range=9, n=3, gap=1.5, pct=0.07, pctLv=0.015)], fx=dict(color=0x9affd8))
+S(J, 2, 2, C_, 3, 'wp_c3', '구조용 붕대 릴', 'support', '손목의 릴에서 넓은 붕대를 쏘아 생명체 소환수를 내 쪽의 안전한 자리로 당기고, 도착하는 순간 한 번 회복시킨다. 고른 소환수가 먼저, 없으면 적의 바닥 공격 위에 선 소환수, 그다음 HP가 절반 아래인 소환수를 고른다. 벽은 통과하지 않는다. 당길 소환수가 없으면 붕대로 나를 감아 즉시 조금 회복한다.',
+  target='self', range=9, mp=18, cd=14, anim='wp_reel', recover=0.3, sfxAt='op',
+  ops=[custom('wp_reel', range=9, pct=0.15, pctLv=0.025, self=0.06, selfLv=0.01)], fx=dict(color=0xf4ead0))
 S(J, 2, 2, C_, 4, 'wp_c4', '다층 코팅막', 'support', '얇은 막 세 겹으로 몸을 감싸 피해를 흡수한다. 체력이 낮을수록 막이 두껍다. 막이 깎이면 바깥 겹부터 벗겨진다.',
   target='self', mp=22, cd=16, anim='wp_compound', recover=0.25,
   ops=[shield(40, 1.2, 8, lowHp=1.0, noAura=True), dict(op='fx', wp='coat', dur=8)], fx=dict(color=0x9ae6ff))
@@ -577,7 +587,6 @@ STATUSES = [
     dict(id='atkdown', name='공격력 감소', kind='statMul', stat='atk', sign=-1, debuff=True, cleanse=True, stack='max', cap=0.5, boss='normal', color='#c04040'),
     dict(id='heat', name='가열', kind='mark', debuff=True, cleanse=False, stack='max', cap=3, boss='normal', color='#ff9a3a'),     # 대장장이: 값 = 중첩(1~3), 더할 때마다 시간 갱신 (js/smith.js addHeat)
     dict(id='brand', name='단조 낙인', kind='mark', debuff=True, cleanse=False, boss='normal', color='#ff5a3a'),               # 대장장이 불량품 판정: 직접 공격 3번에 깨짐
-    dict(id='prescribed', name='표적 전달', kind='mark', debuff=True, cleanse=False, boss='normal', color='#5aa0ff'),
     dict(id='painted', name='색칠 표식', kind='mark', debuff=True, cleanse=False, boss='normal', color='#50c8c8'),
     dict(id='spotlit', name='스포트라이트', kind='mark', debuff=True, cleanse=False, boss='normal', color='#ffe080'),
     # buffs
@@ -595,7 +604,6 @@ STATUSES = [
     dict(id='healup', name='회복량 증가', kind='statAdd', stat='healPower', buff=True, stack='max', color='#70e070'),
     dict(id='maxhp', name='든든함', kind='statMul', stat='maxHp', buff=True, stack='max', cap=0.5, group='food', color='#ffb060'),
     dict(id='foodup', name='음식 효과 증폭', kind='statAdd', stat='foodPower', buff=True, stack='max', group='food', color='#ffd060'),
-    dict(id='catalyst', name='촉매 활성화', kind='flag', buff=True, stack='max', color='#5aa0ff'),
     dict(id='inspired', name='영감', kind='flag', buff=True, stack='max', color='#50c8c8'),
     dict(id='echo', name='메아리', kind='flag', buff=True, stack='max', color='#60d0a0'),
     dict(id='overclock', name='레드라인', kind='flag', buff=True, stack='refresh', color='#ff9a30'),
@@ -699,7 +707,7 @@ SHOP_ADD = dict(shop_general=['m_bottle', 'm_flour', 'm_meat', 'm_veg', 'm_pigme
 for d in SK:
     d['status'] = dict(data=True, impl=d['type'] in ('passive', 'craft') or True, fx=True, test=False, play=False)
     d['implemented'] = True
-    if d['type'] == 'craft': d['recipes'] = [r['id'] for r in RECIPES if r['skill'] == d['id']] + (['salvage'] if d['id'] == 'bs1_c4' else [])
+    if d['type'] == 'craft' or d.get('craftName'): d['recipes'] = [r['id'] for r in RECIPES if r['skill'] == d['id']] + (['salvage'] if d['id'] == 'bs1_c4' else [])   # craftName: 제작이 아닌 스킬의 습득 효과 제작법(양약사 wp_c1·wp_c2, 2026-11-20)
 by_job = {}
 for d in SK: by_job.setdefault(d['job'], []).append(d)
 assert len(SK) == 188, len(SK)

@@ -203,6 +203,7 @@ export class SkillEngine {
     for (const op of d.ops) if (op.op === 'consume' && op.potionCd && pc.potionCd > 0) return '물약 재사용 대기 중';
     if (d.target === 'enemy') { const t = this.targetFor(d); if (!t) return '대상이 없습니다'; if (pc.dist(t) > this.range(d) + t.radius + 0.8) return '사거리 밖입니다';
       if (d.ops.some(o => o.fn === 'smith_tongs') && !clearLine(pc.zone.geo, pc.pos, t.pos)) return '장애물에 막혀 있습니다'; }   // 집게는 벽 너머의 적을 잡지 못함
+    if (this.wp) { const we = this.wp.validate(d, aim); if (we) return we; }   // 양약사 긴급 방출: 작동시킬 내 제제가 없으면 자원을 쓰지 않음
     if (this.chef) { const ce = this.chef.validate(d, aim); if (ce) return ce; }
     if (this.en) { const ee = this.en.validate(d, aim); if (ee) return ee; }   // 엔지니어: 설치 자리·워커 자리·레드라인 냉각   // 슈가 아라베스크 자리 검사(지형·출입구·나/소환수·통로) — 자원을 쓰기 전에
     if (this.ds) { const de = this.ds.validate(d, aim); if (de) return de; }   // 실크 로드: 앞이 바로 막힘   // 슈가 아라베스크 자리 검사(지형·출입구·나/소환수·통로) — 자원을 쓰기 전에
@@ -236,7 +237,7 @@ export class SkillEngine {
     const Lv = Math.max(1, this.lvl(id)), tier = G.data.job(d.job).tier;
     const grade = Math.max(1, Math.min(10, Math.max(0, tier - 1) * 3 + Lv + (d.type === 'ultimate' ? 2 + Lv : 0)));
     const ctx = { d, id, L: Lv, grade, mult: this.mult(d), tgt, aim: at, facing: { ...pc.facing }, origin: { ...pc.pos }, cost, hitOnce: new Set() };
-    if (this.wp) this.wp.onCast(d, ctx);   // 촉매 활성화 충전 사용
+    if (this.wp) this.wp.onCast(d, ctx);   // 양약사(지금은 할 일 없음 — 2026-11-20 촉매 충전 삭제)
     if (this.en) this.en.onCast(d, ctx);   // 엔지니어: 누른 시각·손/팔 장치 그림·전력 획득
     if (this.ds) this.ds.onCast(d, ctx);   // 디자이너 궁극기: 시전 동안 패턴 도면·재단 점선 / 런웨이 예고(실제 범위)
     if (this.music) this.music.onCast(d, ctx);   // 음악가: 코다 악절 수 기록·궁극기 시전 연출
@@ -405,7 +406,7 @@ export class SkillEngine {
     for (const s of op.st || []) applyStatus(t, s.id === 'stagger' ? { ...s, dur: s.dur * stagger } : s, pc, ctx.mult);
     if (op.vsStatus && op.vsStatus.st && t.status.has(op.vsStatus.id) && !t.isBoss) applyStatus(t, op.vsStatus.st, pc);
     let mk = op.mark;
-    if (!mk && op.tag === 'flask' && pc.status.flag('catalyst')) mk = { type: 'reaction', n: 1 };   // 촉매 활성화 동안 약사 1차 약병도 반응 표식
+    if (!mk && op.tag === 'flask' && this.wp && this.wp.flaskMarks()) mk = { type: 'reaction', n: 1 };   // 이중정 습득 효과: 약사 1차 약병도 반응 표식(던질 때마다 대상당 1 — wp.mark 가 ctx 로 막음)
     if (mk && mk.type === 'reaction' && this.wp) this.wp.mark(t, ctx);                               // 반응 표식 규칙(시전마다 대상당 1회, 최대 3): js/wpharm.js
     else if (mk) { if (!mk.every || Math.random() < 1 / mk.every) addMark(t, mk.type, mk.n); }
     if (op.color) addMark(t, 'color', 1, op.color);
@@ -1110,9 +1111,9 @@ export const CUSTOM = {
   meatball_volley(eng, op, ctx) { meatballVolley(eng, op, ctx, G); },
   // 약사 1차 5종 (js/pharm1.js): 유봉 되던지기 · 불꽃심지병 · 서리병 굴리기 · 결정침 개화 · 꿈꽃가루
   ...Object.fromEntries(['ph_rang', 'ph_wick', 'ph_frost', 'ph_crystal', 'ph_dream'].map(k => [k, (eng, op, ctx) => eng.ph && eng.ph[k](op, ctx)])),   // 요리사 미트볼 던지기 (js/meatball.js + js/cookfx.js volley)
-  // 양약사 2차 (js/wpharm.js): 작열·분열 캡슐 · 극저온 결정화 · 이온 관통술 · 삼상 복합제 · 대형 캡슐 붕괴 · 촉매 활성화 · 정밀 표적 전달 · 연쇄 용출 · 임계 농도
+  // 양약사 2차 (js/wpharm.js): 작열·분열 캡슐 · 발포정 · 이온 관통술 · 삼상 복합제 · 대형 캡슐 붕괴 · 이중정 · 긴급 방출 · 연쇄 용출 · 임계 농도 · 구급함 · 서방 패치 · 붕대 릴
   ...Object.fromEntries(['en_sentry', 'en_spider', 'en_drones', 'en_anchor', 'en_walker', 'en_pile', 'en_breach', 'en_hive', 'en_rail', 'en_orbital', 'en_beacon', 'en_redline'].map(k => [k, (eng, op, ctx) => eng.en && eng.en[k](op, ctx)])),   // 엔지니어 2차 (js/engineer.js)
-  ...Object.fromEntries(['wp_capsule', 'wp_cryo', 'wp_ion', 'wp_tri', 'wp_collapse', 'wp_catalyst', 'wp_carrier', 'wp_chain', 'wp_critical'].map(k => [k, (eng, op, ctx) => eng.wp && eng.wp[k](op, ctx)])),
+  ...Object.fromEntries(['wp_capsule', 'wp_foam', 'wp_ion', 'wp_tri', 'wp_collapse', 'wp_tablet', 'wp_release', 'wp_chain', 'wp_critical', 'wp_kit', 'wp_patch', 'wp_reel'].map(k => [k, (eng, op, ctx) => eng.wp && eng.wp[k](op, ctx)])),
 
   // 대장장이 1차 (js/smith.js): 모루 떨구기 · 집게 낚아채기 · 급랭 담금질 · 접이식 철벽 · 튕김망치
   smith_anvil(eng, op, ctx) { eng.smith.smith_anvil(op, ctx); }, smith_tongs(eng, op, ctx) { eng.smith.smith_tongs(op, ctx); }, smith_quench(eng, op, ctx) { eng.smith.smith_quench(op, ctx); },
