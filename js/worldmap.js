@@ -1,4 +1,4 @@
-// 세계 지도 (용흔 대륙), navy + gold chart (2026-11-07 design): painted continent background
+// 세계 지도 (아카디아 대륙 — 2026-11-20 용흔에서 이름 바꿈), navy + gold chart (2026-11-07 design): painted continent background
 // (assets/ui/worldmap_bg.jpg from tools/world/paint_map.py — sea, coast, mountains, forests, rivers, compass, ship),
 // with the live data drawn on top as SVG: region names, dashed roads between linked zones, towns as gold castles,
 // fields as biome-coloured gems, the player's zone with a glowing marker. Tap a place for its details; +/- zoom.

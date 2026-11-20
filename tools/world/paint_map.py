@@ -1,4 +1,4 @@
-"""세계 지도 배경 그림 (2026-11-07): the 용흔 continent painted from the world data (node positions, biomes, links) so the
+"""세계 지도 배경 그림 (2026-11-07): the 아카디아 continent (renamed from 용흔 2026-11-20) painted from the world data (node positions, biomes, links) so the
 map always matches the zones -> assets/ui/worldmap_bg.jpg (2000 x 1520, map units x2) + coastline into zones.json world.
 Hand-painted look: deep sea with wave strokes and clouds, bright shallows, sandy coast; parchment land washed with each
 place's biome colour; painted mountain ranges (snow in the north, purple scar over Zirat), forest clumps, rivers, a frozen

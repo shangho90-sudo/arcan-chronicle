@@ -1,4 +1,4 @@
-"""용흔 대륙 world (2026-11-06, from the story doc 『아르칸 연대기 — 흑룡의 계절』): 8 story towns + 35 new fields
+"""아카디아 대륙 world (2026-11-20 renamed from 용흔) (2026-11-06, from the story doc 『아르칸 연대기 — 흑룡의 계절』): 8 story towns + 35 new fields
 (40 fields with the 5 existing ones), links between them, monster variants, NPCs and the world map data.
 
 Writes
