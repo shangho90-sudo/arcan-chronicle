@@ -36,7 +36,7 @@ const fails = []; const ok = (c, m) => { console.log((c ? '  ok   ' : '  FAIL ')
     // Lv30 + mq22a 진행 중 (선행은 완료로)
     await ev(() => { const Q = G.quests, done = new Set(); const add = id => { if (done.has(id)) return; for (const p of G.data.quests[id].prereq || []) add(p); done.add(id); }; for (const p of G.data.quests.mq22a.prereq) add(p);
       G.profile.quests = [...done].map(id => ({ id, state: 'completed', counts: [] })); G.profile.quests.push({ id: 'mq22a', state: 'active', counts: [0, 0] }); G.profile.level = 30; G.sheet.recalc(); G.profile.ui.track = 'mq22a'; });
-    await pg.waitForTimeout(3500); await ev(() => G.ui.renderQuestHud && G.ui.renderQuestHud(true)); await pg.waitForTimeout(300);
+    await pg.waitForTimeout(500); await ev(() => { G.ui.qprev = null; G.ui.qflash = null; G.ui.renderQuestHud(true); });   // 퀘스트 상태를 한꺼번에 바꿔서 생기는 '시작 안내 완료' 반짝임은 지움(불러오기와 같게) await pg.waitForTimeout(300);
     const ms = await ev(() => Object.fromEntries(['master2_western_pharmacist', 'master2_herbalist', 'master2_chef', 'master2_musician', 'master_pharmacist'].map(id => [id, G.mainState(id)])));
     ok(ms.master2_western_pharmacist === 'talk' && ms.master2_herbalist === 'talk' && ms.master2_chef === '' && ms.master2_musician === '' && ms.master_pharmacist === '', '메인 표시 = 약사 갈래 2차 마스터만 ' + JSON.stringify(ms));
     const tg = await ev(() => G.mainTargets().map(t => [t.quest.id, t.zone, t.zones]));
