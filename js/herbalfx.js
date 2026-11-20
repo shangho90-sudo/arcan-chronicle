@@ -468,7 +468,7 @@ export class HerbalFx extends CookFx {
     if (what === 'scatter') { const pe = this._fx('paper', lead + 0.3, (q) => { const hp = hand(), k = q.t / lead; pp.position.copy(hp).setY(hp.y + 0.05); pp.quaternion.copy(this.camQ); pp.scale.set(1.4 * smooth(0, 0.14, q.t), 1.4 * smooth(0, 0.14, q.t), 1); pp.material.uniforms.uA.value = 1 - smooth(lead, lead + 0.25, q.t);
         if (this.parts && k > 0.5 && k < 1.1) { q.sp = (q.sp || 0) - (q.dt || 0.016); if (q.sp <= 0) { q.sp = 0.03; const f = D3(pc.facing); this.spark(hp, { v: new THREE.Vector3(f.x * 3 + rnd(-0.8, 0.8), rnd(0.3, 1), f.z * 3 + rnd(-0.8, 0.8)), g: -3, drag: 1, life: 0.5, s0: 0.12, s1: 0.03, col: rnd(0, 1) < 0.5 ? 0x9ad8ff : 0xfff0d0, k: 0, a: 1 }); } } });
       const pp = this.rx(pe, 'paper', { order: 6 }); }
-    if (what === 'share' || what === 'lift' || what === 'tilt') { const pe = this._fx('vessel', lead + 0.12, (q) => { const hp = hand(), fw = D3(pc.facing); v.position.copy(hp).addScaledVector(fw, 0.15).setY(hp.y + 0.05); v.rotation.set(0, Math.atan2(fw.x, fw.z), 0); if (what === 'tilt') v.rotateX(0.9 * smooth(0, lead, q.t)); v.scale.setScalar((what === 'lift' ? 0.24 : 0.28) * smooth(0, 0.08, q.t) * (1 - smooth(lead, lead + 0.1, q.t))); });
+    if (what === 'share' || what === 'lift' || what === 'tilt') { const pe = this._fx('vessel', lead + 0.12, (q) => { const hp = hand(), fw = D3(pc.facing); v.position.copy(hp).addScaledVector(fw, 0.15).setY(hp.y + 0.05); v.rotation.set(0, Math.atan2(fw.x, fw.z), 0); if (what === 'tilt') v.rotateX(0.9 * smooth(0, lead, q.t)); v.scale.setScalar((what === 'lift' ? 0.45 : 0.4) * smooth(0, 0.08, q.t) * (1 - smooth(lead, lead + 0.1, q.t))); });
       const v = what === 'lift' ? this.rx(pe, 'cup', { glowC: C.gold, glow: 0.2 }) : this.hs(pe, 'hb_pot', { glowC: C.amber, glow: 0.2 }); }
     return this._h(e, { what, handOff: () => { this._free(e); } });
   }
@@ -1094,12 +1094,12 @@ export class HerbalFx extends CookFx {
     const e = this._fx('cups', o.keep ? (o.hold || 8) + 1.5 : 3, (e) => {
       const hp = hand(), fw = f(), lat = _a.crossVectors(fw, UP).normalize().clone(), k0 = clamp01(e.t / 0.25), t = e.t;
       // 탕관이 손 앞에 나타나 두 번 기울어짐(0~0.3 s) -> 사라짐
-      pot.position.copy(hp).addScaledVector(fw, 0.18).setY(hp.y + 0.12); pot.rotation.set(0, Math.atan2(fw.x, fw.z), 0); pot.rotateX(0.6 * Math.max(Math.sin(clamp01(t / 0.3) * Math.PI * 2), 0)); pot.scale.setScalar(0.28 * easeBack(k0) * (1 - smooth(0.4, 0.6, t)));
+      pot.position.copy(hp).addScaledVector(fw, 0.18).setY(hp.y + 0.12); pot.rotation.set(0, Math.atan2(fw.x, fw.z), 0); pot.rotateX(0.6 * Math.max(Math.sin(clamp01(t / 0.3) * Math.PI * 2), 0)); pot.scale.setScalar(0.42 * easeBack(k0) * (1 - smooth(0.4, 0.6, t)));
       // 잔 둘: 손 양옆에 나란히(0.1 s) — 한 잔은 내 가슴으로 들어가 사라지고, 다른 한 잔은 날아가거나(보낸 잔) 손에 남음(남은 한 잔)
       const c1p = hp.clone().addScaledVector(lat, -0.22).setY(hp.y - 0.05), c2p = hp.clone().addScaledVector(lat, 0.22).setY(hp.y - 0.05);
-      const mine = clamp01((t - 0.3) / 0.35); cup1.position.copy(c1p).lerp(P3(pc.pos).setY((pc.pos.y || 0) + 1.15), easeOut(mine)); cup1.scale.setScalar(0.24 * smooth(0.04, 0.14, t) * (1 - smooth(0.55, 0.7, t))); tea1.position.copy(cup1.position); tea1.scale.copy(cup1.scale);
+      const mine = clamp01((t - 0.3) / 0.35); cup1.position.copy(c1p).lerp(P3(pc.pos).setY((pc.pos.y || 0) + 1.15), easeOut(mine)); cup1.scale.setScalar(0.5 * smooth(0.04, 0.14, t) * (1 - smooth(0.55, 0.7, t))); tea1.position.copy(cup1.position); tea1.scale.copy(cup1.scale);
       let p2 = c2p; if (st.flyP) p2 = st.flyP; else if (st.held) p2 = hp.clone().addScaledVector(lat, 0.18).setY(hp.y + 0.02 + 0.03 * Math.sin(t * 3));
-      const show2 = st.arrived || st.gone || st.drank ? 0 : 1; cup2.position.copy(p2); cup2.scale.setScalar(0.24 * smooth(0.04, 0.14, t) * show2); tea2.position.copy(p2); tea2.scale.copy(cup2.scale);
+      const show2 = st.arrived || st.gone || st.drank ? 0 : 1; cup2.position.copy(p2); cup2.scale.setScalar(0.5 * smooth(0.04, 0.14, t) * show2); tea2.position.copy(p2); tea2.scale.copy(cup2.scale);
       for (const [m, q] of [[gl1, cup1.position], [gl2, p2]]) { m.quaternion.copy(this.camQ); m.position.copy(q).setY(q.y + 0.18); m.scale.setScalar(0.42); }
       gl1.material.uniforms.uA.value = H.intensity * 0.7 * smooth(0.04, 0.14, t) * (1 - smooth(0.5, 0.7, t)); gl2.material.uniforms.uA.value = H.intensity * (st.held ? 0.45 + 0.2 * Math.sin(t * 5) : 0.7) * show2 * smooth(0.04, 0.14, t);
       if (show2 && this.parts && st.held) { e.sp = (e.sp || 0) - (e.dt || 0.016); if (e.sp <= 0) { e.sp = lite() ? 0.3 : 0.16; this.spark(p2.clone().setY(p2.y + 0.15), { v: new THREE.Vector3(rnd(-0.05, 0.05), 0.55, rnd(-0.05, 0.05)), life: 0.7, s0: 0.12, s1: 0.04, col: C.gold, k: 0, a: 0.8 }); } }
@@ -1121,7 +1121,7 @@ export class HerbalFx extends CookFx {
     const ticks = o.ticks || 4, every = o.every || 1, T = (ticks - 1) * every + 0.9, sums = (o.summons || []).slice();
     const e = this._fx('tonic', T + 0.4, (e) => {
       const b = P3(pc.pos), fw = D3(pc.facing), t = e.t, cp = b.clone().addScaledVector(fw, 0.28).setY(b.y + 1.12), fk = 1 - smooth(T - 0.3, T, t);
-      cup.position.copy(cp); cup.scale.setScalar(0.24 * smooth(0, 0.12, t) * fk); tea.position.copy(cp); tea.scale.copy(cup.scale);
+      cup.position.copy(cp); cup.scale.setScalar(0.5 * smooth(0, 0.12, t) * fk); tea.position.copy(cp); tea.scale.copy(cup.scale);
       // 탕관 주둥이 같은 잔 위 가느다란 금빛 김 — 위로 감아 오름(tick 마다 굵어짐)
       steams.forEach((m, i) => { const ph = (t * 0.9 + i / steams.length) % 1, a = ph * 9 + i; m.quaternion.copy(this.camQ); m.position.set(cp.x + Math.sin(a) * 0.08 * (1 + ph), cp.y + 0.15 + ph * 1.1, cp.z + Math.cos(a) * 0.08 * (1 + ph)); m.scale.setScalar(0.16 + 0.22 * ph + e.pulse * 0.2); m.material.uniforms.uA.value = H.intensity * (0.75 + e.pulse) * smooth(0, 0.15, ph) * (1 - smooth(0.6, 1, ph)) * fk; });
       e.pulse = Math.max(0, (e.pulse || 0) - (e.dt || 0.016) * 2.5);
@@ -1176,8 +1176,8 @@ export class HerbalFx extends CookFx {
       const pts = hs.map((h, i) => b.clone().setY(b.y + h).addScaledVector(cr, (i - 1) * 0.12 * (i === 1 ? -1 : 1)));
       const draw = smooth(0, 0.1, t0);   // 붓 한 획: 아래 -> 위로 먹선이 그려짐
       // 먹선 관: 마디 사이 두 토막
-      for (let i = 0; i < 2; i++) { const a = pts[i], c = pts[i + 1], d = c.clone().sub(a), L = d.length() * clamp01(draw * 2 - i); ink[i].position.copy(a); ink[i].quaternion.setFromUnitVectors(UP, d.normalize()); ink[i].scale.set(0.035, Math.max(0.001, L), 0.035); ink[i].material.uniforms.uA.value = 0.92 * fk; }
-      nodes.forEach((n, i) => { n.position.copy(pts[i]); const lk = lit[i] < 0 ? 0 : 1 - smooth(lit[i] + 0.05, lit[i] + 0.4, t0), big = i === 2; n.scale.setScalar((big ? 0.085 : 0.065) * (1 + (big ? 1.2 : 0.6) * lk) * smooth(0, 0.08, t0 - i * 0.03)); n.material.uniforms.uGlow.value = lit[i] < 0 ? 0.05 : 0.3 + 1.2 * lk; n.material.uniforms.uA.value = fk;
+      for (let i = 0; i < 2; i++) { const a = pts[i], c = pts[i + 1], d = c.clone().sub(a), L = d.length() * clamp01(draw * 2 - i); ink[i].position.copy(a); ink[i].quaternion.setFromUnitVectors(UP, d.normalize()); ink[i].scale.set(0.05, Math.max(0.001, L), 0.05); ink[i].material.uniforms.uA.value = 0.92 * fk; }
+      nodes.forEach((n, i) => { n.position.copy(pts[i]); const lk = lit[i] < 0 ? 0 : 1 - smooth(lit[i] + 0.05, lit[i] + 0.4, t0), big = i === 2; n.scale.setScalar((big ? 0.12 : 0.09) * (1 + (big ? 1.2 : 0.6) * lk) * smooth(0, 0.08, t0 - i * 0.03)); n.material.uniforms.uGlow.value = lit[i] < 0 ? 0.05 : 0.3 + 1.2 * lk; n.material.uniforms.uA.value = fk;
         gl[i].quaternion.copy(this.camQ); gl[i].position.copy(pts[i]); gl[i].scale.setScalar((big ? 0.9 : 0.5) * (0.6 + 0.6 * lk)); gl[i].material.uniforms.uA.value = H.intensity * (0.25 + 1.1 * lk) * fk * smooth(0, 0.1, t0); });
       // 붉은 빛: 마디 사이를 지나감(다음 마디가 밝아지는 순간 도착)
       let seg = -1, k = 0; for (let i = 0; i < 3; i++) { const t1 = times[i], tp = i ? times[i - 1] : times[0] - 0.1; if (t0 >= tp && t0 < t1) { seg = i; k = (t0 - tp) / Math.max(0.02, t1 - tp); } }
