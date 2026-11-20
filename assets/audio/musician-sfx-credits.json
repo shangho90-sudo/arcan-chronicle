@@ -1,7 +1,7 @@
 {
  "provider": "synthesized (tools/audio/music_sfx.py, numpy + scipy, fixed seed)",
  "generatedOn": "2026-11-16",
- "note": "음악가 2차 스킬. Runway 크레딧 없이 직접 합성(라장조 5음). 2026-11-17 fx2: 그림 순간 소리 4개(mu_sigil/sparkle/staff/phantom)를 임시 합성으로 더함. Runway eleven_text_to_sound_v2 스크립트 tools/audio/music_runway_sfx.py(25개 프롬프트)는 2026-11-17 계정 하루 작업 한도(429)로 0개 생성 — --run 하면 같은 이름으로 덮어쓰고 runway 항목이 생김.",
+ "note": "음악가 2차 스킬. 2026-11-17 fx2: 효과음을 Runway eleven_text_to_sound_v2로 새로 만듦(runway 항목, 받은 것만). 받은 소리는 예전 합성음과 같은 이름으로 덮어씀(합성 스크립트 music_sfx.py는 대체용 — 다시 돌리면 Runway 소리를 덮어쓰니 주의).",
  "assets": [
   "sfx_mu_bow.mp3",
   "sfx_mu_burst.mp3",
@@ -28,5 +28,162 @@
   "sfx_mu_trio.mp3",
   "sfx_mu_tune.mp3",
   "sfx_mu_wave_hit.mp3"
- ]
+ ],
+ "runway": {
+  "provider": "runway eleven_text_to_sound_v2 · 2026-11-19부터 eleven 이 THROTTLED 로 밀리면 같은 프롬프트로 mirelo_sfx_2_0 — 소리마다 model (tools/audio/music_runway_sfx.py)",
+  "generatedOn": "2026-11-19",
+  "creditsSpent": 48,
+  "assets": {
+   "sfx_mu_bow.mp3": {
+    "prompt": "a single quick expressive violin bow stroke, short bright legato note with a soft magical sparkle, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 0.5,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_mu_burst.mp3": {
+    "prompt": "a resonant membrane bursting with a deep drum boom and a golden bell shimmer tail, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 1.0,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_mu_cello.mp3": {
+    "prompt": "a deep warm cello bow stroke on a low D note, rich and noble with a soft glow, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 0.9,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_mu_chord.mp3": {
+    "prompt": "a big full orchestra D major chord hit, strings brass and timpani together, powerful and bright with a shimmering tail, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 1.0,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_mu_coda.mp3": {
+    "prompt": "an ominous dramatic descending brass motif of three notes with timpani rolls, epic finale beginning, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 1.4,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_mu_cymbal.mp3": {
+    "prompt": "a crisp bright cymbal crash with a short punchy shockwave thump, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 0.8,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_mu_echo.mp3": {
+    "prompt": "two soft reverberating notes echoing in a large hall, ghostly repeat, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 0.8,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_mu_encore.mp3": {
+    "prompt": "a rising heavenly harp arpeggio that blooms into a warm glowing chord, healing and uplifting, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 1.4,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_mu_fanfare.mp3": {
+    "prompt": "a triumphant short trumpet fanfare of three rising notes, marching heroic brass, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 1.0,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_mu_flute.mp3": {
+    "prompt": "a light dreamy flute melody of two notes under moonlight, airy and soft with sparkles, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 0.8,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_mu_flute_tick.mp3": {
+    "prompt": "a single soft breathy flute note, gentle and calm, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 0.4,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_mu_harp.mp3": {
+    "prompt": "a sparkling magical harp glissando arpeggio rising up, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 1.0,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_mu_harp_tick.mp3": {
+    "prompt": "a single soft gentle harp note with a tiny healing chime, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 0.4,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_mu_horn.mp3": {
+    "prompt": "a short heroic brass horn call of two notes, bright fanfare blast, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 0.7,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_mu_note.mp3": {
+    "prompt": "one short ghostly ethereal plucked note, soft and airy with a faint echo, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 0.4,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_mu_phantom.mp3": {
+    "prompt": "ghostly phantom musicians materializing, airy whoosh with a soft shimmering choir-like pad, no words, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 0.8,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_mu_pluck.mp3": {
+    "prompt": "a bright golden harp-like string pluck of two notes A and D with a sparkling shimmer, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 0.6,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_mu_sigil.mp3": {
+    "prompt": "a magic musical circle forming on the ground, rising glassy shimmer hum with music box bell tones, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 1.0,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_mu_sparkle.mp3": {
+    "prompt": "a cute bright sparkle pop of twinkling star chimes and a tiny music box note, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 0.6,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_mu_staff.mp3": {
+    "prompt": "glowing musical notes lighting up one after another, quick ascending glockenspiel twinkles, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 0.8,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_mu_string.mp3": {
+    "prompt": "a short rapid string tremolo of violins swelling, shimmering magical strings, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 0.6,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_mu_symph.mp3": {
+    "prompt": "a grand orchestral string tremolo swelling upward, starry magical symphony beginning with twinkling bells, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 1.4,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_mu_trio.mp3": {
+    "prompt": "a short sweet chamber trio chord of violin cello and flute playing together, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 0.8,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_mu_tune.mp3": {
+    "prompt": "two rising tuning notes on a violin A string with a soft magical glint, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 0.6,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_mu_wave_hit.mp3": {
+    "prompt": "a bright crystalline ting impact of a magical sound wave hitting, short ringing chime, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+    "duration": 0.4,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   }
+  }
+ }
 }

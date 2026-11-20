@@ -1,0 +1,205 @@
+{
+ "spent": 48,
+ "done": {
+  "mu_pluck": {
+   "prompt": "a bright golden harp-like string pluck of two notes A and D with a sparkling shimmer, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 0.6,
+   "task": "bb19c61b-ca1e-4bf3-950d-3409a8009731",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 0.63
+  },
+  "mu_bow": {
+   "prompt": "a single quick expressive violin bow stroke, short bright legato note with a soft magical sparkle, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 0.5,
+   "task": "c637ff3b-e768-4298-94ca-523756e53bb2",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 0.55
+  },
+  "mu_string": {
+   "prompt": "a short rapid string tremolo of violins swelling, shimmering magical strings, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 0.6,
+   "task": "7e7ced6a-4135-40d5-883e-a29895d3fcb4",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 0.63
+  },
+  "mu_harp": {
+   "prompt": "a sparkling magical harp glissando arpeggio rising up, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 1.0,
+   "task": "de9eea29-6de9-4770-8715-053975ed719d",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 0.91
+  },
+  "mu_harp_tick": {
+   "prompt": "a single soft gentle harp note with a tiny healing chime, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 0.4,
+   "task": "e299214b-56a0-42e3-a3d4-c5ca81a09d7a",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 0.44
+  },
+  "mu_cello": {
+   "prompt": "a deep warm cello bow stroke on a low D note, rich and noble with a soft glow, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 0.9,
+   "task": "f9d889d8-b729-42fe-be08-2324737b04c4",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 0.94
+  },
+  "mu_note": {
+   "prompt": "one short ghostly ethereal plucked note, soft and airy with a faint echo, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 0.4,
+   "task": "f4f7b9fd-ff50-4fe9-a0d8-f571f01ef019",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 0.44
+  },
+  "mu_cymbal": {
+   "prompt": "a crisp bright cymbal crash with a short punchy shockwave thump, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 0.8,
+   "task": "7f3ead11-e4bc-4686-802a-dd32de1b1b12",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 0.78
+  },
+  "mu_burst": {
+   "prompt": "a resonant membrane bursting with a deep drum boom and a golden bell shimmer tail, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 1.0,
+   "task": "6c552ee1-6acf-4973-b071-49dfb35d0512",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 1.04
+  },
+  "mu_horn": {
+   "prompt": "a short heroic brass horn call of two notes, bright fanfare blast, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 0.7,
+   "task": "3c7eed3e-b8bf-4221-99d5-ab99e50f9679",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 0.65
+  },
+  "mu_fanfare": {
+   "prompt": "a triumphant short trumpet fanfare of three rising notes, marching heroic brass, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 1.0,
+   "task": "c7cf9e46-91ba-48d7-b764-b73830ad609e",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 0.84
+  },
+  "mu_flute": {
+   "prompt": "a light dreamy flute melody of two notes under moonlight, airy and soft with sparkles, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 0.8,
+   "task": "ccf8a5d2-0c42-4bce-b0d5-aedd556eaad6",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 0.84
+  },
+  "mu_flute_tick": {
+   "prompt": "a single soft breathy flute note, gentle and calm, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 0.4,
+   "task": "87be8cb2-38bb-4ec8-a6f1-8d473c9c3e38",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 0.44
+  },
+  "mu_wave_hit": {
+   "prompt": "a bright crystalline ting impact of a magical sound wave hitting, short ringing chime, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 0.4,
+   "task": "927ecf7a-1829-4933-9469-3527b47a5cfd",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 0.39
+  },
+  "mu_chord": {
+   "prompt": "a big full orchestra D major chord hit, strings brass and timpani together, powerful and bright with a shimmering tail, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 1.0,
+   "task": "1e1b1e94-5350-4ad1-8e58-576cc364060d",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 0.81
+  },
+  "mu_tune": {
+   "prompt": "two rising tuning notes on a violin A string with a soft magical glint, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 0.6,
+   "task": "625a81d0-947e-428b-bab6-f4b6d06d42a9",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 0.63
+  },
+  "mu_echo": {
+   "prompt": "two soft reverberating notes echoing in a large hall, ghostly repeat, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 0.8,
+   "task": "0b5fd639-1c82-4ade-b8f1-7abb716daffb",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 0.84
+  },
+  "mu_trio": {
+   "prompt": "a short sweet chamber trio chord of violin cello and flute playing together, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 0.8,
+   "task": "f99e7039-5821-415d-b30f-87f2aca30021",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 0.84
+  },
+  "mu_coda": {
+   "prompt": "an ominous dramatic descending brass motif of three notes with timpani rolls, epic finale beginning, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 1.4,
+   "task": "3393559c-c3cc-4a06-83a8-3ab01d4df51e",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 0.89
+  },
+  "mu_encore": {
+   "prompt": "a rising heavenly harp arpeggio that blooms into a warm glowing chord, healing and uplifting, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 1.4,
+   "task": "763bf4e9-7c26-410f-a805-22c28be9c2ef",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 1.44
+  },
+  "mu_symph": {
+   "prompt": "a grand orchestral string tremolo swelling upward, starry magical symphony beginning with twinkling bells, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 1.4,
+   "task": "380f1b4f-99b3-4b45-b67f-fa50a7a9ff42",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 1.44
+  },
+  "mu_sigil": {
+   "prompt": "a magic musical circle forming on the ground, rising glassy shimmer hum with music box bell tones, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 1.0,
+   "task": "cb24cbb5-2c93-4f28-a1ab-9801c8da27b1",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 1.04
+  },
+  "mu_sparkle": {
+   "prompt": "a cute bright sparkle pop of twinkling star chimes and a tiny music box note, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 0.6,
+   "task": "db11278a-4c0c-4210-abda-c23b29632d9a",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 0.6
+  },
+  "mu_staff": {
+   "prompt": "glowing musical notes lighting up one after another, quick ascending glockenspiel twinkles, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 0.8,
+   "task": "ed57d389-be54-4fda-a200-2713b1777c60",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 0.81
+  },
+  "mu_phantom": {
+   "prompt": "ghostly phantom musicians materializing, airy whoosh with a soft shimmering choir-like pad, no words, bright magical fantasy RPG skill sound effect, D major, clean, short, no voice, no background music",
+   "duration": 0.8,
+   "task": "aa4b4cf8-58d3-4e41-921d-cd7c6a0a418f",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 0.84
+  }
+ }
+}
