@@ -1045,7 +1045,51 @@ HB_GATHER = action('hb_gather', [
     key(0.98, 'o', twist=0, lean=4, sink=0.10, hand=[-8, -4, 0.40], blade=[0, 70], elbow=[-0.8, -1, -0.1], armL=[56, 34]),
     key(1.20, 's', **HB0),
 ], 0.30, 0.6, None, fadeIn=0.06, fadeOut=0.18)
-HB_ACTS = [HB_BREW, HB_SOW, HB_RAISE, HB_MOXA, HB_FLICK, HB_POUR, HB_GATHER]
+# 2026-11-20 처방 5종(js/herbal.js k_a1·a2·a3·c3·c4, 그림 js/herbalfx.js — 탕관·잔·약포지는 그림이 실제 손에 붙임):
+# hb_share  탕약 나누기: 가슴 앞 탕관을 두 번 기울여 잔 둘에 따르고(0.10·0.20 s) 한 잔을 들어 올림(0.30 s = 마시기·보내기)
+# hb_lift   보중익기탕: 약잔을 두 손으로 가슴 높이까지 천천히 들어 올림(0.30 s = 첫 기력 회복·금빛 김)
+# hb_tilt   구풍해독탕: 탕관을 앞으로 기울여 약액 한 줄기를 내보냄(0.26 s)
+# hb_stroke 소경활혈탕: 붉은 탕액 묻힌 손끝으로 허공에 가로 한 획(0.12 s 시작 -> 0.24 s 끝 = 맥로가 대상에 나타남)
+# hb_scatter 오령산: 약포지를 두 손으로 펼쳤다가(0.14 s) 앞으로 흩뿌림(0.30 s = 다섯 약인이 찍힘)
+HB_SHARE = action('hb_share', [
+    key(0.00, **HB0),
+    key(0.06, 'o', twist=-6, lean=2, sink=0.04, hand=[-20, 6, 0.50], blade=[-10, 40], elbow=[-0.8, -0.8, -0.3], armL=[64, 28]),
+    key(0.10, 's', twist=-10, lean=6, sink=0.05, hand=[-28, 2, 0.56], blade=[-30, -10], elbow=[-0.8, -0.8, -0.3], armL=[66, 30]),
+    key(0.15, 's', twist=-2, lean=3, sink=0.05, hand=[-16, 8, 0.50], blade=[-10, 40], elbow=[-0.8, -0.8, -0.3], armL=[66, 30]),
+    key(0.20, 's', twist=6, lean=6, sink=0.05, hand=[-6, 2, 0.56], blade=[6, -10], elbow=[-0.7, -0.9, -0.2], armL=[66, 30]),
+    key(0.30, 'i', twist=0, lean=-4, sink=0.03, hand=[-10, 30, 0.44], blade=[0, 70], elbow=[-0.8, -0.6, -0.4], armL=[78, 34], squint=True),
+    key(0.46, 'o', twist=0, lean=-5, sink=0.03, hand=[-10, 34, 0.42], blade=[0, 72], elbow=[-0.8, -0.6, -0.4], armL=[74, 34]),
+    key(0.64, 's', **HB0),
+], 0.30, 0.46, None, fadeIn=0.06, fadeOut=0.16)
+HB_LIFT = action('hb_lift', [
+    key(0.00, **HB0),
+    key(0.12, 'o', twist=0, lean=4, sink=0.08, hand=[-12, -20, 0.46], blade=[0, 60], elbow=[-0.8, -1, -0.2], armL=[40, 30]),
+    key(0.30, 'i', twist=0, lean=-6, sink=0.02, hand=[-8, 14, 0.46], blade=[0, 80], elbow=[-0.8, -0.7, -0.3], armL=[64, 34], squint=True),
+    key(0.50, 'o', twist=0, lean=-7, sink=0.02, hand=[-8, 16, 0.45], blade=[0, 82], elbow=[-0.8, -0.7, -0.3], armL=[66, 34]),
+    key(0.70, 's', **HB0),
+], 0.30, 0.46, None, fadeIn=0.06, fadeOut=0.16)
+HB_TILT = action('hb_tilt', [
+    key(0.00, **HB0),
+    key(0.12, 'o', twist=-12, lean=-4, sink=0.05, hand=[-22, 18, 0.60], blade=[-10, 70], elbow=[-0.7, -0.6, -0.6], armL=[50, 28]),
+    key(0.26, 'i', twist=8, lean=12, sink=0.10, hand=[0, 8, 0.96], blade=[0, -30], elbow=[-0.5, -1, -0.1], armL=[56, 30], squint=True),
+    key(0.40, 'o', twist=10, lean=12, sink=0.10, hand=[4, 4, 0.94], blade=[4, -44], elbow=[-0.5, -1, -0.1], armL=[54, 30]),
+    key(0.60, 's', **HB0),
+], 0.26, 0.42, None, fadeIn=0.05, fadeOut=0.15)
+HB_STROKE = action('hb_stroke', [
+    key(0.00, **HB0),
+    key(0.10, 'o', twist=-24, lean=-2, sink=0.05, hand=[-70, 24, 0.82], blade=[-90, 30], elbow=[-0.6, -0.5, -0.8], armL=[30, 26]),
+    key(0.24, 'i', twist=20, lean=8, sink=0.07, hand=[50, 18, 0.92], blade=[80, 20], elbow=[-0.2, -0.8, 0.3], armL=[20, 34], squint=True),
+    key(0.38, 'o', twist=22, lean=8, sink=0.07, hand=[56, 12, 0.88], blade=[86, 14], elbow=[-0.2, -0.8, 0.3], armL=[20, 34]),
+    key(0.58, 's', **HB0),
+], 0.24, 0.40, None, fadeIn=0.05, fadeOut=0.15)
+HB_SCATTER = action('hb_scatter', [
+    key(0.00, **HB0),
+    key(0.14, 'o', twist=0, lean=-2, sink=0.04, hand=[-30, 10, 0.56], blade=[-20, 50], elbow=[-0.8, -0.7, -0.4], armL=[60, 36]),
+    key(0.30, 'i', twist=6, lean=14, sink=0.12, hand=[0, -10, 1.0], blade=[0, -30], elbow=[-0.5, -1, -0.1], armL=[40, 34], squint=True),
+    key(0.46, 'o', twist=8, lean=14, sink=0.12, hand=[6, -16, 0.98], blade=[6, -40], elbow=[-0.5, -1, 0], armL=[36, 34]),
+    key(0.66, 's', **HB0),
+], 0.30, 0.48, None, fadeIn=0.05, fadeOut=0.16)
+HB_ACTS = [HB_BREW, HB_SOW, HB_RAISE, HB_MOXA, HB_FLICK, HB_POUR, HB_GATHER, HB_SHARE, HB_LIFT, HB_TILT, HB_STROKE, HB_SCATTER]
 for _a in HB_ACTS: _a.update(stow=True)
 SKILL_ACTS += HB_ACTS
 

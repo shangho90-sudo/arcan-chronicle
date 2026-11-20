@@ -19,10 +19,17 @@
 //   leyline(pc,{from,c,r,run}) 황정지맥: 금빛 맥이 땅속을 달림 -> ring(n) 둥근 지맥 -> pillar(pos, ok) 낮은 돌기둥·뿌리 -> end()
 //   needles(from,{f,n,pre})   백호유침: needle(t,{at,curve}) -> {land(t, ok), fade()} · miss({f,r,ang}) · mark(t) · claw(t, f)
 //   wave(o,{f,len,w})         현무약해: front(s) 낮은 청옥 물결 + 처음 0.35 s 등껍질 무늬 · splash(pos) · feed(c) · end()
-//   brew(pc,{n})              구증구포·보원탕 제작 완성: 탕관 둘레를 도는 약초 -> 빠짐 -> 호박빛 -> 금빛 김 -> 완성 탕약이 떠오름
+//   (2026-11-20 처방 5종) cups(pc,{hand,to,keep,hold}) 탕약 나누기: 손 앞 탕관 -> 두 잔 -> fly(pos,t)/arrive(t)·spill() · 남은 한 잔: drink()/expire()
+//   tonic(pc,{ticks,every,summons,dur}) 보중익기탕: 가슴 높이 약잔 + 위로 오르는 금빛 김 tick(i) · 영물 발밑 위로 감기는 금빛 바람
+//   purge(pc,{hand,to})       구풍해독탕: 약액 한 줄기 fly(pos,t) -> burst(t,{r,pushed,shieldDur}) 대상에서 바깥으로 퍼지는 잎 + 보호막 막
+//   meridian(t,{times,from})  소경활혈탕: 몸 위 짙은 먹선 맥로 + 세 마디 node(i, ok, last) — 붉은 빛이 차례로, 셋째는 크게 · fade()
+//   wuling(c,{r,run,seals})   오령산: 다섯 푸른 약인 -> 가운데로 모이는 다섯 물길(안쪽으로 흐르는 갈매기 무늬) flow(k) -> surge(hits) 안쪽으로 조여드는 마지막 물결
+//   allyMark(s)               고른 내 영물 발밑 금빛 고리(end)
+//   brew(pc,{n})              보원탕 제작 완성(제작 메뉴 '한약사 탕제'): 탕관 둘레를 도는 약초 -> 빠짐 -> 호박빛 -> 금빛 김 -> 완성 탕약이 떠오름
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { CookFx } from './cookfx.js';
+import { gfxOn } from './gfxq.js';
 
 export const HERBFX = {
   intensity: 1.0,
@@ -154,6 +161,16 @@ void main(){
   gl_FragColor = vec4(col, clamp(CO * 1.2 + HA * .55 + fill, 0., 1.) * uA);
 }`;
 // 빛기둥(열린 원통 hb_beam, uv.y = 높이): 위로 흐르는 줄무늬, 위쪽으로 흐려짐, 가장자리 밝게(가산, 블룸 문턱 아래 색)
+// 오령산 물길(uv.x 0 = 약인 -> 1 = 가운데, uv.y 가로): 진한 남색 바탕 + 하늘빛 물 + 가운데로 흐르는 갈매기(>) 무늬 — 휴대폰에서도 '안으로' 읽히게. uP = 물 머리 위치
+const CH_FS = `uniform vec3 uW, uB; uniform float uA, uT, uP; varying vec2 vUv;
+void main(){
+  float x = vUv.x, y = abs(vUv.y - .5) * 2.; if (x > uP) discard;
+  float edge = 1. - smoothstep(.55, 1., y), head = smoothstep(uP - .12, uP, x);
+  float chev = fract(x * 5. - abs(vUv.y - .5) * 1.6 - uT * 2.4); float arrow = smoothstep(.0, .12, chev) * (1. - smoothstep(.22, .38, chev));
+  vec3 c = mix(uB, uW, .45 + .55 * arrow) + vec3(1.) * head * .6;
+  float a = edge * (.55 + .45 * arrow + .4 * head) * uA;
+  gl_FragColor = vec4(c, a);
+}`;
 const BM_VS = `varying vec2 vUv; varying float vF; void main(){ vUv = uv; vec3 n = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(position, 1.); vF = abs(dot(n, normalize(-mv.xyz))); gl_Position = projectionMatrix * mv; }`;
 const BM_FS = `uniform vec3 uW, uB; uniform float uA, uT; varying vec2 vUv; varying float vF;
 void main(){ float y = vUv.y, st = .55 + .45 * sin(vUv.x * 62.83 * 2. + y * 3. - uT * 2.) * sin(y * 14. - uT * 9. + vUv.x * 31.4);
@@ -273,6 +290,7 @@ export class HerbalFx extends CookFx {
     if (kind === 'sg') return new THREE.ShaderMaterial({ uniforms: U({ uW: Cc(), uB: Cc(), uG: Cc(), uA: 0, uK: 0, uP: 1, uT: 0, uS: 0.6 }), vertexShader: GD_VS, fragmentShader: SG_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide });
     if (kind === 'bm') return new THREE.ShaderMaterial({ uniforms: U({ uW: Cc(), uB: Cc(), uA: 0, uT: 0 }), vertexShader: BM_VS, fragmentShader: BM_FS, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
     if (kind === 'ht') return new THREE.ShaderMaterial({ uniforms: U({ uMap: null, uGlowC: Cc(), uA: 1, uGlow: 0 }), vertexShader: HT_VS, fragmentShader: HT_FS, transparent: true, depthWrite: true, side: THREE.DoubleSide });
+    if (kind === 'ch') return new THREE.ShaderMaterial({ uniforms: U({ uW: Cc(), uB: Cc(), uA: 0, uT: 0, uP: 0 }), vertexShader: GD_VS, fragmentShader: CH_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide });
     if (kind === 'tx') return new THREE.ShaderMaterial({ uniforms: U({ uMap: null, uA: 0, uP: 0 }), vertexShader: GD_VS, fragmentShader: TX_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide });
     return super._mat(kind);
   }
@@ -442,10 +460,16 @@ export class HerbalFx extends CookFx {
     if (what === 'needles') for (let i = 0; i < 9; i++) { const m = this.hs(e, 'hb_needle', { glowC: C.plat, glow: 0.3, spec: 1.2 }); if (m) ndl.push(m); }
     if (what === 'gourd') gd = this.hs(e, 'hb_gourd', { see: true });
     if (this.parts) {   // fx2: 발밑 시전 마법진(원소마다 무늬·색) + 손으로 모이는 기운 — 시전 준비 층
-      const PRE = { brew: [1, 'wood'], raise: [0, 'wood'], sow: [2, 'wood'], moxa: [0, 'fire'], needles: [0, 'metal'], gourd: [3, 'water'] }[what] || [2, 'heal'];
+      const PRE = { brew: [1, 'wood'], raise: [0, 'wood'], sow: [2, 'wood'], moxa: [0, 'fire'], needles: [0, 'metal'], gourd: [3, 'water'], share: [1, 'heal'], lift: [2, 'heal'], tilt: [2, 'heal'], stroke: [0, 'fire'], scatter: [3, 'water'] }[what] || [2, 'heal'];
       const b0 = P3(pc.pos); this.sigil(b0, 1.15, PRE[1], { pat: PRE[0], grow: lead * 0.9, life: lead + 0.55, a: 0.9, spin: 1.2, follow: () => P3(pc.pos) });
       this.gather(b0, 1.0, () => hand(), PRE[1], 10, lead);
     }
+    if (what === 'stroke' && this.parts) this.trail((t) => t < lead + 0.05 ? hand().clone() : null, 'fire', { n: 12, w: 0.09, life: lead + 0.4, w0: 0xffd0c0, w1: 0xc81010 });   // 붉은 탕액 한 획(손끝을 따라)
+    if (what === 'scatter') { const pe = this._fx('paper', lead + 0.3, (q) => { const hp = hand(), k = q.t / lead; pp.position.copy(hp).setY(hp.y + 0.05); pp.quaternion.copy(this.camQ); pp.scale.set(1.4 * smooth(0, 0.14, q.t), 1.4 * smooth(0, 0.14, q.t), 1); pp.material.uniforms.uA.value = 1 - smooth(lead, lead + 0.25, q.t);
+        if (this.parts && k > 0.5 && k < 1.1) { q.sp = (q.sp || 0) - (q.dt || 0.016); if (q.sp <= 0) { q.sp = 0.03; const f = D3(pc.facing); this.spark(hp, { v: new THREE.Vector3(f.x * 3 + rnd(-0.8, 0.8), rnd(0.3, 1), f.z * 3 + rnd(-0.8, 0.8)), g: -3, drag: 1, life: 0.5, s0: 0.12, s1: 0.03, col: rnd(0, 1) < 0.5 ? 0x9ad8ff : 0xfff0d0, k: 0, a: 1 }); } } });
+      const pp = this.rx(pe, 'paper', { order: 6 }); }
+    if (what === 'share' || what === 'lift' || what === 'tilt') { const pe = this._fx('vessel', lead + 0.12, (q) => { const hp = hand(), fw = D3(pc.facing); v.position.copy(hp).addScaledVector(fw, 0.15).setY(hp.y + 0.05); v.rotation.set(0, Math.atan2(fw.x, fw.z), 0); if (what === 'tilt') v.rotateX(0.9 * smooth(0, lead, q.t)); v.scale.setScalar((what === 'lift' ? 0.24 : 0.28) * smooth(0, 0.08, q.t) * (1 - smooth(lead, lead + 0.1, q.t))); });
+      const v = what === 'lift' ? this.rx(pe, 'cup', { glowC: C.gold, glow: 0.2 }) : this.hs(pe, 'hb_pot', { glowC: C.amber, glow: 0.2 }); }
     return this._h(e, { what, handOff: () => { this._free(e); } });
   }
 
@@ -1042,6 +1066,170 @@ export class HerbalFx extends CookFx {
       feed: (c) => { this.ring(P3(c), 1.5, C.sapph, C.sapphB, 0.5, 1.0, 0.2); if (this.parts) this.pang(P3(c).setY((c.y || 0) + 0.4), 'water', { r: 0.5, n: 8, stars: 0, noRing2: true }); },
       end: () => { if (endAt < 0) { endAt = e.t; e.life = e.t + 0.4; } },
       dispose: () => this._free(e) });
+  }
+
+
+  // ================================================================== 2026-11-20 처방 5종 (js/herbal.js k_a1·a2·a3·c3·c4)
+  /** 정점 색이 있는 작은 절차 메시(한 번만 만들어 둠): 찻잔 cup / 보호막 bubble / 먹선 관 ink / 마디 구슬 node / 약포지 paper */
+  _rx(name) {
+    this._rxg = this._rxg || {}; if (this._rxg[name]) return this._rxg[name];
+    let g;
+    const paint = (g, fn) => { g = g.toNonIndexed ? g : g; const p = g.attributes.position, c = new Float32Array(p.count * 3); for (let i = 0; i < p.count; i++) { const col = new THREE.Color(fn(p.getX(i), p.getY(i), p.getZ(i))); c[i * 3] = col.r; c[i * 3 + 1] = col.g; c[i * 3 + 2] = col.b; } g.setAttribute('color', new THREE.BufferAttribute(c, 3)); return g; };
+    if (name === 'cup') { const pr = [[0, 0], [0.30, 0], [0.34, 0.06], [0.42, 0.42], [0.46, 0.56], [0.44, 0.57], [0.38, 0.44], [0.30, 0.10], [0, 0.10]].map(([x, y]) => new THREE.Vector2(x, y));
+      g = paint(new THREE.LatheGeometry(pr, 20), (x, y, z) => y > 0.52 ? 0xffd27a : Math.hypot(x, z) < 0.31 && y < 0.2 ? 0xd88a20 : 0xf6efe2); }
+    else if (name === 'tea') { g = paint(new THREE.CircleGeometry(0.38, 20).rotateX(-Math.PI / 2).translate(0, 0.40, 0), () => 0xe0901e); }
+    else if (name === 'bubble') g = paint(new THREE.SphereGeometry(1, 24, 14), (x, y) => y > 0.6 ? 0xfff4c8 : 0xffcf7a);
+    else if (name === 'ink') g = paint(new THREE.CylinderGeometry(1, 1, 1, 8, 1, true).translate(0, 0.5, 0), () => 0x2a0a0e);
+    else if (name === 'node') g = paint(new THREE.SphereGeometry(1, 14, 10), () => 0x5a0c12);
+    else if (name === 'paper') g = paint(new THREE.PlaneGeometry(0.42, 0.34, 2, 2), (x, y) => Math.abs(x) > 0.18 || Math.abs(y) > 0.14 ? 0xb08040 : 0xf4e2b8);
+    return (this._rxg[name] = g);
+  }
+  rx(e, name, o = {}) { const m = this._m(e, o.see ? 'hsa' : 'hs', this._rx(name), o.order ?? 3), u = m.material.uniforms; u.uTint.value.setHex(o.tint ?? 0xffffff); u.uRim.value.setHex(o.rim ?? 0xfff0d0); u.uGlowC.value.setHex(o.glowC ?? C.gold); u.uA.value = o.a ?? 1; u.uGlow.value = o.glow ?? 0; u.uSpec.value = o.spec ?? 0.6; u.uVein.value = 0; return m; }
+  get _rm() { return this.rm && gfxOn() && this.rm.ok && this.rm.ok() ? this.rm : null; }
+
+  // ------------------------------------------------------------------ A1 탕약 나누기: '두 잔'
+  k_cups(pc, o) {
+    const hand = () => P3(o.hand ? o.hand() : pc.pos), f = () => D3(pc.facing);
+    const st = { flyP: null, arrived: false, held: !!o.keep, drank: false, gone: false, endT: -1 };
+    const e = this._fx('cups', o.keep ? (o.hold || 8) + 1.5 : 3, (e) => {
+      const hp = hand(), fw = f(), lat = _a.crossVectors(fw, UP).normalize().clone(), k0 = clamp01(e.t / 0.25), t = e.t;
+      // 탕관이 손 앞에 나타나 두 번 기울어짐(0~0.3 s) -> 사라짐
+      pot.position.copy(hp).addScaledVector(fw, 0.18).setY(hp.y + 0.12); pot.rotation.set(0, Math.atan2(fw.x, fw.z), 0); pot.rotateX(0.6 * Math.max(Math.sin(clamp01(t / 0.3) * Math.PI * 2), 0)); pot.scale.setScalar(0.28 * easeBack(k0) * (1 - smooth(0.4, 0.6, t)));
+      // 잔 둘: 손 양옆에 나란히(0.1 s) — 한 잔은 내 가슴으로 들어가 사라지고, 다른 한 잔은 날아가거나(보낸 잔) 손에 남음(남은 한 잔)
+      const c1p = hp.clone().addScaledVector(lat, -0.22).setY(hp.y - 0.05), c2p = hp.clone().addScaledVector(lat, 0.22).setY(hp.y - 0.05);
+      const mine = clamp01((t - 0.3) / 0.35); cup1.position.copy(c1p).lerp(P3(pc.pos).setY((pc.pos.y || 0) + 1.15), easeOut(mine)); cup1.scale.setScalar(0.24 * smooth(0.04, 0.14, t) * (1 - smooth(0.55, 0.7, t))); tea1.position.copy(cup1.position); tea1.scale.copy(cup1.scale);
+      let p2 = c2p; if (st.flyP) p2 = st.flyP; else if (st.held) p2 = hp.clone().addScaledVector(lat, 0.18).setY(hp.y + 0.02 + 0.03 * Math.sin(t * 3));
+      const show2 = st.arrived || st.gone || st.drank ? 0 : 1; cup2.position.copy(p2); cup2.scale.setScalar(0.24 * smooth(0.04, 0.14, t) * show2); tea2.position.copy(p2); tea2.scale.copy(cup2.scale);
+      for (const [m, q] of [[gl1, cup1.position], [gl2, p2]]) { m.quaternion.copy(this.camQ); m.position.copy(q).setY(q.y + 0.18); m.scale.setScalar(0.42); }
+      gl1.material.uniforms.uA.value = H.intensity * 0.7 * smooth(0.04, 0.14, t) * (1 - smooth(0.5, 0.7, t)); gl2.material.uniforms.uA.value = H.intensity * (st.held ? 0.45 + 0.2 * Math.sin(t * 5) : 0.7) * show2 * smooth(0.04, 0.14, t);
+      if (show2 && this.parts && st.held) { e.sp = (e.sp || 0) - (e.dt || 0.016); if (e.sp <= 0) { e.sp = lite() ? 0.3 : 0.16; this.spark(p2.clone().setY(p2.y + 0.15), { v: new THREE.Vector3(rnd(-0.05, 0.05), 0.55, rnd(-0.05, 0.05)), life: 0.7, s0: 0.12, s1: 0.04, col: C.gold, k: 0, a: 0.8 }); } }
+    });
+    const pot = this.hs(e, 'hb_pot', { glowC: C.amber, glow: 0.2 }), cup1 = this.rx(e, 'cup'), cup2 = this.rx(e, 'cup', { glowC: C.amber, glow: 0.15 }), tea1 = this.rx(e, 'tea', { glowC: C.amber, glow: 0.4 }), tea2 = this.rx(e, 'tea', { glowC: C.amber, glow: 0.4 });
+    const gl1 = this.spr(e, 0, C.amber, C.amberB, 6), gl2 = this.spr(e, 0, C.gold, C.amberB, 6);
+    if (this.parts) { const b = P3(pc.pos); this.pang(b.clone().setY(b.y + 1.1), 'heal', { r: 0.35, n: 6, ground: b.y, stars: 0, noRing2: true }); this._snd('hb_drop'); const rm = this._rm; if (rm) rm.healAura(pc, { gold: 0xffe08a, col: 0xffb850, dur: 1.0, r: 0.8 }); }
+    let trail = null;
+    return this._h(e, {
+      fly: (p, t) => { st.flyP = P3(p).setY((p.y || 1) + 0.15 + Math.sin(Math.min(1, e.t) * Math.PI) * 0.2); if (!trail && this.parts) trail = this.trail(() => st.flyP && !st.arrived ? st.flyP.clone() : null, 'heal', { n: 12, w: 0.08, life: 3, w0: 0xfff0b0, w1: C.amberB }); },
+      arrive: (t) => { st.arrived = true; const q = P3(t.pos); if (this.parts) { this.pang(q.clone().setY(q.y + 0.8), 'heal', { r: 0.5, n: 10, ground: q.y, stars: lite() ? 1 : 2 }); this.beam(q, 0.45, 1.6, 'heal', { life: 0.5 }); } this.motes(q.clone().setY(q.y + 0.3), lite() ? 4 : 8, { w: C.gold, b: C.amberB, r: 0.4, up: 1.0, life: 0.7 }); const rm = this._rm; if (rm) rm.healAura({ pos: t.pos }, { gold: 0xffe08a, col: 0xffb850, dur: 1.0, r: 0.7 }); this._end(e, 0.3); },
+      spill: () => { st.gone = true; this._end(e, 0.2); },
+      drink: () => { st.drank = true; const b = P3(pc.pos); if (this.parts) { this.pang(b.clone().setY(b.y + 1.1), 'heal', { r: 0.45, n: 10, ground: b.y, stars: lite() ? 1 : 2 }); } this.motes(b.clone().setY(b.y + 0.5), lite() ? 4 : 8, { w: C.gold, b: C.amberB, r: 0.4, up: 1.0, life: 0.7 }); const rm = this._rm; if (rm) rm.healAura(pc, { gold: 0xffe08a, col: 0xffb850, dur: 1.0, r: 0.8 }); this._end(e, 0.25); },
+      expire: () => { st.gone = true; const p = hand(); this._hpuffs(p, 2, 0.2, { c1: 0xfff0c0, c2: C.gold, a: 0.3, life: 0.6, rise: 0.5 }); this._end(e, 0.3); } });
+  }
+
+  // ------------------------------------------------------------------ A2 보중익기탕: '위로 오르는 금빛 김'
+  k_tonic(pc, o) {
+    const ticks = o.ticks || 4, every = o.every || 1, T = (ticks - 1) * every + 0.9, sums = (o.summons || []).slice();
+    const e = this._fx('tonic', T + 0.4, (e) => {
+      const b = P3(pc.pos), fw = D3(pc.facing), t = e.t, cp = b.clone().addScaledVector(fw, 0.28).setY(b.y + 1.12), fk = 1 - smooth(T - 0.3, T, t);
+      cup.position.copy(cp); cup.scale.setScalar(0.24 * smooth(0, 0.12, t) * fk); tea.position.copy(cp); tea.scale.copy(cup.scale);
+      // 탕관 주둥이 같은 잔 위 가느다란 금빛 김 — 위로 감아 오름(tick 마다 굵어짐)
+      steams.forEach((m, i) => { const ph = (t * 0.9 + i / steams.length) % 1, a = ph * 9 + i; m.quaternion.copy(this.camQ); m.position.set(cp.x + Math.sin(a) * 0.08 * (1 + ph), cp.y + 0.15 + ph * 1.1, cp.z + Math.cos(a) * 0.08 * (1 + ph)); m.scale.setScalar(0.16 + 0.22 * ph + e.pulse * 0.2); m.material.uniforms.uA.value = H.intensity * (0.75 + e.pulse) * smooth(0, 0.15, ph) * (1 - smooth(0.6, 1, ph)) * fk; });
+      e.pulse = Math.max(0, (e.pulse || 0) - (e.dt || 0.016) * 2.5);
+      // 영물 발밑: 위로 감기는 금빛 바람(가속 동안)
+      winds.forEach((w, i) => { const s = w.s; if (s.dead) { for (const m of w.ms) m.material.uniforms.uA.value = 0; return; } const sb = P3(s.pos), wk = 1 - smooth(o.dur - 0.5, o.dur, t);
+        w.ms.forEach((m, j) => { const ph = (t * 1.4 + j / w.ms.length) % 1, a = ph * 10 + j * 2.1; m.quaternion.copy(this.camQ); m.position.set(sb.x + Math.cos(a) * (0.55 - 0.3 * ph), sb.y + 0.05 + ph * 0.9, sb.z + Math.sin(a) * (0.55 - 0.3 * ph)); m.scale.setScalar(0.18 * (1 - 0.5 * ph)); m.material.uniforms.uA.value = H.intensity * 0.9 * smooth(0, 0.1, ph) * (1 - smooth(0.7, 1, ph)) * wk * smooth(0, 0.3, t); }); });
+    });
+    e.life = Math.max(T, o.dur || 8) + 0.4; e.pulse = 0;
+    const cup = this.rx(e, 'cup', { glowC: C.gold, glow: 0.2 }), tea = this.rx(e, 'tea', { glowC: C.gold, glow: 0.5 });
+    const steams = []; for (let i = 0; i < (lite() ? 6 : 12); i++) steams.push(this.spr(e, 0, C.gold, C.amberB, 6));
+    const winds = sums.map(s => ({ s, ms: Array.from({ length: lite() ? 4 : 8 }, () => this.spr(e, 0, C.gold, C.goldB, 6)) }));
+    if (this.parts) { this.sigil(P3(pc.pos), 0.9, 'heal', { pat: 2, grow: 0.3, life: 1.2, a: 0.8, spin: 1.2, follow: () => P3(pc.pos) }); for (const s of sums) { this.sigil(P3(s.pos), 0.7, 'heal', { pat: 0, grow: 0.25, life: 1.0, a: 0.75, spin: 2, follow: () => P3(s.pos) }); this.beam(P3(s.pos), 0.35, 1.4, 'heal', { life: 0.5, a: 0.8 }); } }
+    return this._h(e, { tick: (i) => { e.pulse = 1; const b = P3(pc.pos); if (this.parts) { for (let k = 0; k < this._nk(6); k++) this.spark(b.clone().setY(b.y + 1.2), { v: new THREE.Vector3(rnd(-0.3, 0.3), rnd(1.2, 2.2), rnd(-0.3, 0.3)), drag: 1.5, life: 0.8, s0: 0.18, s1: 0.04, col: k % 2 ? C.gold : 0xfff0b0, k: k % 3 ? 0 : 1, a: 1 }); if (i === 0) this.pang(b.clone().setY(b.y + 1.3), 'heal', { r: 0.4, n: 6, ground: b.y, stars: 0, noRing2: true }); } } });
+  }
+
+  // ------------------------------------------------------------------ A3 구풍해독탕: '대상에서 바깥으로 퍼지는 잎'
+  k_purge(pc, o) {
+    let fp = null; const e = this._fx('purge', 3.5, (e) => {
+      const hp = P3(o.hand ? o.hand() : pc.pos), fw = D3(pc.facing), t = e.t;
+      pot.position.copy(hp).addScaledVector(fw, 0.2).setY(hp.y + 0.1); pot.rotation.set(0, Math.atan2(fw.x, fw.z), 0); pot.rotateX(1.1 * smooth(0, 0.2, t)); pot.scale.setScalar(0.3 * smooth(0, 0.08, t) * (1 - smooth(0.35, 0.55, t)));
+      if (fp) { head.quaternion.copy(this.camQ); head.position.copy(fp); head.scale.setScalar(0.38); head.material.uniforms.uA.value = H.intensity * 0.9 * (e.burst ? 0 : 1); }
+    });
+    const pot = this.hs(e, 'hb_pot', { glowC: C.amber, glow: 0.3 }), head = this.spr(e, 0, C.amber, C.amberB, 6);
+    let tr = null;
+    return this._h(e, {
+      fly: (p) => { fp = P3(p).setY((p.y || 1) + 0.1); if (!tr && this.parts) tr = this.trail(() => fp && !e.burst ? fp.clone() : null, 'heal', { n: 16, w: 0.13, life: 3.4, w0: 0xffe8a0, w1: C.amberB });
+        if (this.parts) { e.dp = (e.dp || 0) - (e.dt || 0.016); if (e.dp <= 0) { e.dp = lite() ? 0.08 : 0.04; this.bit('drop', fp, { v: new THREE.Vector3(rnd(-0.2, 0.2), 0.3, rnd(-0.2, 0.2)), g: -6, life: 0.4, s0: 0.07, s1: 0.03, col: 0xffc060, glow: 0.4, floor: fp.y - 1.2 }); } } },
+      burst: (t, bo) => {
+        e.burst = true; const c = P3(t.pos), R = bo.r || 2, gy = c.y;
+        // 잎 고리: 대상 둘레에서 바깥으로 한 번(반경 = 밀어내는 거리 안)
+        const nl = this._nk(18); for (let i = 0; i < nl; i++) { const a = i / nl * 6.283 + rnd(-0.1, 0.1), sp = R * rnd(2.0, 2.6);
+          this.bit('leaf', c.clone().add(new THREE.Vector3(Math.cos(a) * 0.3, 0.45 + rnd(0, 0.4), Math.sin(a) * 0.3)), { v: new THREE.Vector3(Math.cos(a) * sp, rnd(0.4, 1.2), Math.sin(a) * sp), g: -2.5, drag: 3.2, life: rnd(0.5, 0.75), s0: 0.16, s1: 0.1, col: i % 3 ? 0x8ae070 : 0xffd27a, glow: 0.25, wz: rnd(-8, 8), wy: rnd(-6, 6) }); }
+        for (let i = 0; i < this._nk(10); i++) { const a = rnd(0, 6.283); this.spark(c.clone().setY(gy + 0.6), { v: new THREE.Vector3(Math.cos(a) * R * 2.2, rnd(0.2, 0.8), Math.sin(a) * R * 2.2), drag: 3, life: 0.45, s0: 0.2, s1: 0.04, col: i % 2 ? C.amber : 0xfff0b0, k: 1, a: 1 }); }
+        this.ring(c, R, C.amber, C.amberB, 0.42, 1.3, 0.2); this.ring(c, R * 0.6, 0xa8f070, C.jadeB, 0.36, 1.0, 0.1); this._hpuffs(c, lite() ? 3 : 6, R * 0.8, { c1: 0xfff0c8, c2: 0xc8a060, a: 0.32, life: 0.55, rise: 0.4 });
+        if (this.parts) { this.sigil(c, R, 'heal', { pat: 2, grow: 0.12, life: 0.8, a: 0.8, spin: 2.5 }); this.pang(c.clone().setY(gy + 0.8), 'heal', { r: 0.55, n: 10, ground: gy, stars: lite() ? 1 : 2 }); }
+        for (const q of bo.pushed || []) { const p3 = P3(q); this.flash(p3.clone().setY(p3.y + 0.6), 0xffe0a0, C.amberB, 0.45, 0.12, 1); }
+        // 보호막 막: 대상을 감싸는 옅은 호박빛 구(보호막 시간 동안, 처음 0.3 s 밝게)
+        const be = this._fx('shieldbub', bo.shieldDur || 4, (q) => { const k = q.t / q.life, p = P3(t.pos); m.position.copy(p).setY(p.y + 0.55 + (t.radius || 0.5) * 0.2); m.scale.setScalar(((t.radius || 0.5) + 0.45) * (0.9 + 0.1 * easeBack(clamp01(q.t / 0.25)))); m.material.uniforms.uA.value = (0.32 + 0.3 * (1 - smooth(0, 0.35, q.t))) * (1 - smooth(0.8, 1, k)) * (t.dead ? 0 : 1); m.material.uniforms.uGlow.value = 0.25 + 0.4 * (1 - smooth(0, 0.3, q.t)); });
+        const m = this.rx(be, 'bubble', { see: true, glowC: C.amber, glow: 0.4, a: 0.4, spec: 1.2, order: 7 });
+        const rm = this._rm; if (rm) rm.pop(c.clone().setY(gy + 0.7), { col: 0xffc060, hi: 0xfff6d0, size: 1.0, ring: R, groundY: gy, sparks: 10, stars: 3 });
+        this._shout(t.pos, '휘익!', '#fff0b0', '#5a3a10', 1.2);
+        this._end(e, 0.3); },
+      dispose: () => this._end(e, 0.2) });
+  }
+
+  // ------------------------------------------------------------------ C4 소경활혈탕: '붉은 세 마디'
+  k_meridian(t, o) {
+    const times = o.times || [0.12, 0.26, 0.56], top = Math.min(1.5, 0.7 + (t.radius || 0.5) * 0.8), hs = [0.32, 0.62, 0.96].map(k => k * top);
+    const lit = [-1, -1, -1]; let fadeAt = -1;
+    const e = this._fx('meridian', times[2] + 1.0, (e) => {
+      const b = P3(t.pos), cr = this.camR, t0 = e.t, fk = fadeAt >= 0 ? 1 - smooth(fadeAt, fadeAt + 0.25, t0) : 1 - smooth(times[2] + 0.5, times[2] + 0.95, t0);
+      const pts = hs.map((h, i) => b.clone().setY(b.y + h).addScaledVector(cr, (i - 1) * 0.12 * (i === 1 ? -1 : 1)));
+      const draw = smooth(0, 0.1, t0);   // 붓 한 획: 아래 -> 위로 먹선이 그려짐
+      // 먹선 관: 마디 사이 두 토막
+      for (let i = 0; i < 2; i++) { const a = pts[i], c = pts[i + 1], d = c.clone().sub(a), L = d.length() * clamp01(draw * 2 - i); ink[i].position.copy(a); ink[i].quaternion.setFromUnitVectors(UP, d.normalize()); ink[i].scale.set(0.035, Math.max(0.001, L), 0.035); ink[i].material.uniforms.uA.value = 0.92 * fk; }
+      nodes.forEach((n, i) => { n.position.copy(pts[i]); const lk = lit[i] < 0 ? 0 : 1 - smooth(lit[i] + 0.05, lit[i] + 0.4, t0), big = i === 2; n.scale.setScalar((big ? 0.085 : 0.065) * (1 + (big ? 1.2 : 0.6) * lk) * smooth(0, 0.08, t0 - i * 0.03)); n.material.uniforms.uGlow.value = lit[i] < 0 ? 0.05 : 0.3 + 1.2 * lk; n.material.uniforms.uA.value = fk;
+        gl[i].quaternion.copy(this.camQ); gl[i].position.copy(pts[i]); gl[i].scale.setScalar((big ? 0.9 : 0.5) * (0.6 + 0.6 * lk)); gl[i].material.uniforms.uA.value = H.intensity * (0.25 + 1.1 * lk) * fk * smooth(0, 0.1, t0); });
+      // 붉은 빛: 마디 사이를 지나감(다음 마디가 밝아지는 순간 도착)
+      let seg = -1, k = 0; for (let i = 0; i < 3; i++) { const t1 = times[i], tp = i ? times[i - 1] : times[0] - 0.1; if (t0 >= tp && t0 < t1) { seg = i; k = (t0 - tp) / Math.max(0.02, t1 - tp); } }
+      if (seg >= 0 && fadeAt < 0) { const a = seg ? pts[seg - 1] : pts[0].clone().setY(pts[0].y - 0.25), c = pts[seg]; run.quaternion.copy(this.camQ); run.position.copy(a).lerp(c, easeOut(k)); run.scale.setScalar(0.32); run.material.uniforms.uA.value = H.intensity * 1.2; } else run.material.uniforms.uA.value = 0;
+    });
+    const ink = [0, 1].map(() => this.rx(e, 'ink', { order: 8, spec: 0.1 })), nodes = [0, 1, 2].map(() => this.rx(e, 'node', { glowC: 0xff3020, order: 9, spec: 0.8 }));
+    for (const m of [...ink, ...nodes]) m.material.depthTest = false;
+    const gl = [0, 1, 2].map(() => this.spr(e, 0, 0xff6a4a, 0xc81010, 10)), run = this.spr(e, 0, 0xffa080, 0xff2010, 10);
+    if (this.parts && o.from) { const fr = P3(o.from); this.trail((tt) => tt < 0.12 ? fr.clone().lerp(P3(t.pos).setY((t.pos.y || 0) + hs[1]), easeOut(tt / 0.12)) : null, 'fire', { n: 10, w: 0.07, life: 0.4, w0: 0xffd0c0, w1: 0xc81010 }); }
+    return this._h(e, {
+      node: (i, ok, last) => { lit[i] = e.t; const b = P3(t.pos), p = b.clone().setY(b.y + hs[i]);
+        this.flash(p, 0xff8a6a, 0xd01010, last ? 1.0 : 0.45, last ? 0.18 : 0.1, last ? 1.4 : 1.1);
+        if (this.parts) for (let k = 0; k < this._nk(last ? 14 : 5); k++) { const a = rnd(0, 6.283), sp = last ? rnd(1.6, 3) : rnd(0.8, 1.4); this.spark(p, { v: new THREE.Vector3(Math.cos(a) * sp, rnd(0.2, 1.4), Math.sin(a) * sp), drag: 3, life: last ? 0.5 : 0.3, s0: last ? 0.24 : 0.15, s1: 0.03, col: k % 2 ? 0xff5a3a : 0xffd0b0, k: k % 3 ? 0 : 1, a: 1.1 }); }
+        if (last) { this.ring(b, (t.radius || 0.5) + 0.6, 0xff6a4a, 0xa01010, 0.4, 1.3, 0.2); if (this.parts) { this.pang(p, 'fire', { r: 0.55, n: 12, ground: b.y, stars: lite() ? 1 : 2 }); this.sigil(b, (t.radius || 0.5) + 0.4, 'fire', { pat: 0, grow: 0.12, life: 0.8, a: 0.85, spin: 2.5 }); } this._shout(t.pos, '활혈!', '#ffd0c0', '#6a0a10', 1.45);
+          const rm = this._rm; if (rm) rm.pop(p, { col: 0xff5a3a, hi: 0xfff0e0, size: 1.1, ring: (t.radius || 0.5) + 0.6, groundY: b.y, sparks: 10, stars: 3 }); }
+        else this._shout(t.pos, '탁!', '#ffe0d8', '#5a0a10', 1.0); },
+      fade: () => { if (fadeAt < 0) { fadeAt = e.t; e.life = e.t + 0.3; } } });
+  }
+
+  // ------------------------------------------------------------------ C3 오령산: '중앙으로 모이는 다섯 물길'
+  k_wuling(c, o) {
+    const c3 = P3(c), r = o.r || 3.2, run = o.run || 0.6, seals = (o.seals || []).map(P3); let flow = 0, surgeAt = -1;
+    const e = this._fx('wuling', run + 1.6, (e) => {
+      const t = e.t, fk = surgeAt >= 0 ? 1 - smooth(surgeAt + 0.15, surgeAt + 0.55, t) : 1;
+      chs.forEach((m, i) => { const s = seals[i], d = c3.clone().sub(s); d.y = 0; const L = d.length(); m.position.copy(s).lerp(c3, 0.5).setY(Math.max(s.y, c3.y) + 0.05); m.rotation.set(-Math.PI / 2, 0, Math.atan2(-d.z, d.x)); m.scale.set(L, 0.62, 1);
+        const u = m.material.uniforms; u.uT.value = t; u.uP.value = flow; u.uA.value = 0.95 * fk; });
+      stamps.forEach((m, i) => { const s = seals[i]; m.position.copy(s).setY(s.y + 0.05); this._flat(m, 0.42 * easeBack(clamp01((t - i * 0.03) / 0.12)), s.y + 0.06); m.material.uniforms.uA.value = 1.1 * fk; });
+    });
+    const chs = seals.map(() => { const m = this._m(e, 'ch', this.chGeo || (this.chGeo = new THREE.PlaneGeometry(1, 1)), 2), u = m.material.uniforms; u.uW.value.setHex(0xa8e4ff); u.uB.value.setHex(0x1a3a9a); return m; });
+    const stamps = seals.map(() => this.spr(e, 1, 0x9ad8ff, 0x2a5ae0, 3));
+    if (this.parts) { this.sigil(c3, r, 'water', { pat: 3, grow: 0.25, life: run + 0.6, a: 0.55, spin: -1.2 }); seals.forEach((s, i) => this.sigil(s, 0.48, 'water', { pat: 1, grow: 0.12, life: run + 0.4, a: 0.95, spin: 2 })); }
+    for (const s of seals) this.flash(s.clone().setY(s.y + 0.3), 0xc8eeff, 0x2a5ae0, 0.5, 0.14, 1.1);
+    return this._h(e, {
+      flow: (k) => { flow = k; if (this.parts && k < 1) { e.dp = (e.dp || 0) - (e.dt || 0.016); if (e.dp <= 0) { e.dp = lite() ? 0.07 : 0.035; const i = (e.di = ((e.di || 0) + 1) % seals.length), s = seals[i], p = s.clone().lerp(c3, k); p.y += 0.15; const d = c3.clone().sub(s).normalize().multiplyScalar(r * 1.6);
+          this.bit('drop', p, { v: new THREE.Vector3(d.x, 1.2, d.z), g: -7, life: 0.35, s0: 0.1, s1: 0.04, col: 0xd8f4ff, glow: 0.4, floor: s.y }); } } },
+      surge: (hits) => { surgeAt = e.t; flow = 1;
+        // 마지막 물결: 바깥 -> 가운데로 조여드는 고리(현무약해의 '밀어내는' 물결과 반대 방향) + 가운데에서 솟는 물기둥
+        const ce = this._fx('converge', 0.45, (q) => { const k = q.t / 0.45; this._flat(rg, r * (1 - 0.85 * easeOut(k)), c3.y + 0.07); rg.material.uniforms.uA.value = H.intensity * 1.4 * (1 - smooth(0.7, 1, k)); this._flat(rg2, r * 0.8 * (1 - 0.9 * easeOut(clamp01((q.t - 0.06) / 0.39))), c3.y + 0.07); rg2.material.uniforms.uA.value = H.intensity * 1.0 * (1 - smooth(0.6, 1, k)); });
+        const rg = this.spr(ce, 1, 0xd8f4ff, 0x2a5ae0, 4), rg2 = this.spr(ce, 1, 0x9ad8ff, 0x1a3a9a, 4); rg.position.copy(c3); rg2.position.copy(c3);
+        this._later(0.3, () => { if (this.parts) { this.beam(c3, 0.7, 2.4, 'water', { life: 0.55 }); this.pang(c3.clone().setY(c3.y + 0.7), 'water', { r: 0.8, n: 16, ground: c3.y, stars: lite() ? 1 : 3 }); for (let i = 0; i < this._nk(12); i++) { const a = rnd(0, 6.283); this.bit('drop', c3.clone().setY(c3.y + 0.4), { v: new THREE.Vector3(Math.cos(a) * 1.5, rnd(3, 4.5), Math.sin(a) * 1.5), g: -9, life: 0.6, s0: 0.13, s1: 0.05, col: 0xffffff, glow: 0.4, floor: c3.y }); } }
+          for (const q of hits || []) { const p3 = P3(q); this.flash(p3.clone().setY(p3.y + 0.5), 0xc8eeff, 0x2a5ae0, 0.5, 0.12, 1.1); }
+          const rm = this._rm; if (rm) rm.pop(c3.clone().setY(c3.y + 0.6), { col: 0x6ab8ff, hi: 0xf0faff, size: 1.3, ring: r * 0.6, groundY: c3.y, sparks: 12, stars: 3 });
+          if ((hits || []).length) this._shout({ x: c3.x, y: c3.y, z: -c3.z }, '촤르륵!', '#d8f2ff', '#183a7a', 1.4); }, e);
+        e.life = e.t + 0.7; },
+      end: () => this._end(e, 0.3) });
+  }
+
+  k_allyMark(s, o) {
+    const e = this._fx('allymark', 9999, (e) => { if (s.dead) { e.t = e.life; return; } const p = P3(s.pos); this._flat(rg, (s.radius || 0.4) + 0.35 + 0.05 * Math.sin(e.t * 5), p.y + 0.06); rg.position.x = p.x; rg.position.z = p.z; rg.material.uniforms.uA.value = 1.1 * this._fadeK(e);
+      ar.quaternion.copy(this.camQ); ar.position.copy(p).setY(p.y + 1.4 + (s.radius || 0.4) + 0.06 * Math.sin(e.t * 4)); ar.scale.setScalar(0.32); ar.material.uniforms.uA.value = 0.9 * this._fadeK(e); });
+    const rg = this.spr(e, 1, C.gold, C.amberB, 3), ar = this.spr(e, 3, C.gold, C.amberB, 6);
+    return this._h(e, { end: () => this._end(e, 0.2) });
   }
 
   // ================================================================== A1 제작 완성 (skillui.js showCraft)

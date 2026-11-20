@@ -1,7 +1,7 @@
 // Skill window (learn / upgrade / equip / reset), craft window, job advancement window, HUD slot buttons.
 // Mixed into the existing UI class so the original look (ivory / teal / gold) and input handling stay.
 import { UI } from './ui.js';
-import { craft, NORMAL_SLOTS, ADV1_LEVEL, ADV2_LEVEL } from './skillsys.js';
+import { craft, NORMAL_SLOTS, ADV1_LEVEL, ADV2_LEVEL, jobRecipes } from './skillsys.js';
 import { wpLevelText } from './wpharm.js';
 import { enLevelText } from './engineer.js';   // 엔지니어 2차: 실제 계산과 같은 수치 문구   // 양약사 2차: 실제 계산과 같은 수치 문구
 import { chefLevelText } from './chef.js';   // 쉐프 2차: 스킬 창 수치 줄(실제 데이터)
@@ -45,7 +45,7 @@ const SKILL_ART = new Set([
   'nv_a1', 'nv_a2', 'nv_a3', 'nv_a4', 'nv_p1', 'nv_p2', 'nv_p3', 'nv_p4',
   'ph1_a1', 'ph1_a4', 'ph1_a3', 'ph1_a6', 'ph1_a5', 'ph1_b1', 'ph1_b2', 'ph1_b6', 'ph1_b4', 'ph1_b5', 'ph1_c1', 'ph1_c7', 'ph1_c6', 'ph1_c8', 'ph1_c9',
   'wp_a1', 'wp_a2', 'wp_a3', 'wp_a4', 'wp_a5', 'wp_b1', 'wp_b2', 'wp_b3', 'wp_b4', 'wp_b5', 'wp_c1', 'wp_c2', 'wp_c3', 'wp_c4', 'wp_c5',
-  'hb_a1', 'hb_a2', 'hb_a3', 'hb_a4', 'hb_a5', 'hb_b1', 'hb_b2', 'hb_b3', 'hb_b4', 'hb_b5', 'hb_c1', 'hb_c2', 'hb_c3', 'hb_c4', 'hb_c5',
+  'hb_a1', 'hb_a1_cup', 'hb_a2', 'hb_a3', 'hb_a4', 'hb_a5', 'hb_b1', 'hb_b2', 'hb_b3', 'hb_b4', 'hb_b5', 'hb_c1', 'hb_c2', 'hb_c3', 'hb_c4', 'hb_c5',
   'ck1_a1', 'ck1_a2', 'ck1_a3', 'ck1_a4', 'ck1_a5', 'ck1_b1', 'ck1_b2', 'ck1_b3', 'ck1_b4', 'ck1_b5', 'ck1_c1', 'ck1_c2', 'ck1_c3', 'ck1_c4', 'ck1_c5',
   'cf_a1', 'cf_a2', 'cf_a3', 'cf_a4', 'cf_a5', 'cf_b1', 'cf_b2', 'cf_b3', 'cf_b4', 'cf_b5', 'cf_c1', 'cf_c2', 'cf_c3', 'cf_c4', 'cf_c5',
   'bs1_a1', 'bs1_a2', 'bs1_a3', 'bs1_a4', 'bs1_a5', 'bs1_b1', 'bs1_b2', 'bs1_b3', 'bs1_b4', 'bs1_b5', 'bs1_c1', 'bs1_c2', 'bs1_c3', 'bs1_c4', 'bs1_c5',
@@ -178,6 +178,9 @@ Object.assign(UI.prototype, {
   showCraft(skillId) {
     const p = G.player, book = p.sheet.book, bag = p.sheet.bag;
     const crafts = G.data.skill2List.filter(s => (s.type === 'craft' || s.craftName) && book.usable(s.id));   // craftName: 습득 효과 제작법(양약사 구급함·서방 패치 = 예전 조제 스킬 id)
+    { const jr = jobRecipes(G.data, book), groups = {};   // 스킬 없는 직업 제작법(보원탕 — 한약사 Lv30, js/skillsys.js recipeBlock): 제작 스킬처럼 한 묶음으로
+      for (const r of jr) (groups[r.req.name] = groups[r.req.name] || []).push(r.id);
+      for (const [name, ids] of Object.entries(groups)) crafts.push({ id: '_job:' + name, name, recipes: ids, jobRecipe: true }); }
     const b = this.open('craft', '제작', 1700, 920);
     if (!crafts.length) { $('div', 'skempty', b, '<p>배운 제작 스킬이 없습니다. 스킬창(K)에서 제작 스킬을 배우세요.</p>'); return; }
     const inSafe = p.zone.def.kind === 'town';
@@ -185,11 +188,11 @@ Object.assign(UI.prototype, {
     const left = $('div', 'crleft panel-dark', b), right = $('div', 'crright panel-dark', b);
     const sel = this.crSel && G.data.recipes.find(r => r.id === this.crSel) ? this.crSel : null;
     for (const s of crafts) {
-      $('div', 'skcat', left, (s.craftName || s.name) + ` <span class="small muted">Lv${book.level(s.id)}</span>`);
+      $('div', 'skcat', left, (s.craftName || s.name) + (s.jobRecipe ? ' <span class="small muted">직업 제작</span>' : ` <span class="small muted">Lv${book.level(s.id)}</span>`));
       for (const rid of s.recipes || []) {
         if (rid === 'salvage') { const r = $('div', 'crrow' + (this.crSel === 'salvage' ? ' sel' : ''), left, '<b>장비 분해</b> <span class="small muted">장비 → 재료 일부</span>'); r.onclick = () => { this.crSel = 'salvage'; this.showCraft(); }; continue; }
         const rc = G.data.recipes.find(x => x.id === rid); if (!rc) continue; const out = G.data.item(rc.output.item);
-        const ok = rc.inputs.every(x => bag.count(x.item) >= x.count) && book.level(s.id) >= (rc.minLv || 1);
+        const ok = rc.inputs.every(x => bag.count(x.item) >= x.count) && (s.jobRecipe || book.level(s.id) >= (rc.minLv || 1));
         const r = $('div', 'crrow' + (sel === rid ? ' sel' : '') + (ok ? '' : ' locked'), left, `${this.icon(out.icon, 40)} <b>${out.name}</b>${rc.output.count > 1 ? ' x' + rc.output.count : ''}${rc.minLv > 1 ? ` <span class="small muted">(스킬 Lv${rc.minLv})</span>` : ''}`);
         r.onclick = () => { this.crSel = rid; this.crN = 1; this.showCraft(); };
       }
@@ -215,7 +218,7 @@ Object.assign(UI.prototype, {
       if (r.made > 0 && ['ds_c1', 'ds_c2', 'ds_c3'].includes(rc.skill) && p.skills2 && p.skills2.ds) p.skills2.ds.made(rc, out, r.made);   // 디자이너 제작 완성: 마네킹 의상·자수 문양·리본 매듭 (js/designerfx.js made)
       if (r.made > 0 && out.id.startsWith('f_course') && G.skillFx && G.skillFx.chef) G.skillFx.chef.menu(p, { id: out.id, n: r.made });   // 시그니처 메뉴: 메인 → 곁들임 → 소스, 테두리 금빛 (js/cheffx.js)
       if (r.made > 0 && (out.id === 'f_lunch' || out.id === 'f_soup') && G.skillFx && G.skillFx.cook) G.skillFx.cook.made(p, { kind: out.id === 'f_soup' ? 'soup' : 'lunch' });   // 간단한 도시락·따뜻한 수프: the finished dish pops up (js/cookfx.js)
-      if (r.made > 0 && rc.skill === 'hb_a1' && G.skillFx && G.skillFx.herbal) { G.skillFx.herbal.make('brew', p, { n: r.made }); G.audio.sfx('hb_simmer'); }   // 구증구포·보원탕: 약초가 탕관 둘레를 돌다 빠지고 완성 탕약이 떠오름(묶음 제작도 한 번, 개수는 토스트)
+      if (r.made > 0 && rc.id === 'r_tonic' && G.skillFx && G.skillFx.herbal) { G.skillFx.herbal.make('brew', p, { n: r.made }); G.audio.sfx('hb_simmer'); }   // 보원탕(한약사 탕제): 약초가 탕관 둘레를 돌다 빠지고 완성 탕약이 떠오름(묶음 제작도 한 번, 개수는 토스트)
       this.toast(r.made > 0 ? `${out.name} x${r.made} 제작${r.failed ? ` (${r.failed}번 실패)` : ''}${r.bonus ? ` (추가 생산 +${r.bonus})` : ''}${r.returned ? ` · 재료 ${r.returned}개 반환` : ''}` : `제작 실패 — 재료가 사라졌습니다 (성공 확률 ${Math.round(r.rate * 100)}%)`); G.autoSave(); this.showCraft();
     });
   },
@@ -286,8 +289,9 @@ UI.prototype.updateControls = function () {
   const p = G.player; if (!p || !p.skills2) return;
   const eng = p.skills2, sk = p.sheet.book.sk;
   const set = (b, d, i) => {
-    const ic = b.querySelector('.ic'), key = d ? d.id : 'empty' + i;
-    if (b._k2 !== key) { b._k2 = key; ic.innerHTML = d ? skillIcon(d, b.classList.contains('big') ? 72 : 56) : this.icon('skill_ui_locked', 56); }
+    const cupL = d && eng.herbal ? eng.herbal.cupLeft(d.id) : 0;   // 탕약 나누기: 남은 한 잔을 들고 있으면 아이콘이 '남은 한 잔'(js/herbal.js cupLeft)
+    const ic = b.querySelector('.ic'), key = d ? d.id + (cupL > 0 ? ':cup' : '') : 'empty' + i;
+    if (b._k2 !== key) { b._k2 = key; ic.innerHTML = d ? (cupL > 0 ? skillIcon({ id: 'hb_a1_cup' }, b.classList.contains('big') ? 72 : 56) : skillIcon(d, b.classList.contains('big') ? 72 : 56)) : this.icon('skill_ui_locked', 56); }
     const left = d ? eng.cdLeft(d.id) : 0, frac = d ? eng.cdFrac(d.id) : 0;
     b.querySelector('.cd').style.background = frac > 0 ? `conic-gradient(rgba(10,10,25,.72) ${frac * 360}deg, transparent 0)` : 'none';
     b.querySelector('.cdt').textContent = left > 0.05 ? (left >= 1 ? Math.ceil(left) : left.toFixed(1)) : '';
@@ -298,6 +302,8 @@ UI.prototype.updateControls = function () {
     b.classList.toggle('nores', !!noRes);
     // 대장장이 접이식 철벽: 떠 있는 동안 같은 칸 = 걷어차기 — 남은 시간과 '걷어차기'를 띄우고 칸을 주황으로(기력 부족이어도 누를 수 있음)
     const rc = d && eng.smith ? eng.smith.recastLeft(d.id) : 0;
+    if (cupL > 0) { b.classList.add('recast'); b.querySelector('.cd').style.background = 'none'; b.querySelector('.cdt').textContent = cupL >= 1 ? Math.ceil(cupL) : cupL.toFixed(1); b.querySelector('.sub').textContent = '남은 한 잔'; b.querySelector('.sub').style.color = '#ffd070'; ic.style.opacity = 1; b.classList.remove('nores'); b.title = '남은 한 잔 — 다시 누르면 내가 마심'; return; }
+    b.title = '';
     b.classList.toggle('recast', rc > 0);
     if (rc > 0) { b.querySelector('.cd').style.background = 'none'; b.querySelector('.cdt').textContent = rc >= 1 ? Math.ceil(rc) : rc.toFixed(1); b.querySelector('.sub').textContent = '걷어차기'; b.querySelector('.sub').style.color = '#ffc070'; ic.style.opacity = 1; b.classList.remove('nores'); }
   };

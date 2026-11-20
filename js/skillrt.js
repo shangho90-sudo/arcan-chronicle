@@ -224,6 +224,7 @@ export class SkillEngine {
   // ---------------- cast
   cast(id, aim) {
     if (this.smith.wall && this.smith.wall.id === id) return this.smith.kickWall(aim);   // 접이식 철벽: 떠 있는 동안 같은 칸 = 걷어차기(비용·대기 없음)
+    if (this.herbal && this.herbal.cup && id === 'hb_a1' && this.book.usable(id)) return this.herbal.drinkStored();   // 탕약 나누기: 남은 한 잔 = 같은 칸 다시 누르면 내가 마심(비용·대기 없음, js/herbal.js)
     const d = G.data.skill2(id); const e = this.validate(d, aim); if (e != null) return e;
     const pc = this.pc;
     const cost = this.mpCost(d);

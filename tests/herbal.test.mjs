@@ -25,12 +25,16 @@ const near = (a, b, e = 1.5) => Math.abs(a - b) <= e;
 
 // ------------------------------------------------------------------ data
 const OLD = { a1: 30, a2: 33, a3: 36, a4: 40, a5: 45, b1: 30, b2: 33, b3: 36, b4: 40, b5: 45, c1: 30, c2: 33, c3: 36, c4: 40, c5: 45 };
-const TYPES = { a1: 'craft', a2: 'support', a3: 'support', a4: 'support', a5: 'ultimate', b1: 'summon', b2: 'summon', b3: 'summon', b4: 'summon', b5: 'ultimate', c1: 'attack', c2: 'attack', c3: 'attack', c4: 'attack', c5: 'attack' };
+const TYPES = { a1: 'support', a2: 'support', a3: 'support', a4: 'support', a5: 'ultimate', b1: 'summon', b2: 'summon', b3: 'summon', b4: 'summon', b5: 'ultimate', c1: 'attack', c2: 'attack', c3: 'attack', c4: 'attack', c5: 'attack' };
 const hb = skills.filter(s => s.job === 'herbalist');
 ok(hb.length === 15, '15 herbalist skills');
 for (const k of Object.keys(OLD)) { const d = SK['hb_' + k]; ok(d && d.unlock === OLD[k] && d.type === TYPES[k] && d.maxLv === (d.type === 'ultimate' ? 3 : 5) && d.tier === 2, 'kept id/unlock/type/maxLv hb_' + k); }
 ok(['비전 탕약과 경락', '본초 영물술', '오행 침구술'].every((n, i) => hb.filter(s => s.cat === i).length === 5 && hb.filter(s => s.cat === i).every(s => s.catName === n)), 'line titles A/B/C, 3x5');
-ok(S2.recipes.find(r => r.id === 'r_tonic').skill === 'hb_a1' && SK.hb_a1.recipes.includes('r_tonic') && S2.recipes.find(r => r.id === 'r_tonic').output.item === 'f_tonic', 'craft recipe still linked (r_tonic -> f_tonic)');
+{ const rc = S2.recipes.find(r => r.id === 'r_tonic'); ok(rc && !rc.skill && rc.req && rc.req.job === 'herbalist' && rc.req.level === 30 && rc.output.item === 'f_tonic' && !SK.hb_a1.recipes, '보원탕 제작법: 스킬 없이 한약사 Lv30(예전 습득 조건) 직업 제작법 r_tonic -> f_tonic');
+  const it = S2.items.find(i => i.id === 'f_tonic'); ok(it && it.use.status === 'well_fed2' && it.use.value === 0.15 && it.use.duration === 90, '보원탕 아이템 효과 그대로(90초 최대 HP +15%)'); }
+ok(['탕약 나누기', '보중익기탕', '구풍해독탕', '오령산', '소경활혈탕'].join() === ['hb_a1', 'hb_a2', 'hb_a3', 'hb_c3', 'hb_c4'].map(id => SK[id].name).join(), '처방 5종 이름(같은 id·칸)');
+ok(SK.hb_a2.desc.startsWith('기력을 회복하고 주변 영물의 이동 속도를 높인다'), '보중익기탕 짧은 설명');
+ok(SK.hb_c4.target === 'enemy' && SK.hb_c3.target === 'ground' && SK.hb_a1.type === 'support', '소경활혈탕 대상 하나·오령산 지점');
 for (const d of hb) if (d.anim) ok(actions[d.anim] && actions[d.anim].stow && actions[d.anim].hitT <= 0.35, 'motion ' + d.anim + ' (free hands, pestle on back)');
 for (const d of hb) { const pre = d.ops.find(o => o.k === 'pre'); if (pre && actions[d.anim]) ok(Math.abs(-pre.at - actions[d.anim].hitT) < 1e-6, 'pre op starts at the press ' + d.id); }
 if (!process.env.NOICON) for (const d of hb) { const p = new URL(`../assets/ui/skills/${d.id}.png`, import.meta.url); ok(existsSync(p) && readFileSync(p).length > 1500, 'icon ' + d.id); }
@@ -40,7 +44,17 @@ if (!process.env.NOICON) for (const d of hb) { const p = new URL(`../assets/ui/s
   const p = { sk: { points: 3, learned: { hb_a2: 3, hb_b1: 5, hb_c1: 2, hb_b5: 1 }, slots: ['hb_b1', 'hb_c1', 'hb_a2', 'hb_b5'] } };
   const sk = ensureSk(p, data);
   ok(sk.points === 3 && sk.learned.hb_a2 === 3 && sk.learned.hb_b1 === 5 && sk.learned.hb_c1 === 2 && sk.learned.hb_b5 === 1, 'old save: levels + points kept');
-  ok(sk.slots.join() === 'hb_b1,hb_c1,hb_a2,hb_b5', 'old save: slots kept'); }
+  ok(sk.slots.join() === 'hb_b1,hb_c1,hb_a2,hb_b5', 'old save: slots kept');
+  const p2 = { sk: { points: 1, learned: { hb_a1: 4, hb_c3: 2, hb_c4: 5, hb_a3: 1 }, slots: ['hb_c4', 'hb_c3', 'hb_a3', ''] } }, sk2 = ensureSk(p2, data);
+  ok(sk2.learned.hb_a1 === 4 && sk2.learned.hb_c4 === 5 && sk2.learned.hb_c3 === 2 && sk2.points === 1 && sk2.slots.join() === 'hb_c4,hb_c3,hb_a3,', 'old save: 바뀐 5칸 레벨·포인트·칸 그대로(예전 제작 hb_a1 레벨 4 = 탕약 나누기 Lv4)'); }
+// 보원탕 제작법: 한약사(계보) Lv30 이상이면 제작 메뉴에서 — 예전에 hb_a1 을 배운 사람·새 한약사 모두, 다른 직업·Lv29 는 막힘
+{ const { recipeBlock, jobRecipes, craft } = await import('../js/skillsys.js'); const D = { recipes: S2.recipes, job: id => ({ herbalist: { id: 'herbalist', name: '한약사', parent: 'pharmacist', tier: 2 }, pharmacist: { id: 'pharmacist', name: '약사', tier: 1 } }[id]), item: id => S2.items.find(i => i.id === id) || { id, tier: 1 } };
+  const rc = S2.recipes.find(r => r.id === 'r_tonic'), bk = (job, level) => ({ lineage: job === 'herbalist' ? ['novice', 'pharmacist', 'herbalist'] : ['novice', 'pharmacist'], p: { level }, level: () => 0, usable: () => false, passive: () => 0 });
+  ok(recipeBlock(D, bk('herbalist', 30), rc) === null && recipeBlock(D, bk('herbalist', 29), rc) && recipeBlock(D, bk('pharmacist', 40), rc), '보원탕: 한약사 Lv30 이상만');
+  ok(jobRecipes(D, bk('herbalist', 31)).some(r => r.id === 'r_tonic'), '보원탕: 제작 메뉴(직업 제작법 목록)에 나옴');
+  const bag = { n: { m_herb: 8, m_meat: 2, m_boar_tusk: 2 }, count(i) { return this.n[i] | 0; }, remove(i, c) { this.n[i] -= c; return true; }, add(i, c) { this.n[i] = (this.n[i] | 0) + c; return c; }, slots: [], changed() {} };
+  const sheet = { bag, p: { inventory: [], name: 'x', level: 30 }, final: { craftRate: 0 } }; const r = craft(D, sheet, bk('herbalist', 30), rc, 2, () => 0.99);
+  if (process.env.DBG) console.log(r); ok(r.err || r.made === 2, '보원탕 제작: 재료로 2개 만들기 시도(가방 흉내)'); }
 
 // ------------------------------------------------------------------ pure helpers
 { const f = { uid: 1, herb: true, life: 5, ext: 0 }, r1 = new Set(), r2 = new Set(), r3 = new Set();
@@ -72,30 +86,57 @@ function world(o = {}) {
   const eng = new SkillEngine(pc); pc.skills2 = eng;
   bindSkillRt({ audio: { sfx: n => sounds.push(n) }, render: { kick: (...a) => kicks.push(a), addShake() { throw new Error('no random shake'); } }, hitStop() { throw new Error('no global hit-stop'); }, ui: { floatText() {}, toast() {} },
     data: { status: id => STATUS[id], skill2: id => SK[id], config: {}, item: () => null, job: () => ({ id: 'herbalist', tier: 2 }) } });
-  const mon = (x, z, extra = {}) => { const m = { pos: { x, y: 0, z }, radius: 0.5, hp: 1e6, maxHp: 1e6, dead: false, zone: pc.zone, faction: 'monster', status: new StatusSet(), stat: () => 0, taken: [],
+  const mon = (x, z, extra = {}) => { const m = { pos: { x, y: 0, z }, radius: 0.5, knock: { x: 0, z: 0 }, hp: 1e6, maxHp: 1e6, dead: false, zone: pc.zone, faction: 'monster', status: new StatusSet(), stat: () => 0, taken: [],
       takeDamage(hd) { this.taken.push(hd); this.hp -= hd.amount; if (this.hp <= 0) this.dead = true; }, ...extra }; actors.push(m); return m; };
   const ctx = (id, L = 1, more = {}) => ({ d: SK[id], id, L, grade: 1, mult: 1 + (SK[id].type === 'ultimate' ? 0.25 : 0.12) * (L - 1), origin: { ...pc.pos }, facing: { ...pc.facing }, aim: { x: 0, y: 0, z: 3 }, hitOnce: new Set(), ...more });
   const op = (id, k) => SK[id].ops.find(x => x.k === (k || id.slice(3)));
   const cast = (id, L = 1, more = {}) => { const c = ctx(id, L, more); CUSTOM.herb(eng, op(id), c); return c; };
-  const run = (sec, dt = 0.02) => { for (let i = 0; i < Math.round(sec / dt); i++) { eng.tick(dt); for (const a of actors.slice()) if (a.isSummon && a.update) a.update(dt); } };
+  const run = (sec, dt = 0.02) => { for (let i = 0; i < Math.round(sec / dt); i++) { eng.tick(dt); for (const a of actors.slice()) { if (a.isSummon && a.update) a.update(dt);
+      else if (a.knock && Math.hypot(a.knock.x, a.knock.z) > 0.1) { a.pos = geo.move(a.pos, a.knock.x * dt, a.knock.z * dt, a.radius); const k = 1 - Math.exp(-10 * dt); a.knock.x *= 1 - k; a.knock.z *= 1 - k; } } } };   // actors.js baseUpdate 와 같은 밀림
   const sum = m => m.taken.reduce((a, h) => a + h.amount, 0);
   return { pc, eng, kit: eng.herbal, mon, ctx, op, cast, run, sum, sounds, kicks, fxLog, actors };
 }
 const ownAmount = (m, from = 0) => m.taken.slice(from).reduce((a, h) => a + h.amount, 0);
 
-// A2 대주천: self MP regen + haste, haste to living summons within 10 m only
+// A1 탕약 나누기: 고른 영물 우선 / 없으면 가장 다친 영물 / 영물이 없으면 남은 한 잔 — 두 번째 누름은 보관한 잔만(비용·대기 한 번), 보관 시간이 끝나면 원래대로
+{ const W = world({ learned: { hb_a1: 1, hb_b3: 1, hb_b4: 1 } }); W.pc.sheet.book.sk.slots = ['hb_a1', 'hb_b3', 'hb_b4', 'hb_c4']; W.pc.hp = 300;
+  W.cast('hb_b3'); W.cast('hb_b4', 1, { aim: { x: 1, y: 0, z: 1 } }); W.run(1.0); const gs = W.eng.summons.find(s => s.kind === 'ginseng'), dr = W.eng.summons.find(s => s.kind === 'deer');
+  gs.hp = gs.maxHp * 0.8; dr.hp = dr.maxHp * 0.3;
+  const c = W.cast('hb_a1'); ok(near(W.pc.hp, 300 + 100, 0.01), 'a1: 내 잔 = 최대 HP 10% 즉시');
+  ok(c.a1.to === dr, 'a1: 선택이 없으면 체력 비율이 가장 낮은 생명 소환물'); const h0 = dr.hp; W.run(0.6); ok(near(dr.hp - h0, dr.maxHp * 0.25, 0.5), 'a1: 영물 잔이 닿는 순간 그 영물 최대 HP 25%');
+  W.pc.allyTarget = gs; gs.hp = gs.maxHp * 0.9; const c2 = W.cast('hb_a1'); ok(c2.a1.to === gs, 'a1: 직접 고른 영물 우선(덜 다쳤어도)'); }
+{ const W = world({ learned: { hb_a1: 3 } }); W.pc.sheet.book.sk.slots = ['hb_a1', '', '', '']; W.pc.hp = 200; W.pc.sp = 100;
+  const e1 = W.eng.cast('hb_a1'); W.run(0.4); const k = 1 + 0.12 * 2;
+  ok(e1 === null && near(W.pc.hp, 200 + 100 * k, 0.01) && W.pc.sp === 80 && W.kit.cup && W.kit.cupLeft('hb_a1') > 0, 'a1 혼자: 첫 잔 + 남은 한 잔 보관(아이콘 = 남은 한 잔), 기력 20 한 번');
+  const cd0 = W.eng.cdLeft('hb_a1'); const e2 = W.eng.cast('hb_a1');
+  ok(e2 === null && near(W.pc.hp, 200 + 200 * k, 0.01) && W.pc.sp === 80 && !W.kit.cup && W.kit.cupLeft('hb_a1') === 0 && near(W.eng.cdLeft('hb_a1'), cd0, 1e-9), 'a1 두 번째 누름: 보관한 잔만 마심(기력·재사용 대기 다시 안 씀), 아이콘 원래대로');
+  ok(W.eng.cast('hb_a1') === '재사용 대기 중', 'a1: 그다음 누름은 보통 재사용 대기');
+  const W2 = world({ learned: { hb_a1: 1 } }); W2.pc.sheet.book.sk.slots = ['hb_a1', '', '', '']; W2.eng.cast('hb_a1'); W2.run(0.4); ok(W2.kit.cup, 'a1: 보관'); W2.run(8.1); ok(!W2.kit.cup && W2.kit.cupLeft('hb_a1') === 0, 'a1: 보관 시간(8초)이 끝나면 잔이 사라지고 원래 아이콘'); }
+// A2 보중익기탕: 기력 ticks 번(움직여도 이어짐) + 10 m 안 생명 소환물만 가속(나는 가속 없음)
 { const W = world(); W.cast('hb_b3'); W.run(0.1); const gs = W.eng.summons[0];
   const far = new HerbSummon(W.kit, 'root', W.op('hb_b1'), W.ctx('hb_b1'), { x: 30, y: 0, z: 0 }); W.eng.summons.push(far); W.actors.push(far);
-  W.cast('hb_a2', 3);
-  ok(W.pc.status.get('mpregen').value === 4 && near(W.pc.status.get('haste').value, 0.2 * 1.24, 1e-9), 'a2: mp regen + haste (x mult)');
-  ok(gs.status.has('haste') && !far.status.has('haste'), 'a2: near living summon only');
-  ok(near(W.pc.status.get('haste').remaining, 8 * 1.1, 1e-9), 'a2: duration 8 s x (1 + 0.05(L-1))'); }
-// A3 금강 약갑: defup + ccres + shield; recast refreshes (no stacking)
-{ const W = world(); W.cast('hb_a3', 5);
-  ok(near(W.pc.status.get('defup').value, 0.3 * 1.48, 1e-9) && W.pc.status.get('ccres').value === 0.5, 'a3: defup x mult, ccres 50%');
-  ok(W.pc.shield === Math.round(1000 * (0.06 + 0.04)), 'a3: shield 6% +1%/Lv of max HP (Lv5 = 10%)');
-  W.run(3); W.cast('hb_a3', 5); ok(W.pc.shield === 100 && near(W.pc.status.get('defup').remaining, 12, 1e-6), 'a3: recast refreshes, no stacking');
-  W.pc.takeHit = 1; W.kit.onPlayerHit({ source: { pos: { x: 3, z: 0 } } }); ok(W.fxLog.includes('armor.flash'), 'a3: the hit side flashes'); }
+  const machine = { pos: { x: 0, z: 1 }, living: false, dead: false, status: new StatusSet(), hp: 1, maxHp: 1 }; W.eng.summons.push(machine);
+  W.pc.sp = 100; W.cast('hb_a2', 3); W.run(0.05);
+  ok(W.pc.sp === 100 + 8 * 1.1, 'a2: 첫 기력 회복은 잔을 드는 순간'); for (let i = 0; i < 30; i++) { W.pc.pos.x += 0.12; W.run(0.1); }
+  ok(near(W.pc.sp, 100 + 4 * 8 * 1.1, 1e-6) && W.kit.log.a2.ticks === 4, 'a2: 움직이는 동안에도 4번(총 32 × 1.1)');
+  ok(gs.status.has('haste') && !far.status.has('haste') && !machine.status.has('haste') && !W.pc.status.has('haste'), 'a2: 가까운 생명 소환물만 가속(먼 영물·기계·나 X)');
+  ok(near(gs.status.get('haste').value, 0.2 * 1.24, 1e-9) && near(gs.stat('moveSpeed'), HERB.hop.speed * (1 + 0.2 * 1.24), 1e-6), 'a2: 가속 20% × 레벨 몫, 실제 이동 속도에 반영'); }
+// A3 구풍해독탕: 고른 영물 -> 약액이 닿는 순간 근접 거리만큼 일반 몬스터 한 번 밀침 + 보호막 한 번 / 선택 없으면 나 / 보스 안 밀림 / 도발 수호령 대형 유지
+{ const W = world(); W.cast('hb_b3'); W.run(1.0); const gs = W.eng.summons[0]; gs.pos = { x: 4, y: 0, z: 0 };
+  const near1 = W.mon(5.6, 0), near2 = W.mon(4, 1.7), boss = W.mon(2.6, 0, { isBoss: true }), out = W.mon(4, 4.2); W.pc.allyTarget = gs;
+  const c = W.cast('hb_a3', 1); ok(c.a3.to === 'ginseng' && !c.a3.done, 'a3: 고른 영물에게 약액이 날아감(바로 터지지 않음)');
+  W.run(0.5); const R = W.kit.log.a3.reach; ok(near(R, 2.8, 1e-9), 'a3: 반경 = 동자 근접 거리 2.6 + 반지름 0.35 -> 상한 2.8 m');
+  ok(Math.hypot(near1.pos.x - 4, near1.pos.z) > 1.6 + 1.5 && Math.hypot(near2.pos.x - 4, near2.pos.z - 0) > 1.7 + 1.5, 'a3: 가까운 일반 몬스터 바깥으로 밀림');
+  ok(boss.pos.x === 2.6 && out.pos.z === 4.2, 'a3: 보스·반경 밖은 그대로');
+  ok(gs.shield === Math.round(gs.maxHp * 0.12) && W.kit.log.a3.pushed === 2, 'a3: 보호막 그 영물 최대 HP 12% 한 번, 밀침 한 번씩');
+  const hp0 = gs.hp; gs.takeDamage({ amount: 10 }); ok(gs.hp === hp0 && gs.shield === Math.round(gs.maxHp * 0.12) - 10, 'a3: 영물 보호막이 피해를 먼저 흡수');
+  W.run(4.1); ok(gs.shield === 0, 'a3: 보호막 4초');
+  const W2 = world(), m = W2.mon(1.2, 0); W2.pc.hp = 500; const c2 = W2.cast('hb_a3', 5); ok(c2.a3.to === 'self' && c2.a3.done && W2.pc.shield === Math.round(1000 * (0.12 + 0.06)) && Math.hypot(m.knock.x, m.knock.z) > 0, 'a3: 고른 영물이 없으면 나를 중심으로 바로(Lv5 보호막 18%) + 밀침');
+  W2.run(0.5); ok(m.pos.x > 2.6, 'a3: 나를 붙잡던 몬스터가 밀려남');
+  // 도발 중인 녹각수호령: 끌어모은 적은 밀지 않음(대형 유지) + 보호막
+  const W3 = world(); W3.cast('hb_b4', 1, { aim: { x: 0, y: 0, z: 4 } }); W3.run(1.0); const dr = W3.eng.summons[0]; const t1 = W3.mon(dr.pos.x + 1.5, dr.pos.z), t2 = W3.mon(dr.pos.x - 1.2, dr.pos.z + 0.6);
+  ok(W3.kit.tauntedBy(t1, dr) && W3.kit.tauntedBy(t2, dr), 'a3: 수호령 7 m 안 일반 몬스터 = 도발 중(actors.js Monster.player 규칙)');
+  W3.pc.allyTarget = dr; const x1 = { ...t1.pos }; W3.cast('hb_a3'); W3.run(0.7); ok(t1.pos.x === x1.x && t1.knock.x === 0 && W3.kit.log.a3.kept === 2 && W3.kit.log.a3.pushed === 0 && dr.shield > 0, 'a3: 수호령에게 = 끌린 적 대형 유지(밀지 않음) + 보호막'); }
 // A4 백초 훈증진: heal self + LIVING summons, cleanse, first tick at the growth end, one at a time
 { const W = world(); W.cast('hb_b3'); W.run(0.8); const gs = W.eng.summons[0]; gs.hp = 10;
   const machine = { pos: { x: 0, z: 0.5 }, hp: 10, maxHp: 100, living: false, dead: false, herbal: false, status: new StatusSet() }; W.eng.summons.push(machine);
@@ -158,19 +199,31 @@ const ownAmount = (m, from = 0) => m.taken.slice(from).reduce((a, h) => a + h.am
   ok(a.taken.length === 1 && wingT.taken.length === 1 && off.taken.length === 0, 'c2: wings reach 2.3 m to the side, not 2.5 m behind');
   ok(near(a.taken[0].amount, 260, 1) && near(wingT.taken[0].amount, 325, 1), 'c2: 260%, x1.25 vs defence down');
   ok(a.status.has('burn'), 'c2: burn'); }
-// C3 황정지맥: pulse first, once per enemy, then damage reduction while inside
-{ const W = world(), a = W.mon(0, 3), b = W.mon(1.5, 3.5);
-  W.cast('hb_c3', 1, { aim: { x: 0, y: 0, z: 3 } }); W.run(0.2); ok(a.taken.length === 0, 'c3: the golden pulse travels first');
-  W.run(0.5); ok(a.taken.length === 1 && b.taken.length === 1 && near(a.taken[0].amount, 220, 1), 'c3: 220% once each');
-  W.pc.pos = { x: 0, y: 0, z: 3 }; W.run(0.3); ok(W.pc.status.get('dmgreduce') && W.pc.status.get('dmgreduce').value === 0.25, 'c3: 25% damage reduction inside'); }
-// C4 백호유침: 4 needles per target = 2.4 total, centre gets defence down at the 3rd, dead target -> needles go on
-{ const W = world(), a = W.mon(0, 4), b = W.mon(1.0, 4.5);
-  W.cast('hb_c4'); W.run(1.0);
-  ok(a.taken.length === 4 && b.taken.length === 4 && near(ownAmount(a), 240, 2), 'c4: 4 needles each, total 240% (same as old 4 x 60%)');
-  ok(a.status.has('defdown') && !b.status.has('defdown'), 'c4: centre target defence down');
-  const W2 = world(), x = W2.mon(0, 4, { hp: 50 }), y = W2.mon(0.8, 4.2); W2.cast('hb_c4'); W2.run(1.0);
-  ok(x.dead && x.taken.length === 1 && y.taken.length === 7, 'c4: needles of a dead target go to the other target');
-  const W3 = world(); W3.cast('hb_c4'); W3.run(0.5); ok(W3.fxLog.includes('needles.miss'), 'c4: no target -> needles fly out, no damage'); }
+// C3 오령산: 다섯 약인 -> run 동안 일반 몬스터 끌어당김(보스는 안 끌림) -> 만나는 순간 적마다 한 번(물길 다섯이 겹쳐도)
+{ const W = world(), a = W.mon(2.6, 4), b = W.mon(-2.4, 3), boss = W.mon(0, 5.5, { isBoss: true, radius: 1.2 }), far = W.mon(0, 9);
+  W.cast('hb_c3', 1, { aim: { x: 0, y: 0, z: 4 } }); ok(W.fxLog.includes('wuling') && W.kit.log.c3.c.z === 4, 'c3: 약인 다섯·물길(지정 지점)');
+  W.run(0.3); ok(a.taken.length === 0 && b.taken.length === 0, 'c3: 물길이 모이는 동안은 피해 없음');
+  ok(Math.hypot(a.pos.x, a.pos.z - 4) < Math.hypot(2.6, 0) - 0.5 && boss.pos.z === 5.5, 'c3: 일반 몬스터는 가운데로 끌리고 보스는 그대로');
+  W.run(0.4); ok(Math.hypot(a.pos.x, a.pos.z - 4) < 1.2 && Math.hypot(b.pos.x, b.pos.z - 4) < 1.2, 'c3: 0.6초 뒤 가운데 1.2 m 안으로 모임');
+  ok(a.taken.length === 1 && b.taken.length === 1 && boss.taken.length === 1 && far.taken.length === 0 && near(a.taken[0].amount, 220, 1), 'c3: 만나는 순간 220% 적마다 한 번 — 범위 안 보스도 피해(끌리지는 않음), 밖은 X');
+  W.run(1.0); ok(a.taken.length === 1 && boss.taken.length === 1, 'c3: 큰 적(보스)에 물길 다섯이 겹쳐도 한 번'); }
+// 자운화 -> 오령산: 꽃밭 둘레의 몬스터를 꽃 안으로 모아 독 포자를 맞힘
+{ const W = world(), ms = [W.mon(3.4, 3.4), W.mon(-3.4, 4.5), W.mon(0, 7.45)];
+  W.cast('hb_b2', 1, { aim: { x: 0, y: 0, z: 4 } }); W.run(0.7); const before = ms.map(m => m.taken.length);
+  ok(before.every(n => n === 0), '자운화 밖(2.8 m 바깥) 몬스터는 처음엔 안 맞음');
+  W.cast('hb_c3', 1, { aim: { x: 0, y: 0, z: 4 } }); W.run(0.8); ok(ms.every(m => Math.hypot(m.pos.x, m.pos.z - 4) < 2.8), '오령산: 셋 모두 자운화 원 안으로 끌려옴');
+  W.run(2.0); ok(ms.every(m => m.status.has('poison') && m.taken.length >= 2), '자운화 포자가 모인 몬스터를 맞힘(중독)'); }
+// C4 소경활혈탕: 대상 하나 세 마디(탁 0.12·탁 0.26·반 박자 뒤 0.56), 셋째 = 큰 피해 + 방어력 감소, 움직이는 대상 따라감, 그 뒤 주작천구 추가 피해
+{ const W = world({ learned: { hb_c4: 1, hb_c2: 1 } }), a = W.mon(0, 4), side = W.mon(1.0, 4.4); W.pc.target = a; W.pc.sheet.book.sk.slots = ['hb_c4', 'hb_c2', '', ''];
+  const c = W.cast('hb_c4', 1, { tgt: a }); const t0 = W.eng.clock;
+  W.run(0.1); ok(a.taken.length === 0, 'c4: 첫 마디 전엔 피해 없음');
+  for (let i = 0; i < 20; i++) { a.pos.x += 0.06; W.run(0.02); } ok(a.taken.length === 2 && near(a.taken[0].amount, 70, 1) && near(a.taken[1].amount, 70, 1), 'c4: 탁(70%)·탁(70%) — 움직여도 따라감');
+  const nd = c.c4.nodes; ok(near(nd[0].at - t0, 0.12, 0.021) && near(nd[1].at - t0, 0.26, 0.021), 'c4: 마디 시각 0.12·0.26 s');
+  ok(!a.status.has('defdown'), 'c4: 방어력 감소는 셋째 마디 전엔 없음');
+  W.run(0.3); ok(a.taken.length === 3 && near(a.taken[2].amount, 180, 1) && a.status.has('defdown') && near(a.status.get('defdown').value, 0.2, 1e-9) && near(nd[2].at - t0, 0.56, 0.021), 'c4: 반 박자 뒤 셋째 180% + 방어력 -20% 5초(같은 순간)');
+  ok(side.taken.length === 0, 'c4: 대상 하나만');
+  W.cast('hb_c2', 1, { aim: { x: a.pos.x, y: 0, z: a.pos.z } }); W.run(1.0); ok(near(a.taken[3].amount, 260 * 1.25, 1) && near(side.taken[0].amount, 260, 1), '소경활혈탕 3타 -> 주작천구: 방어력 감소 대상 ×1.25(325%), 옆 적은 260%');
+  const W2 = world(), x = W2.mon(0, 4, { hp: 80 }); W2.cast('hb_c4', 1, { tgt: x }); W2.run(1.0); ok(x.dead && x.taken.length === 2 && W2.kit.log.c4.nodes.some(n => n.gone), 'c4: 대상이 쓰러지면 남은 마디는 사라짐(피해 없음)'); }
 // C5 현무약해: knockback normal only, slow, herb field extension once per cast + per-field cap
 { const W = world(), a = W.mon(0, 3), boss = W.mon(0.6, 5, { isBoss: true });
   W.cast('hb_a4', 1, { aim: { x: 0, y: 0, z: 4 } }); W.run(0.6); const f = W.kit.fields[0], life0 = f.life;

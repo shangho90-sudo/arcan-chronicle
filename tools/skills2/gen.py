@@ -178,11 +178,12 @@ S(J, 2, 2, C_, 5, 'wp_c5', '최종 처방·생명 유지', 'passive', '치명적
 J, C = 'herbalist', 0x6ac040
 HA, HB, HC = '비전 탕약과 경락', '본초 영물술', '오행 침구술'
 def herb(k, **kw): return dict(op='custom', fn='herb', k=k, **kw)
-S(J, 2, 0, HA, 1, 'hb_a1', '구증구포·보원탕', 'craft', '아홉 번 찌고 말린 약초를 작은 탕관에 달여 보원탕(90초 동안 최대 HP +15%)을 만든다. 여러 개를 한 번에 달일 수 있다.')
-S(J, 2, 0, HA, 2, 'hb_a2', '대주천', 'support', '발끝에서 손끝까지 기를 한 바퀴 돌려 기력 회복이 빨라지고, 나와 가까운(10 m) 생명 소환물의 이동 속도가 오른다.', target='self', mp=18, cd=20, anim='hb_brew', sfx='hb_resonance', sfxAt='strike', sfxLead=0.05,
-  ops=[herb('a2', dur=8, mp=4, haste=0.2, near=10)], fx=dict(color=0x40d8b0))
-S(J, 2, 0, HA, 3, 'hb_a3', '금강 약갑', 'support', '나무껍질과 잎맥으로 된 옥빛 약갑이 어깨와 팔을 감싼다. 방어력과 경직 저항이 오르고 작은 보호막이 생긴다. 다시 쓰면 시간만 새로 채워진다(겹치지 않음).', target='self', mp=18, cd=22, anim='hb_brew', sfx='hb_resonance', sfxAt='strike', sfxLead=0.05,
-  ops=[herb('a3', survival=True, dur=10, def_=0.3, ccres=0.5, shield=0.06, shieldLv=0.01)], fx=dict(color=0x60d890))
+S(J, 2, 0, HA, 1, 'hb_a1', '탕약 나누기', 'support', '작은 탕관에서 호박빛 탕약을 두 잔 따른다. 한 잔은 내가 마시고, 다른 한 잔은 사거리 안의 내 생명 소환물(직접 고른 영물, 없으면 가장 많이 다친 영물)에게 보내 즉시 회복시킨다. 받을 영물이 없으면 남은 한 잔을 잠시 들고 있다가, 같은 칸을 다시 누르면 내가 마신다(기력·재사용 대기는 처음 한 번만).', target='self', range=8, mp=20, cd=14, anim='hb_share', sfx='hb_pour', sfxAt='op',
+  ops=[herb('a1', selfHeal=0.10, ally=0.25, range=8, hold=8, speed=9)], fx=dict(color=0xffb850))
+S(J, 2, 0, HA, 2, 'hb_a2', '보중익기탕', 'support', '기력을 회복하고 주변 영물의 이동 속도를 높인다. 약잔을 가슴 높이로 들면 금빛 김이 피어올라 기력이 몇 차례에 걸쳐 차오르고(움직여도 이어짐), 가까운 내 생명 소환물의 발밑에 금빛 바람이 감겨 빨라진다.', target='self', mp=18, cd=20, anim='hb_lift', sfx='hb_steam', sfxAt='op',
+  ops=[herb('a2', ticks=4, every=1.0, mp=8, haste=0.2, dur=8, near=10)], fx=dict(color=0xffd060))
+S(J, 2, 0, HA, 3, 'hb_a3', '구풍해독탕', 'support', '탕관을 기울여 호박빛 약액 한 줄기를 고른 내 생명 소환물에게 보낸다. 닿는 순간 대상 둘레로 약향과 잎이 한 번 퍼져 바짝 붙은 일반 몬스터를 짧게 밀어내고(보스 제외) 대상에게 보호막을 준다. 고른 영물이 없으면 나를 중심으로 바로 터진다. 도발 중인 녹각수호령에게 쓰면 끌어모은 적은 밀지 않고 보호막만 준다.', target='self', range=9, mp=18, cd=16, anim='hb_tilt', sfx='hb_leaf', sfxAt='op',
+  ops=[herb('a3', range=9, speed=13, shield=0.12, shieldLv=0.015, shieldDur=4, push=2.0, reachMin=1.6, reachMax=2.8)], fx=dict(color=0xffc060))
 S(J, 2, 0, HA, 4, 'hb_a4', '백초 훈증진', 'support', '가운데 작은 탕관을 놓고 둥근 약초진을 편다. 진 안의 나와 생명 소환물이 주기적으로 회복하고 해로운 상태 하나가 풀린다. 바닥 무늬가 실제 범위.', target='ground', range=6, mp=30, cd=24, anim='hb_sow', sfx='hb_simmer', sfxAt='strike',
   ops=[herb('a4', survival=True, r=3.0, dur=8, tick=1.5, heal=0.025, grow=0.5)], fx=dict(color=0xffc060))
 S(J, 2, 0, HA, 5, 'hb_a5', '백초귀원', 'ultimate', '둥글게 펼친 약초의 기를 금빛 환약 하나로 모아 삼킨다. 환약이 몸에 스며드는 순간 크게 회복하고, 빛의 약초꽃이 피어 공격·방어·회복 효과가 오른다.', target='self', mp=60, cd=60, cast=0.5, anim='hb_gather', sfx='hb_bloom', sfxAt='op',
@@ -201,16 +202,16 @@ S(J, 2, 2, HC, 1, 'hb_c1', '목행·청룡승근', 'attack', '앞쪽 일직선�
   ops=[herb('c1', coef=2.4, len=9, w=1.2, vsRoot=1.6, step=0.055)], fx=dict(color=0x4ad0a0))
 S(J, 2, 2, HC, 2, 'hb_c2', '화행·주작천구', 'attack', '손에서 작은 쑥뜸에 불을 붙여 던지면 붉은 날개를 편 주작이 낮게 날아가 부딪친다. 좌우로 날개 모양 불꽃이 퍼져 범위 피해와 화상. 방어력이 깎인 적에게 더 아프다.', target='ground', range=9, mp=24, cd=8, anim='hb_moxa', sfx='throw', sfxAt='strike',
   ops=[herb('c2', coef=2.6, speed=11, core=1.3, wing=5.0, depth=1.4, burn=0.15, burnDur=4, vsDefdown=1.25)], fx=dict(color=0xff5a2a))
-S(J, 2, 2, HC, 3, 'hb_c3', '토행·황정지맥', 'attack', '금빛 맥이 땅속을 달려 둥근 지맥을 그리고, 적이 선 자리마다 낮은 돌기둥과 뿌리가 차례로 솟는다. 그 뒤 지맥 안에 선 나는 받는 피해가 줄어든다.', target='ground', range=6, mp=24, cd=10, anim='hb_raise', sfx='hb_root', sfxAt='strike',
-  ops=[herb('c3', coef=2.2, r=2.6, run=0.25, ward=6, dr=0.25)], fx=dict(color=0xd8a040))
-S(J, 2, 2, HC, 4, 'hb_c4', '금행·백호유침', 'attack', '어깨 뒤에 백금 침이 부채처럼 펼쳐졌다가 손끝 한 번에 앞쪽 부채꼴로 날아간다. 적마다 침 4개가 조금씩 다른 곡선으로 모여 꽂히고, 가운데 적이 3번 맞으면 방어력이 떨어진다.', range=6, mp=22, cd=7, anim='hb_flick', sfx='hb_needle', sfxAt='strike',
-  ops=[herb('c4', coef=0.6, r=6, ang=50, per=4, maxT=5, gap=0.06, speed=16, stackN=3, defdown=0.2, defdownDur=5)], fx=dict(color=0xf0f0ff))
+S(J, 2, 2, HC, 3, 'hb_c3', '오령산', 'attack', '약포지를 펼쳐 지정한 곳에 산제를 흩뿌린다. 둘레 다섯 곳에 푸른 약인이 찍히고, 거기서 시작한 낮은 물길이 가운데로 모이며 범위 안의 일반 몬스터를 끌어당긴다(보스는 끌리지 않음). 물길이 한 점에서 만나는 순간 마지막 물결이 범위 피해를 준다(적마다 한 번).', target='ground', range=7, mp=24, cd=11, anim='hb_scatter', sfx='hb_seal', sfxAt='op',
+  ops=[herb('c3', coef=2.2, r=3.2, run=0.6, stop=0.55, vmax=7)], fx=dict(color=0x4ab0ff))
+S(J, 2, 2, HC, 4, 'hb_c4', '소경활혈탕', 'attack', '붉은 탕액으로 허공에 한 획을 그으면 적 하나의 몸 위에 맥로가 나타나 따라붙는다. 붉은 빛이 세 마디를 차례로 지나며 \'탁, 탁\' 두 번 치고, 반 박자 뒤 마지막 마디가 크게 풀리며 큰 피해와 함께 방어력을 떨어뜨린다(주작천구가 더 아프게 들어감).', target='enemy', range=6, mp=22, cd=7, anim='hb_stroke', sfx='hb_tak', sfxAt='op',
+  ops=[herb('c4', coefs=[0.7, 0.7, 1.8], times=[0.12, 0.26, 0.56], defdown=0.2, defdownDur=5, lose=11)], fx=dict(color=0xff4a3a))
 S(J, 2, 2, HC, 5, 'hb_c5', '수행·현무약해', 'attack', '호리병의 청옥빛 약수가 넓고 낮은 물결이 되어 앞으로 밀려간다. 맞은 적은 밀려나고 느려지며(보스는 안 밀림), 물결이 지나간 내 약초 영역(백초 훈증진·자운화)은 2초 늘어난다(한 번 쓸 때 영역마다 한 번, 영역마다 최대 +4초).', range=8, mp=24, cd=9, anim='hb_pour', sfx='splash', sfxAt='strike',
   ops=[herb('c5', coef=1.8, len=8, w=2.4, speed=12, knock=2.5, slow=0.35, slowDur=3, extend=2.0, extendCap=4.0)], fx=dict(color=0x3a90ff))
 
 # 누른 순간의 준비 연출(op 'pre', at = -동작의 타격 시각): 씨앗 뿌리기·손 원 그리기·쑥뜸 불붙이기·어깨 뒤 침·호리병 (그림만, 피해 없음)
-HB_PRE = dict(hb_a2=('brew', 0.30), hb_a3=('brew', 0.30), hb_a4=('sow', 0.34), hb_b1=('sow', 0.34), hb_b2=('sow', 0.34), hb_b3=('sow', 0.34), hb_b4=('sow', 0.34),
-              hb_c1=('raise', 0.28), hb_c3=('raise', 0.28), hb_c2=('moxa', 0.26), hb_c4=('needles', 0.16), hb_c5=('gourd', 0.24))
+HB_PRE = dict(hb_a1=('share', 0.30), hb_a2=('lift', 0.30), hb_a3=('tilt', 0.26), hb_a4=('sow', 0.34), hb_b1=('sow', 0.34), hb_b2=('sow', 0.34), hb_b3=('sow', 0.34), hb_b4=('sow', 0.34),
+              hb_c1=('raise', 0.28), hb_c3=('scatter', 0.30), hb_c2=('moxa', 0.26), hb_c4=('stroke', 0.24), hb_c5=('gourd', 0.24))
 for _d in SK:
     if _d['id'] in HB_PRE: w, t = HB_PRE[_d['id']]; _d['ops'].insert(0, herb('pre', what=w, at=-t))
 
@@ -658,15 +659,18 @@ ITEMS = [
     item('t_charm_def', '예술 부적: 평온', '60초 동안 방어력 증가.', 'consumable', 1, sell=4, use=dict(status='defup', duration=60, value=0.15)),
     item('t_charm_mp', '예술 부적: 영감', '60초 동안 기력 회복 증가.', 'consumable', 1, sell=4, use=dict(status='mpregen', duration=60, value=3)),
 ]
-def R(id_, skill, inputs, out, n=1, gold=0, group='', minLv=1, kind='make'):
-    return dict(id=id_, skill=skill, inputs=[dict(item=a, count=b) for a, b in inputs], output=dict(item=out, count=n), gold=gold, group=group, minLv=minLv, kind=kind)
+def R(id_, skill, inputs, out, n=1, gold=0, group='', minLv=1, kind='make', req=None):
+    d = dict(id=id_, skill=skill, inputs=[dict(item=a, count=b) for a, b in inputs], output=dict(item=out, count=n), gold=gold, group=group, minLv=minLv, kind=kind)
+    if req: d['req'] = req   # 스킬 없는 직업 제작법(js/skillsys.js recipeBlock): 직업 계보 + 캐릭터 레벨
+    return d
 RECIPES = [
     # r_potion_s·r_potion_m (회복제 제작 ph1_c1) 삭제 2026-11-19: ph1_c1 이 꿈꽃가루로 바뀜 — 작은·중간 회복제는 상점·드롭·퀘스트 보상으로만 구함
     # r_sp (활력제, ph1_c2) 삭제 2026-11-11: 기력 회복제는 상점 판매·몬스터 드롭으로 구함
     R('r_potion_l', 'wp_c1', [('m_herb', 4), ('m_bottle', 1), ('m_wolf_fang', 1)], 'c_potion_l', 1, group='potion'),
     R('r_regen_hp', 'wp_c2', [('m_herb', 3), ('m_bottle', 1)], 'c_regen_hp', 1, group='potion'),
     R('r_regen_sp', 'wp_c2', [('m_herb', 2), ('m_spore', 2), ('m_bottle', 1)], 'c_regen_sp', 1, group='potion'),
-    R('r_tonic', 'hb_a1', [('m_herb', 4), ('m_meat', 1), ('m_boar_tusk', 1)], 'f_tonic', 1, group='food'),
+    # 보원탕(2026-11-20): hb_a1 이 '탕약 나누기'(보조)로 바뀌어 제작 스킬이 없음 — 한약사(계보) Lv30 이상이면 제작 메뉴 '한약사 탕제'에서 (예전 습득 조건 그대로)
+    R('r_tonic', None, [('m_herb', 4), ('m_meat', 1), ('m_boar_tusk', 1)], 'f_tonic', 1, group='food', req=dict(job='herbalist', level=30, name='한약사 탕제')),
     R('r_lunch', 'ck1_c1', [('m_flour', 1), ('m_veg', 1), ('m_meat', 1)], 'f_lunch', 2, group='food'),
     R('r_soup', 'ck1_c2', [('m_veg', 2), ('m_meat', 1)], 'f_soup', 2, group='food'),
     R('r_course_atk', 'cf_c1', [('m_meat', 2), ('m_veg', 1), ('m_fox_fur', 0)], 'f_course_atk', 1, group='food'),

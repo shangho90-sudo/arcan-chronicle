@@ -13,6 +13,11 @@
 //  * 정리: 주인 사망·존 이동(skillrt clearTemp) -> 소환물·약초 영역·투사체·타이머 모두 정리. 영역이 끝나면 그 강화도 바로 풀림.
 //  * 보스: 속박 -> 둔화(상태 규칙 boss 'slow'), 도발 안 됨(noBossTaunt, actors.js Monster.player), 밀려나지 않음(엔진 dmg 규칙).
 //  * 약초 영역(herb: 백초 훈증진·자운화)은 현무약해가 지나가면 +2 초 — 한 시전에 영역마다 한 번(시전 기록), 영역마다 누적 최대 +4 초.
+//  * 2026-11-20 처방 5종(사용자 기획): A1 탕약 나누기(두 잔 — 남은 한 잔 보관·같은 칸 다시 누르면 내가 마심, 비용·대기는 처음 한 번),
+//    A2 보중익기탕(기력 틱 회복 — 움직여도 이어짐 + 가까운 생명 소환물 가속), A3 구풍해독탕(고른 영물 또는 나: 근접 거리만큼 일반 몬스터를
+//    한 번 밀고 보호막 한 번 — 도발 중인 수호령에게 끌린 적은 밀지 않음), C3 오령산(다섯 물길이 가운데로 끌어모으고 만나는 순간 적마다 한 번),
+//    C4 소경활혈탕(대상 하나 세 마디 — 셋째 마디에 방어력 감소 'defdown' = 주작천구 vsDefdown 이 보는 그 상태).
+//    '고른 영물' = pc.allyTarget(actors.js onClick → game.js Zone.pickAlly, 내 생명 소환물을 누르면 고르고 다시 누르면 풂).
 import { HitShape, StatusSet } from './core.js';
 
 export const HERB = {
@@ -26,7 +31,7 @@ export const HERB = {
   hop: { period: 0.36, air: 0.62, speed: 4.4 },   // 천년삼 동자: 깡충 — 공중에 있는 동안만 앞으로 감(미끄러지지 않음)
   deer: { speed: 4.0 },
   stop: 0.05, stopHeavy: 0.07, kick: [0.06, 0.08], kickHeavy: [0.09, 0.1],   // 강한 타격 순간만: 시전자·대상만 잠깐(초), 카메라 한 번 [m, 초]
-  sfxGap: { hb_root: 0.25, hb_needle: 0.12, heal: 0.9, hb_simmer: 1.2, magic: 0.3, fire: 0.2, splash: 0.2, hb_bloom: 0.5 },   // 같은 소리 반복 제한(초)
+  sfxGap: { hb_root: 0.25, hb_needle: 0.12, hb_tak: 0.08, hb_drop: 0.15, heal: 0.9, hb_simmer: 1.2, magic: 0.3, fire: 0.2, splash: 0.2, hb_bloom: 0.5 },   // 같은 소리 반복 제한(초)
 };
 const durL = (d, L) => d * (1 + 0.05 * (Math.max(1, L) - 1));
 const call = (h, m, ...a) => { try { return h && h[m] ? h[m](...a) : null; } catch (e) { console.warn('herbalfx', m, e); return null; } };
@@ -59,7 +64,7 @@ export function pickTarget(from, list, range, ownerT) {
 let UID = 0;
 export class HerbalKit {
   constructor(eng, h) { this.eng = eng; this.h = h; this.reset(); }
-  reset() { this.fields = []; this.things = []; this.timers = []; this.armor = null; this.cycle = null; this.sfxT = {}; this.log = { ext: 0 }; }
+  reset() { this.fields = []; this.things = []; this.timers = []; this.armor = null; this.cycle = null; this.cup = null; this.mark = null; this.sfxT = {}; this.log = { ext: 0 }; }
   get pc() { return this.eng.pc; }
   get G() { return this.h.G(); }
   get clock() { return this.eng.clock; }
@@ -90,28 +95,81 @@ export class HerbalKit {
   k_pre(op, ctx) { ctx.herbPre = this.fx('pre', this.pc, { what: op.what, lead: -(op.at || 0), facing: ctx.facing, aim: ctx.aim, hand: () => this.handPoint() }); }
 
   // ================================================================== A. 비전 탕약과 경락
-  k_a2(op, ctx) {   // 대주천
-    const pc = this.pc, dur = durL(op.dur, ctx.L), hv = op.haste * ctx.mult;
-    this.apply(pc, 'mpregen', dur, op.mp); this.apply(pc, 'haste', dur, hv);
+  /** 고른 내 생명 소환물(사거리 안·살아 있음) — 없으면 null */
+  allySel(range) { const pc = this.pc, a = pc.allyTarget; return a && !a.dead && a.living && this.eng.summons.includes(a) && Math.hypot(a.pos.x - pc.pos.x, a.pos.z - pc.pos.z) <= range + (a.radius || 0.4) ? a : null; }
+  /** 탕약을 받을 영물: 고른 영물 우선, 없으면 다친(체력 < 최대) 생명 소환물 중 체력 비율이 가장 낮은 것(사거리 안) */
+  allyFor(range) {
+    const sel = this.allySel(range); if (sel) return sel; const pc = this.pc; let best = null, br = 1;
+    for (const s of this.eng.summons) { if (!s || s.dead || !s.living || Math.hypot(s.pos.x - pc.pos.x, s.pos.z - pc.pos.z) > range + (s.radius || 0.4)) continue; const r = s.hp / Math.max(1, s.maxHp); if (r < br - 1e-9) { br = r; best = s; } }
+    return best;
+  }
+  k_a1(op, ctx) {   // 탕약 나누기: 한 잔은 내가 바로, 한 잔은 영물에게(날아가 닿는 순간) — 받을 영물이 없으면 남은 한 잔을 들고 있음
+    const pc = this.pc, self = pc.maxHp * op.selfHeal * ctx.mult * (1 + this.healPow()), t = this.allyFor(op.range);
+    pc.heal(self); this.sfx('hb_pour'); ctx.a1 = { self, to: t };
+    const fx = this.fx('cups', pc, { hand: () => this.handPoint(), to: t, keep: !t, hold: op.hold });
+    if (t) {
+      const from = this.handPoint(), kit = this, amt = t.maxHp * op.ally * ctx.mult;
+      const cup = { pos: { x: from.x, y: from.y, z: from.z }, dead: false, t: 0, update(dt) {
+        if (this.dead) return; this.t += dt; if (t.dead) { this.dead = true; call(fx, 'spill'); return; }
+        const dx = t.pos.x - this.pos.x, dz = t.pos.z - this.pos.z, m = Math.hypot(dx, dz), st = op.speed * dt;
+        if (m <= Math.max(0.35, st) || this.t > 3) { this.dead = true; t.heal(amt); kit.log.a1 = { ...(kit.log.a1 || {}), ally: t.kind, amount: amt, at: kit.clock }; call(fx, 'arrive', t); kit.sfx('hb_drop'); try { kit.G.ui.damageText(t.pos, '+' + Math.round(amt), 'heal'); } catch (e) { } return; }
+        this.pos = { x: this.pos.x + dx / m * st, y: this.pos.y, z: this.pos.z + dz / m * st }; call(fx, 'fly', this.pos, t);
+      }, dispose() { this.dead = true; } };
+      this.things.push(cup);
+    } else { this.cup = { t: op.hold, max: op.hold, n: self, fx }; }
+    this.log.a1 = { self, ally: t ? t.kind : null, kept: !t };
+  }
+  /** 같은 칸을 다시 누름: 남은 한 잔만 마심(기력·재사용 대기 없음, skillrt cast 첫 줄). 성공 = null */
+  drinkStored() {
+    const pc = this.pc, c = this.cup; if (!c) return '남은 잔이 없습니다'; if (pc.dead) return ''; if (pc.stunned) return '행동 불가 상태';
+    pc.heal(c.n); this.cup = null; call(c.fx, 'drink'); this.sfx('hb_drop'); this.log.drink = { n: c.n, at: this.clock };
+    try { if (pc.body && pc.body.sh && pc.body.sh.actions.hb_lift) pc.body.play('hb_lift', 1.6, true); } catch (e) { }
+    return null;
+  }
+  /** 퀵슬롯 '남은 한 잔' 표시(skillui.js): 남은 초, 없으면 0 */
+  cupLeft(id) { return id === 'hb_a1' && this.cup ? Math.max(0.01, this.cup.t) : 0; }
+  k_a2(op, ctx) {   // 보중익기탕: 잔을 드는 순간부터 every 초마다 기력 ticks 번(움직여도 이어짐) + 가까운 생명 소환물 가속
+    const pc = this.pc, dk = 1 + 0.05 * (ctx.L - 1), per = op.mp * dk, dur = durL(op.dur, ctx.L), hv = op.haste * ctx.mult;
     const near = this.summons.filter(s => s.living && Math.hypot(s.pos.x - pc.pos.x, s.pos.z - pc.pos.z) <= op.near);
     for (const s of near) this.apply(s, 'haste', dur, hv);
-    try { this.G.ui.floatText(pc.pos, '대주천', '#7af0c8', 0.9, 1.8); } catch (e) { }
-    if (this.cycle) call(this.cycle.fx, 'end');
-    this.cycle = { t: dur, fx: this.fx('cycle', pc, { dur, summons: near }) };
-    this.log.a2 = { dur, haste: hv, summons: near.length };
+    const fx = this.fx('tonic', pc, { ticks: op.ticks, every: op.every, summons: near, dur });
+    const rec = this.log.a2 = { ticks: 0, mp: 0, summons: near.length, haste: hv, dur, per };
+    for (let i = 0; i < op.ticks; i++) this.later(i * op.every, () => {
+      if (pc.dead) return; const b = pc.sp; pc.sp = Math.min(pc.maxSp, pc.sp + per); rec.ticks++; rec.mp += pc.sp - b;
+      call(fx, 'tick', i); if (i === 0) this.sfx('hb_steam');
+      try { this.G.ui.floatText(pc.pos, '기력 +' + Math.round(per), '#ffd870', 0.8, 1.9); } catch (e) { }
+    });
   }
-  k_a3(op, ctx) {   // 금강 약갑: 다시 쓰면 갱신(값은 max, 보호막은 더 큰 쪽)
-    const pc = this.pc, dur = durL(op.dur, ctx.L);
-    this.apply(pc, 'defup', dur, op.def_ * ctx.mult); this.apply(pc, 'ccres', dur, op.ccres);
-    const sp = pc.sheet && pc.sheet.final ? pc.sheet.final.shieldPower || 0 : 0, n = Math.round(pc.maxHp * (op.shield + (op.shieldLv || 0) * (ctx.L - 1)) * (1 + sp));
-    pc.addShield(n, dur);
-    try { this.G.ui.floatText(pc.pos, '금강 약갑 · 보호막 ' + n, '#9af0b0', 0.9, 1.8); } catch (e) { }
-    if (this.armor && this.armor.t > 0 && this.armor.fx) { this.armor.t = dur; call(this.armor.fx, 'refresh', dur); }
-    else this.armor = { t: dur, fx: this.fx('armor', pc, { dur }) };
-    this.log.a3 = { dur, shield: n };
+  /** 구풍해독탕 반경: 대상의 근접 공격 거리 정도(소환물 o.range + 반지름, 나 = 1.6 m), [reachMin, reachMax] */
+  reachOf(t, op) { const r = t === this.pc ? op.reachMin : ((t.o && t.o.range) || 1.6) + (t.radius || 0.4); return Math.max(op.reachMin, Math.min(op.reachMax, r)); }
+  /** 그 수호령이 끌어모은(도발 중인) 적 — actors.js Monster.player 와 같은 규칙 */
+  tauntedBy(e, s) { return !!(s && s.taunt && !s.dead && Math.hypot(e.pos.x - s.pos.x, e.pos.z - s.pos.z) < 7 && !(s.noBossTaunt && (e.isBoss || (e.def && e.def.questBoss)))); }
+  k_a3(op, ctx) {   // 구풍해독탕: 고른 영물에게 약액 한 줄기 -> 닿는 순간 잎이 바깥으로 한 번 + 보호막 / 고른 영물이 없으면 나를 중심으로 바로
+    const pc = this.pc, t = this.allySel(op.range), rec = ctx.a3 = { to: t ? t.kind : 'self', pushed: 0, kept: 0, shield: 0 };
+    const fx = this.fx('purge', pc, { hand: () => this.handPoint(), to: t });
+    if (!t) return this.purgeBurst(pc, op, ctx, fx, rec);
+    const from = this.handPoint(), kit = this;
+    this.things.push({ pos: { ...from }, dead: false, t: 0, update(dt) {
+      if (this.dead) return; this.t += dt; const tt = t.dead ? pc : t;
+      const dx = tt.pos.x - this.pos.x, dz = tt.pos.z - this.pos.z, m = Math.hypot(dx, dz), st = op.speed * dt;
+      if (m <= Math.max(0.3, st) || this.t > 3) { this.dead = true; kit.purgeBurst(tt, op, ctx, fx, rec); return; }
+      this.pos = { x: this.pos.x + dx / m * st, y: this.pos.y, z: this.pos.z + dz / m * st }; call(fx, 'fly', this.pos, tt);
+    }, dispose() { this.dead = true; call(fx, 'dispose'); } });
   }
-  /** 금강 약갑: 맞은 쪽 잎맥이 금빛으로 번쩍 (actors.js Player.takeDamage) */
-  onPlayerHit(d) { if (!this.armor || this.armor.t <= 0 || !d || d.dot || !d.source || !d.source.pos) return; const pc = this.pc; call(this.armor.fx, 'flash', norm(d.source.pos.x - pc.pos.x, d.source.pos.z - pc.pos.z)); }
+  purgeBurst(t, op, ctx, fx, rec) {
+    if (rec.done) return; rec.done = true; const pc = this.pc, R = this.reachOf(t, op), pushed = [];
+    for (const e of this.eng.targets(HitShape.circle(t.pos.x, t.pos.z, R))) {
+      if (e.dead || e.isBoss || (e.def && e.def.questBoss)) continue;
+      if (this.tauntedBy(e, t)) { rec.kept++; if (e.body && e.body.punch) e.body.punch(e.pos.x - t.pos.x, e.pos.z - t.pos.z, 0.06); continue; }   // 수호령의 대형 유지: 끌린 적은 그 자리(살짝 움찔만)
+      const dx = e.pos.x - t.pos.x, dz = e.pos.z - t.pos.z, m = Math.hypot(dx, dz) || 1;
+      e.knock = { x: dx / m * op.push * 10, z: dz / m * op.push * 10 }; e.hitReact = Math.max(e.hitReact || 0, 0.35); pushed.push(e); rec.pushed++;
+    }
+    const sp = pc.sheet && pc.sheet.final ? pc.sheet.final.shieldPower || 0 : 0, n = Math.round(t.maxHp * (op.shield + (op.shieldLv || 0) * (ctx.L - 1)) * (1 + sp));
+    t.addShield(n, op.shieldDur); rec.shield = n; rec.reach = R; rec.at = this.clock;
+    call(fx, 'burst', t, { r: R, pushed: pushed.map(e => e.pos), shieldDur: op.shieldDur }); this.sfx('hb_leaf');
+    try { this.G.ui.floatText(t.pos, '보호막 ' + n, '#ffd890', 0.85, 1.9); } catch (e) { }
+    this.log.a3 = rec;
+  }
   k_a4(op, ctx) {   // 백초 훈증진 (하나만 — 다시 쓰면 교체)
     for (const f of this.fields) if (f.kind === 'steam') this.endField(f);
     const c = this.ground(ctx.aim.x, ctx.aim.z), dur = durL(op.dur, ctx.L);
@@ -235,46 +293,43 @@ export class HerbalKit {
     this.sfx('fire'); this.impact(hit, dir, true);
     ctx.c2 = { at: c, hit: seen.size };
   }
-  k_c3(op, ctx) {   // 토행·황정지맥: 금빛 맥이 먼저 땅속을 달리고(run), 적이 선 자리마다 차례로 돌기둥·뿌리
-    const pc = this.pc, c = this.ground(ctx.aim.x, ctx.aim.z), done = new Set(), rec = { hits: 0 }; ctx.c3 = rec;
-    const fx = this.fx('leyline', pc, { from: { ...pc.pos }, c, r: op.r, run: op.run });
-    this.later(op.run, () => {
-      if (pc.dead) return;
-      const ts = this.eng.targets(HitShape.circle(c.x, c.z, op.r)).sort((a, b) => Math.hypot(a.pos.x - c.x, a.pos.z - c.z) - Math.hypot(b.pos.x - c.x, b.pos.z - c.z));
-      call(fx, 'ring', ts.length);
-      ts.forEach((t, k) => this.later(0.04 * k, () => {
-        if (pc.dead || t.dead || done.has(t) || Math.hypot(t.pos.x - c.x, t.pos.z - c.z) > op.r + (t.radius || 0.5) + 0.5) return; done.add(t);
-        const ok = this.hit(t, op.coef, ctx, { elem: 'earth' }); rec.hits++;
-        call(fx, 'pillar', { x: t.pos.x, y: t.pos.y || 0, z: t.pos.z }, ok);
-        if (ok) this.impact([t], norm(t.pos.x - c.x, t.pos.z - c.z), false);
-      }));
-      this.sfx('hb_root');
-      const f = this.addField({ kind: 'ward', c, r: op.r, life: durL(op.ward, ctx.L), grow: 0, tick: 0.25, next: 0, op, ctx });
-      f.fx = fx;
-    });
+  k_c3(op, ctx) {   // 오령산: 다섯 약인 -> 물길이 가운데로(run 초) 일반 몬스터를 끌어당김 -> 만나는 순간 마지막 물결(적마다 한 번)
+    const pc = this.pc, c = this.ground(ctx.aim.x, ctx.aim.z), f = ctx.facing, a0 = Math.atan2(f.z, f.x), kit = this;
+    const seals = []; for (let i = 0; i < 5; i++) { const a = a0 + i * Math.PI * 2 / 5; seals.push(this.ground(c.x + Math.cos(a) * op.r, c.z + Math.sin(a) * op.r)); }
+    const rec = ctx.c3 = { pulled: new Set(), hits: 0, dmg: new Map(), at: null, c }; this.log.c3 = rec;
+    const fx = this.fx('wuling', c, { r: op.r, run: op.run, seals }); this.sfx('hb_seal');
+    const imm = e => e.isBoss || (e.def && e.def.questBoss);
+    this.things.push({ t: 0, dead: false, update(dt) {
+      if (this.dead) return; this.t += dt; if (pc.dead) { this.dead = true; call(fx, 'end'); return; }
+      const left = Math.max(0.06, op.run - this.t);
+      for (const e of kit.eng.targets(HitShape.circle(c.x, c.z, op.r + 0.4))) {   // 끌어당김(보스·퀘스트 보스는 강제 이동 면역)
+        if (imm(e)) continue; const dx = c.x - e.pos.x, dz = c.z - e.pos.z, m = Math.hypot(dx, dz), stop = op.stop + (e.radius || 0.5) * 0.6;
+        if (m <= stop) { e.knock = { x: 0, z: 0 }; continue; }
+        const v = Math.min(op.vmax, (m - stop) / left); e.knock = { x: dx / m * v, z: dz / m * v }; rec.pulled.add(e);
+      }
+      call(fx, 'flow', Math.min(1, this.t / op.run));
+      if (this.t >= op.run) { this.dead = true; kit.wulingWave(c, op, ctx, fx, rec); }
+    }, dispose() { this.dead = true; call(fx, 'end'); } });
   }
-  k_c4(op, ctx) {   // 금행·백호유침: 대상마다 침 per개(조금씩 다른 곡선으로 모임), 가운데 대상 stackN번째 침 -> 방어력 감소, 마지막 침 -> 호랑이 발톱
-    const pc = this.pc, f = ctx.facing, from = this.handPoint();
-    const cone = HitShape.cone(pc.pos.x, pc.pos.z, f.x, f.z, op.r, op.ang);
-    const axis = t => Math.abs((t.pos.x - pc.pos.x) * f.z - (t.pos.z - pc.pos.z) * f.x);
-    const ts = this.eng.targets(cone).sort((a, b) => axis(a) - axis(b)).slice(0, op.maxT), centre = ts[0] || null;
-    const rec = { hits: new Map(), defdown: false, needles: 0 }; ctx.c4 = rec;
-    const fx = this.fx('needles', from, { f, pre: ctx.herbPre, n: Math.max(9, ts.length * op.per) });
-    if (!ts.length) { call(fx, 'miss', { f, r: op.r, ang: op.ang }); this.sfx('hb_needle'); return; }
-    let centreHits = 0;
-    ts.forEach((t, j) => { for (let k = 0; k < op.per; k++) {
-      const flight = Math.hypot(t.pos.x - from.x, t.pos.z - from.z) / op.speed, at = flight + k * op.gap + j * 0.02, curve = (k - (op.per - 1) / 2) * 0.55 + (j % 2 ? 0.2 : -0.2);
-      rec.needles++;
-      const nd = call(fx, 'needle', t, { at, curve, lastOnCentre: t === centre && k === op.per - 1 });
-      this.later(at, () => {
-        let tt = t; if (tt.dead) tt = ts.find(x => !x.dead) || null;   // 대상이 죽으면 남은 침은 다른 대상에게(없으면 사라짐)
-        if (!tt || pc.dead) { call(nd, 'fade'); return; }
-        const ok = this.hit(tt, op.coef, ctx, { elem: 'metal' }); rec.hits.set(tt, (rec.hits.get(tt) || 0) + (ok ? 1 : 0));
-        call(nd, 'land', tt, ok); this.sfx('hb_needle');
-        if (ok && tt === centre && !tt.dead) { centreHits++; if (centreHits === op.stackN) { this.apply(tt, 'defdown', op.defdownDur, op.defdown); rec.defdown = true; call(fx, 'mark', tt); } }
-        if (tt === centre && k === op.per - 1) { call(fx, 'claw', tt, f); if (ok) this.impact([tt], f, false); }
-      });
-    } });
+  wulingWave(c, op, ctx, fx, rec) {   // 물길이 만나는 순간: 범위 안 적마다 한 번(물길 다섯이 겹쳐도)
+    const hit = [], seen = new Set(); rec.at = this.clock;
+    for (const t of this.eng.targets(HitShape.circle(c.x, c.z, op.r))) { if (seen.has(t)) continue; seen.add(t);
+      const before = t.taken ? t.taken.length : 0; void before; const ok = this.hit(t, op.coef, ctx, { elem: 'water' }); rec.hits++; rec.dmg.set(t, (rec.dmg.get(t) || 0) + 1); if (ok) hit.push(t); }
+    call(fx, 'surge', hit.map(t => t.pos)); this.sfx('hb_surge'); this.impact(hit, ctx.facing, true);
+  }
+  k_c4(op, ctx) {   // 소경활혈탕: 대상 몸 위 맥로 — 세 마디가 times 초에 차례로(탁·탁·반 박자 뒤 크게), 셋째 = 큰 피해 + 방어력 감소
+    const pc = this.pc, t = ctx.tgt || this.eng.targetFor(ctx.d); const rec = ctx.c4 = { nodes: [], defdown: false }; this.log.c4 = rec;
+    if (!t) return;
+    const fx = this.fx('meridian', t, { times: op.times, from: this.handPoint() });
+    op.times.forEach((at, i) => this.later(at, () => {
+      const last = i === op.times.length - 1;
+      if (pc.dead || t.dead || Math.hypot(t.pos.x - pc.pos.x, t.pos.z - pc.pos.z) > op.lose) { call(fx, 'fade'); rec.nodes.push({ i, ok: false, gone: true }); return; }
+      const ok = this.hit(t, op.coefs[i], ctx, { elem: 'metal' });
+      rec.nodes.push({ i, ok, at: this.clock, pos: { ...t.pos } });
+      if (last && ok && !t.dead) { this.apply(t, 'defdown', op.defdownDur, op.defdown); rec.defdown = true; }
+      call(fx, 'node', i, ok, last); this.sfx(last ? 'hb_node' : 'hb_tak');
+      if (ok) this.impact([t], norm(t.pos.x - pc.pos.x, t.pos.z - pc.pos.z), last);
+    }));
   }
   k_c5(op, ctx) {   // 수행·현무약해: 넓고 낮은 물결이 앞으로 — 적마다 한 번, 지나간 약초 영역마다 한 번 연장
     const pc = this.pc, o = { ...pc.pos }, f = ctx.facing, done = new Set(), rec = new Set(), kit = this; ctx.c5 = { hits: 0, ext: [] };
@@ -323,13 +378,17 @@ export class HerbalKit {
     this.tickFields(dt);
     if (this.armor) { this.armor.t -= dt; if (this.armor.t <= 0 || !this.pc.status.has('defup')) { call(this.armor.fx, 'end'); this.armor = null; } }
     if (this.cycle) { this.cycle.t -= dt; if (this.cycle.t <= 0) { call(this.cycle.fx, 'end'); this.cycle = null; } }
+    if (this.cup) { this.cup.t -= dt; if (this.cup.t <= 0 || this.pc.dead) { call(this.cup.fx, 'expire'); this.cup = null; } }   // 남은 한 잔: 보관 시간이 끝나면 원래 아이콘
+    { const pc = this.pc, a = pc.allyTarget; if (a && (a.dead || !this.eng.summons.includes(a))) pc.allyTarget = null;   // 고른 영물 표시(발밑 금빛 고리)
+      if (pc.allyTarget !== (this.mark && this.mark.s)) { if (this.mark) call(this.mark.fx, 'end'); this.mark = pc.allyTarget ? { s: pc.allyTarget, fx: this.fx('allyMark', pc.allyTarget, {}) } : null; } }
     // 신농백초원: 영역 안의 소환물만 강화 — 들어오고 나가는 그 프레임에 켜고 끔
     for (const s of this.summons) { const b = summonBuff(s, this.fields); if (b !== s.herbBuff) { s.herbBuff = b; call(s.view, 'buff', b > 0); } }
   }
   clear() {
     for (const t of this.things) t.dispose && t.dispose();
     for (const f of this.fields) this.endField(f);
-    if (this.armor) call(this.armor.fx, 'end'); if (this.cycle) call(this.cycle.fx, 'end');
+    if (this.armor) call(this.armor.fx, 'end'); if (this.cycle) call(this.cycle.fx, 'end'); if (this.cup) call(this.cup.fx, 'expire'); if (this.mark) call(this.mark.fx, 'end');
+    try { if (this.pc) this.pc.allyTarget = null; } catch (e) { }
     this.reset();
   }
 }
@@ -364,13 +423,15 @@ export class HerbSummon {
   get stunned() { return this.status.stunned; }
   dist(o) { return Math.hypot(this.pos.x - o.pos.x, this.pos.z - o.pos.z); }
   takeDamage(d) {
-    if (this.dead || d.missed) return; const a = Math.max(0, d.amount || 0); this.hp -= a;
+    if (this.dead || d.missed) return; let a = Math.max(0, d.amount || 0);
+    if (this.shield > 0 && !d.dot) { const k = Math.min(this.shield, a); this.shield -= k; a -= k; if (this.view && this.view.shieldHit) this.view.shieldHit(); if (a <= 0) { try { this.kit.G.ui.floatText(this.pos, '흡수', '#8ce6ff', 0.8); } catch (e) { } return; } }   // 구풍해독탕 보호막
+    this.hp -= a;
     try { this.kit.G.ui.floatText(this.pos, Math.round(a) + '', '#ffb0b0', 0.8); } catch (e) { }
     if (this.view && this.view.hurt) this.view.hurt();
     if (this.hp <= 0) this.vanish(false);
   }
   heal(n) { this.hp = Math.min(this.maxHp, this.hp + n); }
-  addShield() { }
+  addShield(n, d) { this.shield = Math.max(this.shield || 0, n); this.shieldT = d; }
   setFacing(x, z) { const m = Math.hypot(x, z); if (m > 1e-4) this.facing = { x: x / m, z: z / m }; }
   get body() { return null; }
   get xz() { return this.pos; }
@@ -390,6 +451,7 @@ export class HerbSummon {
     if (this.dead) return;
     const pc = this.kit.pc, o = this.o; this.t += dt; this.age += dt; this.life -= dt;
     if (this.life <= 0 || pc.dead || pc.zone !== this.zone) return this.vanish(pc.zone !== this.zone);
+    if (this.shieldT > 0) { this.shieldT -= dt; if (this.shieldT <= 0) this.shield = 0; }
     this.status.tick(dt, s => { if (!this.dead) this.takeDamage({ amount: Math.max(1, s.value), dot: true }); }, s => this.heal(s.value));
     if (this.dead) return;
     // 주인과 너무 멀어지거나 높이가 다르면(보스 전장 결계) 주인 곁에서 다시 자람
@@ -472,8 +534,9 @@ export function herbText(d, L) {
   const ult = d.type === 'ultimate', m = 1 + (ult ? 0.25 : 0.12) * (L - 1), o = (d.ops || []).find(x => x.fn === 'herb' && x.k !== 'pre'); if (!o) return '';
   const D = v => sec(durL(v, L)), out = [];
   switch (o.k) {
-    case 'a2': out.push(`기력 회복 +${o.mp}/초`, `이동 속도 +${pct(o.haste * m)}(나와 ${o.near} m 안 생명 소환물)`, `지속 ${D(o.dur)}`); break;
-    case 'a3': out.push(`방어력 +${pct(o.def_ * m)}`, `경직 저항 ${pct(o.ccres)}`, `보호막 최대 HP의 ${pct(o.shield + (o.shieldLv || 0) * (L - 1))}`, `지속 ${D(o.dur)}(다시 쓰면 갱신)`); break;
+    case 'a1': out.push(`내 잔: 최대 HP의 ${pct(o.selfHeal * m)} 회복`, `영물 잔: 그 영물 최대 HP의 ${pct(o.ally * m)} 회복(사거리 ${o.range} m — 고른 영물, 없으면 가장 다친 영물)`, `받을 영물이 없으면 남은 한 잔 ${sec(o.hold)} 보관 — 같은 칸을 다시 누르면 내가 마심(최대 HP의 ${pct(o.selfHeal * m)}, 기력·재사용 대기 없음)`); break;
+    case 'a2': { const dk = 1 + 0.05 * (L - 1); out.push(`기력 +${Math.round(o.mp * dk)} × ${o.ticks}번(${sec(o.every)} 간격, 총 ${Math.round(o.mp * dk * o.ticks)} — 움직여도 이어짐)`, `나와 ${o.near} m 안 생명 소환물 이동 속도 +${pct(o.haste * m)} ${D(o.dur)}`); break; }
+    case 'a3': out.push(`고른 영물(사거리 ${o.range} m) 또는 나를 중심으로`, `반경 = 대상 근접 거리(${o.reachMin}~${o.reachMax} m) 안 일반 몬스터 ${o.push} m 밀어냄(보스 제외, 한 번)`, `보호막 대상 최대 HP의 ${pct(o.shield + (o.shieldLv || 0) * (L - 1))} ${sec(o.shieldDur)}(한 번)`, '도발 중인 녹각수호령: 끌린 적은 밀지 않음'); break;
     case 'a4': out.push(`반경 ${o.r} m`, `${sec(o.tick)}마다 최대 HP의 ${pct(o.heal * m)} 회복 + 해로운 상태 1개 정화(나·생명 소환물)`, `지속 ${D(o.dur)}`, '현무약해로 최대 +4초'); break;
     case 'a5': out.push(`흡수 순간 최대 HP의 ${pct(o.heal * m)} 회복`, `공격력 +${pct(o.atk * m)} · 방어력 +${pct(o.def_ * m)} · 회복량 +${pct(o.healup)}`, `지속 ${D(o.dur)}`); break;
     case 'b1': out.push(`뿌리 물기 ${pct(o.coef * m)}/${sec(o.rate)} · 사거리 ${o.range} m`, `속박 ${sec(o.root)}(보스는 둔화)`, `${D(o.life)} · 최대 ${o.limit}개`); break;
@@ -483,8 +546,8 @@ export function herbText(d, L) {
     case 'b5': out.push(`반경 ${o.r} m · 시전 순간 뿌리 ${pct(o.coef * m)}`, `적 이동 속도 -${pct(Math.min(0.7, o.slow * m))}`, `안의 내 식물·영물 소환물 피해 +${pct(Math.min(HERB.buffCap, o.empower))}`, `지속 ${D(o.dur)}`); break;
     case 'c1': out.push(`직선 ${o.len} m · ${pct(o.coef * m)}(적마다 1번)`, `속박된 적 ×${o.vsRoot}`); break;
     case 'c2': out.push(`${pct(o.coef * m)} · 날개 폭 ${o.wing} m`, `화상 ${sec(o.burnDur)}`, `방어력 감소 대상 ×${o.vsDefdown}`); break;
-    case 'c3': out.push(`반경 ${o.r} m · ${pct(o.coef * m)}(적마다 1번)`, `지맥 안 받는 피해 -${pct(o.dr)} ${D(o.ward)}`); break;
-    case 'c4': out.push(`부채꼴 ${o.r} m ${o.ang}° · 대상마다 침 ${o.per}개 × ${pct(o.coef * m)} (총 ${pct(o.coef * o.per * m)})`, `최대 ${o.maxT}명`, `가운데 적 ${o.stackN}번째 침: 방어력 -${pct(o.defdown)} ${sec(o.defdownDur)}`); break;
+    case 'c3': out.push(`반경 ${o.r} m · 약인 5개`, `${sec(o.run)} 동안 일반 몬스터를 가운데로 끌어당김(보스 제외)`, `물길이 만나는 순간 ${pct(o.coef * m)}(적마다 1번)`); break;
+    case 'c4': out.push(`대상 하나 세 마디: ${o.coefs.map(c => pct(c * m)).join(' · ')} (총 ${pct(o.coefs.reduce((a, b) => a + b, 0) * m)})`, `셋째 마디: 방어력 -${pct(o.defdown)} ${sec(o.defdownDur)}(주작천구 추가 피해 조건)`); break;
     case 'c5': out.push(`물결 ${o.len} m × ${o.w} m · ${pct(o.coef * m)}`, `밀어냄(보스 제외) · 둔화 ${pct(o.slow * m)} ${sec(o.slowDur)}`, `지나간 약초 영역 +${sec(o.extend)}(영역마다 최대 +${sec(o.extendCap)})`); break;
   }
   return out.join(' · ');

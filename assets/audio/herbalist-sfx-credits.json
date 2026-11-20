@@ -95,5 +95,19 @@
     "date": "2026-11-16"
    }
   }
+ },
+ "synthesized2": {
+  "provider": "synthesized (tools/audio/herbal2_sfx.py, numpy + scipy, fixed seed)",
+  "generatedOn": "2026-11-20",
+  "note": "처방 5종(탕약 나누기·보중익기탕·구풍해독탕·소경활혈탕·오령산) — Runway 크레딧 0",
+  "assets": [
+   "sfx_hb_pour.mp3",
+   "sfx_hb_steam.mp3",
+   "sfx_hb_leaf.mp3",
+   "sfx_hb_tak.mp3",
+   "sfx_hb_node.mp3",
+   "sfx_hb_seal.mp3",
+   "sfx_hb_surge.mp3"
+  ]
  }
 }

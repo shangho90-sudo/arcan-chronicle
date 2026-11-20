@@ -158,12 +158,22 @@ export function advanceBlock(data, sheet, quests, jobId) {
 export function craftSuccessRate(sheet, tier = 1) {
   return clamp(1.06 - 0.06 * Math.max(1, tier) + ((sheet.final && sheet.final.craftRate) || 0), 0.4, 1);
 }
+/** 스킬 없는 직업 제작법(recipe.req = {job, level, name}, 2026-11-20 보원탕 — 한약사 계보 + 캐릭터 레벨): 막는 이유 또는 null */
+export function recipeBlock(data, book, recipe) {
+  const q = recipe && recipe.req; if (!q) return null;
+  if (!book.lineage.includes(q.job)) return (data.job(q.job)?.name || q.job) + ' 제작법입니다';
+  if ((book.p.level | 0) < (q.level | 0)) return `캐릭터 레벨 ${q.level} 필요`;
+  return null;
+}
+/** 지금 제작 메뉴에 보이는 직업 제작법(스킬 없는 것) */
+export function jobRecipes(data, book) { return (data.recipes || []).filter(r => !r.skill && r.req && !recipeBlock(data, book, r)); }
 /** rng: bonus / material-return rolls; optional 7th argument: success-roll rng (default Math.random) */
 export function craft(data, sheet, book, recipe, times = 1, rng = Math.random) {
   times = clamp(times | 0, 1, 99);
   const bag = sheet.bag, inv = sheet.p.inventory;
   const lv = recipe.skill ? book.level(recipe.skill) : 1;
   if (recipe.skill && !book.usable(recipe.skill)) return { err: '제작 스킬을 배워야 합니다' };
+  { const rb = recipeBlock(data, book, recipe); if (rb) return { err: rb }; }
   if (lv < (recipe.minLv || 1)) return { err: `제작 스킬 Lv${recipe.minLv} 필요` };
   const costMul = 1 - Math.min(0.3, book.passive('craftDiscount'));
   const need = recipe.inputs.map(x => ({ item: x.item, count: x.count * times }));
