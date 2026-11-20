@@ -1,6 +1,6 @@
 // Game orchestrator + zone runtime. Port of Boot/ArcanGame.cs and World/ZoneRuntime.cs.
 import { applyGfxQuality, buildTownRemaster, buildFieldRemaster } from './remaster.js';
-import { questExp, josa, GameData, SaveStore, SAVE_SLOTS, saveSlotKey, CharacterSheet, QuestLog, QS, ZoneGeometry, NavGrid, newProfile, DEG, clamp, HitShape, levelGapExp, monsterAtLevel, discoverTown, payWarp, warpPrice, zoneLock, questCategory, questTitle } from './core.js';
+import { questExp, josa, GameData, SaveStore, SAVE_SLOTS, saveSlotKey, CharacterSheet, QuestLog, QS, ZoneGeometry, NavGrid, newProfile, DEG, clamp, HitShape, levelGapExp, monsterAtLevel, discoverTown, payWarp, warpPrice, zoneLock, questCategory, questTitle, jobOffers, jobMastersFor } from './core.js';
 import { Renderer, Fx, TelegraphView, TG_TIME, loadSheet, preloadTextures, THREE, T } from './render.js';
 import { Player, Monster, Boss, Npc, Loot, bindGame as bindActors } from './actors.js';
 import { preloadDrops } from './dropfx.js';
@@ -578,8 +578,9 @@ class Game {
       if (st === QS.Completable && turnIn === npcId) return "ready";
       if (st === QS.Active) {
         const pr = Q.find(q.id);
-        const jm = (this.data.npcs[npcId] || {}).role === "jobmaster";       // 전직 목표 = 전직 마스터에게 가기
-        if (q.objectives.some((o, i) => (o.type === "talk" && o.target === npcId || o.type === "job" && jm) && Q.current(q, i, pr) < o.count)) r = "talk";
+        // 전직 목표 = 다음 전직을 해 줄 마스터에게 가기 (1차 = 길드 회관 다섯 마스터, 2차 = 내 1차 직업에서 갈라지는 2차 마스터만)
+        const jm = o => jobMastersFor(this.data, this.profile, o.target).includes(npcId);
+        if (q.objectives.some((o, i) => (o.type === "talk" && o.target === npcId || o.type === "job" && jm(o)) && Q.current(q, i, pr) < o.count)) r = "talk";
         else if (turnIn === npcId && !r) r = "active";
       } else if (st === QS.Available && q.giver === npcId && r !== "talk") r = "avail";
     }
@@ -594,8 +595,16 @@ class Game {
       const st = Q.stateOf(q); if (st === QS.Completed || st === QS.Locked) continue;
       let zone = S.gz;
       if (st === QS.Completable) zone = S.tz;
-      else if (st === QS.Active) { const pr = Q.find(id), i = q.objectives.findIndex((o, k) => Q.current(q, k, pr) < o.count); zone = (i >= 0 && S.oz[i]) || S.tz; }
-      out.push({ quest: q, zone }); if (out.length >= 2) break;
+      let zones = null;
+      if (st === QS.Active) {
+        const pr = Q.find(id), i = q.objectives.findIndex((o, k) => Q.current(q, k, pr) < o.count); zone = (i >= 0 && S.oz[i]) || S.tz;
+        // 전직 목표: 갈 곳 = 내 직업의 다음 전직 마스터가 있는 마을(2차 마스터는 여러 마을에 흩어짐, 2026-11-20)
+        if (i >= 0 && q.objectives[i].type === "job") {
+          zones = [...new Set(jobMastersFor(this.data, this.profile, q.objectives[i].target).map(n => this.data.npcs[n].town || zone))];
+          if (zones.length) zone = zones[0]; else zones = null;
+        }
+      }
+      out.push(zones ? { quest: q, zone, zones } : { quest: q, zone }); if (out.length >= 2) break;
     }
     return out;
   }
@@ -645,16 +654,28 @@ class Game {
     while (opts.length > 4) opts.splice(opts.length - 2, 1);
     let line = npc.lines && npc.lines.length ? npc.lines[Math.floor(Math.random() * npc.lines.length)] : "...";
     if (greeting && this.audio.npcVoices[npc.id]) line = this.audio.npcVoices[npc.id].line;
-    if (npc.role === "jobmaster" && this.profile.job === "novice") line += `<br><span class="tealtxt">'[전직]'을 고르면 ${this.data.job(npc.job).name}(이)가 될 수 있어요.</span>`;
+    if (npc.role === "jobmaster") line += this.jobHint(npc);
     this.ui.showDialog(npc, line, opts);
   }
   /** jobs this master can turn you into: a novice → the master's 1st job; the master's own 1st job → its 2nd-job branches */
-  jobTargets(npc) {
-    if (npc.role !== "jobmaster" || !npc.job || !this.profile) return [];
-    const cur = this.profile.job;
-    if (cur === "novice") return this.data.job(npc.job) ? [npc.job] : [];
-    if (cur === npc.job) return this.data.jobList.filter(j => j.tier === 2 && j.parent === cur).map(j => j.id);
-    return [];
+  jobTargets(npc) { return jobOffers(this.data, this.profile, npc); }   // 2026-11-20: 2차는 직업마다 따로 있는 2차 마스터만 (core.js jobOffers)
+  /** 전직 마스터 대사 아래 안내 한 줄: 전직할 수 있으면 '[전직]' 안내, 1차 마스터는 2차 마스터가 있는 곳, 다른 직업이면 누구를 맡는지 */
+  jobHint(npc) {
+    const D = this.data, mj = D.job(npc.job), cur = D.job(this.profile.job) || {}, tip = t => `<br><span class="tealtxt">${t}</span>`;
+    if (!mj) return "";
+    const offer = this.jobTargets(npc);
+    if (offer.length) return tip(`'[전직]'을 고르면 ${mj.name}${josa(mj.name, "이", "가")} 될 수 있어요.`);
+    const where = id => { const n = D.npcs[id], z = n && D.zones[n.town]; return n ? `${z ? z.name + "의 " : ""}${n.name}` : ""; };
+    if (mj.tier === 1 && cur.tier === 1 && cur.id === mj.id) {          // 내 1차 마스터: 2차 전직은 이제 각 2차 마스터에게
+      const list = D.jobList.filter(j => j.tier === 2 && j.parent === cur.id).map(j => { const m = Object.values(D.npcs).find(n => n.role === "jobmaster" && n.job === j.id); return m ? `${j.name}${josa(j.name, "은", "는")} ${where(m.id)}` : ""; }).filter(Boolean);
+      return list.length ? tip(`2차 전직은 각 마스터에게 직접 받아야 해요 — ${list.join(", ")}.`) : "";
+    }
+    if (mj.tier === 2) {
+      const par = D.job(mj.parent);
+      if (cur.id === mj.id) return tip(`같은 ${mj.name}${josa(mj.name, "이", "가")} 되었군요. 반가워요.`);
+      return tip(`저는 ${mj.name} 마스터예요. ${par ? par.name + "만" : ""} Lv30에 ${mj.name}${josa(mj.name, "으로", "로")} 전직할 수 있어요.`);
+    }
+    return "";
   }
   /** "…(으)로 전직하시겠습니까?" — 한 번 더 묻고 전직 (조건이 안 되면 이유만 보여 줌) */
   confirmJob(npc, id) {

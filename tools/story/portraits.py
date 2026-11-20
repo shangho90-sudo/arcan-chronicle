@@ -111,6 +111,28 @@ CAST = {
                   "coat over cream clothes, a paint palette and long brush, gentle smile."),
     'silvern_hunter': ('라엘', '실베른 사냥꾼', ['라엘'], "RAEL, a keen-eyed hunter of the Silvern forests, a lean young woman. Short silver-ash hair, forest-green hooded "
                   "cloak, brown leather jerkin, a longbow and quiver of arrows, a wolf-fang charm at her neck, cool focused gaze."),
+    # 2026-11-20 2차 전직 마스터 7명(여러 마을에 흩어짐, tools/world/jobmasters.py) — 다른 메시를 색만 바꿔 빌려 써서 글로만
+    'master2_western_pharmacist': ('세린', '양약사 마스터', ['세린'], "SERIN, the master of precise western alchemy-pharmacy, a sharp elegant woman in her 30s. Sleek dark teal bob "
+                  "hair, thin gold-rimmed round glasses, crisp white long lab coat with gold buttons over a navy vest, a glowing crystal capsule vial "
+                  "held between two fingers, confident analytical smile."),
+    'master2_herbalist': ('운학', '한약사 마스터', ['운학'], "UNHAK, the master of herbal medicine, a kindly old man with a long white goatee and topknot. Flowing moss-green and "
+                  "cream layered robe with wide sleeves, a jade pendant, a bundle of dried ginseng roots and herbs in one hand, a small bronze "
+                  "medicine pot at his side, wise twinkling eyes."),
+    'master2_engineer': ('가온', '엔지니어 마스터', ['가온'], "GAON, the master engineer of magitech machines, an energetic young woman. Short copper-red hair with brass "
+                  "goggles pushed up on her forehead, soot smudge on one cheek, teal work jacket with rolled sleeves over a dark apron with tool "
+                  "pockets, one brass mechanical gauntlet, a tiny clockwork drone on her shoulder, bold grin."),
+    'master2_chef': ('해담', '쉐프 마스터', ['해담'], "HAEDAM, the grand chef master, a jolly broad-shouldered man in his 40s. Neat dark mustache, tall pleated white "
+                  "chef toque with a red ribbon, double-breasted white chef coat with gold buttons and a crimson neckerchief, holding a silver "
+                  "cloche tray with a flame flicker, proud warm smile."),
+    'master2_designer': ('나래', '디자이너 마스터', ['나래'], "NARAE, the haute-couture designer master, a glamorous graceful woman. Long wavy lavender hair in an elegant side "
+                  "braid, violet tailored long coat with silver embroidery and a high collar, a measuring tape draped around her neck, a jeweled "
+                  "brooch, silk ribbon fluttering, poised charming smile."),
+    'master2_painter': ('현묵', '화가 마스터', ['현묵'], "HYEONMUK, the master painter of living ink, a calm artistic man in his 30s. Long black hair tied loosely, ink-black "
+                  "and white flowing scholar coat splashed with vivid red, blue and gold paint, a huge calligraphy brush in hand, a small ink "
+                  "dragon curling around his arm, serene focused gaze."),
+    'master2_musician': ('하율', '음악가 마스터', ['하율'], "HAYUL, the maestro of music, a gentle charismatic young man. Wavy honey-blond hair, deep royal-blue tailcoat with "
+                  "gold trim and a white cravat, a slender silver conductor's baton in one hand, a small golden lyre with a crescent moon at his "
+                  "side, glowing musical notes drifting, warm smile."),
 }
 
 

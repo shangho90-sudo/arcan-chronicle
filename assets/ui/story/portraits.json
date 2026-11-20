@@ -273,6 +273,55 @@
       "names": [
         "라엘"
       ]
+    },
+    "master2_western_pharmacist": {
+      "file": "master2_western_pharmacist.webp",
+      "facing": "right",
+      "names": [
+        "세린"
+      ]
+    },
+    "master2_herbalist": {
+      "file": "master2_herbalist.webp",
+      "facing": "right",
+      "names": [
+        "운학"
+      ]
+    },
+    "master2_engineer": {
+      "file": "master2_engineer.webp",
+      "facing": "right",
+      "names": [
+        "가온"
+      ]
+    },
+    "master2_chef": {
+      "file": "master2_chef.webp",
+      "facing": "right",
+      "names": [
+        "해담"
+      ]
+    },
+    "master2_designer": {
+      "file": "master2_designer.webp",
+      "facing": "right",
+      "names": [
+        "나래"
+      ]
+    },
+    "master2_painter": {
+      "file": "master2_painter.webp",
+      "facing": "right",
+      "names": [
+        "현묵"
+      ]
+    },
+    "master2_musician": {
+      "file": "master2_musician.webp",
+      "facing": "right",
+      "names": [
+        "하율"
+      ]
     }
   }
 }

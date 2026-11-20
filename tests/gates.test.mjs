@@ -44,7 +44,15 @@ for (const sid of M.order) {
     const mons = o.type === 'kill' && !o.spawn ? [o.target] : o.drop ? o.drop.from : [];
     if (mons.length && !o.target.startsWith('boss_')) ok(mons.some(m => [...(lives[m] || [])].some(z => R.has(z))), `${sid} 목표 몬스터 ${mons} 가 열린 지역에 있음`);
     if (o.type === 'job' && o.target === 'tier2')       // 2차 전직 시험(qt_*) 사냥감
-      for (const t of d.questList.filter(t => /^qt_/.test(t.id))) for (const to of t.objectives) if (to.type === 'kill') ok([...(lives[to.target] || [])].some(z => R.has(z)), `${sid} 전직 시험 ${to.target} 사냥터 열림`);
+    { for (const t of d.questList.filter(t => /^qt_/.test(t.id))) for (const to of t.objectives) if (to.type === 'kill') ok([...(lives[to.target] || [])].some(z => R.has(z)), `${sid} 전직 시험 ${to.target} 사냥터 열림`);
+      // 2026-11-20: 2차 전직 마스터 7명(여러 마을) — 이 단계에서 모두 열린 길로 닿음, 전직 시험의 주는/완료 NPC = 그 마스터
+      for (const j of d.jobList.filter(j => j.tier === 2)) {
+        const m = Object.values(d.npcs).find(x => x.role === 'jobmaster' && x.job === j.id); ok(m, `${j.id} 2차 마스터 있음`);
+        const at = Object.values(Z).filter(z => (z.npcs || []).some(x => x.npc === m.id)).map(z => z.id);
+        eq(at, [m.town], `${m.id} 는 ${m.town} 에 한 명`); ok(R.has(m.town), `${sid} 2차 마스터 ${m.name}(${m.town}) 에 열린 길로 갈 수 있음`);
+        const tq = d.quests[j.trialQuest]; eq([tq.giver, tq.turnIn], [m.id, m.id], `${j.trialQuest} 은 ${m.name}에게서`);
+      }
+      ok(S.oz[i] && R.has(S.oz[i]), `${sid} 전직 목표 지역 ${S.oz[i]} 열림`); }
   });
   for (const z of need) ok(R.has(z), `${sid} ${q.name}: ${z} 에 열린 길로 갈 수 있음`);
   // 이야기 NPC(주는/완료/대화)는 그 단계 동안 열린 곳에 서 있음
@@ -78,7 +86,16 @@ eq(d.zones.kairion_capital.unlock, 'q_job1'); eq(d.quests.q_job1.prereq, ['mq00h
   eq(zoneLock(d, p, 'kairion_capital').text, '메인 퀘스트 서장 「첫 전직」을 진행해야 들어갈 수 있습니다');
   p.quests.push({ id: 'mq00h', state: 'completed', counts: [] });
   ok(!zoneLock(d, p, 'kairion_capital'), '서장을 마치면 카이리온 열림 (Lv10 전직)');
-  ok(Object.values(d.npcs).filter(x => x.role === 'jobmaster').every(m => Object.values(Z).some(z => z.id === 'kairion_capital' && (z.npcs || []).some(x => x.npc === m.id))), '전직 마스터는 카이리온에');
+  const jms = Object.values(d.npcs).filter(x => x.role === 'jobmaster'), tier = m => d.job(m.job).tier;
+  ok(jms.filter(m => tier(m) === 1).length === 5 && jms.filter(m => tier(m) === 1).every(m => (Z.kairion_capital.npcs || []).some(x => x.npc === m.id)), '1차 전직 마스터 5명은 카이리온에');
+  // 2026-11-20 사용자 '2차 전직은 직업별로 따로 전직 npc 만들고 여러 마을에 흩어져서': 2차 마스터 7명, 직업마다 한 명, 5곳 이상 마을
+  const m2 = jms.filter(m => tier(m) === 2);
+  eq(m2.map(m => m.job).sort(), d.jobList.filter(j => j.tier === 2).map(j => j.id).sort(), '2차 직업마다 마스터 한 명');
+  const towns2 = new Set(m2.map(m => m.town)); ok(towns2.size >= 5, '2차 마스터는 여러 마을에: ' + [...towns2].join(','));
+  for (const m of m2) { ok(Z[m.town] && Z[m.town].kind === 'town', m.id + ' 마을에 섬'); ok(m.name && m.title === d.job(m.job).name + ' 마스터' && m.lines.length, m.id + ' 이름·직함·대사'); }
+  const idx = id => M.order.indexOf(id);
+  for (const m of m2) ok(d.zones[m.town].unlock == null || idx(d.zones[m.town].unlock) < idx('mq22a'), `${m.town} 은 2차 전직 단계(mq22a) 전에 열림`);
+  ok(d.quests.mq22a.objectives.some(o => o.type === 'job' && o.target === 'tier2') && !/카이리온/.test(d.quests.mq22a.objectives[0].text), 'mq22a 전직 목표 문구는 내 직업 2차 마스터');
   ok(!d.quests.mq07c.objectives.some(o => o.type === 'job'), '7장 ③은 더 이상 전직 목표가 아님(중복 없음)');
   eq(d.questList.filter(q => questCategory(q) === 'main' && q.objectives.some(o => o.type === 'job' && o.target === 'any')).map(q => q.id), ['q_job1'], '1차 전직 메인 단계는 하나');
 }

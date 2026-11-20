@@ -490,6 +490,32 @@ export class CharacterSheet {
 }
 
 // ======================================================================================= quests
+// ---------------------------------------------------------------- 전직 마스터 (2026-11-20)
+// 1차 마스터 5명(카이리온 길드 회관)은 견습생만 그 1차 직업으로, 2차 마스터 7명(여러 마을, tools/world/jobmasters.py)은
+// 그 2차의 부모 1차 직업인 사람만 그 2차 직업으로 전직시켜 줌. 조건(레벨·전직 시험)은 따로 advanceBlock.
+/** 이 마스터가 이 사람에게 내미는 전직: [직업 id] (없으면 []) */
+export function jobOffers(data, profile, npc) {
+  if (!npc || npc.role !== "jobmaster" || !npc.job || !profile) return [];
+  const j = data.job(npc.job); if (!j) return [];
+  const cur = profile.job || "novice";
+  if (j.tier === 1) return cur === "novice" ? [j.id] : [];
+  if (j.tier === 2) return (data.job(cur) || {}).tier === 1 && j.parent === cur ? [j.id] : [];
+  return [];
+}
+/** 이 사람이 다음 전직을 하러 갈 마스터 npc id들 — 메인 퀘스트 전직 목표 표시(머리 위·미니맵·갈 곳)용.
+ *  target: 'any' = 1차, 'tier2' = 2차, 그 밖 = 그 직업 id. 이미 그 단계면 []. 전직 시험(trialQuest)을 받은 갈래가 앞에. */
+export function jobMastersFor(data, profile, target = "any") {
+  if (!profile) return [];
+  const out = [];
+  for (const n of Object.values(data.npcs || {})) {
+    const offer = jobOffers(data, profile, n); if (!offer.length) continue;
+    const j = data.job(offer[0]);
+    if (target === "any" ? j.tier !== 1 : target === "tier2" ? j.tier !== 2 : j.id !== target) continue;
+    const pr = j.trialQuest && (profile.quests || []).find(q => q.id === j.trialQuest);
+    out.push({ id: n.id, rank: pr ? 0 : 1 });
+  }
+  return out.sort((a, b) => a.rank - b.rank).map(o => o.id);
+}
 export const QS = { Locked: 0, Available: 1, Active: 2, Completable: 3, Completed: 4 };
 /** quest category: "main" = story chain, "sub" = side hunting / gathering. quests.json "category"; without it, quests
  *  whose goals are only kill / collect / equip count as side quests. */

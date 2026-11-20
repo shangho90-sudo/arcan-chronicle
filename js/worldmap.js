@@ -121,7 +121,7 @@ export function showWorldMap(ui) {
   const box = document.createElement('div'); box.className = 'wmbox'; b.appendChild(box);
   // 메인 퀘스트(2026-11-15): 닫힌 지역은 흐리게 + 자물쇠, 지금 메인 단계가 보내는 곳은 금별
   const locked = new Set(Object.keys(D.zones).filter(id => D.zones[id].map && G.lockOf && G.lockOf(id)));
-  const goal = new Map(); for (const t of (G.mainTargets ? G.mainTargets() : [])) if (t.zone && !goal.has(t.zone)) goal.set(t.zone, t.quest);
+  const goal = new Map(); for (const t of (G.mainTargets ? G.mainTargets() : [])) for (const z of (t.zones || [t.zone])) if (z && !goal.has(z)) goal.set(z, t.quest);
   const inner = document.createElement('div'); inner.className = 'wminner'; inner.innerHTML = worldMapSvg(D, here, { locked, goal }); box.appendChild(inner);
   const info = document.createElement('div'); info.className = 'wminfo'; b.appendChild(info);
   const txt = document.createElement('div'); txt.className = 'wminfotxt'; info.appendChild(txt);

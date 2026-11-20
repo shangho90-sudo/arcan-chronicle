@@ -59,6 +59,14 @@ export const NPC_MODELS = {
   res_guard_b: { file: 'npc_guard', tex: 'npc_res_guard_b', height: 1.68, headPitch: -6, npc: true },
   res_merchant_a: { file: 'npc_merchant', tex: 'npc_res_merchant_a', height: 1.42, headPitch: -6, npc: true },
   res_merchant_b: { file: 'npc_merchant', tex: 'npc_res_merchant_b', height: 1.51, headPitch: -6, npc: true },
+  // 2차 전직 마스터 7명 (tools/world/jobmasters.py, 2026-11-20): 1차 직업 NPC 메시 + 옷 색만 바꾼 텍스처(tools/npcs/recolor.py)
+  job2_wpharm: { file: 'npc_pharmacist', tex: 'npc_job2_wpharm', height: 1.58, headPitch: -6, npc: true },
+  job2_herb: { file: 'npc_pharmacist', tex: 'npc_job2_herb', height: 1.5, headPitch: -6, npc: true },
+  job2_eng: { file: 'npc_blacksmith', tex: 'npc_job2_eng', height: 1.62, headPitch: -6, npc: true },
+  job2_chef: { file: 'npc_cook', tex: 'npc_job2_chef', height: 1.6, headPitch: -6, npc: true },
+  job2_design: { file: 'npc_hairdresser', tex: 'npc_job2_design', height: 1.6, headPitch: -6, npc: true },
+  job2_paint: { file: 'npc_artist', tex: 'npc_job2_paint', height: 1.58, headPitch: -6, npc: true },
+  job2_music: { file: 'npc_artist', tex: 'npc_job2_music', height: 1.55, headPitch: -6, npc: true },
 };
 /** back holder (backMount): grip at x = this fraction of the right shoulder's x, up / out (m) above the shoulder joint and
  *  behind the back surface; dir = blade direction in bind space (+x = the character's left, +y up, +z forward) */

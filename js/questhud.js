@@ -37,7 +37,7 @@ function questGoals() {
     let hint = '';
     if (st === QS.Completable) hint = `보고하기: ${talkHint(q.turnIn || q.giver)}`;
     else { const o = q.objectives.find((o, i) => ql.current(q, i) < o.count);
-      if (o) hint = o.type === 'talk' ? talkHint(o.target) : o.type === 'kill' ? (mobile ? '공격 버튼으로 공격' : '몬스터를 클릭하거나 Space 키로 공격') : o.type === 'collect' ? '몬스터를 처치하면 재료를 얻습니다' : o.type === 'level' ? '몬스터를 처치해 경험치를 모으세요' : o.type === 'job' ? '직업 마스터에게 말을 걸어 전직' : o.type === 'equip' ? `가방(${mobile ? '가방 버튼' : 'I 키'})에서 장비 장착` : ''; }
+      if (o) hint = o.type === 'talk' ? talkHint(o.target) : o.type === 'kill' ? (mobile ? '공격 버튼으로 공격' : '몬스터를 클릭하거나 Space 키로 공격') : o.type === 'collect' ? '몬스터를 처치하면 재료를 얻습니다' : o.type === 'level' ? '몬스터를 처치해 경험치를 모으세요' : o.type === 'job' ? (o.target === 'tier2' ? '내 직업의 2차 전직 마스터에게 말을 걸어 전직' : '직업 마스터에게 말을 걸어 전직') : o.type === 'equip' ? `가방(${mobile ? '가방 버튼' : 'I 키'})에서 장비 장착` : ''; }
     out.push({ key: q.id, cat: questCategory(q), title: q.name, rows, hint, ready: st === QS.Completable });
   }
   // 2026-11-15: 메인 퀘스트 길잡이 — 갈 곳(다른 지역이면 '갈 곳: …'), 진행 중인 메인이 없으면 다음 메인 단계를 받는 법
@@ -45,7 +45,8 @@ function questGoals() {
   const targets = G.mainTargets ? G.mainTargets() : [];
   for (const g of out) {
     const t = targets.find(t => t.quest.id === g.key);
-    if (t && t.zone && t.zone !== here) g.hint = `갈 곳: ${zname(t.zone)} (세계 지도 M)` + (g.hint ? ' · ' + g.hint : '');
+    if (t && t.zones && !t.zones.includes(here)) g.hint = `갈 곳: ${t.zones.map(zname).join(' 또는 ')} (세계 지도 M)` + (g.hint ? ' · ' + g.hint : '');   // 2차 전직 마스터가 둘인 직업(약사·예술가)
+    else if (t && !t.zones && t.zone && t.zone !== here) g.hint = `갈 곳: ${zname(t.zone)} (세계 지도 M)` + (g.hint ? ' · ' + g.hint : '');
   }
   if (!out.some(g => g.cat === 'main') && G.data.world && G.data.world.main) {
     for (const id of G.data.world.main.order) {

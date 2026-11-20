@@ -10,7 +10,11 @@ JOBS = {'castilla': ('npc_artist', 95, 1.05, 1.0), 'kylus': ('npc_guard', 20, 0.
         'gear_weapon': ('npc_armorer', 150, 1.1, 0.95), 'gear_armor': ('npc_merchant', -110, 1.1, 1.0),
         'warp_keeper': ('npc_pharmacist', 170, 1.3, 1.05),      # 마을 간 워프 안내인 (world.py WARP_KEEPERS)
         # 마을 주민(tools/world/residents.py, 2026-11-12): 같은 메시에 옷 색만 다르게
-        'res_artist_a': ('npc_artist', 40, 1.0, 1.0), 'res_artist_b': ('npc_artist', -150, 0.9, 0.95), 'res_pharmacist_a': ('npc_pharmacist', 60, 1.0, 1.0), 'res_pharmacist_b': ('npc_pharmacist', -120, 1.05, 0.95), 'res_blacksmith_a': ('npc_blacksmith', 100, 0.8, 1.0), 'res_blacksmith_b': ('npc_blacksmith', -60, 0.9, 0.9), 'res_cook_a': ('npc_cook', 150, 0.9, 1.0), 'res_cook_b': ('npc_cook', -70, 1.0, 0.95), 'res_elder_a': ('npc_elder', 120, 0.85, 1.0), 'res_hairdresser_a': ('npc_hairdresser', 70, 1.0, 1.0), 'res_hairdresser_b': ('npc_hairdresser', -130, 1.0, 0.95), 'res_guard_a': ('npc_guard', 90, 0.9, 1.0), 'res_guard_b': ('npc_guard', -90, 1.0, 0.9), 'res_merchant_a': ('npc_merchant', 60, 1.0, 1.0), 'res_merchant_b': ('npc_merchant', 170, 0.9, 0.95)}
+        'res_artist_a': ('npc_artist', 40, 1.0, 1.0), 'res_artist_b': ('npc_artist', -150, 0.9, 0.95), 'res_pharmacist_a': ('npc_pharmacist', 60, 1.0, 1.0), 'res_pharmacist_b': ('npc_pharmacist', -120, 1.05, 0.95), 'res_blacksmith_a': ('npc_blacksmith', 100, 0.8, 1.0), 'res_blacksmith_b': ('npc_blacksmith', -60, 0.9, 0.9), 'res_cook_a': ('npc_cook', 150, 0.9, 1.0), 'res_cook_b': ('npc_cook', -70, 1.0, 0.95), 'res_elder_a': ('npc_elder', 120, 0.85, 1.0), 'res_hairdresser_a': ('npc_hairdresser', 70, 1.0, 1.0), 'res_hairdresser_b': ('npc_hairdresser', -130, 1.0, 0.95), 'res_guard_a': ('npc_guard', 90, 0.9, 1.0), 'res_guard_b': ('npc_guard', -90, 1.0, 0.9), 'res_merchant_a': ('npc_merchant', 60, 1.0, 1.0), 'res_merchant_b': ('npc_merchant', 170, 0.9, 0.95),
+        # 2차 전직 마스터 7명(tools/world/jobmasters.py, 2026-11-20): 1차 직업 메시에 옷 색만 다르게
+        'job2_wpharm': ('npc_pharmacist', 150, 0.5, 1.45), 'job2_herb': ('npc_pharmacist', -10, 1.7, 1.05), 'job2_eng': ('npc_blacksmith', 150, 1.15, 1.0),
+        'job2_chef': ('npc_cook', -25, 1.25, 1.02), 'job2_design': ('npc_hairdresser', -95, 1.05, 1.0), 'job2_paint': ('npc_artist', 0, 0.3, 0.72),
+        'job2_music': ('npc_artist', 15, 1.35, 1.05)}
 def recolor(src, dh, ks, kv):
     im = Image.open(os.path.join(M, src + '.jpg')).convert('HSV'); a = np.asarray(im).astype(np.float32)
     h, s, v = a[..., 0], a[..., 1], a[..., 2]
@@ -19,4 +23,8 @@ def recolor(src, dh, ks, kv):
     out = np.stack([np.where(skin, h, h2), np.where(skin, s, s2), np.where(skin, v, v2)], -1).astype(np.uint8)
     return Image.fromarray(out, 'HSV').convert('RGB')
 if __name__ == '__main__':
-    for n, (src, dh, ks, kv) in JOBS.items(): recolor(src, dh, ks, kv).save(os.path.join(M, 'npc_' + n + '.jpg'), quality=88); print('npc_' + n + '.jpg')
+    import sys
+    only = sys.argv[1:]                                              # 이름을 주면 그것만 (예: job2_wpharm)
+    for n, (src, dh, ks, kv) in JOBS.items():
+        if only and n not in only: continue
+        recolor(src, dh, ks, kv).save(os.path.join(M, 'npc_' + n + '.jpg'), quality=88); print('npc_' + n + '.jpg')

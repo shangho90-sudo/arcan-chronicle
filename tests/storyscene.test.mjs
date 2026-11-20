@@ -56,7 +56,9 @@ for (const [k, v] of Object.entries(man.portraits || {})) ok(existsSync(new URL(
 const { mainSpeakers, missingArt } = await import('../tools/story/missing_art.mjs');
 const spk = mainSpeakers(d, { parseStory, makeResolver }, questCategory), noArt = missingArt(spk, man);
 const ART_REQUIRED = ['elder', 'astel', 'merchant', 'arcan_smith_boy', 'arcan_pharm_clerk', 'arcan_innkeeper', 'guard', 'arcan_guide', 'armorer', 'town_armor', 'warp_town',
-  'master_pharmacist', 'master_cook', 'master_blacksmith', 'master_hairdresser', 'master_artist', 'silvern_hunter'];
+  'master_pharmacist', 'master_cook', 'master_blacksmith', 'master_hairdresser', 'master_artist', 'silvern_hunter',
+  // 2026-11-20 2차 전직 마스터 7명 (tools/world/jobmasters.py)
+  'master2_western_pharmacist', 'master2_herbalist', 'master2_engineer', 'master2_chef', 'master2_designer', 'master2_painter', 'master2_musician'];
 for (const k of ART_REQUIRED) ok(man.portraits[k] && existsSync(new URL('../assets/ui/story/' + man.portraits[k].file, import.meta.url)), '일러스트 ' + k);
 for (const [k, v] of Object.entries(man.portraits)) ok(v.facing === 'right' && Array.isArray(v.names), '초상 manifest ' + k);
 console.log(`  참고: 메인 장면 NPC 화자 ${spk.size}명 중 2D 일러스트 없음 ${noArt.length}명${noArt.length ? ' — ' + noArt.map(s => s.key + '(' + s.name + ')').join(', ') : ''}`);

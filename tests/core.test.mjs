@@ -614,6 +614,47 @@ function TestQuestCategories() {
   Eq(core.questCategory({ objectives: [{ type: "talk" }] }), "main", "no category: talk -> main");
 }
 // 2026-11-19 첫 전직 바로 완료: 전직하고 나서 받아도 받는 순간 완료, 예전 저장(이미 전직 + 1장 이후)은 불러올 때 완료, 서장 제목
+// 2026-11-20: 2차 전직 마스터 7명(여러 마을) — 1차 마스터는 견습생만 1차로, 2차 마스터는 부모 1차 직업인 사람만 그 2차로
+function TestJobMasters() {
+  const d = LoadData(), J = (p, id) => core.jobOffers(d, p, d.npcs[id]);
+  const nov = NewChar(d);
+  Eq(J(nov.p, "master_cook").join(), "cook", "novice: cook master offers cook");
+  Eq(J(nov.p, "master2_chef").length, 0, "novice: chef master offers nothing");
+  Eq(core.jobMastersFor(d, nov.p, "any").sort().join(), "master_artist,master_blacksmith,master_cook,master_hairdresser,master_pharmacist", "novice goes to the five 1st-job masters");
+  Eq(core.jobMastersFor(d, nov.p, "tier2").length, 0, "novice has no 2nd-job master yet");
+  const cook = NewChar(d, "cook");
+  Eq(J(cook.p, "master_cook").length, 0, "cook: own 1st-job master no longer offers 2nd-job branches");
+  Eq(J(cook.p, "master2_chef").join(), "chef", "cook: chef master offers chef");
+  Eq(J(cook.p, "master2_herbalist").length + J(cook.p, "master_pharmacist").length + J(cook.p, "master2_painter").length, 0, "cook: other masters offer nothing");
+  Eq(core.jobMastersFor(d, cook.p, "tier2").join(), "master2_chef", "cook: main-quest job target = chef master only");
+  const ph = NewChar(d, "pharmacist");
+  Eq(core.jobMastersFor(d, ph.p, "tier2").sort().join(), "master2_herbalist,master2_western_pharmacist", "pharmacist: both branch masters");
+  ph.p.quests.push({ id: "qt_herbalist", state: "active", counts: [0, 0, 0] });
+  Eq(core.jobMastersFor(d, ph.p, "tier2")[0], "master2_herbalist", "the branch whose trial is taken comes first");
+  // each master: role, job, distinct name, a town
+  const m2 = Object.values(d.npcs).filter(n => n.role === "jobmaster" && d.job(n.job).tier === 2);
+  Eq(m2.length, 7, "seven 2nd-job masters");
+  Eq(new Set(m2.map(n => n.name)).size, 7, "distinct names");
+  Ok(new Set(m2.map(n => n.town)).size >= 5, "spread over at least five towns");
+  for (const n of m2) Ok(d.zones[n.town] && d.quests[d.job(n.job).trialQuest].giver === n.id, n.id + " in " + n.town + " gives " + d.job(n.job).trialQuest);
+  // conditions are unchanged (advanceBlock): level 30 + trial
+  const q = new QuestLog(d, cook); cook.p.quests.push({ id: "q_job1", state: "completed", counts: [] });
+  cook.p.level = 29; cook.recalc();
+  Ok(/레벨 30/.test(cook.canChooseJob("chef") || ""), "chef needs Lv30");
+  Eq(q.stateOf(d.quests.qt_chef), QS.Locked, "trial locked below Lv30");
+  cook.p.level = 30; cook.recalc();
+  Eq(q.stateOf(d.quests.qt_chef), QS.Available, "cook Lv30: chef trial available");
+  Eq(q.stateOf(d.quests.qt_herbalist), QS.Locked, "cook: herbalist trial locked");
+  Ok(q.questsFor("master2_chef").some(t => t.id === "qt_chef") && !q.questsFor("master_cook").some(t => t.id === "qt_chef"), "chef trial is at the chef master, not the cook master");
+  Ok(/전직 시험/.test(cook.canChooseJob("chef") || ""), "chef needs the trial");
+  Ok(/미용사만/.test(cook.canChooseJob("designer") || ""), "other branch refused");
+  // old save: trial taken from the old giver (cook master) — progress kept, handed in at the new master
+  const old = NewChar(d, "cook"); old.p.level = 30; old.p.quests.push({ id: "q_job1", state: "completed", counts: [] }, { id: "qt_chef", state: "active", counts: [1, 10, 30] });
+  const qo = new QuestLog(d, old); Eq(qo.stateOf(d.quests.qt_chef), QS.Completable, "old save: trial progress kept");
+  Ok(qo.questsFor("master2_chef").some(t => t.id === "qt_chef"), "old save: hand in at the chef master");
+  Ok(qo.complete("qt_chef") == null && old.chooseJob("chef") == null && old.p.job === "chef", "old save: trial done → chef");
+  Eq(core.jobOffers(d, old.p, d.npcs.master2_chef).length, 0, "after the change the chef master offers nothing more");
+}
 function TestJobQuestAuto() {
   const d = LoadData();
   Eq(core.questTitle(d.quests.q_job1).ch, "서장", "서장 kicker"); Eq(core.questTitle(d.quests.q_job1).title, "첫 전직", "서장 title");
@@ -659,7 +700,7 @@ const tests = [
   ["Data", TestData], ["Inventory", TestInventory], ["Shop", TestShop], ["Stats & equipment", TestStats],
   ["Leveling", TestLeveling], ["Jobs", TestJobs], ["Quests", TestQuests], ["Save/Load", TestSave],
   ["Hit shapes", TestShapes], ["Combat math", TestCombat], ["Status effects", TestStatus],
-  ["Geometry & nav", TestGeometry], ["Layouts", TestLayouts], ["Balance", TestBalance], ["Full flow", TestFullFlow], ["Attributes", TestAttributes], ["Quest categories", TestQuestCategories], ["Job quest auto", TestJobQuestAuto], ["Save slots", TestSaveSlots],
+  ["Geometry & nav", TestGeometry], ["Layouts", TestLayouts], ["Balance", TestBalance], ["Full flow", TestFullFlow], ["Attributes", TestAttributes], ["Quest categories", TestQuestCategories], ["Job quest auto", TestJobQuestAuto], ["Job masters", TestJobMasters], ["Save slots", TestSaveSlots],
 ];
 for (const [name, fn] of tests) {
   const p0 = pass, f0 = fail;

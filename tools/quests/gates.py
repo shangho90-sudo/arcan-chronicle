@@ -33,7 +33,9 @@ LEGACY = {
 }
 INSERT_BEFORE = {'mq00h': 'q7_boss', 'mq01a': 'q_job1'}                     # 이야기 순서 안 자리 (2026-11-19 서장: 거대 독버섯·첫 전직은 아르칸 서장 끝)
 # job 목표: 'any' = 1차 전직(길드 회관), 'tier2' = 2차 전직 시험(qt_*: 안개골 우두머리 곰·서리뿔 산양 사냥)
-JOB_ZONES = {'any': ['kairion_capital'], 'tier2': ['kairion_capital', 'mist_valley', 'frost_highland']}
+sys.path.insert(0, os.path.join(HERE, '..', 'world'))
+import jobmasters   # noqa: E402  (2차 전직 마스터 7명이 있는 마을, 2026-11-20)
+JOB_ZONES = {'any': ['kairion_capital'], 'tier2': ['kairion_capital', 'mist_valley', 'frost_highland'] + [t for t in jobmasters.TOWNS2 if t != 'kairion_capital']}
 KEEP_LEVEL = {'forest'}          # 처음 필드(Lv1 몬스터) 레벨은 그대로
 WIDTH = 3                        # 권장 레벨 폭: lo ~ lo + 3
 

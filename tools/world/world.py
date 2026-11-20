@@ -107,7 +107,9 @@ from residents import R as RESIDENTS
 for _t in TOWNS:
     _k = 2.5 if _t['id'] in ('kairion_capital', 'baltazar') else 1.73
     _t['W'] = round(_t['W'] * _k); _t['D'] = round(_t['D'] * _k); _t['houses'] = round(_t['houses'] * (2.6 if _k > 2 else 2.0))
-JOB_MASTERS = ['master_pharmacist', 'master_cook', 'master_blacksmith', 'master_hairdresser', 'master_artist']   # 전직 NPC는 모두 카이리온 왕도 장인 길드 회관 앞
+JOB_MASTERS = ['master_pharmacist', 'master_cook', 'master_blacksmith', 'master_hairdresser', 'master_artist']   # 1차 전직 NPC는 모두 카이리온 왕도 장인 길드 회관 앞
+from jobmasters import MASTERS2   # 2차 전직 마스터 7명: 여러 마을에 흩어짐 (2026-11-20)
+def masters2_place(tid): return [(m[0], m[5]) for m in MASTERS2 if m[4] == tid]
 ARCAN = dict(id='town', name='아르칸 마을', region='kairion', W=50, D=41, wallH=7.0, keep=(18, 12, 15), houses=14, banner='blue',
              centre=dict(id='fountain', file='town_arcan_fountain', pos=[0.0, 0.0], h=180, scale=11.12, size=[11.12, 11.12, 6.48], name='여신의 분수'),   # 2026-11-14 Blender 절차 모델(tools/blender/town_fountain.py), 예전 Tripo angel_fountain과 같은 지름·충돌 원
              fixed_models=[dict(id='smithy', file='medieval_blacksmith_shop', scale=10.5, size=[10.3047, 7.0098, 6.15195], name='마을 대장간'),
@@ -635,7 +637,13 @@ WARP_HINT = 'plaza:250'
 def warp_spawn(g, tid):
     """안내인 앞(광장 가운데 쪽 2.4 m)에 도착 지점 'warp'"""
     n = next(n for n in g['npcs'] if n['npc'] == WARP_KEEPERS[tid][0]); x, z = n['pos']; L = math.hypot(x, z) or 1.0
-    g['spawns'].append(dict(id='warp', pos=[round(x - x / L * 2.4, 2), round(z - z / L * 2.4, 2)], rot=round(yaw_to(x, z), 1)))
+    sx, sz = round(x - x / L * 2.4, 2), round(z - z / L * 2.4, 2)
+    g['spawns'].append(dict(id='warp', pos=[sx, sz], rot=round(yaw_to(x, z), 1)))
+    # 도착 지점에 걸린 작은 장식(벤치 등 Blender 소품, 충돌 props + town3d.blprops)은 치움 (2026-11-20: 그라벨 벤치가 도착 지점을 막았음)
+    near = lambda p: p.get('bl') and math.hypot(p['pos'][0] - sx, p['pos'][1] - sz) < 1.8
+    gone = [p['pos'] for p in g['props'] if near(p)]
+    g['props'] = [p for p in g['props'] if not near(p)]
+    if gone and g.get('town3d'): g['town3d']['blprops'] = [b for b in g['town3d'].get('blprops', []) if b['pos'] not in gone]
 def town_place(t):
     """이야기 NPC·상인 자리 힌트 (towns.py stand)"""
     out, ang = [], [200, 235, 300, 335, 160, 20, 110, 70]
@@ -648,7 +656,7 @@ def gen_town(t, M):
     exits = [(n, name_of(n), direction(tid, n, M), 'to_' + n, 'from_' + n, 'from_' + tid) for n in neighbours(tid)]
     tt = dict(t); tt['place'] = town_place(t)
     if tid == 'kairion_capital': tt['place'] += [(m, 'lm:kairion_guildhall', (i - 2) * 3.2) for i, m in enumerate(JOB_MASTERS)]
-    g = TW.gen_town2(tt, exits, [(r[0], r[4]) for r in RESIDENTS.get(tid, [])] + [(WARP_KEEPERS[tid][0], WARP_HINT)])
+    g = TW.gen_town2(tt, exits, [(r[0], r[4]) for r in RESIDENTS.get(tid, [])] + [(WARP_KEEPERS[tid][0], WARP_HINT)] + masters2_place(tid))
     warp_spawn(g, tid)
     Z = dict(id=tid, name=t['name'], kind='town', bgm='bgm_arcan_town' if rnd.random() < 0.5 else 'bgm_town', bounds=g['bounds'],
              groundTex='grass', ambient=[0.56, 0.53, 0.6], sun=list(TOWN_LIGHT['sun']), shade=json.loads(json.dumps(TOWN_LIGHT['shade'])), spriteTint=[1.0, 0.98, 0.94], spawns=g['spawns'], buildings=[], props=g['props'],
@@ -660,7 +668,7 @@ def gen_arcan(Z, M):
     """아르칸 마을(zones.json의 손으로 만든 'town')도 같은 생성기로: 숲 워프 id(to_field / from_field)는 그대로"""
     exits = [('forest', '속삭이는 숲', direction('town', 'forest', M), 'to_field', 'from_field', 'from_town'),
              ('capital_road', name_of('capital_road'), direction('town', 'capital_road', M), 'to_capital_road', 'from_capital_road', 'from_town')]
-    g = TW.gen_town2(dict(ARCAN), exits, [(r[0], r[4]) for r in RESIDENTS['town']] + [(WARP_KEEPERS['town'][0], WARP_HINT)])
+    g = TW.gen_town2(dict(ARCAN), exits, [(r[0], r[4]) for r in RESIDENTS['town']] + [(WARP_KEEPERS['town'][0], WARP_HINT)] + masters2_place('town'))
     warp_spawn(g, 'town')
     for n in g['npcs']:
         if n['npc'] == 'town_armor': n['gear'] = True
@@ -724,6 +732,9 @@ def world_npcs():
         for nid, name, title, model, hint, lines, hook in rs:
             shop = {'arcan_pharm_clerk': 'shop_pharmacy', 'arcan_smith_boy': 'shop_forge'}.get(nid, '')
             out.append(dict(id=nid, name=name, title=title, sheet='npc_elder', model=model, role='merchant' if shop else 'elder', shop=shop, job='', lines=lines, world=True, resident=True, hook=hook, town=tid))
+    # 2차 전직 마스터 (tools/world/jobmasters.py): role jobmaster + job = 2차 직업 id
+    for nid, job, name, title, tid, hint, model, lines in MASTERS2:
+        out.append(dict(id=nid, name=name, title=title, sheet='npc_master_pharmacist', model=model, role='jobmaster', shop='', job=job, lines=lines, world=True, town=tid, master2=True))
     return out
 
 # ======================================================================== existing zones: links into the new world

@@ -11,6 +11,14 @@ export const MAP_KINDS = {
   job_cook:        { label: '요리사 전직',   bg: '#d9a520', rim: '#4a3604', job: 1 },
   job_hairdresser: { label: '미용사 전직',   bg: '#d0559a', rim: '#4a1034', job: 1 },
   job_artist:      { label: '예술가 전직',   bg: '#8a5ad0', rim: '#2a1250', job: 1 },
+  // 2차 전직 마스터 (2026-11-20, tools/world/jobmasters.py — 여러 마을에 흩어짐)
+  job_western_pharmacist: { label: '양약사 전직', bg: '#2f8fd0', rim: '#0a2c4a', job: 2 },
+  job_herbalist:   { label: '한약사 전직',   bg: '#4f9a3a', rim: '#163a0c', job: 2 },
+  job_engineer:    { label: '엔지니어 전직', bg: '#1f9a8a', rim: '#06362f', job: 2 },
+  job_chef:        { label: '쉐프 전직',     bg: '#c8463c', rim: '#4a0f0a', job: 2 },
+  job_designer:    { label: '디자이너 전직', bg: '#9a5ad6', rim: '#2e1252', job: 2 },
+  job_painter:     { label: '화가 전직',     bg: '#3a3a52', rim: '#0c0c18', job: 2 },
+  job_musician:    { label: '음악가 전직',   bg: '#3a5ad6', rim: '#0e1a50', job: 2 },
 };
 const SHOP_KIND = { shop_weapons: 'weapon', shop_armor: 'armor', shop_general: 'potion', shop_pharmacy: 'potion', shop_forge: 'forge', shop_smithy: 'forge' };
 
@@ -77,6 +85,40 @@ const GLYPH = {
     c.beginPath(); c.moveTo(0.78, -0.1); c.bezierCurveTo(0.78, -0.72, 0.2, -0.86, -0.2, -0.8); c.bezierCurveTo(-0.9, -0.7, -1.0, 0.2, -0.5, 0.62);
     c.bezierCurveTo(-0.1, 0.92, 0.5, 0.82, 0.42, 0.44); c.bezierCurveTo(0.36, 0.14, 0.78, 0.3, 0.78, -0.1); c.closePath(); ink(c);
     for (const [x, y, col] of [[-0.42, -0.38, '#e0483c'], [0.08, -0.5, '#f0c020'], [-0.52, 0.14, '#3c8ae0'], [0.42, -0.22, '#3cb060']]) { c.beginPath(); c.arc(x, y, 0.15, 0, 6.283); c.fillStyle = col; c.fill(); }
+  },
+  job_western_pharmacist(c) {   // 삼각 플라스크
+    poly(c, [[-0.2, -0.86], [0.2, -0.86], [0.2, -0.3], [0.66, 0.66], [-0.66, 0.66], [-0.2, -0.3]]);
+    c.beginPath(); c.moveTo(-0.42, 0.2); c.lineTo(0.42, 0.2); c.lineTo(0.62, 0.62); c.lineTo(-0.62, 0.62); c.closePath(); c.fillStyle = '#2f8fd0'; c.fill();
+  },
+  job_herbalist(c) {   // 잎
+    c.beginPath(); c.moveTo(-0.62, 0.7); c.bezierCurveTo(-0.7, -0.2, 0.0, -0.86, 0.74, -0.8); c.bezierCurveTo(0.76, 0.0, 0.2, 0.7, -0.62, 0.7); c.closePath(); ink(c);
+    c.beginPath(); c.moveTo(-0.62, 0.7); c.lineTo(0.5, -0.52); line(c);
+  },
+  job_engineer(c) {   // 톱니바퀴
+    c.beginPath();
+    for (let i = 0; i < 16; i++) { const a = i / 16 * 6.283, r = i % 2 ? 0.58 : 0.84; c.lineTo(Math.cos(a - 0.12) * r, Math.sin(a - 0.12) * r); c.lineTo(Math.cos(a + 0.12) * r, Math.sin(a + 0.12) * r); }
+    c.closePath(); ink(c);
+    c.beginPath(); c.arc(0, 0, 0.24, 0, 6.283); c.fillStyle = '#1f9a8a'; c.fill(); line(c);
+  },
+  job_chef(c) {   // 셰프 모자
+    c.beginPath(); c.arc(-0.36, -0.2, 0.36, Math.PI * 0.6, Math.PI * 1.6); c.arc(0, -0.42, 0.42, Math.PI * 1.1, Math.PI * 1.9); c.arc(0.36, -0.2, 0.36, Math.PI * 1.4, Math.PI * 0.4);
+    c.lineTo(0.42, 0.4); c.lineTo(-0.42, 0.4); c.closePath(); ink(c);
+    rect(c, -0.48, 0.4, 0.96, 0.32);
+  },
+  job_designer(c) {   // 리본
+    poly(c, [[0, 0], [-0.82, -0.52], [-0.82, 0.52]]); poly(c, [[0, 0], [0.82, -0.52], [0.82, 0.52]]);
+    poly(c, [[-0.12, 0.1], [-0.42, 0.86], [-0.16, 0.72], [0.0, 0.88], [0.0, 0.1]]); circ(c, 0, 0, 0.22);
+  },
+  job_painter(c) {   // 붓
+    c.save(); c.rotate(Math.PI / 4);
+    rect(c, -0.1, -0.1, 0.2, 1.0); rect(c, -0.16, -0.26, 0.32, 0.18);
+    c.beginPath(); c.moveTo(-0.16, -0.26); c.quadraticCurveTo(-0.22, -0.7, 0, -0.96); c.quadraticCurveTo(0.22, -0.7, 0.16, -0.26); c.closePath(); c.lineWidth = 0.14; c.strokeStyle = INK; c.stroke(); c.fillStyle = '#e0483c'; c.fill();
+    c.restore();
+  },
+  job_musician(c) {   // 음표 ♫
+    rect(c, -0.42, -0.7, 0.14, 1.06); rect(c, 0.4, -0.84, 0.14, 1.06);
+    poly(c, [[-0.42, -0.7], [0.54, -0.84], [0.54, -0.6], [-0.42, -0.46]]);
+    c.beginPath(); c.ellipse(-0.56, 0.38, 0.26, 0.2, -0.4, 0, 6.283); ink(c); c.beginPath(); c.ellipse(0.26, 0.24, 0.26, 0.2, -0.4, 0, 6.283); ink(c);
   },
 };
 const INK = 'rgba(8,12,24,.92)';
