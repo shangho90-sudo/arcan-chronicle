@@ -1,5 +1,5 @@
 // Skill window (learn / upgrade / equip / reset), craft window, job advancement window, HUD slot buttons.
-// Mixed into the existing UI class so the original look (ivory / teal / gold, Galmuri) and input handling stay.
+// Mixed into the existing UI class so the original look (ivory / teal / gold) and input handling stay.
 import { UI } from './ui.js';
 import { craft, NORMAL_SLOTS, ADV1_LEVEL, ADV2_LEVEL } from './skillsys.js';
 import { wpLevelText } from './wpharm.js';

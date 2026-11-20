@@ -1,4 +1,4 @@
-// HTML/CSS user interface (ivory / teal / gold, Galmuri pixel font). Port of the Unity uGUI views.
+// HTML/CSS user interface (ornate navy / gold + ivory; system Korean sans, Jua for dialog — 2026-11-20 the Galmuri pixel font and pixel 9-slice skins were removed). Port of the Unity uGUI views.
 import { gfxQ, GFX_LEVELS, GFX_NAMES } from './gfxq.js';
 import { questExp, QS, QUEST_CAT, questCategory, Shop, shopStockFor, jobBuffActive, isEquipment, slotOf, EQUIP_SLOTS, ATTRS, ATTR_KR, ATTR_BASE, ATTR_FX, warpTowns, warpPrice, townsKnown } from './core.js';
 import { showWorldMap } from './worldmap.js';
@@ -81,6 +81,7 @@ const HUD_ICON = (() => {
     skill_ui_attack: W('<path d="M46 10l8 0 0 8-26 26-8-8z" fill="url(#gS)" stroke="#2a3040" stroke-width="2"/><path d="M50 14L24 40" stroke="#fff" stroke-width="1.5" opacity=".7"/><path d="M16 36l12 12-4 4-12-12z" fill="url(#gG)" stroke="#4a2a08" stroke-width="2"/><path d="M14 46l4 4-6 6-4-4z" fill="#6a3a1a" stroke="#2a1608" stroke-width="2"/><circle cx="9" cy="55" r="3.5" fill="url(#gG)" stroke="#4a2a08" stroke-width="1.5"/>'),
     skill_ui_dodge: W('<circle cx="38" cy="13" r="5.5" fill="#f4f0e8"/><path d="M33 21l-9 9 6 6-6 14M33 21l7 10 9 3M29 26l-9-1-6 6M30 36l9 5 3 12" fill="none" stroke="#f4f0e8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 30h10M4 38h10M8 46h8" stroke="#9ad0ff" stroke-width="3" stroke-linecap="round" opacity=".8"/>'),
     skill_ui_interact: W('<path d="M12 14h40a6 6 0 0 1 6 6v20a6 6 0 0 1-6 6H30l-12 10v-10h-6a6 6 0 0 1-6-6V20a6 6 0 0 1 6-6z" fill="#f4f0e8" stroke="#3a3040" stroke-width="2"/><circle cx="22" cy="30" r="3.5" fill="#5a4a6a"/><circle cx="32" cy="30" r="3.5" fill="#5a4a6a"/><circle cx="42" cy="30" r="3.5" fill="#5a4a6a"/>'),
+    unknown: W('<circle cx="32" cy="32" r="24" fill="#1f3a68" stroke="url(#gG)" stroke-width="4"/><path d="M32 16l4 12 12 4-12 4-4 12-4-12-12-4 12-4z" fill="url(#gG)"/>'),
     skill_ui_locked: W('<path d="M22 28v-7a10 10 0 0 1 20 0v7" fill="none" stroke="url(#gG)" stroke-width="5"/><rect x="16" y="28" width="32" height="24" rx="4" fill="url(#gG)" stroke="#4a2a08" stroke-width="2"/><circle cx="32" cy="38" r="3.5" fill="#4a2a08"/><path d="M32 40v6" stroke="#4a2a08" stroke-width="3"/>'),
   };
 })();
@@ -136,31 +137,19 @@ export class UI {
     this.toasts = $("div", "toasts", this.top);
     this.feed = $("div", "feed", this.top);
     this.current = null; this.closable = true; this.plates = new Map(); this.floats = []; this.mobileSetting = 0;
-    this.iconMeta = null; addEventListener("resize", () => this.fit()); this.buildHud(); this.buildControls(); this.showGameplay(false);
+    addEventListener("resize", () => this.fit()); this.buildHud(); this.buildControls(); this.showGameplay(false);
   }
   async load() {
-    this.iconMeta = await (await fetch("assets/ui/icons.json")).json();
-    // 3D item icons, rendered once from the item models (falls back to the pixel atlas for anything else)
-    // 장비(tools/gear/gear.py): 그린 아이콘이 있는 것(art)은 assets/ui/items/<id>.png, 아직 없는 새 계열은 임시로 3D 모델(item.stand)에서 찍음
+    // 3D item icons, rendered once from the item models; 장비(tools/gear/gear.py)·그림 아이콘이 있는 것(art)은 assets/ui/items/<id>.png
+    // (2026-11-20: 예전 도트 아이콘 지도 icons.png 대체는 없앰 — 모델·그림이 없는 이름은 아래 icon()의 금빛 별 SVG)
     try { this.itemIcons = renderItemIcons(G.data.itemList.filter(i => !i.gear || !i.art).map(i => i.icon || i.id)); } catch (e) { console.warn("3d icons", e); this.itemIcons = {}; }
     for (const i of G.data.itemList) if (i.gear && i.art) this.itemIcons[i.icon || i.id] = "assets/ui/items/" + i.id + ".png";
   }
   icon(name, size = 48) {
     if (HUD_ICON[name]) return `<span class="icon svgic" style="width:${size}px;height:${size}px;display:flex">${HUD_ICON[name]}</span>`;
     const img = this.itemIcons && this.itemIcons[name];
-    if (img) return `<span class="icon i3d" style="width:${size}px;height:${size}px;background:url(${img}) center/contain no-repeat;image-rendering:auto"></span>`;
-    const m = this.iconMeta; let i = m.names.indexOf(name); if (i < 0) i = m.names.indexOf("skill_ui_locked");
-    const s = size / m.cell, col = i % m.cols, row = Math.floor(i / m.cols);
-    return `<span class="icon" style="width:${size}px;height:${size}px;background-size:${m.texW * s}px ${m.texH * s}px;background-position:-${col * m.cell * s}px -${row * m.cell * s}px"></span>`;
-  }
-  iconMesh(name) {
-    const m = this.iconMeta; let i = m.names.indexOf(name); if (i < 0) i = 0;
-    const col = i % m.cols, row = Math.floor(i / m.cols);
-    const g = new THREE.PlaneGeometry(0.6, 0.6); const uv = g.attributes.uv;
-    const u0 = col * m.cell / m.texW, u1 = (col + 1) * m.cell / m.texW, v1 = 1 - row * m.cell / m.texH, v0 = 1 - (row + 1) * m.cell / m.texH;
-    uv.array.set([u0, v1, u1, v1, u0, v0, u1, v0]); uv.needsUpdate = true;
-    const mesh = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ map: tex("assets/ui/icons.png"), transparent: true, alphaTest: 0.5, depthWrite: true }));
-    mesh.renderOrder = 6; return mesh;
+    if (img) return `<span class="icon i3d" style="width:${size}px;height:${size}px;background:url(${img}) center/contain no-repeat"></span>`;
+    return `<span class="icon svgic" data-missing="${esc(String(name))}" style="width:${size}px;height:${size}px;display:flex">${HUD_ICON.unknown}</span>`;
   }
   showGameplay(on) { for (const l of [this.hud, this.controls, this.world, this.floatLayer]) l.style.display = on ? "" : "none"; }
   setFade(a) { this.fade.style.opacity = a; this.fade.style.pointerEvents = a > 0.01 ? "auto" : "none"; }
@@ -443,7 +432,8 @@ export class UI {
     this.close(false);
     if (dim) { this.dim = $("div", "dim", this.win); }
     const fancy = !PLAIN.has(name);
-    const wnd = $("div", "window " + (fancy ? "fancy " + (BANNER.has(name) ? "banner " : "") + (title ? "" : "notitle ") : "panel ") + name, this.win);
+    // 대화창(dialog)은 메인 스토리 장면·프롤로그와 같은 금테 상자(.gb-box), 타이틀·캐릭터 만들기는 그림 자체(2026-11-20: 도트 9칸 테두리 panel.png 대신)
+    const wnd = $("div", "window " + (fancy ? "fancy " + (BANNER.has(name) ? "banner " : "") + (title ? "" : "notitle ") : name === "dialog" ? "gb-box " : "") + name, this.win);
     wnd.style.width = w + "px"; if (h) wnd.style.height = h + "px";
     wnd.dataset.w = w; wnd.dataset.h = h || 0;
     if (fancy) {
@@ -454,7 +444,8 @@ export class UI {
       if (closable) { const x = $("button", "fclose", wnd, "✕"); x.setAttribute("aria-label", "닫기"); x.onclick = () => this.close(); }
     } else {
       if (title) $("div", "wtitle", wnd, esc(title));
-      if (closable) { const x = $("button", "btn red wclose", wnd, "X"); x.onclick = () => this.close(); }
+      if (name === "dialog") $("i", "gb-star", wnd);
+      if (closable) { const x = $("button", "fclose wclose", wnd, "✕"); x.setAttribute("aria-label", "닫기"); x.onclick = () => this.close(); }
     }
     const body = $("div", "wbody", wnd);
     this.current = wnd; this.currentName = name; this.closable = closable; this.root.classList.toggle("winopen", name !== "dialog" && name !== "title");
@@ -510,10 +501,11 @@ export class UI {
 
   showDialog(npc, text, options) {
     const b = this.open("dialog", null, 1180, 0, true, false);
-    $("div", "dname", b, npc ? `${npc.title} ${npc.name}` : "");
-    $("div", "dtext", b, text);
+    if (npc) $("div", "dname gb-plate", b, `${npc.title ? `<small>${npc.title}</small>` : ""}${npc.name}`);
+    $("div", "dtext gb-text", b, text);
+    $("div", "gb-rule", b);
     const opts = $("div", "dopts", b);
-    options.forEach(([label, fn], i) => this.button(opts, label, i === options.length - 1 ? "ivory" : "teal", fn, 'dialog'));
+    options.forEach(([label, fn], i) => { const btn = $("button", "gb-btn" + (i === options.length - 1 && options.length > 1 ? " alt" : ""), opts, label); btn.onclick = () => { G.audio.sfx('dialog'); fn(); }; });
     this.current.style.transform = ""; // dialog is anchored to the bottom
   }
 
@@ -923,20 +915,7 @@ export class UI {
     };
     loop();
   }
-  /** animated in-game sprite on a small canvas (walks while turning through the 8 directions) */
-  spritePreview(cv, sheet, phase = 0) {
-    const ctx = cv.getContext("2d"); ctx.imageSmoothingEnabled = false;
-    let img = null, meta = null; const t0 = performance.now() - phase * 1000;
-    G.loadSheet(sheet).then(sh => { meta = sh.meta; img = sh.tex.image; });
-    const anim = () => {
-      if (!cv.isConnected) return; requestAnimationFrame(anim);
-      if (!img || !img.complete || !meta) return;
-      const t = (performance.now() - t0) / 1000, dir = Math.floor(t / 1.6) % 8, a = meta.actions.find(x => x.name === "walk"), f = Math.floor(t * a.fps) % a.frames;
-      const idx = a.start + dir * a.frames + f, col = idx % meta.cols, row = Math.floor(idx / meta.cols);
-      ctx.clearRect(0, 0, cv.width, cv.height); const cw = Math.round(meta.frameW * 0.62), ch = Math.round(cw * cv.height / cv.width), cx = Math.round(meta.pivotX - cw / 2), cy = Math.max(0, meta.frameH - meta.pivotY + Math.round(meta.ppu * 0.25) - ch); ctx.drawImage(img, col * meta.frameW + cx, row * meta.frameH + cy, cw, ch, 0, 0, cv.width, cv.height);
-    };
-    anim();
-  }
+
 }
 
 export const CHARACTERS = [

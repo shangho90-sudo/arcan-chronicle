@@ -1,9 +1,9 @@
 {
- "cell": 64,
+ "cell": 128,
  "cols": 16,
  "rows": 7,
- "texW": 1024,
- "texH": 448,
+ "texW": 2048,
+ "texH": 896,
  "effects": [
   {
    "name": "slash",

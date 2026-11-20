@@ -101,3 +101,14 @@ const miss = [...new Set(need)].filter(c => !/\s/.test(c) && c !== '✦' && !jua
 eq(miss.join(''), '', '대화 상자 글꼴(주아체 + DialogExtra)에 빠진 글자 없음');
 ok([...'『』①無龍…'].every(c => !jua.has(c.codePointAt(0)) ? extra.has(c.codePointAt(0)) : true), '주아체에 없는 기호·한자는 DialogExtra에');
 console.log(`대화 글꼴: ${new Set(need).size}자 확인(주아체 ${jua.size} + 보충 ${extra.size} 글리프)`);
+// 2026-11-20 도트 글꼴(Galmuri) 제거: NPC 대화창(.window.dialog = 주아체 + DialogExtra)·NPC/몬스터/아이템 이름표(주아체 + DialogExtra)의 글자도 빠짐없이
+{ let dlg = '', plate = 'Lv0123456789×', em = 0;
+  for (const nd of Object.values(d.npcs)) { dlg += (nd.name || '') + (nd.title || '') + (nd.lines || []).map(plainText).join(''); plate += (nd.name || '') + (nd.title || ''); }
+  for (const q of d.questList) for (const k of ['name', 'offerText', 'progressText', 'completeText']) if (q[k]) dlg += plainText(q[k]);
+  for (const m of Object.values(d.monsters)) plate += m.name || '';
+  for (const it of d.itemList) plate += it.name || '';
+  const missD = [...new Set(dlg)].filter(c => !/\s/.test(c) && !jua.has(c.codePointAt(0)) && !extra.has(c.codePointAt(0)));
+  const missP = [...new Set(plate)].filter(c => !/\s/.test(c) && !jua.has(c.codePointAt(0)) && !extra.has(c.codePointAt(0)));
+  eq(missD.join(''), '', 'NPC 대화창 글꼴(주아체 + DialogExtra)에 빠진 글자 없음');
+  eq(missP.join(''), '', '이름표 글꼴(주아체 + DialogExtra)에 NPC·몬스터·아이템 이름 글자가 모두 있음');
+  console.log(`대화창·이름표 글꼴: ${new Set(dlg + plate).size}자 확인`); }

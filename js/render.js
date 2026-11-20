@@ -19,6 +19,8 @@ export function tex(path, repeat = false) {
   if (texCache.has(key)) return texCache.get(key);
   const t = loader.load(path);
   t.magFilter = THREE.NearestFilter; t.minFilter = THREE.NearestFilter; t.generateMipmaps = false;
+  // 2026-11-20: 빌더 지형 텍스처(assets/env, tools/ui/env_smooth.py로 다시 그린 256 px 손그림)는 도트가 아니므로 부드럽게
+  if (/\/env\//i.test(path)) { t.magFilter = THREE.LinearFilter; t.minFilter = THREE.LinearMipmapLinearFilter; t.generateMipmaps = true; t.anisotropy = 4; }
   t.colorSpace = THREE.SRGBColorSpace;
   if (repeat) t.wrapS = t.wrapT = THREE.RepeatWrapping;
   texCache.set(key, t);
@@ -159,7 +161,7 @@ export class Renderer {
       if (!mat) {
         const col = new THREE.Color(m.color[0], m.color[1], m.color[2]);
         let map = null;
-        if (m.tex) { map = tex(resPath(m.tex), m.tex.includes("/Env/")); if (m.water) { map = loader.load(resPath(m.tex)); map.magFilter = map.minFilter = THREE.NearestFilter; map.generateMipmaps = false; map.colorSpace = THREE.SRGBColorSpace; map.wrapS = map.wrapT = THREE.RepeatWrapping; this.waterTex.push(map); } }
+        if (m.tex) { map = tex(resPath(m.tex), m.tex.includes("/Env/")); if (m.water) { map = loader.load(resPath(m.tex)); map.magFilter = THREE.LinearFilter; map.minFilter = THREE.LinearMipmapLinearFilter; map.generateMipmaps = true; map.colorSpace = THREE.SRGBColorSpace; map.wrapS = map.wrapT = THREE.RepeatWrapping; this.waterTex.push(map); } }
         if (m.kind === "lit") mat = new THREE.MeshLambertMaterial({ color: col, map });
         else if (m.kind === "unlit") mat = new THREE.MeshBasicMaterial({ color: col, map });
         else mat = new THREE.MeshBasicMaterial({ color: col, opacity: m.color[3], transparent: true, vertexColors: !!m.c, depthWrite: false, side: THREE.DoubleSide, map });
@@ -493,6 +495,8 @@ export class Fx {
     this.meta = await (await fetch("assets/fx/effects.json")).json();
     this.byName = Object.fromEntries(this.meta.effects.map(e => [e.name, e]));
     this.tex = tex("assets/fx/effects.png");
+    // 2026-11-20: 매끈한 128 px 그림(tools/ui/effects_atlas.py) — 도트 시절의 Nearest 대신 부드럽게
+    this.tex.magFilter = THREE.LinearFilter; this.tex.minFilter = THREE.LinearMipmapLinearFilter; this.tex.generateMipmaps = true; this.tex.anisotropy = 4; this.tex.needsUpdate = true;
     this.loaded = true;
   }
   get(name) { return this.byName && this.byName[name]; }

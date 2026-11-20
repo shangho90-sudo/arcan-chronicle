@@ -347,7 +347,7 @@ class Game {
     const sheetNames = new Set();
     for (const m of Object.values(this.data.monsters)) sheetNames.add(m.sheet);
     for (const n of Object.values(this.data.npcs)) sheetNames.add(n.sheet);
-    const resources = [this.audio.loadNpcVoices(), this.fx.load(), this.ui.load(), loadPlayerModel("m"), loadPlayerModel("f"), loadActions(), document.fonts && document.fonts.load("16px Galmuri11").catch(() => { }), ...[...sheetNames].map(n => loadSheet(n))];
+    const resources = [this.audio.loadNpcVoices(), this.fx.load(), this.ui.load(), loadPlayerModel("m"), loadPlayerModel("f"), loadActions(), document.fonts && document.fonts.load("16px Jua").catch(() => { }), ...[...sheetNames].map(n => loadSheet(n))];
     let resourceDone = 0;
     await Promise.all(resources.map(async task => {
       await task;
@@ -355,7 +355,7 @@ class Game {
     }));
     progress(75, "텍스처 준비하는 중...");
     preloadDrops();
-    await preloadTextures([...sheetNames].map(n => "assets/sprites/" + n + ".png").concat(["assets/fx/effects.png", "assets/ui/icons.png", "assets/ui/shadow.png"]));
+    await preloadTextures([...sheetNames].map(n => "assets/sprites/" + n + ".png").concat(["assets/fx/effects.png", "assets/ui/shadow.png"]));
     const unlock = () => this.audio.unlock();
     // capture phase: the first click anywhere (even on a title button) starts the sound before the button acts
     for (const ev of ["pointerdown", "keydown", "touchstart", "mousedown"]) addEventListener(ev, unlock, { capture: true, passive: true });
