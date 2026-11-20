@@ -9,12 +9,15 @@
 // 종류 (FX.wp(kind, a, o) — 모두 null 이 될 수 있음, 규칙은 그대로):
 //   mark(t)                          반응 표식: 발밑 얇은 청록 고리 + 카메라 쪽 구슬 1~3. handle {setStacks(n), dispose()} — 0이 되면 소비 섬광 뒤 사라짐
 //   capsule(pc, {from, tgt(), at(), fly, split, n})   handle {launch(i, dur, ok), hit(i, pos, ok, last), fizzle(i), ring(pos, r)}
-//   cryo(pc, {from, at, r, fly, film, rise, burst})   handle {burst(hits)}
+//   foam(pc, {from, at, r, fall, life, ticks})        handle {land(), pop(i, n), final(n, early), end()}         (2026-11-20 발포정)
 //   ion(pc, {from, f, len, w, align, strike, n})      handle {strike(hits)}
 //   triad(pc, {from, tgt(), at(), times})               handle {hit(i, pos, ok), fizzle(i), compound(pos, r), end()}
 //   collapse(pc, {at, r, contact})                    handle {impact(n)}
-//   catalyst(pc, {dur, n})  carrier(pc, {from, tgt, fly})  chain(pc, {from, tgt, first})  zone(pos, {r, life})  critical(pos, {r, burst, snap})
-//   spray(pos, {r, dur, follow})  coat(pc, {dur, initial})  lastrx(pc, {dur})  made(pc, {kind: vial|capsule})  regen(pc, {status})
+//   tablet(pc, {from, tgt, fly, core})  handle {shell(), blink(i), burst(ok, early), fizzle()}   release(pc, {from, at, kind})   (이중정·긴급 방출)
+//   chain(pc, {from, tgt, first})  zone(pos, {r, life})  critical(pos, {r, burst, snap})
+//   kit(pc, {at, r, n, dur, open}) handle {send(i, u, fly), heal(i, u), close()}  patch(pc, {tgt, n, from}) handle {tick(left), end()}
+//   reel(pc, {tgt, shoot, pull}) handle {taut(to), arrive(), end()}  wrap(pc)        (구급함·서방 패치·붕대 릴 — 패치·붕대·가방은 절차 메시 + PATCH_FS/BAND_FS)
+//   coat(pc, {dur, initial})  lastrx(pc, {dur})  made(pc, {kind: vial|capsule})  regen(pc, {status})
 // 소리: 판정 순간의 소리는 규칙(js/wpharm.js)이 내고, 그림에만 있는 순간(캡슐이 갈라짐·막이 퍼짐·응축·촉매·운반체·분무·코팅·최종 처방·조제)은 여기서
 //   (assets/audio/sfx_wp_*.mp3 — Runway, tools/audio/wp_runway_sfx.py).
 // 저사양(휴대폰 / 그래픽 효과 끔): 입자 수만 줄임(WPFX.liteK) — 캡슐·결정·마법진·빛기둥·표식 소비는 그대로.
@@ -118,6 +121,33 @@ const ADD = { transparent: true, depthWrite: false, blending: THREE.AdditiveBlen
 const LINEN_FS = `uniform vec3 uW, uB; uniform float uA; varying vec2 vUv;
 void main(){ vec2 p = vUv * 2. - 1.; float e = clamp(1. - pow(abs(p.x), 2.4), 0., 1.), a = e * exp(-abs(p.y) * 3.2) * smoothstep(1., .7, abs(p.y)); gl_FragColor = vec4(mix(uB, uW, exp(-abs(p.y) * 9.)), a * uA); }`;
 
+// ---- 2026-11-20 6종 교체용 셰이더 -------------------------------------------------------------------------------
+// 패치(쿼드, 가로:세로 = 1.6:1): uMode 0 = 세 칸 패치(uN = 켜진 칸 수, 켜진 칸은 민트 빛·꺼진 칸은 회색) / 1 = 응급 패치(십자)
+const PATCH_FS = `uniform float uA, uN, uMode, uP; varying vec2 vUv;
+float rbox(vec2 p, vec2 b, float r){ vec2 q = abs(p) - b + r; return length(max(q, 0.)) + min(max(q.x, q.y), 0.) - r; }
+void main(){ vec2 p = vUv * 2. - 1.; p.x *= 1.6; float d = rbox(p, vec2(1.56, .96), .36); if (d > 0.) discard;
+  vec3 c = vec3(.98, .95, .88); c = mix(vec3(.42, .66, .74), c, smoothstep(.0, -.09, d)); float a = 1.;
+  if (uMode < .5) { for (int i = 0; i < 3; i++) { float cx = -.98 + float(i) * .98; float cd = rbox(p - vec2(cx, 0.), vec2(.36, .56), .14); float on = step(float(i) + .5, uN);
+      vec3 cc = mix(vec3(.66, .68, .67), vec3(.4, 1.25, 1.0) * (1. + .25 * uP), on); c = mix(cc, c, smoothstep(-.02, .03, cd)); c += on * vec3(.15, .4, .35) * smoothstep(.22, -.05, cd) * .4; } }
+  else { float cr = min(rbox(p, vec2(.62, .2), .06), rbox(p, vec2(.2, .62), .06)); c = mix(vec3(.95, .26, .3), c, smoothstep(-.02, .03, cr)); }
+  gl_FragColor = vec4(c, a * uA); }`;
+// 붕대(띠, u 길이 / v 폭): 크림색 천 + 결 + 양쪽 청록 줄, uP = 머리 위치(0..1, 그 뒤만 보임)
+const BAND_VS = `attribute float aU, aV; varying vec2 vUv; void main(){ vUv = vec2(aU, aV); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`;
+const BAND_FS = `uniform float uA, uL; varying vec2 vUv;
+void main(){ float v = abs(vUv.y * 2. - 1.), w = .9 + .07 * sin(vUv.x * uL * 90.) * sin(vUv.y * 24.) + .04 * sin(vUv.x * uL * 31. + vUv.y * 9.);
+  vec3 c = vec3(.97, .93, .84) * w; c = mix(c, vec3(.36, .74, .76), smoothstep(.7, .78, v) * smoothstep(.9, .82, v)); c *= 1. - .25 * smoothstep(.9, 1., v);
+  gl_FragColor = vec4(c, uA * smoothstep(1., .94, v)); }`;
+// 발포정 거품(바닥 판, 반지름 1 = 판정 반경): 둥근 거품 방울 무늬, uP = 퍼진 반지름(0..1), uT = 시간(방울이 부풀었다 꺼짐) — 바닥에 붙은 일반 블렌딩(높이 0)
+const FOAM_FS = `uniform float uA, uP, uT; varying vec2 vUv;
+float h21(vec2 c){ return fract(sin(dot(c, vec2(127.1, 311.7))) * 43758.5453); }
+void main(){ vec2 p = vUv * 2. - 1.; float r = length(p); if (r > 1.) discard;
+  float edge = smoothstep(uP, uP - .08, r), a = 0.; vec3 c = vec3(.94, .98, 1.);
+  for (int k = 0; k < 2; k++) { float s = k == 0 ? 9. : 17.; vec2 q = p * s + float(k) * 3.7, ci = floor(q), f = fract(q) - .5; float h = h21(ci + float(k) * 13.), ph = fract(h * 7.1 + uT * (.35 + .4 * h));
+    float rad = .14 + .3 * h * sin(ph * 3.1416); vec2 o = (vec2(h, fract(h * 9.3)) - .5) * .35; float d = length(f - o);
+    float ring = smoothstep(rad, rad - .06, d) - smoothstep(rad - .07, rad - .15, d) * .6; a = max(a, ring * (k == 0 ? .7 : .5)); }
+  float fill = .22 + .2 * smoothstep(.2, 1., r), rim = smoothstep(.04, 0., abs(r - uP + .03)) * .55;
+  c = mix(vec3(.55, .82, .98), c, .65 + .35 * a); gl_FragColor = vec4(c, (fill + a * .6 + rim) * edge * uA); }`;
+
 /** 한 종류의 입자 묶음 = InstancedMesh 하나. 입자: 위치·속도·중력·끌림·땅·회전·크기(시작→끝)·색·알파·자체 빛, 수명 동안 페이드 */
 class Parts {
   constructor(root, geo, mat, cap, bb) {
@@ -199,6 +229,8 @@ export class WpFx extends CookFx {
     if (kind === 'discA') return new THREE.ShaderMaterial({ uniforms: U({ uW: C(), uB: C(), uA: 0, uK: 2, uP: 0, uT: 0, uAdd: 1 }), vertexShader: FLAT_VS, fragmentShader: DISC_FS, ...ADD });
     if (kind === 'sigil') return new THREE.ShaderMaterial({ uniforms: U({ uW: C(), uB: C(), uG: C(), uA: 0, uP: 0, uT: 0, uV: 0, uAdd: 0 }), vertexShader: FLAT_VS, fragmentShader: SIGIL_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
     if (kind === 'sigilA') return new THREE.ShaderMaterial({ uniforms: U({ uW: C(), uB: C(), uG: C(), uA: 0, uP: 0, uT: 0, uV: 0, uAdd: 1 }), vertexShader: FLAT_VS, fragmentShader: SIGIL_FS, ...ADD });
+    if (kind === 'patch') return new THREE.ShaderMaterial({ uniforms: U({ uA: 0, uN: 3, uMode: 0, uP: 0 }), vertexShader: FLAT_VS, fragmentShader: PATCH_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide });
+    if (kind === 'foamD') return new THREE.ShaderMaterial({ uniforms: U({ uA: 0, uP: 0, uT: 0 }), vertexShader: FLAT_VS, fragmentShader: FOAM_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
     if (kind === 'lineN') return new THREE.ShaderMaterial({ uniforms: U({ uW: C(), uB: C(), uA: 0 }), vertexShader: FLAT_VS, fragmentShader: LINEN_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide });
     if (kind === 'pillar') return new THREE.ShaderMaterial({ uniforms: U({ uW: C(), uB: C(), uA: 0, uT: 0 }), vertexShader: PILLAR_VS, fragmentShader: PILLAR_FS, ...ADD });
     if (kind === 'helix') return new THREE.ShaderMaterial({ uniforms: U({ uW: C(), uB: C(), uA: 0, uP: 0 }), vertexShader: PILLAR_VS, fragmentShader: HELIX_FS, ...ADD });
@@ -364,52 +396,104 @@ export class WpFx extends CookFx {
     });
   }
 
-  // ------------------------------------------------------------------ A2 극저온 결정화
-  cryo(pc, o) {
-    if (!this._ok()) return null; const C = WPFX.col, K = WPFX.cryo, low = lite(), at = P3(o.at), from = P3(o.from), r = o.r;
-    const t0 = o.fly, t1 = o.fly + o.film, t2 = t1 + o.rise, TB = o.burst; let burst = -1, landed = false, sig = null;
-    const cr = [], NR = low ? K.rimLite : K.rim, hist = [];
-    this.circle(null, 0.95, { follow: () => P3(pc.pos), col: [C.white, C.iceB, C.gold], v: 2, life: 0.7, draw: 0.16, out: 0.3, spin: 2 });
-    this.emit('glint', from, 5, { col: [C.ice, C.white], speed: [0.2, 0.7], up: [0, 0.5], size: [0.14, 0.22], life: [0.25, 0.4], g: 0, drag: 4 });
-    const e = this._fx('cryo', TB + 0.6, (e, dt) => {
-      const t = e.t; _c.copy(from).lerp(at, 0.5); _c.y += 1.3;
-      if (t <= t0) { bez(_d, from, _c, at, easeIn(t / t0)); amp.position.copy(_d); amp.rotation.set(Math.PI * smooth(0, t0, t), 0, 0);
-        hist.unshift(_d.clone()); if (hist.length > 10) hist.length = 10; this._ribbonSet(rib, hist, 0.07); rib.material.uniforms.uA.value = 1;
-        if (!low || (e.f = (e.f || 0) + 1) % 2) this.emit('glint', _d, 1, { col: [C.ice, C.white], speed: [0.05, 0.3], up: [-0.2, 0.2], size: [0.12, 0.2], life: [0.25, 0.4], g: 0 }); }
-      else { amp.position.copy(at).setY(at.y + 0.18 * (1 - smooth(t0, t1, t))); amp.rotation.set(Math.PI, 0, 0); rib.material.uniforms.uA.value = Math.max(0, rib.material.uniforms.uA.value - dt * 6); }
-      if (!landed && t > t0) { landed = true; this.flash(_a.copy(at).setY(at.y + 0.25), C.white, C.ice, 0.8, 0.14, 1.0); this.sfx('wp_frost');
-        sig = this.circle(at, r, { col: [C.white, C.iceB, C.gold], v: 2, hold: true, draw: o.film + 0.1, out: 0.9, spin: 1.2, a: 0.8 });
-        this.mist(at, 6, r * 0.8, [0xe8f8ff, 0xbfe4ff], { a: 0.26, up: [0.0, 0.15], life: [0.8, 1.1] });
-        this.emit('glint', _a.copy(at).setY(at.y + 0.1), 8, { col: [C.ice, C.white], spread: r * 0.7, speed: [0.1, 0.4], up: [0.2, 0.7], size: [0.12, 0.22], life: [0.4, 0.7], g: 0 }); }
-      amp.material.uniforms.uA.value = 1 - smooth(t1, t1 + 0.2, t);
-      const fk = smooth(t0, t1, t); film.material.uniforms.uP.value = 0.05 + 0.93 * easeOut(fk); film.material.uniforms.uA.value = (burst < 0 ? 1 : 1 - smooth(TB, TB + 0.45, t)) * 0.95 * smooth(t0, t0 + 0.05, t);
-      for (const c of cr) {
-        const k = burst >= 0 ? 1 : smooth(c.d0, c.d0 + 0.16, t), fade = burst >= 0 ? 1 - smooth(TB + c.fo, TB + c.fo + 0.25, t) : 1;
-        if (!c.born && k > 0.05) { c.born = true; if (!low) this.emit('glint', c.m.position, 1, { col: C.ice, speed: [0, 0.1], up: [0.4, 0.8], size: [0.16, 0.24], life: [0.25, 0.35], g: 0 }); }
-        c.m.scale.set(c.s * 0.8, c.s * k * (c.centre ? 0.6 + 0.4 * smooth(t2 - 0.1, TB, t) : 1), c.s * 0.8); c.m.material.uniforms.uA.value = fade * (c.centre ? 1 : 0.9);
-        if (c.centre) c.m.material.uniforms.uGlow.value = 0.2 + 1.2 * smooth(t2, TB, t);
+  // ------------------------------------------------------------------ 2026-11-20 6종 교체: 절차 메시(한 번만 만듦, 정점 색 = 흰색 — 색은 tint 유니폼)
+  _g2() {
+    if (this.g2) return this.g2;
+    const vc = (g) => { g.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(g.attributes.position.count * 3).fill(1), 3)); return g; };
+    const lid = new THREE.BoxGeometry(1.04, 0.12, 0.66); lid.translate(0, 0.06, 0.33);   // 경첩 = 뒤 모서리(원점)
+    const band = (n) => { const g = new THREE.BufferGeometry(), pos = new Float32Array(n * 2 * 3), u = new Float32Array(n * 2), v = new Float32Array(n * 2), idx = [];
+      for (let i = 0; i < n; i++) { u[i * 2] = u[i * 2 + 1] = i / (n - 1); v[i * 2] = 0; v[i * 2 + 1] = 1; if (i < n - 1) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); } }
+      g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('aU', new THREE.BufferAttribute(u, 1)); g.setAttribute('aV', new THREE.BufferAttribute(v, 1)); g.setIndex(idx); return g; };
+    return (this.g2 = {
+      tab: vc(new THREE.CylinderGeometry(1, 1, 0.42, 28)), score: vc(new THREE.BoxGeometry(2.06, 0.1, 0.13)), half: vc(new THREE.CylinderGeometry(1, 1, 0.42, 16, 1, false, 0, Math.PI)),
+      ball: vc(new THREE.SphereGeometry(1, 20, 14)), disc: vc(new THREE.CylinderGeometry(1, 0.94, 0.3, 36)),
+      box: vc(new THREE.BoxGeometry(1, 0.62, 0.62)), lid: vc(lid), bar: vc(new THREE.BoxGeometry(1, 1, 1)), handle: vc(new THREE.TorusGeometry(0.2, 0.035, 6, 14, Math.PI)),
+      reel: vc(new THREE.CylinderGeometry(1, 1, 0.55, 16)), band: band, bandN: 18,
+    });
+  }
+  _band(e, n) {
+    const key = 'band' + n, p = this.pool[key] || (this.pool[key] = []); let m = p.pop();
+    if (!m) { m = new THREE.Mesh(this._g2().band(n), new THREE.ShaderMaterial({ uniforms: { uA: { value: 0 }, uL: { value: 1 } }, vertexShader: BAND_VS, fragmentShader: BAND_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide })); m.frustumCulled = false; m.userData.kind = key; m.userData.n = n; }
+    m.visible = true; m.renderOrder = 6; m.material.uniforms.uA.value = 0; e.items.push(m); e.g.add(m); return m;
+  }
+  /** 붕대 띠를 점들(three 좌표)을 따라 폭 w로 — 카메라를 보는 넓은 띠, uL = 길이(결 무늬) */
+  _bandSet(m, pts, w) {
+    const a = m.geometry.attributes.position, n = m.userData.n; let L = 0;
+    for (let i = 0; i < n; i++) {
+      const k = i / (n - 1) * (pts.length - 1), i0 = Math.floor(k), i1 = Math.min(pts.length - 1, i0 + 1), f = k - i0; _c.copy(pts[i0]).lerp(pts[i1], f);
+      const j0 = Math.max(0, i0 - (f < 1e-6 ? 1 : 0)), j1 = Math.min(pts.length - 1, j0 + 1); _a.subVectors(pts[j1], pts[j0]); if (_a.lengthSq() < 1e-8) _a.set(1, 0, 0);
+      _b.crossVectors(_a, this.toCam); if (_b.lengthSq() < 1e-8) _b.set(0, 1, 0); _b.normalize().multiplyScalar(w / 2);
+      a.setXYZ(i * 2, _c.x - _b.x, _c.y - _b.y, _c.z - _b.z); a.setXYZ(i * 2 + 1, _c.x + _b.x, _c.y + _b.y, _c.z + _b.z);
+    }
+    for (let i = 1; i < pts.length; i++) L += pts[i].distanceTo(pts[i - 1]);
+    a.needsUpdate = true; m.material.uniforms.uL.value = Math.max(0.2, L);
+  }
+  patchQ(e, mode, w, order = 7) { const m = this._m(e, 'patch', this.quad, order), u = m.material.uniforms; u.uMode.value = mode; u.uN.value = 3; u.uA.value = 0; u.uP.value = 0; m.scale.set(w, w / 1.6, 1); return m; }
+  /** 손(three 좌표) — 실제 오른손이 있으면 그것 */
+  _hand(pc) { try { const h = pc.body && pc.body.handPoint && pc.body.handPoint(); if (h) return _d.set(h.x, h.y, h.z).clone(); } catch (e) { /* no body */ } return P3(pc.pos).setY((pc.pos.y || 0) + 1.2); }
+  _chest(t) { return P3({ x: t.pos.x, y: (t.pos.y || 0) + mid(t), z: t.pos.z }); }
+  _front(t, k = 0.6) { const p = this._chest(t); _a.copy(this.toCam).setY(0); if (_a.lengthSq() < 1e-6) _a.set(0, 0, 1); _a.normalize(); return p.addScaledVector(_a, (t.radius || 0.5) * k); }
+  /** 회복 순간(대상 actor): 민트 고리·십자 빛·위로 오르는 반짝이 (+ 리마스터 healAura) */
+  _healPop(u, big = 1) {
+    const C = WPFX.col, g = P3(u.pos), c = this._chest(u);
+    this.groundRing(g, Math.min(1.2, (u.radius || 0.45) + 0.55) * big, C.white, C.mint, 0.32, 1.1); this.flash(c, C.white, C.mint, 0.7 * big, 0.16, 1.0);
+    this.emit('glint', c, Math.round(5 * big), { col: [C.mint, C.white, C.teal], speed: [0.1, 0.4], up: [1.0, 1.9], size: [0.13, 0.22], life: [0.45, 0.65], g: 0 });
+    this.emit('star', c, Math.round(3 * big), { col: [C.mint, C.white], speed: [0.4, 1.0], up: [1.2, 2.2], size: [0.04, 0.065], life: [0.5, 0.7], g: 3, glow: 0.9 });
+    if (this.rm && gfxOn() && this.rm.ok()) this.rm.healAura(u, { col: C.mint, gold: C.gold, dur: 0.9, r: Math.min(1.0, (u.radius || 0.45) + 0.4) });
+  }
+
+  // ------------------------------------------------------------------ A2 발포정
+  /** 커다란 흰 발포정이 조준점 위에서 떨어져(fall) 닿음(land) -> 가장자리부터 녹으며 바닥에 낮은 거품(FOAM_FS, 높이 0)이 판정 반경까지 퍼지고
+   *  작은 유리 기포(≤ 0.17 m — 작은 몬스터의 발이 보이게)가 부풀어 pop(i) 때 터짐 -> 마지막 큰 기포(납작한 구)가 부풀어 final 에 터짐. */
+  foam(pc, o) {
+    if (!this._ok()) return null; const C = WPFX.col, G2 = this._g2(), low = lite(), at = P3(o.at), r = o.r, fall = o.fall || 0.35, life = o.life || 3; let landT = -1, finT = -1, endT = -1, early = false; const bub = [];
+    const sig = this.circle(at, r, { col: [C.white, C.sky, C.gold], v: 2, hold: true, draw: fall, out: 0.4, spin: 0.5, a: 0.45, glowA: 0.3 });
+    this.flash(P3(o.from), C.white, C.sky, 0.5, 0.14, 1.0);
+    const e = this._fx('foam', 30, (e, dt) => {
+      const t = e.t;
+      if (endT >= 0) { endT += dt; if (endT > 0.45) { e.t = e.life; return; } }
+      const fade = endT >= 0 ? 1 - endT / 0.45 : 1;
+      if (landT < 0) {   // falling: tilt + spin, shadow grows
+        const k = clamp01(t / fall), y = at.y + 2.4 * (1 - easeIn(k)) + 0.11;
+        tab.position.set(at.x, y, at.z); tab.rotation.set(0.5 * (1 - k), t * 6, 0.3 * (1 - k)); tab.scale.set(0.62, 0.62, 0.62); tab.material.uniforms.uA.value = smooth(0, 0.06, t);
+        sh.material.uniforms.uA.value = 0.5 * k; sh.scale.set(0.9 * (0.4 + 0.6 * k), 0.9 * (0.4 + 0.6 * k), 1);
+      } else {
+        const lt = t - landT, melt = clamp01(lt / Math.max(0.5, life - fall - 0.3));
+        tab.position.set(at.x, at.y + 0.1 * (1 - melt * 0.8), at.z); tab.rotation.set(0, lt * 0.4, 0); const R = 0.62 * (1 - 0.85 * melt);
+        tab.scale.set(R, 0.62 * (1 - 0.75 * melt), R); tab.material.uniforms.uA.value = fade * (1 - smooth(0.9, 1, melt));
+        sh.material.uniforms.uA.value = 0.35 * fade * (1 - melt);
+        const fu = foamD.material.uniforms; fu.uP.value = 0.25 + 0.75 * easeOut(smooth(0, 0.6, lt)); fu.uT.value = lt; fu.uA.value = fade * (finT >= 0 ? 1 - smooth(0, 0.6, t - finT) : 1);
+        if (!low || (e.f = (e.f || 0) + 1) % 2 === 0) if (finT < 0 && rand() < 0.5) { const a = rnd(0, 6.283), rr = Math.sqrt(rand()) * r * fu.uP.value * 0.95;
+          this.emit('gran', _a.set(at.x + Math.cos(a) * rr, at.y + 0.03, at.z + Math.sin(a) * rr), 1, { col: [C.white, C.ice, C.sky], size: [0.02, 0.04], speed: [0, 0.15], up: [0.2, 0.5], g: 2, ground: at.y + 0.02, life: [0.3, 0.5], glow: 0.5 }); }
+        // small glass bubbles grow until popped
+        for (const b of bub) { if (b.popped) continue; b.k = Math.min(1, b.k + dt * b.sp); const s = b.s * (0.3 + 0.7 * easeOut(b.k)); b.m.position.set(b.x, at.y + s * 0.55, b.z); b.m.scale.set(s, s * 0.8, s); b.m.material.uniforms.uA.value = fade * 0.9; }
+        // the big centre bubble swells over the last ~0.7 s (or at once on an early release)
+        const tf = life - 0.75; const bk = finT >= 0 ? 1 : clamp01((t - tf) / 0.7); if (bk > 0 && finT < 0) { const s = 0.18 + 0.62 * easeOut(bk) + 0.03 * Math.sin(t * 18); big.visible = true; big.position.set(at.x, at.y + s * 0.42, at.z); big.scale.set(s, s * 0.62, s); big.material.uniforms.uA.value = fade; big.material.uniforms.uGlow.value = 0.2 + 0.5 * bk; }
       }
     });
-    const amp = this.propM(e, 'tripo_ampoule', this.geo.wp_ampoule, { tint: C.ice, op: 0.55, glow: 0.3 }); amp.scale.setScalar(0.36);
-    const rib = this._ribbon(e, 10); rib.material.uniforms.uW.value.setHex(C.white); rib.material.uniforms.uB.value.setHex(C.iceB);
-    const film = this.disc(e, 0, C.white, C.iceB); film.position.copy(at).setY(at.y + 0.04); film.scale.set(r * 2, r * 2, 1);
-    for (let i = 0; i < NR; i++) { const a = i / NR * Math.PI * 2 + 0.2, rr = r * 0.82; cr.push({ x: Math.cos(a) * rr, z: Math.sin(a) * rr, d0: t1 + 0.02 * i / NR, s: K.crystal * rnd(0.8, 1.1), fo: 0.05 }); }
-    for (let i = 0; i < K.mid; i++) { const a = i / K.mid * Math.PI * 2 + 0.8, rr = r * 0.45; cr.push({ x: Math.cos(a) * rr, z: Math.sin(a) * rr, d0: t1 + (t2 - t1) * 0.45, s: K.crystal * 1.2, fo: 0.1 }); }
-    cr.push({ x: 0, z: 0, d0: t1 + (t2 - t1) * 0.8, s: K.centre, centre: true, fo: 0 });
-    for (const c of cr) { c.m = this.glassM(e, this.geo.wp_crystal, { tint: C.ice, op: 0.6, glow: 0.2, order: 4 }); c.m.position.set(at.x + c.x, at.y, at.z + c.z); c.m.rotation.set(rnd(-0.18, 0.18), rnd(0, 6), rnd(-0.18, 0.18)); c.m.scale.setScalar(0.001); }
-    e.dispose = () => { if (sig) sig.end(); this._free(e); };
-    return Object.assign(e, { burst: (hits) => {
-      burst = e.t; const top = at.clone(); top.y += K.centre * 0.8; if (sig) sig.end();
-      this.flash(top, C.white, C.iceB, 1.8, 0.16, 1.1); this.vring(top, 2.0, C.white, C.iceB, 0.3, 0.9);
-      this.groundRing(at, r, C.white, C.iceB, 0.34, 1.5); this.groundRing(at, r * 0.65, C.white, C.sky, 0.28, 1.0);
-      this.pillar(at, Math.min(0.9, r * 0.35), 3.2, { col: [C.white, C.iceB], life: 0.5 });
-      this.circle(at, r, { col: [C.white, C.sky, C.gold], v: 2, life: 1.1, draw: 0.01, out: 0.9, spin: 0.6, a: 0.5, glowA: 0.5 });   // 잔광: 서리 문양이 천천히 사라짐
-      this.shards(top, low ? K.shardsLite : K.shards, C.ice, { ground: at.y + 0.03 });
-      this.emit('star', top, 10, { col: [C.ice, C.white, C.sky], speed: [1.6, 3.4], up: [1.4, 3.0], size: [0.05, 0.09], life: [0.5, 0.8], g: 6, glow: 0.8, ground: at.y + 0.03 });
-      this.emit('glint', top, 12, { col: [C.ice, C.white], speed: [1.5, 3.5], up: [0.5, 2.5], size: [0.16, 0.3], life: [0.35, 0.6], g: 1, drag: 3 });
-      this.mist(at, 6, r * 0.7, [0xeaf8ff, 0xcfe8ff], { a: 0.3, life: [0.7, 1.0] });
-      for (const h of hits || []) { const p = P3({ x: h.x, y: (h.y || 0) + 0.6, z: h.z }); this.bang(p, [C.ice, C.sky], 0.7, { stars: 2, ground: (h.y || 0) + 0.02 }); if (h.frozen) this.mist(P3(h), 3, 0.5, [0xe8f8ff, 0x8ac8f0], { a: 0.4, up: [0.3, 0.6], life: [0.5, 0.7] }); }
-    } });
+    const tab = this.solid(e, G2.tab, { tint: 0xf6f8fa, spec: 0.35 }); tab.material.uniforms.uGlow.value = 0.08;
+    const sh = this.disc(e, 1, 0x1a2a40, 0x1a2a40, false, 1); sh.position.set(at.x, at.y + 0.04, at.z);
+    const foamD = this._m(e, 'foamD', this.quad, 2); foamD.rotation.set(-Math.PI / 2, 0, 0); foamD.position.set(at.x, at.y + 0.05, at.z); foamD.scale.set(r * 2, r * 2, 1);
+    const big = this.glassM(e, G2.ball, { tint: C.glass, op: 0.12, rim: C.white, glow: 0.2, order: 5 }); big.visible = false;
+    const addBub = (n) => { for (let i = 0; i < n; i++) { const a = rnd(0, 6.283), rr = Math.sqrt(rand()) * r * 0.85; const m = this.glassM(e, G2.ball, { tint: C.glass, op: 0.15, rim: C.white, glow: 0.15, order: 5 }); m.scale.setScalar(0.01);
+      bub.push({ m, x: at.x + Math.cos(a) * rr, z: at.z + Math.sin(a) * rr, s: rnd(0.08, 0.17), k: 0, sp: rnd(1.6, 3), popped: false }); } };
+    return this._h(e, {
+      land: () => { if (landT >= 0) return; landT = e.t; this.flash(at.clone().setY(at.y + 0.2), C.white, C.sky, 0.8, 0.14, 1.0); this.groundRing(at, Math.min(r, 1.4), C.white, C.sky, 0.3, 1.0);
+        this.emit('gran', at.clone().setY(at.y + 0.1), 12, { col: [C.white, C.ice], size: [0.03, 0.05], speed: [1, 2.4], up: [0.4, 1.2], g: 8, ground: at.y + 0.02, life: [0.35, 0.55], glow: 0.5, bounce: 0.2 }); addBub(low ? 4 : 7); },
+      pop: (i, n) => { const live = bub.filter(b => !b.popped).sort((a, b) => b.k - a.k).slice(0, low ? 2 : 4);
+        for (const b of live) { b.popped = true; b.m.visible = false; const p = _a.set(b.x, at.y + b.s * 0.5, b.z).clone(); this.flash(p, C.white, C.sky, 0.32 + b.s, 0.1, 1.0); this.vring(p, 0.45 + b.s * 2, C.white, C.ice, 0.18, 0.8);
+          this.emit('gran', p, 4, { col: [C.white, C.ice], size: [0.015, 0.03], speed: [0.6, 1.4], up: [0.4, 1.0], g: 7, ground: at.y + 0.02, life: [0.25, 0.4], glow: 0.6 }); }
+        addBub(live.length); if (n > 0 && !low) this.emit('glint', at.clone().setY(at.y + 0.25), 3, { col: [C.sky, C.white], spread: r * 0.6, speed: [0.1, 0.3], up: [0.4, 0.9], size: [0.12, 0.2], life: [0.3, 0.45], g: 0 }); },
+      final: (n, isEarly) => { early = !!isEarly; finT = e.t; const s = big.visible ? big.scale.x : 0.5, p = at.clone().setY(at.y + 0.35); big.visible = false; for (const b of bub) b.m.visible = false;
+        this.flash(p, C.white, early ? C.iceB : C.sky, 1.2 + s, 0.16, 1.2); this.vring(p, 1.6 + s, C.white, C.sky, 0.3, 1.0); this.groundRing(at, r, C.white, C.sky, 0.38, 1.3);
+        this.emit('gran', p, 22, { col: [C.white, C.ice, C.sky], size: [0.025, 0.05], speed: [1.4, 3.2], up: [0.8, 2.0], g: 9, ground: at.y + 0.02, life: [0.45, 0.7], glow: 0.6, bounce: 0.25 });
+        this.emit('star', p, 5 + Math.min(4, n), { col: [C.sky, C.white, C.gold], speed: [1.2, 2.4], up: [1, 2.2], size: [0.05, 0.08], life: [0.45, 0.65], g: 6, glow: 0.8, ground: at.y + 0.02 });
+        this.mist(at.clone().setY(at.y + 0.1), 6, r * 0.7, [0xf4fbff, 0xbfe0f4], { a: 0.26, up: [0, 0.15], size: [0.5, 0.8], end: 1.6, life: [0.6, 0.9] });
+        if (this.rm && gfxOn() && this.rm.ok() && this.rm.pop) try { this.rm.pop(at.clone().setY(at.y + 0.3), { col: C.sky, ring: Math.min(r, 2.0), groundY: at.y }); } catch (err) { /* rm pop optional */ }
+        sig.end(); },
+      end: () => { if (endT < 0) endT = 0; sig.end(); },
+      dispose: () => { if (endT < 0) endT = 0; sig.end(); },
+    });
   }
 
   // ------------------------------------------------------------------ A3 이온 관통술
@@ -561,67 +645,75 @@ export class WpFx extends CookFx {
     } });
   }
 
-  // ------------------------------------------------------------------ B1 촉매 활성화
-  catalyst(pc, o) {
-    if (!this._ok()) return null; const C = WPFX.col, n = o.n || 3, amps = []; let endT = -1;
-    const feet = () => (pc.dead ? null : P3(pc.pos));
-    this.circle(null, 1.15, { follow: feet, col: [C.white, C.goldB, C.gold], v: 0, life: 1.3, draw: 0.22, out: 0.5, spin: 2 });
-    this.helix(feet, 0.62, 2.0, { col: [C.white, C.gold], life: 0.95, spin: 3.5 }); this.pillar(P3(pc.pos), 0.65, 2.4, { col: [C.gold, C.goldB], life: 0.55, a: 0.7 });
-    this.emit('glint', P3(pc.pos).setY((pc.pos.y || 0) + 0.3), 10, { col: [C.gold, C.white], spread: 0.6, speed: [0.1, 0.4], up: [1.2, 2.4], size: [0.14, 0.24], life: [0.5, 0.8], g: 0 });
-    this.sfx('wp_catalyst');
-    const e = this._fx('catalyst', (o.dur || 12) + 0.4, (e, dt) => {
-      if (pc.dead) e.t = e.life;
-      if (endT >= 0) endT += dt;
-      const p = P3(pc.pos), f = _a.set(pc.facing.x, 0, -pc.facing.z).normalize(), side = _b.crossVectors(f, UP).normalize();
-      amps.forEach((q, i) => {
-        if (q.gone) return; const a = (i - (n - 1) / 2) * 0.55;
-        q.m.position.copy(p).addScaledVector(f, -0.32).addScaledVector(side, Math.sin(a) * 0.55 + Math.sin(e.t * 2 + i) * 0.03); q.m.position.y += 1.62 + Math.cos(a) * 0.15 + Math.sin(e.t * 2.4 + i) * 0.04;
-        q.m.rotation.set(0.2, e.t * 1.5 + i, a * 0.6); const fade = endT >= 0 ? 1 - smooth(0, 0.3, endT) : smooth(0, 0.2, e.t);
-        q.m.material.uniforms.uA.value = fade; q.m.material.uniforms.uGlow.value = 0.25 + (q.lit ? 1.6 * (1 - smooth(0, 0.35, e.t - q.lit)) : 0);
-        q.h.position.copy(q.m.position).setY(q.m.position.y + 0.1); q.h.quaternion.copy(this.camQ); q.h.scale.setScalar(0.34 + 0.04 * Math.sin(e.t * 5 + i)); q.h.material.uniforms.uA.value = 0.55 * fade;
-        if (q.lit && e.t - q.lit > 0.35) { q.gone = true; q.m.visible = false; q.h.visible = false; }
-      });
-      if ((e.f = (e.f || 0) + 1) % (lite() ? 24 : 10) === 0 && endT < 0) { const q = amps.find(x => !x.gone); if (q) this.emit('glint', q.m.position, 1, { col: C.gold, speed: [0.05, 0.2], up: [0.2, 0.5], size: [0.1, 0.16], life: [0.4, 0.6], g: 0 }); }
-      if (endT > 0.35) e.t = e.life;
+  // ------------------------------------------------------------------ B1 이중정
+  /** 분할선 있는 흰 정제가 손에서 튕겨져 돌며 날아가 대상 가슴에 붙음 -> shell(): 흰 외층이 두 쪽으로 깨져 날아가고 푸른 내핵이 드러남(대상의 카메라 쪽 앞에 붙어
+   *  따라다님) -> blink(i): 내핵이 밝게 두 번 깜빡임(남은 1초·0.5초) -> 마지막 0.3초 부풀다 burst(ok, early): 푸른 섬광·고리·결정 파편 (early = 금이 가며 깨짐).
+   *  fizzle(): 대상이 쓰러짐 — 정제/내핵이 떨어지며 사라짐. */
+  tablet(pc, o) {
+    if (!this._ok() || !o.tgt) return null; const C = WPFX.col, G2 = this._g2(), t = o.tgt, from = P3(o.from), fly = o.fly || 0.2, coreLen = o.core || 2; let shellT = -1, endT = -1, blinkT = 0, last = null; const hist = [];
+    this.circle(null, 0.9, { follow: () => (pc.dead ? null : P3(pc.pos)), col: [C.white, C.sky, C.gold], v: 0, life: 0.55, draw: 0.12, out: 0.25, spin: 2.5, a: 0.8 });
+    this.flash(from, C.white, C.sky, 0.45, 0.12, 1.0); this.emit('glint', from, 4, { col: [C.white, C.sky], speed: [0.3, 0.8], up: [-0.1, 0.4], size: [0.12, 0.2], life: [0.2, 0.32], g: 0, drag: 4 });
+    const tag = this.circle(null, Math.min(1.1, (t.radius || 0.5) + 0.45), { follow: () => (t.dead || t.removed ? null : P3(t.pos)), col: [C.white, C.iceB, C.gold], v: 3, hold: true, draw: 0.2, out: 0.25, spin: 1.5, a: 0 });
+    const e = this._fx('tablet', 30, (e, dt) => {
+      if (endT >= 0) { endT += dt; if (endT > 0.3) { e.t = e.life; return; } }
+      const alive = !(t.dead || t.removed); if (alive) last = this._front(t, 0.55);
+      if (shellT < 0) {   // flight
+        const k = clamp01(e.t / fly), end = last || from; _c.copy(from).lerp(end, 0.5); _c.y += 0.45;
+        bez(tgG.position, from, _c, end, easeOut(k)); tgG.rotation.set(0.35 + Math.sin(e.t * 9) * 0.2, e.t * 26, 0.2); tgG.scale.setScalar(0.095);
+        tg.material.uniforms.uA.value = endT >= 0 ? 1 - endT / 0.3 : 1; sc.material.uniforms.uA.value = tg.material.uniforms.uA.value;
+        hist.unshift(tgG.position.clone()); if (hist.length > 8) hist.length = 8; this._ribbonSet(rib, hist, 0.045); rib.material.uniforms.uA.value = 0.9 * (endT >= 0 ? 1 - endT / 0.3 : 1);
+        return;
+      }
+      rib.visible = false; tgG.visible = false;
+      const lt = e.t - shellT, left = coreLen - lt; blinkT = Math.max(0, blinkT - dt);
+      const swell = smooth(coreLen - 0.32, coreLen, lt), fade = endT >= 0 ? 1 - endT / 0.3 : smooth(0, 0.08, lt);
+      if (last) { core.position.copy(last); halo.position.copy(last); }
+      const pulse = 0.5 + 0.5 * Math.sin(lt * 7), s = 0.085 * (1 + 0.35 * swell + 0.25 * blinkT / 0.22);
+      core.scale.setScalar(s); core.material.uniforms.uA.value = fade; core.material.uniforms.uGlow.value = 0.55 + 0.3 * pulse + 2.2 * blinkT / 0.22 + 1.2 * swell;
+      halo.quaternion.copy(this.camQ); halo.scale.setScalar(0.34 + 0.08 * pulse + 0.4 * blinkT / 0.22 + 0.3 * swell); halo.material.uniforms.uA.value = fade * (0.6 + 1.0 * blinkT / 0.22 + 0.6 * swell);
+      tag.setA(fade * (0.45 + 0.4 * blinkT / 0.22)); void left;
     });
-    for (let i = 0; i < n; i++) { const m = this.glassM(e, this.geo.wp_ampoule, { tint: C.gold, op: 0.75, glow: 0.25, order: 4 }); m.scale.setScalar(0.14); amps.push({ m, h: this.spr(e, 0, C.gold, C.goldB, 5), lit: 0, gone: false }); }
+    const tgG = new THREE.Group(); e.g.add(tgG);
+    const tg = this.solid(e, G2.tab, { tint: 0xf8fafc, spec: 0.5 }), sc = this.solid(e, G2.score, { tint: 0x7a8698, spec: 0.1 }); sc.renderOrder = 2;
+    for (const m of [tg, sc]) { e.g.remove(m); tgG.add(m); } sc.position.y = 0.215;   // 분할선: 정제 윗면 가운데를 가로지르는 홈
+    const rib = this._ribbon(e, 8); rib.material.uniforms.uW.value.setHex(C.white); rib.material.uniforms.uB.value.setHex(C.sky);
+    const core = this.glassM(e, G2.ball, { tint: 0x4aa8ff, op: 0.85, rim: C.white, glow: 0.6, order: 7 }); core.visible = true; core.material.uniforms.uA.value = 0;
+    const halo = this.spr(e, 0, C.white, C.iceB, 6);
     return this._h(e, {
-      fire: (left) => { const q = amps[n - 1 - left]; if (!q) return; q.lit = e.t; const p = q.m.position.clone();
-        this.flash(p, C.white, C.gold, 0.7, 0.16, 1.2); this.vring(p, 0.9, C.white, C.gold, 0.25, 0.9);
-        this.emit('star', p, 4, { col: [C.gold, C.white], speed: [1, 2], up: [0.4, 1.4], size: [0.04, 0.07], life: [0.35, 0.55], g: 5, glow: 0.9 });
-        this.emit('gran', p, 7, { col: C.gold, size: [0.02, 0.04], speed: [1.5, 3], up: [0.2, 1.2], life: [0.35, 0.5], g: 6, glow: 1.0 }); this.sfx('wp_spark'); },
-      spent: () => { endT = 0; },
+      shell: () => { if (shellT >= 0) return; shellT = e.t; const p = (last || tgG.position).clone(); tag.setA(0.6);
+        this.flash(p, C.white, C.white, 0.75, 0.12, 1.25); this.vring(p, 0.8, C.white, C.sky, 0.22, 0.9);
+        this.emit('shard', p, 8, { col: [0xffffff, 0xeef2f6], size: [0.04, 0.08], speed: [1.4, 3.0], up: [0.8, 2.2], ground: P3(t.pos).y + 0.02, life: [0.45, 0.65], g: 10, glow: 0.2, bounce: 0.3, spin: 14 });
+        this._halves(p);
+        if (this.rm && gfxOn() && this.rm.ok()) this.rm.burstOn(t, { col: C.white, hi: C.white, size: 0.6, sparks: 4 }); },
+      blink: () => { blinkT = 0.22; if (last) { this.vring(last, 0.5, C.white, C.iceB, 0.18, 0.9); this.emit('glint', last, 2, { col: [C.white, C.sky], speed: [0.2, 0.5], up: [0, 0.4], size: [0.14, 0.2], life: [0.18, 0.28], g: 0 }); } },
+      burst: (ok, early) => { const p = (last || core.position).clone(); endT = 0; core.visible = halo.visible = false; tag.end();
+        if (early) { this.flash(p, C.white, C.white, 0.6, 0.06, 1.4); this.emit('shard', p, 6, { col: [0x6ac0ff, 0xffffff], size: [0.03, 0.06], speed: [0.8, 1.8], up: [0.2, 1.0], life: [0.25, 0.4], g: 6, glow: 0.9, spin: 18 }); }
+        this.flash(p, C.white, 0x4aa8ff, 1.0 + (early ? 0.25 : 0), 0.16, 1.25); this.vring(p, 1.25, C.white, C.iceB, 0.26, 1.0);
+        this.emit('shard', p, 10, { col: [0x6ac0ff, C.ice, 0xffffff], size: [0.05, 0.1], speed: [1.6, 3.4], up: [0.8, 2.2], ground: P3(t.pos).y + 0.02, life: [0.5, 0.7], g: 10, glow: 0.7, bounce: 0.3, spin: 14 });
+        this.emit('star', p, 4, { col: [C.sky, C.white], speed: [1.2, 2.4], up: [0.8, 1.8], size: [0.05, 0.08], life: [0.4, 0.6], g: 5, glow: 0.9 });
+        this.groundRing(P3(t.pos), Math.min(1.3, (t.radius || 0.5) + 0.7), C.white, C.iceB, 0.3, 1.0);
+        if (ok && this.rm && gfxOn() && this.rm.ok()) this.rm.burstOn(t, { col: 0x6ac0ff, hi: C.white, size: early ? 1.0 : 0.85 }); },
+      fizzle: () => { const p = (last || tgG.position).clone(); endT = 0; tag.end(); this.emit('glint', p, 3, { col: [C.white, C.sky], speed: [0.2, 0.5], up: [-0.6, -0.2], size: [0.1, 0.16], life: [0.3, 0.45], g: 0 }); },
+      dispose: () => { if (endT < 0) endT = 0; tag.end(); },
     });
   }
+  /** 깨진 흰 외층 두 쪽: 분할선을 따라 반쪽 둘이 양옆으로 튀어 떨어짐 */
+  _halves(p) {
+    const G2 = this._g2(), side = _a.crossVectors(this.toCam, UP).normalize().clone(), gy = p.y - 1.1;
+    const hs = [];
+    const e = this._fx('halves', 0.6, (e, dt) => { for (const h of hs) { h.v.y -= 10 * dt; h.m.position.addScaledVector(h.v, dt); if (h.m.position.y < gy) { h.m.position.y = gy; h.v.set(h.v.x * 0.4, Math.abs(h.v.y) * 0.25, h.v.z * 0.4); } h.m.rotation.x += h.w * dt; h.m.rotation.z += h.w * 0.6 * dt; h.m.material.uniforms.uA.value = 1 - smooth(0.6, 1, e.t / 0.6); } });
+    for (const sg of [1, -1]) { const m = this.solid(e, G2.half, { tint: 0xf8fafc, spec: 0.5 }); m.scale.setScalar(0.095); m.position.copy(p); m.rotation.set(0.4, sg > 0 ? 0 : Math.PI, 0.3); hs.push({ m, v: side.clone().multiplyScalar(sg * 1.6).add(new THREE.Vector3(0, 1.6, 0)), w: sg * 10 }); }
+  }
 
-  // ------------------------------------------------------------------ B2 정밀 표적 전달
-  carrier(pc, o) {
-    if (!this._ok() || !o.tgt) return null; const C = WPFX.col, t = o.tgt, from = P3(o.from); let pulse = 0, endT = -1, latched = false; const hist = [];
-    this.sfx('wp_carrier'); this.flash(from, C.white, C.teal, 0.5, 0.14, 1.0);
-    const tr = (t.radius || 0.5) + 0.62;
-    const sig = this.circle(null, Math.min(1.3, tr), { follow: () => (t.dead || t.removed ? null : P3(t.pos)), col: [C.white, C.teal, C.gold], v: 3, hold: true, draw: 0.3, out: 0.3, spin: 1.2, a: 0 });
-    const e = this._fx('carrier', 1e9, (e, dt) => {
-      if (endT >= 0) { endT += dt; if (endT > 0.25) e.t = e.life; }
-      if (t.dead || t.removed) { if (endT < 0) endT = 0; }
-      pulse = Math.max(0, pulse - dt);
-      const tp = P3(t.pos), R = (t.radius || 0.5) + 0.62, k = clamp01(e.t / o.fly), a = e.t * 1.2;
-      _d.copy(tp).add(_a.set(Math.cos(a) * ((t.radius || 0.5) + 0.12), mid(t) + 0.15, Math.sin(a) * ((t.radius || 0.5) + 0.12)));
-      if (k < 1) { _c.copy(from).lerp(_d, 0.5); _c.y += 0.9; bez(sph.position, from, _c, _d, easeOut(k)); } else sph.position.copy(_d);
-      if (k >= 1 && !latched) { latched = true; this.flash(sph.position, C.white, C.teal, 0.8, 0.16, 1.1); this.vring(sph.position, 1.2, C.white, C.teal, 0.28, 0.9);
-        this.emit('glint', sph.position, 6, { col: [C.teal, C.white, C.gold], speed: [0.8, 1.8], up: [0, 1], size: [0.14, 0.24], life: [0.3, 0.5], g: 0, drag: 3 }); }
-      const fade = endT >= 0 ? 1 - endT / 0.25 : 1;
-      hist.unshift(sph.position.clone()); if (hist.length > 9) hist.length = 9; this._ribbonSet(rib, hist, 0.05); rib.material.uniforms.uA.value = (k < 1 ? 1 : 0.45) * fade;
-      sph.material.uniforms.uA.value = fade; sph.material.uniforms.uGlow.value = 0.2 + 0.8 * pulse / 0.3;
-      core.position.copy(sph.position); core.quaternion.copy(this.camQ); core.scale.setScalar(0.24 + 0.15 * Math.sin(e.t * 4)); core.material.uniforms.uA.value = 0.9 * fade;
-      ring.position.copy(tp).setY(tp.y + 0.07); ring.scale.setScalar(R * 2 * (1 + 0.15 * pulse / 0.3)); ring.material.uniforms.uA.value = (k >= 1 ? 0.9 : 0) * fade; ring.rotation.set(-Math.PI / 2, 0, e.t * 0.5);
-      sig.setA((k >= 1 ? 0.55 + 0.4 * pulse / 0.3 : 0) * fade);
-    });
-    const sph = this.glassM(e, this.geo.wp_granule, { tint: C.teal, op: 0.4, rim: C.white, glow: 0.2, order: 4 }); sph.scale.setScalar(0.14);
-    const core = this.spr(e, 0, C.white, C.teal, 5), rib = this._ribbon(e, 9); rib.material.uniforms.uW.value.setHex(C.white); rib.material.uniforms.uB.value.setHex(C.teal);
-    const ring = this.spr(e, 1, C.white, C.white, 3); ring.material.uniforms.uP.value = 0;
-    const end = () => { if (endT < 0) endT = 0; sig.end(); };
-    e.dispose = end;
-    return Object.assign(e, { refresh: () => { pulse = 0.3; this.vring(sph.position, 1.0, C.white, C.teal, 0.25, 0.8); } });
+  // ------------------------------------------------------------------ B2 긴급 방출: 손 -> 제제로 짧은 빛 줄 + 손 섬광
+  release(pc, o) {
+    if (!this._ok()) return null; const C = WPFX.col, A = P3(o.from), B = P3(o.at);
+    this.circle(null, 0.8, { follow: () => (pc.dead ? null : P3(pc.pos)), col: [C.white, C.iceB, C.gold], v: 3, life: 0.4, draw: 0.08, out: 0.2, spin: 4, a: 0.8 });
+    this.flash(A, C.white, C.sky, 0.55, 0.1, 1.2);
+    const e = this._fx('release', 0.2, (e) => { const k = e.t / 0.2; this.seg(ln, A, B, 0.16 * (1 - k)); ln.material.uniforms.uA.value = 1.2 * (1 - smooth(0.3, 1, k)); });
+    const ln = this.spr(e, 2, C.white, C.sky, 6);
+    this.emit('glint', B, 4, { col: [C.white, C.sky], speed: [0.4, 1.2], up: [0, 0.6], size: [0.14, 0.22], life: [0.2, 0.3], g: 0, drag: 3 });
+    return this._h(e);
   }
 
   // ------------------------------------------------------------------ B3 연쇄 용출
@@ -706,35 +798,124 @@ export class WpFx extends CookFx {
     });
   }
 
-  // ------------------------------------------------------------------ C3 생체 회복 분무
-  spray(pos, o) {
-    if (!this._ok()) return null; const C = WPFX.col, low = lite(), N = low ? 4 : 6, pc = o.follow, dur = o.dur || 6, amps = [], mists = []; let endT = -1;
-    const at = () => P3(pc && !pc.dead ? pc.pos : pos);
-    const sig = this.circle(null, o.r, { follow: at, col: [C.white, C.mint, C.gold], v: 0, hold: true, draw: 0.35, out: 0.4, spin: 0.7, a: 0.55, glowA: 0.4 });
-    this.helix(at, 0.6, 2.0, { col: [C.white, C.mint], life: 0.9, spin: 3 }); this.sfx('wp_spray');
-    const e = this._fx('spray', dur + 0.5, (e, dt) => {
-      if (endT >= 0) { endT += dt; if (endT > 0.4) e.t = e.life; }
-      const fade = (endT >= 0 ? 1 - endT / 0.4 : 1) * (1 - smooth(dur - 0.4, dur, e.t)), open = easeOut(smooth(0, 0.35, e.t)), c = at();
-      sig.setA(fade);
-      amps.forEach((q, i) => { const a = q.a + e.t * 0.5, rr = 0.25 + 0.75 * open; q.m.position.set(c.x + Math.cos(a) * rr, c.y + 1.25 + Math.sin(e.t * 2 + i) * 0.05, c.z + Math.sin(a) * rr);
-        q.m.rotation.set(0, -a, Math.PI / 2 + 0.5); q.m.material.uniforms.uA.value = fade;
-        if (!low && fade > 0.3 && (e.f = (e.f || 0) + 1) % 18 === i * 3) this.emit('mist', q.m.position, 1, { col: [0xc8fff0, 0xa8f0e0], cone: { x: -Math.cos(a) * 0.3, y: -0.4, z: -Math.sin(a) * 0.3 }, speed: [1, 1.6], size: [0.25, 0.4], end: 2.2, life: [0.5, 0.7], g: 0, drag: 2, a: 0.3, fin: 0.1 }); });
-      for (const s of mists) { s.k += dt / s.life; if (s.k >= 1) { s.k = 0; s.a = rnd(0, Math.PI * 2); } const rr = (1 - s.k) * (o.r * 0.85), y = 0.2 + 1.0 * (1 - s.k);
-        s.m.position.set(c.x + Math.cos(s.a) * rr, c.y + y, c.z + Math.sin(s.a) * rr); s.m.quaternion.copy(this.camQ); s.m.scale.setScalar(0.5 + 0.4 * (1 - s.k)); s.m.material.uniforms.uA.value = 0.16 * fade * smooth(0, 0.2, s.k) * (1 - smooth(0.7, 1, s.k)); }
-      ring.position.copy(c).setY(c.y + 0.05); ring.material.uniforms.uA.value = 0.5 * fade;
-      if (fade > 0.2 && (e.g2 = (e.g2 || 0) + 1) % (low ? 16 : 6) === 0) this.emit(rand() < 0.5 ? 'petal' : 'glint', _a.copy(c).setY(c.y + 0.1), 1, { col: [C.mint, C.white, C.pink], spread: o.r * 0.8, speed: [0, 0.15], up: [0.5, 0.9], size: [0.08, 0.14], end: 0.7, life: [0.8, 1.2], g: 0, drag: 0.5, glow: 0.5, spin: 2 });
+  // ------------------------------------------------------------------ C1 구급함 전개
+  /** 발치의 작은 왕진 가방(빨간 몸통·흰 십자·손잡이): 톡 놓이며 나타남 -> 뚜껑이 뒤로 열림(open 초) -> 안쪽에 응급 패치 n 장이 서 있음(살짝 떠오름) ->
+   *  send(i, u, fly): 패치 i 가 포물선으로 날아가 heal(i, u): 대상에 붙으며 민트 회복 -> close(): 뚜껑이 닫히고 가방이 작아지며 사라짐.
+   *  바닥: 가방 밑 작은 마법진 + 회복 범위(r)를 보여 주는 옅은 고리. */
+  kit(pc, o) {
+    if (!this._ok()) return null; const C = WPFX.col, G2 = this._g2(), at = P3(o.at), n = o.n || 3, open = o.open || 0.4, r = o.r || 6; let closeT = -1;
+    const f = _a.set(pc.facing.x, 0, -pc.facing.z).normalize().clone(), yaw = Math.atan2(f.x, f.z) + Math.PI;   // 열린 뚜껑(경첩)이 시전자 반대쪽 = 안쪽이 시전자·카메라 쪽으로
+    const sig = this.circle(at, 0.85, { col: [C.white, C.mint, C.gold], v: 0, hold: true, draw: 0.25, out: 0.35, spin: 0.8, a: 0.75, glowA: 0.45 });
+    const ring = this.circle(at, r, { col: [C.white, C.tealB, C.gold], v: 2, hold: true, draw: 0.35, out: 0.35, spin: 0.25, a: 0.22, glowA: 0.12 });
+    this.emit('glint', at.clone().setY(at.y + 0.3), 8, { col: [C.mint, C.white], spread: 0.4, speed: [0.2, 0.6], up: [0.6, 1.4], size: [0.14, 0.22], life: [0.4, 0.6], g: 0 });
+    const S = 0.42, P = [];
+    const e = this._fx('kit', (o.dur || 10) + 2, (e, dt) => {
+      const t = e.t, pop = easeOut(smooth(0, 0.16, t)) * (1 + 0.15 * Math.sin(Math.min(1, t / 0.3) * Math.PI)), ck = closeT >= 0 ? clamp01((t - closeT) / 0.55) : 0;
+      if (closeT >= 0 && ck >= 1) { e.t = e.life; return; }
+      const sc = S * pop * (1 - smooth(0.45, 1, ck));
+      bag.position.set(at.x, at.y, at.z); bag.rotation.set(0, yaw, 0); bag.scale.setScalar(Math.max(0.001, sc));
+      const lidA = closeT >= 0 ? -1.9 * (1 - smooth(0, 0.4, ck)) : -1.9 * easeOut(smooth(0.12, 0.12 + open, t));
+      lidP.rotation.set(lidA, 0, 0);
+      const fade = 1 - smooth(0.5, 1, ck);
+      for (const m of [body, lid, crs1, crs2, lcr1, lcr2, hdl, strap]) m.material.uniforms.uA.value = fade;
+      P.forEach((q, i) => {
+        if (q.state === 'in') { const op = smooth(0.12 + open * 0.6, 0.12 + open + 0.1, t); q.m.position.set(-0.24 + i * 0.24, 0.38 + 0.18 * op + 0.02 * Math.sin(t * 3 + i), -0.08); q.m.material.uniforms.uA.value = op * fade;
+          q.w.getWorldPosition(_b); }
+        if (q.state === 'fly') { const k = clamp01((t - q.t0) / q.dur), end = q.u && !q.u.dead ? this._front(q.u, 0.5) : q.end; q.end = end.clone(); _c.copy(q.from).lerp(end, 0.5); _c.y += 1.0;
+          bez(q.fm.position, q.from, _c, end, easeOut(k)); q.fm.quaternion.copy(this.camQ); q.fm.rotateZ(t * 8); q.fm.material.uniforms.uA.value = 1;
+          q.hist.unshift(q.fm.position.clone()); if (q.hist.length > 8) q.hist.length = 8; this._ribbonSet(q.rib, q.hist, 0.04); q.rib.material.uniforms.uA.value = 0.9; }
+        if (q.state === 'done') { q.fm.material.uniforms.uA.value = Math.max(0, q.fm.material.uniforms.uA.value - dt * 6); q.rib.material.uniforms.uA.value = Math.max(0, q.rib.material.uniforms.uA.value - dt * 6); }
+      });
     });
-    for (let i = 0; i < N; i++) { const m = this.propM(e, 'tripo_ampoule', this.geo.wp_ampoule, { tint: C.teal, op: 0.7, glow: 0.3, order: 4 }); m.scale.setScalar(0.19); amps.push({ m, a: i / N * Math.PI * 2 }); }
-    for (let i = 0; i < (low ? 4 : 9); i++) mists.push({ m: this.puff(e, 0xc8fff0, C.tealB, 4), k: i / 9, a: rnd(0, 6.28), life: rnd(1.0, 1.4) });
-    const ring = this.disc(e, 1, C.white, C.tealB); ring.scale.set(o.r * 2, o.r * 2, 1);
-    const end = () => { if (endT < 0) endT = 0; sig.end(); };
-    e.dispose = () => { sig.end(); this._free(e); };
-    return Object.assign(e, {
-      pulse: (t) => { if (!t || !t.pos) return; const p = P3(t.pos); this.groundRing(p, Math.min(1.2, (t.radius || 0.5) + 0.6), C.white, C.teal, 0.3, 1.0);
-        const pp = p.clone().setY(p.y + 0.3); this.emit('gran', pp, 4, { col: [C.teal, C.mint], size: [0.025, 0.04], speed: [0.1, 0.4], up: [1.6, 2.6], g: 0, life: [0.5, 0.65], glow: 0.9 });
-        this.emit('glint', pp, 3, { col: [C.mint, C.white], speed: [0.1, 0.3], up: [1.2, 2.0], size: [0.12, 0.2], life: [0.4, 0.6], g: 0 }); },
-      end,
+    const bag = new THREE.Group(); e.g.add(bag);
+    const own = (m) => { e.g.remove(m); return m; };
+    const body = own(this.solid(e, G2.box, { tint: 0xc0383c, spec: 0.35 })); body.position.y = 0.31; bag.add(body);
+    const lidP = new THREE.Group(); lidP.position.set(0, 0.62, -0.31); bag.add(lidP);
+    const lid = own(this.solid(e, G2.lid, { tint: 0xd0484a, spec: 0.35 })); lid.position.set(0, 0, 0); lidP.add(lid);
+    const crs1 = own(this.solid(e, G2.bar, { tint: 0xfaf6ee, spec: 0.2 })), crs2 = own(this.solid(e, G2.bar, { tint: 0xfaf6ee, spec: 0.2 }));
+    crs1.scale.set(0.36, 0.11, 0.02); crs2.scale.set(0.11, 0.36, 0.02); for (const c of [crs1, crs2]) { c.position.set(0, 0.31, 0.315); bag.add(c); }
+    const lcr1 = own(this.solid(e, G2.bar, { tint: 0xfaf6ee, spec: 0.2 })), lcr2 = own(this.solid(e, G2.bar, { tint: 0xfaf6ee, spec: 0.2 }));
+    lcr1.scale.set(0.3, 0.02, 0.1); lcr2.scale.set(0.1, 0.02, 0.3); for (const c of [lcr1, lcr2]) { c.position.set(0, 0.125, 0.33); lidP.add(c); }
+    const hdl = own(this.solid(e, G2.handle, { tint: 0x5a3a2a, spec: 0.3 })); hdl.position.set(0, 0.13, 0.33); hdl.rotation.set(0, 0, 0); lidP.add(hdl);
+    const strap = own(this.solid(e, G2.bar, { tint: 0xe8c070, spec: 0.6 })); strap.scale.set(1.02, 0.07, 0.64); strap.position.set(0, 0.5, 0); bag.add(strap);
+    for (let i = 0; i < n; i++) { const w = new THREE.Group(); bag.add(w); const m = own(this.patchQ(e, 1, 0.3, 8)); m.rotation.set(-0.15, 0, 0); w.add(m);
+      const fm = this.patchQ(e, 1, 0.3 * S * 2.4, 8); fm.visible = false; const rib = this._ribbon(e, 8); rib.material.uniforms.uW.value.setHex(C.white); rib.material.uniforms.uB.value.setHex(C.mint); rib.visible = false;
+      P.push({ m, w, fm, rib, state: 'in', hist: [] }); }
+    this.sfx('wp_kit');
+    return this._h(e, {
+      send: (i, u, dur) => { const q = P[i]; if (!q) return; q.m.getWorldPosition(_b); q.from = _b.clone(); q.m.visible = false; q.state = 'fly'; q.u = u; q.t0 = e.t; q.dur = dur; q.end = this._front(u, 0.5);
+        q.fm.visible = true; q.rib.visible = true; this.flash(q.from, C.white, C.mint, 0.4, 0.1, 1.0); },
+      heal: (i, u) => { const q = P[i]; if (q) { q.state = 'done'; } if (u) this._healPop(u, 1); },
+      close: () => { if (closeT < 0) { closeT = e.t; sig.end(); ring.end(); this.emit('glint', at.clone().setY(at.y + 0.3), 5, { col: [C.mint, C.white], spread: 0.3, speed: [0.2, 0.5], up: [0.6, 1.2], size: [0.12, 0.2], life: [0.3, 0.5], g: 0 }); } },
+      dispose: () => { if (closeT < 0) closeT = e.t; sig.end(); ring.end(); },
     });
+  }
+
+  // ------------------------------------------------------------------ C2 서방 패치
+  /** 세 칸 패치(PATCH_FS uMode 0): 손에서 대상 가슴(카메라 쪽 앞)으로 붙어 따라다님 — tick(left): 칸 하나가 꺼지며 민트 회복, end(): 떼어지며 사라짐 */
+  patch(pc, o) {
+    if (!this._ok() || !o.tgt) return null; const C = WPFX.col, u = o.tgt, from = P3(o.from), FLY = 0.18; let endT = -1, pulse = 0;
+    const e = this._fx('patch', 30, (e, dt) => {
+      if (endT >= 0) { endT += dt; if (endT > 0.35) { e.t = e.life; return; } }
+      if (u.dead || u.removed) { if (endT < 0) endT = 0; }
+      pulse = Math.max(0, pulse - dt); const end = this._front(u, 0.75); end.y += 0.12; const k = clamp01(e.t / FLY);
+      if (k < 1) { _c.copy(from).lerp(end, 0.5); _c.y += 0.25; bez(pm.position, from, _c, end, easeOut(k)); } else pm.position.copy(end);
+      pm.quaternion.copy(this.camQ); pm.rotateZ(0.12 + (endT >= 0 ? endT * 3 : 0)); const w = 0.46 * (1 + 0.12 * pulse / 0.25) * (endT >= 0 ? 1 + endT : 1);
+      pm.scale.set(w, w / 1.6, 1); const mu = pm.material.uniforms; mu.uA.value = endT >= 0 ? 1 - endT / 0.35 : smooth(0, 0.06, e.t); mu.uP.value = 0.5 + 0.5 * Math.sin(e.t * 4) + pulse * 3;
+      gl.position.copy(pm.position); gl.quaternion.copy(this.camQ); gl.scale.setScalar(0.7 + 0.3 * pulse / 0.25); gl.material.uniforms.uA.value = (0.25 + 1.2 * pulse / 0.25) * mu.uA.value;
+    });
+    const pm = this.patchQ(e, 0, 0.46, 8), gl = this.spr(e, 0, C.white, C.mint, 7);
+    this.flash(from, C.white, C.mint, 0.4, 0.1, 1.0);
+    return this._h(e, {
+      tick: (left) => { pm.material.uniforms.uN.value = left; pulse = 0.25; const p = pm.position.clone(); this.flash(p, C.white, C.mint, 0.5, 0.12, 1.1);
+        this.emit('glint', p, 4, { col: [C.mint, C.white], speed: [0.1, 0.4], up: [0.6, 1.2], size: [0.12, 0.2], life: [0.35, 0.5], g: 0 }); this._healPop(u, 0.7); },
+      end: () => { if (endT < 0) endT = 0; },
+      dispose: () => { if (endT < 0) endT = 0; },
+    });
+  }
+
+  // ------------------------------------------------------------------ C3 구조용 붕대 릴
+  /** 손목의 작은 릴(금 테·청록 몸통)에서 넓은 크림색 붕대가 출렁이며 소환물로 날아가 감음(shoot) -> taut(): 붕대가 곧게 팽팽해지고 릴이 빠르게 돌며
+   *  소환물이 끌려옴(규칙이 위치를 정함) -> arrive(): 붕대가 풀려 릴로 되감기며 민트 회복 -> end. 대상 몸에는 붕대가 나선으로 감긴 띠. */
+  reel(pc, o) {
+    if (!this._ok() || !o.tgt) return null; const C = WPFX.col, G2 = this._g2(), s = o.tgt, shoot = o.shoot || 0.14, pull = o.pull || 0.42, N = G2.bandN; let tautT = -1, arrT = -1, spin = 0;
+    this.circle(null, 0.85, { follow: () => (pc.dead ? null : P3(pc.pos)), col: [C.white, C.mint, C.gold], v: 1, life: 0.9, draw: 0.1, out: 0.3, spin: 3, a: 0.8 });
+    const e = this._fx('reel', 3, (e, dt) => {
+      const t = e.t, H = this._hand(pc), T = this._chest(s), done = arrT >= 0 ? clamp01((t - arrT) / 0.28) : 0;
+      if (done >= 1 && arrT >= 0) { e.t = e.life; return; }
+      // reel on the wrist
+      spin += dt * (tautT >= 0 && arrT < 0 ? 28 : arrT >= 0 ? 36 : 6); rl.position.copy(H); rl.rotation.set(0, Math.atan2(pc.facing.x, -pc.facing.z), Math.PI / 2); rl.rotateY(spin); rl.scale.set(0.07, 0.07, 0.07);
+      cr.position.copy(H); cr.rotation.copy(rl.rotation); cr.translateY(0.03); cr.translateX(0.05 * Math.cos(spin)); cr.translateZ(0.05 * Math.sin(spin)); cr.scale.set(0.018, 0.03, 0.018);
+      for (const m of [rl, cr]) m.material.uniforms.uA.value = 1 - done;
+      // the band: wave while flying, straight when taut, reeling back after the arrival
+      const head = tautT < 0 ? clamp01(t / shoot) : 1, pts = [], back = done;
+      for (let i = 0; i < N; i++) { const k = i / (N - 1) * head * (1 - back); _c.copy(H).lerp(T, k); const wav = tautT < 0 ? Math.sin(k * 9 - t * 30) * 0.12 * (1 - k * 0.3) : (arrT < 0 ? Math.sin(t * 80 + k * 20) * 0.006 : 0); _c.y += wav + (tautT < 0 ? -Math.sin(k * Math.PI) * 0.25 : 0); pts.push(_c.clone()); }
+      this._bandSet(bd, pts, 0.17); bd.material.uniforms.uA.value = 1 - back;
+      // wrapped around the summon once it is caught
+      if (tautT >= 0) { const wk = smooth(0, 0.12, t - tautT) * (1 - back), R = (s.radius || 0.4) + 0.08, base = P3(s.pos), wp = [];
+        for (let i = 0; i < N; i++) { const k = i / (N - 1), a = k * 9.4 + 0.6; wp.push(new THREE.Vector3(base.x + Math.cos(a) * R, base.y + 0.25 + 0.55 * k, base.z + Math.sin(a) * R)); }
+        this._bandSet(wr, wp, 0.12); wr.material.uniforms.uA.value = wk; }
+      if (tautT >= 0 && arrT < 0 && (e.f = (e.f || 0) + 1) % (lite() ? 4 : 2) === 0) this.emit('glint', _c.copy(H).lerp(T, rand()), 1, { col: [C.mint, C.white], speed: [0, 0.1], up: [0.1, 0.3], size: [0.08, 0.13], life: [0.2, 0.3], g: 0 });
+    });
+    const rl = this.solid(e, G2.reel, { tint: 0x2aa8a0, spec: 0.7 }), cr = this.solid(e, G2.bar, { tint: C.gold, spec: 0.9 }), bd = this._band(e, N), wr = this._band(e, N);
+    this.flash(this._hand(pc), C.white, C.mint, 0.5, 0.12, 1.1);
+    return this._h(e, {
+      taut: () => { if (tautT >= 0) return; tautT = e.t; const T = this._chest(s); this.flash(T, C.white, C.mint, 0.6, 0.12, 1.0); this.vring(T, 0.9, C.white, C.mint, 0.22, 0.8); },
+      arrive: () => { arrT = e.t; this._healPop(s, 1.1); },
+      end: () => { if (arrT < 0) arrT = e.t; },
+      dispose: () => { if (arrT < 0) arrT = e.t; },
+    });
+  }
+  /** 붕대 릴 — 당길 소환물이 없을 때: 붕대가 손목에서 풀려 나를 아래에서 위로 감고 민트 회복 */
+  wrap(pc) {
+    if (!this._ok()) return null; const C = WPFX.col, G2 = this._g2(), N = G2.bandN;
+    const e = this._fx('wrap', 0.95, (e) => { const t = e.t, k = smooth(0, 0.35, t), out = smooth(0.6, 0.95, t), base = P3(pc.pos), R = 0.46, pts = [];
+      for (let i = 0; i < N; i++) { const q = i / (N - 1) * k, a = q * 11 + t * 2; pts.push(new THREE.Vector3(base.x + Math.cos(a) * R, base.y + 0.15 + 1.25 * q, base.z + Math.sin(a) * R)); }
+      this._bandSet(bd, pts, 0.15); bd.material.uniforms.uA.value = 1 - out; });
+    const bd = this._band(e, N);
+    this.circle(null, 0.85, { follow: () => (pc.dead ? null : P3(pc.pos)), col: [C.white, C.mint, C.gold], v: 0, life: 0.9, draw: 0.15, out: 0.35, spin: 2, a: 0.8 });
+    this._fx('wrapHeal', 0.36, () => {}).update = (x) => { if (x.t >= 0.35 && !x.done) { x.done = true; this._healPop(pc, 1); } };
+    return this._h(e);
   }
 
   // ------------------------------------------------------------------ C4 다층 코팅막: 실제 보호막 비율 -> 겹 수
