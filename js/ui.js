@@ -648,7 +648,7 @@ export class UI {
     const body = $("div", "qbody", b);
     const render = () => {
       const c = this.qtab, mine = act.filter(of(c));
-      let html = `<p class="qcat-desc small muted">${c === "main" ? "아르칸 대륙의 이야기를 따라가는 퀘스트입니다. 끝내면 다음 이야기가 열립니다." : "주민들의 부탁 — 몬스터 사냥, 재료 모으기 같은 따로 하는 퀘스트입니다."}</p>`;
+      let html = `<p class="qcat-desc small muted">${c === "main" ? "아카디아 대륙의 이야기를 따라가는 퀘스트입니다. 끝내면 다음 이야기가 열립니다." : "주민들의 부탁 — 몬스터 사냥, 재료 모으기 같은 따로 하는 퀘스트입니다."}</p>`;
       if (!mine.length) html += `<p class='muted'>진행 중인 ${QUEST_CAT[c]}가 없습니다. 머리 위에 <b>!</b> 가 있는 주민에게 말을 걸어 보세요.</p>`;
       for (const q of mine) {
         const st = ql.stateOf(q), n = G.data.npcs[q.turnIn || q.giver];
