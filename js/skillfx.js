@@ -1672,7 +1672,7 @@ export class SkillFx {
     this.painter = new PaintFx(this.root); this.painter.load();               // 화가 2차: 그림 소환물·채색·풍경 (js/painterfx.js)
     this.rm = new RmFx(this.root); this.rm.load();                            // 리마스터 공용 다층 메시 이펙트 (js/rmfx.js) — 직업 모듈이 gfxOn()일 때 빌려 씀
     this.art = new ArtFx(this.root); this.art.load(); this.art.rm = this.rm; this.yeon.rm = this.rm; this.hair.rm = this.rm; this.cook.rm = this.rm; this.smith.rm = this.rm; this.painter.rm = this.rm; this.en.rm = this.rm; this.wp.rm = this.rm;                         // 예술가 1차: 물감·음표·액자·전구 (js/artfx.js)
-    this.pharm = new PharmFx(this.root); this.pharm.load(); this.pharm.rm = this.rm;                   // 약사 1차: 황금 유봉·약병·주사기·보호막·회복진 (js/pharmfx.js)                      // 배쉬 crescent / impact / dust meshes (js/bashfx.js)
+    this.pharm = new PharmFx(this.root); this.pharm.load(); this.pharm.rm = this.rm; this.sal.rm = this.rm; this.biyeon.rm = this.rm; this.bash.rm = this.rm;   /* 리마스터 12묶음: 일격참·비연참·배쉬 */                   // 약사 1차: 황금 유봉·약병·주사기·보호막·회복진 (js/pharmfx.js)                      // 배쉬 crescent / impact / dust meshes (js/bashfx.js)
     /** optional camera-shake hook: (amplitude, duration) => void. Suppressed when SkillFx.reduceFlash. */
     this.onShake = null;
   }

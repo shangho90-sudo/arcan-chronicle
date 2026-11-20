@@ -651,14 +651,16 @@ export class PharmFx {
       m.position.set(gp.x + d.vx * fl, gp.y + Math.max(0.04, 0.06 + y), gp.z + d.vz * fl); m.quaternion.setFromAxisAngle(d.ax, d.w * fl); m.material.uniforms.uA.value = 1 - smooth(d.life - 0.1, d.life, u); } };
     const tickDust = (t) => { for (const m of dust) { const d = m.userData, u = clamp01((t - d.t0) / d.life); m.visible = u > 0 && u < 1; if (!m.visible) continue;   // low and short: the head touching down stays readable
       m.quaternion.copy(this.camQ); m.position.copy(gp).addScaledVector(d.d, 0.25 + d.go * easeOut(u)); m.position.y = gp.y + 0.1 + u * 0.06; m.scale.set(d.s * (0.6 + 0.8 * easeOut(u)), d.s * 0.45 * (0.6 + 0.5 * easeOut(u)), 1); m.material.uniforms.uA.value = d.a * Math.sin(Math.PI * Math.pow(u, 0.5)); } };
+    const RM = this.rm && gfxOn() ? this.rm : null; let rmDone = !RM;   // 리마스터 12묶음: 첫 프레임(머리 접지점을 다시 읽은 뒤) 그 자리에 slam 층 — 구덩이 크기에 맞춤
+    const rmSlam = () => { if (rmDone) return; rmDone = true; RM.slam(gp.clone(), hit ? { r: Math.min(1.4, S.crater * 1.6), pal: 'stone', k: 0.95, rubble: 9 } : { r: Math.min(1.1, S.crater * 1.2), pal: 'stone', k: 0.45, rubble: 3, crack: false }); };
     if (!hit) {
-      e = this._fx('smash', END, (e) => { anchor(); crater(e.t); tickChips(e.t); tickDust(e.t); });
+      e = this._fx('smash', END, (e) => { anchor(); rmSlam(); crater(e.t); tickChips(e.t); tickDust(e.t); });
       const crater = this._crater(e, gp, S.crater * 0.85, 0.8); statics.push(...crater.items);
       mkChips(low ? 2 : 3, 0.8); mkDust(low ? 1 : 2, 0.2); return e;
     }
     const R = S.ringR;
     e = this._fx('smash', Math.max(S.tealLife + 0.05, END), (e) => {
-      const t = e.t; anchor(); crater(t);
+      const t = e.t; anchor(); rmSlam(); crater(t);
       // A: platinum core at the head — sharp, small, gone in ~0.045 s; a few short low hit lines
       core.visible = t < S.flashT; if (core.visible) { core.position.copy(gp).setY(gp.y + 0.14); core.quaternion.copy(this.camQ); core.scale.setScalar(0.4 + 0.3 * (t / S.flashT)); core.material.uniforms.uA.value = I * S.flash; }
       star.visible = t < 0.1; if (star.visible) { star.position.copy(gp).setY(gp.y + 0.14); star.quaternion.copy(this.camQ); star.rotateZ(0.4); star.scale.setScalar(0.4 + 0.35 * easeOut(t / 0.07)); star.material.uniforms.uA.value = I * 1.2 * (1 - smooth(0.03, 0.1, t)); }
@@ -770,6 +772,7 @@ export class PharmFx {
         m.quaternion.copy(this.camQ); m.position.set(d.x, 0.35 + k * 1.5, d.z); m.scale.setScalar(d.s); m.material.uniforms.uA.value = I * (u < 1 ? 1.2 : 0.55) * Math.sin(Math.PI * Math.pow(k, 0.7)) * end; }
     });
     const sy = this.solid(e, this.geo.pharm_syringe, { rim: 0xffe0c0, em: 0xff7030, glow: 0.15, spec: 1.2 }); sy.scale.setScalar(0.42);
+    if (this.rm && gfxOn()) this.rm.buffAura(pc, { delay: T0, s: 14, gold: 0xffe0a0, col: 0xff6a2a, cols: [0xffd27a, 0xff6a2a, 0xffffff], mode: 'spiral', dur: 1.3, r: 0.85, flashY: 1.32 });   // 리마스터 10묶음: 주사 순간까지 그려지는 주황 육망성 + 섬광·고리·몸을 감는 빛 나선
     const ring = this.ring(e, pal, 0.2), ribs = [], rays = [], arrows = [];
     if (this.kit.ready) {   // 2026-11-14: 주황 액체 방울이 팔의 주사 자리로 모였다가(T0 = 주사 순간) 몸을 따라 오름 + 발밑 작은 연금술 문양; 지속 중에는 가끔 한 방울만
       const at = () => { const f = pc.facing || { x: 0, z: 1 }, fx = f.x, fz = -f.z, n = Math.hypot(fx, fz) || 1, P = P3(pc.pos); return new THREE.Vector3(P.x + (fz / n) * 0.42 + fx / n * 0.08, P.y + 1.32, P.z - (fx / n) * 0.42 + fz / n * 0.08); };

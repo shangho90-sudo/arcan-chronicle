@@ -10,6 +10,7 @@
 //   dream(pc)   handle: blow() / dispose()                                           손바닥 위 연보라 꽃 → 꽃잎 + 금빛 꽃가루가 실제 부채꼴로
 //   moon(t)     handle: wake() / dispose()                                           잠든 몬스터 머리 위 작은 초승달(숨쉬듯 둥실), 깨면 톡 사라짐
 import * as THREE from 'three';
+import { gfxOn } from './gfxq.js';
 
 export const PH1FX = {
   rang: { spin: 15, tilt: 0.3, h: 1.0, size: 1.6, trail: { liq: 0xffc24a }, trailW: 0.3, trailA: 1.2 },   // size: 날아가는 유봉 그림 배율(손의 유봉은 게임 카메라에서 너무 작게 보임 — 판정과 무관)
@@ -71,6 +72,8 @@ export class Ph1Fx {
   mesh(e, gk, mk) { const m = new THREE.Mesh(this.geo(gk), mk === 'ball' || mk === 'guide' || mk === 'guideD' || mk === 'ice' || mk === 'iceA' ? this.mat(mk).clone() : this.mat(mk)); m.frustumCulled = false; e.g.add(m); (e.own || (e.own = [])).push(m); return m; }
   free(e) { for (const m of e.items) if (m.onBeforeRender !== NOOP_RENDER) { m.onBeforeRender = NOOP_RENDER; m.visible = true; }   // pooled meshes go back without our per-frame closures
     if (e.own) for (const m of e.own) if (m.material !== this.mats.petal && m.material !== this.mats.core && m.material !== this.mats.stem && m.material !== this.mats.moon) m.material.dispose(); if (e.ownGeo) for (const g of e.ownGeo) g.dispose(); }
+  /** 리마스터 공용 키트(js/rmfx.js) — 높음·보통만, 낮음 = null(예전 연출 그대로) */
+  rmk() { const r = this.px.rm; return r && gfxOn() && r.ok() ? r : null; }
   fx(kind, life, upd) { const e = this.px._fx(kind, life, upd); e.onFree = () => { this.free(e); if (e.tr) this.kit.trailFree(e.tr); }; return e; }
 
   // ================================================================== 유봉 되던지기
@@ -87,6 +90,7 @@ export class Ph1Fx {
       const g = gy(pos), H = hand(pc); let P = new THREE.Vector3(pos.x, g + R.h, -pos.z);
       if (back && H) { const d = Math.hypot(pos.x - pc.pos.x, pos.z - pc.pos.z), k = 1 - smooth(0.6, 3.0, d); P.y = g + R.h + (H.y - g - R.h) * k; if (d < 1.3) P.lerp(H, smooth(1.3, 0.5, d) * 0.85); }
       pivot.position.copy(P); pivot.quaternion.setFromAxisAngle(_y, spin);
+      if (rtr) rtr.set({ x: P.x, y: P.y, z: -P.z });
       // trail = the head end of the spinning pestle
       _v.set(0, 0, (tiltG.userData.L || 0.6) * 0.5).applyQuaternion(tiltG.quaternion).applyQuaternion(pivot.quaternion).add(P);
       if (!e.tr) e.tr = K.trail(R.trail); K.trailPush(e.tr, _v, t); K.trailDraw(e.tr, t, R.trailA, R.trailW);
@@ -100,15 +104,17 @@ export class Ph1Fx {
         c.scale.multiplyScalar(s.x * R.size); c.position.set(0, 0, -((bb.min.z + bb.max.z) / 2) * s.x * R.size); L *= R.size; tiltG.add(c); } } catch (err) { /* no prop */ }
     if (!tiltG.children.length) { const m = px.solid(e, px.geo.pharm_pestle, { spec: 0.6, fill: 0.4 }); if (m) { m.parent.remove(m); m.scale.setScalar(0.45); m.rotation.x = Math.PI / 2; m.position.z = -0.25; tiltG.add(m); } }
     tiltG.userData.L = L; tiltG.rotation.x = -R.tilt;   // the pestle lies almost flat (axis +Z tipped up R.tilt rad) and spins about the vertical: head + handle both read from the 44 deg camera
+    const RM = this.rmk(); let rtr = null; const rEnd = () => { if (rtr) { rtr.dispose(); rtr = null; } };   // 리마스터 12묶음: 도는 유봉 둘레 금빛 빛 궤적, 낚아챌 때 별 반짝임
     const sparkle = (p, n, col) => { for (let i = 0; i < this.n(n); i++) { const a = rnd(0, 6.283), sp = rnd(1, 2.6); K.P('spark', { x: p.x, y: p.y, z: p.z, vx: Math.cos(a) * sp, vz: Math.sin(a) * sp, vy: rnd(0.5, 2.5), g: 3, drag: 2.5, orient: 'cam', sx: 0.05, sy: 0.05, sz: 0.05, col, glow: 0.4, a: 1, fade: 0.5, life: rnd(0.2, 0.4) }); } };
     return {
-      throw: (start) => { flying = true; pos = { ...start }; from = { ...start }; pivot.visible = true; const H = hand(pc); if (H) sparkle(H, 6, 0xffe0a0); },
+      throw: (start) => { flying = true; pos = { ...start }; from = { ...start }; pivot.visible = true; const H = hand(pc); if (H) sparkle(H, 6, 0xffe0a0);
+        if (RM) { rEnd(); rtr = RM.tracer({ x: start.x, y: gy(start) + R.h, z: start.z }, { col: 0xffa020, hi: 0xfff0b0, light: 0xffd27a, w: 0.34, glow: 0.7, trail: 14 }); } },
       set: (p, b) => { pos = { ...p }; back = !!b; },
-      turn: (p) => { const g = gy(p); sparkle({ x: p.x, y: g + R.h, z: -p.z }, 5, 0xffd27a); },
-      hit: (p) => { const P = P3(p); sparkle(P, 8, 0xfff0c0); const f = px.spr(e, 'flare', { w: 0xffffff, b: 0xffc04a, h: 0xc07010 }, 8), t0 = e.t; f.position.copy(P); f.scale.setScalar(0.9);
+      turn: (p) => { const g = gy(p); sparkle({ x: p.x, y: g + R.h, z: -p.z }, 5, 0xffd27a); if (RM) RM.pop(new THREE.Vector3(p.x, g + R.h, -p.z), { col: 0xffb030, hi: 0xfff0c0, size: 0.6, sparks: 4, stars: 2 }); },
+      hit: (p) => { const P = P3(p); sparkle(P, 8, 0xfff0c0); if (RM) RM.pop(P, { col: 0xffa020, hi: 0xfff0c0, size: 0.85, sparks: 7, stars: 2 }); const f = px.spr(e, 'flare', { w: 0xffffff, b: 0xffc04a, h: 0xc07010 }, 8), t0 = e.t; f.position.copy(P); f.scale.setScalar(0.9);
         f.onBeforeRender = () => { const k = (e.t - t0) / 0.12; f.material.uniforms.uA.value = Math.max(0, 1.4 * (1 - k)); f.quaternion.copy(px.camQ); f.visible = k < 1; }; },
-      catch: () => { flying = false; caughtT = e.t; pivot.visible = false; const H = hand(pc); if (H) sparkle(H, 10, 0xffd27a); },
-      dispose: () => px._free(e),
+      catch: () => { flying = false; caughtT = e.t; pivot.visible = false; const H = hand(pc); if (H) sparkle(H, 10, 0xffd27a); rEnd(); if (RM && H) RM.pop(H, { col: 0xffc040, hi: 0xffffff, size: 0.8, sparks: 6, stars: 6, roll: 0.785 }); },
+      dispose: () => { rEnd(); px._free(e); },
     };
   }
 
@@ -153,11 +159,11 @@ export class Ph1Fx {
     const ember = px.spr(e, 'glow', { w: 0xffffff, b: 0xffb030, h: 0xff5000 }, 8); ember.scale.setScalar(0.32); ember.visible = false;
     return {
       fly: (p) => { fly = P3(p); },
-      land: (n) => { landT = e.t; fly = null;
+      land: (n) => { landT = e.t; fly = null; const RM = this.rmk(); if (RM) RM.pop(new THREE.Vector3(c.x, g0 + 0.35, c.z), { col: 0xffa040, hi: 0xffe8b0, size: 0.9, groundY: g0, ring: r * 0.75, sparks: 6, stars: 2 });   // 리마스터 12묶음: 깨지는 순간 섬광·고리
         for (let i = 0; i < this.n(8); i++) { const a = rnd(0, 6.283), hs = rnd(1.5, 3.5), s = rnd(0.06, 0.12); K.P(i % 2 ? 'shardA' : 'shardB', { x: c.x, y: g0 + 0.3, z: c.z, vx: Math.cos(a) * hs, vz: Math.sin(a) * hs, vy: rnd(2, 4), g: 16, drag: 3, gy: g0 + 0.03, bounce: 0.28, life: rnd(0.5, 0.8), q: K.q(K.randAx(), rnd(0, 6)), ax: K.randAx(), w: rnd(10, 20), sx: s, sy: s, sz: s, col: 0xffe6b8, shrink: 0.3 }); }
         for (let i = 0; i < this.n(10); i++) { const a = rnd(0, 6.283), vy = rnd(1.8, 3.4), sp = rnd(0.6, 2.0), s = rnd(0.06, 0.1); K.P('drop', { x: c.x, y: g0 + 0.3, z: c.z, vx: Math.cos(a) * sp, vz: Math.sin(a) * sp, vy, g: 9, gy: g0 + 0.03, orient: 'vel', stretch: 0.1, sx: s, sy: s * 1.15, sz: s, col: W.amber, life: 0.9, shrink: 0.3 }); }
         const fl = K.flashQuad(e, { accent: 0xffd070 }); fl.position.set(c.x, g0 + 0.35, c.z); fl.quaternion.copy(px.camQ); fl.scale.setScalar(r * 0.6); fl.material.uniforms.uA.value = 1.2; fl.onBeforeRender = () => { const k = (e.t - landT) / 0.07; fl.material.uniforms.uA.value = Math.max(0, 1.2 * (1 - k)); fl.visible = k < 1; }; },
-      ignite: () => { igT = e.t; nextF = e.t;
+      ignite: () => { igT = e.t; nextF = e.t; const RM = this.rmk(); if (RM) RM.fireHit({ x: c.x, y: g0, z: -c.z }, Math.min(r, 1.6) * 0.9, { pal: 'fire' });   // 리마스터 12묶음: 점화 = 섬광 + 판정 반경 안 불꽃 혀 고리 + 땅 고리 + 불티
         const wv = K.disc(e, 1, true, 3); wv.position.set(c.x, g0 + 0.05, c.z); wv.scale.setScalar(r); wv.material.uniforms.uCol.value.setHex(0xff8a2a); wv.material.uniforms.uHi.value.setHex(0xffe0a0); const t0 = e.t;
         wv.onBeforeRender = () => { const k = (e.t - t0) / 0.25; wv.material.uniforms.uFront.value = 0.15 + 0.82 * easeOut(k); wv.material.uniforms.uA.value = Math.max(0, 0.9 * (1 - k)); wv.visible = k < 1; }; },
       tick: () => { },
@@ -209,9 +215,11 @@ export class Ph1Fx {
           const m = this.mesh(e, 'quad', 'ice'), a = this.mesh(e, 'quad', 'iceA');
           for (const q of [m, a]) { q.position.set(lastSeg.x, y, -lastSeg.z); q.rotation.y = -yaw; q.scale.set(q === m ? 0.38 : 0.6, 1, d + 0.04); q.material.opacity = 0; }
           segs.push({ m, a, t0: e.t }); lastSeg = { ...p };
+          if (segs.length % 2 === 1) { const RM = this.rmk(); if (RM) RM.frostBits(new THREE.Vector3(mx, y, -mz)); }   // 리마스터 12묶음: 얼음길 위 작은 결정·반짝임
           if (!this.low() && segs.length % 2 === 0) K.P('iceB', { x: mx + rnd(-0.15, 0.15), y: y, z: -mz + rnd(-0.15, 0.15), q: K.q(K.randAx(), rnd(0, 6)), sx: 0.05, sy: 0.12, sz: 0.05, glow: 0.2, a: 1, col: 0xeafaff, grow: 0.1, life: F.segLife * 0.8, shrink: 0.2 }); }
         void prev; },
       shatter: (p, n) => { shT = e.t; endT = e.t; ball.visible = false; const c = P3(p); c.y = gy(p) + 0.25;
+        { const RM = this.rmk(); if (RM) RM.iceCone({ pos: { x: ox, y: gy({ x: ox, z: oz }), z: oz } }, { f, r: fr, ang: o.fanAng || 70, at: 0, hold: 0.45 }); }   // 리마스터 12묶음: 실제 파편 부채꼴 안 서리 무늬·마법진·결정이 솟았다 깨짐
         K.burst({ x: p.x, y: gy(p), z: p.z }, { elem: 'ice', r: 1.0 });
         for (let i = 0; i < this.n(14); i++) { const a = yaw - half + rnd(0, 2 * half), sp = rnd(4, 8), L = Math.min(fr * rnd(0.5, 1.0), fr) / sp, s = rnd(0.06, 0.12);
           K.P(i % 2 ? 'iceB' : 'iceA', { x: c.x, y: c.y, z: c.z, vx: Math.sin(a) * sp, vz: -Math.cos(a) * sp, vy: rnd(0.5, 1.6), g: 6, q: K.q(K.randAx(), rnd(0, 6)), ax: K.randAx(), w: rnd(8, 16), sx: s, sy: s * 1.8, sz: s, glow: 0.3, a: 1, col: 0xeafaff, life: L + rnd(0.1, 0.3), shrink: 0.3 }); }
@@ -255,7 +263,8 @@ export class Ph1Fx {
       K.P(big && i % 2 ? 'petal' : 'shardA', { x: P.x, y: P.y, z: P.z, vx: Math.cos(a) * sp, vz: Math.sin(a) * sp, vy: rnd(0.4, big ? 3 : 1.8), g: 7, drag: 1.5, gy: (t.pos.y || 0) + 0.03, q: K.q(K.randAx(), rnd(0, 6)), ax: K.randAx(), w: rnd(6, 14), sx: s, sy: s * (big ? 0.6 : 1), sz: s, col: i % 3 ? C.col : C.hi, life: rnd(0.4, 0.8), shrink: 0.4,
         fn: big && i % 2 ? undefined : undefined }); } };
     return {
-      pierce: (i, ok) => { done[i] = true; const P = aimAt(i), big = i === 2;
+      pierce: (i, ok) => { done[i] = true; const P = aimAt(i), big = i === 2; const RM = ok ? this.rmk() : null;
+        if (RM) RM.pop(P, { col: C.col, hi: C.hi, size: big ? 1.4 : 0.75, groundY: t.pos.y || 0, ring: big ? (t.radius || 0.5) + 0.6 : 0, sparks: big ? 10 : 5, stars: big ? 5 : 2, shards: big ? 10 : 2, shardCols: [C.col, C.hi, 0xffb0e0], shardA: 0.8, roll: 0.4 * i });   // 리마스터 12묶음: 꽂힐 때마다 결정 섬광, 마지막 = 꽃잎 같은 결정 파편 폭발 + 고리
         if (ok) { burst(P, big ? 18 : 6, big); const f = px.spr(e, 'flare', pal, 8); f.position.copy(P); f.scale.setScalar(big ? 1.4 : 0.7); lastHit = { f, t: e.t, a: big ? 1.6 : 1.1 };
           if (big) for (let k = 0; k < 6; k++) { const a = k * 1.047; K.P('petal', { x: P.x, y: P.y, z: P.z, vx: Math.cos(a) * 1.6, vz: Math.sin(a) * 1.6, vy: 1.2, g: 3, drag: 2, q: K.qDir(a, 0.5), sx: 0.18, sy: 0.18, sz: 0.18, col: C.col, life: 0.5, shrink: 0.5 }); } } },
       scatter: (i) => { scatterT = e.t; for (let k = i; k < 3; k++) if (!done[k]) { const P = buds[k].position.clone(); for (let j = 0; j < this.n(6); j++) { const a = rnd(0, 6.283), sp = rnd(0.6, 1.6); K.P('spark', { x: P.x, y: P.y, z: P.z, vx: Math.cos(a) * sp, vz: Math.sin(a) * sp, vy: rnd(-0.5, 0.8), g: 2, orient: 'cam', sx: 0.05, sy: 0.05, sz: 0.05, col: C.col, glow: 0.35, a: 1, fade: 0.6, life: rnd(0.3, 0.6) }); } } },
@@ -284,7 +293,8 @@ export class Ph1Fx {
     for (let i = 0; i < 5; i++) { const m = new THREE.Mesh(this.geo('petal'), this.mat('petal')); m.rotation.y = i * 1.2566; m.rotation.x = -0.35; flower.add(m); petals.push(m); (e.own || (e.own = [])).push(m); }
     const core = new THREE.Mesh(this.geo('dot'), this.mat('core')); core.scale.setScalar(0.32); core.position.y = 0.1; flower.add(core); e.own.push(core);
     return {
-      blow: () => { blowT = e.t; const H = hand(pc); if (H) for (let i = 0; i < this.n(8); i++) { const a = yaw + rnd(-half, half), sp = rnd(1, 2.4); K.P('spark', { x: H.x, y: H.y, z: H.z, vx: Math.sin(a) * sp, vz: -Math.cos(a) * sp, vy: rnd(0, 1), drag: 2, orient: 'cam', sx: 0.05, sy: 0.05, sz: 0.05, col: D.pollen, glow: 0.5, a: 1, fade: 0.5, life: rnd(0.3, 0.6) }); } },
+      blow: () => { blowT = e.t; const RM = this.rmk(); if (RM) { RM.windCone(pc, { f, r, ang: o.ang || 80, at: 0, cols: [0xfff0ff, 0xc89aff] }); RM.buffAura(pc, { s: 10, gold: 0xffe8a8, col: 0xd8a8ff, cols: [0xffe8a8, 0xffc0f0, 0xffffff], dur: 0.9, r: 0.8, rings: 0, flash: 0.6 }); }   // 리마스터 12묶음: 판정 부채꼴 안 몽환 꽃바람 리본 + 발밑 연보라 잎 마법진
+        const H = hand(pc); if (H) for (let i = 0; i < this.n(8); i++) { const a = yaw + rnd(-half, half), sp = rnd(1, 2.4); K.P('spark', { x: H.x, y: H.y, z: H.z, vx: Math.sin(a) * sp, vz: -Math.cos(a) * sp, vy: rnd(0, 1), drag: 2, orient: 'cam', sx: 0.05, sy: 0.05, sz: 0.05, col: D.pollen, glow: 0.5, a: 1, fade: 0.5, life: rnd(0.3, 0.6) }); } },
       dispose: () => px._free(e),
     };
   }

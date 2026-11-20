@@ -42,6 +42,7 @@ void main(){ vUv = uv; vec3 P = position; if (uJ > 0.) { float a = atan(P.z, P.x
 //           12 frost ground fan (dendrite frost lines growing to uE) / 14 fire sigil quad (hexagram, drawn in by uE, uT = turn)
 //           15 fire pillar on rm_band (flame tongues scrolling up, uE = height cut) / 16 sound wall (rm_wave / rm_band: grooves, uE > 1.5 = closed ring)
 //           17 ice crystal body (translucent fresnel + bright tip) / 18 ice sigil quad (snowflake, drawn in by uE) / 19 heat shimmer quad (faint wavy bands)
+//           20 ground crack star / 21 dust wall (rm_band; white = steam) / 22 swirl sigil (speed·style) / 23 music staff sigil
 const FS = `uniform vec3 uW, uB; uniform float uA, uS, uE, uT, uQ, uAdd, uJ; varying vec2 vUv; varying vec3 vN, vV;
 float h21(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f); return mix(mix(h21(i), h21(i + vec2(1., 0.)), f.x), mix(h21(i + vec2(0., 1.)), h21(i + vec2(1., 1.)), f.x), f.y); }
@@ -93,9 +94,21 @@ void main(){
       float br = step(.55, vn(vec2(floor(an / 6.2832 * 9. + uQ * .37) * 3.1, 1.))), len = mix(.7, 1., br);
       float line = smoothstep(.03 + .012 * (1. - r), 0., d) * step(.06, r) * smoothstep(len, len - .12, r);
       a = (line * (.65 + .35 * (1. - r)) + exp(-r * r * 16.) * .9) * smoothstep(uE, uE - .14, r) * smoothstep(1., .86, r); core = line * smoothstep(.6, 0., r) + exp(-r * r * 30.); }
-    else {   // 21 dust wall on rm_band: soft noisy ring of dust rising, thinning upward, eroding with uE
+    else if (uS < 21.5) {   // 21 dust wall on rm_band: soft noisy ring of dust rising, thinning upward, eroding with uE
       float v = vUv.y, n = vn(vec2(vUv.x * 16. + uQ, v * 3. - uT * 1.4)) * .65 + vn(vec2(vUv.x * 37. - uQ, v * 7. - uT * 2.)) * .35;
       a = pow(1. - v, 1.4) * smoothstep(.25, .75, n + (1. - v) * .25) * smoothstep(0., .06, v) * (1. - smoothstep(uE - .3, uE, n * .6 + v * .7)); core = .15 * n; }
+    else if (uS < 22.5) {   // 22 swirl sigil (flat quad): double ring + three spiral arms turning + bead dots, drawn in by uE (speed / style buffs)
+      float sh = step(ang + 3.14159, uE * 6.2832 + .001), sp = abs(fract((ang + uT * 1.2) / 2.0944 + r * 1.15) - .5);
+      float arms = smoothstep(.07, 0., sp * (.4 + r)) * step(.16, r) * step(r, .76), rings = exp(-pow((r - .93) * 40., 2.)) + .6 * exp(-pow((r - .8) * 55., 2.)) + .4 * exp(-pow((r - .16) * 40., 2.));
+      float dots = smoothstep(.05, 0., length(vec2(mod(ang + uT * .8, 6.2832 / 16.) - 3.14159 / 16., (r - .865) * 5.)));
+      a = (rings + arms * .8 + dots * .8) * sh + .12 * smoothstep(1., .2, r) * sh; core = rings * .8 + arms * .5 + dots; }
+    else {   // 23 music staff sigil (flat quad): five thin staff rings + note heads riding round them + outer double ring, drawn in by uE
+      float sh = step(ang + 3.14159, uE * 6.2832 + .001), st = 0.;
+      for (int i = 0; i < 5; i++) st += exp(-pow((r - (.46 + float(i) * .065)) * 140., 2.));
+      float na = mod(ang - uT * .9, 6.2832 / 7.) - 3.14159 / 7., nr = .46 + .065 * (2. + 2. * sin(floor((ang - uT * .9) / (6.2832 / 7.)) * 2.3));
+      float note = smoothstep(.06, .03, length(vec2(na * r * 1.6, (r - nr) * 1.3)));
+      float rings = exp(-pow((r - .93) * 40., 2.)) + .6 * exp(-pow((r - .82) * 60., 2.));
+      a = (rings + st * .7 + note) * sh + .1 * smoothstep(1., .2, r) * sh; core = rings * .8 + note; }
   }
   else {   // 10 heal sigil (flat quad): double ring + 8 leaf petals + rotating dots, drawn in by uE (0..1), uT = time
     vec2 p = vUv * 2. - 1.; float r = length(p), ang = atan(p.y, p.x), sh = step(ang + 3.14159, uE * 6.2832 + .001);
@@ -543,6 +556,9 @@ export class RmFx {
     pan: { w: 0xfff2d8, b: 0xff9a3a, mid: 0xffd08a, deep: 0x5a3416, ember: [0xfff0c0, 0xffc060, 0xffffff], dust: [0xe0d4b8, 0x9a8466] },
     anvil: { w: 0xfff2c0, b: 0xff6a1a, mid: 0xffb040, deep: 0x3a2418, ember: [0xffe6a0, 0xffa030, 0xff6a1a], dust: [0xb0a090, 0x6a5a4a] },
     sky: { w: 0xffffff, b: 0x6ab8ff, mid: 0xb8e2ff, deep: 0x1a3a9a, ember: [0xffffff, 0xbfe8ff, 0x7ac8ff], dust: [0xd8dce8, 0x8a90a8] },
+    flour: { w: 0xffffff, b: 0xf0e6d0, mid: 0xfff8ea, deep: 0xb8a888, ember: [0xffffff, 0xfff4dc, 0xf6e6c0], dust: [0xfffaf0, 0xd8ccb4] },
+    stone: { w: 0xfff6e0, b: 0xffc070, mid: 0xffe0a8, deep: 0x4a4038, ember: [0xfff2c8, 0xffd27a, 0xffffff], dust: [0xc8c0b0, 0x7a7064] },
+    steam: { w: 0xffffff, b: 0xd8eeff, mid: 0xf2faff, deep: 0x8aa8c8, ember: [0xffffff, 0xe8f6ff, 0xbfe0ff], dust: [0xfafdff, 0xb8cce0] },
   };
   /** fire in a cone (용광로 개방·뜨거운 국물·온풍 드라이). o: {f (game facing), r, ang, at (s until the burst = damage frame), dur (sustain s, channel), pal}
    *  준비(at 전): 부채꼴 안 지면 마법진이 그려짐 / 발동: 섬광 + 불꽃 부채꼴의 충격 앞선(= 원형 충격파를 판정 부채꼴로 자름) + 도는 불꽃 혀 + 솟는 불기둥 + 불티 + 열기 아지랑이 / 끝: 천천히 꺼짐.
@@ -795,6 +811,7 @@ export class RmFx {
     const gw = this._m(e, 'add', this.quad, { w: P.mid, b: P.b, s: 6, order: 9 }); gw.position.y = 0.35;
     const crD = this._m(e, 'alpha', this.quad, { w: P.deep, b: P.deep, s: 20, order: 2 }); this._flat(crD, r * 2, 0.045);
     const cr = this._m(e, 'add', this.quad, { w: P.w, b: P.b, s: 20, order: 3 }); this._flat(cr, r * 2, 0.055); cr.material.uniforms.uQ.value = crD.material.uniforms.uQ.value;
+    if (o.crack === false) { cr.visible = false; crD.visible = false; }   // 균열 없는 충격(밀가루 포대·철벽 세우기 등): 섬광·고리·먼지·파편만
     const r1 = this._m(e, 'add', this.geo.rm_ring, { w: 0xffffff, b: P.b, s: 3, order: 4 }); r1.position.y = 0.07;
     const r2 = this._m(e, 'add', this.geo.rm_ring, { w: P.mid, b: P.b, s: 3, order: 4 }); r2.position.y = 0.08;
     const dc = P.dust || [0xd8c8a0, 0x8a7458], dust = this._m(e, 'alpha', this.geo.rm_band, { w: dc[0], b: dc[1], s: 21, order: 5 }); dust.position.y = 0.02;
@@ -941,6 +958,109 @@ export class RmFx {
     const rings = [0, 1, 2].map(i => this._m(e, 'add', this.geo.rm_ring, { w: 0xffffff, b: i % 2 ? gold : col, s: 3, order: 7 }));
     return e;
   }
+
+  // ================================================================== 10묶음 보조·버프 (색칠 표식·행진곡·영감·즉흥·작은 걸작·아드레날린·스타일링)
+  /** buff aura on pc: ground sigil (o.s 10 잎 / 14 육망성 / 18 눈꽃 / 22 소용돌이 / 23 오선) drawn in during o.delay (the cast), then at the burst (t = delay):
+   *  0.05 s flash + a ground shock ring + rising light rings round the body + dust. o.mode: 'rise' (straight up) / 'spiral' (helix of dust round the body) /
+   *  'gather' (streaks drawn in to the head — charging). o: {gold, col, cols, s, r, dur (after the burst), delay, rings (n), alive (fn: false = fade early), headY, flash}. */
+  buffAura(pc, o = {}) {
+    if (!this.ok() || !pc || !pc.pos) return null;
+    const low = rmLite(), gold = o.gold ?? 0xffe08a, col = o.col ?? 0x7dffb0, cols = o.cols || [gold, col, 0xffffff], I = RMFX.intensity * rawK(), d0 = Math.max(0, o.delay || 0), dur = o.dur || 1.3, R = o.r || 0.9;
+    const mode = o.mode || 'rise', nR = low ? Math.min(2, o.rings ?? 3) : (o.rings ?? 3), hy = o.headY ?? 1.75; let pT = 0, cut = -1, ang = rnd(0, 6.28);
+    const e = this._fx('buff', d0 + dur, (e, dt) => { const t = e.t, T = t - d0, on = T >= 0;
+      e.g.position.set(pc.pos.x, pc.pos.y || 0, -pc.pos.z);
+      if (cut < 0 && o.alive && t > 0.1 && !o.alive()) { cut = t; e.life = Math.min(e.life, t + 0.35); }
+      const out = (cut >= 0 ? 1 - smooth(0, 0.35, t - cut) : 1) * (1 - smooth(e.life - 0.45, e.life, t));
+      sig.material.uniforms.uE.value = easeOut(t / Math.max(0.22, d0 || 0.3)); sig.material.uniforms.uT.value = t; sig.material.uniforms.uA.value = I * (0.75 + (on ? 0.7 * Math.exp(-T * 7) : 0)) * smooth(0, 0.06, t) * out;
+      sigA.material.uniforms.uE.value = sig.material.uniforms.uE.value; sigA.material.uniforms.uT.value = t; sigA.material.uniforms.uA.value = 0.45 * smooth(0, 0.06, t) * out;
+      glow.material.uniforms.uA.value = I * 0.3 * smooth(0, 0.1, t) * out;
+      this._face(fl, (o.flash ?? 1) * (0.6 + 0.5 * easeOut(Math.max(0, T) / 0.03))); fl.material.uniforms.uA.value = on && o.flash !== 0 ? I * 1.3 * (1 - smooth(0.012, 0.06, T)) : 0;
+      const kr = T / 0.32; ring.visible = on && kr < 1; ring.scale.set(R * 1.15 * (0.3 + 0.7 * easeOut(kr)), 1, R * 1.15 * (0.3 + 0.7 * easeOut(kr))); ring.material.uniforms.uA.value = I * 1.1 * (1 - smooth(0.4, 1, kr)); ring.material.uniforms.uT.value = t;
+      rings.forEach((m, i) => { const kk = (T - 0.06 - i * 0.2) / 0.7; m.visible = kk > 0 && kk < 1; const h = 0.1 + 1.6 * easeOut(kk), rr = 0.6 - 0.16 * kk;
+        m.position.y = h; m.scale.set(rr, 1, rr); m.material.uniforms.uA.value = I * Math.sin(Math.PI * clamp01(kk)) * out; m.material.uniforms.uT.value = t; });
+      pT -= dt; if (pT <= 0 && out > 0.3 && (on || mode === 'gather')) { pT = low ? 0.05 : 0.025; const P = e.g.position, c0 = cols[(rand() * cols.length) | 0];
+        if (mode === 'spiral') { ang += 0.9; const h = (t * 1.1) % 1.7, rr = R * 0.7 * (1 - 0.3 * h / 1.7);
+          this.emit('star', 1, () => ({ p: _a.set(P.x + Math.cos(ang) * rr, P.y + 0.15 + h, P.z + Math.sin(ang) * rr), v: _c.set(-Math.sin(ang) * 0.8, 0.9, Math.cos(ang) * 0.8), s: rnd(0.04, 0.065), col: c0, life: rnd(0.35, 0.55), spin: 6 }));
+          this.emit('streak', 1, () => ({ p: _a.set(P.x + Math.cos(ang + 3.14) * rr, P.y + 0.1 + h * 0.8, P.z + Math.sin(ang + 3.14) * rr), v: _c.set(Math.sin(ang) * 1.2, 2.0, -Math.cos(ang) * 1.2), s: rnd(0.035, 0.05), col: c0, life: 0.4, stretch: 0.09 })); }
+        else if (mode === 'gather') { const a = rnd(0, 6.283), rr = rnd(0.9, 1.3), y = rnd(0.2, 1.3), lf = rnd(0.32, 0.45);
+          this.emit('streak', 1, () => ({ p: _a.set(P.x + Math.cos(a) * rr, P.y + y, P.z + Math.sin(a) * rr), v: _c.set(-Math.cos(a) * rr / lf, (hy - y) / lf, -Math.sin(a) * rr / lf), s: rnd(0.035, 0.05), col: c0, life: lf, stretch: 0.07 })); }
+        else { const a = rnd(0, 6.283), rr = rnd(0.2, R * 0.8);
+          this.emit('streak', 1, () => ({ p: _a.set(P.x + Math.cos(a) * rr, P.y + rnd(0, 0.4), P.z + Math.sin(a) * rr), v: _c.set(0, rnd(1.6, 2.6), 0), s: rnd(0.035, 0.05), col: c0, life: rnd(0.45, 0.7), stretch: 0.09 })); } }
+    });
+    e.g.position.set(pc.pos.x, pc.pos.y || 0, -pc.pos.z);
+    const sig = this._m(e, 'add', this.quad, { w: gold, b: col, s: o.s ?? 22, order: 3 }); this._flat(sig, R * 2, 0.05);
+    const sigA = this._m(e, 'alpha', this.quad, { w: gold, b: o.deep ?? col, s: o.s ?? 22, order: 2 }); this._flat(sigA, R * 2, 0.045); sigA.material.uniforms.uQ.value = sig.material.uniforms.uQ.value;
+    const glow = this._m(e, 'add', this.quad, { w: col, b: col, s: 6, order: 2 }); this._flat(glow, R * 2.3, 0.04);
+    const fl = this._m(e, 'add', this.quad, { w: 0xffffff, b: col, s: 4, order: 9 }); fl.position.y = o.flashY ?? 1.05; fl.material.depthTest = false;
+    const ring = this._m(e, 'add', this.geo.rm_ring, { w: 0xffffff, b: col, s: 3, order: 4 }); ring.position.y = 0.06;
+    const rings = []; for (let i = 0; i < nR; i++) rings.push(this._m(e, 'add', this.geo.rm_ring, { w: 0xffffff, b: i % 2 ? gold : col, s: 3, order: 7 }));
+    e.burst = (k = 1) => {   // an extra star burst (e.g. the charge completes): flash + stars + ring at the head
+      const P = e.g.position, hp = _b.set(P.x, P.y + hy, P.z).clone();
+      this.pop(hp, { col, hi: gold, size: 1.1 * k, groundY: P.y, ring: R * 1.3, sparks: 8, stars: 6 }); };
+    return e;
+  }
+  /** generic layered pop at a point p (THREE or game coords, y = the flash height): 0.05 s star flash + glow + optional ground ring (o.ring = radius, at o.groundY)
+   *  + spark streaks + stars. o: {col, hi, size, sparks, stars, ring, groundY, dir (game dir: sparks lean away), shards (n, o.shardCols)} */
+  pop(p0, o = {}) {
+    if (!this.ok() || !p0) return null;
+    const low = rmLite(), col = o.col ?? 0xffd27a, hi = o.hi ?? 0xffffff, I = RMFX.intensity * rawK(), p = p0.isVector3 ? p0.clone() : P3(p0), sz = o.size ?? 1, gy = o.groundY != null ? o.groundY : null;
+    const dir = o.dir ? new THREE.Vector3(o.dir.x, 0, -o.dir.z).normalize() : null, fdur = Math.min(0.08, Math.max(0.03, o.fdur ?? 0.055)), R = o.ring || 0;
+    const e = this._fx('pop', 0.45, (e) => { const t = e.t;
+      this._face(fl, sz * (0.55 + 0.6 * easeOut(t / 0.03))); fl.rotateZ(o.roll ?? 0.5); fl.material.uniforms.uA.value = I * 1.35 * (1 - smooth(0.012, fdur, t));
+      this._face(gw, sz * 0.85 * (0.6 + 0.6 * easeOut(t / 0.1))); gw.material.uniforms.uA.value = I * 0.6 * (1 - smooth(0.03, 0.24, t));
+      if (ring) { const kr = (t - 0.01) / 0.28; ring.visible = kr > 0 && kr < 1; ring.scale.set(R * (0.25 + 0.75 * easeOut(kr)), 1, R * (0.25 + 0.75 * easeOut(kr))); ring.material.uniforms.uA.value = I * 1.1 * (1 - smooth(0.45, 1, kr)); ring.material.uniforms.uT.value = t; }
+    });
+    e.g.position.copy(p);
+    const fl = this._m(e, 'add', this.quad, { w: 0xffffff, b: hi, s: 4, order: 10 }), gw = this._m(e, 'add', this.quad, { w: hi, b: col, s: 6, order: 9 });
+    for (const m of [fl, gw]) m.material.depthTest = false;
+    const ring = R > 0 && gy != null ? this._m(e, 'add', this.geo.rm_ring, { w: hi, b: col, s: 3, order: 4 }) : null; if (ring) ring.position.set(0, gy - p.y + 0.06, 0);
+    const k = low ? RMFX.liteK : 1;
+    this.emit('streak', Math.round((o.sparks ?? 6) * k), () => { _b.set(rnd(-1, 1), rnd(-0.1, 0.9), rnd(-1, 1)); if (dir) _b.addScaledVector(dir, 0.7); _b.normalize();
+      return { p, v: _c.copy(_b).multiplyScalar(rnd(3.5, 6.5) * Math.min(1.4, sz)), s: rnd(0.04, 0.065), col: rand() < 0.5 ? hi : col, life: rnd(0.12, 0.2), drag: 7, stretch: 0.09 }; });
+    this.emit('star', Math.round((o.stars ?? 3) * k), () => ({ p: _a.copy(p).add(_b.set(rnd(-0.3, 0.3), rnd(-0.15, 0.3), rnd(-0.3, 0.3))), v: _c.set(rnd(-0.5, 0.5), rnd(0.6, 1.3), rnd(-0.5, 0.5)), s: rnd(0.045, 0.08), col: rand() < 0.5 ? 0xffffff : col, life: rnd(0.4, 0.65), spin: 6, t: -rnd(0, 0.1) }));
+    if (o.shards) { const sc = o.shardCols || [col, hi]; this.emit('shard', Math.round(o.shards * k), () => { _b.set(rnd(-1, 1), rnd(0.3, 1.1), rnd(-1, 1)).normalize();
+      return { p, v: _c.copy(_b).multiplyScalar(rnd(2, 3.8)), s: rnd(0.06, 0.11), col: sc[(rand() * sc.length) | 0], a: o.shardA ?? 0.85, life: rnd(0.45, 0.7), grav: 9, floor: (gy ?? p.y - 1) + 0.02, spin: 9 }; }); }
+    return e;
+  }
+  /** a ground mark on a target (색칠 표식 등): its sigil (o.s) round the feet within radius + 0.35 m, drawn in fast, a 0.05 s flash on the body, a ring, then it fades */
+  markOn(t, o = {}) {
+    if (!this.ok() || !t || !t.pos) return null;
+    const r = (t.radius || 0.5) + 0.35, col = o.col ?? 0xff4a5a, hi = o.hi ?? 0xffe0e0, I = RMFX.intensity * rawK(), life = o.dur ?? 0.9;
+    const e = this._fx('mark', life, (e) => { const k = e.t / life; e.g.position.set(t.pos.x, t.pos.y || 0, -t.pos.z);
+      for (const [m, a] of [[sig, I * 1.0], [sigA, 0.5]]) { m.material.uniforms.uE.value = easeOut(e.t / 0.18); m.material.uniforms.uT.value = e.t; m.material.uniforms.uA.value = a * (1 - smooth(0.55, 1, k)); } });
+    e.g.position.set(t.pos.x, t.pos.y || 0, -t.pos.z);
+    const sig = this._m(e, 'add', this.quad, { w: hi, b: col, s: o.s ?? 14, order: 3 }); this._flat(sig, r * 2, 0.05);
+    const sigA = this._m(e, 'alpha', this.quad, { w: hi, b: col, s: o.s ?? 14, order: 2 }); this._flat(sigA, r * 2, 0.045); sigA.material.uniforms.uQ.value = sig.material.uniforms.uQ.value;
+    const at = P3(t.pos); at.y += Math.min(1.2, 0.45 + (t.radius || 0.5) * 0.6);
+    this.pop(at, { col, hi, size: 0.85, groundY: t.pos.y || 0, ring: r, sparks: 5, stars: 3, dir: o.dir });
+    return e;
+  }
+  /** a steam column at p (game, ground y): white flash + two noisy white dust walls (rm_band shader 21) rising to o.h and thinning, slow rising wisps. o: {r, h, k (1..3 stacks), life} */
+  steam(p0, o = {}) {
+    if (!this.ok() || !p0) return null;
+    const low = rmLite(), P = RmFx.PAL.steam, I = RMFX.intensity * rawK(), g = p0.isVector3 ? p0.clone() : P3(p0), k = o.k ?? 1, r = Math.min(1.0, (o.r ?? 0.6) * 0.85), H = (o.h ?? 1.4) * (0.85 + 0.15 * k), life = o.life ?? (0.5 + 0.08 * k);
+    const e = this._fx('steam', life + 0.1, (e) => { const t = e.t, u = t / life;
+      this._face(fl, (0.8 + 0.15 * k) * (0.6 + 0.5 * easeOut(t / 0.03))); fl.material.uniforms.uA.value = I * 1.2 * (1 - smooth(0.012, 0.06, t));
+      cols.forEach((m, i) => { const rr = r * (0.75 + 0.35 * easeOut(u * 1.5)) * (1 - 0.18 * i), hh = H * (0.25 + 0.75 * easeOut(u * 2.2)) * (1 - 0.2 * i);
+        m.scale.set(rr, hh, rr); m.rotation.y = t * (i ? -1.3 : 1.1); m.material.uniforms.uT.value = t * 1.6 + i; m.material.uniforms.uE.value = 1.35 - 1.25 * smooth(0.35, 1, u); m.material.uniforms.uA.value = (0.62 - 0.17 * i) * smooth(0, 0.05, t); });
+      const kr = t / 0.3; ring.visible = kr < 1; ring.scale.set(r * 1.6 * (0.3 + 0.7 * easeOut(kr)), 1, r * 1.6 * (0.3 + 0.7 * easeOut(kr))); ring.material.uniforms.uA.value = I * 0.9 * (1 - smooth(0.4, 1, kr));
+    });
+    e.g.position.copy(g);
+    const fl = this._m(e, 'add', this.quad, { w: 0xffffff, b: P.b, s: 4, order: 9 }); fl.position.y = 0.6; fl.material.depthTest = false;
+    const cols = [0, 1].slice(0, low ? 1 : 2).map(() => this._m(e, 'alpha', this.geo.rm_band, { w: P.dust[0], b: P.dust[1], s: 21, order: 6 }));
+    const ring = this._m(e, 'add', this.geo.rm_ring, { w: 0xffffff, b: P.b, s: 3, order: 4 }); ring.position.y = 0.06;
+    this.emit('streak', Math.round((3 + 2 * k) * (low ? RMFX.liteK : 1)), () => ({ p: _a.copy(g).add(_b.set(rnd(-r, r) * 0.6, rnd(0.2, 0.7), rnd(-r, r) * 0.6)), v: _c.set(rnd(-0.3, 0.3), rnd(1.4, 2.4), rnd(-0.3, 0.3)), s: rnd(0.05, 0.08), col: rand() < 0.5 ? 0xffffff : P.mid, life: rnd(0.35, 0.55), drag: 1.5, stretch: 0.06 }));
+    return e;
+  }
+
+  /** a few tiny frost crystals + a sparkle on the ground at p (THREE coords) — 서리병 얼음길 */
+  frostBits(p) {
+    if (!this.ok() || !p) return; const low = rmLite(), P = RmFx.PAL.ice;
+    this.emit('shard', low ? 1 : 2, () => ({ p: _a.copy(p).add(_b.set(rnd(-0.15, 0.15), 0.04, rnd(-0.15, 0.15))), v: _c.set(0, rnd(0.2, 0.5), 0), s: rnd(0.05, 0.08), col: rand() < 0.5 ? 0xeafaff : P.mid, a: 0.8, life: rnd(1.0, 1.6), grav: 3, floor: p.y + 0.03, spin: 2 }));
+    this.emit('star', 1, () => ({ p: _a.copy(p).setY(p.y + 0.1), v: _c.set(0, rnd(0.3, 0.6), 0), s: rnd(0.04, 0.06), col: 0xffffff, life: 0.4, spin: 6 }));
+  }
+  /** run fn after d seconds of effect time (dropped on clear — 사망·지역 이동 때 예약된 그림은 나오지 않음) */
+  after(d, fn) { if (!this.ok()) return null; const e = this._fx('after', Math.max(0, d), () => {}); e.free = () => { if (e.t >= e.life - 1e-6) { try { fn(); } catch (err) { console.warn('rmfx after', err); } } }; return e; }
 
   // ------------------------------------------------------------------ frame
   update(dt) {

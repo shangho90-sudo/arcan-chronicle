@@ -182,11 +182,14 @@ export class SmithFx extends CookFx {
     const sm = this._m(e, 'btex', this.quad, 9), pl = this._m(e, 'btex', this.quad, 9), ring = this.spr(e, 1, C.white, C.brand, 8);
     sm.material.uniforms.uMap.value = T.stamp; sm.material.uniforms.uC.value = 0; sm.material.uniforms.uHot.value = 0;
     pl.material.uniforms.uMap.value = T.plate; pl.material.uniforms.uA.value = 0;
-    { const p = P3(t.pos); p.y += cookTop(t) * 0.6; this.flash(p, { size: 0.9, life: 0.1, b: C.brand }); this.sparks(p, lite() ? 2 : 4, { ground: P3(t.pos).y, tint: 0xffa070, life: 0.3 }); }
+    { const p = P3(t.pos); p.y += cookTop(t) * 0.6; this.flash(p, { size: 0.9, life: 0.1, b: C.brand }); this.sparks(p, lite() ? 2 : 4, { ground: P3(t.pos).y, tint: 0xffa070, life: 0.3 });
+      if (this.rm && gfxOn()) this.rm.pop(p, { col: C.brand, hi: 0xffe0d0, size: 1.15, groundY: P3(t.pos).y, ring: (t.radius || 0.5) + 0.55, sparks: 8, stars: 2, roll: 0.78 }); }   // 리마스터 12묶음: 도장이 찍히는 순간 붉은 별 섬광 + 땅 충격 고리
     const at = () => pl.position.clone();
     return this._h(e, {
       setCracks: (v) => { n = v; pop = 0.2; hot = 1; const p = at(); this.flash(p, { size: 0.35 + 0.12 * v, life: 0.08, b: C.hot }); this.sparks(p, lite() ? 1 : 2, { ground: P3(t.pos).y, tint: 0xffd0a0, life: 0.25, size: [0.02, 0.035] }); },
-      shatter: () => { const p = at(), low = lite(), gy = P3(t.pos).y; this.flash(p, { size: 1.15, ring: (t.radius || 0.5) + 0.5, gy, w: 0xffffff, b: C.brand, rb: C.brand, a: 1.5 });
+      shatter: () => { const p = at(), low = lite(), gy = P3(t.pos).y;
+        if (this.rm && gfxOn()) this.rm.pop(p, { col: C.brand, hi: 0xffffff, size: 1.35, groundY: gy, ring: (t.radius || 0.5) + 0.7, sparks: 10, stars: 4, shards: 8, shardCols: [0xe8ecf2, 0xffb090, C.brand] });   // 리마스터: 각인이 깨지는 순간 큰 별 섬광·고리·쇳조각
+        this.flash(p, { size: 1.15, ring: (t.radius || 0.5) + 0.5, gy, w: 0xffffff, b: C.brand, rb: C.brand, a: 1.5 });
         this._bits(p, low ? 4 : 9, { geo: this.geo.smith_shard, tint: 0xe8ecf2, size: [0.06, 0.12], speed: [2.2, 4.0], up: [1.4, 3.0], ground: gy, life: 0.55 }); this.sparks(p, low ? 2 : 6, { tint: 0xff9070 }); this._free(e); },
       expire: () => { if (fadeT < 0) fadeT = e.t; },   // 시간 만료: 조용히 흐려짐(소리·섬광 없음)
     });
@@ -252,7 +255,10 @@ export class SmithFx extends CookFx {
     const mk = (geo) => { const m = this.solid(e, geo, { rim: C.hot, spec: 1.1 }); e.g.remove(m); grp.add(m); m.renderOrder = 6; return m; };
     const jA = mk(this.geo.smith_jaw), jB = mk(this.geo.smith_jaw), bA = mk(this.geo.smith_bar), bB = mk(this.geo.smith_bar);
     return this._h(e, { grab: (t) => { if (grabbed >= 0) return; grabbed = e.t; ok = !!t && !t.dead; snap = 1;
-      const p = last.clone(); p.y += 0.6; if (t) { this.flash(p, { size: heavy ? 1.3 : 0.85, ring: heavy ? (t.radius || 0.5) + 0.5 : 0, gy: last.y }); this.sparks(p, lite() ? 3 : (heavy ? 9 : 6), { ground: last.y }); if (heavy) this._puffs(last.clone(), lite() ? 2 : 5, 1.0, { a: 0.38 }); } } });
+      const p = last.clone(); p.y += 0.6;
+      if (t && this.rm && gfxOn()) { const fr = P3(pc.pos); fr.y += K.y; this.rm.lance(fr, p, { run: 0.05, life: 0.24, col: C.hot, hi: 0xfff2c0, light: 0xffc070, w: heavy ? 0.3 : 0.22, flash: heavy ? 1.0 : 0.7 });   // 리마스터 11묶음: 집게 줄을 따라 당기는 빛 + 무는 순간 불꽃 별·고리
+        this.rm.pop(p, { col: C.hot, hi: 0xfff2c0, size: heavy ? 1.2 : 0.85, groundY: last.y, ring: heavy ? (t.radius || 0.5) + 0.5 : (t.radius || 0.5) + 0.2, sparks: heavy ? 9 : 6, stars: 2 }); }
+      if (t) { this.flash(p, { size: heavy ? 1.3 : 0.85, ring: heavy ? (t.radius || 0.5) + 0.5 : 0, gy: last.y }); this.sparks(p, lite() ? 3 : (heavy ? 9 : 6), { ground: last.y }); if (heavy) this._puffs(last.clone(), lite() ? 2 : 5, 1.0, { a: 0.38 }); } } });
   }
 
   // ------------------------------------------------------------------ 망치 접촉 / 용광로
@@ -342,6 +348,8 @@ export class SmithFx extends CookFx {
         if (h.miss) { this._splash(p, dir, 0.5); return; }
         this._splash(p, dir, 1.0, g.y);
         if (h.n) this._steam(p, g.y, h.n, h.r || 0.5);
+        if (this.rm && gfxOn()) { if (h.n) this.rm.steam(g, { r: Math.min(0.9, (h.r || 0.5) + 0.1 * h.n), k: h.n, h: 1.0 + 0.15 * h.n });   // 리마스터 12묶음: 달군 적 = 흰 섬광 + 솟는 수증기 기둥(중첩마다 굵고 높게)
+          else this.rm.pop(p, { col: C.waterB, hi: C.water, size: 0.75, groundY: g.y, ring: (h.r || 0.5) + 0.3, sparks: 5, stars: 1 }); }
       },
     });
   }
@@ -397,10 +405,13 @@ export class SmithFx extends CookFx {
     const plates = [mk(grp, 0), mk(wl, -0.5), mk(wr, 0.5)];
     const face = () => grp.position.clone().setY(grp.position.y + 0.7 * K.h);
     this.sparks(P3({ x: pc.pos.x + pc.facing.x * K.dist, y: (pc.pos.y || 0) + 0.2, z: pc.pos.z + pc.facing.z * K.dist }), lite() ? 2 : 4, { ground: pc.pos.y || 0, life: 0.3 });
+    const RM = this.rm && gfxOn() ? this.rm : null;
+    if (RM) RM.after(K.unfold, () => { if (!fly && folding < 0) RM.slam(grp.position.clone(), { r: 0.9, pal: 'anvil', k: 0.55, rubble: 5, crack: false }); });   // 리마스터 11묶음: 철벽이 펼쳐져 땅에 박히는 순간 충격 고리·먼지(균열 없음)
     return this._h(e, {
-      block: () => { flashT = 1; const p = face(); this.flash(p, { size: 0.7, life: 0.1 }); this.sparks(p, lite() ? 2 : 4, { ground: grp.position.y }); },
+      block: () => { flashT = 1; const p = face(); this.flash(p, { size: 0.7, life: 0.1 }); this.sparks(p, lite() ? 2 : 4, { ground: grp.position.y });
+        if (RM) RM.pop(p, { col: C.hot, hi: 0xfff2c0, size: 0.75, sparks: 6, stars: 1, dir: { x: pc.facing.x, z: pc.facing.z } }); },   // 리마스터: 막을 때 금속 불꽃 별 + 앞으로 튀는 빛줄기
       kick: () => { fly = { p: grp.position.clone(), t: 0 }; flashT = 1; e.life = e.t + 1.2;
-        return { set: (p) => { const q = P3(p); fly.p.set(q.x, fly.p.y, q.z); }, hit: (c) => { const p = P3(c.pos); p.y += 0.6; this.flash(p, { size: 0.9, b: C.hot }); this.sparks(p, lite() ? 2 : 5, { ground: P3(c.pos).y }); flashT = 1; },
+        return { set: (p) => { const q = P3(p); fly.p.set(q.x, fly.p.y, q.z); }, hit: (c) => { const p = P3(c.pos); p.y += 0.6; if (RM) RM.burstOn(c, { col: C.hot, hi: 0xfff2c0, size: 1.0, sparks: 8 }); this.flash(p, { size: 0.9, b: C.hot }); this.sparks(p, lite() ? 2 : 5, { ground: P3(c.pos).y }); flashT = 1; },
           end: () => { if (folding < 0) { folding = e.t; this._puffs(fly.p.clone(), lite() ? 1 : 3, 0.6, { a: 0.3, life: 0.3 }); } } }; },
       fold: () => { if (folding < 0) folding = e.t; },
     });
@@ -463,21 +474,23 @@ export class SmithFx extends CookFx {
       if (tr.length > 1) { this._ribbonSet(rb, tr, K.trail); rb.material.uniforms.uA.value = I * (st === 'fly' ? (lobbing ? 1.0 : 0.85) : 0.5 * a); } else rb.material.uniforms.uA.value = 0;
     });
     const hm = this.solid(e, this.hammerGeo(), { rim: C.hot, spec: 0.9 }); hm.renderOrder = 6;
+    const RM = this.rm && gfxOn() ? this.rm : null; let trc = null; const trEnd = () => { if (trc) { trc.dispose(); trc = null; } };   // 리마스터 12묶음: 나는 손망치 둘레 금빛 빛 궤적(튕겨 오르는 포물선도 따라감)
     const gl = this.spr(e, 0, C.gold, C.hot, 5), rb = this._ribbon(e, trailN); rb.material.uniforms.uW.value.setHex(C.gold); rb.material.uniforms.uB.value.setHex(C.hot);
     return this._h(e, {
-      release: (q) => { st = 'fly'; p = q; const hp = P3(q); this.flash(hp, { size: 0.45, life: 0.08, b: C.hot }); tr.length = 0; },
-      set: (q, ff) => { p = q; if (ff) f = ff; },
+      release: (q) => { st = 'fly'; p = q; const hp = P3(q); this.flash(hp, { size: 0.45, life: 0.08, b: C.hot }); tr.length = 0; if (RM) { trEnd(); trc = RM.tracer(q, { col: C.hot, hi: C.gold, light: 0xffc060, w: 0.26, glow: 0.6, trail: 12 }); } },
+      set: (q, ff) => { p = q; if (ff) f = ff; if (trc) trc.set(q); },
       lob: () => { lobbing = true; },
       clang: (top, ff, pulsed) => {   // 모루 윗면: 맑은 흰 섬광 + 불꽃이 망치가 날아온 방향의 양옆으로 갈라져 튐
         const at = P3(top), side = new THREE.Vector3(ff.z, 0, ff.x).normalize(), low = lite(), dirs = [];   // (ff.z, ff.x) in three = perpendicular of game (ff.x, ff.z)
         for (let i = 0; i < (low ? 4 : 9); i++) { const s = i % 2 ? 1 : -1; dirs.push(side.clone().multiplyScalar(s).add(new THREE.Vector3(rnd(-0.25, 0.25), rnd(0.35, 0.9), rnd(-0.25, 0.25))).normalize()); }
         this.flash(at, { size: 1.0, life: 0.1, w: 0xffffff, b: C.gold, a: 1.6, ring: pulsed ? 0 : 0.6, gy: at.y - SMITH_TOP });
         this._jet(at, dirs, { ground: at.y - SMITH_TOP, speed: [3.2, 6.0], life: 0.42 });
+        if (RM) RM.pop(at, { col: C.gold, hi: 0xffffff, size: 1.2, groundY: at.y - SMITH_TOP, ring: pulsed ? 0 : 0.6, sparks: 10, stars: 3, roll: 0.785 });   // 리마스터: '깡!' = 큰 별 섬광 + 사방 불꽃
         lobbing = true;
       },
-      hit: (t) => { const g = P3(t.pos), q = g.clone(); q.y = Math.max(g.y + 0.4, hm.position.y); this.flash(q, { size: 1.05, ring: (t.radius || 0.5) + 0.35, gy: g.y, b: C.hot }); this.sparks(q, lite() ? 3 : 7, { ground: g.y, speed: [2, 4] }); this._puffs(g, lite() ? 1 : 3, 0.7, { a: 0.3, life: 0.32 }); },
+      hit: (t) => { const g = P3(t.pos), q = g.clone(); q.y = Math.max(g.y + 0.4, hm.position.y); trEnd(); if (RM) RM.burstOn(t, { col: C.hot, hi: C.gold, size: 1.0, sparks: 8 }); this.flash(q, { size: 1.05, ring: (t.radius || 0.5) + 0.35, gy: g.y, b: C.hot }); this.sparks(q, lite() ? 3 : 7, { ground: g.y, speed: [2, 4] }); this._puffs(g, lite() ? 1 : 3, 0.7, { a: 0.3, life: 0.32 }); },
       glance: () => { this.flash(hm.position.clone(), { size: 0.4, life: 0.08, w: 0xffffff, b: C.iron }); },
-      drop: (g) => { if (st === 'drop') return; st = 'drop'; dropT = e.t; gyDrop = P3(g).y; const d = new THREE.Vector3(f.x, 0, -f.z); v = d.multiplyScalar(-1.2).setY(2.2); e.life = e.t + K.dropT + 0.2; },
+      drop: (g) => { if (st === 'drop') return; trEnd(); st = 'drop'; dropT = e.t; gyDrop = P3(g).y; const d = new THREE.Vector3(f.x, 0, -f.z); v = d.multiplyScalar(-1.2).setY(2.2); e.life = e.t + K.dropT + 0.2; },
     });
   }
 

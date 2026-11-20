@@ -20,6 +20,7 @@
 // Low spec (phone / "그래픽 효과" off): 2 afterimages, 4 chips. "섬광 효과 줄이기": dimmer flash.
 // (The old crescent-fan assets assets/fx/fx_biyeon.* / tools/blender/fx_biyeon.py are no longer used.)
 import * as THREE from 'three';
+import { gfxOn } from './gfxq.js';
 
 export const BIYEON = { rim: 0x4fb8ff, inner: 0x6cc8ff, halo: 0x0a2850, diam: 0.7, spin: 22, bank: 0.26, tilt: 0.1, intensity: 1, speed: 1 };
 /** impact point (GAME coords) of a disc flying along f = {x, z} (unit) into actor t: front of the body at torso height. */
@@ -132,10 +133,12 @@ export class BiyeonFx {
     s.t = 0; s.k = flashK() * rawK() * BIYEON.intensity; s.dx = dir.x / m; s.dz = -dir.z / m; s.state = 'fly'; s.endT = 0; s.d = o.diam || BIYEON.diam;
     s.p = new THREE.Vector3(pos.x, pos.y ?? 1, -pos.z); s.hist = []; s.spin = rnd(0, 6.28); s.nG = lite() ? 2 : 3; s.n = new THREE.Vector3(0, 1, 0); s.n0 = new THREE.Vector3(); s.bs = 0;
     this.root.add(s.g); this.live.push(s); this._projTick(s, 0);
+    let tr = this.rm && gfxOn() ? this.rm.tracer({ x: pos.x, y: pos.y ?? 1, z: pos.z }, { col: 0x6ab8ff, hi: 0xffffff, light: 0xbfe6ff, w: Math.min(0.5, s.d * 0.55), glow: 0.55, trail: 12 }) : null;   // 리마스터 12묶음: 원반 뒤 부드러운 청백 빛 리본 + 테두리 반짝임
+    const trEnd = () => { if (tr) { tr.dispose(); tr = null; } };
     return {
-      set(p, d) { if (s.state !== 'fly' || !p) return; s.p.set(p.x, p.y ?? s.p.y, -p.z); if (d) { const n = Math.hypot(d.x, d.z) || 1; s.dx = d.x / n; s.dz = -d.z / n; } },
-      hit(p, ho = {}) { if (s.state !== 'fly') return; s.state = 'hit'; s.endT = s.t; s.miss = !!ho.missed; s.n0.copy(s.n); },
-      dispose() { if (s.state === 'fly') { s.state = 'end'; s.endT = s.t; s.n0.copy(s.n); } },
+      set(p, d) { if (s.state !== 'fly' || !p) return; s.p.set(p.x, p.y ?? s.p.y, -p.z); if (d) { const n = Math.hypot(d.x, d.z) || 1; s.dx = d.x / n; s.dz = -d.z / n; } if (tr) tr.set({ x: p.x, y: p.y ?? s.p.y, z: p.z }); },
+      hit(p, ho = {}) { if (s.state !== 'fly') return; s.state = 'hit'; s.endT = s.t; s.miss = !!ho.missed; s.n0.copy(s.n); trEnd(); },
+      dispose() { trEnd(); if (s.state === 'fly') { s.state = 'end'; s.endT = s.t; s.n0.copy(s.n); } },
       get pos() { return s.p; },
     };
   }
@@ -172,7 +175,9 @@ export class BiyeonFx {
     const back = new THREE.Vector3(-dir.x / m, 0, dir.z / m);   // chips spray back toward the thrower a little, mostly sideways on screen
     s.ch = s.chips.map((me, i) => { if (i >= (lo ? 4 : 6)) return null; const a = (i / (lo ? 4 : 6)) * 6.283 + rnd(-0.4, 0.4), sp = rnd(1.6, 2.8);
       return { me, v: right.clone().multiplyScalar(Math.cos(a) * sp).addScaledVector(up, Math.sin(a) * sp * 0.8 + 0.4).addScaledVector(back, 0.6), p: s.c.clone(), life: rnd(0.16, 0.26), sz: rnd(0.09, 0.13) }; });
-    this.root.add(s.g); this.live.push(s); this._hitTick(s, 0); return s;
+    this.root.add(s.g); this.live.push(s); this._hitTick(s, 0);
+    if (this.rm && gfxOn()) this.rm.pop(pos, { col: 0x6ab8ff, hi: 0xeaf6ff, size: Math.min(1.0, 0.55 + s.R * 0.6), sparks: 7, stars: 3, dir, roll: 0.785 });   // 리마스터 12묶음: 접촉 순간 별 섬광 + 테두리에서 튀는 빛줄기·반짝임
+    return s;
   }
   _hitTick(s, dt) {
     const t = s.t, U = m => m.material.uniforms;

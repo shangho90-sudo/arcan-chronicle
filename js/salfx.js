@@ -21,6 +21,7 @@
 // Tuning: SAL (colours, intensity, length / width multipliers, speed) - window.SAL_FX at runtime for quick tests.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { gfxOn } from './gfxq.js';
 
 export const SAL = { white: 0xfff7ff, pink: 0xff4fd8, magenta: 0xd83cff, purple: 0x7b4dff, intensity: 1, length: 1, width: 1, speed: 1, hitSize: 1 };
 const CAST_LIFE = 0.42, HIT_LIFE = 0.37, DEPTH_BIAS = 1.3;   // m towards the camera (see VS)
@@ -145,7 +146,10 @@ export class SalFx {
    *  o.cast = the slot returned by cast(): its beam end is locked onto this exact point (primary hit only). */
   hit(pos, dir, o = {}) {
     if (!this.ready) { this.load(); return; }
-    if (o.cast && o.cast.kind === 'cast' && this.live.includes(o.cast) && !o.secondary && !o.whiff) { o.cast.lock = new THREE.Vector3(pos.x, pos.y || 0, -pos.z); this._place(o.cast); }
+    if (o.cast && o.cast.kind === 'cast' && this.live.includes(o.cast) && !o.secondary && !o.whiff) { o.cast.lock = new THREE.Vector3(pos.x, pos.y || 0, -pos.z); this._place(o.cast);
+      if (this.rm && gfxOn() && this.rm.ok()) { const B = new THREE.Vector3(pos.x, pos.y || 0, -pos.z), A = o.cast.tipP && o.cast.tipP.distanceTo(B) > 0.2 ? o.cast.tipP.clone() : B.clone().addScaledVector(new THREE.Vector3(dir.x, 0, -dir.z).normalize(), -1.2);   // 리마스터 12묶음: 칼끝 → 명중점 가는 빛 창 + 0.05초 별 섬광·찌른 방향 빛줄기
+        this.rm.lance(A, B, { run: 0.035, life: 0.2, col: 0x7ad8ff, hi: 0xffffff, light: 0xd8f4ff, w: 0.16, flash: 0.75 }); this.rm.slashHit(pos, { flash: true, dir, c1: 0xbfeeff, c2: 0x6a9cff, roll: 0.785 }); } }
+    else if (o.secondary && this.rm && gfxOn()) this.rm.pop(pos, { col: 0x8ad8ff, hi: 0xffffff, size: 0.55, sparks: 3, stars: 1, dir });
     const s = this._hitSlot(), lo = lite(), m = Math.hypot(dir.x, dir.z) || 1, dx = dir.x / m, dz = -dir.z / m;
     s.mode = o.whiff ? 'whiff' : o.secondary ? 'sec' : 'main';
     s.t = -(o.delay || 0); s.k = flashK(); s.size = (o.size ?? (s.mode === 'sec' ? 0.62 : s.mode === 'whiff' ? 0.5 : 1)) * SAL.hitSize;

@@ -478,6 +478,8 @@ export class CookFx {
       const t = okT, g0 = P3(t.pos); anchor.copy(g0); rad = t.radius || 0.5; tossed = !!o.canToss && o.canToss(t);
       this._pop(g0, { r: rad + 0.3, y: 0.25, size: tossed ? 0.8 : 1.15, flash: K.flash * (tossed ? 1 : 1.25), ring: K.ring, w: COOK.col.warm, b: COOK.col.gold });
       this._puffs(g0, lite() ? 2 : 4, rad, { a: 0.36, life: 0.4 });
+      if (this.rm && gfxOn()) { this.rm.lance(g0.clone().setY(g0.y + 0.08), g0.clone().setY(g0.y + Math.min(2.4, cookTop(t) + 0.9)), { run: 0.08, life: 0.3, col: COOK.col.gold, hi: 0xffffff, light: COOK.col.warm, w: 0.4, flash: 0.9 });   // 리마스터 11묶음: 퍼 올리는 순간 땅에서 솟는 빛기둥 + 별 섬광·고리
+        this.rm.pop(g0.clone().setY(g0.y + 0.3), { col: COOK.col.gold, hi: 0xffffff, size: 0.9, groundY: g0.y, ring: rad + 0.45, sparks: 6, stars: 3 }); }
       if (!tossed && this.geo.cook_star) this._bits(g0.clone().setY(g0.y + cookTop(t) * 0.6), lite() ? 2 : 4, { geo: this.geo.cook_star, size: [0.07, 0.1], speed: [1.5, 2.4], up: [2.0, 3.0], ground: g0.y, life: 0.5 });
       e.life = Math.max(e.life, e.t + (tossed ? launch : 0) + 0.45);
     };
@@ -506,6 +508,8 @@ export class CookFx {
     });
     const bd = this.solid(e, this.geo.cook_board, { rim: 0xffe6b0, spec: 0.25 }), marks = []; bd.renderOrder = 5; bd.material.depthWrite = false;
     this._puffs(P3(pc.pos).addScaledVector(this._f3(pc.facing || { x: 0, z: 1 }), K.fwd), lite() ? 2 : 3, 0.6, { a: 0.3, life: 0.35 });
+    const RM = this.rm && gfxOn() ? this.rm : null;
+    if (RM) RM.after(0.16, () => { if (ended < 0 && !pc.dead) RM.slam(P3(pc.pos).addScaledVector(this._f3(pc.facing || { x: 0, z: 1 }), K.fwd), { r: 0.75, pal: 'pan', k: 0.45, rubble: 3, crack: false }); });   // 리마스터 11묶음: 도마가 내려앉는 순간 작은 충격 고리·먼지
     e.block = () => {
       if (e.dead || ended >= 0) return; recoil = 1;
       // a knife mark stays on the face (up to K.marks), a short spark where it landed
@@ -514,6 +518,7 @@ export class CookFx {
       const w = bd.localToWorld(new THREE.Vector3(x, y, 0.08));
       const fx = this._fx('boardhit', 0.2, (q) => { const k = q.t / q.life; fl.quaternion.copy(this.camQ); fl.scale.setScalar(0.55 * (0.6 + 0.7 * easeOut(k))); fl.material.uniforms.uA.value = I * K.spark * (1 - smooth(0.05, 0.8, k)); this._alignLine(ln, _a.set(Math.cos(rot), Math.sin(rot), 0).applyQuaternion(bd.quaternion)); ln.scale.set(0.7 * (0.6 + 0.6 * easeOut(k)), 0.3, 1); ln.material.uniforms.uA.value = I * 1.6 * (1 - smooth(0.1, 1, k)); });
       fx.g.position.copy(w); const fl = this.spr(fx, 3, 0xffffff, COOK.col.gold, 7), ln = this.spr(fx, 2, 0xffffff, COOK.col.steelB, 7);
+      if (RM) RM.pop(w, { col: COOK.col.gold, hi: 0xffffff, size: 0.7, sparks: 6, stars: 1, dir: pc.facing });   // 리마스터: 막을 때 별 섬광 + 앞으로 튀는 빛줄기
       this._bits(w, lite() ? 1 : 3, { geo: this.geo.cook_chip_c, tint: COOK.col.wood, size: [0.03, 0.06], speed: [1.0, 2.0], up: [1.0, 2.2], ground: P3(pc.pos).y, life: 0.4 });
       this.sfx('ck_board');
     };
@@ -585,6 +590,8 @@ export class CookFx {
       this._bits(sh.position.clone(), low ? 3 : 7, { geo: this.geo.cook_chip_c, tint: COOK.col.pepper1, size: [0.025 * K.vis, 0.045 * K.vis], speed: [0.4 * K.vis, r * 0.9 * K.vis], up: [-1.5, 0.5], ground: g0.y, life: 0.5 });
       this._puffs(g0, low ? K.puffsLite : K.puffs, r * 0.9 * K.vis, { c1: 0xb8a888, c2: 0x5a4a3a, a: K.a, life: 0.6, rise: 0.35 });
       for (const t of ok || []) { const g = P3(t.pos); this._puffs(g.clone().setY(g.y + cookTop(t) * 0.8), 1, 0.4 * K.vis, { c1: COOK.col.dust1, c2: COOK.col.pepper2, a: 0.4, life: 0.35, rise: 0.3 * K.vis }); }
+      if (this.rm && gfxOn()) { this.rm.pop(sh.position.clone().setY(g0.y + 0.6), { col: 0xc8783a, hi: 0xfff0d0, size: 0.8, groundY: g0.y, ring: r * 0.9, sparks: 5, stars: 2 });   // 리마스터 11묶음: 흔드는 순간 판정 반경 안 충격 고리 + 맞은 적마다 매운 불티 섬광
+        for (const t of ok || []) this.rm.burstOn(t, { col: 0xd8602a, hi: 0xffe0a0, size: 0.7, sparks: 4 }); }
     };
     return e;
   }
@@ -612,6 +619,7 @@ export class CookFx {
     this._puffs(g0.clone().setY(g0.y + 0.1), low ? K.burstLite : K.burst, r * 0.8, { c1: COOK.col.flour1, c2: COOK.col.flour2, a: 0.72, life: 0.55, rise: 0.6 });
     this._bits(g0.clone().setY(g0.y + 0.3), low ? 2 : 5, { geo: this.geo.cook_chip_c, tint: 0xfff8ea, size: [0.04, 0.07], speed: [1.0, 2.4], up: [1.5, 3.0], ground: g0.y, life: 0.5 });
     this.sfx('ck_flour');
+    if (this.rm && gfxOn()) this.rm.slam(g0, { r: Math.min(r * 0.85, 2.4), pal: 'flour', k: 0.9, rubble: 4, crack: false });   // 리마스터 11묶음: 포대가 터지는 순간 흰 섬광·충격 고리 두 겹·솟는 밀가루 벽(반경 안, 균열 없음)
     const wisps = [];
     const e = this._fx('flour', dur + 0.5, (e) => {
       const fade = ended >= 0 ? 1 - clamp01((e.t - ended) / 0.45) : smooth(0, 0.3, e.t) * (1 - smooth(dur - 0.6, dur, e.t));

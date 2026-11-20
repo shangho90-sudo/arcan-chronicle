@@ -23,6 +23,7 @@
 // Tuning: BASH (colours, intensity, size, speed) - window.BASH_FX at runtime.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { gfxOn } from './gfxq.js';
 
 export const BASH = {
   white: 0xffffff, blade: 0xbdeeff, shock: 0x8ddcff, gold: 0xffdfa0, dustA: 0xb39a78, dustB: 0xbdb7aa, rock: 0x857565,
@@ -231,6 +232,8 @@ export class BashFx {
       const v = new THREE.Vector3().addScaledVector(side, sg * rnd(1.2, 3.2)).addScaledVector(s.dir3, rnd(0, 1.6)).setY(rnd(2.4, 4.6));
       s.rk.push({ p: s.gp.clone().setY(s.gy + 0.2), v, life: rnd(0.45, 0.6), sz: rnd(0.045, 0.09), rx: rnd(-9, 9), ry: rnd(-9, 9), e: new THREE.Euler(rnd(0, 6), rnd(0, 6), 0), hue: Math.random() }); }
     if (o.cast && this.live.includes(o.cast)) o.cast.hit = s.p.clone();
+    if (!s.whiff && this.rm && gfxOn() && this.rm.ok()) { this.rm.slashHit(pos, { fin: true, flash: true, dir, groundY: gr.y || 0, r: 1.5, c1: 0xbfe8ff, c2: 0x7a8aff, roll: 0.6 });   // 리마스터 12묶음: 섬광 + 땅 충격 고리 두 겹 + 앞으로 미끄러지는 큰 반달 충격파 + 먼지(균열 없음)
+      this.rm.slam({ x: gr.x, y: gr.y || 0, z: gr.z }, { r: 1.1, pal: 'stone', k: 0.5, rubble: 5, crack: false }); }
     this.root.add(s.g); this.live.push(s); this._hitTick(s, 0); return s;
   }
   /** the real sword tip of the follow actor, in its body space, or null */

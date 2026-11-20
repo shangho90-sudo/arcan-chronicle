@@ -302,6 +302,9 @@ export class HairFx {
       if (t) { tgt = t; anchor.copy(P3(t.pos)); mid = hairMid(t); rad = t.radius || 0.5; }
       hitAt = e.t; ok = true; bonus = !!bn; e.life = e.t + 0.5;
       const c = new THREE.Vector3(anchor.x, anchor.y + mid, anchor.z), n = low ? K.tipsLite : K.tips + (bonus ? 3 : 0);
+      if (this.rm && gfxOn()) { const sd = new THREE.Vector3(-f.z, 0, -f.x).normalize(), W = Math.min(2.2, 1.2 + rad * 1.1);   // 리마스터 11묶음: 허리 높이를 가로로 긋는 빛 칼날 + 섬광, 마무리면 금빛 별·고리
+        this.rm.lance(c.clone().addScaledVector(sd, -W / 2), c.clone().addScaledVector(sd, W / 2), { run: 0.05, life: 0.26, col: bonus ? C.goldB : C.pinkB, hi: 0xffffff, light: bonus ? C.gold : C.pink, w: bonus ? 0.36 : 0.28, flash: bonus ? 1.0 : 0.7 });
+        if (bonus) this.rm.pop(c, { col: C.goldB, hi: C.gold, size: 1.3, groundY: anchor.y, ring: rad + 0.6, sparks: 10, stars: 6 }); }
       if (bonus) { const u = (m, w, b) => { m.material.uniforms.uW.value.setHex(w); m.material.uniforms.uB.value.setHex(b); };
         u(fl, 0xffffff, C.goldB); u(rg, 0xffffff, C.goldB); u(pl, 0xfff4d0, C.gold);
         g2 = this.spr(e, 1, C.gold, C.goldB, 6); rays = Array.from({ length: low ? 4 : K.rays }, () => this.spr(e, 2, 0xffffff, C.goldB, 7));
@@ -353,6 +356,7 @@ export class HairFx {
       if (hs.length) { anyHit = true; if (!ctr) ctr = P3({ x: hs.reduce((a, q) => a + q.x, 0) / hs.length, y: hs[0].y || 0, z: hs.reduce((a, q) => a + q.z, 0) / hs.length }).addScaledVector(fw, -0.3); }
       if (L && !L.fired) { L.at = e.t; L.hit = hs.length > 0; }
       for (const q of hs) this.snip({ x: q.x, y: (q.y || 0) + [1.25, 0.85, 0.5][Math.min(2, h | 0)] * Math.min(1, (q.mid || 0.8) / 0.75), z: q.z }, { size: 0.75, roll: rnd(-0.15, 0.15), ground: q.y || 0 });
+      if (this.rm && gfxOn()) for (const q of hs) this.rm.slashHit({ x: q.x, y: (q.y || 0) + [1.25, 0.85, 0.5][Math.min(2, h | 0)] * Math.min(1, (q.mid || 0.8) / 0.75), z: q.z }, { flash: true, tan: side, c1: (h | 0) === 2 ? C.violet : 0xffd0ec, c2: (h | 0) === 2 ? C.violetB || 0x8a5ad8 : 0xc860d8, roll: 0.4 + (h | 0) * 0.5 });   // 리마스터 11묶음: 층마다 0.05초 별 섬광 + 가로 빛줄기
       e.life = Math.max(e.life, e.t + 0.6);
     };
     return e;
@@ -571,6 +575,7 @@ export class HairFx {
     const c1 = mk(HAIR.col.pink), c2 = mk(HAIR.col.violet), rl = this.model(e, 'tripo_roller', 'hair_roller', { rim: 0xffffff, spec: 0.5 }), rg = this.spr(e, 1, 0xffffff, HAIR.col.pinkB, 3);
     if (rl) rl.renderOrder = 6;
     if (!lite()) this.sparkles(P3(t.pos), 5, R, { y0: 0.3, y1: H, life: 0.6 });
+    if (this.rm && gfxOn()) this.rm.markOn(t, { col: HAIR.col.pinkB, hi: 0xffe6f4, s: 22, dur: Math.min(1.2, dur) });   // 리마스터 11묶음: 덫이 닫히는 순간 발밑 분홍 소용돌이 마법진 + 섬광·고리
     return e;
   }
 
@@ -578,6 +583,7 @@ export class HairFx {
   style(pc, o = {}) {
     if (!this._ok()) return null;
     if (o.kind === 'coat' && this.rm && gfxOn()) this.rm.healAura(pc, { gold: 0xf6e8ff, col: 0xb08aff, dur: 1.0, r: 0.85, s: 14 });   // 리마스터: 헤어 코팅 = 라일락 육망성 마법진 + 빛 고리
+    if ((o.kind || 'haste') === 'haste' && this.rm && gfxOn()) this.rm.buffAura(pc, { s: 22, gold: 0xffe6a0, col: 0xff7ac8, cols: [0xffe6a0, 0xff7ac8, 0xffffff], mode: 'spiral', dur: 1.1, r: 0.85 });   // 리마스터 10묶음: 스타일링(이동 속도) = 분홍·금 소용돌이 마법진 + 몸을 감는 빛 나선
     if (o.kind === 'fresh' && this.rm && gfxOn()) this.rm.healAura(pc, { gold: 0xfff2c8, col: 0x7dffd8, dur: 1.2, r: 0.85 });   // 리마스터: 기분 전환(정화) = 민트·금 회복 마법진 + 몸을 감고 오르는 고리
     const I = HAIR.intensity, kind = o.kind || 'haste', C = HAIR.col, low = lite(), life = kind === 'coat' ? 0.9 : 0.85;
     const cA = kind === 'fresh' ? C.mintB : kind === 'coat' ? C.violet : C.pink, cB = kind === 'fresh' ? C.mint : kind === 'coat' ? C.white : C.gold;

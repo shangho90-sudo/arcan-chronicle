@@ -399,6 +399,7 @@ export class ArtFx {
     });
     const mk = this.pnt(e, 10, light(col, 0.5), col, 6), fl = this.spr(e, 3, 0xffffff, light(col, 0.3), 7);
     const at = P3(t.pos); at.y += artMid(t); this._bits(at, lite() ? 2 : 4, { cols: [col, light(col, 0.3)], ground: t.pos.y || 0, life: 0.45 });
+    if (this.rm && gfxOn()) this.rm.markOn(t, { col, hi: light(col, 0.6), s: 14, dir: o.dir });   // 리마스터 10묶음: 발밑 표식 마법진(육망성) + 몸 섬광·고리·빛줄기
     t._artMark = e; return e;
   }
 
@@ -459,6 +460,7 @@ export class ArtFx {
         this._hopNote(p.clone().add(_a.set(-f.x * 0.45 - f.z * side, 0.25, f.z * 0.45 - f.x * side)), n++); }
     });
     const st = this.spr(e, 11, C.gold, C.goldB, 3);
+    if (this.rm && gfxOn()) this.rm.buffAura(pc, { s: 23, gold: C.gold, col: C.violet, cols: [C.gold, C.violet, 0xffffff], mode: 'spiral', dur: 1.3, r: 0.85 });   // 리마스터 10묶음: 오선 마법진 + 몸을 감고 도는 음표빛
     for (let i = 0; i < (lite() ? 2 : 4); i++) { const a = i * Math.PI / 2 + 0.4; this._hopNote(P3(pc.pos).add(_a.set(Math.cos(a) * 0.7, 0.2, Math.sin(a) * 0.7)), i, 1.3); }
     pc._artMarch = e; return e;
   }
@@ -475,6 +477,7 @@ export class ArtFx {
     const e = this._fx('inspire', dur + 0.6, (e) => {
       const alive = o.alive ? o.alive() : true, p = P3(pc.pos); p.y += 1.75 + K.lift; e.g.position.copy(p);
       if (gone < 0 && ((e.t > 0.1 && !alive) || e.t >= dur)) { gone = e.t; full = e.t >= dur - 0.08; e.life = e.t + (full ? 0.45 : 0.25);
+        if (full && rmA && rmA.burst) rmA.burst(1.1);   // 리마스터: 다 모였을 때 머리 위 별 섬광·고리
         if (full) { const fx = this._fx('ping', 0.4, (x) => { const k = x.t / 0.4; this._face(st, 1.9 * (0.5 + 0.6 * easeOut(k * 2))); st.material.uniforms.uA.value = I * 1.6 * (1 - smooth(0.1, 1, k)); this._face(rg, 1.5 * (0.3 + 0.7 * easeOut(k))); rg.material.uniforms.uA.value = I * 1.0 * (1 - smooth(0.2, 1, k)); });
           fx.g.position.copy(p); const st = this.spr(fx, 3, 0xffffff, C.gold, 7), rg = this.spr(fx, 1, C.gold, C.goldB, 6); } }
       const s = Math.floor(e.t / tick), lv = clamp01((s + 1) / Math.max(1, Math.round(dur / tick)));
@@ -487,6 +490,7 @@ export class ArtFx {
     });
     let flick = 0;
     const bl = this.solid(e, geo, { tint: 0xffffff, rim: C.warm, spec: 1.0 }), gl = this.spr(e, 0, C.warm, C.goldB, 3); bl.renderOrder = 6;
+    const rmA = this.rm && gfxOn() ? this.rm.buffAura(pc, { s: 10, gold: C.gold, col: C.warm, cols: [C.gold, C.warm, 0xffffff], mode: 'gather', flash: 0, dur, r: 0.95, alive: o.alive, headY: 1.75 + K.lift, rings: 2 }) : null;   // 리마스터 10묶음: 발밑 금빛 마법진 + 전구로 빨려 드는 빛줄기
     return e;
   }
   _mote(pc, ph) {
@@ -514,6 +518,7 @@ export class ArtFx {
     const TILT = [[0.25, 0.1], [-0.3, 0.35], [0.5, -0.4]];
     const sc = PRIM.slice(0, low ? 2 : 3).map((c) => { const m = this.solid(e, this.geo.art_scribble, { tint: c, rim: light(c, 0.6), glow: 0.25, spec: 0.3 }); m.renderOrder = 6; return m; });
     const pa = this.solid(e, geoP, { spec: 0.4, rim: C.warm }); pa.renderOrder = 6;
+    if (this.rm && gfxOn()) this.rm.buffAura(pc, { s: 10, gold: C.yel, col: C.red, cols: PRIM.concat([0xffffff]), mode: 'spiral', dur: 1.2, r: 0.9 });   // 리마스터 10묶음: 무지개 잎 마법진 + 삼원색 빛 나선
     pc._artImprov = e; return e;
   }
 
@@ -532,6 +537,7 @@ export class ArtFx {
     e.g.position.copy(g0);
     const fr = this.solid(e, geo, { rim: C.warm, spec: 0.9 }), fl = this.spr(e, 3, 0xffffff, C.gold, 7), rg = this.spr(e, 1, C.gold, C.goldB, 3); fl.position.y = 0.8;
     this._bits(g0.clone().setY(g0.y + 0.7), lite() ? 4 : 9, { cols: PRIM.concat([C.grn, C.vio]), ground: g0.y, speed: [1.0, 2.4], up: [1.8, 3.4], size: [0.05, 0.1], life: 0.6 });
+    if (this.rm && gfxOn()) this.rm.buffAura({ pos }, { s: 10, gold: C.gold, col: C.vio, cols: PRIM.concat([C.grn, 0xffffff]), mode: 'rise', dur: 1.0, r: 0.8, rings: 2, flashY: 0.8 });   // 리마스터 10묶음: 액자 아래 무지개 마법진 + 섬광·땅 고리·오르는 빛
     return e;
   }
   /** the little painted creature itself (its own material: lives in the scene as the summon's view, not in the pool) */
