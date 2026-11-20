@@ -41,8 +41,21 @@ function glyph(g, d) {
   else { g.lineWidth = 6; g.beginPath(); g.moveTo(0, 24); g.lineTo(0, -20); g.moveTo(-14, -6); g.lineTo(0, -22); g.lineTo(14, -6); g.stroke(); }
   g.restore();
 }
-// 그림 아이콘이 있는 스킬(견습생 기본 검술 8종·약사 1차 15종, tools/ui/skill_icons_crop.py → assets/ui/skills/<id>.png). 나머지는 아래 캔버스 임시 아이콘.
-const SKILL_ART = new Set(['nv_a1', 'nv_a2', 'nv_a3', 'nv_a4', 'nv_p1', 'nv_p2', 'nv_p3', 'nv_p4', ...['a1', 'a3', 'a4', 'a5', 'a6', 'b1', 'b2', 'b4', 'b5', 'b6', 'c1', 'c6', 'c7', 'c8', 'c9'].map(k => 'ph1_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'bs1_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'wp_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'cf_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'hb_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'en_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'ds_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'pt_' + k), ...['a1', 'a2', 'a3', 'a4', 'a5', 'b1', 'b2', 'b3', 'b4', 'b5', 'c1', 'c2', 'c3', 'c4', 'c5'].map(k => 'mu_' + k)]);   // + 화가 2차 15종(tools/ui/painter_icons.py)   // + 엔지니어 2차 15종(tools/ui/en_icons.py)   // + 한약사 2차 15종(tools/ui/herbal_icons.py)   // + 쉐프 2차 15종(tools/ui/chef_icons.py) + 양약사 2차 15종(원형, tools/ui/wp_icons.py)   // + 대장장이 1차 15종(원형, tools/ui/smith_icons.py)   // 견습생(둥근 사각형) + 약사 1차(원형, 2026-11-11 개편 뒤 15종)   // + 디자이너 2차 15종(tools/ui/designer_icons.py)
+const SKILL_ART = new Set([
+  'nv_a1', 'nv_a2', 'nv_a3', 'nv_a4', 'nv_p1', 'nv_p2', 'nv_p3', 'nv_p4',
+  'ph1_a1', 'ph1_a4', 'ph1_a3', 'ph1_a6', 'ph1_a5', 'ph1_b1', 'ph1_b2', 'ph1_b6', 'ph1_b4', 'ph1_b5', 'ph1_c1', 'ph1_c7', 'ph1_c6', 'ph1_c8', 'ph1_c9',
+  'wp_a1', 'wp_a2', 'wp_a3', 'wp_a4', 'wp_a5', 'wp_b1', 'wp_b2', 'wp_b3', 'wp_b4', 'wp_b5', 'wp_c1', 'wp_c2', 'wp_c3', 'wp_c4', 'wp_c5',
+  'hb_a1', 'hb_a2', 'hb_a3', 'hb_a4', 'hb_a5', 'hb_b1', 'hb_b2', 'hb_b3', 'hb_b4', 'hb_b5', 'hb_c1', 'hb_c2', 'hb_c3', 'hb_c4', 'hb_c5',
+  'ck1_a1', 'ck1_a2', 'ck1_a3', 'ck1_a4', 'ck1_a5', 'ck1_b1', 'ck1_b2', 'ck1_b3', 'ck1_b4', 'ck1_b5', 'ck1_c1', 'ck1_c2', 'ck1_c3', 'ck1_c4', 'ck1_c5',
+  'cf_a1', 'cf_a2', 'cf_a3', 'cf_a4', 'cf_a5', 'cf_b1', 'cf_b2', 'cf_b3', 'cf_b4', 'cf_b5', 'cf_c1', 'cf_c2', 'cf_c3', 'cf_c4', 'cf_c5',
+  'bs1_a1', 'bs1_a2', 'bs1_a3', 'bs1_a4', 'bs1_a5', 'bs1_b1', 'bs1_b2', 'bs1_b3', 'bs1_b4', 'bs1_b5', 'bs1_c1', 'bs1_c2', 'bs1_c3', 'bs1_c4', 'bs1_c5',
+  'en_a1', 'en_a2', 'en_a3', 'en_a4', 'en_a5', 'en_b1', 'en_b2', 'en_b3', 'en_b4', 'en_b5', 'en_c1', 'en_c2', 'en_c3', 'en_c4', 'en_c5',
+  'hd1_a1', 'hd1_a2', 'hd1_a3', 'hd1_a4', 'hd1_a5', 'hd1_b1', 'hd1_b2', 'hd1_b3', 'hd1_b4', 'hd1_b5', 'hd1_c1', 'hd1_c2', 'hd1_c3', 'hd1_c4', 'hd1_c5',
+  'ds_a1', 'ds_a2', 'ds_a3', 'ds_a4', 'ds_a5', 'ds_b1', 'ds_b2', 'ds_b3', 'ds_b4', 'ds_b5', 'ds_c1', 'ds_c2', 'ds_c3', 'ds_c4', 'ds_c5',
+  'ar1_a1', 'ar1_a2', 'ar1_a3', 'ar1_a4', 'ar1_a5', 'ar1_b1', 'ar1_b2', 'ar1_b3', 'ar1_b4', 'ar1_b5', 'ar1_c1', 'ar1_c2', 'ar1_c3', 'ar1_c4', 'ar1_c5',
+  'pt_a1', 'pt_a2', 'pt_a3', 'pt_a4', 'pt_a5', 'pt_b1', 'pt_b2', 'pt_b3', 'pt_b4', 'pt_b5', 'pt_c1', 'pt_c2', 'pt_c3', 'pt_c4', 'pt_c5',
+  'mu_a1', 'mu_a2', 'mu_a3', 'mu_a4', 'mu_a5', 'mu_b1', 'mu_b2', 'mu_b3', 'mu_b4', 'mu_b5', 'mu_c1', 'mu_c2', 'mu_c3', 'mu_c4', 'mu_c5',
+]);
 export function skillIcon(d, size = 48) {
   const k = d.id + size; if (iconCache.has(k)) return iconCache.get(k);
   if (SKILL_ART.has(d.id)) { const html = `<span class="icon i3d skic ${d.id.startsWith('nv_') ? 'skart' : 'skround'}" style="width:${size}px;height:${size}px;background:url(assets/ui/skills/${d.id}.png) center/contain no-repeat;image-rendering:auto"></span>`; iconCache.set(k, html); return html; }
