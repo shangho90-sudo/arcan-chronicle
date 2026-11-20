@@ -90,8 +90,14 @@
  "runway": {
   "provider": "runway eleven_text_to_sound_v2 · 2026-11-19부터 eleven 이 THROTTLED 로 밀리면 같은 프롬프트로 mirelo_sfx_2_0 — 소리마다 model (tools/audio/en_runway_sfx.py)",
   "generatedOn": "2026-11-19",
-  "creditsSpent": 31,
+  "creditsSpent": 43,
   "assets": {
+   "sfx_en_alarm.mp3": {
+    "prompt": "machine overload alarm, two short urgent red warning beeps with an engine revving up hard, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+    "duration": 1.0,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
    "sfx_en_assemble.mp3": {
     "prompt": "big robot mech assembling itself, heavy armor plates and legs clanking together in sequence, bolts tightening, hydraulic whirr, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
     "duration": 1.4,
@@ -108,6 +114,18 @@
     "prompt": "electromagnetic coil capacitor charging up, rising electric whine with crackling sparks, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
     "duration": 1.0,
     "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_en_core.mp3": {
+    "prompt": "small blue energy core flying into a device, soft magical whoosh ending in a bright chime click, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+    "duration": 0.6,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_en_craft.mp3": {
+    "prompt": "blueprint magic crafting, metal gun parts sliding and clicking together, a final satisfying lock and sparkling chime, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+    "duration": 1.4,
+    "date": "2026-11-20",
     "model": "runway mirelo_sfx_2_0"
    },
    "sfx_en_deploy.mp3": {
@@ -170,6 +188,12 @@
     "date": "2026-11-19",
     "model": "runway mirelo_sfx_2_0"
    },
+   "sfx_en_target.mp3": {
+    "prompt": "high tech targeting reticle locking on, quick rising digital beeps ending in a confirm tone, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+    "duration": 0.7,
+    "date": "2026-11-20",
+    "model": "runway mirelo_sfx_2_0"
+   },
    "sfx_en_vent.mp3": {
     "prompt": "cooling fins snapping open on a machine with a short burst of hot steam and a warning beep, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
     "duration": 0.7,
@@ -180,6 +204,12 @@
     "prompt": "small welding torch sparks sizzling and crackling, repair tool buzz, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
     "duration": 0.8,
     "date": "2026-11-19",
+    "model": "runway mirelo_sfx_2_0"
+   },
+   "sfx_en_whistle.mp3": {
+    "prompt": "orbital artillery shell falling from the sky, descending whistle with a faint electric hum, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+    "duration": 1.2,
+    "date": "2026-11-20",
     "model": "runway mirelo_sfx_2_0"
    },
    "sfx_en_zap.mp3": {

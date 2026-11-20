@@ -1,5 +1,5 @@
 {
- "spent": 31,
+ "spent": 43,
  "done": {
   "en_lock": {
    "prompt": "small mechanical device locking into place, two crisp metallic clicks and a tiny servo chirp, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
@@ -128,6 +128,46 @@
    "model": "mirelo_sfx_2_0",
    "date": "2026-11-19",
    "out": 0.52
+  },
+  "en_target": {
+   "prompt": "high tech targeting reticle locking on, quick rising digital beeps ending in a confirm tone, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+   "duration": 0.7,
+   "task": "f5fb300b-b52b-4029-a212-6be80c5a8b22",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 0.63
+  },
+  "en_whistle": {
+   "prompt": "orbital artillery shell falling from the sky, descending whistle with a faint electric hum, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+   "duration": 1.2,
+   "task": "a914b492-c9c9-4fe0-b630-b5f8405691d8",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 1.23
+  },
+  "en_core": {
+   "prompt": "small blue energy core flying into a device, soft magical whoosh ending in a bright chime click, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+   "duration": 0.6,
+   "task": "94e1041a-1096-4fe6-8ff1-d147e7f5f108",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 0.44
+  },
+  "en_alarm": {
+   "prompt": "machine overload alarm, two short urgent red warning beeps with an engine revving up hard, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+   "duration": 1.0,
+   "task": "d89d3923-b290-408b-9f49-40b6240e765c",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 1.04
+  },
+  "en_craft": {
+   "prompt": "blueprint magic crafting, metal gun parts sliding and clicking together, a final satisfying lock and sparkling chime, fantasy RPG magitech skill sound effect, clean, short, no music, no voice",
+   "duration": 1.4,
+   "task": "e08669ae-f25d-4240-a714-73b91d145597",
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20",
+   "out": 1.44
   }
  }
 }
