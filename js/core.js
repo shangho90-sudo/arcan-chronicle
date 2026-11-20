@@ -552,11 +552,16 @@ export class QuestLog {
     }
     return out;
   }
+  acceptAdvancementGuide() {
+    const id = this.ch.p.job === "novice" ? "q_job1" : "adv_guide_" + this.ch.p.job;
+    if (this.data.quests[id]) this.accept(id);
+  }
   emit(k, v) { for (const f of this.events[k]) f(v); }
   find(id) { return this.ch.p.quests.find(q => q.id === id); }
   stateOf(q) {
     const pr = this.find(q.id);
     if (pr) return pr.state === "completed" ? QS.Completed : (this.isDone(q, pr) ? QS.Completable : QS.Active);
+    if (q.guideJob && this.ch.p.job !== q.guideJob) return QS.Locked;
     if (this.ch.p.level < q.minLevel) return QS.Locked;
     if (q.jobReq) { const jr = this.data.job(q.jobReq); if (!jr || this.ch.p.job !== jr.parent) return QS.Locked; }
     for (const pre of q.prereq || []) { const pp = this.find(pre); if (!pp || pp.state !== "completed") return QS.Locked; }

@@ -9,13 +9,18 @@ const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 /** profile.sk schema (v1). Everything validated on load so a broken save never breaks the game. */
 export function ensureSk(p, data) {
   const sk = (p.sk && typeof p.sk === 'object') ? p.sk : {};
-  sk.v = 1;
+
   sk.points = Math.max(0, sk.points | 0);
   sk.granted = Array.isArray(sk.granted) ? sk.granted.filter(n => Number.isInteger(n) && n >= ADV1_LEVEL && n <= 99) : [];
   sk.adv2Bonus = !!sk.adv2Bonus;
   // 견습생 기본 검술: its own pool, 1 point per character level from Lv1 (kept through every job change)
   sk.npoints = Math.max(0, sk.npoints | 0);
   sk.ngranted = Array.isArray(sk.ngranted) ? sk.ngranted.filter(n => Number.isInteger(n) && n >= 1 && n <= 99) : [];
+  if (sk.v !== 2) {
+    sk.points += new Set(sk.granted.filter(level => level > ADV1_LEVEL)).size;
+    sk.npoints += new Set(sk.ngranted.filter(level => level > 1)).size;
+    sk.v = 2;
+  }
   sk.learned = (sk.learned && typeof sk.learned === 'object') ? sk.learned : {};
   for (const id of Object.keys(sk.learned)) {
     const d = data.skill2(id); const lv = sk.learned[id] | 0;
@@ -54,9 +59,9 @@ export class SkillBook {
   // ---------------------------------------------------------------- points (idempotent: every grant is recorded)
   grantPoints() {
     const sk = this.sk; let gained = 0;
-    for (let L = ADV1_LEVEL; L <= this.p.level; L++) if (!sk.granted.includes(L)) { sk.granted.push(L); const n = L === ADV1_LEVEL ? 5 : 1; sk.points += n; gained += n; }
+    for (let L = ADV1_LEVEL; L <= this.p.level; L++) if (!sk.granted.includes(L)) { sk.granted.push(L); const n = L === ADV1_LEVEL ? 5 : 2; sk.points += n; gained += n; }
     if (this.job && this.job.tier === 2 && !sk.adv2Bonus) { sk.adv2Bonus = true; sk.points += 5; gained += 5; }
-    for (let L = 1; L <= this.p.level; L++) if (!sk.ngranted.includes(L)) { sk.ngranted.push(L); sk.npoints += 1; this.ngained = (this.ngained || 0) + 1; }
+    for (let L = 1; L <= this.p.level; L++) if (!sk.ngranted.includes(L)) { sk.ngranted.push(L); const n = L === 1 ? 1 : 2; sk.npoints += n; this.ngained = (this.ngained || 0) + n; }
     return gained;
   }
   get spent() { return Object.entries(this.sk.learned).reduce((a, [id, b]) => a + (this.isNovice(this.data.skill2(id)) ? 0 : b), 0); }

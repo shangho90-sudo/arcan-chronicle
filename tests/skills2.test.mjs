@@ -41,10 +41,25 @@ const bad = sys.economyCheck(d, d.recipes); Eq(bad.length, 0, "no buy->craft->se
 let ch = make(9); Eq(ch.book.sk.points, 0, "no points before Lv10");
 ch = make(10); Eq(ch.book.sk.points, 5, "5 points at Lv10");
 ch.book.grantPoints(); Eq(ch.book.sk.points, 5, "no double grant");
-ch = make(15); Eq(ch.book.sk.points, 10, "5 + 1/level (Lv15 -> 10)");
+ch = make(15); Eq(ch.book.sk.points, 15, "5 + 2/level (Lv15 -> 15)");
 ch.p.job = "pharmacist"; ch.recalc();
-ch.p.job = "western_pharmacist"; ch.book.grantPoints(); Eq(ch.book.sk.points, 15, "2nd job +5 once");
-ch.book.grantPoints(); Eq(ch.book.sk.points, 15, "2nd job bonus not repeated");
+ch.p.job = "western_pharmacist"; ch.book.grantPoints(); Eq(ch.book.sk.points, 20, "2nd job +5 once");
+ch.book.grantPoints(); Eq(ch.book.sk.points, 20, "2nd job bonus not repeated");
+
+// Milestone guides survive reloads and branch selection is left to the player.
+{
+  const c = make(30, "pharmacist"), log = new QuestLog(d, c);
+  c.p.quests.push({id: "q_job1", state: "completed", counts: [1]});
+  c.p.level = 29; log.acceptAdvancementGuide();
+  Ok(!log.find("adv_guide_pharmacist"), "guide locked before 30");
+  c.p.level = 30; log.acceptAdvancementGuide(); log.acceptAdvancementGuide();
+  Eq(c.p.quests.filter(q => q.id.startsWith("adv_guide_")).length, 1, "one matching guide at 30");
+  Ok(!log.accept("adv_guide_artist"), "other lineage guide locked");
+  c.p.job = "herbalist"; log.autoComplete("job");
+  Ok(log.isCompleted("adv_guide_pharmacist"), "either pharmacist branch completes the guide");
+  const saved = JSON.parse(JSON.stringify(c.p)), reloaded = new CharacterSheet(d, saved);
+  Eq(reloaded.book.sk.points, c.book.sk.points + (c.book.sk.adv2Bonus ? 0 : 5), "no repeated level bonuses after reload");
+}
 
 // ---- learning rules
 ch = make(10); ch.p.job = "pharmacist"; ch.recalc();
@@ -172,7 +187,7 @@ Eq(p4.version, 4, "migrated to v4"); Eq(ch4.p.job, "cook", "legacy job kept"); E
   Ok(!d.recipes || !d.recipes.some || !d.recipes.some(r => r.id === "r_sp"), "활력제 recipe removed"); }
 // removed skills: points come back on load
 { const p6 = newProfile(d, "환불", "m"); p6.level = 20; p6.job = "pharmacist"; p6.sk = { points: 0, granted: [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], learned: { ph1_a1: 2, ph1_a2: 3, ph1_c3: 1, ph1_c5: 2 }, slots: ["ph1_a2", "ph1_a1", "", ""] };
-  const ch6 = new CharacterSheet(d, p6); Eq(ch6.book.sk.points, 6, "points of removed skills refunded"); Eq(ch6.book.level("ph1_a2"), 0, "removed skill dropped"); Eq(ch6.book.sk.slots[0], "", "removed skill unslotted"); Eq(ch6.book.level("ph1_a1"), 2, "kept skill kept"); }
+  const ch6 = new CharacterSheet(d, p6); Eq(ch6.book.sk.points, 16, "removed skills refunded plus ten historical level bonuses"); Eq(ch6.book.level("ph1_a2"), 0, "removed skill dropped"); Eq(ch6.book.sk.slots[0], "", "removed skill unslotted"); Eq(ch6.book.level("ph1_a1"), 2, "kept skill kept"); }
 // 약사 수련 passive stats, immunity, element resistance
 { const ch7 = make(20); ch7.p.job = "pharmacist"; ch7.recalc(); const sp0 = ch7.final.maxSp, ma0 = ch7.final.matk;
   Ok(ch7.book.learn("ph1_c9") == null, "learn 약사 수련"); ch7.recalc();

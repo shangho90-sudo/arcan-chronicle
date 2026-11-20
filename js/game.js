@@ -442,6 +442,7 @@ class Game {
     this.ui.close(false);
     this.profile = prof; this.sheet = new CharacterSheet(this.data, prof); this.quests = new QuestLog(this.data, this.sheet);
     this.wireEvents(); this.inWorld = true; this.ui.showGameplay(true);
+    this.quests.acceptAdvancementGuide();
     this.quests.autoComplete("load");       // 예전 저장: 이미 전직했는데 받아 둔 전직 퀘스트(core.js migrateArcanArc)
     const zone = this.data.zones[prof.zone] ? prof.zone : this.data.levels.startZone;
     // a brand-new character gets a one-time welcome notice after the area name (profile.ui.welcomed is saved)
@@ -456,6 +457,8 @@ class Game {
     S.events.levelUp.push(l => {
       ui.toast("레벨 업! Lv." + l); ui.toast("능력치 포인트 +3 (능력치 창: P 키 / 능력치 버튼)"); this.audio.sfx("levelup");
       if (this.player) { const p = this.player; if (this.reward) this.reward.levelUp(); else this.fx.play("levelup", { x: p.pos.x, y: p.pos.y + 0.8, z: p.pos.z }, 1.6); p.hp = p.maxHp; p.sp = p.maxSp; }
+      Q.acceptAdvancementGuide();
+      if (l === 10 && S.p.job === "novice" && !Q.find("q_job1")) ui.toast("1차 전직 준비 · 아르칸 서장 수확제 전야를 마치세요.");
       Q.refreshPassive(); this.autoSave();
     });
     S.events.skill.push(s => {
@@ -464,16 +467,16 @@ class Game {
       const d = this.data.skill(s); if (d) ui.toast("새 스킬 습득: " + d.name);
     });
     S.bag.onChange.push(() => { Q.refreshPassive(); ui.refresh(); });
-    S.events.job.push(() => { Q.refreshPassive(); this.audio.sfx('jobchange'); });
+    S.events.job.push(() => { Q.acceptAdvancementGuide(); Q.refreshPassive(); this.audio.sfx('jobchange'); });
     // quest progress is shown inside the quest window (check mark + highlight), not as centre notices
     this.qworld = new QuestWorld(this);
-    Q.events.accepted.push(() => { this.audio.sfx("quest"); ui.updateTracker(); if (this.zone) Q.notify("visit", this.zone.def.id, 1); this.qworld.sync(); });
+    Q.events.accepted.push(q => { if (q.guideJob || q.id === "q_job1") ui.toast("전직 퀘스트 시작 · " + q.name); this.audio.sfx("quest"); ui.updateTracker(); if (this.zone) Q.notify("visit", this.zone.def.id, 1); this.qworld.sync(); });
     Q.events.ready.push(q => {
       const pr = Q.find(q.id); if (pr) { if (pr._toasted) return; pr._toasted = true; pr._readyNotified = true; }
       this.audio.sfx("quest"); ui.updateTracker();
     });
     Q.events.updated.push(() => ui.updateTracker());
-    Q.events.completed.push(() => { this.audio.sfx("quest"); ui.updateTracker(); this.autoSave(); this.qworld.sync(); });
+    Q.events.completed.push(q => { if (q.id === "mq00h" || q.id === "q_job1") Q.acceptAdvancementGuide(); this.audio.sfx("quest"); ui.updateTracker(); this.autoSave(); this.qworld.sync(); });
     // 2026-11-19 전직 퀘스트(서장 「첫 전직」)는 전직하는 순간 바로 완료(core.js QuestLog.autoComplete): 보상 알림 + 전직 연출(3.6초)이
     // 끝난 뒤 다른 창이 없으면 완료 대사 장면. 가방이 가득하면 실패 안내 — 그때는 예전처럼 완료 NPC에게.
     Q.events.auto.push(({ q, err, why }) => {

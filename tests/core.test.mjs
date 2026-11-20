@@ -177,7 +177,7 @@ function TestLeveling() {
   Eq(gained, 40, "40 level ups from Lv10");
   Eq(levels, 40, "40 events");
   Eq(ch.p.exp, 0, "exp 0 at max");
-  Eq(ch.book.sk.points, 5 + 40, "points: 5 at Lv10 + 1 per level 11..50");
+  Eq(ch.book.sk.points, 5 + 80, "points: 5 at Lv10 + 2 per level 11..50");
   Eq(ch.addExp(500), 0, "no more levels");
   Ok(ch.final.maxHp > CharacterSheet.baseStats(d.job("cook"), 1).maxHp * 2, "hp grows with level");
   Eq(ch.p.hp, ch.final.maxHp, "level up restores hp");

@@ -120,7 +120,7 @@ Object.assign(UI.prototype, {
     const lineage = book.lineage;
     const b = this.open('skills', '스킬', 1700, 0);
     const head = $('div', 'skhead', b);
-    head.innerHTML = `<i class="fstar4"></i><b class="skjob">${job.name} <span>Lv<em>${p.sheet.p.level}</em></span></b> · 기본 검술 포인트 <em class="skpt">${sk.npoints}</em>` + (job.id !== 'novice' ? ` · 직업 스킬 포인트 <em class="skpt">${sk.points}</em> <span class="small muted">(사용 ${book.spent})</span>` : ` · <span class="sknote">레벨마다 1포인트 · 직업 스킬은 Lv${ADV1_LEVEL} 1차 전직 후</span>`) + '<i class="fline"></i>';
+    head.innerHTML = `<i class="fstar4"></i><b class="skjob">${job.name} <span>Lv<em>${p.sheet.p.level}</em></span></b> · 기본 검술 포인트 <em class="skpt">${sk.npoints}</em>` + (job.id !== 'novice' ? ` · 직업 스킬 포인트 <em class="skpt">${sk.points}</em> <span class="small muted">(사용 ${book.spent})</span>` : ` · <span class="sknote">레벨업마다 2포인트 · 직업 스킬은 Lv${ADV1_LEVEL} 1차 전직 후</span>`) + '<i class="fline"></i>';
     if (!lineage.length) { $('div', 'skempty', b, `<p>견습생은 레벨 ${ADV1_LEVEL}에 1차 전직을 하면 스킬을 배울 수 있습니다.</p>`); this.slotBar(b); return; }
     const tabs = $('div', 'sktabs', head);
     const show = tabJob && lineage.includes(tabJob) ? tabJob : lineage[lineage.length - 1];

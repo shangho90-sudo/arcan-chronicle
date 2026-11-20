@@ -291,7 +291,7 @@ const marks = (m) => (m._marks ? m._marks.reaction : 0);
   p0.sk = { v: 1, points: 7, granted: [], learned: { wp_a1: 4, wp_a2: 3, wp_a3: 2, wp_b1: 2, wp_b2: 5, wp_b3: 3, wp_b4: 1, wp_a5: 1, wp_c1: 2, wp_c2: 1, wp_c3: 4, wp_c5: 1 }, slots: ['wp_b1', 'wp_b3', 'wp_a2', 'wp_c3'], cds: {}, npoints: 3, ngranted: Array.from({ length: 45 }, (_, i) => i + 1), adv2Bonus: true, ult: '', res: {}, dye: {} };
   p0.sk.granted = Array.from({ length: 36 }, (_, i) => i + 10);   // 이미 받은 레벨 포인트(예전 저장처럼) — 불러와도 새로 주지 않음
   const learned = JSON.stringify(p0.sk.learned); const ch = new CharacterSheet(data, migrate(JSON.parse(JSON.stringify(p0))));
-  ok(JSON.stringify(ch.book.sk.learned) === learned && ch.book.sk.slots.join() === 'wp_b1,wp_b3,wp_a2,wp_c3' && ch.book.sk.points === 7 && ch.book.sk.npoints === 3, 'old save: learned levels + points + slots unchanged (old catalyst/cryo/spray slots now hold 이중정/발포정/붕대 릴)');
+  ok(JSON.stringify(ch.book.sk.learned) === learned && ch.book.sk.slots.join() === 'wp_b1,wp_b3,wp_a2,wp_c3' && ch.book.sk.points === 42 && ch.book.sk.npoints === 47, 'old save: learned levels and slots retained, historical points credited (old catalyst/cryo/spray slots now hold 이중정/발포정/붕대 릴)');
   ok(ch.book.usable('wp_c1') && ch.book.usable('wp_c2') && SK.wp_c1.recipes.includes('r_potion_l'), 'old craft learners keep the recipes (same skill ids)');
   const sys = await import('../js/skillsys.js'); const rc = data.recipes.find(r => r.id === 'r_potion_l');
   ch.bag.add('m_herb', 4); ch.bag.add('m_bottle', 1); ch.bag.add('m_wolf_fang', 1); const r = sys.craft(data, ch, ch.book, rc, 1, () => 0.0);
