@@ -1,4 +1,113 @@
 {
- "spent": 0,
- "done": {}
+ "spent": 38,
+ "done": {
+  "pt_sketch": {
+   "task": "ddbcce8d-fe9f-401d-9d79-0d3aab9ccaf9",
+   "duration": 0.8,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20"
+  },
+  "pt_brush": {
+   "task": "1e020000-e171-46bc-97c2-cb4650ae2f81",
+   "duration": 0.6,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20"
+  },
+  "pt_wash": {
+   "task": "6bdf2f8d-b56b-41d5-8b1c-0e51c485d2b0",
+   "duration": 1.0,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20"
+  },
+  "pt_dot": {
+   "task": "e9d95691-e614-4f20-a068-09f763b611b3",
+   "duration": 0.5,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20"
+  },
+  "pt_mix": {
+   "task": "7389eb26-6ca1-42e8-beb4-288fb6ef5e19",
+   "duration": 1.0,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20"
+  },
+  "pt_ink": {
+   "task": "b6c51655-f988-476b-af41-b0086a01ac53",
+   "duration": 1.0,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20"
+  },
+  "pt_frame": {
+   "task": "2d4a7cbc-4672-4cf7-bb05-c042dfc5378c",
+   "duration": 1.2,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20"
+  },
+  "pt_fold": {
+   "task": "b0746afd-0059-4f52-948c-65979ed7f924",
+   "duration": 0.6,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20"
+  },
+  "pt_bolt": {
+   "task": "bc3afbb7-06d6-4a54-bc53-8028465ae343",
+   "duration": 1.0,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20"
+  },
+  "pt_bite": {
+   "task": "d7d81222-1170-4a85-aa97-d77939e1e44f",
+   "duration": 0.5,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20"
+  },
+  "pt_sigil": {
+   "task": "c219334c-12e8-43a8-9c32-f229971343ee",
+   "duration": 1.2,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20"
+  },
+  "pt_twinkle": {
+   "task": "c19b9448-f042-49b7-9c65-396e43cdaa0a",
+   "duration": 0.6,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20"
+  },
+  "pt_howl": {
+   "task": "91929a53-53f3-4fae-b94e-cdc3996cfcd6",
+   "duration": 1.2,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20"
+  },
+  "pt_roar": {
+   "task": "cd431397-800a-4404-b5ce-a1c07fd872c1",
+   "duration": 1.4,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20"
+  },
+  "pt_flap": {
+   "task": "9427a862-3845-4c1c-989a-56f4c7626492",
+   "duration": 0.6,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20"
+  },
+  "pt_clank": {
+   "task": "696592b1-7e61-4afe-8c88-357ffa482cb4",
+   "duration": 0.8,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20"
+  },
+  "pt_splash": {
+   "task": "26e82c05-784b-499c-94e8-002ea1ff89e7",
+   "duration": 0.6,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20"
+  },
+  "pt_bloom": {
+   "task": "1047df7a-5f84-43f6-983d-56795f0c92c4",
+   "duration": 1.0,
+   "model": "mirelo_sfx_2_0",
+   "date": "2026-11-20"
+  }
+ }
 }

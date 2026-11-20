@@ -1,28 +1,136 @@
 {
- "note": "2026-11-17 fx2: Runway eleven_text_to_sound_v2 로 다시 만듦(예전 합성 10개를 같은 이름으로 대체 + 그림용 8개). 아직 못 만든 것은 synthesized 에 — tools/audio/painter_sfx.py 합성음(예전 10개는 --force 일 때만 다시 씀).",
+ "note": "2026-11-17 fx2: Runway eleven_text_to_sound_v2 로 다시 만듦(예전 합성 10개를 같은 이름으로 대체 + 그림용 8개). 2026-11-19 eleven 이 THROTTLED 로 밀려 같은 프롬프트로 mirelo_sfx_2_0(2 크레딧/초) — 소리마다 model 항목. 아직 못 만든 것은 synthesized 에 — tools/audio/painter_sfx.py 합성음(예전 10개는 --force 일 때만 다시 씀).",
  "model": "runway eleven_text_to_sound_v2",
  "tool": "tools/audio/painter_runway_sfx.py",
  "post": "ffmpeg trim / loudnorm -16 LUFS / mono mp3 96k",
- "spentCredits": 0,
- "synthesized": {
-  "sfx_pt_sketch": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
-  "sfx_pt_brush": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
-  "sfx_pt_wash": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
-  "sfx_pt_dot": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
-  "sfx_pt_mix": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
-  "sfx_pt_ink": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
-  "sfx_pt_frame": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
-  "sfx_pt_fold": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
-  "sfx_pt_bolt": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
-  "sfx_pt_bite": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
-  "sfx_pt_sigil": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
-  "sfx_pt_twinkle": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
-  "sfx_pt_howl": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
-  "sfx_pt_roar": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
-  "sfx_pt_flap": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
-  "sfx_pt_clank": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
-  "sfx_pt_splash": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)",
-  "sfx_pt_bloom": "tools/audio/painter_sfx.py 합성(2026-11-17 Runway 일일 작업 한도로 아직 대체 못 함 — --run 으로 이어받으면 대체됨)"
- },
- "sounds": {}
+ "spentCredits": 38,
+ "synthesized": {},
+ "sounds": {
+  "sfx_pt_sketch": {
+   "prompt": "quick pencil sketching scratches and paper rustle on a canvas, rising into a soft magical shimmer, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.8,
+   "use": "그림 소환물·궁극기 시전(밑그림)",
+   "date": "2026-11-20",
+   "model": "runway mirelo_sfx_2_0"
+  },
+  "sfx_pt_brush": {
+   "prompt": "thick wet oil paint brush sweeping hard, juicy heavy paint smear swoosh with a bright sparkle at the end, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.6,
+   "use": "B1 임파스토·기사 베기",
+   "date": "2026-11-20",
+   "model": "runway mirelo_sfx_2_0"
+  },
+  "sfx_pt_wash": {
+   "prompt": "magical watercolor wave rushing forward, flowing water surge and splash with a bright glittering shimmer, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 1.0,
+   "use": "B2 워터컬러·풍경 그리기",
+   "date": "2026-11-20",
+   "model": "runway mirelo_sfx_2_0"
+  },
+  "sfx_pt_dot": {
+   "prompt": "tiny bright magical paint dot pop, cute soft plink with a little sparkle, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.5,
+   "use": "B3 점묘 점 터짐",
+   "date": "2026-11-20",
+   "model": "runway mirelo_sfx_2_0"
+  },
+  "sfx_pt_mix": {
+   "prompt": "swirling paint mixing gooey squelch blooming into a bright magical chord and sparkle burst, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 1.0,
+   "use": "B4 팔레트 퓨전·B5 스펙트럼",
+   "date": "2026-11-20",
+   "model": "runway mirelo_sfx_2_0"
+  },
+  "sfx_pt_ink": {
+   "prompt": "black ink explosion splash, deep wet splat with a dark magical whoosh burst, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 1.0,
+   "use": "A5 숨결·B3 마무리·A5 출발",
+   "date": "2026-11-20",
+   "model": "runway mirelo_sfx_2_0"
+  },
+  "sfx_pt_frame": {
+   "prompt": "ornate golden picture frame appearing, wooden knock followed by a warm magical golden chime swell, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 1.2,
+   "use": "C5 만상갤러리",
+   "date": "2026-11-20",
+   "model": "runway mirelo_sfx_2_0"
+  },
+  "sfx_pt_fold": {
+   "prompt": "origami paper folding, crisp paper flaps and folds with a light magical sparkle, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.6,
+   "use": "A2 종이학·C2 성벽 접힘",
+   "date": "2026-11-20",
+   "model": "runway mirelo_sfx_2_0"
+  },
+  "sfx_pt_bolt": {
+   "prompt": "magical lightning bolt strike, sharp electric crack with a short thunder rumble, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 1.0,
+   "use": "C3 번개",
+   "date": "2026-11-20",
+   "model": "runway mirelo_sfx_2_0"
+  },
+  "sfx_pt_bite": {
+   "prompt": "ink spirit wolf bite snap, quick fierce chomp with a wet ink splat, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.5,
+   "use": "흑랑 물기·용 관통",
+   "date": "2026-11-20",
+   "model": "runway mirelo_sfx_2_0"
+  },
+  "sfx_pt_sigil": {
+   "prompt": "colourful magic circle appearing on the ground, rising shimmering chime swell with a soft paint swirl, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 1.2,
+   "use": "시전 마법진(그림)",
+   "date": "2026-11-20",
+   "model": "runway mirelo_sfx_2_0"
+  },
+  "sfx_pt_twinkle": {
+   "prompt": "little cluster of twinkling star sparkles, light magical glitter chime, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.6,
+   "use": "잔광 별(그림)",
+   "date": "2026-11-20",
+   "model": "runway mirelo_sfx_2_0"
+  },
+  "sfx_pt_howl": {
+   "prompt": "magical ink spirit wolf howl, short fierce animal howl with an ethereal echo, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 1.2,
+   "use": "흑랑 완성(그림)",
+   "date": "2026-11-20",
+   "model": "runway mirelo_sfx_2_0"
+  },
+  "sfx_pt_roar": {
+   "prompt": "oriental dragon roar, powerful mystical dragon growl with rushing wind whoosh, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 1.4,
+   "use": "A5 용 출발(그림)",
+   "date": "2026-11-20",
+   "model": "runway mirelo_sfx_2_0"
+  },
+  "sfx_pt_flap": {
+   "prompt": "flock of paper cranes flapping wings, soft fluttering paper whoosh, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.6,
+   "use": "A2 학 날개·급강하(그림)",
+   "date": "2026-11-20",
+   "model": "runway mirelo_sfx_2_0"
+  },
+  "sfx_pt_clank": {
+   "prompt": "chubby armored knight stepping out of a painting, metal armor clank with a short heroic magical chime, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.8,
+   "use": "A3 기사 완성(그림)",
+   "date": "2026-11-20",
+   "model": "runway mirelo_sfx_2_0"
+  },
+  "sfx_pt_splash": {
+   "prompt": "watery paint splash hitting a target, bright liquid splat with tiny droplets, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 0.6,
+   "use": "B2 파도 명중(그림)",
+   "date": "2026-11-20",
+   "model": "runway mirelo_sfx_2_0"
+  },
+  "sfx_pt_bloom": {
+   "prompt": "flowers blooming magically, soft rising sparkling chimes with a gentle petal whoosh, bright fantasy RPG skill sound effect, clean, short, no music, no voice, no speech",
+   "duration": 1.0,
+   "use": "C1 꽃의 들판(그림)",
+   "date": "2026-11-20",
+   "model": "runway mirelo_sfx_2_0"
+  }
+ }
 }
