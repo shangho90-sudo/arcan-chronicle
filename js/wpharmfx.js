@@ -145,8 +145,8 @@ void main(){ vec2 p = vUv * 2. - 1.; float r = length(p); if (r > 1.) discard;
   for (int k = 0; k < 2; k++) { float s = k == 0 ? 9. : 17.; vec2 q = p * s + float(k) * 3.7, ci = floor(q), f = fract(q) - .5; float h = h21(ci + float(k) * 13.), ph = fract(h * 7.1 + uT * (.35 + .4 * h));
     float rad = .14 + .3 * h * sin(ph * 3.1416); vec2 o = (vec2(h, fract(h * 9.3)) - .5) * .35; float d = length(f - o);
     float ring = smoothstep(rad, rad - .06, d) - smoothstep(rad - .07, rad - .15, d) * .6; a = max(a, ring * (k == 0 ? .7 : .5)); }
-  float fill = .22 + .2 * smoothstep(.2, 1., r), rim = smoothstep(.04, 0., abs(r - uP + .03)) * .55;
-  c = mix(vec3(.55, .82, .98), c, .65 + .35 * a); gl_FragColor = vec4(c, (fill + a * .6 + rim) * edge * uA); }`;
+  float fill = .3 + .2 * smoothstep(.2, 1., r), rim = smoothstep(.05, 0., abs(r - uP + .03)) * .75;
+  c = mix(vec3(.42, .72, .95), c, .45 + .55 * a); gl_FragColor = vec4(c, (fill + a * .6 + rim) * edge * uA); }`;
 
 /** 한 종류의 입자 묶음 = InstancedMesh 하나. 입자: 위치·속도·중력·끌림·땅·회전·크기(시작→끝)·색·알파·자체 빛, 수명 동안 페이드 */
 class Parts {
@@ -808,7 +808,7 @@ export class WpFx extends CookFx {
     const sig = this.circle(at, 0.85, { col: [C.white, C.mint, C.gold], v: 0, hold: true, draw: 0.25, out: 0.35, spin: 0.8, a: 0.75, glowA: 0.45 });
     const ring = this.circle(at, r, { col: [C.white, C.tealB, C.gold], v: 2, hold: true, draw: 0.35, out: 0.35, spin: 0.25, a: 0.22, glowA: 0.12 });
     this.emit('glint', at.clone().setY(at.y + 0.3), 8, { col: [C.mint, C.white], spread: 0.4, speed: [0.2, 0.6], up: [0.6, 1.4], size: [0.14, 0.22], life: [0.4, 0.6], g: 0 });
-    const S = 0.42, P = [];
+    const S = 0.55, P = [];
     const e = this._fx('kit', (o.dur || 10) + 2, (e, dt) => {
       const t = e.t, pop = easeOut(smooth(0, 0.16, t)) * (1 + 0.15 * Math.sin(Math.min(1, t / 0.3) * Math.PI)), ck = closeT >= 0 ? clamp01((t - closeT) / 0.55) : 0;
       if (closeT >= 0 && ck >= 1) { e.t = e.life; return; }
